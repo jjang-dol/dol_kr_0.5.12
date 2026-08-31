@@ -1,0 +1,1451 @@
+:: Widgets children [widget]
+/*args[0] - filter in the form of an object ({location, donor, excludeUnhatched: true to also exclude unhatched eggs})
+args[1] - "both" to include unrelated children or "only" to exclude the player children
+Results are ordered by birth, so _childrenIds.last() is the newest birth. Unhatched eggs come first.*/
+<<widget "getChildrenIds">>
+	<<set _childrenIds to []>>
+	<<if _args[0]>>
+		<<run Object.keys(_args[0]).forEach(key => {
+			if (key !== "location" and key !== "donor" and key !== "excludeUnhatched") {
+				throw new Error(`getChildrenIds: unsupported filter key "${key}", only "location", "donor" and "excludeUnhatched" are supported`);
+			}
+		})>>
+	<</if>>
+	<<run getBornChildren().forEach(child => {
+		const pregnancy = getPregnancyOf(child);
+		if ((pregnancy.carrier === "pc" || pregnancy.donor === "pc") && _args[1] === "only") {
+			return;
+		} else if ((pregnancy.carrier !== "pc" && pregnancy.donor !== "pc") and !_args[1]) {
+			return;
+		}
+		if (T.args[0] && T.args[0].location !== undefined && child.development.location !== T.args[0].location) {
+			return;
+		}
+		if (T.args[0] && T.args[0].donor !== undefined && pregnancy.donor !== T.args[0].donor) {
+			return;
+		}
+		if (T.args[0] && T.args[0].excludeUnhatched && childIsUnhatchedEgg(child)) {
+			return;
+		}
+		if (child.childId !== undefined) T.childrenIds.push(child.childId);
+	})>>
+	<<run T.childrenIds.sort((a, b) => (V.childRecords[a].bornDate ?? 0) - (V.childRecords[b].bornDate ?? 0))>>
+<</widget>>
+
+/*args[0] - location, args[1] - min length requirement, args[2] - max length requirement,
+args[3] - "both" to include unrelated children or "only" to exclude the player children
+Groups littermates by pregnancyId.*/
+<<widget "getSameBirthChildrenIds">>
+	<<set _birthChildrenIds to {}>>
+	<<run getBornChildren().forEach(child => {
+		const pregnancy = getPregnancyOf(child);
+		if (pregnancy.carrier !== "pc" && pregnancy.donor !== "pc") {
+			if (T.args[3] !== "both" && T.args[3] !== "only") return;
+		} else if (T.args[3] === "only") {
+			return;
+		}
+		if (childIsUnhatchedEgg(child)) return;
+		if (T.args[0] !== undefined && child.development.location !== T.args[0]) return;
+		if (T.birthChildrenIds[child.pregnancyId] === undefined) T.birthChildrenIds[child.pregnancyId] = [];
+		T.birthChildrenIds[child.pregnancyId].push(child.childId);
+	})>>
+	<<if _args[1]>>
+		<<for $_label, $_value range _birthChildrenIds>>
+			<<if $_value.length lt _args[1] or $_value.length gt _args[2]>>
+				<<run delete _birthChildrenIds[$_label]>>
+			<</if>>
+		<</for>>
+	<</if>>
+<</widget>>
+
+/*args[0] - childId, args[1] - new name*/
+<<widget "childRename">>
+	<<if _args[0] isnot undefined>>
+		<<set $childRecords[_args[0]].name to generateBabyName(_args[1], $childRecords[_args[0]].gender, _args[0])>>
+	<</if>>
+<</widget>>
+
+/*args[0] - childId, args[1] - set to display specific text output*/
+<<widget "childAge">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set _childTotalDaysRaw to childAgeOf($childRecords[_args[0]])>>
+		<<switch $childRecords[_args[0]].species>>
+			<<case "human" "wolf" "hawk">><<set _childTotalDaysCap to 200>>
+			<<default>><<set _childTotalDaysCap to 0>>
+		<</switch>>
+		<<set _childTotalDays to Math.clamp(_childTotalDaysRaw, 0, _childTotalDaysCap)>>
+		<<set _childYears to Math.floor(_childTotalDays / 360)>>
+		<<set _childDays to Math.floor(_childTotalDays % 360)>>
+		<<switch _args[1]>>
+			<<case "full">>
+				<<set $_text_output to _childYears + " year" + (_childYears isnot 1 ? "s, " : ", ") + _childDays + " day" + (_childDays isnot 1 ? "s " : " ") + "old">>
+			<<case "year">>
+				<<set $_text_output to _childYears + " year" + (_childYears isnot 1 ? "s" : "")>>
+			<<case "day">>
+				<<set $_text_output to _childDays + " day" + (_childDays isnot 1 ? "s" : " ")>>
+			<<case "totalDays">>
+				<<set $_text_output to _childTotalDays>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><<if _childTotalDaysCap is _childTotalDays>> <mouse class="tooltip linkBlue">(Capped)<span>Reached end of current child activity content.</span></mouse><</if>><</if>><</widget>>
+
+/*:: Widgets children2 [widget]*/
+
+/*args[0] - childId*/
+<<widget "childSelect">>
+	<<if _args[0] isnot undefined>>
+		<<set $childSelected to $childRecords[_args[0]]>>
+		<<if $childRecords[_args[0]].species isnot "human" and $childRecords[_args[0]].features.monster is "monster">>
+			<<set $cmonster to 1>>
+		<<else>>
+			<<set $cmonster to 0>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+/*args[0] - childId*/
+<<widget "childname">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<set $_text_output to $childRecords[$_id].name>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId in an array*/
+<<widget "childrenNames">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_text_output to "">>
+		<<for $_i to 0; $_i lt _args[0].length; $_i++>>
+			<<set $_text_output += $childRecords[_args[0][$_i]].name>>
+			<<if $_i is _args[0].length - 1>>
+			<<elseif $_i is _args[0].length - 2>>
+				<<set $_text_output += " and ">>
+			<<else>>
+				<<set $_text_output += ", ">>
+			<</if>>
+		<</for>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId in an array*/
+<<widget "childInteratedWith">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<set $_development to $childRecords[$_id].development>>
+		<<if $_development.interactionsTotal is undefined>>
+			<<set $_development.interactionsTotal to 0>>
+			<<set $_development.interactions to 0>>
+		<</if>>
+		<<set $_development.interactionsTotal++>>
+		<<if $daily.childInteractions is undefined>><<set $daily.childInteractions to []>><</if>>
+		<<if !$daily.childInteractions.includes($_id)>>
+			<<set $_development.interactions++>>
+			<<run $daily.childInteractions.push($_id)>>
+		<</if>>
+		<<set $pregnancyStats.childInteractions++>>
+		<<if $location is "home">><<set $pregnancyStats.orphanageInteractions++>><</if>>
+	<</if>>
+<</silently>><</widget>>
+
+/*Currently herm children default to she pronouns.*/
+
+/*args[0] - childId*/
+<<widget "childHe">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "He">>
+			<<case "f" "h">><<set $_text_output to "She">>
+			<<case "h">><<set $_text_output to "They">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhe">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "he">>
+			<<case "f" "h">><<set $_text_output to "she">>
+			<<case "h">><<set $_text_output to "they">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childHis">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "His">>
+			<<case "f" "h">><<set $_text_output to "Her">>
+			<<case "h">><<set $_text_output to "Their">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhis">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "his">>
+			<<case "f" "h">><<set $_text_output to "her">>
+			<<case "h">><<set $_text_output to "their">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childHim">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "Him">>
+			<<case "f" "h">><<set $_text_output to "Her">>
+			<<case "h">><<set $_text_output to "Them">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhim">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "him">>
+			<<case "f" "h">><<set $_text_output to "her">>
+			<<case "h">><<set $_text_output to "them">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+<<widget "childhimself">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "himself">>
+			<<case "f" "h">><<set $_text_output to "herself">>
+			<<case "h">><<set $_text_output to "themselves">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childHers">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "His">>
+			<<case "f" "h">><<set $_text_output to "Hers">>
+			<<case "h">><<set $_text_output to "Theirs">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhers">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "his">>
+			<<case "f" "h">><<set $_text_output to "hers">>
+			<<case "h">><<set $_text_output to "theirs">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childherself">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "himself">>
+			<<case "f" "h">><<set $_text_output to "herself">>
+			<<case "h">><<set $_text_output to "themself">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childsibling">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "brother">>
+			<<case "f">><<set $_text_output to "sister">>
+			<<case "h">><<set $_text_output to "sibling">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args - childId for each argument, OR one array argument with childIds */
+<<widget "childsiblings">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_brothers to 0>><<set $_sisters to 0>>
+		<<if typeof _args[0] is "object">>
+			<<for $_i to 0; $_i lt _args[0].length; $_i++>>
+				<<switch $childRecords[_args[0][$_i]].gender>>
+					<<case "m">><<set $_brothers++>>
+					<<case "f" "h">><<set $_sisters++>>
+				<</switch>>
+			<</for>>
+		<<else>>
+			<<for $_i to 0; $_i lt _args.length; $_i++>>
+				<<switch $childRecords[_args[$_i]].gender>>
+					<<case "m">><<set $_brothers++>>
+					<<case "f" "h">><<set $_sisters++>>
+				<</switch>>
+			<</for>>
+		<</if>>
+		<<set $_text_output to "">>
+		<<if $_brothers gte 1>>
+			<<set $_text_output += "brother">>
+			<<if $_brothers gte 2>>
+				<<set $_text_output += "s">>
+			<</if>>
+		<</if>>
+		<<if $_brothers gte 1 and $_sisters gte 1>>
+			<<set $_text_output += " and ">>
+		<</if>>
+		<<if $_sisters gte 1>>
+			<<set $_text_output += "sister">>
+			<<if $_sisters gte 2>>
+				<<set $_text_output += "s">>
+			<</if>>
+		<</if>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childson">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].gender>>
+			<<case "m">><<set $_text_output to "son">>
+			<<case "f">><<set $_text_output to "daughter">>
+			<<case "h">><<set $_text_output to "child">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args - childId for each argument, OR one array argument with childIds */
+<<widget "childsons">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_sons to 0>><<set $_daughters to 0>>
+		<<if typeof _args[0] is "object">>
+			<<for $_i to 0; $_i lt _args[0].length; $_i++>>
+				<<switch $childRecords[_args[0][$_i]].gender>>
+					<<case "m">><<set $_sons++>>
+					<<case "f" "h">><<set $_daughters++>>
+				<</switch>>
+			<</for>>
+		<<else>>
+			<<for $_i to 0; $_i lt _args.length; $_i++>>
+				<<switch $childRecords[_args[$_i]].gender>>
+					<<case "m">><<set $_sons++>>
+					<<case "f" "h">><<set $_daughters++>>
+				<</switch>>
+			<</for>>
+		<</if>>
+		<<set $_text_output to "">>
+		<<if $_sons gte 1>>
+			<<set $_text_output += "son">>
+			<<if $_sons gte 2>>
+				<<set $_text_output += "s">>
+			<</if>>
+		<</if>>
+		<<if $_sons gte 1 and $_daughters gte 1>>
+			<<set $_text_output += " and ">>
+		<</if>>
+		<<if $_daughters gte 1>>
+			<<set $_text_output += "daughter">>
+			<<if $_daughters gte 2>>
+				<<set $_text_output += "s">>
+			<</if>>
+		<</if>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhand">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "hand">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "paw">>
+			<<case "hawk">><<set $_text_output to ($childRecords[$_id].features.monster is "monster" ? "hand" : "wing")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhands">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "hands">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "paws">>
+			<<case "hawk">><<set $_text_output to ($childRecords[$_id].features.monster is "monster" ? "hands" : "wings")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+<<widget "childfeet">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "feet">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "paws">>
+			<<case "hawk">><<set $_text_output to ($childRecords[$_id].features.monster is "monster" ? "feet" : "legs")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+<<widget "childtoes">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "toes">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "pads">>
+			<<case "hawk">><<set $_text_output to ($childRecords[$_id].features.monster is "monster" ? "toes" : "talons")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+<<widget "childfinger">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "finger">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "claw">>
+			<<case "hawk">><<set $_text_output to ($childRecords[$_id].features.monster is "monster" ? "finger" : "wing")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childgiggles">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set _id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set _id to $childSelected.childId>>
+	<</if>>
+	<<if _id isnot undefined>>
+		<<switch $childRecords[_id].species>>
+			<<case "human">><<set $_text_output to "giggles">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "wags <<childhis _id>> tail">>
+			<<case "hawk">><<set $_text_output to ($childRecords[_id].features.monster is "monster" ? "giggles" : "ruffles <<childhis _id>> feathers")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childhair">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "hair">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "fur">>
+			<<case "hawk">><<set $_text_output to "feathers">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - cry type, args[1] - childId */
+<<widget "childcry">><<silently>>
+	<<if _args[1] isnot undefined>>
+		<<set $_id to _args[1]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<if between(_args[0], 1, 4)>>
+			<<set $_cry to _args[0]>>
+		<<else>>
+			<<set $_cry to 1>>
+		<</if>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">>
+				<<switch $_cry>>
+					<<case 1>><<set $_text_output to "sniffling">>
+					<<case 2>><<set $_text_output to "weeping">>
+					<<case 3>><<set $_text_output to "sobbing">>
+					<<case 4>><<set $_text_output to "wailing">>
+				<</switch>>
+			<<case "wolf" "wolfboy" "wolfgirl">>
+				<<switch $_cry>>
+					<<case 1>><<set $_text_output to "whining">>
+					<<case 2>><<set $_text_output to "whimpering">>
+					<<case 3>><<set $_text_output to "crying">>
+					<<case 4>><<set $_text_output to "howling">>
+				<</switch>>
+			<<case "hawk">>
+				<<switch $_cry>>
+					<<case 1>><<set $_text_output to "chirping">>
+					<<case 2>><<set $_text_output to "warbling">>
+					<<case 3>><<set $_text_output to "trilling">>
+					<<case 4>><<set $_text_output to "lilting">>
+				<</switch>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId*/
+<<widget "childtype">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined>>
+		<<switch $childRecords[$_id].species>>
+			<<case "human">><<set $_text_output to "child">>
+			<<case "wolf" "wolfboy" "wolfgirl">><<set $_text_output to "pup">>
+			<<case "hawk">><<set $_text_output to ($childRecords[$_id].features.monster is "monster" ? "nestling" : "chick")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - child object*/
+<<widget "childTypeDisplay">><<silently>>
+	<<if _args[0] and _args[0].childId isnot undefined>>
+		<<if !(_args[0].species is "wolf" && _args[0].features.monster && _args[0].gender isnot "h")>>
+			<<switch _args[0].gender>>
+				<<case "m">><<set $_text_output to "Male ">>
+				<<case "f">><<set $_text_output to "Female ">>
+				<<case "h">><<set $_text_output to "Hermaphrodite ">>
+			<</switch>>
+		<<else>>
+			<<set $_text_output to "">>
+		<</if>>
+		<<if _args[0].species isnot "human">>
+			<<if _args[0].features.monster>>
+				<<switch _args[0].species>>
+					<<case "wolf">>
+						<<set $_text_output += "Wolf">>
+						<<switch _args[0].gender>>
+							<<case "m">><<set $_text_output += "boy">>
+							<<case "f">><<set $_text_output += "girl">>
+							<<default>><<set $_text_output += "kid">>
+						<</switch>>
+					<<case "hawk">>
+						<<set $_text_output += "Harpy">>
+				<</switch>>
+			<<else>>
+				<<set $_text_output += _args[0].species.toUpperFirst()>>
+			<</if>>
+		<<else>>
+			<<set $_text_output += "Human<<if _args[0].features.beastTransform or _args[0].features.divineTransform>> (<<childTransform _args[0]>>)<</if>>">>
+		<</if>>
+	<</if>>
+<</silently>><<if $_text_output>><span class="gold">Type:</span> <<print $_text_output>><</if>>
+<</widget>>
+
+<<widget "childTransform">><<silently>>
+	<<if _args[0] and _args[0].childId isnot undefined>>
+		<<set $_child to _args[0]>>
+	<<elseif _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+		<<set $_child to $childRecords[$_id]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+		<<set $_child to $childRecords[$_id]>>
+	<</if>>
+	<<if $_child isnot undefined>>
+		<<set $_text_output to "">>
+		<<switch $_child.features.divineTransform>>
+			<<case "angel">><<set $_text_output += "Angelic">>
+			<<case "demon">><<set $_text_output += "Demonic">>
+			<<case "fallen">><<set $_text_output += "Fallen">>
+		<</switch>>
+		<<if $_child.features.divineTransform and $_child.features.beastTransform>><<set $_text_output += " ">><</if>>
+		<<switch $_child.features.beastTransform>>
+			<<case "cat">><<set $_text_output += "Cat" + ($_child.gender === "m" ? "boy" : "girl")>>
+			<<case "cow">><<set $_text_output += "Cow" + ($_child.gender === "m" ? "boy" : "girl")>>
+			<<case "wolf">><<set $_text_output += "Wolf" + ($_child.gender === "m" ? "boy" : "girl")>>
+			<<case "bird">><<set $_text_output += "Bird" + ($_child.gender === "m" ? "boy" : "girl")>>
+			<<case "fox">><<set $_text_output += "Fox" + ($_child.gender === "m" ? "boy" : "girl")>>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - childId, args[1] - word*/
+<<widget "childFirstWord">><<silently>>
+	<<if _args[0] isnot undefined>>
+		<<set $_id to _args[0]>>
+	<<elseif $childSelected isnot undefined>>
+		<<set $_id to $childSelected.childId>>
+	<</if>>
+	<<if $_id isnot undefined and $childRecords[$_id].development.firstWord>>
+		<<set $_text_output to $childRecords[$_id].development.firstWord>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - location, args[1] - toyid, toy set or toy name, args[2] - option of either "notext" or "lowercase"*/
+<<widget "childtoy">><<silently>>
+	<<set _toys to $storedChildrenToys[_args[0]]>>
+	<<if _toys>>
+		<<if between(_args[1], 0, _toys.length - 1)>>
+			<<set _toy to _toys[_args[1]]>>
+		<<elseif _args[1]>>
+			<<set _toySelect to []>>
+			<<for $_i to 0; $_i lt _toys.length; $_i++>>
+				<<if _toys[$_i].set is _args[1] or _toys[$_i].name is _args[1]>>
+					<<run _toySelect.push($_i)>>
+				<</if>>
+			<</for>>
+			<<if _toySelect.length gt 0>>
+				<<set _toyid to _toySelect[random(0,_toySelect.length - 1)]>>
+				<<set _toy to _toys[_toyid]>>
+			<</if>>
+		<<else>>
+			<<set _toyid to random(0,_toys.length - 1)>>
+			<<set _toy to _toys[_toyid]>>
+		<</if>>
+		<<if _toy>>
+			<<switch _args[2]>>
+				<<case "notext">>
+				<<case "lowercase">>
+					<<set $_text_output to clone(_toy.name_lower)>>
+					<<set _toyName to clone(_toy.name_lower)>>
+				<<default>>
+					<<set $_text_output to clone(_toy.name)>>
+					<<set _toyName to clone(_toy.name)>>
+			<</switch>>
+		<</if>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+/*args[0] - location*/
+<<widget "childSelectRandom">>
+	<<set $childSelected to getBornChildren().filter(child => !_args[0] or child.development.location === _args[0]).random()>>
+<</widget>>
+
+<<widget "childViewerDisplay">>
+	<<set _idList to _args[0]>>
+	<<set _listMaxItems to 10>>
+	<<set _listPage to 1>>
+	<<set _listPageMax to Math.ceil(_idList.length / _listMaxItems)>>
+	<<set _childStart to 0>>
+	<<set _childEnd to (_childStart + _listMaxItems gt _idList.length ? _idList.length : _childStart + _listMaxItems)>>
+	<div id="childViewer">
+		<<childViewerDisplayElements>>
+	</div>
+<</widget>>
+
+<<widget "childViewerPageUpdate">>
+	<<set _childStart to _listMaxItems * (_listPage - 1)>>
+	<<set _childEnd to (_childStart + _listMaxItems lte _idList.length ? _childStart + _listMaxItems : _idList.length)>>
+	<<replace '#childViewer'>>
+		<<childViewerDisplayElements>>
+	<</replace>>
+<</widget>>
+
+<<widget "childViewerDisplayElements">>
+	<div class="settingsGrid m-0 childContainer">
+		<<for $_i to _childStart; $_i lt _childEnd; $_i++>>
+			<<set _childId to _childrenIds[$_i]>>
+			<<capture _childId>>
+				<div @id="'child-' + _childId">
+					<<childViewerElement `_childId`>>
+				</div>
+			<</capture>>
+		<</for>>
+	</div>
+	<br>
+	<div class="childrenUiControls">
+		<<set _disabled = _listPage > 1 ? "" : "disabled">>
+		<div @class="'div-link btn-pagination prev ' + _disabled">
+			<<link "Previous">>
+				<<if _listPage > 1>>
+					<<set _listPage -= 1>>
+					<<childViewerPageUpdate>>
+				<</if>>
+			<</link>>
+			<div class="btn-pagination-arrow">&lt;</div>
+		</div>
+		<div>
+			<<print (_listPage) + " out of " + _listPageMax>>
+		</div>
+		<<set _disabled = _listPage < _listPageMax ? "" : "disabled">>
+		<div @class="'div-link btn-pagination next ' + _disabled">
+			<<link "Next">>
+				<<if _listPage < _listPageMax>>
+					<<set _listPage += 1>>
+					<<childViewerPageUpdate>>
+				<</if>>
+			<</link>>
+			<div class="btn-pagination-arrow">&gt;</div>
+		</div>
+	</div>
+	<<run linkifyDivs('#childViewer')>>
+<</widget>>
+
+<<widget "childViewerElement">>
+	<<if _children is undefined>>
+		<<set _children to {}>>
+	<</if>>
+	<<capture _args>>
+		<div class="childItem m-0 childName">
+			<div>
+				<label><div><<childrenicon _args[0]>></div><div>Name:</div> <div><<textbox "$childRecords[_args[0]].name" `$childRecords[_args[0]].name`>></div></label>
+			</div>
+		</div>
+		<div class="childItem m-0 childDetails">
+			<<childTypeDisplay $childRecords[_args[0]]>>
+			<span class="no-numberify">
+				| <<link "Extra Details">><<childViewerHiddenElementsUnhide _args[0]>><</link>>
+			</span>
+			<<childViewerHiddenElements _args[0] _args[1]>>
+			<<childActivity _args[0]>>
+		</div>
+	<</capture>>
+<</widget>>
+
+<<widget "childViewerHiddenElements">>
+	<<if _args[0] isnot undefined>>
+		<div @id="'childViewerHidden-'+_args[0]" @class="'childViewerHidden' + (_args[1] ? '' : ' hidden')">
+			<span class="gold">Mother:</span>
+			<<if knowsCarrier($childRecords[_args[0]].pregnancyId, "pc")>>
+				<<print pregnancyNameCorrection(getPregnancyOf($childRecords[_args[0]]).carrier, true)>>
+			<<else>>
+				????
+			<</if>>
+			| <span class="gold">Father:</span>
+			<<if knowsDonor($childRecords[_args[0]].pregnancyId, "pc")>>
+				<<print pregnancyNameCorrection(getPregnancyOf($childRecords[_args[0]]).donor, true)>>
+			<<else>>
+				????
+			<</if>>
+			<br>
+			<<if childIsUnhatchedEgg($childRecords[_args[0]])>>
+				<<set _laidDate to new DateTime(getPregnancyOf($childRecords[_args[0]]).deliveredDate)>>
+				<span class="gold">Laid:</span> <<print _laidDate.day + " " + _laidDate.monthName + " " + _laidDate.year>>
+			<<elseif $childRecords[_args[0]].species is "hawk" or $childRecords[_args[0]].species is "harpy">>
+				<<set _laidDate to new DateTime(getPregnancyOf($childRecords[_args[0]]).deliveredDate)>>
+				<<set _hatchedDate to new DateTime($childRecords[_args[0]].bornDate)>>
+				<span class="gold">Laid:</span> <<print _laidDate.day + " " + _laidDate.monthName + " " + _laidDate.year>> |
+				<span class="gold">Hatched:</span> <<print _hatchedDate.day + " " + _hatchedDate.monthName + " " + _hatchedDate.year>>
+			<<else>>
+				<<set _bornDate to new DateTime($childRecords[_args[0]].bornDate)>>
+				<span class="gold">Born:</span> <<print _bornDate.day + " " + _bornDate.monthName + " " + _bornDate.year>>
+			<</if>>
+			<<if $childRecords[_args[0]].development.adoptedDate>>
+				<<set _adoptedDate to new DateTime($childRecords[_args[0]].development.adoptedDate)>>
+				| <span class="gold">Adopted:</span> <<print _adoptedDate.day + " " + _adoptedDate.monthName + " " + _adoptedDate.year>>
+			<</if>>
+			<br>
+			<span class="gold">Age:</span> <<childAge _args[0] "full">>
+			<br>
+			<span class="gold">Size:</span> <<print $childRecords[_args[0]].features.size>>
+			<<if $childRecords[_args[0]].features.hairColour>>
+				<<if $childRecords[_args[0]].species.includes("human")>>
+					| <span class="gold">Hair:</span>
+				<<elseif $childRecords[_args[0]].species.includes("hawk")>>
+					| <span class="gold">Plumage:</span>
+				<<else>>
+					| <span class="gold">Fur:</span>
+				<</if>>
+				<<hairmapcolourtext $childRecords[_args[0]].features.hairColour>>
+			<</if>>
+			<<if $childRecords[_args[0]].features.skinColour>>
+				| <span class="gold">Skin:</span> <<skinColourName $childRecords[_args[0]].features.skinColour>>
+			<</if>>
+			<br>
+			<<if $childRecords[_args[0]].identical isnot null>>
+				<span class="gold">Identical:</span> Yes
+				<br>
+			<</if>>
+			<<if $childRecords[_args[0]].development.interactionsTotal>>
+				<span class="gold">Total Interactions:</span> <<print $childRecords[_args[0]].development.interactionsTotal>>
+				<br>
+			<</if>>
+			<span class="no-numberify">
+				<span class="gold">Rename:</span>
+				<<link "Random Name">>
+					<<set $childRecords[_args[0]].name to generateBabyName(undefined, $childRecords[_args[0]].gender, _args[0])>>
+					<<replace `"#child-" + _args[0]`>><<childViewerElement _args[0] true>><</replace>>
+				<</link>>
+			</span>
+			<<if $debug is 1>>
+				<br>
+				<small>
+					ChildId: <<print $childRecords[_args[0]].childId>> |
+					saveId: <<print $saveId>>
+					<<if $saveName isnot "">>
+						| name: <<print $saveName>>
+					<</if>>
+				</small>
+			<</if>>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "childViewerHiddenElementsUnhide">>
+	<<capture _args>>
+		<<if _args[0] isnot undefined>>
+			<<toggleclass `'#childViewerHidden-' + _args[0]` "hidden">>
+		<</if>>
+	<</capture>>
+<</widget>>
+
+<<widget "childActivity">>
+	<<if _args[0] isnot undefined>>
+		<<childAge _args[0]>>
+		<<childSelect _args[0]>>
+		/*'updateChildActivity' Changes the current event if enough time has passed*/
+		<<updateChildActivity _args[0]>>
+		<hr>
+		<<switch $childRecords[_args[0]].species>>
+			<<case "human">><<humanChildActivity _args[0]>>
+			<<case "wolf" "wolfboy" "wolfgirl">><<wolfChildActivity _args[0]>>
+			<<case "hawk">><<hawkChildActivity _args[0]>>
+		<</switch>>
+	<</if>>
+<</widget>>
+
+/*ToDo: Pregnancy Story Content: Lacking events. Human children events which the place accesses by going to the childrens UI*/
+<<widget "humanChildActivity">>
+	<<set _activityColour to !$daily.childInteractions or !$daily.childInteractions.includes(_args[0]) ? " childrensActivityGold" : "">>
+	<span @class="'no-numberify' + _activityColour">
+		<<switch $childRecords[_args[0]].development.activity>>
+			<<case "noEvent">>
+				<<childHe>>'s sleeping soundly.
+			<<case "sleeping">>
+				<<childHe>>'s sleeping soundly.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<set _rng to random(1, 6)>>
+					<<switch _rng>>
+						<<case 1>>
+							<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"transfixed", childid:_args[0]}>><</link>>
+						<<case 2>>
+							<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"stroke", childid:_args[0]}>><</link>>
+						<<case 3>>
+							<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"yawn", childid:_args[0]}>><</link>>
+						<<case 4>>
+							<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"murmur", childid:_args[0]}>><</link>>
+						<<case 5>>
+							<<link [[Nap (0:30)|Children Activity Events]]>><<pass 30>><<set $childActivityEvent to {event:"cotNap", childid:_args[0]}>><</link>>
+						<<default>>
+							<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"shiverInCot", childid:_args[0]}>><</link>>
+					<</switch>>
+				<</if>>
+			<<case "restlessSleep">>
+				<<childHe>>'s moving restlessly in <<childhis>> sleep.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Calm <<childhim>> down (0:30)|Children Activity Events]]>><<pass 30>><<set $childActivityEvent to {event:"restlessSleep", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "crying">>
+				<<childHe>>'s distressed and crying.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<set _rng to random(1, 6)>>
+					<<switch _rng>>
+						<<case 1>>
+							<<link [[Comfort (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"holdToShoulder", childid:_args[0]}>><</link>>
+						<<case 2>>
+							<<link [[Comfort (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"melodicLullaby", childid:_args[0]}>><</link>>
+						<<case 3>>
+							<<link [[Comfort (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"foreheadKiss", childid:_args[0]}>><</link>>
+						<<case 4>>
+							<<link [[Comfort (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"objectShow", childid:_args[0]}>><</link>>
+						<<case 5>>
+							<<link [[Comfort (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"carryRevolt", childid:_args[0]}>><</link>>
+						<<default>>
+							<<link [[Comfort (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"rockToSleep", childid:_args[0]}>><</link>>
+					<</switch>>
+				<</if>>
+			<<case "lonely">>
+				<<childHe>>'s looking lonely.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<set _rng to random(1, 10)>>
+					<<switch _rng>>
+						<<case 1>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"nurseryRhymes", childid:_args[0]}>><</link>>
+						<<case 2>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"FeetCup", childid:_args[0]}>><</link>>
+						<<case 3>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"shareThoughts", childid:_args[0]}>><</link>>
+						<<case 4>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"speakCry", childid:_args[0]}>><</link>>
+						<<case 5>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"waveTongue", childid:_args[0]}>><</link>>
+						<<case 6>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"handsClap", childid:_args[0]}>><</link>>
+						<<case 7>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"peekaboo", childid:_args[0]}>><</link>>
+						<<case 8>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"blowRaspberriesHappy", childid:_args[0]}>><</link>>
+						<<case 9>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"blowRaspberriesUpset", childid:_args[0]}>><</link>>
+						<<default>>
+							<<link [[Soothe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"faceStudy", childid:_args[0]}>><</link>>
+					<</switch>>
+				<</if>>
+			<<case "happy">>
+				<<childHe>>'s smiling and happily cooing.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Smile and laugh (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"smilesAndLaughs", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "talking">>
+				<<childHe>>'s gurgling and babbling to <<childherself>>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Join in the babbling (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"talking", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "talking2">>
+				<<childHe>>'s gurgling and attempting to make sounds to <<childherself>>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Join in the talking (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"talking2", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "nappyChange">>
+				<<childHe>>'s looking uncomfortable and smells.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Clean up (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"nappyChange", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "bathe">>
+				<<childHe>> is looking ready for a bath.
+				<<if $childRecords[_args[0]].development.event>>
+					<<switch random(1, 4)>>
+						<<case 1>>
+							<<link [[Bathe (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"batheGentle", childid:_args[0]}>><</link>>
+						<<case 2>>
+							<<link [[Bathe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"batheShampoo", childid:_args[0]}>><</link>>
+						<<case 3>>
+							<<link [[Bathe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"BatheCalm", childid:_args[0]}>><</link>>
+						<<case 4>>
+							<<link [[Bathe (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"batheTantrum", childid:_args[0]}>><</link>>
+						<<default>>
+					<</switch>>
+				<</if>>
+			<<case "thumbSucking">>
+				<<childHe>>'s happily sucking on <<childhis>> thumb.
+			<<case "grumpyChild">>
+				<<childHe>>'s being irritable.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Tickle (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"grumpyChild", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "crawlingAttempt">>
+				<<childHe>>'s lying on <<childhis>> belly and flailing about.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Help <<childhim>> out (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"crawlingAttempt", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "crawlingAttempt2">>
+				<<childHe>>'s slowly crawling about the room.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Help <<childhim>> out (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"crawlingAttempt2", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "readingAttempt">>
+				<<childHe>>'s looking at a children's book upside down.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Flip the book (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"readingAttempt", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "readingCorrected">>
+				<<childHe>>'s looking at a children's book.
+			<<case "babyRattle">>
+				<<childtoy $location "baby rattles" "notext">>
+				<<if _toyid>>
+					<<childHe>>'s staring at a <<childtoy $location _toyid "lowercase">>.
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyid>><<link [[Shake it (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"babyRattle", childid:_args[0], toyid:_toyid}>><</link>><</capture>> |
+					<</if>>
+				<<else>>
+					<<humanChildActivityNoToy _args[0]>>
+				<</if>>
+			<<case "teddyBear">>
+				<<childtoy $location "teddy bears" "notext">>
+				<<if _toyid>>
+					<<childHe>>'s turning and tossing in <<childhis>> sleep by a <<childtoy $location _toyid "lowercase">>.
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyid>><<link [["Give " + _toyName + " (0:05)"|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"teddyBear", childid:_args[0], toyid:_toyid}>><</link>><</capture>> |
+					<</if>>
+				<<else>>
+					<<humanChildActivityNoToy _args[0]>>
+				<</if>>
+			<<case "teddyBear2">>
+				<<childHe>>'s sleeping soundly by <<childhis>> <<print $childRecords[_args[0]].development.toy>>.
+			<<case "toyCar">>
+				<<childtoy $location "toy cars" "notext">>
+				<<if _toyid>>
+					<<childHe>>'s waving a <<childtoy $location _toyid "lowercase">> in the air.
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyid>><<link [[Play with <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"toyCar", childid:_args[0], toyid:_toyid}>><</link>><</capture>> |
+					<</if>>
+				<<else>>
+					<<humanChildActivityNoToy _args[0]>>
+				<</if>>
+			<<case "dummy">>
+				<<childtoy $location "dummies" "notext">>
+				<<if _toyid>>
+					<<set _rng to random(1,4)>>
+					<<childHe>>'s <<childcry _rng>>. There's a <<childtoy $location _toyid "lowercase">> on the floor nearby.
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyid _rng>><<link [[Pacify (0:15)|Children Activity Events]]>><<pass 15>><<set $childActivityEvent to {event:"dummy", childid:_args[0], toyid:_toyid, childCry:_rng}>><</link>><</capture>> |
+					<</if>>
+				<<else>>
+					<<humanChildActivityNoToy _args[0]>>
+				<</if>>
+			<<case "dummySucking">>
+				<<childHe>>'s suckling loudly on <<childhis>> dummy.
+			<<case "clown">>
+				<<childtoy $location "clown" "notext">>
+				<<if _toyid>>
+					<<childHe>>'s looking at a <<childtoy $location _toyid "lowercase">> with an unsure expression.
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyid>><<link [[Play with <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"clown", childid:_args[0], toyid:_toyid}>><</link>><</capture>> |
+					<</if>>
+				<<else>>
+					<<humanChildActivityNoToy _args[0]>>
+				<</if>>
+			<<case "clownHappy">>
+				<<if _childTotalDays lt 199>>
+					<<childHe>>'s playing happily looking between the clown and you.
+				<<else>>
+					<<childHe>>'s playing happily with the clown, pulling its cord and making it chuckle every now and then.
+				<</if>>
+			<<case "Robin">>
+				<<if getRobinLocation() isnot "orphanage" or $location is "alex_cottage">>
+					<<childHe>>'s happily sucking on <<childhis>> thumb.
+				<<else>>
+					Robin cradles <<childhim>>.
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Hold (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"Robin", childid:_args[0]}>><</link>>
+					<</if>>
+				<</if>>
+			<<case "Wraith">>
+				<<childHe>>'s laughing and reaching for something unseen.
+				<br>
+				<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"Wraith", childid:_args[0]}>><</link>>
+			<<default>>
+				<<childHe>>'s has figured out that they're in a video game (This is an error, please report).
+				<<print $childRecords[_args[0]].development.activity>>
+		<</switch>>
+	</span>
+<</widget>>
+
+<<widget "humanChildActivityNoToy">>
+	<<childHe>>'s sleeping soundly.
+	<<if $childRecords[_args[0]].development.event>>
+		<br>
+		<<link [[Watch <<childhim>> (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"shiverInCot", childid:_args[0]}>><<set $child_played.pushUnique(_args[0])>><</link>>
+	<</if>>
+<</widget>>
+
+/*ToDo: Pregnancy Story Content: Lacking events. Wolf pups events which the place accesses by going to the childrens UI*/
+<<widget "wolfChildActivity">>
+	<span class="no-numberify">
+		<<switch $childRecords[_args[0]].development.activity>>
+			<<case "noEvent">>
+				<<childHe>>'s sleeping soundly.
+			<<case "sleeping">>
+				<<childHe>>'s sleeping on <<childhis>> own.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Stroke head (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"sleepingStroke", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "sleepingWithWolf">>
+				<<childHe>>'s sound asleep while cuddled up against another <<if $monster is 1>>wolfgirl<<else>>female wolf<</if>>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Cuddle up to (0:30)|Children Activity Events]]>><<pass 30>><<set $childActivityEvent to {event:"cuddleAndNap", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "crying">>
+				<<childHe>>'s distressed and <<childcry>>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Comfort <<childhim>> (0:15)|Children Activity Events]]>><<pass 15>><<set $childActivityEvent to {event:"cryingWolf", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "playing">>
+				<<childHe>>'s playing with some other pups.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Join in (0:15)|Children Activity Events]]>><<pass 15>><<set $childActivityEvent to {event:"playing", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "watchingCurious">>
+				<<childHe>>'s watching you with a curious expression.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Sate curiosity (0:30)|Children Activity Events]]>><<pass 30>><<set $childActivityEvent to {event:"curiousGaze", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "watchingLonging">>
+				<<childHe>>'s watching you with a longing expression.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Scratch ears (0:30)|Children Activity Events]]>><<pass 30>><<set $childActivityEvent to {event:"longingGaze", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "playFighting">>
+				<<childHe>>'s play fighting with another pup.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Calm <<childhim>> (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"playFighting", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "staringOutside">>
+				<<childHe>>'s staring out of the cave.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Go for a walk (0:30)|Children Activity Events]]>><<pass 30>><<set $childActivityEvent to {event:"fieldTrip", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "grumpyWolf">>
+				<<childHe>>'s sitting alone and snapping at any who come near.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Cheer up (0:15)|Children Activity Events]]>><<pass 15>><<set $childActivityEvent to {event:"grumpyWolf", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "hungryWolf">>
+				<<childHe>>'s <<childcry>> in front of an overcrowded female <<wolf_cave_singular "f">>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Help finding a nipple (0:15)|Children Activity Events]]>><<pass 15>><<set $childActivityEvent to {event:"hungryWolf", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "gnawing">>
+				<<childHe>>'s gnawing on
+				<<switch random(1,4)>>
+					<<case 1>>a shed antler. <<set $pupToy to "antler">>
+					<<case 2>>a deer bone. <<set $pupToy to "bone">>
+					<<case 3>>an old rubber boot. <<set $pupToy to "boot">>
+					<<case 4>>a dead branch. <<set $pupToy to "stick">>
+				<</switch>>
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Play tug of war (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"gnawing", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "squeakyToy">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("squeaky")>>
+					<<childHe>>'s looking at a _toyName with curiosity.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyName>><<link [[Give squeaky toy (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"squeakyToy", childid:_args[0]}>><<set $phase to _toyName>><</link>><</capture>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "squeakyToy2">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("squeaky")>>
+					<<childHe>> sniffs the _toyName and bats it experimentally.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<capture _toyName>><<link [[Squeak the _toyName (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"squeakyToy2", childid:_args[0]}>><<set $phase to _toyName>><</link>><</capture>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "chewRope">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("rope")>>
+					<<childHe>>'s chewing on a colourful rope toy.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Play tug of war (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"chewRope", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "chewRope2">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("rope")>>
+					<<childHe>> sniffs the rope, then gives it an experimental nip.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Pull the rope (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"chewRope2", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "chewBone">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("bone")>>
+					<<if $childRecords[_args[0]].development.event>>
+						<<childHe>>'s trying to dig a hole.
+						<br>
+						<<link [[Help dig (0:20)|Children Activity Events]]>><<pass 20>><<set $childActivityEvent to {event:"chewBone", childid:_args[0]}>><</link>>
+					<<else>>
+						<<childHe>>'s guarding <<childhis>> buried bone.
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "chewBone2">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("bone")>>
+					<<childHe>> sniffs the bone, then begins licking it.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Nudge bone (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"chewBone2", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "rollBall">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("ball")>>
+					<<childHe>>'s nudging a ball closer to you.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Roll ball (0:15)|Children Activity Events]]>><<pass 15>><<set $childActivityEvent to {event:"rollBall", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<case "rollBall2">>
+				<<silently>><<childtoy $location "chew toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("ball")>>
+					<<childHe>> nuzzles the ball and rolls it along the ground.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Throw ball (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"rollBall2", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<wolfChildActivity _args[0]>>
+				<</if>>
+			<<default>>
+				<<childHe>>'s has figured out that they're in a video game (This is an error, please report).
+				<<print $childRecords[_args[0]].development.activity>>
+		<</switch>>
+	</span>
+<</widget>>
+
+<<widget "wolfChildActivityNoToy">>
+	<<childHe>>'s sleeping on <<childhis>> own.
+	<<if $childRecords[_args[0]].development.event>>
+		<br>
+		<<link [[Stroke head (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"sleepingStroke", childid:_args[0]}>><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "hawkChildActivity">>
+	<span class="no-numberify">
+		<<switch $childRecords[_args[0]].development.activity>>
+			<<case "noEvent">>
+				<<childHe>>'s sleeping soundly.
+			<<case "sleeping">>
+				<<childHe>>'s sleeping on <<childhis>> own.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Stroke head (0:10)|Children Activity Events]]>><<pass 10>><<set $childActivityEvent to {event:"sleepingStrokeHawk", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "sleepingWithGreatHawk">>
+				<<npc "Great Hawk">>
+				<<childHe>>'s sound asleep while cuddled up against <<your_bird_text>>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link [[Cuddle up to (0:30)|Children Activity Events]]>>
+						<<set _otherChildrenIds to []>>
+						<<run getBornChildren().forEach(child => {
+							if (child.development.location is $location and child.development.activity is "sleepingWithGreatHawk" and child.childId isnot T.args[0]) {
+								T.otherChildrenIds.push(child.childId);
+							}
+						})>>
+						<<pass 30>><<set $childActivityEvent to {event:"cuddleAndNapHawk", childid:_args[0], otherChildrenIds:_otherChildrenIds}>>
+					<</link>>
+				<</if>>
+				<<endevent>>
+			<<case "crying">>
+				<<childHe>>'s distressed and <<childcry>>.
+				<<if $childRecords[_args[0]].development.event>>
+					<br>
+					<<link "Comfort <<childhim>> (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"cryingHawk", childid:_args[0]}>><</link>>
+				<</if>>
+			<<case "reaching">>
+				<<childHe>>'s reaching for you.
+				<br>
+				<<link "Pick <<childhim>> up (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"pickUpHawk", childid:_args[0]}>><</link>>
+			<<case "flap">>
+				<<childHe>>'s flapping <<childhis>> little wings in short bursts.
+				<br>
+				<<link "Help <<childhim>> pretend to fly (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"pretendFly", childid:_args[0]}>><</link>>
+			<<case "preen">>
+				<<childHe>> seems agitated and pecks at <<childhis>> wings.
+				<br>
+				<<link "Help <<childhim>> preen (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"preen", childid:_args[0]}>><</link>>
+			<<case "perch">>
+				<<childHe>> stares out at the perch.
+				<br>
+				<<link "Take <<childhim>> to the perch (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"perch", childid:_args[0]}>><</link>>
+			<<case "bathe">>
+				<<childHe>> looks like <<childhe>> needs a bath.
+				<br>
+				<<link "Bathe <<childhim>> (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"bathe", childid:_args[0]}>><</link>>
+			<<case "batheSelf">>
+				<<childHe>>'s dipping <<childhis>> legs in the rainwater pool.
+				<br>
+				<<link "Help <<childhim>> bathe (0:15)" "Children Activity Events">><<pass 15>><<set $childActivityEvent to {event:"batheHelp", childid:_args[0]}>><</link>>
+			<<case "lurkerEat">>
+				<<childHe>>'s
+				<<if _childDays lte 180>>
+					<<if $cmonster>>
+						gumming on a piece of lurker meat.
+					<<else>>
+						pecking at a piece of lurker meat.
+					<</if>>
+				<<else>>
+					<<if $cmonster>>
+						chewing on a lurker.
+					<<else>>
+						pecking at a lurker.
+					<</if>>
+				<</if>>
+			<<case "swingToy">>
+				/* currently unreachable. credit writer as Anonymous when properly added */
+				<<silently>><<childtoy $location "hawk toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("swing")>>
+					<<childHe>>'s trying to climb onto the swing.
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Help <<childhim>> up (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"swingToy", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<hawkChildActivity _args[0]>>
+				<</if>>
+			<<case "preeningToy">>
+				/* currently unreachable. credit writer as mochamante when properly added */
+				<<silently>><<childtoy $location "hawk toys" "lowercase">><</silently>>
+				<<if _toyName?.includes("preening")>>
+					<<if _childTotalDays lte 40>>
+						<<childHe>>'s awkwardly trying to preen <<childhimself>>.
+					<<else>>
+						<<childHe>>'s looking at the preening toy.
+					<</if>>
+
+					<<if $childRecords[_args[0]].development.event>>
+						<br>
+						<<link [[Give preening toy (0:05)|Children Activity Events]]>><<pass 5>><<set $childActivityEvent to {event:"preeningToy", childid:_args[0]}>><</link>>
+					<</if>>
+				<<else>>
+					<<set $childRecords[_args[0]].development.activity to "sleeping">>
+					<<hawkChildActivity _args[0]>>
+				<</if>>
+			<<default>>
+				<<childHe>>'s has figured out that they're in a video game (This is an error, please report).
+				<<print $childRecords[_args[0]].development.activity>>
+		<</switch>>
+	</span>
+<</widget>>
+
+<<widget "skinColourName">><<silently>>
+	<<switch _args[0]>>
+		<<case "rlight" "ylight" "glight" "blight">><<set $_text_output to "light">>
+		<<case "rmedium" "ymedium" "gmedium" "bmedium">><<set $_text_output to "medium">>
+		<<case "rdark" "ydark" "gdark" "bdark">><<set $_text_output to "dark">>
+		<<case "ghostlyPale" "ghost">><<set $_text_output to "ghostly pale">>
+		<<case "gyaru" "ygyaru" "rgyaru" "ggyaru" "bgyaru">><<set $_text_output to "medium">>
+		<<default>><<set $_text_output to _args[0]>>
+	<</switch>>
+	<</silently>><<print $_text_output>>
+<</widget>>
