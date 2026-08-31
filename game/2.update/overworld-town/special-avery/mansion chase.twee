@@ -1,0 +1,1641 @@
+:: Mansion Chase Run
+<<effects>>
+
+당신은 에이버리에게서 팔을 비틀어 빼내고 달아난다. "어딜 도망가는 거야?" 에이버리가 등 뒤에서 소리친다. "넌 도망칠 수 없어."
+<br><br>
+
+<<avery_mansion_chase_run>>
+<br>
+
+:: Mansion Chase Apologise
+<<effects>>
+
+<<if $avery_mansion.chase.victory gte 1>>
+	<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+		"제발 때리지 마세요." 당신이 말한다. "죄송해요!"
+	<<elseif $speech_attitude is "bratty">>
+		"진정해요." 당신이 말한다. "화나게 할 생각은 없었어요. 죄송해요."
+	<<else>>
+		"죄송해요." 당신이 말한다. "이제부터 잘할게요."
+	<</if>>
+	<br><br>
+
+	"내가 너한테 무슨 짓을 할지 알게 되면 정말로 미안해질 거다." 에이버리가 다가오며 말한다.
+	<br><br>
+
+<<else>>
+	<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+		"정말 죄송해요." 당신이 말한다. "다시는 이런 일 없을 거예요."
+	<<elseif $speech_attitude is "bratty">>
+		"죄송해요." 당신이 말한다. "요즘 너무 바빠서 그랬어요."
+	<<else>>
+		"죄송해요." 당신이 말한다. "화나게 할 생각은 없었어요."
+	<</if>>
+	<br><br>
+
+	"죄송하다고?" 에이버리가 당신을 더 가까이 끌어당기며 묻는다. "내가 아주 미안하게 만들어주지."
+	<br><br>
+<</if>>
+
+<<link [[다음|Mansion Chase Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Mansion Chase Brace
+<<effects>>
+
+<<if $avery_mansion.chase.victory gte 1>>
+	에이버리가 <<his>> 눈에 악의를 품고 다가오자 당신은 몸을 움츠린다.
+<<else>>
+	에이버리가 당신을 더 가까이 끌어당기자, <<his>> 눈에 악의가 서려 있어 당신은 몸을 움츠린다.
+<</if>>
+<br><br>
+
+<<link [[다음|Mansion Chase Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Mansion Chase Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	<<set $encounterDialogue to "averyMansionChase">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[Next|Mansion Chase Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[Next|Mansion Chase Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Mansion Chase Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	에이버리는 쓰러지지만, <<his>> 눈은 여전히 악의로 가득 차 있다. <<tearful>> 당신은 <<he>>【이가】 회복하기 전에 돌아서서 달아난다.
+	<<avery_mansion_victory>><<ggfrustration>><<larage>><<npcincr Avery rage -1>>
+	<<set $avery_mansion.chase.victory += 1>>
+	<<set $avery_mansion.chase.health -= 2>>
+	<br><br>
+	<<if $avery_mansion.chase.health lte 0>>
+
+		<<clotheson>>
+		<<endcombat>>
+		<<npc "Avery">><<person1>>
+		<<link [[다음|Mansion Chase Victory]]>><</link>>
+		<br>
+	<<else>>
+		<<clotheson>>
+		<<endcombat>>
+		<<npc "Avery">><<person1>>
+		<<avery_mansion_chase_run>>
+		<br>
+
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+	에이버리는 쓰러지지만, <<his>> 눈은 여전히 악의로 가득 차 있다. <<tearful>> 당신은 <<he>>【이가】 회복하기 전에 돌아서서 달아난다.
+	<<avery_mansion_victory>><<ggfrustration>><<garage>><<ldom>><<npcincr Avery rage 1>><<npcincr Avery dom -1>>
+	<<set $avery_mansion.chase.victory += 1>>
+	<<set $avery_mansion.chase.health -= 2>>
+	<br><br>
+	<<if $avery_mansion.chase.health lte 0>>
+		<<clotheson>>
+		<<endcombat>>
+		<<npc "Avery">><<person1>>
+		<<link [[다음|Mansion Chase Victory]]>><</link>>
+		<br>
+	<<else>>
+		<<clotheson>>
+		<<endcombat>>
+		<<npc "Avery">><<person1>>
+		<<avery_mansion_chase_run>>
+		<br>
+
+	<</if>>
+
+<<else>>
+	<<tearful>> 당신은 바닥에 쓰러진다. 너무 다쳐 더는 싸울 수 없다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Mansion Chase Defeat]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Defeat
+<<effects>><<avery_mansion>>
+
+<<npc "Avery">><<person1>>
+에이버리의 분노가 넘쳐흐른다. <<He>>
+<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+	당신의 <<bellyDescription "pc">>【을를】 걷어차려 움직이고, 당신은 본능적으로 그곳을 감싼다. <<He>>【은는】 그 틈을 노려 대신 당신의 얼굴을 걷어찬다. 그러고 나서 <<he>>【은는】
+<<else>>
+	당신의 배를 걷어차고, 갈비뼈를 찌르고,
+<</if>>
+당신의 머리채를 잡아당기고, 당신에게 침을 뱉는다. <<He>>【은는】 숨을 고르려 잠시 멈췄다가 당신을 일으켜 세운다.<<ggtrauma>><<ggstress>><<gggpain>><<trauma 12>><<stress 12>><<pain 12>>
+<br><br>
+
+<<if $avery_mansion.schedule is "party_prepare" or $avery_mansion.schedule is "party">>
+	"파티에 네가 필요하다는 걸 다행으로 알아," <<he>>【이가】 내뱉는다.
+	<br><br>
+	<<endevent>>
+	<<avery_mansion_chase_end>>
+	<<avery_mansion_end_links>>
+<<else>>
+	<<set $avery_mansion.away_timer to 24>>
+	<<set $avery_mansion.schedule to "away">>
+	<<endevent>>
+	<<avery_mansion_chase_end>>
+	<<npc Avery>><<person1>>
+	"네가 내게 보상할 방법을 알고 있습니다," <<he>>【이가】 말한다. 뜨거운 분노는 적어도 지금은 차가운 악의로 바뀌어 있다.
+	<<if $avery_mansion.jobs.includes("dungeon")>>
+		"훈육 시간이다."
+		<br><br>
+		<<if $bus is "avery_dungeon">>
+			<<link [[다음|Mansion Dungeon Intro 2]]>><<set $phase to 1>><</link>>
+			<br>
+		<<else>>
+			<<link [[다음|Mansion Dungeon Intro]]>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		"보여줄 게 있어. 네가 아직 못 본 방이 있지."
+		<br><br>
+		<<link [[다음|Mansion Return Dungeon]]>><<set $avery_mansion.jobs.pushUnique("dungeon")>><</link>>
+		<br>
+	<</if>>
+
+<</if>>
+
+:: Mansion Chase Victory
+<<effects>>
+<<endevent>>
+<<npc "Avery">><<person1>>
+당신은 다시 에이버리에게서 도망친다. <<He>>【은는】 이번에는 따라오지 않는다.
+<br><br>
+엔진의 굉음, 정문이 덜컹거리는 소리, 그리고 <<he>>【이가】 저택을 떠날 때 나는 에이버리의 타이어가 끌리는 날카로운 소리가 들린다.
+<br><br>
+
+<span class="green">지금은 안전하다.</span>
+<br><br>
+<<set $avery_mansion.away_timer to 7>>
+<<set $avery_mansion.schedule to "away">>
+<<endevent>>
+<<avery_mansion_chase_end>>
+<<avery_mansion_end_links>>
+
+:: Mansion Chase Victory Escape
+<<effects>>
+<<endevent>>
+<<npc "Avery">><<person1>>
+당신은 정문을 통해 저택과 에이버리를 뒤로하고 탈출한다. 잠시 후, 타이어가 긁히는 날카로운 소리가 등 뒤에서 들려온다. 당신은 나무 뒤에 몸을 숨긴다.
+<br><br>
+
+에이버리가 제한속도를 넘겨 차를 몰고 지나간다. <<He>>【은는】 모퉁이를 돌며 벽에 거의 들이받을 뻔한다.
+<br><br>
+
+<span class="green">지금은 안전하다.</span>
+<br><br>
+
+<<set $avery_mansion.away_timer to 7>>
+<<set $avery_mansion.schedule to "away">>
+<<endevent>>
+<<avery_mansion_chase_end>>
+
+<<link [[다음|Danube Street]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Mansion Chase Lounge
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "lounge">>
+당신은 에이버리의 저택 라운지에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.key_checked.includes("lounge") and $avery_mansion.chase.key is false>>
+			<<ind>><<link [[열쇠를 찾는다 (0:01)|Mansion Chase Lounge Key]]>><<set $avery_mansion.chase.key_checked.push("lounge")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+		<<if !$avery_mansion.chase.gear.includes("marbles")>>
+			<<ind>><<link [[구슬 몇 개를 챙긴다 (0:01)|Mansion Chase Lounge Marbles]]>><<set $avery_mansion.chase.gear.push("marbles")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+
+		<<ind>><<link [[탁자 아래에 숨는다 (0:01)|Mansion Chase Lounge Table]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[소파 뒤에 숨는다 (0:01)|Mansion Chase Lounge Sofa]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-display.png">><<link [[전시실 (0:01)|Mansion Chase Display]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[복도 (0:01)|Mansion Chase Hallway 1 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Lounge Marbles
+<<effects>>
+
+당신은 찬장들을 뒤져 구슬을 찾는다. 적당히 혼란을 일으키기에 충분한 몇 봉지를 찾아낸다.
+<br><br>
+
+<<link [[다음|Mansion Chase Lounge]]>><</link>>
+<br>
+
+:: Mansion Chase Lounge Key
+<<effects>>
+
+당신은 응접실에서 열쇠를 찾으며 표면들을 훑고 의자의 틈새를 확인한다.
+<<avery_housework_change "lounge" 1>>
+<<if $avery_mansion.chase.key_location is "lounge">>
+
+	<span class="green">소파 안에서 그것을 찾아낸다.</span> 팔걸이 옆 틈으로 떨어져 있었다.
+	<br><br>
+	<<link [[다음|Mansion Chase Lounge]]>><<set $avery_mansion.chase.key to true>><</link>>
+<<else>>
+	<span class="red">여기에는 없다.</span>
+	<br><br>
+
+	<<link [[다음|Mansion Chase Lounge]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Lounge Table
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "lounge">>
+	당신은 라운지 중앙에 있는 테이블 아래로 재빨리 기어 들어간다. 바로 그 순간 에이버리가 문을 박차고 들어온다.
+	<<He>>【은는】 방을 훑어본다,
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<span class="red">그러고는 당신의 은신처로 곧장 달려든다.</span> <<He>>【은는】 당신의 머리채를 움켜쥐고 탁자 밑에서 끌어낸다.<<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			그러더니 뒤를 뒤지려는 급한 마음에 소파를 거의 내던지듯 치운다. <<He>>【은는】 텅 빈 공간을 잠시 바라보다가, <span class="green">방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용해지자, 당신은 테이블 밑에서 기어 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Lounge]]>><<avery_mansion_chase_location "hallway_1_e">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<span class="green">그러고는 방을 떠난다.</span>
+		<br><br>
+
+		주변이 조용해지자, 당신은 테이블 밑에서 기어 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Lounge]]>><<avery_mansion_chase_location "hallway_1_e">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 응접실 한가운데 있는 탁자 아래로 재빨리 들어가 에이버리의 소리를 듣는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 테이블 밑에서 기어 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Lounge]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Lounge Sofa
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "lounge">>
+	당신은 소파 밑으로 몸을 숙인다. 잠시 후 에이버리가 라운지 문을 활짝 여는 소리가 들린다.
+	더 이상 아무 소리도 들리지 않지만, 위험을 감수하고 싶지 않아 쳐다보지 않는다.
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<span class="red">그 순간 소파가 당신에게서 멀어지고, 에이버리의 노려보는 얼굴이 드러난다.</span> <<He>>【은는】 당신의 머리채를 움켜쥐고 그 아래에서 끌어낸다.<<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			발소리 몇 번, 또 한 번의 멈춤, 그리고 <span class="green">에이버리가 방을 떠나는</span> 발소리가 더 들린다.
+			<br><br>
+
+			주변이 조용해지자, 당신은 소파 뒤에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Lounge]]>><<avery_mansion_chase_location "hallway_1_e">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		잠시 아무 소리도 들리지 않는다. 그러고 나서 <span class="green"><<he>>【이가】 방을 떠나는</span> <<his>> 발소리가 들린다.
+		<br><br>
+
+		주변이 조용해지자, 당신은 소파 밑에서 기어 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Lounge]]>><<avery_mansion_chase_location "hallway_1_e">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 소파 아래로 몸을 숨기고, 에이버리의 소리를 듣는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 소파 뒤에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Lounge]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Dining
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "dining">>
+당신은 에이버리의 저택 식당에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<ind>><<link [[탁자 아래에 숨는다 (0:01)|Mansion Chase Dining Table]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[커튼 뒤에 숨는다 (0:01)|Mansion Chase Dining Curtains]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-kitchen.png">><<link [[부엌 (0:01)|Mansion Chase Kitchen]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[복도 (0:01)|Mansion Chase Hallway 1 E]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Dining Table
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "dining">>
+	당신은 두 의자 사이를 기어 테이블 밑에 숨는다. 이곳은 공간이 꽤 넓다. 에이버리의 발이 방으로 들어오는 것이 보인다. 당신은 <<he>>【이가】 방을 따라 걸어 내려와, 점점 가까워져 <<his>> 발이 당신에게서 몇 인치 떨어질 때까지 지켜본다. <<He>>【은는】 지나간다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<Hes>> 방을 나가려는 것처럼 보이지만, 곧 몸을 돌려 당신 쪽으로 걸어온다. <<He>>【은는】 탁자 밑으로 손을 뻗어, <span class="red">당신의 팔을 붙잡는다.</span> <<He>>【은는】 당신을 은신처에서 끌어낸다.<<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 방 반대편에 도착해 잠시 멈추더니 커튼을 뜯어낸다. 아무것도 찾지 못하자, <span class="green"><<he>>【은는】 다음 방으로 계속 간다.</span>
+			<br><br>
+
+			주변이 조용해지자, 당신은 테이블 밑에서 기어 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Dining]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<He>>【은는】 방 반대편에 도착해 잠시 몸을 돌리고, <span class="green">이내 떠난다.</span>
+		<br><br>
+
+		주변이 조용해지자, 당신은 테이블 밑에서 기어 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Dining]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 의자 두 개 사이를 기어 탁자 아래에 숨는다. 에이버리의 소리에 귀를 기울인다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 테이블 밑에서 기어 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Dining]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Dining Curtains
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "dining">>
+	당신은 커튼 뒤에 숨는다. 커튼은 당신을 가릴 만큼 크고 풍성하다. 그러길 바랄 뿐이다. 에이버리가 방에 들어오는 소리가 들린다. <<He>>【은는】 속도를 늦추지 않고 움직여, <<hes>> 당신의 은신처에서 몇 인치 떨어진 곳까지 온다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<He>>【은는】 멈춰 서더니, <span class="red">커튼을 뜯어내 당신을 드러낸다.</span>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 잠시 멈추고, 곧 <<his>> 주먹이 탁자를 내리치는 소리가 들린다. <span class="green"><<He>>【은는】 방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용해지자, 당신은 커튼 뒤에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Dining]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<He>>【은는】 당신을 지나쳐 <span class="green">다른 방으로 들어간다.</span>
+		<br><br>
+
+		주변이 조용해지자, 당신은 커튼 뒤에서 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Dining]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 커튼 뒤에 숨는다. 커튼은 당신을 가릴 만큼 크고 풍성하다. 그러길 바랄 뿐이다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 커튼 뒤에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Dining]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Kitchen
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "kitchen">>
+당신은 에이버리의 저택 주방에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.gear.includes("oil")>>
+			<<ind>><<link [[기름을 챙긴다|Mansion Chase Kitchen Oil]]>><<set $avery_mansion.chase.gear.push("oil")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+		<<ind>><<link [[찬장 안에 숨는다 (0:01)|Mansion Chase Kitchen Cupboard]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[냉동고 안에 숨는다 (0:01)|Mansion Chase Kitchen Freezer]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-dining.png">><<link [[식당 (0:01)|Mansion Chase Dining]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-garage.png">><<link [[차고 (0:01)|Mansion Chase Garage]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[복도 (0:01)|Mansion Chase Hallway 1 E]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Kitchen Oil
+<<effects>>
+
+당신은 높은 찬장 중 하나에서 가득 찬 식용유 병을 꺼낸다.
+<br><br>
+
+<<link [[다음|Mansion Chase Kitchen]]>><</link>>
+<br>
+
+:: Mansion Chase Kitchen Cupboard
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "kitchen">>
+	당신은 조리대 아래 찬장 중 하나에 웅크려 숨는다. 문이 제대로 닫히지 않아 밖을 볼 수 있고, 에이버리가 방으로 들어오는 것을 본다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<He>>【은는】 되는대로 찬장들을 열어젖히기 시작하지만, 대부분은 놓친다. <span class="red">하지만 당신이 있는 곳은 놓치지 않는다.</span> <<He>>【은는】 당신의 어깨를 붙잡고 부엌 바닥으로 끌어낸다. <<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 되는대로 찬장들을 열어젖히다가 냉동고에 다다른다. <<He>>【은는】 의지만으로 당신을 그 안에 나타나게 할 수 있기라도 한 듯 내부를 노려보더니, 문을 쾅 닫고 <span class="green">다음 방으로 계속 간다.</span>
+			<br><br>
+
+			주변이 조용해지자, 당신은 찬장에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Kitchen]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		에이버리는 서랍 몇 개를 열었다가 세게 닫으며 <<his>> 분노를 조금 풀고, <span class="green">다음 방으로 계속 간다.</span>
+		<br><br>
+
+		주변이 조용해지자, 당신은 찬장에서 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Kitchen]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 몸을 웅크리고 조리대 아래 찬장 하나 안에 숨는다. 문은 제대로 닫히지 않아, 틈 사이로 밖을 볼 수 있다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 찬장에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Kitchen]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Kitchen Freezer
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "kitchen">>
+	당신은 냉동고를 열어젖히고 안으로 들어간다. 지금은 차가운 공기가 상쾌하게 느껴진다. 잠시 뒤 에이버리가 들어오는 소리가 들린다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<him>>【이가】 되는대로 찬장들을 여는 소리가 들린다. <span class="red">그러다 <<he>>【은는】 냉동고를 연다.</span> <<His>> 미소는 끔찍하다. <<He>>【은는】 당신의 팔을 붙잡고 끌어낸다. <<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<him>>【이가】 되는대로 찬장들을 여는 소리가 들리더니, <span class="green">방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용해지자, 몸이 떨리기 시작할 때쯤 냉동고에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Kitchen]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<his>> 발소리가 들린다. <<He>>【은는】 방 한가운데로 걸어와 잠시 멈춘 뒤, <span class="green">다음 방으로 계속 간다.</span>
+		<br><br>
+
+		주변이 조용해지자, 몸이 떨리기 시작할 때쯤 냉동고에서 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Kitchen]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 냉동고를 열어젖히고 안으로 들어간다. 지금은 차가운 공기가 상쾌하게 느껴진다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 몸이 떨리기 시작할 때쯤 냉동고에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Kitchen]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Display
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "display">>
+당신은 에이버리의 저택 전시실에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<ind>><<link [[가장 큰 전시물 뒤에 숨는다 (0:01)|Mansion Chase Display Hide]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-lounge.png">><<link [[응접실 (0:01)|Mansion Chase Lounge]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[복도 (0:01)|Mansion Chase Hallway 1 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Display Hide
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "display">>
+	당신은 더 큰 전시물 중 하나 뒤에 숨는다. 양쪽 입구로부터는 몸이 가려지지만, 여전히 노출된 기분이 든다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		잠시 뒤 에이버리가 들어오는 소리가 들린다. <<He>>【은는】 전시물 사이를 배회한다. 당신은 전시물을 사이에 두고 에이버리를 피하려 하지만, <span class="red">소용없다.</span> <<He>>【은는】 당신의 발소리를 듣고 방 가장자리에서 당신을 몰아넣는다.
+		<br><br>
+		<<avery_mansion_chase_caught>>
+	<<else>>
+		잠시 뒤 에이버리가 들어오는 소리가 들리지만, <span class="green"><<he>>【은는】 멈추지 않는다.</span> <<He>>【은는】 다음 방으로 계속 간다.
+		<br><br>
+
+		주변이 조용해지자, 당신은 밖으로 나선다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Display]]>><<avery_mansion_chase_location "hallway_1_e">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 더 큰 전시물 중 하나 뒤에 숨는다. 양쪽 입구로부터는 몸이 가려지지만, 여전히 꽤 노출된 기분이 든다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 밖으로 나선다.
+	<br><br>
+	<<link [[다음|Mansion Chase Display]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Garage
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "garage">>
+당신은 에이버리의 저택 차고에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<case "trap">>
+		<<He>>【은는】 <<his>> 차들에 난 흠집을 알아차리자 그대로 굳는다. <<He>>【은는】 잠시 당신을 잊고, 피를 막으려는 것처럼 손을 손상 부위에 갖다 댄다.<<gfrustration>><<set $avery_mansion.chase.health -= 1>>
+		<br><br>
+
+		당신은 <<he>>【이가】 <<his>> 분노를 당신에게 돌리기 전에 탈출한다.
+		<br><br>
+		<<avery_mansion_chase_run>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.key_checked.includes("garage") and $avery_mansion.chase.key is false>>
+			<<ind>><<link [[열쇠를 찾는다 (0:01)|Mansion Chase Garage Key]]>><<set $avery_mansion.chase.key_checked.push("garage")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+
+		<<if $avery_mansion.chase.key is true and !$avery_mansion.chase.trap_done.includes("garage")>>
+			<<ind>><<link [[에이버리의 차에 흠집을 낸다 (0:01)|Mansion Chase Garage Scratch]]>><<pass 1>><<control 10>><<stress -6>><<avery_mansion_chase_location>><<avery_mansion_chase_trap "garage">><</link>><<gcontrol>><<lstress>>
+			<br>
+		<</if>>
+
+		<<ind>><<link [[일상용 차 아래에 숨는다 (0:01)|Mansion Chase Garage Everyday]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[스포츠카 뒤에 숨는다 (0:01)|Mansion Chase Garage Sports]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-kitchen.png">><<link [[부엌 (0:01)|Mansion Chase Kitchen]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-garden.gif">><<link [[정원 (0:01)|Mansion Chase Garden]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Garage Key
+<<effects>>
+
+당신은 차창 안을 들여다보며 차고에서 열쇠를 찾는다.
+<<if $avery_mansion.chase.key_location is "garage">>
+
+	<span class="green">장갑 한 쌍에 반쯤 가려진 채 조리대 위에 놓인 그것을 발견한다.</span>
+	<br><br>
+	<<link [[다음|Mansion Chase Garage]]>><<set $avery_mansion.chase.key to true>><</link>>
+<<else>>
+	<span class="red">여기에는 없다.</span>
+	<br><br>
+
+	<<link [[다음|Mansion Chase Garage]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Garage Scratch
+<<effects>>
+
+당신은 정문 열쇠를 에이버리의 일상용 차에 대고, 그 둘레를 따라 걸으며 도장에 눈에 띄는 흠집을 남긴다. 스포츠카에도 똑같이 한 뒤, 한 걸음 물러나 당신의 솜씨를 감상한다.
+<br><br>
+
+<<link [[다음|Mansion Chase Garage]]>><</link>>
+<br>
+
+:: Mansion Chase Garage Everyday
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "garage">>
+	당신은 에이버리의 일상용 차 밑에 숨는다. <<he>>【이가】 방으로 들어서는 것을 발로 본다.
+	<br><br>
+	<<if $avery_mansion.chase.trap.includes("garage")>>
+		<<He>>【은는】 <<his>> 차들에 난 흠집을 알아차리자 그대로 굳는다. <<He>>【은는】 잠시 당신을 잊고, 피를 막으려는 것처럼 손을 손상 부위에 갖다 댄다.<<gfrustration>><<set $avery_mansion.chase.health -= 1>>
+		<br><br>
+
+		당신은 <<he>>【이가】 <<his>> 분노를 당신에게 돌리기 전에 탈출한다.
+		<<set $avery_mansion.chase.trap.delete("garage")>>
+		<br><br>
+		<<avery_mansion_chase_run>>
+	<<elseif random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<He>>【은는】 차들을 하나씩 돌며 살피고, <<his>> 다른 소유물들에게 퍼붓던 분노를 어느 쪽에도 보이지 않는다. 그러다 <<his>> 얼굴이 나타나, <span class="red">당신을 똑바로 노려본다.</span> <<He>>【은는】 당신을 밖으로 끌어낸다. <<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 차들을 하나씩 돌며 살피고, <<his>> 다른 소유물들에게 퍼붓던 분노를 어느 쪽에도 보이지 않는다. 스포츠카 아래를 뒤지는 <<his>> 뒷머리가 보이지만, <<he>>【은는】 돌아보지 않는다. <span class="green"><<He>>【은는】 방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용해지자, 당신은 차 밑에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Garage]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<He>>【은는】 잠시 멈추더니 다시 멈추지 않고 <span class="green">다음 방으로 계속 간다</span>.
+		<br><br>
+
+		주변이 조용해지자, 당신은 차 밑에서 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Garage]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 에이버리의 일상용 차 밑에 숨는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 차 밑에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Garage]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Garage Sports
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "garage">>
+	당신은 땅에 엎드려 에이버리의 스포츠카 밑에 숨는다. 잠시 후 방 입구에 에이버리의 발이 나타나는 것을 본다.
+	<br><br>
+	<<if $avery_mansion.chase.trap.includes("garage")>>
+		<<He>>【은는】 <<his>> 차들에 난 흠집을 알아차리자 그대로 굳는다. <<He>>【은는】 잠시 당신을 잊고, 피를 막으려는 것처럼 손을 손상 부위에 갖다 댄다.<<gfrustration>><<set $avery_mansion.chase.health -= 1>>
+		<br><br>
+
+		당신은 <<he>>【이가】 <<his>> 분노를 당신에게 돌리기 전에 탈출한다.
+		<<set $avery_mansion.chase.trap.delete("garage")>>
+		<br><br>
+		<<avery_mansion_chase_run>>
+	<<elseif random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<He>>【은는】 차들을 하나씩 돌며 살피고, <<his>> 다른 소유물들에게 남겨둔 분노를 차들에게는 전혀 보이지 않는다. 그러더니 <<he>>【은는】 무릎을 꿇고 스포츠카 아래를 들여다보다가, <span class="red">당신을 똑바로 바라본다.</span> <<He>>【은는】 당신을 은신처에서 끌어낸다.<<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 차들을 하나씩 돌며 살피고, <<his>> 다른 소유물들에게 남겨둔 분노를 차들에게는 전혀 보이지 않는다. 그러더니 <<he>>【은는】 무릎을 꿇고 <<his>> 일상용 차 아래를 들여다본다. <<He>>【은는】 돌아보지 않는다. <<He>>【은는】 몸을 일으켜, <span class="green">방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용해지자, 당신은 숨어 있던 곳에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Garage]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<span class="green"><<He>>【은는】 멈추지 않고 지나간다.</span>
+		<br><br>
+
+		주변이 조용해지자, 당신은 차 밑에서 기어 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Garage]]>><<avery_mansion_chase_location "hallway_1_w">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 땅에 엎드려 에이버리의 스포츠카 밑에 숨는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 차 밑에서 기어 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Garage]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Garden
+<<set $outside to 1>><<effects>>
+
+<<set $avery_mansion.chase.bus to "garden">>
+당신은 에이버리의 저택 밖 정원에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<ind>><<link [[덤불 속에 숨는다 (0:01)|Mansion Chase Garden Bush]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[조각상 뒤에 숨는다 (0:01)|Mansion Chase Garden Statue]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "front-gate.png">><<link [[정문을 확인한다 (0:01)|Mansion Chase Gate]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-atrium.png">><<link [[아트리움 (0:01)|Mansion Chase Hallway 1]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-garage.png">><<link [[차고 (0:01)|Mansion Chase Garage]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-pool.png">><<link [[수영장 (0:01)|Mansion Chase Pool]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Gate
+<<effects>>
+
+정문이 당신 앞에 서 있다. 가시가 돋쳐 있고 위압적이다.
+
+<<if $avery_mansion.chase.key is true>>
+	당신은 열쇠를 꽂고, <span class="green">문이 열린다.</span> 이제 탈출할 수 있다.
+	<br><br>
+	<<link [[탈출한다 (0:03)|Mansion Chase Victory Escape]]>><<pass 3>><</link>>
+	<br>
+	<<link [[정원으로 돌아간다|Mansion Chase Garden]]>><</link>>
+	<br>
+<<else>>
+	당신은 열어보려 하지만 문은 잠겨 있다. <span class="purple">열쇠가 필요하다.</span> 저택 어딘가에 있을 것이다.
+	<br><br>
+
+	<<link [[다음|Mansion Chase Garden]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Garden Bush
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "garden">>
+	당신은 에이버리 정원 구석에 있는 덤불 뒤, 길에서 벗어난 곳에 숨는다. 나뭇가지 사이로 엿보니, 에이버리가 밖으로 나오는 것이 보인다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<He>>【은는】 식물 사이를 배회하며 꽃을 짓밟고 가지를 찢어낸다. <<He>>【은는】 당신이 숨은 곳 옆에 서서 양손으로 덤불을 가르고, <span class="red">당신을 드러낸다.</span>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 식물 사이를 배회하며 꽃을 짓밟고 가지를 찢어내고 조각상까지 쓰러뜨린다. <span class="green"><<He>>【은는】 다른 곳으로 이동하며,</span> <<his>> 공포를 다른 곳으로 가져간다.
+			<br><br>
+
+			주변이 조용해지자, 당신은 밖으로 나선다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Garden]]>><<avery_mansion_chase_location "lounge">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		에이버리는 식물 사이를 배회하며 꽃을 짓밟고 가지를 찢어낸다. <span class="green"><<He>>【은는】 다른 곳으로 이동한다.</span> <<His>> 공포를 다른 곳으로 가져가며.
+		<br><br>
+
+		주변이 조용해지자, 당신은 밖으로 나선다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Garden]]>><<avery_mansion_chase_location "lounge">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 에이버리 정원 구석에 있는 덤불 뒤, 길에서 벗어난 곳에 숨는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용해지자, 당신은 밖으로 나선다.
+	<br><br>
+	<<link [[다음|Mansion Chase Garden]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Garden Statue
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "garden">>
+	당신은 정원 구석에 있는 동상 뒤에 있다. 그 팔다리 사이로 엿보니, 에이버리가 밖으로 나오는 것이 보인다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			<<He>>【은는】 정원을 배회하며 꽃을 짓밟고 가지를 뜯어낸다. 조각상에 이르자 <<he>>【은는】 그것을 밀어붙이고, 당신은 어쩔 수 없이 물러나 <span class="red">훤히 드러난 곳으로 나온다.</span>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<else>>
+			<<He>>【은는】 정원을 배회하며 꽃을 짓밟고, 덤불 뒤를 보기 위해 가지를 뜯어낸다. <span class="green"><<He>>【은는】 거칠게 떠나며,</span> <<his>> 공포를 다른 곳으로 가져간다.
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 조각상 뒤에서 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Garden]]>><<avery_mansion_chase_location "lounge">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<He>>【은는】 정원을 노려보지만, <span class="green">여기서는 멈추지 않는다.</span>
+		<br><br>
+
+		주변이 조용한 것을 확인하고, 당신은 조각상 뒤에서 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Garden]]>><<avery_mansion_chase_location "lounge">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 정원 구석에 있는 조각상 뒤에 숨는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용한 것을 확인하고, 당신은 조각상 뒤에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Garden]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Pool
+<<set $outside to 1>><<effects>>
+
+<<set $avery_mansion.chase.bus to "pool">>
+당신은 에이버리 저택 밖 수영장 옆에 있다.
+
+<<if $avery_mansion.chase.trap.includes("pool")>>
+	당신은 쏟아진 기름을 피해 걸어간다.
+<</if>>
+<br><br>
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<case "trap">>
+		<<He>>【은는】 당신에게서 3미터쯤 떨어진 곳까지 온다. 그때 <<he>>【은는】 기름에 미끄러진다. 한쪽 다리가 벌어지고, <<his>> 얼굴이 충격으로 일그러지더니, <<he>>【은는】 수영장으로 빠진다.<<gfrustration>><<set $avery_mansion.chase.health -= 1>>
+		<br><br>
+
+		<<he>>【이가】 기어 나오기 전에 당신은 탈출한다.
+		<br><br>
+		<<avery_mansion_chase_run>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.trap.includes("pool") and $avery_mansion.chase.gear.includes("oil")>>
+			<<ind>><<link [[수영장 가장자리에 식용유를 뿌린다 (0:01)|Mansion Chase Pool Trap]]>><<pass 1>><<avery_mansion_chase_location>><<avery_mansion_chase_trap "pool">><<set $avery_mansion.chase.gear.delete("oil")>><</link>>
+			<br>
+		<</if>>
+		<<icon "avery-pool.png">><<link [[수영장에 숨는다 (0:01)|Mansion Chase Pool Hide]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-hallway.png">><<link [[안으로 들어간다 (0:01)|Mansion Chase Hallway 1 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-garden.gif">><<link [[정원 (0:01)|Mansion Chase Garden]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Pool Trap
+<<effects>>
+
+당신은 수영장 주변 길에 식용유 한 병을 전부 쏟아부어 위험한 함정을 만든다.
+<br><br>
+
+<<link [[다음|Mansion Chase Pool]]>><</link>>
+<br>
+
+:: Mansion Chase Pool Hide
+<<water>><<waterbr 2>><<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "pool">>
+	당신은 심호흡을 하고 물보라를 최소화하며 수영장으로 들어간다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		당신은 고개를 들어 에이버리가 수영장 가장자리로 다가오는 것을 본다. <<His>> 시선은 수영장 위를 지나 먼 벽을 훑는다. <span class="red">그러다 <<his>> 주의가 아래로 홱 꺾이고,</span> <<he>>【은는】 당신을 똑바로 바라본다. <<He>>【은는】 당신의 어깨를 붙잡고 마른 바닥으로 끌어올린다.<<gpain>><<pain 4>>
+		<br><br>
+		<<avery_mansion_chase_caught>>
+	<<else>>
+		당신은 고개를 들어 에이버리가 수영장 가장자리로 다가오는 것을 본다. <<His>> 시선은 수영장 위를 지나 먼 벽을 훑는다. <span class="green">그러고는 <<he>>【이가】 걸어가 버린다.</span>
+		<br><br>
+
+		당신은 <<hes>> 사라졌는지 확인하려고 수영장 가장자리 위로 살짝 고개를 내민 뒤, 밖으로 기어오른다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Pool]]>><<avery_mansion_chase_location "hallway_1">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 심호흡을 하고 물보라를 최소화하며 수영장으로 들어간다.
+
+	<<avery_mansion_chase>>
+
+	당신은 <<hes>> 정말 다른 곳에 있는지 확인하려고 가장자리 위로 살짝 고개를 내민 뒤, 밖으로 기어오른다.
+	<br><br>
+	<<link [[다음|Mansion Chase Pool]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Bedroom
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "bedroom">>
+당신은 에이버리의 침실에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.key_checked.includes("bedroom") and $avery_mansion.chase.key is false>>
+			<<ind>><<link [[열쇠를 찾는다 (0:01)|Mansion Chase Bedroom Key]]>><<set $avery_mansion.chase.key_checked.push("bedroom")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+
+		<<ind>><<link [[침대 아래에 숨는다 (0:01)|Mansion Chase Bedroom Bed]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[욕조 안에 숨는다 (0:01)|Mansion Chase Bedroom Tub]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<ind>><<link [[옷장 안에 숨는다 (0:01)|Mansion Chase Bedroom Wardrobe]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br><br>
+		<<icon "avery-bathroom.png">><<link [[욕실 (0:01)|Mansion Chase Bathroom]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[복도 (0:01)|Mansion Chase Hallway 2 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Bedroom Key
+<<effects>>
+
+당신은 침실에서 열쇠를 찾으며, 에이버리가 최근에 입었던 옷의 주머니까지 뒤진다.
+<<avery_housework_change "bedroom" 1>>
+<<if $avery_mansion.chase.key_location is "bedroom">>
+
+	<span class="green">침대 옆 협탁에서 열쇠를 찾는다.</span> 에이버리 쪽 침대 옆이다.
+	<br><br>
+	<<link [[다음|Mansion Chase Bedroom]]>><<set $avery_mansion.chase.key to true>><</link>>
+<<else>>
+	<span class="red">여기에는 없다.</span>
+	<br><br>
+
+	<<link [[다음|Mansion Chase Bedroom]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Bedroom Bed
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "bedroom">>
+	당신은 바닥에 엎드려 침대 아래로 꿈틀거리며 기어 들어간다. 여기서는 방이 조금 보인다. 에이버리의 발이 방 안으로 들어온다. <<him>>의 나머지 몸도 함께 있을 거라고 생각한다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 3>>
+		<<if $rng is 3>>
+			<<He>>【은는】 천천히 방을 가로질러 침대 바로 옆에 선다. 그러더니 침대를 몇 피트 옆으로 밀어붙여, <span class="red">당신을 드러낸다.</span>
+			<<avery_housework_change "bedroom" 1>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<elseif $rng is 2>>
+			<<He>>【은는】 침실을 지나 발코니로 걸어간다. 그곳에서 잠시 멈췄다가, <span class="green">방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 침대 밑에서 기어 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+			<br>
+		<<else>>
+			<<He>>【은는】 침실을 가로질러 옷장 안으로 사라진다. 잠시 뒤 다시 나와, <span class="green">방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 숨어있던 곳에서 기어 나온다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		에이버리가 침실을 훑어보듯 천천히 지나간다. <span class="green"><<His>> 발이 다음 방으로 사라진다.</span>
+		<br><br>
+
+		주변이 조용한 것을 확인하고, 당신은 침대 밑에서 기어 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 엎드려서 침대 밑으로 기어 들어간다. 이곳에서는 방의 일부만 보인다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용한 것을 확인하고, 당신은 침대 밑에서 기어 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Bedroom]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Bedroom Tub
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "bedroom">>
+	당신은 발코니로 나가 몸을 낮춘 채 온수 욕조로 들어간다. 에이버리의 발소리가 침실로 들어오는 것이 들린다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 3>>
+		<<if $rng is 3>>
+			<<him>>【이가】 걸어오는 소리가 점점 가까워진다. 이윽고 <<he>>【이가】 위에 나타나, <span class="red">곧장 당신을 내려다본다.</span> <<He>>【은는】 당신을 온수 욕조에서 끌어낸다.<<gpain>><<pain 4>>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<elseif $rng is 2>>
+			에이버리가 침대를 밀어 바닥을 긁는 소리가 들린다. 잠시 정적이 흐르고, <span class="green">이내 <<he>>【은는】 방을 떠난다.</span>
+			<<avery_housework_change "bedroom" 1>>
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 온수 욕조에서 나와 침실로 돌아간다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+			<br>
+		<<else>>
+			<<him>>【이가】 방을 가로질러 걷는 소리가 들리고, 이내 조용해진다. 당신은 숨어있던 곳에서 거의 일어날 뻔했지만, 다시 <<him>>의 소리가 들린다. <<He>>【은는】 방을 나간다. 당신은 잠시 기다렸다가, <<hes>> 떠났는지 확인하기 위해 온수 욕조 위로 살짝 엿본다.
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 기어 나와 침실로 돌아간다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<him>>【이가】 멈추지 않고 방을 지나가는 소리가 들린다.
+		<br><br>
+
+		주변이 조용한 것을 확인하고, 당신은 온수 욕조에서 나와 침실로 돌아간다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 발코니로 나가 몸을 낮춘 채 온수 욕조로 들어간다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용한 것을 확인하고, 당신은 온수 욕조에서 나와 침실로 돌아간다.
+	<br><br>
+	<<link [[다음|Mansion Chase Bedroom]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Bedroom Wardrobe
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "bedroom">>
+	당신은 붙박이장에 숨어 문을 살짝 열어두고 밖을 엿본다. 잠시 후 에이버리가 침실로 들어와 방을 훑어보며 멈춰 선다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<rng 3>>
+		<<if $rng is 3>>
+			<<He>>【은는】 옷장 쪽으로 걸어온다. 당신은 어둠 속으로 더 물러나지만, 에이버리의 입가가 미소로 비틀린다. <<He>>【은는】 문을 홱 열어젖혀, <span class="red">당신을 드러낸다.</span>
+			<br><br>
+			<<avery_mansion_chase_caught>>
+		<<elseif $rng is 2>>
+			당신은 <<he>>【이가】 침대까지 걸어가 그것을 옆으로 밀어내는 모습을 지켜본다. <<He>>【은는】 당신을 찾지 못한 것이 의외라는 듯 잠시 멈췄다가, <span class="green">방을 떠난다.</span>
+			<<avery_housework_change "bedroom" 1>>
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 문을 열고 침실로 나간다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+			<br>
+		<<else>>
+			<<He>>【은는】 발코니로 나가 온수 욕조 안을 들여다본다. 몸을 홱 돌려 방을 다시 훑는다. <<His>> 눈길이 당신이 숨은 곳에 잠시 머물지만, <span class="green">곧 <<he>>【은는】 방을 떠난다.</span>
+			<br><br>
+
+			주변이 조용한 것을 확인하고, 당신은 문을 열고 침실로 나간다.
+			<br><br>
+
+			<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		에이버리는 잠시 기다릴 뿐, <span class="green">곧 다음 방으로 이동한다.</span>
+		<br><br>
+
+		주변이 조용한 것을 확인하고, 당신은 문을 열고 침실로 나간다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Bedroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 붙박이장에 숨어 문을 살짝 열어두고 밖을 엿본다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용한 것을 확인하고, 당신은 문을 열고 침실로 나간다.
+	<br><br>
+	<<link [[다음|Mansion Chase Bedroom]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Bathroom
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "bathroom">>
+당신은 에이버리의 욕실에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.key_checked.includes("bathroom") and $avery_mansion.chase.key is false>>
+			<<ind>><<link [[열쇠를 찾는다 (0:01)|Mansion Chase Bathroom Key]]>><<set $avery_mansion.chase.key_checked.push("bathroom")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+
+		<<ind>><<link [[욕조에 숨는다 (0:01)|Mansion Chase Bathroom Bath]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-bedroom.png">><<link [[침실 (0:01)|Mansion Chase Bedroom]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Bathroom Key
+<<effects>>
+
+당신은 욕실에서 열쇠를 찾으며, 약장과 급히 놓고 갔을 만한 곳들을 뒤진다.
+<<avery_housework_change "bathroom" 1>>
+<<if $avery_mansion.chase.key_location is "bathroom">>
+	<span class="green">에이버리의 칫솔 옆에서 열쇠를 찾는다.</span>
+	<br><br>
+	<<link [[다음|Mansion Chase Bathroom]]>><<set $avery_mansion.chase.key to true>><</link>>
+<<else>>
+	<span class="red">여기에는 없다.</span>
+	<br><br>
+
+	<<link [[다음|Mansion Chase Bathroom]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Bathroom Bath
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "bathroom">>
+	당신은 욕조에 들어가 몸을 낮춘다. 에이버리가 방으로 들어온다. <<his>> 숨소리가 들릴 만큼 가깝다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<He>>【은는】 가까이 다가와 아래를 흘끗 본다. 그것만으로 충분하다. <span class="red"><<He>>【은는】 당신을 노려보더니,</span> 욕조에서 끌어낸다.<<gpain>><<pain 4>>
+		<br><br>
+		<<avery_mansion_chase_caught>>
+	<<else>>
+		<<him>>【이가】 한 걸음 더 내딛는 소리가 들리고, 곧 <<he>>【은는】 가만히 멈춰 선다. <<He>>【은는】 숨을 세 번 고른다. <span class="green">그리고 몸을 돌려 떠난다.</span>
+		<br><br>
+
+		주변이 조용한 것을 확인하고, 당신은 욕조에서 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Bathroom]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 욕조에 들어가 몸을 낮춘다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용한 것을 확인하고, 당신은 욕조에서 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Bathroom]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Study
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "study">>
+당신은 에이버리 저택의 서재에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if !$avery_mansion.chase.key_checked.includes("study") and $avery_mansion.chase.key is false>>
+			<<ind>><<link [[열쇠를 찾는다 (0:01)|Mansion Chase Study Key]]>><<set $avery_mansion.chase.key_checked.push("study")>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+
+		<<ind>><<link [[책상 밑에 숨는다 (0:01)|Mansion Chase Study Desk]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[복도 (0:01)|Mansion Chase Hallway 3]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Study Key
+<<effects>>
+
+당신은 책상 안팎을 뒤지며 서재에서 열쇠를 찾는다. 책들 사이에 비밀 은닉처가 없기만을 바란다.
+<<avery_housework_change "study" 1>>
+<<if $avery_mansion.chase.key_location is "study">>
+
+	<span class="green">서랍 안에서 열쇠를 찾는다.</span> 낯선 분위기의 라이터 옆이다.
+	<br><br>
+	<<link [[다음|Mansion Chase Study]]>><<set $avery_mansion.chase.key to true>><</link>>
+<<else>>
+	<span class="red">여기에는 없다.</span>
+	<br><br>
+
+	<<link [[다음|Mansion Chase Study]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Study Desk
+<<effects>>
+
+<<if $avery_mansion.chase.avery_bus is "study">>
+	당신은 네 발로 엎드려 책상 밑에 숨는다. 잠시 뒤 에이버리가 들어온다. 당신에게 보이는 건 <<his>> 발뿐이다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+		<<He>>【은는】 성큼 다가와 몸을 숙이고, <span class="red"><<his>> 시선으로 당신을 꿰뚫는다.</span> <<He>>【은는】 당신의 어깨를 붙잡아 은신처에서 끌어낸다.<<gpain>><<pain 4>>
+		<br><br>
+		<<avery_mansion_chase_caught>>
+	<<else>>
+		<<He>>【은는】 몸을 돌려 왔던 길로 떠난다.
+		<br><br>
+
+		주변이 조용한 것을 확인하고, 당신은 책상 밑에서 기어 나온다.
+		<br><br>
+
+		<<link [[다음|Mansion Chase Study]]>><<avery_mansion_chase_location "hallway_2">><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 네 발로 엎드려 책상 밑에 숨는다.
+
+	<<avery_mansion_chase>>
+
+	주변이 조용한 것을 확인하고, 당신은 책상 밑에서 기어 나온다.
+	<br><br>
+	<<link [[다음|Mansion Chase Study]]>><</link>>
+	<br>
+<</if>>
+
+:: Mansion Chase Hallway 1
+<<set $outside to 0>><<effects>>
+
+<<if $phase is 1>>
+	계단을 오르자 삐걱거리는 소리가 난다. <span class="red">에이버리가 들었을 것이다.</span>
+	<br><br>
+<</if>>
+<<set $avery_mansion.chase.bus to "hallway_1">>
+당신은 에이버리 저택의 아트리움에 있다. 2층으로 이어지는 계단이 있다.
+
+<<avery_mansion_chase_state>>
+<<if $avery_mansion.chase.state is "chase" and $avery_mansion.chase.avery_bus is "hallway_2" and $avery_mansion.chase.trap.includes("hallway_2")>>
+	<<set $avery_mansion.chase.state to "trap">>
+	<<set $avery_mansion.chase.trap.delete("hallway_2")>>
+<</if>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<case "trap">>
+		위쪽 계단참에서 놀란 비명이 들린다. 에이버리가 구슬을 밟고 미끄러져 계단 아래로 굴러떨어진 뒤, 당신 발치에서 멈춘다.<<gfrustration>><<set $avery_mansion.chase.health -= 1>>
+		<<set $avery_mansion.chase.avery_bus to "hallway_1">>
+		<br><br>
+
+		당신은 <<he>>【이가】 정신을 차리기 전에 탈출한다.
+		<br><br>
+		<<avery_mansion_chase_run>>
+	<<default>>
+		<<avery_mansion_chase>>
+		<<if $phase is 1>>
+			<<icon "avery-atrium.png">><<link [[위층 (0:01)|Mansion Chase Hallway 2]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><<set $phase to 1>><</link>>
+			<br>
+			<<icon "avery-hallway.png">><<link [[서쪽 복도 (0:01)|Mansion Chase Hallway 1 W]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><</link>>
+			<br>
+			<<icon "avery-hallway.png">><<link [[동쪽 복도 (0:01)|Mansion Chase Hallway 1 E]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><</link>>
+			<br>
+			<<icon "avery-garden.gif">><<link [[정원 (0:01)|Mansion Chase Garden]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><</link>>
+			<br>
+		<<else>>
+			<<icon "avery-atrium.png">><<link [[위층 (0:01)|Mansion Chase Hallway 2]]>><<pass 1>><<avery_mansion_chase_location>><<set $phase to 1>><</link>>
+			<br>
+			<<icon "avery-hallway.png">><<link [[서쪽 복도 (0:01)|Mansion Chase Hallway 1 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+			<<icon "avery-hallway.png">><<link [[동쪽 복도 (0:01)|Mansion Chase Hallway 1 E]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+			<<icon "avery-garden.gif">><<link [[정원 (0:01)|Mansion Chase Garden]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+<</switch>>
+<<set $phase to 0>>
+
+:: Mansion Chase Hallway 1 W
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "hallway_1_w">>
+당신은 에이버리 저택 1층 서쪽에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<icon "avery-lounge.png">><<link [[응접실 (0:01)|Mansion Chase Lounge]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-display.png">><<link [[전시실 (0:01)|Mansion Chase Display]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-atrium.png">><<link [[아트리움 (0:01)|Mansion Chase Hallway 1]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[동쪽 복도 (0:01)|Mansion Chase Hallway 1 E]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Hallway 1 E
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "hallway_1_e">>
+당신은 에이버리 저택 1층 동쪽에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<icon "avery-dining.png">><<link [[식당 (0:01)|Mansion Chase Dining]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-kitchen.png">><<link [[부엌 (0:01)|Mansion Chase Kitchen]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-atrium.png">><<link [[아트리움 (0:01)|Mansion Chase Hallway 1]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[서쪽 복도 (0:01)|Mansion Chase Hallway 1 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Hallway 2
+<<set $outside to 0>><<effects>>
+
+<<if $phase is 1>>
+	계단을 오르자 삐걱거리는 소리가 난다. <span class="red">에이버리가 들었을 것이다.</span>
+	<br><br>
+<</if>>
+
+<<set $avery_mansion.chase.bus to "hallway_2">>
+당신은 에이버리 저택 2층 계단참에 있다.
+
+<<if $avery_mansion.chase.trap.includes("hallway_2")>>
+	당신은 구슬이 흩뿌려진 바닥을 살금살금 가로지른다.
+<</if>>
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<case "trap">>
+		구슬을 밟고 미끄러진 <<his>> 눈이 충격으로 커진다. <<He>>【은는】 당신을 붙잡으려 하지만, 기세에 휩쓸려 멀어지고 계단 아래로 굴러떨어진다.<<gfrustration>><<set $avery_mansion.chase.health -= 1>>
+		<<set $avery_mansion.chase.avery_bus to "hallway_1">>
+		<br><br>
+
+		당신은 <<he>>【이가】 정신을 차리기 전에 탈출한다.
+		<br><br>
+		<<avery_mansion_chase_run>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if $phase is 1>>
+			<<if $avery_mansion.chase.gear.includes("marbles") and !$avery_mansion.chase.trap.includes("hallway_2")>>
+				<<link [[구슬을 바닥에 쏟는다|Mansion Chase Hallway 2 Marbles]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><<avery_mansion_chase_trap "hallway_2">><<set $avery_mansion.chase.gear.delete("marbles")>><</link>>
+				<br>
+			<</if>>
+			<<icon "avery-hallway.png">><<link [[서쪽 복도 (0:01)|Mansion Chase Hallway 2 W]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><</link>>
+			<br>
+			<<icon "avery-hallway.png">><<link [[동쪽 복도 (0:01)|Mansion Chase Hallway 2 E]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><</link>>
+			<br>
+			<<icon "avery-atrium.png">><<link [[아래층 (0:01)|Mansion Chase Hallway 1]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_1">><<set $phase to 1>><</link>>
+			<br>
+		<<else>>
+			<<if $avery_mansion.chase.gear.includes("marbles") and !$avery_mansion.chase.trap.includes("hallway_2")>>
+				<<link [[구슬을 바닥에 쏟는다|Mansion Chase Hallway 2 Marbles]]>><<pass 1>><<avery_mansion_chase_location>><<avery_mansion_chase_trap "hallway_2">><<set $avery_mansion.chase.gear.delete("marbles")>><</link>>
+				<br>
+			<</if>>
+			<<icon "avery-hallway.png">><<link [[서쪽 복도 (0:01)|Mansion Chase Hallway 2 W]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+			<<icon "avery-hallway.png">><<link [[동쪽 복도 (0:01)|Mansion Chase Hallway 2 E]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+			<<icon "avery-atrium.png">><<link [[아래층 (0:01)|Mansion Chase Hallway 1]]>><<pass 1>><<avery_mansion_chase_location>><<set $phase to 1>><</link>>
+			<br>
+		<</if>>
+<</switch>>
+<<set $phase to 0>>
+
+:: Mansion Chase Hallway 2 Marbles
+<<effects>>
+
+당신은 계단 꼭대기 근처 바닥에 구슬 주머니를 쏟아붓는다. 보지 않고 밟는 사람은 심하게 넘어질 위험이 있다.
+<br><br>
+
+<<link [[다음|Mansion Chase Hallway 2]]>><</link>>
+<br>
+
+:: Mansion Chase Hallway 2 W
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "hallway_2_w">>
+당신은 에이버리 저택 2층 서쪽 복도에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<icon "avery-bedroom.png">><<link [[침실 (0:01)|Mansion Chase Bedroom]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[계단참 (0:01)|Mansion Chase Hallway 2]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Hallway 2 E
+<<set $outside to 0>><<effects>>
+
+<<set $avery_mansion.chase.bus to "hallway_2_e">>
+당신은 에이버리 저택 2층 동쪽 복도에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<icon "avery-hallway.png">><<link [[위층 (0:01)|Mansion Chase Hallway 3]]>><<pass 1>><<avery_mansion_chase_location>><<set $phase to 1>><</link>>
+		<br>
+		<<icon "avery-hallway.png">><<link [[계단참 (0:01)|Mansion Chase Hallway 2]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+		<br>
+<</switch>>
+
+:: Mansion Chase Hallway 3
+<<set $outside to 0>><<effects>>
+
+<<if $phase is 1>>
+	계단을 오르자 삐걱거리는 소리가 난다. <span class="red">에이버리가 들었을 것이다.</span>
+	<br><br>
+<</if>>
+
+<<set $avery_mansion.chase.bus to "hallway_3">>
+당신은 에이버리 저택 3층, <<his>> 서재로 이어지는 긴 복도에 있다.
+
+<<avery_mansion_chase_state>>
+<<switch $avery_mansion.chase.state>>
+	<<case "victory">>
+		<<avery_mansion_trap_victory>>
+	<<case "caught">>
+		<<avery_mansion_chase_caught>>
+	<<default>>
+		<<avery_mansion_chase>>
+
+		<<if $phase is 1>>
+			<<icon "avery-hallway.png">><<link [[아래층 (0:01)|Mansion Chase Hallway 2 E]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_2">><</link>>
+			<br>
+			<<icon "avery-study.png">><<link [[서재 (0:01)|Mansion Chase Study]]>><<pass 1>><<avery_mansion_chase_location "sound_stairs_2">><</link>>
+			<br>
+		<<else>>
+			<<icon "avery-hallway.png">><<link [[아래층 (0:01)|Mansion Chase Hallway 2 E]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+			<<icon "avery-study.png">><<link [[서재 (0:01)|Mansion Chase Study]]>><<pass 1>><<avery_mansion_chase_location>><</link>>
+			<br>
+		<</if>>
+<</switch>>
+
+<<set $phase to 0>>

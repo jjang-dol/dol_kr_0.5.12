@@ -1,0 +1,1343 @@
+:: Elk Compound Climb
+<<set $outside to 1>><<set $location to "town">><<effects>>
+당신은 울타리를 기어올라 꼭대기를 넘어, 엘크 가로 내려선다. 아무도 당신을 보지 못한 것 같다.
+<br><br>
+
+<<link [[다음|Elk Street]]>><</link>>
+<br>
+
+:: Elk Compound Leave
+<<set $outside to 1>><<set $location to "town">><<effects>>
+당신은 문으로 걸어가 경비원들과 이야기한다.
+<br><br>
+<<if $speech_attitude is "meek">>
+	"소포를 배달했어요." 당신이 말한다. "ㅈ-제가 나가도 될까요?"
+<<elseif $speech_attitude is "bratty">>
+	"다 끝났어요." 당신이 말한다. "이제 보내줄래요?"
+<<else>>
+	"소포를 배달했습니다." 당신이 말한다. "나가게 해주세요."
+<</if>>
+<br><br>
+경비원이 당신을 훑어본다. "확인됐다." 당신은 문이 열리기를 기다렸다가 엘크 가로 다시 나간다.
+<br><br>
+
+<<link [[다음|Elk Street]]>><</link>>
+<br>
+
+:: Elk Compound
+<<set $outside to 1>><<set $location to "compound">><<effects>>
+당신은 엘크 가에 있는 단지 안에 있다. 붉은 벽돌 건물 세 채가 사슬 울타리에 둘러싸여 서 있다. 정문은 경비원이 지키고 있다.
+<<if !$compound.allowed>>
+	<span class="red">무단 침입 상태입니다.</span>
+<</if>>
+<br><br>
+<<if !$compound.discovered>>
+	<span class="gold">엘크 가의 단지를 발견했습니다.</span>
+	<<earnFeat "Illicit Science">>
+	<br><br>
+	<<set $compound.discovered to true>>
+<</if>>
+<<if $compound.alarm gte 1>>
+	<<set $daily.compoundState to 1>>
+<</if>>
+<<if $compound.alarm is 0>>
+	<span class="green">경비가 느슨합니다.</span>
+<<elseif $compound.alarm is 1>>
+	<span class="lblue">경비가 의심하고 있습니다.</span>
+<<elseif $compound.alarm is 2>>
+	<span class="purple">경비가 침입자를 인지했습니다.</span>
+<<else>>
+	<span class="red">경비가 최고 경계 태세에 돌입했습니다.</span>
+<</if>>
+<br><br>
+/* Commented out the compound task part of the check to give the wraith priority as it creates an awkward situation allowing you to avoid the wraith or for it to suddenly take control only if you place a single camera down */
+<<if $stress gte $stressmax>>
+	<<passoutcompound>>
+<<elseif $hallucinations gte 2 and $wraithCompoundEvent is true/* and !(isPubfameTaskAccepted("compound") and $pubfame.compound.cameras.length is 0)*/>>
+	<<unset $wraithCompoundEvent>>
+	<<generateWraith 1 true>><<person1>><<hallucinogen 15>>
+	<<if !$wraith.will>>
+		<<set $wraith.will to random(1300, 1700)>>
+	<</if>>
+	단지가 갑자기 조용해져서 주위를 둘러본다. 심호흡을 해보지만, 마치 솜을 통해 숨을 쉬는 것 같다. <<rainWraith true>>
+	<br><br>
+
+	귓가에 이명이 울리고, <<print window.KR.getWeatherKr(Weather.precipitation)>> 속에서 어떤 형체가 나타난다. 아름답고 창백한 형체가 땅 바로 위를 떠다니고 있다. 바람에 흩날리는 반투명한 흰 로브를 입고 있다. 그 눈이 밝은 <<wraithEyes>> 빛으로 번뜩인다.
+	<br><br>
+
+	<<if $wraith.state is "haunt" or $wraith.offspring is "dead">>
+		<<if $wraith.state is "haunt">>
+			그것은 당신을 노려보며 화난 듯 자신의 목을 할퀸다. "<span class="wraith">도둑들 중의 도둑. 네게 딱 맞는 곳이군.</span>"
+		<<else>>
+			그것이 당신을 노려본다. "<span class="wraith">도살자들 중의 도살자. 네게 딱 맞는 곳이군.</span>"
+		<</if>>
+		몇 초간 침묵이 흐른다.
+		<br><br>
+
+		<<if $wraith.offspring is "sold">>
+			"<span class="wraith">아니면 네 아이들이 부르는 소리를 들었나?</span>"
+			<br><br>
+		<</if>>
+
+		갑자기 그것은 땅에 있는, 혹은 땅속에 있는 무언가를 보려고 돌아선다. 동요하는 것처럼 보인다. 당신이 뒷걸음질 치려 하자, 그것은 고개를 비틀어 당신을 쳐다본다. "<span class="wraith">내 적의 적. 도구로군.</span>" 순식간에 그것은 당신 앞에 서 있다. 그 눈 속에서 형체들이 빙글빙글 돌기 시작하고, 당신의 몸은 의지와 상관없이 이완되기 시작한다.
+		<br><br>
+
+		<<skinicon "wraith">><<link [[굴복한다|Elk Compound Wraith Give]]>><<endevent>><</link>>
+	<<else>>
+		처음에는 당신을 알아채지 못한 것 같다. 동요하는 것처럼 보인다. 그것은 땅, 혹은 땅속을 응시하다가, 곁눈질로 당신을 발견하고는 돌아본다. "<span class="wraith"><<pcPetname "Wraith">>.</span>"
+		<br><br>
+
+		그것은 당신을 훑어보더니, 당신을 향해 떠온다. "<span class="wraith">너는 저들과 함께가 아니군. 저들에게 맞서는 자인가?<<if $wraith.offspring is "sold">> 아니면 우리 아이들이 우는 소리를 들었나?<</if>></span>" 그것은 당신에게 다가와 손바닥을 편 채로 손을 내민다. "<span class="wraith">네 자신을 내게 빌려다오.</span>" 그 눈 속에서 형체들이 빙글빙글 돌기 시작하고, 당신의 몸은 의지와 상관없이 이완되기 시작한다.
+		<br><br>
+
+		<<skinicon "wraith">><<link [[손을 잡는다|Elk Compound Wraith Give]]>><<endevent>><</link>><<handholdingvirginitywarning>>
+	<</if>>
+	<br>
+
+	<<refuseicon>><<link [[저항한다|Elk Compound Wraith Resist]]>><</link>>
+<<else>>
+	<<if $compound.alarm gte random(1, 3) and $eventskip isnot 1>>
+		<<if $rng gte 51>>
+			<<beastNEWinit 1 dog>>
+			경비 <<beasttype>> 한 마리가 당신을 향해 달려온다. <<bHe>>【은는】 몇 피트 떨어진 곳에서 멈춰 짖기 시작한다.
+			<br><br>
+			<<if $monster is 1 or $settings.bestialityEnabled>>
+				<<if hasSexStat("deviancy", 2)>>
+					<<link [[`<<bhim>>【을를】 진정시키기`|Elk Compound Bestiality]]>><<set $sexstart to 1>><</link>><<deviant2>>
+					<br>
+				<</if>>
+				<<link [[싸운다|Elk Compound Bestiality]]>><<set $molestationstart to 1>><</link>>
+				<br>
+				<<link [[단지에서 탈출한다|Elk Compound Run]]>><<crimeUp 30 "trespassing">><</link>><<athleticsdifficulty 1 1000>><<crime "trespassing">>
+				<br>
+			<<else>>
+				<<link [[단지에서 탈출한다|Elk Compound Run]]>><<crimeUp 30 "trespassing">><<set $athleticsSuccess to true>><</link>><<crime "trespassing">>
+				<br>
+			<</if>>
+		<<else>>
+			손 하나가 당신의 어깨에 놓인다. <<generateSecurity 1>><<person1>>"자, <<girl>>, 놀이 시간은 끝났어." <<He>>【은는】 당신 얼굴 앞에서 <<his>> 곤봉을 흔든다. "밖에서 <<phim>>【을를】 찾았어." <<he>>【은는】 <<his>> 무전기에 대고 말한다. "알았어, 그때까지 <<phim>>【을를】 여기 붙잡아 둘게."
+			<br><br>
+
+			<<if $compound.bluff is true>>
+				<span class="pink">속임수가 다시 통하지는 않을 겁니다.</span>
+				<br>
+			<<else>>
+				<<set $skulduggerydifficulty to 600>>
+				<<link [[속인다|Elk Compound Bluff]]>><</link>><<skulduggerydifficulty>>
+				<br>
+			<</if>>
+			<<link [[싸운다|Elk Compound Fight]]>><<set $fightstart to 1>><</link>>
+			<br>
+			<<link [[기다린다|Elk Compound Underground]]>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the courtyard")>>
+			<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.unshift("the courtyard")>><</link>><<gsecurity>>
+			<br><br>
+		<</if>>
+		<<if !$compound.theft.pipes or isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with storage tanks")>>
+			<<investigateicon>><<link [[밖에 저장 탱크가 있는 건물을 조사한다|Elk Compound Pipes]]>><</link>>
+			<br>
+		<</if>>
+		<<if !$compound.theft.smoke or isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with smokestacks")>>
+			<<investigateicon>><<link [[굴뚝이 있는 건물을 조사한다|Elk Compound Smoke]]>><</link>>
+			<br>
+		<</if>>
+		<<if !$weekly.compoundCentre or $phials_held gte 1 or isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the central building")>>
+			<<investigateicon>><<link [[중앙 건물을 조사한다|Elk Compound Central]]>><</link>>
+			<br>
+		<</if>>
+		<<if $compound.allowed and !$compound.alarm>>
+			<<getouticon>><<link [[정문을 통해 나간다|Elk Compound Leave]]>><<resetCompound>><</link>>
+		<<else>>
+			<<getouticon>><<link [[담을 넘어 안전한 곳으로 간다|Elk Compound Climb]]>><<resetCompound>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Elk Compound Pipes
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+건물 문은 쉽게 열렸고, 당신은 안으로 들어간다. 내부는 분홍색 액체가 담긴 수영장이 대부분을 차지하고 있다.
+<<if !$compound.theft.pipes>>
+	중앙에는 받침대 위에 분홍색 수정이 놓여 있고, 좁은 통로로 옆쪽과 연결되어 있다. 값비싸 보인다.
+	<br><br>
+	<<ind>><<link [[가져간다|Elk Compound Crystal]]>><</link>><<crime "thievery">><<gsecurity>>
+	<br>
+<<else>>
+	<br><br>
+<</if>>
+
+<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with storage tanks")>>
+	<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Pipes Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.pushUnique("the building with storage tanks")>><</link>><<gsecurity>>
+	<br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Smoke
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+문은 쉽게 열렸고, 당신은 건물 안으로 들어간다. 내부는 달콤한 냄새가 나는 연기로 가득하다. 몇 피트 앞밖에 보이지 않는다. 연기 때문에 머리가 몽롱해진다.
+<br><br>
+
+<<if !$compound.theft.smoke>>
+	<<investigateicon>><<link [[탐색한다 (0:10)|Elk Compound Explore]]>><<pass 10>><</link>>
+	<br>
+<</if>>
+<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with smoke stacks")>>
+	<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Smoke Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.pushUnique("the building with smoke stacks")>><</link>><<gsecurity>>
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Central
+<<set $outside to 1>><<set $location to "compound">><<effects>><<set $lock to 300>>
+문은 단단히 잠겨 있다.
+<br><br>
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		자물쇠를 딸 수 있을 것 같지만, <span class="blue">팔이 묶여 있지 않다면 말이다.</span>
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+		<<lockicon "pick">><<link [[침입한다 (0:05)|Elk Compound Interior]]>><<pass 5>><<crimeUp 30 "trespassing">><</link>><<ggcrime "trespassing">><<gsecurity>>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+<<if $phials_held gte 1>>
+	<<if $compound.alarm gte 1>>
+		<span class="blue">배달을 하려면 경비가 느슨해질 때까지 기다려야 합니다.</span>
+		<br>
+	<<else>>
+		<<ind>><<link [[초인종을 누른다|Elk Compound Central Ring]]>><</link>>
+		<br>
+	<</if>>
+
+<</if>>
+<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Central Ring
+<<effects>>
+
+<<generate1>><<person1>>
+위에서 녹색 불빛이 깜박인다. 진동이 느껴지더니 문이 열린다. <<person>>【이가】 차가운 시선으로 당신을 쳐다보며 기다리고 있다.
+<br><br>
+
+<<if $phials_held gte 2>>
+	<<link [[최음제 약병들을 판다|Elk Compound Sell]]>><</link>>
+	<br>
+<<elseif $phials_held is 1>>
+	<<link [[최음제 약병을 판다|Elk Compound Sell]]>><</link>>
+	<br>
+<</if>>
+<<link [[사과한다|Elk Compound Central Apologise]]>><<set $compound.alarm += 1>><<stress 6>><</link>><<gsecurity>><<gstress>>
+<br>
+
+:: Elk Compound Sell
+<<effects>><<wearProp "phial pink mist">>
+
+당신은
+<<if $phials_held gte 2>>
+	약병들을 내민다.
+<<else>>
+	약병을 내민다.
+<</if>>
+<<person>>【은는】 말없이 액체를 살피더니, <<his>> 코트에서 현금 뭉치를 꺼낸다. <<He>>【은는】 쳐다보지도 않고 당신에게 돈을 건네고는 문을 닫는다.
+<br><br>
+
+<<money `($phials_held * 100000)` "compoundPhials">>
+<span class="gold">£<<print ($phials_held * 1000)>>【을를】 벌었습니다.</span>
+<br><br>
+<<world_corruption "soft" $phials_held>>
+<<set $stat_aphrodisiacs_sold += $phials_held>>
+<<set $phials_held to 0>>
+<<earnFeat "Dealing">>
+
+<<link [[다음|Elk Compound]]>><<endevent>><</link>>
+<br>
+
+:: Elk Compound Central Apologise
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"기, 길을 잃었어요." 당신은 말한다. "죄송해요."
+<<elseif $speech_attitude is "bratty">>
+	"잘못 찾아왔어요." 당신은 말한다. "죄송해요."
+<<else>>
+	"길을 잃었어요." 당신은 말한다. "죄송해요."
+<</if>>
+<br><br>
+
+<<person>>【이가】 문을 쾅 닫는다. 잠시 후 경보가 울린다.
+<br><br>
+
+<<link [[다음|Elk Compound]]>><<endevent>><</link>>
+<br>
+
+:: Elk Compound Bestiality
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $enemytrust -= 40>><<set $enemyanger += 20>>
+	<<enable_rescue>>
+<<elseif $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+	<<set $enemytrust -= 40>>
+	당신은 바닥에 엎드려 짝짓기 자세를 취한다. <<beasttype>>【은는】 짖는 것을 멈추지만, 이제 다른 생각을 품고 있다.
+	<<deviancy2>>
+	<<enable_rescue>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend>>
+	<span id="next"><<link [[다음|Elk Compound Bestiality Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Elk Compound Bestiality]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Elk Compound Run
+<<set $outside to 1>><<set $location to "compound">><<effects>>
+<<if $athleticsSuccess>>
+	당신은 <span class="green">성공적으로</span> 담장을 기어올라 꼭대기를 넘어, 엘크 가에 제대로 착지한다. 뒤에서 <<beasttype>>들이 짖는 소리가 들리고, 경비원들이 경고를 받고 달려오지만 당신이 탈출하는 것을 볼 뿐이다.
+	<br><br>
+	<<link [[다음|Elk Street]]>><<resetCompound>><<endevent>><</link>>
+	<br>
+<<else>>
+	도망치려 하지만, <span class="red"><<beasttype 0>>【이가】 당신을 쫓아온다.</span>
+	<br><br>
+	<<link [[다음|Elk Compound Bestiality]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Bestiality Finish
+<<set $outside to 1>><<set $location to "compound">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	숨을 헐떡이며, 경비 <<beasttype 0>>【은는】 원래 있던 곳으로 돌아간다.
+	<br><br>
+	<<tearful>> 당신은 자리에서 일어선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Compound]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	<<beasttype 0>>【은는】 낑낑거리며 건물 중 하나 뒤로 숨는다.
+	<br><br>
+	<<tearful>> 당신은 자리에서 일어선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Compound]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $alarm is 1 and $rescue is 1>>
+	<<generateSecurity 2>><<generateSecurity 3>><<person2>>소음을 조사하기 위해 <<person>>【와과】 <<person3>><<person>>【이가】 도착한다.
+	<<if $NPCList[0].stance is "top">>
+		그들은 <<beasttype 0>>【이가】 당신에게 박는 것을 보고 웃는다. "착하다, <<beasttype 0>>." <<person2>><<person>>【이가】 말한다.
+		<br><br>
+	<<else>>
+		그들은 <<beasttype 0>>【이가】 당신에게서 무엇을 원하는지 보고 웃는다. "착하다, <<beasttype 0>>." <<person2>><<person>>【이가】 말한다.
+		<br><br>
+	<</if>>
+	<<person3>>"<<beasttype 0>>【이가】 간식을 먹게 둬야겠군." <<person>>【이가】 더 가까이서 보려고 웅크리며 말한다. <<He>>【은는】 <<his>> 휴대폰을 꺼내 촬영하기 시작한다.
+	<br><br>
+	<<set $alarm to 0>><<set $rescue to 0>>
+	<<link [[다음|Elk Compound Bestiality 2]]>><</link>>
+	<br>
+<<else>>
+	<<beasttype 0>>【은는】 돌아서서 짖으며 멀리 달아난다.
+	<<crime "trespassing">><<set $compound.alarm++>>
+	<<crimeUp 50 "trespassing">>
+	<br><br>
+	<<tearful>> 당신은 자리에서 일어선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Compound]]>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Bestiality 2
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<person3>><<person>>【이가】 당신을 촬영한다.
+<<if $face is "covered">>
+	적어도 <<he>>【은는】 당신의 얼굴을 볼 수 없다.
+<<else>>
+	<<famebestiality 1>>
+<</if>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Elk Compound Bestiality 2 Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Elk Compound Bestiality 2]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Elk Compound Bestiality 2 Finish
+<<set $outside to 1>><<set $location to "compound">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	숨을 헐떡이며, 경비 <<beasttype 0>>【은는】 <<bhe>>【이가】 왔던 곳으로 돌아간다.
+	<br><br>
+	<<person2>><<person>>【이가】 당신의 팔을 잡는다. "자, <<girl>>, 재미는 충분히 봤잖아." <<he>>【이가】 당신을 문으로 끌고 가며 말한다.
+	<br><br>
+	"아래층에 말해야 할까?" <<person2>><<person>>【이가】 묻는다.
+	<br><br>
+	"물론. 네 휴대폰에 다 찍었잖아? 그들이 좋아할 거야. 이 <<bitch>>【은는】 스릴을 위해 침입했고 대가를 치렀으니, 더 이상 <<phim>>【을를】 붙잡아 둘 필요는 없어."
+	그들은 당신을 문 밖으로 밀어내고 뒤에서 문을 닫는다.
+	<br><br>
+	<<tearful>> 당신은 자리에서 일어선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Street]]>><<resetCompound>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<<beasttype 0>>【은는】 낑낑거리며 건물 중 하나 뒤로 숨는다.
+	<br><br>
+	<<person2>><<person>>【이가】 당신의 팔을 잡는다. "자, <<girl>>, 재미는 충분히 봤잖아." <<he>>【이가】 당신을 문으로 끌고 가며 말한다.
+	<br><br>
+	"아래층에 말해야 할까?" <<person2>><<person>>【이가】 묻는다.
+	<br><br>
+	"물론. 네 휴대폰에 다 찍었잖아? 그들이 좋아할 거야. 이 <<bitch>>【은는】 스릴을 위해 침입했고 대가를 치렀으니, 더 이상 <<phim>>【을를】 붙잡아 둘 필요는 없어."
+	그들은 당신을 문 밖으로 밀어내고 뒤에서 문을 닫는다.
+	<br><br>
+	<<tearful>> 당신은 자리에서 일어선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Street]]>><<resetCompound>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Bluff
+<<set $outside to 1>><<set $location to "compound">><<effects>>
+<<if $speech_attitude is "meek">>
+	"저, 저기..." 당신은 더듬거린다. "공을 담장 너머로 차버렸어요. 그냥 다시 찾으려고요." 당신은 부끄러운 척 고개를 숙인다.
+<<elseif $speech_attitude is "bratty">>
+	당신은 <<him>>【을를】 향해 돌아서서 허리에 손을 얹는다. "실례합니다?" 당신은 말한다. "전 여기 있을 권리가 있어요. 직장을 소중히 여긴다면 귀찮게 굴지 마세요."
+<<else>>
+	"배달 중이에요." 당신은 말한다. "당신 상사에게 물어보세요."
+<</if>>
+<br><br>
+<<skulduggerycheck>>
+<<skulduggeryuse>>
+<<if $skulduggerysuccess is 1>>
+	<<set $compound.bluff to true>>
+	<<if $speech_attitude is "meek">>
+		<<He>>【은는】 한숨을 쉰다. "멍청한 <<girl>>, 네가 모르는 곳에 들어오면 안 되지. 가서 공이나 찾아, 그리고 바로 떠나, 알았지?" <span class="green">당신은 고개를 끄덕이고 총총 사라진다.</span>
+	<<elseif $speech_attitude is "bratty">>
+		당신은 <<him>>【을를】 불안하게 만들었다. "잠깐만요." <<he>>【이가】 말한다. "감독관에게 확인 좀 해보겠습니다." <<He>>【은는】 등을 돌려 무전기에 대고 말한다. 당신에게 필요한 건 그것뿐이다. <span class="green">당신은 <<his>> 등이 돌아선 틈을 타 슬쩍 빠져나간다.</span>
+	<<else>>
+		"그럼 어슬렁거리고 있으면 안 되죠." <<he>>【이가】 말한다. "그냥 당신 일이나 하고 떠나세요. 여긴 당신에게 안전하지 않아요." <span class="green">당신은 고개를 끄덕이고 걸어간다.</span>
+	<</if>>
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Elk Compound]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	"어림없지." <<he>>【이가】 말한다. "하지만 빠져나갈 순 없을 거다." <span class="red"><<He>>【은는】 당신의 어깨를 더 꽉 잡는다.</span>
+	<br><br>
+	<<link [[다음|Elk Compound Underground]]>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	당신은 <<his>> 손을 뿌리친다. "그렇게 나온다면야." <<he>>【이가】 말한다.
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Elk Compound Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Elk Compound Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Elk Compound Underground
+<<set $outside to 1>><<set $location to "compound">><<effects>>
+"오래 기다릴 필요는 없을 겁니다." <<person1>><<person>>【이가】 말한다. 그 말에 대답하듯,
+<<if $phase is 1>>
+	승강기 문이 열린다.
+<<else>>
+	중앙 건물 문이 열린다.
+<</if>>
+<<generate3>><<npcClothesType $NPCList[2] "compoundLab">>실험복을 입은 <<person3>><<person>>【이가】 나온다.
+<br><br>
+"여기서부터는 제가 이 <<girl>>【을를】 데려가겠습니다." <<he>>【이가】 말한다. "아래층에서 <<phim>>【와과】 이야기하고 싶어 합니다."
+<br><br>
+"그러시다면야."
+<br><br>
+<<person>>【이가】 당신의 팔에 손을 대자마자 충격이 온몸을 휩쓴다. 당신은 의식을 잃는다.
+<br><br>
+
+<<link [[다음|Elk Compound Experiment]]>><<upperruined>><<lowerruined>><<underruined>><<underupperruined>><<handheldruined>><<if $combat is 1>><<endcombat>><<else>><<endevent>><</if>><</link>>
+<br>
+
+:: Elk Compound Fight Finish
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">>
+	<<He>>【은는】 벽에 기대 숨을 헐떡인다. <<tearful>> 당신은 단지 내에 널려 있는 저장 탱크와 파이프 미로 속으로 탈출한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Compound]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	<<tearful>> 당신은 <<person>>【을를】 벽으로 밀치고 달아난다. <<He>>【은는】 쫓아오려 하지만, 당신은 단지 내에 널려 있는 저장 탱크와 파이프 사이에서 <<him>>【을를】 따돌린다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Elk Compound]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<<tearful>> 당신은 바닥에 쓰러진다. "마음에 들진 않았지만," <<person1>><<person>>【이가】 말한다. "내 일이니 어쩔 수 없지."
+	<br><br>
+	<<clotheson>>
+	<<link [[다음|Elk Compound Underground]]>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Experiment
+<<pass 1 hour>><<set $outside to 0>><<set $location to "compound">><<effects>>
+<<resetCompound>>
+당신은 깨어난다. <<if playerChastity()>>$worn.genitals.name【을를】 제외하고는 <</if>>알몸인 채로 금속판에 묶여 있다. 콘크리트 벽에서는 파이프와 전선이 튀어나와 있다. <<generateRole 0 0 "scientist">><<npcClothesType $NPCList[0] "compoundLab">><<person1>>구석의 콘솔에서 <<person>>【이가】 작업하고 있다. <<He>>【은는】 당신을 힐끗 본다. "아하," <<he>>【이가】 말한다. "깨어났군." <<He>>【은는】 의자에 앉은 채로 당신 쪽으로 다가와 <<his>> 실험복에서 전선 뭉치를 꺼낸다.
+<br><br>
+전선 한쪽 끝에는 패드가 달려 있다. <<He>>【은는】 그것들을 당신의 몸에 붙이기 시작한다. <<He>>【은는】 임상적인 전문성으로 <<his>> 일을 처리해서, 당신은 <<lewdness>>에도 불구하고 예상보다 덜 굴욕감을 느낀다. <<he>>【이가】 당신의 <<nipples>> 각각에 하나씩 붙이기 전까지는 말이다.
+<br><br>
+<<if playerChastity("penis")>>
+	<<He>>【은는】 당신의 $worn.genitals.name 위에 한 뭉치를 올려놓는다. "주파수를 높이면 돼, 문제없어." <<he>>【이가】 혼잣말을 중얼거린다.
+<</if>>
+<<if $player.penisExist and $player.vaginaExist and !playerChastity("hidden")>>
+	<<He>>【은는】 당신의 <<penis>> 끝에 하나, <<if $player.ballsExist>>각 고환에 하나씩 붙이고, 그리고 하나를<<else>>그리고 두 개를<</if>> 당신의 <<pussy>> 안으로 밀어 넣는다. 당신은 그 감각에 몸을 긴장시킨다.
+<<else>>
+	<<if $player.penisExist>>
+		<<if $worn.genitals.name is "chastity parasite">>
+			<<He>>【은는】 당신의 정조대 기생충 바로 위에 하나를 놓고 그것을 희롱한다. 당신은 그 감각에 몸을 긴장시킨다.
+		<<elseif !playerChastity("cage")>>
+			<<He>>【은는】 당신의 <<penis>> 끝에 하나, 그리고 각 고환에 하나씩 붙인다. 당신은 그 감각에 몸을 긴장시킨다.
+		<</if>>
+	<</if>>
+	<<if $player.vaginaExist and !playerChastity("hidden")>>
+		<<He>>【은는】 당신의 <<pussy>> 안으로 하나를 밀어 넣고, 이어서 또 하나를 넣는다. 당신은 그 감각에 몸을 긴장시킨다.
+	<</if>>
+<</if>>
+"자, 됐군." <<he>>【이가】 전선의 다른 쪽 끝을 <<him>> 옆에 있는 기계에 꽂으며 말한다. "이제 <<girl>>, 말해봐, 누구 밑에서 일하지?"
+<br><br>
+<<if $player.penisExist and $player.vaginaExist>>
+	"운이 좋은 줄 알아." <<he>>【이가】 당신의 성기를 흘끗 보며 덧붙인다. "나한테 달렸다면, 실험을 위해 널 여기 가둬뒀을 거야. 진정한 자웅동체는 드물거든."
+	<br><br>
+<</if>>
+<i>고통이나 흥분도가 최대치에 도달하면, 당신은 <<him>>에게 모든 것을 말하게 될 것이다.</i>
+<br><br>
+<<set $compound.interrogation to {
+	beg: 0,
+	flirt: 0,
+	honest: 0,
+	lie: 0,
+	mock: 0,
+}>>
+<<compoundoptions>>
+
+:: Elk Compound Crystal
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+
+<<if dangerEvent() and $eventskip is 0>>
+	<<if $rng gte 51 and $settings.tentaclesEnabled and $hallucinations gte 2>>
+		당신이 통로를 건너는 동안, 아래의 액체에서 여러 개의 촉수가 솟아오른다.
+		<br><br>
+		<<link [[다음|Elk Compound Tentacles]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		당신이 통로를 건너는 동안 아래의 액체가 격렬하게 움직인다. 일부가 당신에게 튀어 옷을 녹여버린다.
+		<<if !$worn.over_upper.type.includes("naked")>>
+			<<set $worn.over_upper.integrity -= 10>>
+		<<else>>
+			<<set $worn.upper.integrity -= 10>>
+		<</if>>
+		<<if !$worn.over_lower.type.includes("naked")>>
+			<<set $worn.over_lower.integrity -= 10>>
+		<<else>>
+			<<set $worn.lower.integrity -= 10>>
+		<</if>>
+		<br><br>
+		당신은 중앙으로 계속 가서 수정을 집는다. 만지니 따뜻하다.
+		<br><br>
+		<<set $compound.theft.pipes to true>>
+		<<set $blackmoney += 50>>
+		<<set $compound.alarm++>>
+		<<crimeUp 50 "thievery">>
+		<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with storage tanks")>>
+			<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Pipes Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.pushUnique("the building with storage tanks")>><</link>><<gsecurity>>
+			<br>
+			<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+			<br>
+		<<else>>
+			<<link [[다음|Elk Compound]]>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<<else>>
+	당신은 통로를 건너 수정을 집는다. 만지니 따뜻하다.
+	<br><br>
+	<<set $compound.theft.pipes to true>>
+	<<set $blackmoney += 50>>
+	<<set $compound.alarm++>>
+	<<crimeUp 50 "thievery">>
+	<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with storage tanks")>>
+		<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Pipes Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.pushUnique("the building with storage tanks")>><</link>><<gsecurity>>
+		<br>
+		<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Elk Compound]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Elk Compound Tentacles
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+	<<tentaclestart 7 10>>
+	<<set $tentacles[0].shaft to "waist">>
+<</if>>
+<<statetentacles>>
+
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<actionstentacles>>
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Elk Compound Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Elk Compound Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Elk Compound Tentacles Finish
+<<effects>>
+생물은 당신에게 흥미를 잃고 분홍색 액체 속으로 사라진다. <<tearful>> 당신은 힘겹게 일어나 수정을 향해 건너가는 것을 마친다. 만지니 따뜻하다.
+<<clotheson>>
+<<endcombat>>
+<<set $compound.theft.pipes to true>>
+<<set $blackmoney += 50>>
+<<set $compound.alarm++>>
+<<crimeUp 50 "thievery">>
+<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("the building with storage tanks")>>
+	<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Pipes Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.pushUnique("the building with storage tanks")>><</link>><<gsecurity>>
+	<br>
+	<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Elk Compound]]>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Explore
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+당신은 건물 더 깊숙이 걸어 들어간다. 입구는 당신 뒤로 삼켜진다. 당신은 용도를 알 수 없는 파이프와 기계의 미로를 통과한다. 연기 때문에 몸이 따뜻해지기 시작한다.
+<<drugs 60>>
+<br><br>
+당신은 보라색 수정이 놓인 받침대에 도착한다. 값비싸 보인다.
+<<if $trash_key isnot 1>>그 옆에는 크고 변색된 열쇠가 있다.<</if>>
+<br><br>
+<<icon "crystal-purple.png">><<link [[가져간다|Elk Compound Purple]]>><</link>><<crime "thievery">><<gsecurity>>
+<br>
+<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Purple
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+
+당신은 수정을 집는다. 만지니 따뜻하다.
+<<if $trash_key isnot 1>>
+<<set $trash_key to 1>>당신은 열쇠도 집는다. 보기보다 무겁지 않다. <i>어딘가에 있는 큰 자물쇠에 맞을 것이다.</i>
+<</if>>
+<br><br>
+나가는 길을 찾는 것은 들어올 때보다 훨씬 쉽다.
+<br><br>
+<<set $compound.theft.smoke to true>>
+<<set $blackmoney += 50>>
+<<set $compound.alarm++>>
+<<crimeUp 50 "thievery">>
+<<link [[다음|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Honest
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if isPubfameTaskAccepted("compound")>>
+	<<if $compound.interrogation.honest is 1>>
+		"어떤 사람에게 부탁받은 일을 하고 있어요." 당신은 질문을 회피하며 말한다.
+		<br><br>
+		<<He>>【은는】 당신에게는 뒷면만 보이는 화면을 보더니, 다이얼을 돌린다. 당신에게 부착된 패드에서 부드러운 파동이 흘러나와 몸 구석구석을 기분 좋게 만든다. "좋아. 봐, 그렇게 나쁘진 않았지? 자, 그럼, 여긴 왜 온 거지?"
+	<<elseif $compound.interrogation.honest is 2>>
+		<<if $pubfame.compound.cameras.length gte 1>>
+			"카메라를 설치하고 있었어요." 당신이 말한다. "돌처럼 생겼어요. <<print formatList($pubfame.compound.cameras, undefined, true)>>에 하나 있어요."
+		<<else>>
+			"카메라를 설치하려고 했어요." 당신이 말한다. "하지만 하나도 설치하기 전에 잡혔어요."
+		<</if>>
+		<br><br>
+		<<He>>【은는】 무언가를 적고 다시 다이얼을 돌리자, 당신은 다시 한번 부드러운 파동에 휩싸인다. "부탁이라고 말했지." <<he>>【이가】 말한다. "어떤 종류의 부탁이지?"
+	<<elseif $compound.interrogation.honest is 3>>
+		<<if $pubfame.goal.includes("Lower")>>
+			"덜 유명해지고 싶어요." 당신이 말한다. "제 <<fameProse $pubfame.target>> 평판을 낮추기 위해서요."
+			<br><br>
+			<<if $fame[$pubfame.target] gte 400>>
+				<<He>>【은는】 고개를 끄덕인다.
+				<<if ["sex","prostitution","rape","bestiality","scrap"].includes($pubfame.target)>>
+					"<<underworld_nickname>>,
+				<<else>>
+					"<<overworld_nickname>>,
+				<</if>>
+				말인가? 그럴 만하군."
+			<<else>>
+				<<He>> 눈을 가늘게 뜬다. "필요한지 잘 모르겠지만, 상관없어."
+			<</if>>
+		<<else>>
+			"더 유명해지고 싶어요." 당신이 말한다. "제 <<fameProse $pubfame.target>> 평판을 높이기 위해서요."
+			<br><br>
+			<<if $fame[$pubfame.target] gte 400>>
+				<<He>>【은는】 눈썹을 치켜올린다.
+				<<if ["sex","prostitution","rape","bestiality","scrap"].includes($pubfame.target)>>
+					"<<underworld_nickname>>,
+				<<else>>
+					"<<overworld_nickname>>,
+				<</if>>
+				말인가? 이미 충분히 유명하잖아."
+			<<else>>
+				<<He>> 눈을 가늘게 뜬다. "못 알아보겠군. 확실히 필요하겠어."
+			<</if>>
+		<</if>>
+		<<He>>【은는】 다시 다이얼을 돌리자, 당신은 다시 한번 부드러운 파동에 휩싸인다. "첫 번째 질문을 피했어. 누구 밑에서 일하는 거지? 누가 네 평판을 조작하고 있는 거야?"
+	<<elseif $compound.interrogation.honest is 4>>
+		"술집에 있는 사람이에요." 당신이 말한다. "해커요. 랜디가 그 사람을 알아요."
+		<br><br>
+		<<He>>【은는】 미소 지으며 다이얼을 돌려, 당신의 몸 위로 부드러운 파동을 보낸다. "이제야 좀 진전이 있군. 정확히 누구지?" <span class="red">만약 다시 정직하게 대답하면, <<he>>【은는】 당신에게서 필요한 모든 것을 얻게 될 것이고, 미키는 곤경에 처할 것이다.</span>
+	<<else>>
+		"진짜 이름은 몰라요." 당신이 말한다. "하지만 미키라고 불려요." 당신은 수치스러워하며 시선을 돌린다.
+	<</if>>
+<<else>>
+	<<if $compound.interrogation.honest is 1>>
+		"누구 밑에서 일하는 거 아니에요." 당신이 말한다. "혼자 왔어요."
+		<br><br>
+		<<He>>【은는】 당신에게는 뒷면만 보이는 화면을 보더니, 다이얼을 돌린다. 당신에게 부착된 패드에서 부드러운 파동이 흘러나와 몸 구석구석을 기분 좋게 만든다. "좋아. 봐, 그렇게 나쁘진 않았지? 자, 그럼, 여긴 왜 온 거지?"
+	<<elseif $compound.interrogation.honest is 2>>
+		"<<if $blackmoney is 0>>차를 털다가 갇혔어요. 차가 절 여기로 데려왔어요<<else>>물건을 훔치러 왔어요<</if>>." 당신이 말한다. "<<if $blackmoney is 0>>정말이에요<<else>>돈 때문에요<</if>>."
+		<br><br>
+		<<He>>【은는】 다시 다이얼을 돌리자, 당신은 다시 한번 부드러운 파동에 휩싸인다. "자," <<he>>【이가】 말한다. "뭘 <<if $blackmoney is 0>>훔치려<</if>> 훔쳤지?"
+	<<elseif $compound.interrogation.honest is 3>>
+		"<<if $blackmoney is 0>>돈<<else>>돈을 훔쳐요<</if>>【이】나 팔 수 있는 건 뭐든지요." 당신이 말한다.
+		<br><br>
+		<<He>>【은는】 다시 다이얼을 돌리자, 당신은 다시 한번 부드러운 파동에 휩싸인다. "물건은 어디서 팔지?"
+	<<elseif $compound.interrogation.honest is 4>>
+		"<<if $produce_sold gte 1 or $pubintro is 1>>저는 <<if $produce_sold gte 1>>콘누다투스 가에서 빌린 가판대에서 꽃을 팔고,<</if>><<if $produce_sold gte 1 and $pubintro is 1>> 그리고 <</if>><<if $pubintro is 1>>하베스트 가에서 훔친 물건을 팔아요,<</if>><<else>>아무것도 판 적 없어요<</if>>" 당신이 말한다.<<if $chef_state gte 1>> "<<if $produce_sold gte 1 and $pubintro is 1>>또 <</if>>빵도 구워요." 당신이 덧붙인다.<</if>><<if $prostitutionstat gte 1 or $forcedprostitutionstat gte 1>> "...<<if $produce_sold gte 1 or $pubintro is 1 or $chef_state gte 1>>그리고 <</if>>몸도 팔았어요." 당신은 조용히 중얼거린다<<if $forcedprostitutionstat gte 1>>, "원하든 원하지 않든요."<<else>>.<</if>><</if>>
+		<br><br>
+		<<He>>【은는】 <<if !$pubintro>>흥미 없다는 듯이<</if>> 다시 다이얼을 돌리자, 당신은 다시 한번 부드러운 파동에 휩싸인다. "<<if $pubintro is 1>>훔친 물건은 누구에게 팔지?<<else>>정말 그게 전부인가?<</if>>" <span class="red">만약 다시 정직하게 대답하면, <<he>>【은는】 당신에게서 필요한 모든 것을 얻게 될 것이다.</span>
+	<<else>>
+		"<<if $pubintro is 1>>랜디에게 물건을 팔아요<<else>>전부 다 말했어요<</if>>." 당신은 <<if $pubintro is 1 or $prostitutionstat gte 1 or $forcedprostitutionstat gte 1>>수치스러워하며<</if>> 말한다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<compoundoptions>>
+
+:: Elk Compound Lie
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if $compound.interrogation.lie is 1>>
+	"저는 정부 소속입니다." 당신은 말한다. "저를 풀어주는 게 좋을 겁니다."
+	<br><br>
+	<<He>>【은는】 당신이 볼 수 없는 화면을 본다. "거짓말쟁이." <<He>>【이가】 기계의 다이얼을 돌리자 끔찍한 고통이 당신을 덮친다. 고통은 잠시뿐이었지만, 당신은 몸을 떨게 되었다. "다시는 이런 짓 하고 싶지 않군. 그러니 거짓말하지 마."
+	<br><br>
+<<elseif $compound.interrogation.lie is 2>>
+	"길을 잃었어요." 당신은 말한다. "나가는 길을 찾고 있었을 뿐이에요."
+	<br><br>
+	<<He>>【은는】 다이얼을 다시 한번 돌리고, 고통이 또다시 당신을 덮친다. "이것보다 훨씬 쉬울 수도 있었을 텐데." <<he>>【이가】 말한다.
+	<br><br>
+<<elseif $compound.interrogation.lie is 3>>
+	"제 공을 찾고 있었—" 당신의 변명은 또 다른 고통의 물결에 의해 중단된다.
+	<br><br>
+	"그 수에 넘어갈 줄 알고." <<he>>【이가】 말한다.
+	<br><br>
+<<elseif $compound.interrogation.lie is 4>>
+	"당신에게 날 풀어줄 기회를 주는 겁니다." 당신은 말한다. "내가 여기서 빠져나가서 당신 엉덩이를 걷어차기 전에요."
+	<br><br>
+	<<He>>【은는】 다이얼을 돌리며 웃는다. "이번엔 화면을 확인할 필요도 없겠군."
+	<br><br>
+<<else>>
+	"너무 심하게 다치게 했어요." 당신은 말한다. "아무것도 기억나지 않아요."
+	<br><br>
+	"그거 안됐군." <<he>>【이가】 다이얼을 돌리며 말한다. "난 한참 여기 있을 수 있거든."
+	<br><br>
+<</if>>
+<<compoundoptions>>
+
+:: Elk Compound Mock
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if $compound.interrogation.mock is 1>>
+	"물론이죠, 전부 말해줄게요." 당신은 말한다. "전 버릇없는 실험실 조교들을 혼내주러 왔어요. 일을 시작할 수 있게 풀어주세요."
+	<br><br>
+	"오래 웃지는 못할 거다." <<he>>【이가】 기계의 다이얼을 돌리며 말한다. 고통이 당신을 꿰뚫지만, 정신은 오히려 맑아지는 느낌이다.
+	<br><br>
+<<elseif $compound.interrogation.mock is 2>>
+	"네 그 작은 장난감으로 날 다치게 할 수 있을 것 같아?" 당신은 이를 악물고 말한다. "간지러울 뿐이야."
+	<br><br>
+	"오, 그럼 이것도 괜찮겠군." <<He>>【은는】 다이얼을 다시 돌린다.
+	<br><br>
+<<elseif $compound.interrogation.mock is 3>>
+	"분명 재미로 이 기계에 스스로를 묶어놓고 놀겠지." 당신은 말한다. "괜찮아. 우리 모두 페티쉬는 있으니까."
+	<br><br>
+	"네 페티쉬를 찾은 것 같다는 생각이 들기 시작하는군." <<He>>【은는】 다이얼을 다시 한번 돌린다.
+	<br><br>
+<<elseif $compound.interrogation.mock is 4>>
+	"이거 익숙해질 수도 있겠는데." 당신은 말한다. "과학 쪽 일이 잘 안 풀리면, 변태 창녀로서 빛나는 경력을 쌓을 수도 있겠어."
+	<br><br>
+	"이거 작동은 하는 건가?" <<he>>【이가】 다이얼을 다시 돌리며 중얼거린다.
+	<br><br>
+<<else>>
+	"그럼 <<girls>> 괴롭히는 걸 좋아하나 보네?" 당신은 말한다. "경찰이 찾기 전에 네 포르노나 잘 숨겨두는 게 좋을걸—"
+	<br><br>
+	"닥쳐." <<he>>【이가】 다이얼을 돌리며 말을 끊는다.
+	<br><br>
+<</if>>
+<<compoundoptions>>
+
+:: Elk Compound Beg
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if $compound.interrogation.beg is 1>>
+	"제발, 아프게 하지 마세요." 당신은 말한다.
+	<br><br>
+	"내가 시키는 대로 하면 그럴 필요 없어. 맛보기로 조금만 보여주지." <<He>>【이가】 다이얼을 돌리자 패드에서 쾌감의 물결이 퍼져 나온다. 그 느낌이 당신의 속까지 달래준다.
+	<br><br>
+<<elseif $compound.interrogation.beg is 2>>
+	"무-무서워요." 당신은 말한다.
+	<br><br>
+	"괜찮아, <<girl>>, 그냥 내가 묻는 것에 대답만 해." <<He>>【은는】 다이얼을 다시 돌려, 당신을 다시 한번 달래준다.
+	<br><br>
+<<elseif $compound.interrogation.beg is 3>>
+	"잘못된 일을 할 생각은 없었어요." 당신은 말한다.
+	<br><br>
+	"알아, 그러니 내가 알고 싶은 걸 말해줘." <<He>>【은는】 다이얼을 돌린다.
+	<br><br>
+<<elseif $compound.interrogation.beg is 4>>
+	"제발, 절 보내주세요." 당신은 말한다.
+	<br><br>
+	"협조하면 보내주지." <<He>>【은는】 다이얼을 돌린다.
+	<br><br>
+<<else>>
+	"제발 그냥 가게 해주세요." 당신은 말한다.
+	<br><br>
+	"마지막으로 말하는데, 협조하면 보내주겠다." <<He>>【은는】 다이얼을 돌린다.
+	<br><br>
+<</if>>
+<<compoundoptions>>
+
+:: Elk Compound Flirt
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if $compound.interrogation.flirt is 1>>
+	"저를 꽁꽁 묶어놓고 다 드러나게 했잖아요." 당신은 말한다. "저한테 하고 싶은 다른 일이 있는 거 아니에요?"<<promiscuity1>>
+
+	<<He>>【은는】 얼굴을 붉히며 어떻게 대답해야 할지 몰라 한다. "그-그런 식으로 농담하지 마. 넌 지금 큰일 난 거야." 당신은 호흡을 가다듬고 집중한다.
+	<br><br>
+<<elseif $compound.interrogation.flirt is 2>>
+	"어떤 사람들은 당신이 나한테 해주는 대우에 큰돈을 낼 거예요." 당신이 말한다. "제대로 감사해야겠네요." <<promiscuity2>>
+
+	<<He>>【이가】 불편하게 몸을 뒤척인다. "달콤한 말로 구슬리려 하지 마. 소용없으니까."
+	<br><br>
+<<elseif $compound.interrogation.flirt is 3>>
+	"여기서 진짜 고문은," 당신이 말한다. "당신의 손길을 거부당하는 거예요."
+	<<promiscuity3>>
+
+	<<He>>【이가】 다이얼에서 <<his>> 손을 떼고 <<his>> 관자놀이를 문지른다. "그만 좀 하지 그래?"
+	<br><br>
+<<elseif $compound.interrogation.flirt is 4>>
+	"정말 애태우시네요. 메인 코스로 뭘 원하실지 정말 기대돼요." 당신이 윙크한다.
+	<<promiscuity4>>
+	"이게 메인 코스야." <<he>>【이가】 얼굴을 붉히며 말한다. "어디서 그런 식으로 말하는 걸 배웠지?"
+	<br><br>
+<<else>>
+	"여기 너무 더워지고 있어요." 당신이 말한다. "제발 도와주세요. 당신의 처분에 맡길게요. 당신의 손가락, 당신의 혀, 당신의..."
+	<<promiscuity5>>
+	"그만! 당장." <<He>>【은는】 진지해 보인다.
+	<br><br>
+<</if>>
+<<compoundoptions>>
+
+:: Elk Compound Interior
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+당신은 성공적으로 자물쇠를 따고 건물 안으로 들어간다.
+<<set $compound.alarm++>>
+<<skulduggeryuse 400 "locks">>
+
+내부는 커다란 승강기가 대부분을 차지하고 있다.
+<<if $weekly.compoundCentre>>
+	작동시킬 방법이 보이지 않는다.
+<<else>>
+	작동시킬 방법은 보이지 않지만, 구석 테이블 위에 작은 용기와 함께 노트북이 놓여 있다.
+<</if>>
+<br><br>
+<<if !$weekly.compoundCentre>>
+	<<if $compoundspray isnot 1>>
+		<<techicon "computer">><<link [[가져가서 떠난다|Elk Compound Interior Take]]>><<set $blackmoney += 100>><<crimeUp 100 "thievery">><<set $spraymax += 1>><<spray 5>><<world_corruption "soft" -10>><</link>><<crime "thievery">><<gspraymax>>
+	<<else>>
+		<<techicon "computer">><<link [[가져가고 떠난다|Elk Compound Interior Take]]>><<set $blackmoney += 100>><<crimeUp 100 "thievery">><<spray 1>><</link>><<crime "thievery">><<gspray>>
+	<</if>>
+	<br>
+<</if>>
+<<if isPubfameTaskAccepted("compound") and !$pubfame.compound.cameras.includes("중앙 건물")>>
+	<<techicon "vcam">><<link [[카메라를 설치한다|Elk Compound Interior Camera]]>><<set $compound.alarm++>><<set $pubfame.compound.cameras.pushUnique("the central building")>><</link>><<gsecurity>>
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Interior Take
+<<set $outside to 0>><<set $location to "compound">><<effects>><<set $weekly.compoundCentre to true>><<wearProp "pepper spray">>
+
+<<if $compoundspray is 1>>
+	당신은 노트북과 용기를 집어 들고 출구로 향한다.
+	<br><br>
+<<else>>
+	<<set $compoundspray to 1>>
+	당신은 노트북과 용기를 집어 든다. 후추 스프레이 충전기처럼 보이지만, 바닥에 컴퓨터 칩이 노출되어 있다. 당신은 그것을 넣고 출구로 향한다.
+	<br><br>
+
+	<span class="gold">후추 스프레이 추가 충전량을 얻었습니다.</span>
+	<br><br>
+<</if>>
+
+<<if random(1, 4) is 4>>
+	당신은 문 옆의 버튼을 누른다. 아무 일도 일어나지 않는다. 다시 누르자, 당신의 양쪽에서 두 개의 해치가 열린다. 금속 팔이 튀어나와 당신의 손목을 잡고 땅으로 밀어붙인다.
+	<br><br>
+	<span class="red">침입자 감지.</span> 경보가 울려 퍼진다. 아직 듣지 못했다면, 누군가 듣게 될 것이다.
+	<<set $compound.alarm++>>
+	<<set $daily.compoundState to 1>>
+	<br><br>
+	<<if $player.vaginaExist or $settings.analEnabled>>
+		<<link [[항의한다|Elk Compound Interior Seduce]]>><</link>>
+		<br>
+	<</if>>
+	<<link [[몸부림친다|Elk Compound Interior Struggle]]>><</link>>
+	<br>
+<<else>>
+	<<getouticon>><<link [[떠난다|Elk Compound]]>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Interior Seduce
+<<effects>>
+
+<<set $seductiondifficulty to 8000>>
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<seductionskilluse>>
+
+"저는 침입자가 아니에요." 당신은 말한다.
+<br><br>
+<<if $seductionrating gte $seductionrequired>>
+
+	<span class="green">"스캔 중."</span> 문 옆의 빨간 불이 깜박인다. "실험체 확인됨. <<if $settings.pregnancySpeechEnabled>>번식 <</if>>절차 개시." 다른 해치가 열린다, 다른 것들보다 더 큰 것이다. 어둠 속에서 남근 모양의 물체가 나타난다.
+	<br><br>
+
+	<<link [[다음|Elk Compound Machine Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+
+<<else>>
+
+	<span class="red">침입자가 협조를 거부함.</span> 금속 팔을 통해 전류가 흘러 당신에게 충격을 준다.<<gpain>><<pain 4>>
+	<br><br>
+	<<generateSecurity 1>><<generateSecurity 2>>
+	<<fullGroup>>【이가】 곤봉을 준비한 채 달려 들어온다. 그들은 당신을 보고 긴장을 푼다.
+	<br><br>
+
+	"이 고물 덩어리, 위로 가져올 가치가 있었네." <<person1>><<person>>【이가】 곤봉을 <<his>> 옆에 채우며 말한다.
+	<br><br>
+
+	"이거 꺼." <<person2>><<person>>【이가】 말한다. "아래층에 알릴게." <<He>>【은는】 <<his>> 옆에서 무전기를 푼다.
+	<br><br>
+
+	<<link [[싸운다|Elk Compound Interior Fight]]>><</link>>
+	<br>
+	<<link [[풀어달라고 설득한다|Elk Compound Interior Convince]]>><</link>><<englishdifficulty 1 1000>>
+	<br>
+	<<link [[침묵을 지킨다|Elk Compound Interior Silent]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Elk Compound Machine Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+
+	<<set $machine_health to 10>><<set $machine_ammo to 8>>
+	<<if $player.vaginaExist>>
+		<<machine_init vaginal arm_chains>>
+		<<set $machine.vaginal.armed to 1>>
+	<<else>>
+		<<machine_init anal arm_chains>>
+		<<set $machine.anal.armed to 1>>
+	<</if>>
+<</if>>
+
+<<effects>>
+
+<<machine_effects>><<machine_combat>>
+<<machine_state>>
+
+<br><br>
+<<machine_actions>>
+
+<<if $machine.number lte 0 or $finish is 1>>
+	<span id="next"><<link [[다음|Elk Compound Machine Rape End]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Elk Compound Machine Rape]]>><</link>></span><<nexttext>>
+<</if>>
+<br>
+
+:: Elk Compound Machine Rape End
+<<effects>>
+
+<<if $anusfucked is 1 or $vaginafucked is 1 or $penisfucked is 1>>
+	"<<if $settings.pregnancySpeechEnabled>>번식 <</if>>성공." 목소리가 단조롭게 말한다. 팔과 남근이 수축하고, 해치가 닫힌다.
+	<br><br>
+<<else>>
+	"오류." 목소리가 단조롭게 말한다. 팔과 남근이 수축하고, 해치가 닫힌다.
+	<br><br>
+<</if>>
+<<tearful>> 당신은 자리에서 일어선다.
+<br><br>
+
+<<machine_end>>
+<<clotheson>>
+
+<<link [[다음|Elk Compound]]>><</link>>
+<br>
+
+:: Elk Compound Interior Struggle
+<<effects>>
+
+<<generateSecurity 1>><<generateSecurity 2>>
+당신은 금속 손아귀에 저항하지만, 너무 꽉 조여있다. 문이 열린다. <<fullGroup>>【이가】 곤봉을 준비한 채 달려 들어온다. 그들은 당신을 보고 긴장을 푼다.
+<br><br>
+
+"이 고물 덩어리, 위로 가져올 가치가 있었네." <<person1>><<person>>【이가】 곤봉을 <<his>> 옆에 채우며 말한다.
+<br><br>
+
+"내가 끌게." <<person2>><<person>>【이가】 말한다. "아래층에 알려."
+<br><br>
+
+<<link [[싸운다|Elk Compound Interior Fight]]>><</link>>
+<br>
+<<link [[풀어달라고 설득한다|Elk Compound Interior Convince]]>><</link>><<englishdifficulty 1 1000>>
+<br>
+<<link [[침묵을 지킨다|Elk Compound Interior Silent]]>><</link>>
+<br>
+
+:: Elk Compound Interior Fight
+<<effects>>
+
+당신은 수축하는 금속 팔을 붙잡고 몸을 일으킨다. <<person2>><<person>>【은는】 싸울 준비를 하며 <<his>> 무전기를 옆으로 떨어뜨린다.
+<br><br>
+
+<<link [[다음|Elk Compound Fight 2]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Elk Compound Interior Convince
+<<effects>>
+
+<<if $englishSuccess>>
+	<<if $speech_attitude is "meek">>
+		"제-제발 보내주세요,"
+		<<if $pain gte 20>>
+			당신은 눈물을 흘리며 말한다.
+		<<else>>
+			당신은 말한다.
+		<</if>>
+		"저는 그냥 학생이에요. 해-해를 끼칠 생각은 없었어요. 저-저-저는..."
+	<<elseif $speech_attitude is "bratty">>
+		"당신 상사가 당신 때문에 아주 기뻐하겠네요." 당신은 말한다. "동네 학생이나 잡고. 저는 겨우 단지 내부까지밖에 못 들어왔다고요."
+	<<else>>
+		"당신 상사가 당신 때문에 아주 기뻐하겠네요." 당신은 말한다. "동네 학생이나 잡고. 저는 겨우 단지 내부까지밖에 못 들어왔다고요."
+	<</if>>
+	<br><br>
+	<span class="green">두 사람은 어색한 표정으로 서로를 쳐다본다.</span> "그냥 겁주려던 것뿐이야." <<person1>><<person>>【이가】 말한다.
+	<br><br>
+
+	그들은 당신을 단지 정문으로 데려간다. 당신 뒤에서 문이 쾅 닫힌다.
+	<br><br>
+
+	<<link [[다음|Elk Street]]>><<resetCompound>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"저-저를 넘기면 당신들도 곤란해질 거예요." 당신은 말한다. "저를 더 빨리 잡았어야 했잖아요."
+	<<elseif $speech_attitude is "bratty">>
+		"날 보내줘." 당신은 말한다. "아니면 당신들 상사한테 당신들이 얼마나 일을 못하는지 말해버릴 거야."
+	<<else>>
+		"날 보내줘." 당신은 말한다. "아니면 당신들이 날 잡기 전에 내가 얼마나 멀리까지 들어왔는지 당신들 상사한테 말해버릴 거야."
+	<</if>>
+	<br><br>
+
+	<span class="red">두 사람은 당신을 무시한다.</span> <<person2>><<person>>【은는】 한쪽으로 물러서서 <<his>> 무전기에 대고 말한다.
+	<br><br>
+
+	<<link [[다음|Elk Compound Underground]]>><<set $phase to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Elk Compound Interior Silent
+<<effects>>
+
+당신은 <<person2>><<person>>【이가】 <<his>> 무전기에 대고 말하는 동안 침묵을 지킨다.
+<br><br>
+
+<<link [[다음|Elk Compound Underground]]>><<set $phase to 1>><</link>>
+<br>
+
+:: Elk Compound Fight 2
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Elk Compound Fight 2 Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Elk Compound Fight 2]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Elk Compound Fight 2 Finish
+<<set $outside to 0>><<set $location to "compound">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">>
+	두 사람은 문 양쪽 벽에 기대어, 당신에게 필요한 기회를 준다. <<tearful>> 당신은 밖으로 탈출한다. 담을 넘는 동안 다가오는 발소리가 들린다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Elk Street]]>><<resetCompound>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	두 사람이 당신에게서 물러나, 당신에게 필요한 기회를 준다. <<tearful>> 당신은 밖으로 탈출한다. 담을 넘는 동안 <<person2>><<person>>【이가】 지원을 요청하는 소리가 들린다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Elk Street]]>><<resetCompound>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<<tearful>> 당신은 땅에 쓰러진다. "침입자를 제압했습니다." <<person2>><<person>>【이가】 <<his>> 무전기에 대고 말하는 동안 <<person1>><<person>>【은는】 당신을 억누른다. "맞습니다. <<phim>>【을를】 여기 잡아두겠습니다."
+	<br><br>
+	<<clotheson>>
+	<<link [[다음|Elk Compound Underground]]>><</link>>
+	<br>
+<</if>>
+
+:: Elk Compound Approach
+<<set $outside to 1>><<set $location to "compound">>
+
+당신은 정문으로 걸어간다. 두 명의 경비원이 지키고 있다. <<generateSecurity 1>><<generateSecurity 2>><<person1>>그들 중 한 명인 <<person>>【이가】 당신이 다가가자 팔을 뻗는다. "더 가까이 오지 마, <<girl>>. 여긴 사유지야." <<His>> 동료가 당신을 위아래로 훑어본다.
+<br><br>
+
+<<if $phials_held gte 1>>
+	<<icon "lust.png">><<link [[최음제 약병을 보여준다|Elk Compound Show]]>><</link>>
+	<br>
+<</if>>
+<<if $compound.card>>
+	<<icon "access-card.png">><<link [[훔친 카드를 보여준다|Elk Compound Card]]>><</link>>
+	<br>
+<</if>>
+<<elkicon>><<link [[떠난다|Elk Street]]>><<endevent>><</link>>
+<br>
+
+:: Elk Compound Show
+<<effects>><<wearProp "aphrodisiac jar">>
+
+당신은 약병을 내민다. <<person>>【이가】 그것을 들여다본다. "흥." <<he>>【이가】 소리를 낸다. "좋아. 중앙 건물로 가. 배달하고 썩 나가." <<His>> 동료는 부스 안으로 사라지고, 문이 덜컹거리며 열린다.
+<br><br>
+
+<<link [[엘크 단지|Elk Compound]]>><<endevent>><<set $compound.allowed to true>><<set $daily.compoundAllowedEntrance to true>><</link>>
+<br>
+
+:: Elk Compound Card
+<<effects>>
+<<if $speech_attitude is "meek">>
+	"죄-죄송합니다, <<sir>>." 당신은 말한다. "하지만 여기로 오라는 말을 들었어요."
+<<elseif $speech_attitude is "bratty">>
+	"닥쳐." 당신은 말한다. "나 여기 볼일 있어."
+<<else>>
+	"여기 볼일이 있어서요." 당신은 말한다.
+<</if>>
+당신은 훔친 카드를 내민다.
+<br><br>
+경비원이 카드를 낚아채 확인한다. <<He>>【은는】 <<his>> 허리춤에 있는 장치에 카드를 긁고 화면을 확인한다. "흥." <<he>>【이가】 소리를 낸다. "좋아. 배달하고 썩 나가."
+<br><br>
+<<His>> 동료는 부스 안으로 사라지고, 문이 덜컹거리며 열린다.
+<br><br>
+<<endevent>>
+<<link [[들어간다|Elk Compound]]>><<endevent>><<set $compound.allowed to true>><<set $daily.compoundAllowedEntrance to true>><</link>>
+<br>
+
+:: Elk Compound Station
+<<set $location to "compound">><<effects>>
+
+열차가 속도를 줄이며 돌벽으로 둘러싸인 새로운 승강장에 도착한다. 당신은 열차 창문 너머를 엿본다. 한쪽 벽을 따라 파란색 금속 문이 있다. 저택에서 봤던 것과 같은 상자들이 근처에 쌓여 있지만, 이것들은 비어 있다. 또한 몇 미터 위에 있는 해치로 이어지는 사다리도 있다.
+<br><br>
+
+<<generateSecurity 1>><<generateSecurity 2>>
+당신은 열차 입구 쪽으로 걸어간다. 파란 문이 덜컹거리며 열리고, 당신은 몸을 숨긴다. 흰 제복을 입고 큰 총을 든 <<fullGroup>>【이가】 달려 나온다. 그들은 당신을 알아채지 못했다.
+<br><br>
+
+<<link [[다음|Elk Compound Station 2]]>><</link>>
+<br>
+
+:: Elk Compound Station 2
+<<effects>>
+
+"비었어." <<person>>【이가】 말한다. "장전도 안 되어 있네."
+<br><br>
+"누군가 제대로 엿됐군." <<person2>><<person>>【이가】 대답한다. "우리 쪽 사람을 보낸 줄 알았는데."
+<br><br>
+<<person1>><<person>>【은는】 <<his>> 무전기를 들어 올린다. "이상 무. 라저."
+<br><br>
+
+<<person1>><<persons>> 허리춤에 있는 주머니에서 작은 용기가 굴러 나온다. 파란 문이 그들 뒤에서 닫힌다.
+<br><br>
+
+<<if $compoundspray2 isnot 1>>
+	<<peppersprayicon>><<link [[용기를 줍는다|Elk Compound Station Canister]]>><<set $spraymax += 1>><<spray 5>><<world_corruption "soft" -10>><</link>><<gspraymax>>
+	<br>
+<<else>>
+	<<peppersprayicon>><<link [[용기를 줍는다|Elk Compound Station Canister]]>><<spray 1>><</link>><<gspray>>
+	<br>
+<</if>>
+<<getouticon>><<link [[그냥 떠난다|Elk Compound Station Leave]]>><</link>>
+<br>
+
+:: Elk Compound Station Badge
+<<effects>>
+
+당신은 배지를 집어 들고 살펴본다. 그것은 <<person1>><<person>>【이가】 높은 수준의 보안 허가를 받은 경비원 <<= window.KR.gatPersonNameDictKR($NPCList[0].name)>>【이】라는 것을 나타낸다.
+<br><br>
+
+/*
+<<icon "access-card.png">><<link [[문을 확인한다|Elk Compound Lab Enter]]>><<endevent>><</link>>
+<br>
+*/
+<<getouticon>><<link [[그냥 떠난다|Elk Compound Station Leave]]>><</link>>
+
+:: Elk Compound Station Canister
+<<effects>><<wearProp "pepper spray">>
+
+<<if $compoundspray2 isnot 1>>
+	<<set $compoundspray2 to 1>>
+	당신은 용기를 집어 든다. 후추 스프레이 충전기처럼 보이지만, 바닥에 컴퓨터 칩이 노출되어 있다. 당신은 그것을 넣고 출구로 향한다.
+	<br><br>
+
+	<span class="gold">후추 스프레이 추가 충전량을 얻었습니다.</span>
+	<br><br>
+<<else>>
+	당신은 용기를 집어 든다. 후추 스프레이 충전기다. 당신은 그것을 넣고 출구로 향한다.
+	<br><br>
+<</if>>
+
+다른 출구는 하나뿐이다. 천장에 있는 해치. 당신은 사다리를 올라가 그것을 연다. 교통 소음이 당신을 맞이한다. 당신은 나머지 길을 올라, 엘크 가 옆 골목으로 나온다.
+<br><br>
+
+당신 뒤에서 해치가 딸깍 소리를 내며 닫힌다.
+<br><br>
+
+<<link [[다음|Elk Street]]>><<set $eventskip to 1>><<endevent>><</link>>
+<br>
+
+:: Elk Compound Station Leave
+<<effects>>
+
+<<if $phase is "escape">>
+	당신이 역 승강장으로 나온 직후 시설 문이 닫힌다.
+<</if>>
+다른 출구는 하나뿐이다. 천장에 있는 해치. 당신은 사다리를 올라가 그것을 연다. 교통 소음이 당신을 맞이한다. 당신은 나머지 길을 올라, 엘크 가 옆 골목으로 나온다.
+<br><br>
+
+당신 뒤에서 해치가 딸깍 소리를 내며 닫힌다.
+<br><br>
+
+<<link [[다음|Elk Street]]>><<set $eventskip to 1>><<endevent>><</link>>
+<br>
+
+:: Elk Compound Widgets [widget]
+<<widget "resetCompound">>
+	<<set $compound.alarm to 0>>
+	<<set $compound.bluff to false>>
+	<<set $compound.theft to {
+		pipes: false,
+		smoke: false,
+	}>>
+<</widget>>

@@ -1,0 +1,776 @@
+:: Orphanage Loft
+
+<<set $outside to 0>><<set $location to "home">><<effects>>
+당신은 고아원 위 다락방에 있다. 중앙에는 넓은 복도가 있고, 양옆으로는 다른 방으로 이어지는 복도들이 늘어서 있다. 먼지 쌓인 상자들이 높이 쌓여 있다.
+<br>
+<<if $loft_kylar>>
+	방 하나에서 톡 쏘는 냄새가 풍겨온다.
+	<br>
+<</if>>
+<<if $loft_river is 1>>
+	방 중 한 곳에서 따뜻한 수프와 갓 구운 빵 냄새가 풍겨온다.
+	<br>
+<</if>>
+<<if $loft_doren is 1>>
+	독서 공간에서 마음이 편안해지는 책 냄새가 풍겨온다.
+	<br>
+<</if>>
+<<if $loft_gh gte 2>>
+	맨 뒤쪽의 돌출창을 통해 빛이 스며든다.
+	<br>
+<</if>>
+<<if $loft_sam is 1>>
+	공기 중에 커피 향이 감돈다.
+	<br>
+<</if>>
+<br>
+<<if $loft_spray isnot 1 and $spray lt $spraymax and $loft_kylar>>
+	<<peppersprayicon>><<link [[후추 스프레이 리필하기|Orphanage Loft Spray]]>><<spray 1>><<set $loft_spray to 1>><</link>><<gspray>>
+	<br>
+<</if>>
+<<if $loft_river gte 1>>
+	<<kitchenicon "range">><<link [[비밀 주방|Orphanage Loft Kitchen]]>><</link>>
+	<br>
+<</if>>
+<<if $loft_doren is 1>>
+	<<schoolicon "library">><<link [[독서 공간|Orphanage Loft Reading Nook]]>><</link>>
+	<br>
+<</if>>
+<<if $loft_gh gte 2>>
+	<<baywindowicon>><<link [[돌출창|Orphanage Loft Bay Window]]>><</link>>
+	<br>
+<</if>>
+<<if $loft_sam is 1>>
+	<<foodicon "coffee">><<link [[커피 포트|Orphanage Loft Coffee Pot]]>><</link>>
+	<br>
+<</if>>
+<<main_hall_icon>><<link [[중앙 홀 (0:01)|Orphanage]]>><<pass 1>><</link>>
+<br>
+
+:: Orphanage Loft Spray
+<<set $outside to 0>><<set $location to "home">><<effects>><<wearProp "pepper spray">>
+화학 실험실에 들어선다. 여러 비커가 부글부글 끓고 있다. <<generateyv1>><<person1>><<person>>【이가】 일을 처리하고 있다. <<He>>【은는】 당신에게 갓 만든 후추 스프레이 충전재를 건네준다.
+<br><br>
+<<link [[다음|Orphanage Loft]]>><<endevent>><</link>>
+<br>
+
+:: Orphanage Loft Kitchen
+<<set $outside to 0>><<set $location to "home">><<set $bus to "loft_kitchen">><<effects>>
+당신은 베일리에게서 숨겨진 고아원 다락방의 주방에 있다.
+<<if Time.dayState is "night">>
+	고아들이 밤새 스튜를 약한 불에 끓여두었다.
+<<elseif Time.dayState is "dawn">>
+	고아들이 아침 식사를 하러 오고 있다.
+<<elseif Time.dayState is "dusk">>
+	고아들이 냄비를 닦고 엎질러진 밀가루를 치우며 정리하고 있다.
+<<else>>
+	한 고아가 크고 달콤한 냄새가 나는 냄비를 젓고 있고, 다른 아이들은 반죽을 치대고 있다.
+<</if>>
+<br><br>
+
+<<robinorphanagekitchen>>
+
+<<if Object.keys($loftIngredients).length gte 1>>
+	<<for _i range Object.keys($loftIngredients)>>
+		<<if $loftIngredients[_i] lte 0>>
+			<<if $recipeMade and setup.foodstuff[$recipeMade].recipe?.ingredients.includes(_i)>>
+				<span class="red">마지막 남은 <<print setup.foodstuff[_i].plural>>【을를】 사용했습니다.</span>
+				<br>
+			<</if>>
+			<<run delete $loftIngredients[_i]>>
+		<<else>>
+			<span class="green">최근에 <<print setup.foodstuff[_i].plural>>【이가】 이곳으로 배달되었습니다.</span> <span class="gold"><<number $loftIngredients[_i]>>끼니</span>를 만들기에 충분할 것입니다.
+			<br>
+		<</if>>
+	<</for>>
+	<br>
+	<<ingredientsSupplied `Object.keys($loftIngredients)`>>
+<<else>>
+	여기서 원하는 것은 무엇이든 요리할 수 있지만, 재료는 직접 조달해야 합니다.
+	<br><br>
+<</if>>
+
+<<allowLewdIngredients>>
+<<kitchenDisplay>>
+
+<<getouticon>><<link [[나가기|Orphanage Loft]]>><<kitchenExit>><</link>>
+<br>
+
+:: Orphanage Loft Reading Nook
+<<effects>>
+You stand before the cosy reading nook, by a window. The shelves are filled with books, newspapers, and magazines. Bookmarks, flash cards, stationery, and craft supplies are stored in the drawers.
+<br><br>
+<<rng 5>>
+<<switch $rng>>
+	<<case 1>>The orphans gather around the reading nook, listening to a <<generatey1>><<person1>><<person>> read.
+	<<case 2>>A <<generatey1>><<person1>><<person>> quizzes a <<generatey2>><<person2>><<person>> with flash cards.
+	<<case 3>>A <<generatey1>><<person1>><<person>> <<= either("quietly","expressively")>> reads in the nook.
+	<<case 4>>A <<generatey1>><<person1>><<person>> falls asleep in the nook.
+	<<default>>A group of orphans are doing arts and crafts.
+<</switch>>
+
+<<endevent>>
+<br><br>
+<<if !$daily.reading_nook>>
+	<<link [[Read a reference book (0:30)|Orphanage Loft Reading Nook 2]]>><<set $phase to "reference">><<pass 30>><</link>><<gtiredness>>
+	<br>
+	<<link [[Read a comic book (0:20)|Orphanage Loft Reading Nook 2]]>><<set $phase to "comic">><<pass 20>><</link>><<gtiredness>><<lstress>>
+	<br>
+	<<link [[Read a novel (0:30)|Orphanage Loft Reading Nook 2]]>><<set $phase to "novel">><<pass 30>><</link>><<gtiredness>><<genglish>>
+	<br>
+	<<link [[Read a newspaper (0:20)|Orphanage Loft Reading Nook 2]]>><<set $phase to "newspaper">><<pass 20>><</link>><<gtiredness>>
+	<br>
+	<<link [[Read a magazine (0:20)|Orphanage Loft Reading Nook 2]]>><<set $phase to "magazine">><<pass 20>><</link>><<gtiredness>>
+	<br>
+	<<link [[Study with the flash cards (0:20)|Orphanage Loft Reading Nook 2]]>><<set $phase to "flashcards">><<pass 20>><</link>><<gtiredness>>
+	<br>
+	<<link [[Do arts and crafts (0:20)|Orphanage Loft Reading Nook 2]]>><<set $phase to "crafts">><<pass 20>><</link>><<lstress>><<ltrauma>><<gtiredness>>
+	<br>
+	<<link [[Practise writing (0:20)|Orphanage Loft Reading Nook 2]]>><<set $phase to "write">><<pass 20>><</link>><<lstress>><<ltrauma>><<gtiredness>><<genglish>>
+	<br>
+	<<if ($worn.lower.name !== "naked" and ($worn.lower.integrity lte (clothingData('lower',$worn.lower,'integrity_max')/5))) or
+			($worn.upper.name !== "naked" and ($worn.upper.integrity lte (clothingData('upper',$worn.upper,'integrity_max')/5))) or
+			($worn.under_upper.name !== "naked" and ($worn.under_upper.integrity lte (clothingData('under_upper',$worn.under_upper,'integrity_max')/5))) or
+			($worn.under_lower.name !== "naked" and ($worn.under_lower.integrity lte (clothingData('under_lower',$worn.under_lower,'integrity_max')/5)))>>
+		<<link [[Fix your clothes (?:??)|Orphanage Loft Reading Nook 2]]>><<set $phase to "sew">><</link>><<ghousekeeping>><<note "Time depends on Housekeeping skill." "italic">>
+		<br>
+	<</if>>
+	<<if $tiredness gte 1700>>
+		<<link [[Take a nap (0:15)|Orphanage Loft Reading Nook 2]]>><<set $phase to "nap">><<pass 15>><</link>><<lstress>><<ltiredness>>
+		<br>
+	<</if>>
+	<br>
+<</if>>
+<<getouticon>><<link [[Leave|Orphanage Loft]]>><<kitchenExit>><</link>>
+
+:: Orphanage Loft Reading Nook 2
+<<effects>>
+<<set $daily.reading_nook to 1>>
+<<if $phase is "reference">>
+	<<tiredness 10>>
+	<<rng 5>>
+	<<switch $rng>>
+		<<case 1>>
+			간단한 요리법을 알려주는 요리책이다.
+			<br><br>
+			<<reading_nook_recipe>>
+		<<case 2>>백과사전이다. 새로운 것을 배운다. <<= either(`<<genglish>><<englishskill>>`, `<<ghistory>><<historyskill>>`, `<<gmaths>><<mathsskill>>`, `<<gscience>><<scienceskill>>`)>>
+		<<case 3>>세계사 지도책이다. 새로운 것을 배운다. <<ghistory>><<historyskill>>
+		<<case 4>>사전이다. 새로운 것을 배운다. <<genglish>><<englishskill>>
+		<<default>><<= either("동물학", "인류 진화", "자연", "생물 다양성")>>에 관한 도감이다. 새로운 것을 배운다. <<gscience>><<scienceskill>>
+	<</switch>>
+<<elseif ["novel","comic"].includes($phase)>>
+	<<tiredness 10>>
+	<<if $phase is "novel">>
+		<<englishskill>>
+		<<rng 3>>
+		<<switch $rng>>
+			<<case 1>>읽어내기가 정말 힘들다.
+			<<case 2>><<= either("문장이 너무 매끄럽게 읽혀서", "너무 흥미진진해서")>> 한 시간이 지난 줄도 모른다.<<pass 60>>
+			<<case 3>>너무 몰입해서 시간 가는 줄 모른다.<<pass 60>>
+			<<default>>가볍게 읽기 좋다.
+		<</switch>>
+	<<else>>
+		<<stress -5>>
+		<<rng 6>>
+		<<switch $rng>>
+			<<case 1>>읽어내기가 정말 힘들다.
+			<<case 2>><<= either("색채", "구도")>> 사용이 기가 막힌다.
+			<<case 3>>그림체가 <<= either("귀엽다", "독특하다", "눈길을 끈다", "아름답다", "화려하다")>>.
+			<<case 4>><<= either("내용이 너무 매끄럽게 읽혀서", "너무 흥미진진해서")>> 한 시간이 지난 줄도 모른다.<<pass 60>>
+			<<case 5>>너무 몰입해서 시간 가는 줄 모른다.<<pass 60>>
+			<<default>>가볍게 읽기 좋다.
+		<</switch>>
+	<</if>>
+	<<rng 10>>
+	<<switch $rng>>
+		<<case 1>>잠시 멈춰서 생각하게 만든다.<<pass 40>>
+		<<case 2>>실존적 위기를 안겨준다. <<gstress>><<stress 5>>
+		<<case 3>>삶에 더 감사하게 만든다. <<lstress>><<stress -5>>
+		<<case 4>>지루하다. <<= either("하지만 계속 읽는다", "<<set _read_bored to true>>그래서 읽기를 그만둔다", "그래서 대충 훑어본다")>>.
+		<<case 5>>재미있다. 즐거운 시간을 보낸다. <<lstress>><<stress -5>>
+		<<case 6>>웃음을 자아낸다. 몇 번이나 빵 터진다. <<lstress>><<stress -5>>
+		<<case 7>>내내 조마조마하다. 반전이 충격적이다.
+		<<case 8>>위안이 되는 책이다. 책 속 세계에 사는 자신을 상상하며 미소 짓는다. <<lstress>><<stress -5>>
+		<<case 9>>눈물샘을 자극한다. 등장인물에게 감정 이입하여 눈물을 흘린다.
+		<<default>>너무 <<= either("디스토피아적이다", "무섭다")>>. <<= either("피부에 소름이 돋는", "등골이 오싹해지는")>> 것을 느낀다.
+	<</switch>>
+	<br><br>
+	<<if _read_bored isnot true>>
+		결말은 <<= either("완벽하다.", "이보다 더 좋을 수 없다.", "괜찮다.", "더 나을 수도 있었다.", "해답보다 더 많은 의문을 남긴다.", "어설프다.", "실망스럽다.")>>
+	<<else>>
+		결말에는 관심이 없다.
+	<</if>>
+<<elseif $phase is "newspaper">>
+	<<tiredness 10>>
+	<<rng 4>>
+	<<switch $rng>>
+		<<case 1>>독해력이 향상된다. <<genglish>><<englishskill>>
+		<<case 2>>세상에 대해 더 많이 알게 된 기분이다. <<ghistory>><<historyskill>>
+		<<case 3>>사회, 정치, 경제 문제에 대한 이해도가 높아진다. <<gmaths>><<mathsskill>>
+		<<default>>과학적 소양이 향상된다. <<gscience>><<scienceskill>>
+	<</switch>>
+<<elseif $phase is "magazine">>
+	<<tiredness 10>>
+	<<rng 3>>
+	<<switch $rng>>
+		<<case 1>>【이가】 호에는 요리 레시피가 실려 있다. <<reading_nook_recipe>>
+		<<case 2>>최신 <<= either("패션 트렌드", "인기 음악가", "인기 예술가")>>에 대해 더 잘 알게 된 기분이다.
+		<<default>><<= either("유명한", "인기 있는")>> <<= either("예술가", "밴드", "음악가")>>의 인터뷰를 읽는다. <<= either("재미있고 통찰력이 있다. <<lstress>><<stress -6>>", "따분하고 지루하다.")>>
+	<</switch>>
+<<elseif $phase is "flashcards">>
+	<<tiredness 10>>
+	낱말 카드를 사용해 공부한다. 암기력이 좋아지는 것을 느낀다.<<= either(`<<gggenglish>><<englishskill 18>>`, `<<ggghistory>><<historyskill 18>>`, `<<gggmaths>><<mathsskill 18>>`, `<<gggscience>><<scienceskill 18>>`)>>
+<<elseif $phase is "write">>
+	<<tiredness 10>><<englishskill>>
+		당신은 <<= either("시","단편 소설")>> 쓰는 연습을 한다. 결과물은 <<=("끔찍하다","그저 그렇다","괜찮다","훌륭하다","놀랍다")>>.
+<<elseif $phase is "nap">>
+	<<tiredness -12>>
+	몸을 웅크리고 눈을 짓누르는 졸음에 굴복하여 꾸벅꾸벅 존다. 나중에 상쾌하고 푹 쉰 기분으로 일어난다. <<lstress>><<stress -5>><<ltrauma>><<trauma -5>>
+	<<if $englishtrait gte 3>>
+		<<cleareventpool>>
+		<<addinlineevent "readingorphans" 1>>
+		<<generatey1>><<generatey2>>
+		<br><br>
+		고아 몇 명이 주위에 모여드는 것을 알아차린다. 그중 한 명인 <<person1>><<person>>【이가】 묻는다. "안녕! 혹시 우리한테 책 좀 읽어줄 수 있어?"
+		<br><br>
+		<<link [[수락한다 (0:20)|Reading Nook Orphans]]>><<pass 20>><<set $phase to 1>><</link>><<ghope>>
+		<br>
+		<<link [[거절한다|Reading Nook Orphans]]>><<set $phase to 2>><</link>>
+		<<set _hide_links to 1>>
+		<</addinlineevent>>
+		<<runeventpool>>
+	<</if>>
+<<elseif $phase is "crafts">>
+	<<tiredness 10>>
+	서랍에 있는 용품을 사용하여,
+	<<rng 4>>
+	<<switch $rng>>
+		<<case 1>>
+			<<= either ("코바늘 공예품", "뜨개질 공예품", "비즈 공예품", "점토 공예품", "펠트 공예품", "장식품", "액세서리", "모루 공예품", "종이 반죽 공예품")>>【을를】 만든다.
+		<<case 2>>
+			<<= either(`<<wearProp "paper sheet">>`,`<<wearProp "scissors">>`)>>
+			<<= either ("책갈피", "종이접기")>>【을를】 만든다.
+		<<case 3>>
+			<<= either(`<<wearProp "paintbrush">>그림을 그린다`,`<<wearProp "pencil">>스케치를 한다`)>>.
+		<<default>>
+			<<wearProp "rag">>
+			천 조각에 무늬를 수놓는다.
+	<</switch>>
+		마음이 치유된다. <<lstress>><<stress -5>><<ltrauma>><<trauma -5>>
+<<elseif $phase is "sew">>
+	<<housekeeping 5>>
+	<<outfitChecks>>
+
+	<<silently>>
+	<<set _equip to []>>
+	<<for _tatteredOutfit range Object.keys($worn)>>
+		<<if _tatteredOutfit is "genitals" or $worn[_tatteredOutfit].name is "naked" or $worn[_tatteredOutfit].integrity is undefined>>
+			<<continue>>
+		<</if>>
+
+		<<if $worn[_tatteredOutfit].integrity lte clothingData(_tatteredOutfit,$worn[_tatteredOutfit],'integrity_max')/5>>
+			<<run _equip.push(_tatteredOutfit)>>
+		<</if>>
+	<</for>>
+
+	<<set _items to []>>
+	<<for _i to 0; _i lt _equip.length; _i++>>
+		<<run _items.push($worn[_equip[_i]].name)>>
+	<</for>>
+
+	<<set _itemListText to formatList(_items, undefined, true)>>
+	<</silently>>
+
+	<<if $housekeeping gte 800>>
+		<<pass 15>>
+		<<for _i to 0; _i lt _equip.length; _i++>>
+			<<set $worn[_equip[_i]].integrity = clothingData(_equip[_i],$worn[_equip[_i]],'integrity_max')>>
+			<<set $_slot to _equip[_i]>>
+		<</for>>
+		<<if _equip.length is 1>>
+			너덜너덜해진 _itemListText【을를】 꼼꼼하게 꿰맨다. 이제 새것처럼 멀쩡하다.
+		<<else>>
+			너덜너덜해진 _itemListText【을를】 꼼꼼하게 꿰맨다. 이제 새것처럼 멀쩡하다.
+		<</if>>
+	<<elseif $housekeeping gte 500>>
+		<<pass 30>>
+		<<for _i to 0; _i lt _equip.length; _i++>>
+			<<set $worn[_equip[_i]].integrity = clothingData(_equip[_i],$worn[_equip[_i]],'integrity_max')>>
+			<<set $_slot to _equip[_i]>>
+		<</for>>
+		<<if _equip.length is 1>>
+			너덜너덜해진 _itemListText【을를】 꿰맨다. 시간이 좀 걸리지만, 이제 새것처럼 멀쩡하다.
+		<<else>>
+			너덜너덜해진 _itemListText【을를】 꿰맨다. 시간이 좀 걸리지만, 이제 새것처럼 멀쩡하다.
+		<</if>>
+	<<else>>
+		<<rng 3>>
+		<<switch $rng>>
+			<<case 1>>
+				<<pass 45>>
+				<<for _i to 0; _i lt _equip.length; _i++>>
+					<<set $worn[_equip[_i]].integrity = clothingData(_equip[_i],$worn[_equip[_i]],'integrity_max')>>
+				<</for>>
+
+				너덜너덜해진 _itemListText【을를】 꿰매려 시도한다. 생각보다 시간이 훨씬 오래 걸린다.
+			<<case 2>>
+				<<pass 45>>
+				<<for _i to 0; _i lt _equip.length; _i++>>
+					<<set $worn[_equip[_i]].integrity -= $worn[_equip[_i]].integrity/2>>
+					<<if $worn[_equip[_i]].integrity lt 1>>
+						<<generalRuined _equip[_i]>>
+					<</if>>
+					<<set $_slot to _equip[_i]>>
+				<</for>>
+
+				너덜너덜해진 _itemListText【을를】 꿰매려 시도한다.
+				<<if _equip.length is 1>>
+					불행히도, 수선하려는 시도는 상태를 더 악화시킬 뿐이다. _itemListText【은는】 이제 더 너덜너덜해졌다.
+				<<else>>
+					불행히도, 수선하려는 시도는 상태를 더 악화시킬 뿐이다. _itemListText【은는】 이제 더 너덜너덜해졌다.
+				<</if>>
+			<<default>>
+				<<pass 15>>
+				<<for _i to 0; _i lt _equip.length; _i++>>
+					<<set $worn[_equip[_i]].integrity = $worn[_equip[_i]].integrity + clothingData(_equip[_i],$worn[_equip[_i]],'integrity_max')/10>>
+				<</for>>
+				_itemListText【을를】 꼼꼼하게 고치려 시도한다. 약간은 고쳐졌다.
+		<</switch>>
+	<</if>>
+<</if>>
+<br><br>
+<<if !_hide_links>>
+	<<link [[다음|Orphanage Loft Reading Nook]]>><</link>>
+<</if>>
+
+:: Reading Nook Orphans
+<<effects>>
+<<if $phase is 1>>
+	<<famegood 10>><<hope 1>>
+	"고마워!" 그들은 미소 지으며 자리에 앉아, 당신이 책 읽는 것을 듣는다. <<= either("당신의 낭독은 그들을 푹 빠져들게 한다", "당신은 장면을 연기하고 우스꽝스러운 목소리를 내어 그들을 크게 즐겁게 한다")>>. 책을 다 읽은 후, 당신은 그들에게 책에 관한 퀴즈를 내고, 그들은 기꺼이 참여한다. 즐거운 시간을 보낸다.<<lstress>><<stress -5>><<gtiredness>><<tiredness 10>>
+<<else>>
+	고개를 젓는다.
+	<br><br>
+	<<if $speech_attitude is "meek">>
+		"미안해, 안 될 것 같아."
+	<<elseif $speech_attitude is "bratty">>
+		"싫어. 안 미안해."
+	<<else>>
+		"미안하지만, 오늘은 안 돼."
+	<</if>>
+	<br><br>
+	<<person2>><<person>>【이가】 당신을 안심시킨다. "괜찮아. 이해해. 좋은 하루 보내!"
+	<br><br>
+	"안녕," 무리가 이구동성으로 말한다. 그들은 종종걸음으로 사라진다.
+<</if>>
+
+<br><br>
+<<link [[다음|Orphanage Loft Reading Nook]]>><<endevent>><</link>>
+
+:: Orphanage Loft Bay Window
+<<effects>>
+
+돌출창 앞에 서 있다. 창문이 위로 솟아 있다. 중앙 창문의 걸쇠가 단단히 잠겨 있다.
+<<if $loft_gh is 3>>
+	아래에 이불을 덧댄 퀼트가 편안해 보인다. 쿠션과 베개가 창가에 흩어져 있다. 풍경이 부드럽게 흔들린다.
+<</if>>
+<br><br>
+<<if Time.hour lte 22>>
+	<<switch random(1,4)>>
+		<<case 1>><<generatey1>><<person1>><<person>>【이가】 아래 정원을 내려다보고 있다.
+		<<case 2>><<generatey1>><<person1>><<person>>【이가】 창턱에 앉아 <<generatey2>><<person2>><<person>>【와과】 수다를 떨고 있다<<if $loft_gh is 3>>. 가슴에 베개를 껴안은 채다<</if>>.
+		<<case 3>><<generatey1>><<person1>><<person>>【이가】 <<= Time.dayState is "night" ? "달빛 아래서" : "햇빛을 쬐며">> 꾸벅꾸벅 졸고 있다.
+		<<default>>고아 몇 명이 창가에 모여 밖을 내다보며 숲속의 무언가를 신나게 가리키고 있다.
+	<</switch>>
+	<br><br>
+<</if>>
+창문을 열고 창턱 끝에 걸터앉아 허공에 발을 대롱거린다.
+<br><br>
+
+<<loft_window_options>>
+
+:: Orphanage Loft Bay Window Preen
+<<effects>>
+
+<<if $plucked>>
+	날개를 다듬으려 하지만, 그윌란이 헐거운 깃털을 하나도 남기지 않았다. 이미 철저하게 뽑힌 상태다.
+<<elseif $daily.birdSelfPreen is undefined>>
+	<<set $daily.birdSelfPreen to 1>>
+	날개를 다듬는다. 혼자 하려니 더 힘들다.
+	<<set _selfFeatherNum to random(1,2)>>
+	<<switch _selfFeatherNum>>
+		<<case 1>>헐거워진 깃털 하나가 빠졌다. <span class="teal">그것을 챙긴다.</span>
+		<<case 2>>헐거워진 깃털 몇 개가 빠졌다. <span class="teal">그것들을 챙긴다.</span>
+	<</switch>>
+	<<set $bird.materials.feathers += _selfFeatherNum>>
+	<<wearProp "pc feather" "hair">>
+<<else>>
+	날개를 다듬는다. 당장 뽑아낼 헐거운 깃털은 더 이상 없지만, 어쨌든 기분이 좋아진다.
+<</if>>
+<br><br>
+
+<<loft_window_options>>
+
+:: Orphanage Loft Bay Window Sing
+<<effects>>
+
+<<if $harpy gte 6>>
+	<<transform bird 1>>
+	<<print either(
+		"힘차고 맑은 목소리가 허공을 가르며 닿는 모든 생물을 굴복시킨다. 아무리 까다로운 짐승이라도 예외는 아니다. 숲이 당신에게 복종한다.",
+		"깊고 부드러운 목소리가 세상의 모든 슬픔을 달래준다. 숲이 조금 더 평화로워 보인다.",
+		"영광스러운 노래가 먼 땅을 향해 손짓한다. 나무들이 덜컹거리고 나뭇잎이 바스락거리며 당신의 부름에 응답하는 듯하다.",
+		"바람 속에서 콧노래를 부르며, 노래가 광활한 하늘을 가로질러 퍼지게 한다. 노래가 지나가는 곳마다 나무들이 길을 내어주고 꽃들이 더욱 아름답게 피어난다.",
+		"당신의 발라드가 공기 자체를 우아하게 만든다. 자연이 당신을 경외하며 숨을 죽인다.",
+		"마치 하늘이 고향에 온 것을 환영하듯, 당신의 멜로디가 공기를 타고 흐른다.",
+		"목소리가 꿀 같은 노래처럼 허공에 뚝뚝 떨어진다. 모든 음표가 사이렌의 부름처럼 마음을 끌어당긴다.",
+		"목구멍에서 나오는 각 음표가 하늘을 뒤흔들 만큼 밝게 느껴진다. 산들바람조차 당신의 멜로디에 맞춰 춤을 추는 듯하다."
+	)>><<trauma -6>><<ltrauma>>
+	<br><br>
+	<<cleareventpool>>
+
+	<<addinlineevent "loft_sing_birds" 1>>
+		선율적인 곡조가 <<= Time.dayState is "night" ? "올빼미를 끌어들이고, 올빼미는 창턱의 당신 곁에 앉는다. 올빼미의 부엉거리는 소리가 당신의 노래를 뒷받침한다" : "명금류 떼를 끌어들인다. 새들이 당신 주위에 모여들어 지저귀는 소리로 반주를 더한다">>.
+	<</addinlineevent>>
+
+	<<if $seabird_lullaby gte 2 and !$weekly.seabird_sing>>
+		<<addinlineevent "loft_sing_lullaby" .01>>
+			<<set $weekly.seabird_sing to true>>
+			충동적으로, <span class="teal">바닷새의 자장가</span>의 익숙한 여섯 음표를 흥얼거린다. 그러자 가장 자연스러운 방식으로 입술에서 가사가 흘러나온다. 당신의 목소리를 제외하고는 모든 것이 고요하다. <<if Time.hour gte 23>>목소리가 허공을 떠돌며, 가장 지친 영혼조차 잠으로 이끈다.<</if>>
+			<br><br>
+			숲에서 부드러운 노랫소리가 메아리친다.
+			<<if $gwylan.hunting gte 2 and $hypnosis_traits.devotion gt 0 and !isGwylanAbsent()>>
+				<<silently>><<gwylanWillpowerDifficulty>><</silently>>
+				그것은 이상하고 거부할 수 없는 감정을 불러일으키고, 갑자기 숲속 깊은 곳으로 들어가고 싶은 충동을 느낀다.
+					<<if $willpowerSuccess>>
+						고개를 저으며 그 생각을 떨쳐낸다.
+					<<else>>
+						무아지경에 더 깊이 빠져든다. <<hypnosisText "방치했던 의무가 떠오르며 죄책감이 밀려온다.">><<trauma 6>><<gtrauma>>
+					<</if>>
+			<<elseif isGwylanAbsent() is "nobody">>
+				아무 소리도 들리지 않는 것 같다. 고개를 젓는다. 아무것도 들리지 않는다.
+			<<else>>
+				그윌란의 목소리 같다. 두 사람의 목소리가 합쳐져 듀엣을 이룬다.
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if Time.hour gte 21>>
+		<<addinlineevent "loft_sing_orphan_lull" .5>>
+			<<generatey1>><<person1>>
+			근처에서 또 다른 고아가 잠든다. 목소리를 낮춰 부드럽게 속삭인다.
+			<br><br>
+			잠시 후 <<him>>【을를】 깨워 침대에 가서 자라고 제안한다.
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $dissociation gte 1 and $hallucinations gte 2 and Time.dayState is "night">>
+		<<addinlineevent "loft_sing_trauma" 1>>
+			차가운 밤공기 속으로 슬픔과 고통을 쏟아낸다. 어둠이 외로운 곡조를 뒤덮으며, 마치 당신을 통째로 삼키려는 듯하다.
+			<<if Weather.bloodMoon>>
+				순간, 붉은 달이 마치 악의를 품고 당신을 뚫어지게 쳐다보는 눈동자처럼 보인다. 무언가가 당신을 향해 다가오고 있다. <span class="red">입을 열지만, 노래를 부를 수 없다는 것을 깨닫는다.</span><<trauma 10>><<ggtrauma>>
+				<<set $daily.no_sing to true>>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if Weather.bloodMoon and Time.dayState is "night">>
+		<<addinlineevent "loft_sing_blood" .7>>
+			<<set $daily.no_sing to true>>
+			<<set _no_options to true>>
+			짙은 붉은 달빛이 당신을 감싸며 모든 것을 붉게 물들인다. 목소리가 떨리고, 가슴에 두려움이 차오른다.
+			<br><br>
+			무언가 끔찍한 것이 가까이 있다.
+			<br><br>
+			그것이 도착했다.
+			<br><br>
+			<span class="red">첫째, 목구멍에서 아무 소리도 나오지 않는다.
+			<br><br>
+			둘째, 더 이상 아무 소리도 들리지 않는다.
+			<br><br>
+			셋째, 시야에 붉은색이 몰려들어 아무것도 보이지 않게 된다. 피가 너무 많다.</span><<trauma 10>><<ggtrauma>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $world_corruption_soft gte 99 and $hallucinations gte 2 and Time.dayState is "night">>
+		<<addinlineevent "loft_sing_snuffed" 1>>
+			주변이 갑자기 어두워지며, 어둠의 촉수가 당신을 조여온다.
+			<br><br>
+			더 이상 자신의 노랫소리가 들리지 않는다. 비명을 지른다. 그 소리마저 묻혀버린다. <span class="red">목소리를 빼앗겼다.</span><<trauma 20>><<gggtrauma>>
+			<br><br>
+			밤은 섬뜩할 정도로 고요하다. 거친 숨소리 외에는 아무 소리도 들리지 않는다.
+			<<set $daily.no_sing to true>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $loft_gh is 3>>
+		<<addinlineevent "loft_sing_chimes" 1>>
+			바람이 풍경을 부드럽게 흔들어, 딸랑거리는 소리가 당신의 목소리와 어우러져 조화로운 교향곡을 이룬다.
+		<</addinlineevent>>
+	<</if>>
+
+	<<addinlineevent "loft_sing_instrument" .7>>
+		<<generatey1>><<person1>>
+		<<person>>【이가】 당신 곁에 앉아, 손에
+		<<if random(1,50) is 50>>
+			<<print either("크루스", "시톨", "피브고른", "시턴", "콘서티나", "뼈 피리", "허디거디", "앵글로색슨 리라")>>【을를】 들고 있다.
+			<br><br>
+			노래를 잠시 멈추고, 호기심 어린 눈으로 <<his>> 악기를 살펴본다. 이런 악기를 보는 것은 드문 일이다.
+		<<else>>
+			<<print either("하모니카", "기타", "클라리넷", "손북", "바이올린", "리라", "우쿨렐레", "칼림바", "색소폰")>>【을를】 들고 있다.
+		<</if>>
+		<br><br>
+		<<He>>【은는】 당신에게 미소를 지으며 말없이 당신의 노래에 <<his>> 연주를 더한다. <<He>>【은는】 당신의 박자에 맞추려 최선을 다한다.
+		<br><br>
+		노래가 끝날 무렵, <<his>> 얼굴은 흥분으로 상기되어 있다. <<He>>【은는】 마치 당신이 <<his>> 뮤즈라도 되는 양 감탄하며 당신을 바라본다.<<stress -6>><<lstress>>
+	<</addinlineevent>>
+
+	<<addinlineevent "loft_sing_wolves" 1>>
+		멀리서 늑대 울음소리가 들린다. <<if $wolfpackleader is 1>> 당신의 늑대 무리가 그들만의 방식으로 당신에게 화답하는 노래를 부른다.<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "loft_sing_longing" 1>>
+		하늘이 마치 당신을 향한 그리움을 표현하듯 강력한 돌풍을 보낸다. <<if $transformationParts.bird.wings isnot "hidden">>날개가 펄럭이고, 산들바람이 깃털 하나하나를 어루만진다.<</if>> 다시 하늘에 닿고 싶어 안달이 난다. <<if $plucked>>하지만 당신의 날개는 아직 당신을 하늘로 데려다줄 수 없다.<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "default" 1>>
+		당신의 노래가 바람을 타고 지평선 너머 멀리까지 떠돈다.
+	<</addinlineevent>>
+	<<runeventpool>>
+<<else>>
+	숲을 향해 노래를 부르자, 숲은 그에 화답하듯
+	<<if Weather.precipitation isnot "none">>
+		<<if Weather.precipitation is "rain">>
+			축축한 숲의 흙내음을 머금은 산들바람을 보낸다.
+		<<else>>
+			코에 눈송이를 떨어뜨리는 돌풍을 보낸다. 재채기가 나온다.
+		<</if>>
+	<<elseif Time.season is "autumn">>
+		썩어가는 낙엽과 잘 익은 과일 냄새가 나는 부드러운 산들바람을 보낸다.
+	<<elseif Time.season is "summer">>
+		강렬한 태양에 녹아내린 나무 수지의 향신료와 달콤함이 섞인 상쾌한 산들바람을 보낸다.
+	<<else>>
+		상쾌한 소나무와 만발한 꽃향기를 품은 부드러운 미풍을 보낸다.
+	<</if>>
+	<<stress -6>><<lstress>>
+	<br><br>
+	<<cleareventpool>>
+
+	<<if Time.dayState is "night" and !Weather.bloodMoon and !Weather.isOvercast>>
+		<<addinlineevent "loft_sing_moonlight" 1>>
+			달이 밤하늘 높이 떠올라, 은빛 색조를 당신에게 부드럽게 드리운다.
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $dissociation gte 1>>
+		<<addinlineevent "loft_sing_sorrow" .7>>
+			<<set $daily.no_sing to true>>
+			노래가 갑자기 멈춘다. 일어났던 모든 일의 무게가 짓누르며 목이 멘다. 얼굴을 감싼다.
+		<</addinlineevent>>
+	<</if>>
+
+	<<if Weather.bloodMoon and Time.dayState is "night">>
+		<<addinlineevent "loft_sing_dread" 1>>
+			<<set $daily.no_sing to true>>
+			잠시 멈추고 하늘을 올려다본다. 붉은 달이 당신을 짓누르며 시야를 붉게 채운다.
+			<br><br>
+			<span class="red">갑자기, 더 이상 노래하고 싶지 않아진다.</span>
+		<</addinlineevent>>
+	<</if>>
+
+	<<addinlineevent "loft_sing_clap" 1>>
+		<<generatey1>><<person1>>
+		어린 고아가 당신 곁으로 다가온다. <<He>>【은는】 당신의 노래에 맞춰 박수를 치며 격려한다.
+	<</addinlineevent>>
+
+	<<addinlineevent "loft_sing_wave" 1>>
+		정원에서 당신을 본 고아 몇 명이 손을 흔든다.
+	<</addinlineevent>>
+
+	<<runeventpool>>
+<</if>>
+
+<br><br>
+<<loft_window_options>>
+
+:: Orphanage Loft Bay Window Watch
+<<effects>>
+
+숲을 바라본다.
+<br><br>
+<<if $transformationParts.traits.sharpEyes isnot "disabled">>
+	날카로운 시력 덕분에,
+	<<switch random(1,13)>>
+		<<case 1>>외곽에 만발한 제철 꽃들이 보인다.
+		<<case 2>>멀리 있는 나무에 매달린 잘 익은 과일들이 보인다.
+		<<case 3>>멀리서 새알을 묻고 있는 여우가 보인다.
+		<<case 4>>동굴 속으로 사라질 때까지 숲속 깊은 곳으로 달려가는 외로운 늑대가 보인다.
+		<<case 5>>숲속 깊은 곳 어딘가에서 피어오르는 연기가 보인다.
+		<<case 6>>숲속 깊은 곳으로 사라지는 외로운 인영이 보인다.
+		<<case 7>>바람이 불지 않는데도 흔들리는 나뭇가지가 보인다.
+		<<case 8>>덤불 사이를 쏜살같이 달리는 토끼가 보인다.
+		<<case 9>>숲을 구불구불 가로지르는 좁은 오솔길이 보인다.
+		<<case 10>>나뭇가지 사이를 뛰어다니는 다람쥐가 보인다.
+		<<case 11>>숲 가장자리 근처에서 풀을 뜯는 사슴이 보인다.
+		<<case 12>>숨겨진 연못에 퍼지는 잔물결이 보인다.
+		<<default>>나무 위를 맴도는 새 떼가 보인다.
+	<</switch>>
+	<<stress -6>><<lstress>>
+<<else>>
+	푸른 녹음이 끝없이 펼쳐져 있다. 숲속 호수의 한구석이 보인다. 마음이 편안해진다.<<stress -3>><<lstress>>
+<</if>>
+<br><br>
+
+<<cleareventpool>>
+
+<<if $transformationParts.traits.sharpEyes isnot "disabled">>
+	<<addinlineevent "forest_watch_shop" .01>>
+		수목 한계선에 자리 잡은 성처럼 생긴 이상한 상점을 발견한다.<<if $forest_shop_intro is 1>> 숲속 상점이다.<</if>>
+		<br><br>
+		여기서 건물의 꼭대기 창문을 들여다볼 수 있다. <<= isGwylanAbsent() is "nobody" ? "아무도 없다.": "실루엣이 왔다 갔다 한다. 마치 당신의 시선을 느낀 듯, 창문 앞에서 갑자기 멈춰 서서 당신을 마주 본다.">>
+		<br><br>
+		시선을 돌린다.
+	<</addinlineevent>>
+<</if>>
+
+<<addinlineevent "forest_watch_gun" .2>>
+	멀리서 총소리가 숲에 울려 퍼진다. 잠시 후, 깜짝 놀란 새 떼가 나무 위로 날아오른다.
+<</addinlineevent>>
+
+<<addinlineevent "forest_watch_misc" 10>>
+	<<switch random(1,7)>>
+		<<case 1>>
+			<<if $loft_gh is 3>>
+				<<print either(
+					"커튼이 당신 곁에서 부드럽게 부풀어 오른다.",
+					"퀼트가 당신의 무게에 편안하게 가라앉는다.",
+					"담요가 당신의 움직임에 따라 뭉친다.",
+					"커튼이 나무 틀에 부딪혀 부드럽게 펄럭인다.",
+					"헐렁한 천이 산들바람에 조용히 바스락거린다."
+				)>>
+			<<else>>
+				상록수 향기가 공기 중에 맴돈다.
+			<</if>>
+		<<case 2>>
+			<<if Weather.name is "thunderstorm">>
+				차가운 폭풍이 숲을 어둠으로 뒤덮는다. 열린 창가에 홀로 앉아, 번개가 하늘을 가를 때 다리에 부드럽게 떨어지는 빗방울을 느낀다.
+			<<elseif Weather.precipitation isnot "none">>
+				<<= Weather.precipitation is "rain" ? "빗방울이 대롱거리는 다리에 부드럽게 떨어진다." : "창턱을 따라 눈이 쌓인다.">>
+			<<else>>
+				열린 창틀에 기대자 <<= Time.dayState is "night" ? "달빛이 피부를 어루만진다": Time.dayState is "dusk" ? "노을이 피부를 물들인다" : "햇빛이 피부를 따뜻하게 데운다">>.
+			<</if>>
+		<<case 3>>
+			<<if $loft_river is 1>>
+		주방에서 수프 냄새가 풍겨온다.
+			<<else>>
+				고아원에 차분한 정적이 내려앉는다.
+			<</if>>
+		<<case 4>>
+			<<if Weather.bloodMoon>>
+				붉은 달이 나무들을 붉게 물들인다. 숲은 섬뜩할 정도로 고요하다.
+			<<elseif Time.dayState is "night">>
+				<<print either(
+					"밤의 숲이 보이지 않는 생명체들로 웅성거린다.",
+					"달이 숲 위로 조용히 떠 있다.",
+					"달빛이 돌출창을 은빛으로 물들인다."
+				)>>
+			<<else>>
+				따뜻한 빛이 다락방 바닥에 고인다.
+			<</if>>
+		<<case 5>>
+			<<if Time.season is "spring">>
+				나무 너머로 봄꽃이 보인다.
+			<<elseif Time.season is "winter">>
+				상록수 가지에 눈이 쌓인다.
+			<<elseif Time.season is "summer">>
+				밖에서 매미가 운다.
+			<<else>>
+		열린 창문 사이로 낙엽이 날아 들어온다.
+			<</if>>
+		<<case 6>>
+			<<if $harpy gte 6 and $transformationParts.bird.wings isnot "hidden">>
+				<<print either(
+					"깃털이 산들바람에 느슨하게 펄럭인다.",
+					"따뜻한 산들바람이 깃털 사이로 스며든다.",
+					"바람이 깃털 사이를 장난치듯 스쳐 지나간다.",
+					"탁 트인 하늘이 내면의 그리움을 자극한다.",
+					"날개를 쫙 편다."
+				)>>
+			<<else>>
+				낙엽이 숲의 공기를 가르며 나선형으로 떨어진다.
+			<</if>>
+		<<default>><<print either(
+		"바람이 나무를 바스락거리게 한다.",
+		"머리 위로 철새들이 이동한다.",
+		"멀리서 늑대들이 울부짖는다.",
+		"아래에서 숲의 덮개가 부드럽게 흔들린다.",
+		"새들이 나뭇가지 사이를 휙휙 날아다닌다.",
+		"떨어진 솔잎이 상록수 아래 숲 바닥을 덮고 있다.",
+		"고아들이 창가 주변에서 조용히 수다를 떤다.",
+		"나무 너머 어딘가에서 새소리가 메아리친다.",
+		"숲이 지평선 아래로 끝없이 펼쳐져 있다."
+		)>>
+	<</switch>>
+<</addinlineevent>>
+
+<<addinlineevent "forest_watch_idle" 1>>
+	평소와 다를 바 없어 보인다.
+<</addinlineevent>>
+
+<<runeventpool>>
+<br><br>
+<<loft_window_options>>
+
+:: Orphanage Loft Coffee Pot
+<<effects>>
+
+커피포트 쪽으로 걸어간다. 풍부한 향기가 당신을 반긴다.
+<br><br>
+<<switch random(1,6)>>
+	<<case 1>>다른 고아들이 기계 주위에 서서 음료를 내리고 있다.
+	<<case 2>><<generatey1>><<person1>><<person>>【이가】 커피를 만들고 있다.
+	<<case 3>><<generatey1>><<person1>><<person>>【이가】 무엇을 마실지 고르고 있다.
+	<<case 4>><<generatey1>><<person1>><<person>>【은는】 당장이라도 쓰러질 것 같았지만, 커피를 한 모금 마시자마자 기운을 차린다.
+	<<case 5>><<generatey1>><<person1>><<person>>【이가】 커피에 설탕을 잔뜩 쏟아붓고 있다. 한 모금 마신 후의 표정을 보니 너무 많이 넣은 게 분명하다.
+	<<default>><<generatey1>><<person1>><<person>>【이가】 커피를 너무 많이 마신다고 <<generatey2>><<person2>><<person>>【을를】 꾸짖는 것을 지켜본다.
+<</switch>>
+<br><br>
+
+<<if $daily.loftcoffee isnot 1>>
+	<<foodicon "coffee">><<link [[커피 한 잔 타기|Orphanage Loft Coffee Pot Drink]]>><<endevent>><<set $daily.loftcoffee to 1>><<pass 5>><<stress -3>><<tiredness -4>><</link>><<lstress>><<ltiredness>>
+	<br>
+<<else>>
+	<span class="blue">오늘은 이미 충분히 마셨다.</span>
+	<br>
+<</if>>
+<<getouticon>><<link [[떠난다|Orphanage Loft]]>><<endevent>><</link>>
+
+:: Orphanage Loft Coffee Pot Drink
+<<effects>>
+<<wearProp "coffee">>
+<<set _coffee to either("mocha", "latte", "caramel latte", "white chocolate mocha", "flat white", "caramel iced latte")>>
+<<print window.KR.getCoffeeMenuKr(_coffee)>>【을를】 탄다. 갓 내린 커피 향이 공기를 채운다.
+<br><br>
+<<switch random(1,6)>>
+	<<case 1>>맛있다. 샘이 좋은 원두를 골라준 게 틀림없다.
+	<<case 2>>조금 쓰지만, 어쨌든 마신다.
+	<<case 3>>커피의 다양한 풍미를 모두 느낄 수 있다.
+	<<case 4>>커피에서 약간의 과일 향이 난다. 맛있다.
+	<<case 5>>이번에는 커피가 그리 진하지 않다. 기계에 원두를 충분히 넣지 않은 건지 의문이 든다.
+	<<default>>조금 초조해진다. 커피를 탄 건 좋은 생각이 아니었을지도 모른다. 적어도 맛은 좋다.
+<</switch>>
+<br><br>
+<<if Time.betweenHours(6,11)>>
+	<<set _daytime to "morning">>
+<<elseif Time.betweenHours(12,17)>>
+	<<set _daytime to "afternoon">>
+<<elseif Time.betweenHours(18,20)>>
+	<<set _daytime to "evening">>
+<<else>>
+	<<set _daytime to "nighttime">>
+<</if>>
+	음료를 다 마시고 자리를 정리한다. _daytime 커피를 마시니 상쾌한 기분이 든다.
+<br><br>
+
+<<link [[다음|Orphanage Loft Coffee Pot]]>><<endevent>><</link>>

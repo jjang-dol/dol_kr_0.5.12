@@ -1,0 +1,94 @@
+:: Wolf Street
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "wolf">><<getTarget true>>
+당신은 울프 가에 있다. 근처 숲이 마을로 스며드는 곳이며, 특히 신전이 있는 곳이 그렇다.
+<<if Weather.dayState is "day">>
+	<<if Weather.precipitation is "rain">>
+		나무들이 바람에 흔들린다.
+	<<elseif Weather.precipitation is "snow">>
+		나무들이 바람에 흔들리며 가지에 쌓인 눈을 떨어뜨린다.
+	<<else>>
+		마을에서 조용한 곳 중 하나다.
+	<</if>>
+<<elseif Weather.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		빗소리를 뚫고 안에서 들려오는 노랫소리가 선명하다.
+	<<elseif Weather.precipitation is "snow">>
+		눈 때문에 안에서 들려오는 노랫소리가 희미하다.
+	<<else>>
+		안에서 노랫소리가 들려온다.
+	<</if>>
+<<elseif Weather.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		어두운 빗속에서 불길한 실루엣을 드러낸다.
+	<<elseif Weather.isSnow>>
+		눈이 덮여 있어도 불길한 실루엣은 여전하다.
+	<<else>>
+		어두워지는 하늘을 배경으로 불길한 실루엣을 드러낸다.
+	<</if>>
+<<elseif Weather.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		빗줄기 때문에 실루엣조차 보이지 않는다.
+		<<if $hallucinations gte 2>>
+			하지만 당신은 그것이 지켜보고 있음을 느낀다.
+		<</if>>
+	<<else>>
+		거의 칠흑같이 어둡다.
+	<</if>>
+<</if>>
+<<streeteffects>>
+<br><br>
+<<if $exposed gte 1>>
+	<<exhibitionism "street">>
+<</if>>
+<<if $arousal gte $arousalmax>>
+	<<orgasmstreet>>
+<</if>>
+<<if $stress gte $stressmax and !$possessed>>
+	<<passoutstreet>>
+<<else>>
+
+	<<if (dangerEvent() or $eventforced) and $eventskip is 0>>
+		<<eventsstreet>>
+	<<else>>
+		<<if $options.mapTop is true>>
+			<<map "wolf">>
+			<br>
+		<</if>>
+		주요 장소
+		<br>
+		<<wolficon>><<link [[신전 (0:01)|Temple]]>><<pass 1>><</link>>
+		<br>
+			<<if $soup_kitchen_known is 1 and $exposed lte 0>>
+				<!-- take passage of time into account -->
+				<<if Time.betweenHours(18, 20, 1)>>
+					<<kitchenicon "soup">><<link [[무료 급식소 (0:01)|Soup Kitchen]]>><<pass 1>><</link>>
+				<<else>>
+					<<kitchenicon "soup">><<link [[무료 급식소 (0:01)|Soup Kitchen Closed]]>><<pass 1>><</link>>
+				<</if>>
+			<br>
+			<</if>>
+		<<foresticon>><<link [[숲 (0:10)|Forest]]>><<pass 10>><<set $forest to 0>><<set $eventskip to 1>><</link>>
+		<br><br>
+		<<if $exposed gte 1 and Time.dayState isnot "night">>
+		<<else>>
+			<<add_link "이동<br>">><<hideDisplay>>
+			<<danube>>
+			<<nightingale>>
+			<<connudatus>>
+			<<high>>
+			<<if $exposed lte 0>>
+				<<buswait>>
+			<</if>>
+			<<loiter>>
+		<</if>>
+		<<add_link "<br>다른 경로<br>">><<hideDisplay>>
+		<<commercial>>
+		<<stormdrain>>
+		<<displayLinks>>
+		<<if $options.mapTop isnot true>>
+			<br>
+			<<map "wolf">>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>

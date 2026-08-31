@@ -1,0 +1,1213 @@
+:: Farm Kennel
+<<set $outside to 0>><<effects>>
+<<beastNEWinit 1 dog>>
+<<if $kennel_intro isnot true>>
+	<<set $kennel_intro to true>>
+	개집으로 들어간다. <<beastsplural>>의 냄새가 당신을 감싼다. <<if $farm.kennel gte 1>>여기서 농장을 지키도록 훈련시킬 수 있다.<</if>>
+	<br><br>
+	<<if $wolfgirl gte 5>>
+		얼마 지나지 않아 첫 번째 <<beasttype>>【이가】 당신을 알아챈다. 곧 개집 전체가 당신을 쳐다본다. 그들은 당신의 꼬리를 살피며 고개를 갸웃거린다. 어떻게 받아들여야 할지 확신이 서지 않는 듯하다가, 한 마리가 승인하듯 짖는다.<<ggrespect>><<farm_dogs 3>>
+		<br><br>
+
+	<<elseif $cat gte 5>>
+		얼마 지나지 않아 <<beastsplural>>【이가】 당신을 알아챈다. 당신의 고양이 같은 냄새가 존재를 드러낸 모양이다. 그들은 동요하는 것 같다. 냄새가 그들을 흥분시키고 있다. 당신은 가르랑거려 보지만, 도움이 되지 않는다.<<llrespect>><<farm_dogs -3>>
+		<br><br>
+
+	<<elseif $harpy gte 5>>
+		그들은 당신의 날개를 살피고는 뒷걸음질 친다. 당신은 그들에게 끔찍한 무언가를 떠올리게 한다.<<lrespect>><<farm_dogs -1>>
+		<br><br>
+
+	<<elseif $cow gte 5>>
+		<<if $lactating is 1 and $milk_amount gte 30>>
+			그들의 코가 씰룩거린다. 당신의 우유 냄새를 맡을 수 있고, 그 냄새는 그들을 안심시킨다. 어쨌든 그들은 소에 익숙하다.<<ggrespect>><<farm_dogs 3>>
+		<<else>>
+			그들은 당신의 존재를 거의 알아채지 못하는 것 같다. 어쨌든 그들은 소에 익숙하다.<<grespect>><<farm_dogs 1>>
+		<</if>>
+		<br><br>
+
+	<<elseif $fox gte 5>>
+		얼마 지나지 않아 첫 번째 <<beasttype>>【이가】 당신을 알아챈다. 당신의 여우 같은 냄새가 존재를 드러낸 모양이다. 그들은 당신의 꼬리를 살피며 고개를 갸웃거린다. 어떻게 받아들여야 할지 확신이 서지 않는 듯하다가, 한 마리가 망설이며 승인하듯 짖는다.<<ggrespect>><<farm_dogs 1>>
+		<br><br>
+
+	<<else>>
+		한 <<beasttype>>【이가】 고개를 든다. 곧 개집 전체가 당신을 쳐다본다.
+
+	<</if>>
+	<<kennel_intro>>
+	<br><br>
+
+	<<link [[다음|Farm Kennel]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	당신은 개집 안에 있다.
+	<<if $farm.beasts.dogs gte 20>>
+		<<beastsplural>>【이가】 꼬리를 흔들며 당신의 말을 기다린다.
+	<<elseif $farm.beasts.dogs gte 5>>
+		<<beastsplural>>【이가】 당신의 말을 기다린다.
+	<<elseif $farm.beasts.dogs gte -5>>
+		<<beastsplural>>【이가】 당신을 무시한다.
+	<<elseif $farm.beasts.dogs gte -20>>
+		한 <<beasttype>>【이가】 당신에게 으르렁거린다.
+	<<else>>
+		<<beastsplural>>【이가】 억제되지 않은 욕망으로 당신을 지켜본다.
+	<</if>>
+	<<if $farm.kennel gte 1>>훈련 장비가 한쪽 벽에 늘어서 있다.<</if>>
+	<br><br>
+
+	<<if $farm.kennel gte 1>>
+		<<animalicon "dog">><<link [[훈련 (1:00)|Farm Kennel Train]]>><<set $farm_kennel to 1>><<pass 60>><</link>>
+		<br>
+	<</if>>
+	<<petshopicon "treat">><<link [[간식 주기|Farm Kennel Treats]]>><</link>>
+	<br>
+	<<petshopicon "chew">><<link [[놀아주기|Farm Kennel Play]]>><<set $farm_kennel to 1>><</link>>
+	<br>
+	<<getouticon>><<link [[떠나기|Farm Work]]>><<endevent>><</link>>
+	<br>
+
+<</if>>
+
+:: Widgets Kennel [widget]
+<<widget "kennel_intro">>
+	<<if $farm.beasts.dogs gte 5>>
+		그들은 당신이 있는 것을 만족스러워하는 것 같다.
+	<<elseif $farm.beasts.dogs gte -5>>
+		그들은 당신의 존재를 용인하고, 대부분은 당신을 알아본 후 시선을 돌린다.
+	<<elseif $farm.beasts.dogs gte -20>>
+		<span class="pink">환영받지 못하는 기분이 든다.</span>
+	<<else>>
+		당신은 <<bhe>>【이가】 당신의 다리에 허리를 흔들려고 하는 것을 밀쳐낸다. <span class="red">그들은 당신을 존중하지 않는다.</span>
+	<</if>>
+<</widget>>
+
+<<widget "kennel_treats">>
+	<<if _args[0]>>
+		<<set $kennel_treats += _args[0]>>
+		<<if $kennel_treats lt 0>>
+			<<set $kennel_treats to 0>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "kennel_treat_options">>
+	<<if $kennel_treats gte 20>>
+		<<ind>><<link [[전부 먹인다 (20)|Farm Kennel Treats All]]>><<farm_dogs 3>><<kennel_treats -20>><</link>><<ggrespect>>
+		<br>
+	<</if>>
+	<<if $kennel_treats gte 10>>
+		<<ind>><<link [[반만 먹인다 (10)|Farm Kennel Treats Half]]>><<farm_dogs 2>><<kennel_treats -10>><</link>><<grespect>>
+		<br>
+	<</if>>
+	<<if $kennel_treats gte 5>>
+		<<ind>><<link [[조금만 먹인다 (5)|Farm Kennel Treats Some]]>><<farm_dogs 1>><<kennel_treats -5>><</link>><<grespect>>
+		<br>
+	<</if>>
+	<<if $kennel_treats gte 1>>
+		<<ind>><<link [[하나만 먹인다|Farm Kennel Treats One]]>><<kennel_treats -1>><</link>>
+		<br>
+	<<else>>
+		간식이 다 떨어졌다.
+		<br>
+	<</if>>
+	<<getouticon>><<link [[떠난다|Farm Work]]>><<endevent>><</link>>
+	<br>
+<</widget>>
+
+<<widget "kennel_play_options">>
+	<<link [[물어오기 놀이 (1:00)|Farm Kennel Play Fetch]]>><<tiredness 6>><<farm_dogs 3>><</link>><<ggrespect>>
+	<br>
+	<<link [[경주하기 (1:00)|Farm Kennel Play Race]]>><<athletics 6>><<tiredness 6>><<pass 60>><</link>><<gathletics>>
+	<br>
+	<<if $settings.bestialityEnabled or $farm_work.dog.monster is true>>
+		<<if $farm.beasts.dogs gte -5>>
+			<<if hasSexStat("deviancy", 3)>>
+				<<link [[은밀한 놀이 (1:00)|Farm Kennel Play Lewd]]>><<pass 60>><</link>><<deviant3>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if $farm.beasts.dogs gte 5>>
+			<<if hasSexStat("deviancy", 5)>>
+				<<link [[특별한 놀이를 한다 (1:00)|Farm Kennel Play Gang]]>><<pass 60>><</link>><<deviant5>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if $farm.beasts.dogs gte 20>>
+			<<if hasSexStat("deviancy", 5)>>
+				<<link [[개집의 일원이 되어 함께한다 (1:00)|Farm Kennel Play Member]]>><<pass 60>><</link>><<deviant5>><<grespect>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+:: Farm Kennel Treats
+<<effects>>
+
+당신은 옆방의 잠긴 찬장을 열고 간식 봉지를 찾는다.
+
+<<if !$kennel_treats>>
+	비어있다. 마을의 애완동물 가게에서 간식을 더 살 수 있다.
+	<br><br>
+
+	<<link [[다음|Farm Kennel]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<wearProp "dog treat">>
+	<<set $farm_kennel to 1>>
+	당신은 그것을 <<beastsplural>>에게 가져간다.
+
+	<<if $farm.beasts.dogs gte 20>>
+		그들은 열렬한 기세로 주위에 모여든다. 그들의 주의를 끄는 데 간식은 필요 없다.
+		<br><br>
+
+		<<kennel_treat_options>>
+	<<elseif $farm.beasts.dogs gte 5>>
+		그들은 열렬한 기세로 주위에 모여든다. 간식 냄새가 그들의 코에 닿았다.
+		<br><br>
+
+		<<kennel_treat_options>>
+	<<elseif $farm.beasts.dogs gte -5>>
+		그들이 당신 주위로 모여든다.
+		<br><br>
+
+		<<kennel_treat_options>>
+	<<elseif $farm.beasts.dogs gte -20>>
+		그들은 당신을 존중하지 않을지 모르지만, 지금은 음식에 대한 욕구가 그것을 능가한다. 그들은 당신을 참아준다.
+		<br><br>
+
+		<<kennel_treat_options>>
+	<<else>>
+		그들은 당신의 의도나 지시에는 아랑곳하지 않고 당신에게 달려든다. 그들은 간식을 원한다.
+		<br><br>
+
+		<<link [[다음|Farm Kennel Fight]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Farm Kennel Treats All
+<<effects>><<wearProp "dog treat">>
+
+<<if $farm.beasts.dogs gte 20>>
+
+	<<beastsplural>>【이가】 똑바로 앉아 간식을 기다린다. 단 한 마리도 멋대로 행동하지 않는다. 모두 입을 벌리고 기다린다. 당신은 한 마리씩 먹여준다. 그들은 순식간에 간식을 먹어치우고, 당신이 쓰다듬어주자 손을 핥는다.
+	<br><br>
+
+	그들은 순종적으로 당신을 바라보며 앉아 있다.
+	<br><br>
+
+	<<link [[안아주기|Farm Kennel Treats Hug]]>><<farm_dogs 1>><</link>><<grespect>>
+	<br>
+	<<if $settings.bestialityEnabled or $farm_work.dog.monster is true>>
+		<<if hasSexStat("deviancy", 2)>>
+			<<link [[유혹하기|Farm Kennel Treats Seduce]]>><</link>><<deviant2>>
+		<</if>>
+		<br>
+		<<if hasSexStat("deviancy", 3) and $lactating gte 1 and $milk_amount gte 30 and $settings.breastFeedingEnabled>>
+			<<link [[모유 수유하기|Farm Kennel Treats Breastfeed]]>><<farm_dogs 3>><</link>><<deviant3>><<ggrespect>>
+			<br>
+		<</if>>
+	<</if>>
+	<br>
+
+<<elseif $farm.beasts.dogs gte 5>>
+	<<beastsplural>>【이가】 당신 주위로 모여든다. 단 한 마리도 멋대로 행동하지 않는다. 그들은 당신이 간식을 나눠줄 때까지 차례를 기다렸다가, 순식간에 먹어치운다.
+	<<if $monster is 1>>
+		몇몇은 당신이 간식을 건네주자 고마워한다.
+	<<else>>
+		몇몇은 당신이 먹이를 주자 부드럽게 으르렁거린다.
+	<</if>>
+	<br><br>
+
+	당신이 개집을 떠날 때 그들은 꼬리를 흔들며 누워 있다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+
+<<elseif $farm.beasts.dogs gte -5>>
+	<<beastsplural>>【이가】 당신 주위에서 긴장을 푼다. 그들은 간식을 갈망하지만, 당신을 존중하여 차례를 기다릴 줄 안다. 그들은 순식간에 간식을 먹어치운다.
+	<br><br>
+
+	당신은 입술을 핥고 있는 그들을 남겨두고 개집에서 걸어 나온다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	당신은 간식이 많다. 당신은 <<beastsplural>>에게 자유롭게 던져준다. 그들은 순식간에 간식을 먹어치우고, 배고픔으로 빛나는 눈으로 더 달라고 짖는다.
+	<<if $monster is 1>>
+		그들은 더 많은 간식을 요구한다.
+	<<else>>
+		두 마리가 더 가까이 다가오며 목구멍 깊은 곳에서 으르렁거린다.
+	<</if>>
+	<br><br>
+
+	당신은 뒷걸음질 쳐서 상황이 악화되기 전에 간신히 탈출한다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Farm Kennel Treats Seduce
+<<effects>>
+
+당신은 <<beasttype>> 앞에서 땅에 엎드린다. <<bHe 0>>【은는】 열망하는 것처럼 보인다.
+<<deviancy2>>
+
+<<link [[다음|Farm Kennel Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Farm Kennel Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+<</if>>
+
+다른 <<beastsplural>>【이가】 지켜본다.
+<br><br>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farm Kennel Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Kennel Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Kennel Sex Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<beastejaculation>>
+
+	<<tearful>> 당신은 개집을 떠난다. <<beastsplural>>【이가】 꼬리를 흔들며 눕는다.<<ggrespect>><<farm_dogs 3>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+
+	꾸짖자, <<beasttype>>【이가】 낑낑거리며 당신에게서 물러난다.
+	<br><br>
+
+	<<tearful>> 당신은 개집을 떠난다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<<else>>
+
+	<<beasttype>>【이가】 당신에게서 물러난다. <<bhe 0>>【이가】 뭔가 잘못했다고 생각하는지 두려워한다.
+	<br><br>
+
+	<<tearful>> 당신은 개집을 떠난다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Kennel Treats Breastfeed
+<<effects>>
+
+당신은 <<beasttype>>에게 <<breasts>>【을를】 내민다. <<bHe 0>>【은는】 망설이다가 당신의 유두를 핥는다. 우유가 <<bhis 0>> 입으로 흘러 들어간다.
+<<deviancy3>><<breastfeed>>
+
+만족한 <<beasttype>>【이가】 눕는다. 당신이 농장으로 돌아갈 때 <<bHis>> 꼬리가 흔들린다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Treats Hug
+<<effects>>
+
+당신은 <<beasttype>>【을를】 부드럽게 안아준다. <<bHe 0>>【은는】 그것을 고마워하는 것 같다. 당신이 떠날 때 <<beastsplural>>【이가】 꼬리를 흔들며 눕는다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Treats Half
+<<effects>><<wearProp "dog treat">>
+
+당신은 간식 열 개를 꺼낸다. <<beastsplural>>【은는】 확률을 높이려는 희망에 최상의 태도를 보인다. 당신은 운 좋은 녀석들에게 간식을 나눠주고, 나머지는 다음 기회가 있을 것이라고 암시한다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Treats Some
+<<effects>><<wearProp "dog treat">>
+
+당신은 간식 다섯 개를 꺼내고 단호한 어조로 말한다. "이걸로 다투면, 하나도 안 줄 거야."
+<br><br>
+
+<<beastsplural>>【은는】 확률을 높이려는 희망에 최상의 태도를 보인다. 당신은 간식을 나눠준다. 간식을 받은 녀석들은 간식을 부숴 개집의 나머지 녀석들과 나눠 먹는다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Treats One
+<<effects>><<wearProp "dog treat">>
+
+당신은 간식 하나를 꺼낸다.
+<<if $farm.beasts.dogs lte -5>>
+	<<beastsplural>>【이가】 반항적으로 쏘아본다. 그들은 간식이 하나뿐인 것을 보고, 마음에 들어 하지 않는다.
+	<br><br>
+
+	당신은 개집 건너편으로 간식을 던진다. <<beastsplural>>【은는】 즉시 당신에 대한 흥미를 잃고, 미친 듯이 간식을 향해 달려간다. 당신은 빠져나온다.
+	<br><br>
+<<else>>
+	<<beastsplural>>【은는】 실망한 듯 보이지만, 화내지는 않는다. 그들은 당신 주위의 땅에 눕는다.
+	<br><br>
+	당신은 개집 건너편으로 간식을 던진다. 나이 든 <<beasttype>>【이가】 다가와서 그것을 조각내어 나눠준다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Fight
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $enemyanger += 200>>
+	<<set $enemytrust -= 50>>
+<</if>>
+
+다른 <<beastsplural>>【이가】 지켜본다.
+<br><br>
+
+<<effects>>
+<<effectsman>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Kennel Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Kennel Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Kennel Fight Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<beastejaculation>>
+
+	당신은 간식 봉지를 가까이 두는 데 성공한다. 다른 녀석들은 지금으로서는 아무것도 시도하지 않는다.
+	<br><br>
+
+	<<tearful>> 당신은 힘겹게 일어선다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<if !$kennel_treats>>
+		<<link [[다음|Farm Work]]>><</link>>
+	<<else>>
+		<<beastNEWinit 1 dog>>
+		<<kennel_treat_options>>
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+
+	<<beasttype>>【이가】 주눅 들어 당신에게서 물러난다. 다른 녀석들은 아무것도 시도하지 않는다.<<ggrespect>><<farm_dogs 1>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<if !$kennel_treats>>
+		<<link [[다음|Farm Work]]>><</link>>
+	<<else>>
+		<<beastNEWinit 1 dog>>
+		<<kennel_treat_options>>
+	<</if>>
+<<else>>
+
+	<<kennel_treats -100>>당신이 쓰러지자 <<beastsplural>>【은는】 흥미를 잃는다. 그들은 간식 봉지를 찢어 잔치를 벌인다.<<llrespect>><<farm_dogs -3>>
+	<br><br>
+
+	<<tearful>> 당신은 비틀거리며 개집을 나선다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Kennel Play
+<<effects>>
+
+당신은 <<beastsplural>>【을를】 위해 재미있는 일을 하기로 결심한다.
+
+<<if $farm.beasts.dogs gte 20>>
+	그들은 꼬리를 흔들며 당신 주위로 모여든다. 그들은 의심 없이 복종할 것이다.
+	<br><br>
+
+	그들과 어떻게 놀고 싶은가?
+	<br><br>
+
+	<<kennel_play_options>>
+<<elseif $farm.beasts.dogs gte 5>>
+	그들은 꼬리를 흔들며 활기차게 당신 주위로 모여든다.
+	<br><br>
+
+	그들과 어떻게 놀고 싶은가?
+	<br><br>
+
+	<<kennel_play_options>>
+<<elseif $farm.beasts.dogs gte -5>>
+	그들은 당신 주위로 모여든다. 그들은 당신을 신경 쓰지 않는다.
+	<br><br>
+
+	그들과 어떻게 놀고 싶은가?
+	<br><br>
+
+	<<kennel_play_options>>
+<<elseif $farm.beasts.dogs gte -20 or random(1, 2) is 2>>
+	그들은 당신 주위로 모여든다. 그들은 당신을 별로 신뢰하지 않는다.
+	<br><br>
+
+	그들과 어떻게 놀고 싶은가?
+	<br><br>
+
+	<<kennel_play_options>>
+<<else>>
+	불행히도, 그들은 다른 종류의 재미를 염두에 두고 있다. 그들은 당신에게 달려든다.
+	<br><br>
+
+	<<endevent>>
+	<<beastNEWinit 6 dog>>
+	<<link [[다음|Farm Kennel Gang Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farm Kennel Gang Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<beastTrainGenerate>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farm Kennel Gang Rape End]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Kennel Gang Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Kennel Gang Rape End
+<<effects>>
+<<if $enemyhealth lte 0>>
+	<<beastwound>>
+	<<if $combatTrain.length gt 0>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러들지만, 다른 놈이 차례를 기다리고 있다.
+
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Gang Rape]]>><</link>>
+	<<else>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러든다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Gang Rape End]]>><<set $finish to 1>><</link>>
+	<</if>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<if $combatTrain.length gt 0>>
+		만족한 <<beasttype>>【이가】 물러나고 다른 놈이 차례를 차지한다.
+
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Gang Rape]]>><</link>>
+	<<else>>
+		만족한 <<beasttype>>【이가】 당신에게서 멀어진다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Gang Rape End]]>><<set $finish to 1>><</link>>
+	<</if>>
+<<else>>
+	<<if $enemywounded is 1 and $enemyejaculated is 0>>
+		<<beasttype>>【이가】 낑낑거리며 달아난다.
+	<<elseif $enemywounded is 0 and $enemyejaculated is 1>>
+		만족한 <<beasttype>>【이가】 떠난다.
+	<<elseif $enemywounded gte 2 and $enemyejaculated is 0>>
+		당신이 가치보다 더 귀찮다고 느낀 짐승들이 달아난다.
+	<<elseif $enemywounded is 0 and $enemyejaculated gte 2>>
+		짐승들은 당신을 지치고 떨게 한 채 떠난다.
+	<<elseif $enemywounded gte 1 and $enemyejaculated gte 1>>
+		짐승들은 당신을 지치고 떨게 한 채 떠난다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 비틀거리며 개집을 나선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+<</if>>
+
+:: Farm Kennel Play Fetch
+<<effects>><<wearProp "chewy ball">>
+
+당신은 찬장에서 공을 꺼내 개집 건너편으로 던진다.
+<br><br>
+
+<<if $farm.beasts.dogs gte 5>>
+	<<beastsplural>>【이가】 공을 쫓아 달려가다가, 한 마리가 단단히 잡는 데 성공한다. 그들은 그것을 당신에게 가져와서, 당신이 다시 던져주기를 기다린다.
+	<br><br>
+
+	그들의 에너지를 따라가기는 힘들지만, 그 덕분에 기분이 좋아진다.<<physique 4>>
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<beastsplural>>【이가】 공을 쫓아 달려가지만, 당신에게 다시 가져오는 것보다 자기들끼리 싸우는 데 더 관심이 있다. 그들은 지칠 때까지 계속한다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<</if>>
+<<pass 60>>
+
+:: Farm Kennel Play Race
+<<effects>>
+
+당신은 <<beastsplural>>【을를】 밖으로 내보내고, 들판을 함께 달린다.
+<br><br>
+
+<<if currentSkillValue('athletics') gte 800>>
+	당신은 그들을 따라잡는 데 성공하고, 그들은 그것을 고마워하는 것 같다.<<grespect>><<farm_dogs 1>>
+	<br><br>
+<<elseif currentSkillValue('athletics') gte 400>>
+	당신은 그들을 완전히 따라잡지는 못하지만, 뒤따라갈 수는 있다. 그들은 어쨌든 운동을 해서 행복해 보이고, 개집으로 돌아올 때쯤에는 지쳐 있다.
+	<br><br>
+<<else>>
+	그들은 즉시 당신을 앞지르고, 당신은 곧 따라가는 것을 포기한다. 그들은 어쨌든 운동을 해서 행복해 보이고, 개집으로 돌아올 때쯤에는 지쳐 있다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Play Lewd
+<<effects>>
+
+당신은 <<beasttype>>에게 목줄을 채우고, 옆방으로 이끈다. 당신은 뒤에서 문을 닫고, 땅에 엎드린다. <<beasttype>>【은는】 무슨 일인지 안다.
+<<deviancy3>>
+<br><br>
+
+<<link [[다음|Farm Kennel Play Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Farm Kennel Play Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farm Kennel Play Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Kennel Play Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Kennel Play Sex Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<beastejaculation>>
+
+	<<tearful>> 당신은 일어선다. "착한 <<girl_npc>>." 당신이 말한다. <<beasttype>>의 꼬리가 흔들린다.
+	<br><br>
+
+	당신은 <<bhim 0>>【을를】 개집으로 돌려보낸다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+
+	<<beasttype>>【이가】 낑낑거리며 당신에게서 물러난다. <<tearful>> 당신은 일어선다.
+	<br><br>
+
+	당신은 <<bhim 0>>【을를】 개집으로 돌려보낸다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<<else>>
+
+	<<beasttype>>【이가】 당신에게서 물러난다. <<tearful>> 당신은 일어선다.
+	<br><br>
+
+	당신은 <<bhim 0>>【을를】 개집으로 돌려보낸다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Kennel Play Gang
+<<effects>>
+
+<<beastsplural>>【이가】 순종적으로 기다리다가, 당신이 유혹적으로 몸을 흔들자 가장 우세한 녀석이 먼저 다가온다.<<deviancy5>>
+
+<<endevent>>
+<<beastNEWinit 6 dog>>
+<<link [[다음|Farm Kennel Play Gang Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Farm Kennel Play Gang Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+
+	<<beastCombatInit>>
+	<<beastTrainGenerate>>/* - Delete if there aren't multiple beasts*/
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farm Kennel Play Gang Sex End]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Kennel Play Gang Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Kennel Play Gang Sex End
+<<effects>>
+<<if $enemyhealth lte 0>>
+	<<beastwound>>
+	<<if $combatTrain.length gt 0>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러들지만, 다른 놈이 차례를 기다리고 있다.
+
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Play Gang Sex]]>><</link>>
+	<<else>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러든다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Play Gang Sex End]]>><<set $finish to 1>><</link>>
+	<</if>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<if $combatTrain.length gt 0>>
+		만족한 <<beasttype>>【이가】 물러나고 다른 놈이 차례를 차지한다.
+
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Play Gang Sex]]>><</link>>
+	<<else>>
+		만족한 <<beasttype>>【이가】 당신에게서 멀어진다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farm Kennel Play Gang Sex End]]>><<set $finish to 1>><</link>>
+	<</if>>
+<<else>>
+	<<beastsplural>>【이가】 당신이 일어설 때 만족스럽게 핥아준다.
+	<br><br>
+	<<tearful>> 당신은 개집을 떠난다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farm Work]]>><</link>>
+	<br>
+<</if>>
+
+:: Farm Kennel Play Member
+<<effects>>
+
+<<strip>>
+<<set _tf to checkTFparts()>>당신은 개집 문을 잠근다. <<beastsplural>>【은는】 당신이 네 발로 엎드려 <<if _tf.foxTail or _tf.wolfTail or _tf.catTail or _tf.cowTail or _tf.birdTail>>꼬리를 흔들자<<else>>엉덩이를 흔들자<</if>> 의아한 표정을 짓지만, 당신을 자신들의 일원으로 기꺼이 환영하는 것 같다.
+<br><br>
+
+당신은 손과 무릎으로 개집을 기어 다닌다.
+<<deviancy5>>
+<br><br>
+<<link [[다음|Farm Kennel Play Member 2]]>><</link>>
+<br>
+
+:: Farm Kennel Play Member 2
+<<effects>><<canvas-model-override "mouth" "chew">>
+
+배가 고파져서 먹이통으로 기어간다. 음식은 맛있어 보이지 않지만, 양옆의 <<beastsplural>>【은는】 게걸스럽게 먹는다.
+<br><br>
+
+<<if $wolfgirl gte 6>>
+	당신은 음식을 한 입 베어 문다. 맛있다. 배불리 먹고 나서, 배가 부른 채로 등을 대고 눕는다. 다른 녀석들이 합류하고, 당신은 곧 흔들리는 꼬리들에 둘러싸여 거대한 무더기 한가운데에 눕게 된다.<<ltrauma>><<trauma -4>>
+<<else>>
+	조금 먹어본다. 끔찍한 맛이다. 계속 먹으려고 노력하지만, 다른 녀석들은 아무 문제 없이 먹는데, 당신은 곧 포기한다. 배가 아프기 전에 눕는다. 다른 녀석들 중 일부가 당신에게 다가와 껴안는다.
+<</if>>
+<br><br>
+
+<<link [[다음|Farm Kennel Play Member 3]]>><<canvas-model-override "clear">><</link>>
+<br>
+
+:: Farm Kennel Play Member 3
+<<effects>>
+
+얼마 후 잠에서 깨어난다. 깜빡 잠이 들었던 모양이다. 다른 <<beastsplural>>들은 서로를 핥아주며 몸을 닦고 있다. 그중 한 마리가 당신에게 다가와 귀 뒤를 핥는다.
+<br><br>
+
+<<if $wolfgirl gte 6>>
+	당신도 보답으로 <<beastsplural>> 중 한 마리의 귀 뒤를 열심히 핥아준다. 귀에서부터 등까지 혀를 쭉 뻗어 핥는다. 아주 자연스러운 행동이다.
+	<br><br>
+
+	<span class="lewd">당신의 <<genitals 1>>에 따뜻하고 축축한 감각이 느껴진다</span>, 그리고 놀라서 얼어붙는다. 당신을 핥던 <<beasttype>>【은는】 곧 다른 곳으로 가버린다.
+	<br><br>
+
+	<<beastsplural>>들과 이 순간을 공유하자 기묘한 평온함이 느껴진다.<<lawareness>><<awareness -6>><<ltrauma>><<lstress>><<trauma -6>><<stress -6>>
+	<br><br>
+
+<<else>>
+	당신은 잠시 망설이다가, 보답으로 <<beasttype>>의 귀 뒤를 핥아준다. 털 맛이 나서 역하다. 혀에 털 몇 가닥이 달라붙기도 한다. 그래도 <<beasttype>>【은는】 당신의 노력에 고마워하는 것 같다.
+	<br><br>
+<</if>>
+
+자리에서 일어선다. 농장으로 돌아갈 시간이다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<clotheson>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Train
+<<effects>>
+
+훈련을 위해 <<beastsplural>>들을 불러 모은다.
+
+<<if $farm.beasts.dogs gte 20>>
+	그들은 당신의 인정을 받기 위해 열심히 따른다.
+	<br><br>
+<<elseif $farm.beasts.dogs gte 5>>
+	그들은 불평 없이 따른다.
+	<br><br>
+<<elseif $farm.beasts.dogs gte -5>>
+	그들은 약간 불평하지만, 따른다.
+	<br><br>
+<<elseif $farm.beasts.dogs gte -20>>
+	그들은 당신을 경계하는 눈치다.
+	<br><br>
+<<else>>
+	그들이 당신을 향해 으르렁거린다.
+	<<if $monster is 1>>
+		"침입자다!" 한 마리가 짖는다.
+		<br>
+		"노리개다!" 다른 한 마리가 제안한다. 나머지도 동의한다.
+	<</if>>
+	존중심이 부족한 것이 명백하다.
+	<br><br>
+<</if>>
+
+어떤 종류의 훈련을 시도하겠습니까?
+<br><br>
+
+<<link [[엄격하게|Farm Kennel Train Strict]]>><<stress 12>><<tiredness 12>><<farm_dogs 3>><</link>><<gstress>><<ggtiredness>><<gggrespect>>
+<br>
+<<link [[온화하게|Farm Kennel Train Mild]]>><<stress 6>><<tiredness 6>><<farm_dogs 2>><</link>><<gstress>><<gtiredness>><<ggrespect>>
+<br>
+<<link [[느긋하게|Farm Kennel Train Easy]]>><<farm_dogs 1>><</link>><<grespect>>
+<br>
+
+:: Farm Kennel Train Strict
+<<effects>>
+
+<<if $farm.beasts.dogs gte 20>>
+
+	훈련 중에 소리칠 필요가 없다. <<beastsplural>>들은 아무 문제 없이 모든 명령을 따른다. 뛰라고 하면 뛰고, 구르라고 하면 구르고, 공격하라고 하면 공격한다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+
+<<elseif $farm.beasts.dogs gte 5>>
+
+	당신은 <<beastsplural>>들에게 소리치며 명령한다. 그들은 주저 없이 따른다. 소리칠 필요가 있었는지조차 확실하지 않다. 그들은 훈련에 열심인 것 같다.
+	<br><br>
+
+	<<if $rng gte 81>>
+		막 훈련을 끝내려던 참에 <<beasttype>> 한 마리가 당신에게 달려온다.
+		<<if $monster is 1>>
+			<<bHe 0>>【이가】 당신을 올려다본다. "주인님, 머리 쓰다듬어 주실 수 있나요?" <<bhe 0>>【이가】 애원한다.
+		<<else>>
+			<<bHe 0>>【이가】 꼬리를 흔들며 당신을 올려다본다.
+		<</if>>
+		<br><br>
+
+		<<link [[쓰다듬어준다|Farm Kennel Train Pat]]>><<trauma -6>><<stress -6>><</link>><<ltrauma>><<lstress>>
+		<br>
+		<<link [[마무리한다|Farm Work]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		훈련은 잘 진행된다. 당신은 훈련을 마무리한다.<<grespect>><<farm_dogs 1>>
+		<br><br>
+
+		<<link [[다음|Farm Work]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+
+<<elseif $farm.beasts.dogs gte -5>>
+	당신은 <<beastsplural>>들에게 명령을 따르라고 소리친다. 그들은 별다른 열의 없이 따른다.
+	<br><br>
+
+	<<if $rng gte 51>>
+		훈련은 잘 진행되지만, 끝날 무렵 <<beasttype>> 한 마리가 당신에게 절뚝거리며 다가와 <<bhis 0>> <<if $monster is 1>>발<<else>>앞발<</if>>【을를】 내민다.
+		<br><br>
+
+		<<link [[앞발을 돌봐준다|Farm Kennel Train Paw]]>><<stress 6>><<trauma -6>><</link>><<gstress>><<ltrauma>>
+		<br>
+		<<link [[마무리한다|Farm Work]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		훈련이 생산적이었다고 느껴진다.<<grespect>><<farm_dogs 1>>
+		<br><br>
+
+		<<link [[다음|Farm Work]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $farm.beasts.dogs gte -20>>
+	당신은 <<beastsplural>>들에게 명령을 따르라고 소리친다. 그들은 대부분의 명령을 무시하고, 일부만이 가끔씩 따른다.
+	<br><br>
+
+	<<if $rng gte 51>>
+		진행은 더디지만, 일부에게는 먹히는 것 같다.<<grespect>><<farm_dogs 1>>
+	<<else>>
+		다음 훈련은 더 잘되기를 바란다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	당신은 <<beastsplural>>들에게 명령을 따르라고 소리친다. <span class="red">그들은 당신을 무시한다.</span>
+	<br><br>
+
+	<<if $rng gte 41>>
+		당신은 한숨을 쉬며 훈련을 끝내고, 실망감을 느끼며 개집을 떠난다.
+		<br><br>
+		<<link [[다음|Farm Work]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		당신은 한숨을 쉬며 훈련을 끝내고 출구로 향한다. <span class="red">한 <<beasttype>>【이가】 당신의 길을 막고 으르렁거린다.</span> 다른 녀석들이 뒤에서 접근한다.
+		<br><br>
+
+		<<link [[억지로 뚫고 나간다|Farm Kennel Gang Rape]]>><<endevent>><<beastNEWinit 3 dog>><<set $molestationstart to 1>><</link>>
+		<br>
+		<<link [[애원한다|Farm Kennel Train Strict Plead]]>><</link>>
+		<br>
+		<<link [[굴복한다|Farm Kennel Train Strict Submit]]>><<sub 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Farm Kennel Train Pat
+<<effects>>
+
+당신은 <<beasttype>>에게 미소를 지으며 <<bhis 0>> 머리를 부드럽게 쓰다듬어 준다. <<bHe 0>>【은는】 황홀경에 빠져 <<bhis 0>> 눈을 감는다. 당신은 마음이 따뜻해지는 것을 느낀다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Train Paw
+<<effects>>
+
+자세히 살펴본다. 눈에 띄는 상처는 없지만, 손으로 조심스럽게 훑어본다. 안쪽에 작은 돌멩이가 박혀 있는 것을 발견한다. 쉽게 빼낼 수 있다.
+<br><br>
+
+고마워하는 <<beasttype>>【은는】 당신이 일을 마무리하는 동안 다른 녀석들에게 돌아간다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Train Strict Plead
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제발 지나가게 해줘." 당신이 말해보지만, <<beastsplural>>들은 꼼짝도 하지 않는다. 그들은 당신에게서 원하는 것이 있다.
+	<br><br>
+	<<endevent>>
+	<<beastNEWinit 3 dog>>
+	<<link [[다음|Farm Kennel Gang Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<<elseif $speech_attitude is "bratty">>
+	"엎드려." 당신은 단호한 목소리로 말한다. "지금 당장."
+	<br><br>
+	<<beastsplural>>들이 망설이더니, 길을 막고 있던 녀석이 지시대로 따른다. <<bHe 0>>【은는】 당신이 개집을 떠나는 동안 욕정에 가득 찬 눈으로 당신을 지켜본다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	"지나가게 해줘." 당신이 말한다. "명령이야."
+	<br><br>
+	<<beastsplural>>들이 망설이더니, 길을 막고 있던 녀석이 지시대로 따른다. <<bHe 0>>【은는】 당신이 개집을 떠나는 동안 욕정에 가득 찬 눈으로 당신을 지켜본다.
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<</if>>
+<br><br>
+
+:: Farm Kennel Train Strict Submit
+<<effects>>
+
+당신은 바닥에 주저앉는다. 그들이 원하는 것을 알고 있으며, 순순히 주는 편이 더 쉬울 것이다.
+<br><br>
+<<endevent>>
+<<beastNEWinit 3 dog>>
+<<link [[다음|Farm Kennel Gang Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Farm Kennel Train Mild
+<<effects>>
+
+You set up a simple parkour. The goal for the <<beastsplural>> is to finish without your help.
+
+<<if $farm.beasts.dogs gte 5>>
+
+	They follow your orders with vigour, vying for your attention by putting in extra effort.
+	<br><br>
+
+	<<link [[Wrap things up|Farm Work]]>><<endevent>><</link>>
+	<br>
+	<<if $settings.bestialityEnabled or $NPCList[0].monster>>
+		<<if hasSexStat("deviancy", 3)>>
+			<<link [[Reward the most impressive|Farm Kennel Train Mild One]]>><<handskill 6>><</link>><<deviant3>><<ghandskill>>
+			<br>
+		<</if>>
+		<<if hasSexStat("deviancy", 5)>>
+			<<link [[Reward them all|Farm Kennel Train Mild All]]>><<farm_dogs 3>><</link>><<deviant5>><<ggrespect>>
+			<br>
+		<</if>>
+	<</if>>
+
+
+<<elseif $farm.beasts.dogs gte -5>>
+
+	They follow your orders without enthusiasm, but the training goes well.<<grespect>><<farm_dogs 1>>
+	<br><br>
+
+	<<link [[Next|Farm Work]]>><<endevent>><</link>>
+	<br>
+
+<<elseif $farm.beasts.dogs gte -20>>
+
+	However, it's soon clear they have their own ideas. They don't outright ignore you, but many ignore the obstacles. You yell firm instructions, which helps a bit. It might be best to ignore the remaining troublemakers.
+	<br><br>
+
+	<<link [[Discipline them|Farm Kennel Train Mild Discipline]]>><</link>>
+	<br>
+	<<link [[Wrap things up|Farm Work]]>><<endevent>><</link>>
+	<br>
+
+
+<<else>>
+	However, it's soon clear that they have different ideas. They walk past the obstacles, and ignore the hoops.
+	<br><br>
+
+	<<link [[Give up|Farm Work]]>><<endevent>><</link>>
+	<br>
+	<<link [[Yell|Farm Kennel Train Mild Yell]]>><</link>><<tendingdifficulty 1 1000>>
+	<br>
+<</if>>
+
+:: Farm Kennel Train Mild Discipline
+<<effects>>
+
+당신은 <<beasttype>> 한 마리를 골라내지만, <<bhe 0>>【이가】 잘 반응할 것이라고 기대하지는 않는다.
+
+<<if $rng gte 21>>
+	<<if $monster is 1>>
+		<<bHe 0>>【이가】 당신을 노려본다,
+	<<else>>
+		<<bHe 0>>【이가】 되받아 짖는다,
+	<</if>>
+	그러고는 당신의 발목을 물고 나머지 무리 속으로 도망쳐 숨는다.<<gpain>><<pain 4>>
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	당신의 거친 말이 조금은 먹혀든다.<<grespect>><<farm_dogs 1>>
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Farm Kennel Train Mild Yell
+<<effects>>
+
+당신은 <<beastsplural>>들에게 복종하라고 소리친다.
+
+<<if $tendingSuccess>>
+	그들은 으르렁거리며 맞서다가, <span class="green">이내 물러선다.</span> 몇몇은 적어도 장애물 일부를 시도한다.<<ggrespect>><<farm_dogs 3>>
+	<br><br>
+
+	<<link [[다음|Farm Work]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<span class="red">그들을 흥분시킬 뿐 아무 소용이 없다.</span> 그들은 당신을 제자리에 돌려놓기로 작정한 듯 다가온다.
+	<br><br>
+	<<endevent>>
+	<<beastNEWinit 3 dog>>
+	<<link [[다음|Farm Kennel Gang Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farm Kennel Train Mild One
+<<effects>>
+
+<<beastsplural>>들이 최선을 다했지만, 당신은 특별히 한 마리를 골라 보상하기로 한다. 당신이 <<bhim 0>>【을를】 옆방으로 데려가 <<bhim 0>> 옆에 웅크리자 <<bHis 0>> 꼬리가 흔들린다.
+<br><br>
+
+<<if $NPCList[0].penis isnot "none">>
+	<<bHe 0>>【은는】 보상을 기대하며 이미 발기해 있다. 당신은 먼저 <<bhis 0>> 배를 잘 문질러주다가, 손을 아래로 내려 <<bhis 0>> 자지를 손바닥에 쥔다.
+	<<deviancy3>>
+
+	당신은 <<bhis 0>> 자지가 맥동하며 뜨거운 액체를 바닥에 뿜어낼 때까지 쓰다듬는다.
+	<<if $monster is 1>>
+		"고-고맙습니다, 주인님." <<bhe 0>>【이가】 헐떡인다.
+	<</if>>
+	<br><br>
+<<else>>
+	<<bHe 0>>【은는】 보상을 기대하고 있다. 당신은 먼저 <<bhis 0>> 배를 잘 문질러주다가, 손을 아래로 내려 <<bhis 0>> 따뜻한 보지에 손가락을 집어넣는다.
+	<<deviancy3>>
+
+	당신은 <<bhis 0>> 몸이 오르가즘으로 떨릴 때까지 손가락을 넣었다 뺐다 한다.
+	<<if $monster is 1>>
+		"고-고맙습니다, 주인님." <<bhe 0>>【이가】 헐떡인다.
+	<</if>>
+	<br><br>
+<</if>>
+
+만족한 <<beasttype>>【은는】 당신을 따라 개집으로 돌아간다.
+<br><br>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>
+
+:: Farm Kennel Train Mild All
+<<effects>>
+
+<<strip>>
+당신은 옷을 벗고 바닥에 눕는다. 그들의 열렬한 활력에도 불구하고, <<beastsplural>>들은 당신이 명령을 내릴 때까지 순종적으로 기다린다.
+<<endevent>>
+<<beastNEWinit 6 dog>>
+<br><br>
+<<link [[다음|Farm Kennel Play Gang Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Farm Kennel Train Easy
+<<effects>>
+
+당신은 <<beastsplural>>한테 쉬운 과제를 내주고, 당신을 무시하고 싶어하는 녀석들은 그냥 내버려 둔다.
+
+<<if $farm.beasts.dogs gte 20>>
+	하지만 모두들 꽤나 집중하고 싶어하는 것 같고, 명령을 따르는 데 아무런 문제가 없다.<<grespect>><<farm_dogs 1>>
+	<br><br>
+<<elseif $farm.beasts.dogs gte 5>>
+	몇몇은 떠나지만, 대부분은 집중하고 싶어하는 것 같다.
+	<br><br>
+<<elseif $farm.beasts.dogs gte -5>>
+	몇몇은 가끔 당신의 지시를 따른다.
+	<br><br>
+<<elseif $farm.beasts.dogs gte -20>>
+	대부분이 그렇지만, 몇몇은 가끔 당신의 명령을 기꺼이 따른다.
+	<br><br>
+<<else>>
+	결국 모두가 그렇고, 당신은 거의 아무것도 하지 못한다.<<lrespect>><<farm_dogs -1>>
+	<br><br>
+<</if>>
+
+<<link [[다음|Farm Work]]>><<endevent>><</link>>
+<br>

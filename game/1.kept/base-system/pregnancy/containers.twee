@@ -1,0 +1,497 @@
+:: Widgets containers [widget]
+<<widget "creatureActivity">>
+	<!-- Activity is determined by parasite's speed stat -->
+	<<if _args[0]>>
+		<<if _args[0] lt 60>>
+			<span class="gold">완벽한 활동성</span>
+			<<earnFeat "Top Broodmother Host">>
+		<<elseif _args[0] lte 70>>
+			<span class="green">놀라운 활동성</span>
+		<<elseif _args[0] lte 100>>
+			<span class="teal">좋은 활동성</span>
+		<<elseif _args[0] lte 150>>
+			<span class="lblue">준수한 활동성</span>
+		<<elseif _args[0] lte 200>>
+			<span class="blue">보통 활동성</span>
+		<<elseif _args[0] lte 250>>
+			<span class="purple">낮은 활동성</span>
+		<<elseif _args[0] lte 300>>
+			<span class="pink">드문 활동성</span>
+		<<else>>
+			<span class="red">매우 드문 활동성</span>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "creatureContainersProgressDay">>
+	<!-- Runs once per day -->
+	<<set _list to $container.list>>
+	<<for _i to 0; _i lt _list.length; _i++>>
+		<<set _container to $container[_list[_i]]>>
+		<<if _container.count is 0>>
+			<<set _container.daysSinceFed to 0>>
+			<<continue>>
+		<</if>>
+		<<if _list[_i] is "home">>
+			<!-- Kylar will help feed your home parasites at high love. This is told to the player with a note signed "K" -->
+			<<if C.npc.Kylar.love gte 75 and C.npc.Kylar.state is "active">>
+				<<set _container.kylarHelp to true>>
+			<<else>>
+				<<set _container.kylarHelp to false>>
+			<</if>>
+			<<if _container.kylarHelp is true and _container.kylarDelay is 0 and _container.daysSinceFed is _container.maxDaysWithoutFood>>
+				<<npcincr Kylar love -1>>
+				<<set _container.daysSinceFed -= 1>>
+				<<set _container.kylarFed to true>>
+			<<elseif _container.kylarHelp is true and _container.kylarDelay gt 0 and _container.daysSinceFed is 0>>
+				<<set _container.kylarDelay-->>
+				<<set _container.kylarFed to false>>
+			<</if>>
+		<</if>>
+		<<set _container.daysSinceFed += 1>>
+		<<if _container.daysSinceFed gt _container.maxDaysWithoutFood>>
+			<!-- Parasites die if they don't get fed enough. The max time you can leave them is determined by tank size/parasite barn quality -->
+			<<set _container.deadCreatures to _container.count>>
+			<<for _i to 0; _i lt _container.maxCount; _i++>>
+				<<if _container.creatures[_i] is undefined or _container.creatures[_i] is null>>
+					<<continue>>
+				<</if>>
+				<<if _container.creatures[_i].creature.includes("Pale") and $wraith.state>>
+					<!-- If a pale parasite dies, the Ivory Wraith becomes angry, and encounters become more dangerous -->
+					<<set $wraith.offspring to "dead">>
+					<<set $wraithAngerCooldown to 30>>
+					<<set $wraithShow to true>>
+					<<if !$wraithAngerCount>>
+						<<set $wraithAngerCount to 0>>
+					<</if>>
+					<<set $wraithAngerCount ++>>
+				<</if>>
+			<</for>>
+			<<set _container.count to 0>>
+			<<set _container.creatures to {}>>
+		<</if>>
+		<<set _container.visited to false>>
+	<</for>>
+<</widget>>
+
+<<widget "creatureVisit">>
+	<!-- You can visit each location to get stat reductions once per day -->
+	<<set _container.visited to true>>
+	<<set _container.daysSinceFed to 0>>
+	<<if _args[0] is false>>
+		<<set $_notVisited to false>>
+	<<else>>
+		<<set $_notVisited to true>>
+	<</if>>
+	<<set $_creature to []>><<set _creatureTip to []>><<set _luxuryTip to []>>
+
+	/*stress, trauma, fatigue, purity, hallucinogens*/
+	<<set _boosts to {stress: 0, trauma: 0, tiredness: 0, purity: 0, hallucinogen: 0}>>
+	<<set _tenticles to 0>><<set _paleChance to 0>>
+	<<for _i to 0; _i lt _container.maxCount; _i++>>
+		<<if _container.creatures[_i] is undefined or _container.creatures[_i] is null>>
+			<<continue>>
+		<</if>>
+		<<set $_creature[_i] to {tiredness: 0, purity: 0, hallucinogen: 0, tenticles: 0}>>
+		<<set _creatureTip[_i] to []>>
+		<!-- Higher tending increases stress and fatigue losses -->
+		<<set _tendingMulti to 1 + (currentSkillValue('tending') / 1000)>>
+		<<set _pregValue = Math.floor(5000 / _container.creatures[_i].stats.speed)>>
+		<<if _container.upgrades.luxury gt 0>>
+			<!-- Decorations/barn quality increase value -->
+			<<set _pregValue to Math.floor(_pregValue * (1 + (0.25 * _container.upgrades.luxury)))>>
+		<</if>>
+		<<if _pregValue gt 0>>
+			<!-- The decorations get a tooltip noting that stress is reduced -->
+			<<set _boosts.stress += Math.floor(_pregValue * _tendingMulti)>>
+			<<set _luxuryTip.pushUnique("- 스트레스")>>
+		<</if>>
+		<<if Math.floor(_pregValue / 8) gt 0>>
+			<!-- With high enough value, trauma is also reduced -->
+			<<set _boosts.trauma += Math.floor(_pregValue / 8)>>
+			<<set _luxuryTip.pushUnique("- 트라우마")>>
+		<</if>>
+		<<if _container.creatures[_i].creature is "Slime">>
+			<!-- Slimes innately raise purity -->
+			<<set _boosts.purity += 0.5>>
+			<<set $_creature[_i].purity += 0.5>>
+		<</if>>
+		<<if _container.creatures[_i].creature is "Pale Slime">>
+			<!-- Pale slimes raise purity more and also raise hallucinogens -->
+			<<set _boosts.purity += 1.5>>
+			<<set _boosts.hallucinogen += 20>>
+			<<set $_creature[_i].purity += 1.5>>
+			<<set $_creature[_i].hallucinogen to 1>>
+			<<set _paleChance++>>
+		<</if>>
+		<<if _container.creatures[_i].creature is "Worm">>
+			<!-- Worms innately lower purity -->
+			<<set _boosts.purity -= 0.5>>
+			<<set $_creature[_i].purity -= 0.5>>
+		<</if>>
+		<<if _container.creatures[_i].creature is "Pale Tentacle">>
+			<!-- Pale tentacles lower fatigue and impact purity based on other parasites -->
+			<<if Math.floor(_pregValue / 3) gt 0>>
+				<<set _boosts.tiredness += Math.floor((_pregValue / 3) * _tendingMulti)>>
+				<<set _boosts.hallucinogen += 30>>
+				<<set $_creature[_i].tiredness to 1>>
+				<<set $_creature[_i].hallucinogen to 1>>
+				<<set _paleChance++>>
+			<</if>>
+			<<set _tenticles += 1.5>><<set $_creature[_i].tenticles += 1.5>>
+		<<elseif _container.creatures[_i].creature.includes("Tentacle") or _container.creatures[_i].creature.includes("Vine")>>
+			<!-- Other tentacles and vines also impact fatigue and purity, but less than pale tentacles -->
+			<<if Math.floor(_pregValue / 4) gt 0>>
+				<<set _boosts.tiredness += Math.floor((_pregValue / 4) * _tendingMulti)>>
+				<<set $_creature[_i].tiredness to 1>>
+			<</if>>
+			<<set _tenticles += 0.5>><<set $_creature[_i].tenticles += 0.5>>
+		<</if>>
+		<<if Object.keys($_creature[_i]).length gte 1>>
+			<!-- Adding the tooltips -->
+			<<if $_creature[_i].tiredness is 1>>
+				<<set _creatureTip[_i].pushUnique("- 피로도")>>
+			<</if>>
+			<<if $_creature[_i].purity gt 0>>
+				<<set _creatureTip[_i].pushUnique("+ 순결함 (자연)")>>
+			<<elseif $_creature[_i].purity lt 0>>
+				<<set _creatureTip[_i].pushUnique("- 순결함 (자연)")>>
+			<</if>>
+			<<if $_creature[_i].hallucinogen is 1>>
+				<<set _creatureTip[_i].pushUnique("+ 환각")>>
+			<</if>>
+		<</if>>
+	<</for>>
+
+	<!-- Tentacle purity calculation and tooltips -->
+	<<if _boosts.purity gt 0>>
+		<<set _boosts.purity += _tenticles>>
+	<<elseif _boosts.purity lt 0>>
+		<<set _boosts.purity -= _tenticles>>
+	<</if>>
+	<<set _boosts.purity to Math.ceil(_boosts.purity)>>
+	<<for _i to 0; _i lt _creatureTip.length; _i++>>
+		<<if _container.creatures[_i] is undefined or _container.creatures[_i] is null>>
+			<<continue>>
+		<</if>>
+		<<if $_creature[_i].tenticles isnot 0>>
+			<<if _boosts.purity gte 1>>
+				<<set _creatureTip[_i].pushUnique("+ 순결함 (상호작용)")>>
+			<<elseif _boosts.purity lte -1>>
+				<<set _creatureTip[_i].pushUnique("- 순결함 (상호작용)")>>
+			<</if>>
+		<</if>>
+	<</for>>
+
+	<<if $_notVisited>>
+		<!-- Stat changes only happen once per day -->
+		<<if _boosts.stress isnot 0>>
+			<<set $stress -= _boosts.stress>><<lstress>>
+		<</if>>
+		<<if _boosts.trauma isnot 0>>
+			<<set $trauma -= _boosts.trauma>><<traumaClamp>><<ltrauma>>
+		<</if>>
+		<<if _boosts.tiredness isnot 0>>
+			<<set $tiredness -= _boosts.tiredness>><<ltiredness>>
+		<</if>>
+		<<if _boosts.purity isnot 0>>
+			<<purity _boosts.purity>>
+			<<if _boosts.purity gt 0>><<gpurity>><<else>><<lpurity>><</if>>
+		<</if>>
+		<<if _boosts.hallucinogen isnot 0>>
+			<<hallucinogen _boosts.hallucinogen>><<ghallucinogens>>
+		<</if>>
+
+		<<if $wraith.state and (_paleChance gte random(1, 10) or _paleChance gte 1 and !$wraith.offspringWarning) and !$possessed>>
+			<!-- When you have pale parasites, the Ivory Wraith has a chance of appearing and warning you to keep them alive -->
+			<!-- It's guaranteed to appear if you're viewing pale parasites for the first time -->
+			<br><br>
+			바로 옆에 서 있는 창백한 형체를 얼핏 보고, 깜짝 놀라 뒤로 물러선다. 그것이 천천히 당신을 향해 돌아선다.
+			<br><br>
+			"<span class="wraith">아름다워. <<pluralise _container.count "그 아이" "그 아이들">>【을를】 안전하게 지켜.</span>" 그것은 눈부신 섬광과 함께 사라진다. <<stress 6>><<gstress>>
+			<<if !["dead","sold"].includes($wraith.offspring)>>
+				<<set $wraith.offspring to "alive">>
+			<</if>>
+			<<if !$wraith.offspringWarning>>
+				<br>
+				창백한 생물을 죽게 내버려두면 어떻게 될지 상상해 본다. <span class="purple">섬뜩한 공포가 등골을 훑는다.</span>
+				<<set $wraith.offspringWarning to true>>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "creatureNameDisplay">><<silently>>
+	<<if _args[0] is "Pale Tentacle">>
+		<<set _creatureName to "창백한 촉수">>
+	<<else>>
+		<<set _creatureName to window.KR.getCreatureTypeKr(_args[0])>>
+	<</if>>
+<</silently>><<print _creatureName>><</widget>>
+
+<<widget "creatureTooltip">>
+	<<if _creatureTip[_i].length gte 1 and $pregnancyStats.parasiteBook is 3 and !$settings.blindStatsEnabled>>
+		<mouse class="tooltip"><<creatureNameDisplay _container.creatures[_i].creature>><span class="gold"><<print _creatureTip[_i].join("<br>")>></span></mouse>
+	<<else>>
+		<<creatureNameDisplay _container.creatures[_i].creature>>
+	<</if>>
+<</widget>>
+
+<<widget "luxuryTooltip">>
+	<span class="gold">
+	<<if $phase is "farm" and $farm.parasitebarn gte 2>>
+		<<if _luxuryTip.length gte 1 and $pregnancyStats.parasiteBook is 3 and !$settings.blindStatsEnabled>>
+			<mouse class="tooltip">최대한 발전된 형태<span><<print _luxuryTip.join("<br>")>></span></mouse>
+		<<else>>
+			최대한 발전된 형태
+		<</if>>
+	<<else>>
+		<<if _luxuryTip.length gte 1 and $pregnancyStats.parasiteBook is 3 and !$settings.blindStatsEnabled>>
+			<mouse class="tooltip"><<print window.KR.getContainerDecoKr(_container.decorations)>><span><<print _luxuryTip.join("<br>")>></span></mouse>
+		<<else>>
+			<<print window.KR.getContainerDecoKr(_container.decorations)>>
+		<</if>>
+	<</if>>
+	</span>
+<</widget>>
+
+<<widget "containersLink">>
+	<!-- Printing the initial link to the containers -->
+	<<if $location is "alex_farm">>
+		<<set $phase to "farm">>
+	<<else>>
+		<<set $phase to $location>>
+	<</if>>
+	<<switch $phase>>
+		<<case "farm">><<farmicon "parasitebarn">>
+		<<case "home">><<fishtankicon>>
+		<<default>><<investigateicon>>
+	<</switch>>
+	<<set $container.lastLocation to $location>>
+	<<set _phaseNameKr to window.KR.getContainerNameKr($container[$phase].name)>>
+
+	<<if $nextPassageCheck is "Containers">>
+		<span class="nextLink"><<link [[_phaseNameKr + " 확인하기 (0:05)"|Containers]]>><<pass 5>><</link>></span>
+	<<elseif $container[$phase].kylarFed is true>>
+		<<link [[_phaseNameKr + " 확인하기 (0:05)"|Kylar Parasites Feed]]>><<pass 5>><</link>>
+	<<else>>
+		<<link [[_phaseNameKr + " 확인하기 (0:05)"|Containers]]>><<pass 5>><</link>>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "containerInfo">>
+	<<assignmenticon>><<wearProp "notebook">><<updatesidebarimg>>
+	<<link "수첩 닫기">><<updatesidebarimg>><<replace "#info">><<assignmenticon>><<link "수첩 열기">><<replace "#info">><<containerInfo>><</replace>><</link>><</replace>><</link>>
+	<br>
+	<<set _locCount to 0>>
+	<<for _locs range $container.list>>
+		<<if $container[_locs].count gte 1>>
+			<<set _locCount++>>
+		<</if>>
+	<</for>>
+	<<if _locCount gte 2>>
+		기생충을 확인하면 각 장소마다 하루에 한 번씩 당신의 스탯에 영향을 미칩니다.
+	<<else>>
+		기생충을 확인하면 하루에 한 번 당신의 스탯에 영향을 미칩니다.
+	<</if>>
+	<<if $location is "alex_farm">>
+		현재 있는 기생충들의 활동성과 기생충 축사의 품질은,
+	<<elseif $location is "home">>
+		현재 있는 기생충들의 활동성과 당신이 보유한 장식의 품질은,
+	<<else>>
+		현재 있는 기생충들의 활동성은
+	<</if>>
+	기생충들을 확인할 때 스트레스와 트라우마가 얼마나 감소하는지를 결정합니다. 활동성은 <span class="red">매우 드묾</span>부터 <span class="gold">완벽함</span>까지입니다.
+	<br><br>
+	<<if $pregnancyStats.parasiteTypesSeen.includes("Slime")>>
+		<li>모든 종류의 <b>슬라임</b>은 확인할 때 순결함을 약간 상승시킵니다.</li>
+	<</if>>
+	<<if $pregnancyStats.parasiteTypesSeen.includes("Worm")>>
+		<li><b>벌레</b>들은 확인할 때 순결함을 약간 감소시킵니다.</li>
+	<</if>>
+	<<if $pregnancyStats.parasiteTypesSeen.includes("Tentacle")>>
+		<li>모든 종류의 <b>촉수</b>는 확인할 때 피로도를 감소시킵니다. 또한, 주변에 있는 다른 기생충들에 따라 순결함을 올리거나 낮출 수 있습니다.
+		<<if _boosts and _boosts.purity gt 0>>
+			현재 순결함을 높이고 있습니다.
+		<<elseif _boosts and _boosts.purity lt 0>>
+			현재 순결함을 낮추고 있습니다.
+		<<else>>
+			현재 아무 영향도 주지 않고 있습니다.
+		<</if>>
+		다른 기생충들보다 활동성이 좋을 가능성이 높습니다.</li>
+		<<if $pregnancyStats.parasiteTypesSeen.includes("Vine")>>
+			<li><b>덩굴</b>은 촉수와 같은 효과를 가집니다.</li>
+		<</if>>
+	<<elseif $pregnancyStats.parasiteTypesSeen.includes("Vine")>>
+		<li><b>덩굴</b>은 확인할 때 피로도를 감소시킵니다. 또한, 주변에 있는 다른 기생충들에 따라 순결함을 올리거나 낮출 수 있습니다.
+		<<if _boosts and _boosts.purity gt 0>>
+			현재 순결함을 높이고 있습니다.
+		<<elseif _boosts and _boosts.purity lt 0>>
+			현재 순결함을 낮추고 있습니다.
+		<<else>>
+			현재 아무 영향도 주지 않고 있습니다.
+		<</if>>
+		다른 기생충들보다 활동성이 좋을 가능성이 높습니다.</li>
+	<</if>>
+	<<if $pregnancyStats.parasiteTypesSeen.includes("Lurker")>>
+		<li><b>럴커</b>들은 활동성이 더 높을 가능성이 있지만, 태어나는 데 오래 걸리고 더 낮은 가격에 팔립니다. 다른 눈에 띄는 특성은 없습니다.</li>
+	<</if>>
+	<!-- Printing info for all remaining types seen, that don't have any special traits -->
+	<<set $_typesRemainder to clone($pregnancyStats.parasiteTypesSeen).filter(types => !["Lurker","Vine","Tentacle","Slime","Worm"].includes(types))>>
+	<<if $_typesRemainder.length gte 1>>
+		<<for _r to 0; _r lt $_typesRemainder.length; _r++>>
+			<<set $_typesRemainder[_r] to "<b>" + $_typesRemainder[_r]>>
+			<<if $_typesRemainder[_r].endsWith("s") or $_typesRemainder[_r].endsWith("sh")>>
+				<!-- Avoiding "Fishs". Most parasites have the s stripped off the end anyway, but best to be sure -->
+				<<set $_typesRemainder[_r] += "</b>">>
+			<<else>>
+				<<set $_typesRemainder[_r] += "s</b>">>
+			<</if>>
+		<</for>>
+		<li><<print formatList($_typesRemainder)>>에는 눈에 띄는 특성이 없습니다.</li>
+	<</if>>
+	<!-- Pale parasites are down here because they're variants. It looks kinda awkward because there are very few parasite variants -->
+	<<if $pregnancyStats.parasiteVariantsSeen.includes("Pale")>>
+		<li><b><span class="wraith">창백한</span></b> 기생충들은 다른 기생충들보다 더 큰 보너스를 주며 당신을 환각 물질에 노출시키기도 합니다.</li>
+	<</if>>
+	<!-- Printing info for all remaining variants seen, that don't have any special traits -->
+	<<set $_variantsRemainder to clone($pregnancyStats.parasiteVariantsSeen).filter(types => !["Pale"].includes(types))>>
+	<<if $_variantsRemainder.length gte 1>>
+		<<for _r to 0; _r lt $_variantsRemainder.length; _r++>>
+			<<set $_variantsRemainder[_r] to "<b>" + $_variantsRemainder[_r] + "</b>">>
+		<</for>>
+		<li><<print formatList($_variantsRemainder)>> 기생충들은 일반 기생충과 비교해 눈에 띄는 차이가 없습니다.</li>
+	<</if>>
+<</widget>>
+
+:: Containers
+<<set $outside to 0>><<set $location to $container.lastLocation>><<effects>>
+<<set $phase to $phase || $location>>
+<<set _container to $container[$phase]>>
+<<set _aPregnancy to $sexStats.anus.pregnancy>>
+<<set _vPregnancy to $sexStats.vagina.pregnancy>>
+<<set $checkboxResult to {}>>
+
+<<if _container.count is 0>>
+	<<if _container.deadCreatures is 0>>
+		현재 <span class="gold"><<print window.KR.getContainerNameKr(_container.name)>></span> 안에는 <<if $pregnancyStats.namesParasitesChild is true>>기생충 아이<<else>>기생충<</if>>【이가】 없습니다.
+	<<else>>
+		<<if $pregnancyStats.namesParasitesChild is true>>당신의 <<pluralise _container.deadCreatures "아이" "아이들">><<else>>그 <<pluralise _container.deadCreatures "기생충" "기생충들">><</if>>【을를】 확인하지 않고 먹이도 주지 않았더니, <span class="red">죽어버린 것 같다</span>. 당신은 시간을 들여 매장한다.
+		<<ggtrauma>>
+		<br><br>
+		<<if $pregnancyStats.namesParasitesChild is true>>
+			<<set _traumaMulti to 2>>
+		<<else>>
+			<<set _traumaMulti to 1>>
+		<</if>>
+		<<trauma `30 * _traumaMulti * _container.deadCreatures`>>
+		<<if $wraith.state and $wraithShow>>
+			<<if !$wraithAngerCount>>
+				<<set $wraithAngerCount to 1>>
+			<</if>>
+			<<set _wraithRage to ($wraithAngerCount * 2)>>
+			<<unset $wraithShow>>
+			<<unset $wraithAngerCount>>
+			등 뒤에서 무언가가 조심스레 목을 움켜쥔다.
+			<br><br>
+			"<span class="wraith">용서할 수 없다. 너도 곧 그 곁으로 가게 될 것이다.</span>" <<stress 12>><<trauma 12>><<ggstress>><<ggtrauma>>
+			<br><br>
+			뒤를 돌아보지만, 아무것도 없다. <<gobsession _wraithRage>>
+			<br><br>
+		<</if>>
+
+		<<link [[다음 (1:00)|$passage]]>><<set _container.deadCreatures to 0>><<pass 60>><</link>>
+	<</if>>
+<<else>>
+	<<if _container.visited is false>>
+		<<if $pregnancyStats.namesParasitesChild is true>>당신의 <<pluralise _container.count "아이" "아이들">><<else>>그 <<pluralise _container.count "기생충" "기생충들">><</if>>【을를】 살피고, <span class="gold"><<print window.KR.getContainerNameKr(_container.name)>></span> 안에서 필요한 모든 것을 갖췄는지 확인한다.
+		<<creatureVisit>>
+	<<else>>
+		<<creatureVisit false>>
+		<span class="gold"><<print window.KR.getContainerNameKr(_container.name)>></span> 안에 있는 <<if $pregnancyStats.namesParasitesChild is true>>당신의 <<pluralise _container.count "아이" "아이들">><<else>>그 <<pluralise _container.count "기생충" "기생충들">><</if>>【을를】 지켜본다.
+	<</if>>
+	<br><br>
+	최대 수용량은 <<number _container.maxCount>>마리 이며, <<if $pregnancyStats.namesParasitesChild is true>>당신의 <<pluralise _container.count "아이" "아이들">><<else>>그 <<pluralise _container.count "기생충" "기생충들">><</if>>【은는】 당신이 돌보지 않아도 <<number _container.maxDaysWithoutFood>>일 동안 생존할 수 있습니다<<if _container.feederName>>. 당신의 <span class="gold"><<print window.KR.getFeederNameKr(_container.feederName)>></span> 덕분입니다<</if>>.
+	<<if _container.decorations>>수조 안에는 <<luxuryTooltip>> 장식이 설치되어 있습니다.<</if>>
+	<<if $phase is "farm" and $farm.parasitebarn gte 2>>축사에는 <<luxuryTooltip>> 장비가 설치되어 있습니다.<</if>>
+	<!-- For players who had multiple parasite children before the tooltip update -->
+	<<if $pregnancyStats.parasiteTypesSeen.length gte 4 and (!$pregnancyStats.parasiteBook or $pregnancyStats.parasiteBook is 1)>>
+		<<set $pregnancyStats.parasiteBook to 1>>
+		<br><br>
+		<span class="gold">하퍼 의사라면 당신의 <<if $pregnancyStats.namesParasitesChild is true>><<pluralise _container.count "아이" "아이들">><<else>><<pluralise _container.count "기생충" "기생충들">><</if>>에 대해 더 알아내는 데 도움을 줄지도 모릅니다.</span>
+	<<elseif $pregnancyStats.parasiteTypesSeen.length gte 4 and $pregnancyStats.parasiteBook is 2>>
+		<br><br>
+		<span class="gold">하이 가의 애완동물 가게에서 당신의 <<if $pregnancyStats.namesParasitesChild is true>><<pluralise _container.count "아이" "아이들">><<else>><<pluralise _container.count "기생충" "기생충들">><</if>>【을를】 기록할 노트를 구매할 수 있습니다.</span>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $pregnancyStats.parasiteBook is 3>>
+	<div id="info" class="no-numberify"><<assignmenticon>><<link "노트 열기">><<replace "#info">><<containerInfo>><</replace>><</link>></div>
+<</if>>
+
+<<if _container.count gt 0>>
+	<ul>
+		<<for _i to 0; _i lt _container.maxCount; _i++>>
+			<<if _container.creatures[_i] is undefined>>
+				<<continue>>
+			<</if>>
+			<<if _container.creatures[_i] isnot null>>
+				<li><label><<print '<<checkbox "$checkboxResult[' + clone(_i) + ']" false true>>'>> - <<creatureTooltip>> - <<print window.KR.getGenderKR(_container.creatures[_i].stats.gender)>> - <<creatureActivity _container.creatures[_i].stats.speed>></label></li>
+			<</if>>
+		<</for>>
+	</ul>
+<</if>>
+
+<<if _container.deadCreatures is 0>>
+	<<if _aPregnancy.type !== "parasite">>
+	<<elseif _aPregnancy.parasiteFeltMovement>>
+		<<if playerChastity("anus")>>
+			항문 보호대를 착용하고 있는 동안에는 <<if $pregnancyStats.namesParasitesChild is true>>당신의 기생충 아이들을<<else>>기생충들을<</if>> 출산할 수 없습니다.
+		<<else>>
+			<<if $pregnancyStats.namesParasitesChild is true>>
+				<<link [[항문 속 기생충 아이 출산 시도 (1:00)|GiveBirth]]>><<pass 60>><<set $giveBirthLocation to "anus">><</link>>
+			<<else>>
+				<<link [[항문 속 기생충 출산 시도 (1:00)|GiveBirth]]>><<pass 60>><<set $giveBirthLocation to "anus">><</link>>
+			<</if>>
+		<</if>>
+		<br><br>
+	<<elseif _aPregnancy.fetus.length - (_aPregnancy.motherStatus is 2 ? 1 : 0) gt 0>>
+		항문 속의 <<print ($pregnancyStats.namesParasitesChild is true ? "기생충 아이들이" : "기생충들이")>> 아직 태어날 준비가 되지 않은 것 같다.
+		<br><br>
+	<</if>>
+	<<if _vPregnancy.type !== "parasite">>
+	<<elseif _vPregnancy.parasiteFeltMovement>>
+		<<if playerChastity("hidden")>>
+			정조대를 착용하고 있는 동안에는 <<if $pregnancyStats.namesParasitesChild is true>>당신의 기생충 아이들을<<else>>기생충들을<</if>> 출산할 수 없습니다.
+		<<else>>
+			<<if $pregnancyStats.namesParasitesChild is true>>
+				<<link [[질 속 기생충 아이 출산 시도 (1:00)|GiveBirth]]>><<pass 60>><<set $giveBirthLocation to "vagina">><</link>>
+			<<else>>
+				<<link [[질 속 기생충 출산 시도 (1:00)|GiveBirth]]>><<pass 60>><<set $giveBirthLocation to "vagina">><</link>>
+			<</if>>
+		<</if>>
+		<br><br>
+	<<elseif _vPregnancy.fetus.length - (_aPregnancy.motherStatus is 2 ? 1 : 0) gt 0>>
+		질 속의 <<print ($pregnancyStats.namesParasitesChild is true ? "기생충 아이들이" : "기생충들이")>> 아직 태어날 준비가 되지 않은 것 같다.
+		<br><br>
+	<</if>>
+	<<if _container.count gt 0>>
+		<<ind>><<link [[선택한 것을 판매용으로 옮기기|$passage]]>>
+			<<for _i to 0; _i lt _container.maxCount;_i++>>
+				<<if _container.creatures[_i] is undefined>>
+					<<continue>>
+				<</if>>
+				<<if _container[_i] isnot null>>
+					<<if $checkboxResult[_i] is true>>
+						<<set $number to clone(_i)>> /* unused */
+						<<moveCreature $phase "portable" _i>>
+					<</if>>
+				<</if>>
+			<</for>>
+		<</link>>
+		<br>
+	<</if>>
+	<<getouticon>><<link [[떠나기|_container.leaveLink]]>><</link>>
+<</if>>

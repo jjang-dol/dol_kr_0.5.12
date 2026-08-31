@@ -1,0 +1,551 @@
+:: Widgets Livestock [widget]
+<<widget "livestock_sleep">>
+	<<set _autosavehere to true>>
+	<<if Time.hour is 21>>
+		<<set _livestock_sleep to 9>>
+	<<elseif Time.hour is 22>>
+		<<set _livestock_sleep to 8>>
+	<<elseif Time.hour is 23>>
+		<<set _livestock_sleep to 7>>
+	<<else>>
+		<<set _livestock_sleep to (6 - Time.hour)>>
+	<</if>>
+	<<for _l to 0; _l lt _livestock_sleep; _l++>>
+		<<pass 60>>
+		<<set $sleepStat++>>
+		<<set $tiredness -= 200>>
+		<<if !($sleeptrouble is 1 and $controlled is 0 and !$hypnosis_traits.slumber)>>
+			<<set $tiredness -= 50>>
+		<</if>>
+		<<if $hypnosis_traits.slumber>>
+			<<set _traumaToSleep to Math.floor($trauma / 100)>>
+			<<set $tiredness -= _traumaToSleep>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "livestock_init">>
+	<<set $livestock.intro to true>>
+	<<set $livestock.obey to 50>>
+<</widget>>
+
+<<widget "livestock_end">>
+	<<unset $livestock.food>>
+	<<unset $livestock.muzzle>>
+	<<unset $livestock.dig.fence>>
+	<<unset $livestock.dig.barn>>
+<</widget>>
+
+<<widget "pcow">><<silently>>
+	<<set _text_output to ($player.gender_appearance is "m" ? "황소" : "암소")>>
+<</silently>><<print _text_output>><</widget>>
+
+<!-- Modified for Monster People -->
+<<widget "livestock_cows">>
+	<<if ($settings.monsterChance gte 1 and $hallucinations gte 1) or ($settings.monsterChance gte 1 and !$settings.monsterHallucinationsOnly)>>
+		<<if $settings.maleVictimChance is 0>>
+			<<set _text_output to "젖소 소녀들">>
+		<<elseif $settings.maleVictimChance is 100>>
+			<<set _text_output to "황소 소년들">>
+		<<else>>
+			<<set _text_output to "젖소 소녀들과 황소 소년들">>
+		<</if>>
+	<<else>>
+		<<if $settings.maleVictimChance is 0>>
+			<<set _text_output to "젖소들">>
+		<<elseif $settings.maleVictimChance is 100>>
+			<<set _text_output to "황소들">>
+		<<else>>
+			<<set _text_output to "젖소들과 황소들">>
+		<</if>>
+	<</if>>
+
+	<<if _args[0] is "cap">>
+		<<set _text_output to _text_output.toUpperFirst()>>
+	<</if>>
+
+	<<print _text_output>>
+<</widget>>
+
+<<widget "livestock_horse">>
+	<<if ($settings.monsterChance gte 1 and $hallucinations gte 1) or ($settings.monsterChance gte 1 and !$settings.monsterHallucinationsOnly) or (!$settings.bestialityEnabled)>>
+		<<set _text_output to "켄타우로스">>
+	<<else>>
+		<<if beastMaleChance() gte random(1, 100)>>
+			<<set _text_output to "종마">>
+		<<else>>
+			<<set _text_output to "암말">>
+		<</if>>
+	<</if>>
+	<<print _text_output>>
+<</widget>>
+
+<<widget "livestock_horses">>
+	<<if ($settings.monsterChance gte 1 and $hallucinations gte 1) or ($settings.monsterChance gte 1 and !$settings.monsterHallucinationsOnly) or (!$settings.bestialityEnabled)>>
+		<<set _text_output to "켄타우로스들">>
+	<<else>>
+		<<set _text_output to "말들">>
+	<</if>>
+	<<print _text_output>>
+<</widget>>
+
+<<widget "livestock_obey_description">>
+	<<if $livestock.obey gte 100>>
+		<span class="green">농장 일꾼들은 당신을 두 번 다시 쳐다보지 않는다. 그들이 보기에 당신은 그저 완전히 길들여진 가축 무리의 일부일 뿐이다.</span>
+	<<elseif $livestock.obey gte 80>>
+		<span class="teal">농장 일꾼들은 당신에게 별로 관심을 기울이지 않는다. 그들은 아무 문제도 일어나지 않을 거라 여긴다.</span>
+	<<elseif $livestock.obey gte 60>>
+		<span class="lblue">농장 일꾼들은 이따금 당신을 힐끗 보지만, 당신의 행동에 크게 신경 쓰지 않는 눈치다.</span>
+	<<elseif $livestock.obey gte 40>>
+		<span class="blue">농장 일꾼들이 조심스럽게 당신을 주시한다.</span>
+	<<elseif $livestock.obey gte 20>>
+		<<if $livestock.winter.active>>
+			<span class="purple">농장 인부들이 문간에서 경계심 어린 눈으로 당신을 지켜본다.</span>
+		<<else>>
+			<span class="purple">농장 일꾼들이 울타리 너머에서 경계하며 당신을 지켜본다.</span>
+		<</if>>
+	<<elseif $livestock.obey gte 1>>
+		<span class="pink">농장 일꾼들이 곧 문제를 일으킬 거라 생각하며 당신을 주시한다.</span>
+	<<else>>
+		<span class="red">농장 일꾼들이 당신이 도망치려 할 거라 생각하며 주시한다.</span>
+	<</if>>
+<</widget>>
+
+<<widget "livestock_overhear">>
+	<<cleareventpool>>
+	<<generate1>><<generate2>><<generate3>><<generate4>><<person1>>
+	<<if $livestock.winter.active and $rng gte 51>>
+		<<addinlineevent "livestock_overhear_winter 1">>
+			"또 청소 당번이 걸리다니 믿을 수가 없군," 한 <<person>>【이가】 불평한다. "청소 당번표가 조작된 게 틀림없어."
+			<br>
+			"그만 좀 징징대," <<person2>><<person>>【이가】 말한다. "실내에 있는 걸 다행으로 알아. 밖에 있는 불쌍한 녀석들은 계속 일해야 한다고."
+			<br>
+			"이 녀석들 근처에서 하루 종일 건초나 푸느니 차라리 그게 낫겠어." <<person1>><<He>>【이가】 <<livestock_cows>>【을를】 쏘아본다. "오싹하잖아."
+			<br>
+			"일은 일이지," <<person3>><<person>>【이가】 말한다.
+			<br>
+			"내 생각엔 빌어먹을 일 같은데," <<person1>><<person>>【이가】 중얼거린다.
+			<br>
+			"아무도 안 물어봤어," <<person2>><<person>>【이가】 말한다.
+			<br><br>
+			그들이 멀어지면서 말다툼 소리가 잦아든다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear_winter 2">>
+			"그 얘기 들었어?" 한 <<person>>【이가】 묻는다.
+			<br>
+			"무슨 얘기?" <<person2>><<person>>【이가】 말한다.
+			<br>
+			"그 조그만 골칫거리 중 하나가 또 다른 헛간으로 들어갔대."
+			<br>
+			"또?"
+			<br>
+			"어. 우리들만큼이나 추위를 타나 보지 뭐."
+			<br>
+			"다 죽여버렸으면 좋겠지만, 사장님이 산 채로 잡으라잖아."
+			<br>
+			"사장이 아주 가끔이라도 자리에서 좀 일어난다면 모를까—"
+			<br><br>
+			<<person2>><<person>>【이가】 <<person1>><<person>>【을를】 걷어찬다. 두 사람은 초조하게 주위를 둘러보더니 종종걸음으로 도망친다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear_winter 3">>
+			헛간 문이 열리며 차가운 공기가 밀려온다. 농장 일꾼인 <<person>>【이가】 <<person2>><<person>>【이가】 서둘러 들어오자 화들짝 놀라 잠에서 깬다.
+			<br><br>
+			"교대 시간이야," <<person2>><<person>>【이가】 <<his>> 발을 굴러 눈을 털어내며 말한다.
+			<br>
+			"말도 안 돼," <<person1>><<person>>【이가】 불평한다. "밖은 얼어 죽을 것 같단 말이야!"
+			<br>
+			<<person2>><<person>>【이가】 <<person1>><<person>>【을를】 의자에서 밀쳐낸다. "빨리 나가," <<person2>><<he>>【이가】 말한다. "이제 내가 따뜻할 차례니까."
+			<br><br>
+			<<person1>><<person>>【이가】 작게 욕설을 내뱉는다. <<He>>【은는】 마음을 다잡고 헛간을 나간다.
+			<br><br>
+			<<person2>><<person>>【은는】 문을 닫고 의자에 자리를 잡고 졸기 시작한다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear_winter 4">>
+			당신은 헛간 앞쪽을 바라본다. 농장 일꾼인 <<person>>【이가】 당신을 빤히 쳐다보고 있다. <<his>> 얼굴에는 음흉한 미소가 떠올라 있다. <<He>>【은는】 노골적으로 당신의 노출된 <<genitals>>【을를】 훑어본다. 당신은 얼굴을 붉히며 시선을 피한다.
+			<br><br>
+			당신이 다시 쳐다보았을 때, <<person>>【은는】 바지 앞섶으로 손을 집어넣고 있다. <<He>>【은는】 손을 빠르게 움직인다. 잠시 후, <<he>>【이가】 <<if $awareness gte 100>>오르가즘의 환희에 찬 경련을 일으킨다<<else>>경련을 일으킨다. 당신은 <<he>>【이가】 괜찮은지 궁금해한다<</if>>.
+			<br><br>
+			<<He>>【은는】 남은 근무 시간 내내 당신을 쳐다보지 않으려 피한다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear_winter 5">>
+			비명 소리가 공기를 가른다. 문 앞에 있던 농장 일꾼이 자리에서 벌떡 일어난다. <<He>>【이가】 주위를 둘러본다. 일부 <<livestock_cows>>【은는】 불안해하는 눈치다.
+			<br><br>
+			몇 분간의 정적 후 긴장감이 사라진다. 당신은 창밖을 내다본다. <<if hasSharpSenses("sight")>>멀리서 <<if C.npc["Great Hawk"].init is 1>>익숙한 <</if>>실루엣이 흐릿하게 보인다. <</if>><<livestock_cows>>【이가】 진정될 즈음, 또 다른 비명 소리가 그들을 다시 혼란에 빠뜨린다.
+			<br><br>
+			<<silently>><<willpowerdifficulty 250 1000>><</silently>>
+			<<if $syndromebird>>
+				<span class=green>당신은 두려움 없이 서 있는다.</span> 배우자의 울음소리는 어디서든 알아볼 수 있다.
+			<<elseif $willpowerSuccess>>
+				<span class=green>당신은 도망치고 싶은 충동을 참는다.</span>
+			<<else>>
+				<span class=red>당신은 겁에 질린 무리와 합류하여 문으로 돌진한다.</span><<stress 8>><<pain 8>><<gstress>><<gpain>>
+			<</if>>
+			<br><br>
+			총소리가 들린다. 당신 주변의 <<livestock_cows>>【이가】 얼어붙는다. 문을 지키던 농장 일꾼이 숨을 헐떡인다. <<his>> 총구에서 연기가 피어오른다. <<He>>【은는】 겁먹은 표정이다.
+			<br><br>
+			"진정해!" <<he>>【이가】 명령한다. "여긴 안전해. 어떤 괴물도 널 데려갈 수 없어." <<His>> 목소리가 떨리지만 애써 태연한 척한다.
+			<br><br>
+			<<his>> 재촉에 <<livestock_cows>>【은는】 다시 히터 곁으로 돌아간다. 당신도 따라가지만, 다시 한 번 창밖을 내다본다. 자유로웠던 기억이 떠올라 가슴 한구석이 찌릿하다.
+			<<if $cow gte 6 and $livestock.obey gte 80>>
+				당신은 헛간으로 발길을 돌리며, 새로운 삶에 만족하고 있다고 스스로를 다독인다.
+			<<else>>
+				당신은 언젠가 다시 자유를 찾겠다고 다짐한다.
+			<</if>>
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear_winter 6">>
+			<<endevent>><<beastNEWinit 1 cow>><<generate2>><<person1>>
+			헛간 앞쪽의 소란에 당신의 시선이 끌린다. 당신은 <<livestock_cows>>도 그곳을 보고 있다는 것을 알아챈다. 몇몇은 호기심과 짜증이 섞인 울음소리를 낸다.
+			<br><br>
+			두 명의 농장 일꾼이 <<beasttype>>【을를】 붙잡고 문 쪽으로 끌고 가려 실랑이를 벌이고 있다. <<beasttype>>【은는】 항의하듯 <<if $monster is 1>>비명을 지른다<<else>>울음소리를 낸다<</if>>.
+			<br><br>
+			<<if $monster is 1>>
+				"제발요," <<bhe>>【이가】 애원한다. "다시는 안 그럴게요!"
+				<br>
+				"닥쳐," <<person2>><<person>>【이가】 말한다. <<He>>【은는】 <<person1>><<bhim>>【을를】 문 쪽으로 끌고 간다. "거역하면 어떻게 되는지 알고 있었잖아."
+				<br>
+				"안 돼요," <<beasttype>>【이가】 말한다. <<bHe>>【은는】 창밖의 무언가를 응시한다. 당신은 <<bhe>>【이가】 무엇을 보고 있는지 볼 수 없지만, <<bhe>>【은는】 극도로 겁에 질려 보인다. "말 잘 들을게요, 약속해요!"
+				<br><br>
+				농장 일꾼들이 실랑이를 벌이다 짜증이 났는지 한 명이 <<bhim>>【을를】 걷어차자 <<bhe>>【은는】 조용해진다.
+			<<else>>
+				<<beasttype>>【이가】 다시 한 번 울음소리를 낸다. 이번에는 거의 비명처럼 들린다. <<bHe>>【은는】 발굽으로 땅을 파고들며 머리를 뒤로 젖힌다. 농장 일꾼들이 실랑이를 벌이다 한 명이 엉덩이를 걷어찬다. <<beasttype>>【은는】 깜짝 놀란 울음소리와 함께 앞쪽으로 주춤거린다.
+				<br><br>
+				<<bHe>>【은는】 당신이 볼 수 없는 창밖의 무언가를 쳐다본다. 농장 일꾼들이 <<bhim>>【을를】 끌고 갈 때, <<bhe>>【은는】 마지막으로 절박하게 운다.
+			<</if>>
+			<br><br>
+			당신은 <<beasttype>>【이가】 끌려가는 것을 지켜본다. <<if $livestock.seen.includes("tieStall")>>그에게 어떤 일이 일어날지 알기에<<else>>그에게 무슨 짓을 할지 궁금해서<</if>> 당신의 뱃속이 메스꺼워진다.<<stress 8>><<trauma 4>><<gstress>><<gtrauma>>
+		<</addinlineevent>>
+
+		<<if Weather.temperature lte -20>>
+			<<addinlineevent "livestock_overhear_winter 7">>
+				당신은 네 명의 농장 일꾼이 히터 근처에서 잡담을 나누는 것을 본다. 편안하게 낮잠 잘 곳을 찾는 척하며 당신은 그들의 말을 엿듣는다.
+				<br><br>
+				"오늘 아침에 운전하다가 갑자기 - 쾅! 빙판길에 미끄러질 뻔했지 뭐야. 차가 도로 밖으로 처박힐 뻔했다고," 한 <<person>>【이가】 불평한다.
+				<br>
+				"그거 진짜 싫지," <<person2>><<person>>【이가】 대답한다. "우리 <<print either("여동생", "남동생")>>도 그럴 뻔했어."
+				<br>
+				"그거 알아," <<person3>><<person>>【이가】 말한다. "스노우 타이어로 바꿔야 해. 예전에 내 목숨을 구한 적이 있거든."
+				<br>
+				<<person4>><<person>>【이가】 웃는다. "우린 그거 살 만큼 돈 못 벌잖아."
+				<br><br>
+				그저 잡담일 뿐이다. 딱히 유용한 정보는 없다. 당신은 자리를 피한다.
+			<</addinlineevent>>
+		<</if>>
+
+		<<addinlineevent "livestock_overhear_winter 8">>
+			<<endevent>><<beastNEWinit 1 cow>><<generate2>><<generate3>><<person2>>
+			한 <<person>>【이가】 헛간 문으로 몰래 들어온다. 근무 중인 농장 일꾼은 <<person3>><<his>> 의자에 앉아 졸고 있다. <<person2>><<person>>【은는】 문을 닫고 주변을 둘러본다. <<His>> 시선이 당신에게 머물렀다가 황급히 시선을 돌린다. 호기심이 생긴 당신은 <<him>>【을를】 지켜본다.
+			<br><br>
+			<<personsimple>>【은는】 무리를 지은 <<livestock_cows>> 중 한 곳으로 다가간다. <<He>>【은는】 그들 사이를 지나 한가운데로 들어간다. 그곳에는 듬성듬성 파인 건초더미가 있다. <<He>>【은는】 그 위에 자리를 잡고 눈을 감는다.
+			<br><br>
+			<<person1>><<beastsplural>> 중 하나가 <<person2>><<personsimple>>의 다리 위에 자신의 머리를 얹는다. <<He>>【이가】 한쪽 눈을 슬그머니 뜬다.
+			<br><br>
+			"좋아," <<he>>【이가】 속삭인다. "이번 한 번만이야."
+			<br><br>
+			<<beasttype 0>>【이가】 부드럽게 운다. <<person>>【은는】 미소 지으며 눈을 다시 감는다. 이내, <<he>>【은는】 코를 골기 시작한다.
+			<br><br>
+			그 광경에 미소 지은 뒤, 당신은 헛간 쪽으로 다시 고개를 돌린다.<<stress -5>><<lstress>>
+		<</addinlineevent>>
+	<<else>>
+		당신은 두 명의 농장 일꾼이 <<if $livestock.winter.active>>가판대 옆에서<<else>>울타리 뒤에서<</if>> 대화하는 것을 엿듣는다.
+		<br><br>
+		<<addinlineevent "livestock_overhear 1">>
+			"레미는 저 야수 떼를 어떻게 통제하는 거야?" 한 <<person>>【이가】 묻는다.
+			<br>
+			"전혀 모르겠어," <<person2>><<person>>【이가】 대답한다. "다른 사람 말은 아예 안 듣잖아."
+			<br>
+			"쟤네 전속력으로 달리는 거 본 적 있어?"
+			<br>
+			"어. 예전에 암소 한 마리가 도망쳤을 때, 레미가 한 마리 타고 쫓아간 적이 있었는데. 보는 것만으로도 소름 돋았어."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 2">>
+			"레미는 쫌생이야," <<person>>【이가】 뒤를 돌아보며 말한다.
+			<br>
+			"맞아," <<person2>><<person>>【이가】 대답한다. "특히 동물들한테 더 그렇지. 사과를 금덩이처럼 취급한다니까."
+			<br>
+			"나 예전에 저 말들 앞에서 사과를 먹은 적이 있거든. 사과를 쳐다보는 눈빛이 어찌나 간절한지, 괜히 내가 다 미안해지더라고."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 3">>
+			"그 우유가 어디로 간다고 생각해?" 한 <<person>>【이가】 묻는다.
+			<br>
+			"어디겠어?" <<person2>><<person>>【이가】 대답한다. "슈퍼마켓이지. 또 어디가 있겠어?"
+			<br>
+			"아니, 내 말은 그"—<<person1>><<he>>【이가】 뒤를 슬쩍 돌아본다—"그 특별한 소들에게서 짠 우유 말이야. 내 찻잔에 들어가는 건 아니겠지?"
+			<br>
+			"일부는 다른 데서 가공된다고는 들었는데. 그 이상은 나도 잘 몰라."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 4">>
+			"어젯밤에 남쪽에서 이상한 소리가 더 들렸어," 한 <<person>>【이가】 말한다.
+			<br>
+			"그냥 짐승이겠지," <<person2>><<person>>【이가】 대답한다. "기껏해야 늑대일 거야. 뭐, 무서워?"
+			<br>
+			"네가 직접 못 들어봐서 그래. 비명소리 같았다니까. 레미한테 시간 좀 바꿔달라고 해야겠어."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 5">>
+			"말도 안 돼," 한 <<person>>【이가】 말한다. "선생님들 중 한 명이라도 나섰을 텐데."
+			<br>
+			"아무도 안 나섰어," <<person2>><<person>>【이가】 대답한다. "모르는 걸지도 몰라. 못 믿겠으면 직접 확인해 보든가."
+			<br>
+			"나 그 동네 안 좋아하는 거 알잖아. 똥냄새 난다고."
+			<br>
+			"내가 아는 똥냄새가 아니었어."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 6">>
+			"저 의사 왠지 찜찜해," 한 <<person>>【이가】 말한다.
+			<br>
+			"그 애?" <<person2>><<person>>【이가】 웃는다. "바보 같은 소리 마."
+			<br>
+			"<<nnpc_He "Harper">>【은는】 이런 곳에 있기엔 너무 착해 빠졌어. 뭔가 이상하다고."
+			<br>
+			"넌 그냥 의사한테 쫄아서 그래."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 7">>
+			"저 새로운 <<girls>>【은는】 다 어디서 났대?" 한 <<person>>【이가】 묻는다. "그냥 길거리에서 납치한 거 아니야?"
+			<br>
+			"레미가 몇몇 상인들을 알고 있거든," <<person2>><<person>>【이가】 대답한다. "어떻게 데려오는지는 모르지. 경찰들이 가끔 쓰레기들을 이쪽으로 던지기도 하고."
+			<br>
+			"그래서 경찰차가 있었구나. 우릴 단속하려는 건 줄 알았지."
+			<br>
+			"아마 단속하려는 것도 있었을걸."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 8">>
+			"저 새로 들어온 <<girl>> 귀엽네," 한 <<person>>【이가】 말한다.
+			<br>
+			"저 새로 들어온 <<pcow>> 말하는 거지," <<person2>><<person>>【이가】 받아친다.
+			<br>
+			"맞아. 맛있게 생긴 녀석이군."
+			<br>
+			"헛생각하지 마. 레미는 우리가 참견하는 걸 싫어하니까."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<addinlineevent "livestock_overhear 9">>
+			"우리한테 사진 좀 보여줬으면 좋겠어," 한 <<person>>【이가】 말한다.
+			<br>
+			"맞아," <<person2>><<person>>【이가】 대답한다. "그 사진사한테 좀 보자고 했더니. <<nnpc_He "Niki">>【은는】 날 씹어먹을 듯 쳐다보더라고."
+			<br>
+			"누군가에게 팔고 있는 게 분명해."
+			<br>
+			"우리보다 돈 많은 변태들이겠지."
+			<br><br>
+			그들이 시야에서 멀어진다.
+		<</addinlineevent>>
+
+		<<if playerBellyVisible() and $settings.pregnancySpeechEnabled>>
+			<<addinlineevent "livestock_overhear 10">>
+				"저 임신한 <<girl>> 예쁘네," 한 <<person>>【이가】 말한다.
+				<br>
+				"그러게," <<person2>><<person>>【이가】 대답한다. "또 실험 같은 걸 하는 걸까?"
+				<br>
+				"누가 알아? 말 조심해, 가축들을 놀래키고 싶진 않으니까."
+				<br>
+				<<if $player.breastsize gte 12>>
+					"글쎄, 레미가 무슨 짓을 하고 있든, 젖가슴엔 확실히 효과가 있네."
+				<<elseif $player.breastsize gte 8>>
+					"글쎄, 레미가 무슨 짓을 하고 있든, 효과는 있는 거 같아. <<pshe>>【은는】 꽤 좋은 가슴을 가졌잖아."
+				<<elseif $player.breastsize gte 6>>
+					"글쎄, 레미가 무슨 짓을 하고 있든, 무언가 하고 있는 거 같아. <<pher>> 가슴이 점점 커지는 거 같아."
+				<<elseif $player.breastsize gte 1>>
+					"글쎄, 레미가 무슨 짓을 하고 있든, 이번에는 효과가 없나 봐, <<pshe>>【은는】 거의 평면이잖아."
+				<<else>>
+					"글쎄, 레미가 무슨 짓을 하고 있든, 이번에는 효과가 없나 봐, <<pshe>>【은는】 완전 절벽이야."
+				<</if>>
+				<br><br>
+				그들이 시야에서 멀어진다.
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+
+	<<runeventpool>>
+	<br><br>
+	<<endevent>>
+<</widget>>
+
+<<widget "passoutremy">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "remy">>
+	<<else>>
+		<<passout>>
+		당신은 너무 무리했다. 당신은 정신을 잃는다.
+		<br><br>
+		<<link [[다음|Livestock Passout]]>><<pass 60>><<set $stress -= 4000>><</link>>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "livestock_bodywriting">>
+	<<if $skin[_bodypart].writing>>
+		<<bodywriting_clear _bodypart>>
+	<</if>>
+	<<rng 6>>
+	<<switch $rng>>
+		<<case 1>>
+			<<add_bodywriting _bodypart remys_cattle tattoo>>
+		<<case 2>>
+			<<if $player.gender_appearance is "m">>
+				<<add_bodywriting _bodypart remys_bull tattoo>>
+			<<else>>
+				<<add_bodywriting _bodypart remys_cow tattoo>>
+			<</if>>
+		<<case 3>>
+			<<if $player.gender_appearance is "m">>
+				<<add_bodywriting _bodypart remys_bull tattoo>>
+			<<else>>
+				<<add_bodywriting _bodypart dairy_cow tattoo>>
+			<</if>>
+		<<case 4>>
+			<<add_bodywriting _bodypart milk_me tattoo>>
+		<<case 5>>
+			<<add_bodywriting _bodypart animal tattoo>>
+		<<case 6>>
+			<<add_bodywriting _bodypart breedable tattoo>>
+	<</switch>>
+<</widget>>
+
+<<widget "livestockescape">>
+	<<if $whitneyromance is 1>>
+		<<set $whitneyReunionScene to "farm">>
+	<</if>>
+
+	<<if C.npc.Kylar.love gte 50>>
+		<<set $kylarReunionScene to "farm">>
+	<</if>>
+
+	<<unset $baileySold>>
+<</widget>>
+
+<<widget "livestockFieldGrassEvents">>
+	<<if $rng gte 81>>
+		<!-- Modified for Monster People -->
+		<<if ($settings.monsterChance gte 1 and ($hallucinations gte 1 or !$settings.monsterHallucinationsOnly))>>
+			<<if maleChance() lt random(1, 100)>>
+				카우걸이 당신의 냄새를 맡고 음매 운다. 당신은 그녀의 머리를 쓰다듬는다.
+				<<lstress>><<stress -6>>
+			<<else>>
+				불보이가 당신의 냄새를 맡고 음매 운다. 당신은 그의 머리를 쓰다듬는다.
+				<<lstress>><<stress -6>>
+			<</if>>
+		<<else>>
+			소가 당신의 냄새를 맡고 음매 운다. 당신은 그것의 머리를 쓰다듬는다.
+			<<lstress>><<stress -6>>
+		<</if>>
+		<br><br>
+	<<elseif $rng gte 51>>
+		<<if $uncomfortable.nude is true>>
+			고개를 들자, <<generate1>><<person1>><<person>>【이가】 음흉한 미소를 지으며 당신을 쳐다보는 것이 보인다. <<covered>><<gstress>><<stress 6>>
+		<<else>>
+			당신은 아주 잠시 위를 올려다본다. 당신을 노골적으로 쳐다보는 <<generate1>><<person1>><<person>>【을를】 발견하지만,
+			당신은 <<him>>【을를】 무시하고 하던 일에 집중한다.
+			<<if $livestock.winter.active>>
+				<<if $cow gte 6>>맛있는 <</if>>건초를 계속 우적우적 씹어먹는다.
+			<<else>>
+				<<if $cow gte 6>>맛있는 <</if>>풀을 찾는 일에 집중한다.
+			<</if>>
+		<</if>>
+		<br><br>
+	<<else>>
+		<<livestock_overhear>>
+	<</if>>
+<</widget>>
+
+<<widget "livestock_lock_desc">>
+	/*Description of the current state of the farm gate lock */
+	<<if $livestock.lock.strength is 100>>
+		<span class="green">온전하다.</span>
+	<<elseif $livestock.lock.strength lte 99 and $livestock.lock.strength gt 69>>
+		<span class="teal">약간 손상되었다.</span>
+	<<elseif $livestock.lock.strength lte 69 and $livestock.lock.strength gt 40>>
+		<span class="blue">상당히 손상되었다.</span>
+	<<elseif $livestock.lock.strength lte 40 and $livestock.lock.strength gt 29>>
+		<span class="purple">심하게 손상되었다.</span>
+	<<elseif $livestock.lock.strength lte 29 and $livestock.lock.strength gt 0>>
+		<span class="pink">부서지기 직전이다.</span>
+	<<elseif $livestock.lock.strength lte 0>>
+		<span class="red">부서졌다.</span>
+	<</if>>
+<</widget>>
+
+<<widget "livestock_patrol">>
+	/*Lock damage based on physique check*/
+	<<if $physiqueSuccess is 1>>
+		<<set $livestock.lock.strength -= 10>>
+		당신은 꽤 많은 진전을 이룬 것 같은 기분이 든다.
+		<br>
+	<<else>>
+		<<set $livestock.lock.strength -= 5>>
+		당신은 별로 진전을 이루지 못한 것 같은 기분이 든다.
+		<br>
+	<</if>>
+	/*Farm hand catch chance based on your livestock obidence */
+	<<if $livestock.obey lte 100 and $livestock.obey gt 60>>
+		<<set $livestock.lock.patrol -= 20>>
+
+	<<elseif $livestock.obey lte 60 and $livestock.obey gt 20>>
+		<<set $livestock.lock.patrol -= 27>>
+
+	<<elseif $livestock.obey lte 20>>
+		<<set $livestock.lock.patrol -= 40>>
+	<</if>>
+	/*Farm hand status while your rocking the gate*/
+	<<if $livestock.lock.patrol lte 80 and $livestock.lock.patrol gt 60>>
+		<span class="teal">농장 일꾼은 반대편 열의 먼 외양간에서 일하느라 바쁘다</span>
+
+	<<elseif $livestock.lock.patrol lte 60 and $livestock.lock.patrol gt 40>>
+		<span class="blue">농장 일꾼은 반대편 열의 먼 외양간에서 일하느라 바쁘다.</span>
+
+	<<elseif $livestock.lock.patrol lte 40 and $livestock.lock.patrol gt 20>>
+		<span class="purple">농장 일꾼은 반대편 열의 가까운 외양간에서 일하느라 바쁘다.</span>
+
+	<<elseif $livestock.lock.patrol lte 20>>
+		<span class="pink">농장 일꾼은 당신이 있는 열의 가까운 외양간에서 일하느라 바쁘다.</span>
+	<</if>>
+<</widget>>
+
+<<widget "livestock_lock_cleanup">>
+	/*Clean up of Livestock lock varaibles*/
+	<<unset $livestock.lock.sequence>>
+	<<unset $livestock.lock.keys>>
+	<<unset $livestock.lock.unlocked>>
+	<<unset $livestock.lock.patrol>>
+	<<unset $livestock.lock.cooldown>>
+	<<unset $livestock.lock.intro>>
+<</widget>>
+
+<<widget "farm_var_set">>
+	/*Make sure some farm lock var get unset/set when they need to be */
+	<<if $livestock.lock.cooldown lte 1>>
+		<<unset $livestock.lock.cooldown>>
+	<</if>>
+	<<if $livestock.lock.strength lte 0>>
+		<<set $livestock.lock.strength to 99>>
+	<</if>>
+	<<if $livestock.lock.sequence isnot undefined>>
+		<<unset $livestock.lock.sequence>>
+	<</if>>
+<</widget>>

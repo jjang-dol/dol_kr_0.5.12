@@ -1,0 +1,743 @@
+:: Robin Trick Hall
+<<set $outside to 0>><<set $location to "home">><<effects>>
+<<npc Robin>><<person1>>
+<<set _robin to statusCheck("Robin")>>
+<<set _costume to getHalloweenCostume()>>
+<<if $halloween_robin_costume is "witch">>
+	당신은 로빈에게 다가간다. <<He>>【은는】 마녀 모자 밑에서 당신을 올려다본다.
+	<<if _robin.pronoun isnot "f">>
+		<<His>> 머리카락은 챙 주위로 늘어져 있고, 드레스는 여성스러운 윤곽을 살짝 드러낸다. <<him>>【을를】 아는 사람이 아니라면, <<he>>【이가】 남자아이라고는 생각하지 못할 것이다.
+	<</if>>
+<<elseif $halloween_robin_costume is "vampire">>
+	당신은 로빈에게 다가간다. <<He>>【은는】 뱀파이어 옷깃 너머로 당신을 훔쳐본다.
+	<<if _robin.pronoun isnot "m">>
+		<<His>> 머리카락은 높은 칼라 속으로 사라져 길이를 감추고, 망토는 <<his>> 여성스러운 곡선을 가린다. <<him>>【을를】 아는 사람이 아니라면, <<he>>【이가】 여자아이라고는 생각하지 못할 것이다.
+	<</if>>
+<<elseif $halloween_robin_costume is "ghost">>
+	당신은 로빈에게 다가간다. <<He>>【은는】 침대 시트에 거칠게 뚫린 구멍 한 쌍 사이로 당신을 바라본다.
+	<<if _robin.pronoun is "f" and _robin.breastsize gte 5>>
+		침대 시트가 <<his>> <<= window.KR.getBreastSizeKr(_robin.breastsdesc)>> 위로 걸쳐져, <<his>> 가슴 주위 천이 텐트처럼 솟아 있다.
+	<</if>>
+<<else>> <!-- if you don't already know robin is wearing the ghost costume -->
+	당신은 급조한 유령 의상을 입은 사람에게 다가간다.
+	<<if _robin.pronoun is "f" and _robin.breastsize gte 5>>
+		침대 시트가 <<= window.KR.getBreastSizeKr(_robin.breastsdesc)>> 위로 걸쳐져, 가슴 주위 천이 텐트처럼 솟아 있다.
+	<</if>>
+	그들이 당신 쪽으로 몸을 돌리자, 침대 시트에 거칠게 뚫린 구멍 사이로 두 눈이 보인다. 로빈이다.
+	<<set $halloween_robin_costume to "ghost">>
+<</if>>
+<<if $halloween_robin_costume is (_robin.pronoun is "f" ? "vampire" : "witch")>>
+	<<set _robin.cdstart to _robin.cdstart or "halloween">> /* if it's undefined, set it to "halloween" */
+	<<set _robin.crossdress to _robin.crossdress or 1>>
+<</if>>
+<br><br>
+
+<<set _readyToLeave to true>>
+<<if _costume is "none">>
+	"우리 이제 막 사탕 받으러 갈 참이었어." <<he>>【이가】 말한다. "같이 갈래? 너도 의상이 있어야 제대로지."
+	<br><br>
+
+	<i>어쩌면 옷장에 뭔가 있을지도 모른다.</i>
+	<<set _readyToLeave to false>>
+
+<<elseif _costume is $halloween_robin_costume>>
+	<<He>>【은는】 당신의 옷을 보고, 그다음 <<his>> 옷을 본다. <<He>>【은는】 깨달은 듯 숨을 들이킨다. "우리 의상이 맞춰 입은 것 같아!" <<he>>【이가】 신이 나서 뛰어오르며 외쳐 다른 고아들을 놀라게 한다. "다들 미안." <<He>>【은는】 다시 당신을 돌아본다. "우리랑 같이 사탕 받으러 갈래? 우리 쌍둥이
+	<<if _costume is "witch">>
+		마녀가 될 수 있겠다.<<if $worn.head.name isnot "witch hat">> 그런데 네 모자가 없네.<</if>>"
+	<<else>>
+		<<costumeNameKr _costume>>【이가】 될 수 있겠다."
+	<</if>>
+<<elseif _costume is "mummy" and $robinSeen.includes("hospitalMummy")>>
+	<<He>>【은는】 잠시 당신의 의상을 빤히 바라보며 무언가를 떠올리는 듯하더니, 눈을 몇 번 깜빡이고는 당신에게 미소를 지어 보인다. "의상 마음에 든다," <<he>>【이가】 말한다. "우리랑 같이 사탕 받으러 갈래?"
+	<!-- Robin is remembering the events of "Robin Hospital 2" -->
+<<elseif _costume is "sailor" and $robinPunishments.includes("docks")>>
+	<<He>>【은는】 당신의 세일러 의상을 보고, 아주 잠깐 <<his>> 눈에 공포가 스쳐 지나가 <<him>>【을를】 불안하게 만든다. "아, 너구나." <<He>>【은는】 머뭇거린다. "의상 예쁘다. 우리랑 같이 사탕 받으러 갈래?"
+<<else>>
+	<<He>>【은는】 당신의 옷을 본다.
+	<<switch _costume>>
+		<<case "vampire">>
+			"네 의상 마음에 들어." <<he>>【이가】 고아들을 향해 돌아보며 말한다. "<<pshe>>【이가】 내 피를 빨지 않았으면 좋겠네!" 고아들이 웃는다. <<He>>【은는】 다시 당신에게로 돌아선다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "witch">>
+			"네 의상 마음에 들어." <<he>>【이가】 고아들을 향해 돌아보며 말한다. "<<pshe>>【이가】 날 도롱뇽으로 만들지 않았으면 좋겠네!" 고아들이 웃는다. <<He>>【은는】 다시 당신에게로 돌아선다.
+			"<<if $worn.head.name is "sage witch hat">>특히 모자가 멋지다. 귀랑 꽃이 전부 살아 있는 것 같아. <</if>>우리랑 같이 사탕 받으러 갈래?"
+		<<case "scarecrow">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리랑 같이 사탕 받으러 갈래? 네가 우리 사탕에서 까마귀들을 쫓아줄 수 있겠다!"
+		<<case "mummy">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "좀 엉성해 보이지만, 그래도 으스스하네. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "skeleton">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "더 먹어야겠네! 뼈밖에 없잖아!" <<He>>【은는】 킥킥거리며 덧붙인다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "futuresuit">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "미래에도 할로윈이 있었으면 좋겠다. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "pumpkin">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "걸어 다니는 호박 파이 같아. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "gothic">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "정말 화려하다! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "nun">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "수녀는 정말 무서울 수 있지. <<if (_tf.angelHalo and _tf.angelWings) or (_tf.fallenAngelHalo and _tf.fallenAngelWings)>>날개랑 후광도 멋진 포인트야.<</if>> 우리랑 같이 사탕 받으러 갈래?"
+		<<case "monk" "initiate">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "예복이 진짜 같아 보여. <<if (_tf.angelHalo and _tf.angelWings) or (_tf.fallenAngelHalo and _tf.fallenAngelWings)>>날개랑 후광도 멋진 포인트야.<</if>> 우리랑 같이 사탕 받으러 갈래?"
+		<<case "evangelist">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리랑 같이 사탕 받으러 갈래? 동시에 좋은 말씀을 전파할 것 같아 보여."
+		<<case "confessor">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "말 안 듣는 수련생들을 자로 때리러 갈 것 같아. <<if (_tf.angelHalo and _tf.angelWings) or (_tf.fallenAngelHalo and _tf.fallenAngelWings)>>날개랑 후광도 멋진 포인트야.<</if>> 우리랑 같이 사탕 받으러 갈래?"
+		<<case "exorcist">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리랑 같이 사탕 받으러 갈래? 악령으로부터 우리를 지켜줄 수 있겠다!"
+		<<case "sparring">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "성스러운 슈퍼히어로 같아. <<if (_tf.angelHalo and _tf.angelWings) or (_tf.fallenAngelHalo and _tf.fallenAngelWings)>>날개랑 후광도 멋진 포인트야.<</if>> 우리랑 같이 사탕 받으러 갈래?"
+		<<case "maid">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "메이드는 정말 귀여워. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "karate">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "닌자들로부터 우리를 안전하게 지켜주겠네! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "christmas">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "아직 크리스마스는 아니지만, 괜찮아. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "gift wrap">>
+			"그렇게 밖에 나가도 괜찮아? 네...가 거의 다 보이는데..." <<he>>【은는】 말을 멈추고 <<his>> 고개를 젓는다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "cheerleader">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리랑 같이 사탕 받으러 갈래? 우리가 사탕 받는 동안 응원해 줄 수 있겠다!"
+		<<case "football">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "다음 풋볼 스타가 되겠네! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "belly dancer">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "정말 이국적이야. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "cowboy">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "올가미만 있으면 되겠네! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "riding">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "사탕 경주에 나갈 거야. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "cow onesie">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "<<if (_tf.cowTail and _tf.cowHorns)>>꼬리랑 뿔도 멋진 포인트야. <</if>>네 우유는 맛있을 것 같아!" <<He>>【은는】 그 말이 얼마나 음란하게 들리는지 모르는 듯하다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "prison">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "그래서 무슨 죄로 여기 들어왔어?" <<He>>【은는】 더 굵은 목소리로 덧붙이고는 웃는다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "straightjacket">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "매달린 버클 때문에 더 으스스해 보여. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "sailor">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리만 육지 사람이라 미안하네! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "nurse">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "학교 양호 선생님이 생각나네. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "rags">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "거지 분장이야? 나도 그 기분 알아." <<He>>【은는】 불안하게 킥킥거린다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "bride" "groom">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다.
+			<<if $robinromance gte 1>>
+				"나-나도 그래." <<He>>【은는】 당신이 무슨 말을 해 주길 기다리는 것처럼 잠시 불안하게 발을 비비적거리다가, <<his>> 목을 가다듬는다. "우리랑 같이 사탕 받으러 갈래?"
+			<<else>>
+				"이제 주례사만 있으면 되겠네! 우리랑 같이 사탕 받으러 갈래?"
+			<</if>>
+		<<case "chef">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리한테 맛있는 거라도 해줬으면 좋겠다. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "swan">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "밤새 춤출 준비가 된 것 같네. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "butterfly">>
+			"와!" <<He>>【은는】 당신 주위를 돌기 시작한다. "정말 멋진 의상이야, 너무 예쁘다! 진짜 나비 같아! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "succubus">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다. "충분히 따뜻했으면 좋겠다. 날개로 몸을 감쌀 수 있어? <<if (_tf.demonTail and _tf.demonHorns)>>꼬리랑 뿔도 멋진 포인트야.<</if>> 우리랑 같이 사탕 받으러 갈래?"
+		<<case "vintage">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. <<He>>【은는】 천천히 당신 주위를 걷는다. "어딘가 익숙해 보이네. 어디선가 낡은 액자 속에서 저 옷을 본 것 같아." <<He>>【은는】 어깨를 으쓱한다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "chain tunic">>
+			"와, 그거 진짜야?" <<he>>【이가】 묻는다. "신전과 마녀 이야기 속에 나오는 기사 같은걸! 우리랑 같이 사탕 받으러 갈래<<if $robinromance gte 1>>, 나의 빛나는 갑옷을 입은 기사님<</if>>?"
+		<<case "eyepatch">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "이야아, 친구!" <<He>>【은는】 킥킥거린다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "medical eyepatch">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "진짜 다친 건 아니지, 그렇지? 우리랑 같이 사탕 받으러 갈래?"
+		<<case "gasmask">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "세상의 종말에 대비한 것 같네. 꼭 그 새 게임처럼! 우리랑 같이 사탕 받으러 갈래?"
+		<<case "beret">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "너한테 경례해야 할 것 같은 기분이야. 우리랑 같이 사탕 받으러 갈래?"
+
+		<!-- TF-related lines -->
+		<<case "harpy TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "우리가 끝나기 전에 날아가 버리지 않았으면 좋겠네. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "angel TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "정말로 헤일로가 떠 있는 것 같아. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "wolf TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "귀가 정말 진짜 같아. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "fallen angel TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "정말로 헤일로 조각들이 떠 있는 것 같아. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "demon TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "꼬리 안 떨어지게 조심해. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "cat TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "쓰다듬어주고 싶어지네. 우리랑 같이 사탕 받으러 갈래?"
+		<<case "cow TF">>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "네 우유는 맛있을 거야!" <<He>>【은는】 그 말이 얼마나 음탕한지 모르는 것 같다. "우리랑 같이 사탕 받으러 갈래?"
+		<<case "fox TF">>
+			"네 의상 정말 좋아," <<he>>【이가】 말한다.
+			<<if $worn.head.name is "spirit mask">>
+				"가면이 네 여우 귀랑 정말 잘 어울려.
+			<<else>>
+				"꼬리가 정말 푹신해 보여!
+			<</if>>
+			우리랑 같이 사탕 받으러 갈래?"
+
+		<!-- Misc lines -->
+		<<default>>
+			"네 의상 마음에 들어." <<he>>【이가】 말한다. "뭘 표현한 건지는 잘 모르겠지만, 아주 독특하네! 우리랑 같이 사탕 받으러 갈래?"
+	<</switch>>
+<</if>>
+<br><br>
+
+<<if _readyToLeave>>
+	<<foodicon "halloween">><<link [[사탕 받으러 간다 (3:00)|Robin Trick 1]]>><<pass 30>><</link>>
+	<br>
+<<else>>
+	<<ind>><<link [[대충 뚝딱 만든다|Robin Trick Mummy]]>><</link>>
+	<br>
+<</if>>
+<<main_hall_icon>><<link [[대강당 (0:01)|Orphanage]]>><<pass 1>><<endevent>><</link>>
+<br>
+
+:: Robin Trick Mummy
+<<effects>>
+
+좋은 생각이 떠오른다. 당신은 화장실로 들어가, 두루마리 휴지로 몸을 감싸기 시작한다.
+<br><br>
+
+거울로 자신을 확인한다. 미라 의상이 완성됐다. 베일리가 그 많은 휴지가 어디로 갔는지 알아차리지 않길 바란다.
+<br><br>
+
+<<upperwear "mummy top">><<lowerwear "mummy skirt">><<facewear "mummy facewrap">>
+
+<<link [[다음|Robin Trick Mummy 2]]>><</link>>
+<br>
+
+:: Robin Trick Mummy 2
+<<effects>>
+
+당신은 로빈에게 돌아간다. <<He>>【은는】 당신의 의상을 빤히 바라본다. <<He>>【은는】 처음에는 당황한 듯 보였지만, 곧 즐거운 웃음을 터뜨린다. "왜 난 그 생각을 못 했지?" <<he>>【이가】 혼잣말처럼 묻는다. <<He>>【은는】 다시 당신의 의상을 보고 키득인다.
+<br><br>
+
+마침내, <<he>>【은는】 간신히 <<himself>>【을를】 진정시킨다. "우리랑 같이 사탕 받으러 갈래?"
+<br><br>
+
+<<link [[사탕 받으러 간다 (3:00)|Robin Trick 1]]>><<pass 30>><</link>>
+<br>
+<<link [[떠난다|Orphanage]]>><<endevent>><</link>>
+<br>
+
+:: Robin Trick 1
+<<set $outside to 0>><<set $location to "town">><<effects>>
+<<addNNPCOutfit "Robin" $halloween_robin_costume>><<getNNPCClothes "Robin">><<npcClothesName $NPCList[0] $halloween_robin_costume>>
+<<if $robinromance is 1>><<set $dateCount.Total++>><<set $dateCount.Robin++>><</if>>
+당신과 로빈, 그리고 고아들은 빈 가방을 들고 함께 고아원을 나선다. 고아들은 손수 만든 다양한 의상을 입고 있다. 몇몇은 눈 구멍을 낸 침대 시트만 뒤집어썼다.
+
+<<if $halloween_robin_costume is "witch" and C.npc.Robin.pronoun is "m" and isCrossdressing()>>
+	<<if $player.sex is "f" and $player.gender_appearance is "m">>
+		"남자애처럼 입어줘서 고마워." 당신이 문을 통과하자 로빈이 말한다. "나만 다른 성별로 입은 게 아니라서 기분이 좀 낫네."
+	<<elseif $player.sex isnot "f" and $player.gender_appearance is "f">>
+		"여자애처럼 입어줘서 고마워." 당신이 문을 통과하자 로빈이 말한다. "덕분에 자신감이 더 생겼어."
+	<</if>>
+<<elseif $halloween_robin_costume is "vampire" and C.npc.Robin.pronoun is "f" and isCrossdressing()>>
+	<<if $player.sex isnot "m" and $player.gender_appearance is "m">>
+		"남자애처럼 입어줘서 고마워." 당신이 문을 통과하자 로빈이 말한다. "덕분에 자신감이 더 생겼어."
+	<<elseif $player.sex is "m" and $player.gender_appearance is "f">>
+		"여자애처럼 입어줘서 고마워." 당신이 문을 통과하자 로빈이 말한다. "나만 다른 성별로 입은 게 아니라서 기분이 좀 낫네."
+	<</if>>
+<</if>>
+<br><br>
+일행은 길가에서 멈춘다. 거리 위아래로 다른 사탕 받으러 나온 아이들이 보인다. "다들 가까이 붙어 있어," 로빈이 말한다.
+<br><br>
+
+<<link [[다음|Robin Trick 2]]>><</link>>
+<br>
+
+:: Robin Trick 2
+<<set $outside to 0>><<set $location to "town">><<effects>><<wearProp "halloween">>
+
+가장 가까운 집으로 걸어가 초인종을 누른다. <<generate2>><<person2>><<person>>【이가】 문을 연다.
+<br><br>
+
+"사탕 안 주면 장난칠 거예요!" 고아들이 한목소리로 외친다. <<person>>【은는】 미소를 지으며 각 고아의 가방에 사탕을 한 줌씩 넣어준다. 몇몇이 포장지를 뜯기 시작하자, 로빈이 기다리라고 설득한다.
+<<ghope>><<hope 1>>
+<br><br>
+
+당신은 집집마다 돌아다니며 외치고 가방을 채운다. 대부분의 집은 친절하지만, 사탕 받으러 오는 아이들을 경고하는 표지판을 붙여 둔 곳도 있다. 거리 끝에 주차된 차 안에서 경찰관이 지켜보는 것이 보인다.
+<br><br>
+
+<<link [[다음|Robin Trick 3]]>><<endevent>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick 3
+<<set $outside to 0>><<set $location to "town">><<effects>><<wearProp "halloween">>
+
+밝게 불이 켜진 집에 도착한다. 화려한 장식으로 뒤덮여 있다. 당신이 초인종을 누르자 고아들은 흥분에 가득 찬다.
+<br><br>
+
+<<generate1>><<person1>><<person>>【이가】 나온다. <<He>>【은는】 로빈을 깔보듯 훑어보지만, <<he>>【이가】 당신을 보자 히죽거린다. "정말 사랑스러운 꼬마 의상들이네," <<he>>【이가】 말한다. "특히 네 건." <<He>>【은는】 한쪽으로 손을 뻗어 거대한 사탕 자루를 꺼낸다. 고아들이 숨을 들이킨다.
+<br><br>
+
+"미안하지만," <<he>>【이가】 말한다. "의상은 멋지지만, 기준에 미치지는 못하는 것 같네." 고아들의 실망한 기색이 역력하다. <<He>>【은는】 가까이 다가와 <<his>> 목소리를 낮춘다. "어쩌면 날 설득할 수도 있겠지. 단둘이서 말이야. 친구들을 실망시키고 싶진 않겠지?"
+<br><br>
+<<saveNPC 0 trick_or_treat>>
+<<if hasSexStat("promiscuity", 3)>>
+	<<link [[받아들인다|Robin Trick Oral]]>><<set $halloween_trick_NPC to "oral">><<set $sexstart to 1>><</link>><<promiscuous1>><<ghope>>
+	<br>
+<</if>>
+<<link [[거절한다|Robin Trick Refuse]]>><<set $halloween_trick_NPC to "refused">><<hope -1>><</link>><<lhope>>
+
+:: Robin Trick Refuse
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+당신은 <<person>>에게서 한 걸음 물러선다. "좋아," <<he>>【이가】 비웃는다. "내 집에서 꺼져."
+<br><br>
+
+로빈은 모두의 기운을 북돋우려 애쓰며, 아직 갈 집이 많이 남았다고 말한다.
+<br><br>
+<<endevent>>
+<<link [[다음|Robin Trick 4]]>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick Oral
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<enable_rescue>>
+	<<if $speech_attitude is "meek">>
+		당신은 고아들을 돌아본다. "내가 <<his>> 마음을 바꿔놓을게." 당신이 말한다. "오래 안 걸릴 거야."
+	<<elseif $speech_attitude is "bratty">>
+		"그건 불공평해요." 당신이 선언한다. 당신은 고아들을 돌아본다. "우리가 저 사탕들을 받아올게."
+	<<else>>
+		당신은 고아들을 돌아본다. "내가 <<his>> 마음을 바꿔놓을게." 당신이 말한다. "오래 안 걸릴 거야."
+	<</if>>
+	당신은 환호성을 뒤로하고 문 안으로 들어선다. 문이 채 닫히기도 전에 <<person>>【이가】 <<his>> 손으로 당신의 어깨를 눌러 무릎을 꿇게 만든다.
+	<<promiscuity3>>
+	<<maninit>><<npcoral>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Robin Trick Oral Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Robin Trick Oral]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Robin Trick Oral Finish
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>><<hope 1>>
+	<<ejaculation>>
+	"할로윈은 정말 좋아," <<he>>【이가】 헐떡인다. "사탕 챙겨, 걸레야." <<He>>【은는】 건물 안쪽으로 비틀거리며 들어간다.
+	<br><br>
+	<<clothesontowel>>
+	<<endcombat>>
+	<<wearProp "halloween">>
+	<<tearful>> 당신은 사탕 자루를 집어 들고 밖으로 나간다. 고아들은 당신의 성공에 크게 기뻐한다. 당신이 사탕을 나눠 주자 모두가 몰려든다. 로빈은 당신이 방금 한 일을 전혀 모르는 듯하다.
+	<br><br>
+
+<<elseif $enemyhealth lte 0>><<hope 1>>
+	당신은 <<him>>【을를】 뒤로 밀친다. <<He>>【은는】 자루에 걸려 넘어져 바닥에 부딪힌다.
+	<br><br>
+
+	<<clothesontowel>>
+	<<endcombat>><<wearProp "halloween">>
+	<<tearful>> 당신은 사탕을 낚아채 밖으로 뛰쳐나간다. 고아들은 당신의 성공에 크게 기뻐한다. 당신이 사탕을 나눠 주자 모두가 몰려든다. 로빈은 당신이 방금 한 일을 전혀 모르는 듯하다.
+	<br><br>
+
+<<elseif $rescue is 1 and $alarm is 1>>
+	문에서 노크 소리가 들린다. "괜찮아?" 로빈이다.
+	<br><br>
+	<<person>>【은는】 당신에게서 몸을 뗀다. "개같은 걸레," <<he>>【이가】 으르렁거린다. "너한테 줄 사탕은 없어." <<He>>【은는】 자루를 들고 건물 안쪽으로 걸어간다.
+	<br><br>
+	<<clothesontowel>>
+	<<endcombat>>
+	<<tearful>> 당신은 비틀거리며 건물 밖으로 나온다. 고아들은 당신이 빈손인 것을 보고 실망한다.
+	<br><br>
+	로빈은 모두의 기운을 북돋우려 애쓰며, 아직 갈 집이 많이 남았다고 말한다.
+<br><br>
+
+<<else>><<hope -1>>
+	"좋아," <<person>>【이가】 으르렁거린다. "너한테 줄 사탕은 없어." <<He>>【은는】 자루를 들고 건물 안쪽으로 걸어간다.
+	<br><br>
+	<<clothesontowel>>
+	<<endcombat>>
+	<<tearful>> 당신은 비틀거리며 건물 밖으로 나온다. 고아들은 당신이 빈손인 것을 보고 실망한다.
+	<br><br>
+	로빈은 모두의 기운을 북돋우려 애쓰며, 아직 갈 집이 많이 남았다고 말한다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Robin Trick 4]]>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick 4
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+<<npc Robin>><<generatey2>><<person2>>
+
+해가 지붕 아래로 내려앉는 동안, 당신은 계속 집집마다 돌아다닌다.
+<br><br>
+
+한 집에 다가가자 시끄러운 음악이 들린다. 좀비 분장을 한 <<person>>【이가】 문을 연다. "트릭 오어 트릿!" 고아들이 외친다. <<person>>【은는】 <<he>>【이가】 사탕을 나눠 주는 동안에도 로빈에게서 <<his>> 눈을 떼지 않는다.
+<br><br>
+
+고아 중 하나가 사탕 하나의 소유권을 두고 다른 아이를 밀친다. 일이 커지기 전에 막으려고 당신은 급히 달려간다.
+<br><br>
+
+<<link [[다음|Robin Trick 5]]>><</link>>
+<br>
+
+:: Robin Trick 5
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+돌아보니 <<person>>【이가】 로빈의 머리 위로 <<his>> 팔을 올리고 있다. <<Hes>>【은는】 끔찍할 정도로 가까이 서 있다.
+<br><br>
+
+"우리 둘만 있는 곳으로 가는 게 어때,
+<<if $halloween_robin_costume is "witch">>
+	소녀." <<he>>【이가】 로빈에게 말한다. "네 마법을 보여줘."
+<<elseif $halloween_robin_costume is "vampire">>
+	소년." <<he>>【이가】 로빈에게 말한다. "네가 빨아먹을 맛있는 피가 있는데."
+<<else>>
+	<<nnpc_gendery "Robin">>," <<he>>【이가】 로빈에게 말한다. "그 시트 밑에 뭘 숨기고 있는지 보여줘."
+<</if>>
+<br><br>
+<<person1>>
+로빈은 너무 당황해서 아무 말도 못 하고 <<his>> 발만 쳐다본다.
+<br><br>
+
+<<if hasSexStat("promiscuity", 3) and $robinromance is 1>>
+	<<link [[쓰리섬을 제안한다|Robin Trick Threesome]]>><<npcincr Robin trauma 1>><</link>><<promiscuous3>><<grtrauma>>
+	<br>
+<</if>>
+<<link [[로빈을 끌어낸다|Robin Trick Pull]]>><<npcincr Robin love 1>><</link>><<glove>>
+<br>
+<<if $robinromance is 1>>
+	<<link [[따귀를 때린다|Robin Trick Slap]]>><<npcincr Robin dom -1>><<npcincr Robin love 1>><</link>><<ldom>>
+	<br>
+<</if>>
+<<link [[무시한다|Robin Trick Ignore]]>><<npcincr Robin trauma 3>><</link>><<grtrauma>>
+<br>
+
+:: Robin Trick Pull
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+당신은 로빈의 손을 잡고 <<him>>【을를】 끌어내려 한다. <<person2>><<person>>【은는】 <<person1>><<his>> 다른 쪽 팔을 잡고 잡아당긴다. "내 거야." <<person2>><<person>>【이가】 으르렁거린다. "꺼져."
+<br><br>
+
+당신은 한동안 서로 잡아당기다가, 로빈이 <<person2>><<person>>에게서 <<person1>><<his>> 팔을 홱 빼낸다. 갑작스러운 반동에 둘 다 거의 넘어질 뻔한다. 로빈은 당신의 허리를 붙잡는다. <<person1>><<Hes>> 떨고 있다.
+<br><br>
+
+<<person2>><<person>>【은는】 당신이 그 집을 떠날 때 쏘아보지만, 더 이상 아무 말도 하지 않는다.
+<br><br>
+
+<<link [[다음|Robin Trick 6]]>><<endevent>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick Ignore
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+<<person2>><<person>>【이가】 점점 대담해지더니,
+
+<<if $halloween_robin_costume is "witch" and C.npc.Robin.penis isnot "none">>
+	<<person1>><<his>> 가슴과 사타구니를 더듬기 시작한다. <<person2>><<He>>【은는】 로빈의 치마 속을 더듬다가, 흠칫 놀라며 문 쪽으로 뒷걸음질 친다. "너 남자잖아!" <<he>>【이가】 말한다. "이 미친 변태 새끼가." <<He>>【은는】 로빈에게서 시선을 떼면 덮칠까 봐 겁나는지, 문손잡이를 더듬거리며 찾는다. 그러고는 건물 안으로 사라진다.
+<<elseif $halloween_robin_costume is "vampire" and C.npc.Robin.penis is "none">>
+	<<person1>><<his>> 가슴과 사타구니를 더듬기 시작한다. <<person2>><<He>>【은는】 로빈의 바지 속을 더듬다가, 흠칫 놀라며 문 쪽으로 뒷걸음질 친다. "너 여자잖아!" <<he>>【이가】 말한다. "이 미친 변태 새끼가." <<He>>【은는】 로빈에게서 시선을 떼면 덮칠까 봐 겁나는지, 문손잡이를 더듬거리며 찾는다. 그러고는 건물 안으로 사라진다.
+<<else>>
+	<<person1>><<his>> 가슴과 사타구니를 더듬기 시작한다. 로빈은 몸을 뒤틀며 <<person2>><<persons>> 흥분한 손길을 요리조리 피한다. <<person1>><<He>>【은는】 당신의 등 뒤로 숨는다.
+	<br><br>
+
+	당신이 그 사람의 사유지를 벗어나자, <<person2>><<person>>【이가】 로빈을 향해 입에 담지 못할 욕설을 퍼붓는다.
+<</if>>
+<br><br>
+로빈은 다음 집으로 이동하는 동안 아무 말도 하지 않는다.
+<br><br>
+
+<<link [[다음|Robin Trick 6]]>><<endevent>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick Slap
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+당신은 <<person2>><<person>>에게 성큼 다가가고, <<he>>【이가】 돌아서는 바로 그 순간 얼굴에 제대로 따귀를 날린다. 로빈은 <<person1>><<his>> 눈을 가린다. <<person2>><<person>>【은는】 주먹을 치켜들지만, 당신은 이미 앞으로 나서고 있다. 당신은 <<him>>【을를】 문 안으로 밀쳐 넣는다. 문이 <<him>> 뒤에서 닫힌다.
+<br><br>
+
+돌아보니 고아들이 당신을 빤히 쳐다보고 있다.
+<br><br>
+
+<<link [[정당화한다|Robin Trick Justify]]>><<hope -1>><<reb 1>><</link>><<lhope>><<greb>>
+<br>
+<<link [[사과한다|Robin Trick Apologise]]>><<stress 6>><</link>><<gstress>>
+<br>
+
+:: Robin Trick Justify
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+<<person2>>"<<He>>【이가】 자초한 거야," 당신이 말한다. "사람을 괴롭히는 건 괜찮은 일이 아니고, 로빈도 <<him>>【을를】 싫어했어."
+<br><br>
+다음 집으로 향하는 동안 로빈은 조용히 있지만, 당신 가까이에 붙어 있다. 고아들이 자기들끼리 속삭이고 키득거리는 소리가 들린다. 한동안 당신의 성질 얘기를 하게 될 것 같다.
+<br><br>
+
+<<link [[다음|Robin Trick 6]]>><<endevent>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick Apologise
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+"모두 미안해." 당신이 말한다. "사람을 그렇게 때리면 안 됐어. 내가 이성을 잃었어. 변명의 여지가 없네."
+<br><br>
+다음 집으로 향하는 동안 로빈은 조용히 있지만, 당신 가까이에 붙어 있다. 고아들이 자기들끼리 속삭이고 키득거리는 소리가 들린다. 한동안 당신의 성질 얘기를 하게 될 것 같다.
+<br><br>
+
+<<link [[다음|Robin Trick 6]]>><<endevent>><<pass 30>><</link>>
+<br>
+
+:: Robin Trick Threesome
+<<set $outside to 0>><<set $location to "town">><<effects>>
+<<set _robin to statusCheck("Robin")>>
+
+<<if _robin.dom gte 20>>
+	당신은 로빈과 <<person2>><<person>>에게 다가간다. "우리 셋이 어디 조용한 데로 가는 건 어때?" 당신이 묻는다. "고아들은 몇 분 정도 괜찮을 거야."
+	<<promiscuity3>>
+	<<person>>【은는】 기대에 찬 얼굴이지만, 로빈은 <<person1>><<his>> 눈을 <<his>> 발에 고정한 채 <span class="red"><<his>> 고개를 젓는다.</span>
+	<<if _robin.trauma gte 30>>
+		"싫어... 안 할 거야." <<his>> 눈에 눈물이 차오르는 게 보이지만, <<he>>【은는】 물러서지 않는다.
+	<<else>>
+		"싫어."
+	<</if>>
+	<br><br>
+
+	당신은 로빈의 손을 잡고 <<him>>【을를】 끌어내려 한다. <<person2>><<person>>【은는】 <<person1>><<his>> 다른 쪽 팔을 잡고 잡아당긴다. "내 거야." <<person2>><<person>>【이가】 으르렁거린다. "꺼져."
+	<br><br>
+
+	당신은 한동안 서로 잡아당기다가, 로빈이 <<person2>><<person>>에게서 <<person1>><<his>> 팔을 홱 빼낸다. 갑작스러운 반동에 둘 다 거의 넘어질 뻔한다. 로빈은 당신의 허리를 붙잡는다. <<person1>><<Hes>> 떨고 있다.
+	<br><br>
+
+	<<person2>><<person>>【은는】 당신이 그 집을 떠날 때 쏘아보지만, 더 이상 아무 말도 하지 않는다.
+	<br><br>
+
+	<<link [[다음|Robin Trick 6]]>><<endevent>><<pass 30>><</link>>
+	<br>
+<<else>>
+	<<set $seductiondifficulty to 8000>>
+	<<seductioncheck>>
+	<<seductionskilluptext>>
+	<<seductionskilluse>>
+
+	당신은 로빈과 <<person2>><<person>>에게 다가간다. "우리 셋이 어디 조용한 데로 가는 건 어때?" 당신이 묻는다. "고아들은 몇 분 정도 괜찮을 거야."
+	<<promiscuity3>>
+
+	<<if $seductionrating gte $seductionrequired>>
+
+		"좋아," <<person>>【이가】 말한다. 로빈은 <<person1>><<his>> 눈을 <<his>> 발에 고정한 채, <span class="green">그래도 고개를 끄덕인다.</span>
+		<<if _robin.trauma gte 30>>
+			<<his>> 눈에 눈물이 고이는 것이 보인다.
+		<</if>>
+		<br><br>
+
+		당신은 고아들에게 오래 걸리지 않을 것이라고 말한 뒤, 집 안으로 안내된다. 시끄러운 방을 지나간다. 안에서 파티가 열리는 것 같다. 당신은 1층 침실로 들어가고, <<person2>><<person>>【은는】 당신 뒤에서 문을 닫는다.
+		<br><br>
+
+		<<his>> 처음 관심은 로빈에게 있었지만, <<he>>【이가】 덮친 것은 당신이다.
+		<br><br>
+
+		<<link [[다음|Robin Trick Sex]]>><<set $sexstart to 1>><</link>>
+		<br>
+
+	<<else>>
+
+		"좋아," <<person>>【이가】 말한다. 로빈은 <<person1>><<his>> 눈을 <<his>> 발에 고정한 채 <span class="red"><<his>> 고개를 젓는다.</span>
+		<br><br>
+
+		당신은 로빈의 손을 잡고 <<him>>【을를】 끌어내려 한다. <<person2>><<person>>【은는】 <<person1>><<his>> 다른 쪽 팔을 잡고 잡아당긴다. "내 거야." <<person2>><<person>>【이가】 으르렁거린다. "꺼져."
+		<br><br>
+
+		당신은 한동안 서로 잡아당기다가, 로빈이 <<person2>><<person>>에게서 <<person1>><<his>> 팔을 홱 빼낸다. 갑작스러운 반동에 둘 다 거의 넘어질 뻔한다. 로빈은 당신의 허리를 붙잡는다. <<person1>><<Hes>> 떨고 있다.
+		<br><br>
+
+		<<person2>><<person>>【은는】 당신이 그 집을 떠날 때 쏘아보지만, 더 이상 아무 말도 하지 않는다.
+		<br><br>
+
+		<<link [[다음|Robin Trick 6]]>><<endevent>><<pass 30>><</link>>
+		<br>
+
+	<</if>>
+<</if>>
+
+:: Robin Trick Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 200>><<promiscuity5>>
+<</if>>
+<<set $enemyanger to 0>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($enemyanger gte 20 or $consensual isnot 1)>>
+	<span id="next"><<link [[다음|Robin Trick Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Robin Trick Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Robin Trick Sex Finish
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<person2>><<person>>【은는】 침대에 쓰러져 한 팔로 <<his>> 얼굴을 가린다. <<He>>【은는】 코를 골기 시작한다.
+	<<promiscuity3>>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<tearful>> 당신과 로빈은 고아들에게 돌아간다. 로빈은 아무 말도 하지 않지만, 건물을 나서며 당신의 뺨에 입 맞춘다.
+	<br><br>
+<<elseif $enemyhealth lte 0>>
+	<<person2>><<person>>【은는】 침대에 쓰러진다. 당신은 로빈의 팔을 잡고 방에서 도망친다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyanger gte 20 or $consensual isnot 1>>
+	"그-그만해." 로빈이 말을 더듬는다. "그만. 이거 싫어. 너무 거칠어."
+	<br><br>
+	이게 거칠다고?" <<person2>><<person>>【이가】 불평한다. <<He>>【은는】 더는 밀어붙이지 않지만, 기분 나쁜 채로 <<his>> 파티로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<tearful>> 당신과 로빈은 고아들에게 돌아간다. 로빈은 아무 말도 하지 않지만, 건물을 나서며 당신의 뺨에 입 맞춘다.
+	<br><br>
+
+<<else>>
+	씨발, 마음 좀 정해." <<person2>><<person>>【이가】 불평한다. <<He>>【은는】 기분 나쁜 채로 <<his>> 파티로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<tearful>> 당신과 로빈은 고아들에게 돌아간다. 로빈은 아무 말도 하지 않지만, 건물을 나서며 당신의 뺨에 입 맞춘다.
+	<br><br>
+
+<</if>>
+
+다음 집으로 이동하는 동안 로빈은 조용히 있지만, 당신 곁에 바싹 붙어 있다.
+<br><br>
+
+<<link [[다음|Robin Trick 6]]>><<pass 30>><</link>>
+
+:: Robin Trick 6
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+<<npc Robin>>당신은 집들을 계속 돌며 점점 더 많은 간식을 모은다. 해가 하늘 낮게 걸려 있다. "우리 돌아가야 할 것 같아," 로빈이 말한다. "고아들이 지친 것 같아."
+<br><br>
+당신은 사탕으로 가득 찬 가방들을 들고 고아원으로 돌아온다.
+<<ghope>><<hope 1>>
+
+<br><br>
+<<link [[다음|Robin Trick 7]]>><<pass 60>><</link>>
+<br>
+
+:: Robin Trick 7
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+"기억해," 고아원 밖에 도착하자 로빈이 낮은 목소리로 말한다. "베일리가 모르게 해야 해. <<endevent>><<npc Bailey>><<person1>><<Hes>> 오늘 바쁘긴 하지만, 그래도 조심해."
+<br><br>
+<<endevent>><<npc Robin>><<person1>>
+당신은 로빈과 함께 <<his>> 방으로 간다. <<if $halloween_robin_costume is "ghost">><<He>>【은는】 <<his>> 머리에서 시트를 벗긴다.<<elseif $robinromance is 1>><<He>>【은는】 당신 앞에서 <<his>> <<costumeNameKr $halloween_robin_costume>> 의상을 벗고 다시 평상복으로 갈아입는다.<<else>><<Hes>> 아직 <<costumeNameKr $halloween_robin_costume>> 차림이다.<</if>> <<He>>【은는】 지쳐 보이지만, 당신에게 미소 짓는다. "같이 와 줘서 고마워," <<he>>【이가】 말한다. "덕분에 고아들을 더 쉽게 돌볼 수 있었어."
+<br><br>
+
+<<link [[안아준다 (0:05)|Robin Trick Hug]]>><<npcincr Robin love 1>><<npcincr Robin trauma -2>><<pass 5>><</link>><<glove>><<lrtrauma>>
+<br>
+<<if $robinromance is 1>>
+	<<link [[키스한다 (0:05)|Robin Trick Kiss]]>><<pass 5>><<set $sexstart to 1>><<npcincr Robin love 1>><</link>><<promiscuous1>><<glove>>
+	<br>
+<</if>>
+<<link [[대화한다 (0:05)|Robin Trick Talk]]>><<npcincr Robin love 1>><<pass 5>><</link>><<glove>>
+<br>
+
+:: Robin Trick Hug
+<<set $outside to 0>><<set $location to "town">><<effects>><<wearProp "halloween">>
+
+당신은 로빈을 끌어안고, <<he>>【은는】 당신을 마주 꼭 안는다. <<He>>【은는】 <<his>> 머리를 당신의 어깨에 기댄다. 당신은 <<him>>【을를】 몇 분 동안 안고, <<he>>【이가】 몸을 뗄 때까지 <<him>>【이가】 숨 쉬는 소리를 듣는다.
+<br><br>
+
+"내 사탕!" <<he>>【이가】 말한다. "깜빡할 뻔했어." <<He>>【은는】 <<his>> 가방을 들어 내용물을 뒤적인다. "정말 많아," <<he>>【이가】 말한다. <<He>>【은는】 당신의 가방을 가리킨다. "싫어하는 건 서로 바꾸자."
+<br><br>
+
+당신은 로빈과 사탕을 교환한다. <<he>>【은는】 <<his>> 마음을 정하지 못하다가, <<he>>【이가】 너무 많이 먹고 침대에 드러눕는다.
+<<stress -18>><<trauma -18>><<lltrauma>><<llstress>>
+<br><br>
+
+<<robinoptions>>
+
+:: Robin Trick Talk
+<<set $outside to 0>><<set $location to "town">><<effects>><<wearProp "halloween">>
+
+당신은 로빈과 이야기를 나누다가, <<he>>【이가】 <<his>> 두 발로 벌떡 일어선다. "내 사탕!" <<he>>【이가】 말한다. "깜빡할 뻔했어." <<He>>【은는】 <<his>> 가방을 들어 내용물을 뒤적인다. "정말 많아," <<he>>【이가】 말한다. <<He>>【은는】 당신의 가방을 가리킨다. "싫어하는 건 서로 바꾸자."
+<br><br>
+
+당신은 로빈과 사탕을 교환한다. <<he>>【은는】 <<his>> 마음을 정하지 못하다가, <<he>>【이가】 너무 많이 먹고 침대에 드러눕는다.
+<<stress -18>><<trauma -18>><<lltrauma>><<llstress>>
+<br><br>
+
+<<robinoptions>>
+
+:: Robin Trick Kiss
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 200>><<npckiss>><<set $enemyarousalmax to 500>>
+
+	당신은 로빈 위에 올라타 <<him>>【을를】 침대에 눕힌다. 입술이 맞닿자 <<He>>【은는】 숨을 삼킨다. <<takeKissVirginity "Robin" `($robinromance is 1?"loveInterest":"romantic")`>>
+	<br><br>
+<</if>>
+
+<<set $enemyanger to 0>>
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Robin Trick Kiss Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Robin Trick Kiss]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Robin Trick Kiss Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	로빈이 당신에게 매달린다. "네가 있어서 정말 다행이야." <<he>>【이가】 당신의 목에 <<his>> 얼굴을 묻으며 말한다.
+	<<promiscuity1>>
+
+	<<clotheson>>
+	<<endcombat>>
+
+<<elseif $enemyhealth lte 0>>
+
+	"너무 거칠게는 하지 마!" 로빈이 말한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $finish is 1>>
+
+	<<clotheson>>
+	<<endcombat>>
+<</if>>
+<<npc Robin>><<person1>><<wearProp "halloween">>
+로빈이 <<his>> 두 발로 벌떡 일어난다. "내 사탕!" <<he>>【이가】 말한다. "깜빡할 뻔했어." <<He>>【은는】 <<his>> 가방을 들어 내용물을 뒤적인다. "정말 많아," <<he>>【이가】 말한다. <<He>>【은는】 당신의 가방을 가리킨다. "싫어하는 건 서로 바꾸자."
+<br><br>
+
+당신은 로빈과 사탕을 교환한다. <<he>>【은는】 <<his>> 마음을 정하지 못하다가, <<he>>【이가】 너무 많이 먹고 침대에 드러눕는다.
+<<stress -18>><<trauma -18>><<lltrauma>><<llstress>>
+<br><br>
+
+<<robinoptions>>

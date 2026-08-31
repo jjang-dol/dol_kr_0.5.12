@@ -1,0 +1,901 @@
+:: Moor
+<<set $location to "moor">><<set $bus to "moor">><<set $outside to 1>><<effects>>
+<<if $moor_hunt gte 1>>
+	A terrible shadow passes. <span class="red">You are being hunted.</span>
+	<br><br>
+<</if>>
+<<switch $moormove>>
+<<case "careful">>
+	You move through the moor, taking detours around hillocks and other higher areas.
+<<case "quick">>
+	You move through the moor by the most direct path.
+<<case "normal">>
+	You move through the moor, avoiding the more conspicuous areas.
+<<case "fly">>
+	<<flight_effects>>
+	You catch the wind with a running jump, and fly low across the moor. Your wings tire quickly, but you cover a lot of ground before needing to land.
+<<case "careful_search">>
+	You keep low, searching the nooks and crannies of the moor.
+<<case "quick_search">>
+	You climb the nearest hillock, and observe the surrounding area. You get a good view of the moor.
+<<case "normal_search">>
+	You search the moor for anything of value.
+<<case "fly_search">>
+	<<flight_effects>>
+	You soar high above the moor, your keen eyes scanning the ground below. Your wings tire quickly, and you land upon a hillock to catch your breath.
+<<case "hobble">>
+	You hobble across the uneven moor, careful not to trip.
+<<case "horse">>
+	The <<beasttype>> easily gallops through the treacherous moor.
+<<default>>
+	You are on the moor.
+<</switch>>
+
+<<if $moor gte 100>>
+	A great castle looms above, despite being ruined and half-sunken into the peat.
+	<<earnFeat "Wet and Ruined">>
+<<elseif $moor gte 61>>
+	Water bubbles up from unseen wells, running between the bushes and rocks. The ground is uneven and treacherous.
+<<elseif $moor gte 51>>
+	Water bubbles up from unseen wells, running between the bushes and rocks into large pools teaming with life.
+<<elseif $moor gte 21>>
+	The bushes and rock formations make travelling difficult.
+<<elseif $moor gte 1>>
+	Plains of heather stretch in all directions.
+<<else>>
+	A great plain of heather stretches before you. Farms lie in the other direction, and the sea beyond.
+<</if>>
+<<if $moor is 10>>
+	You're stood outside a farm, surrounded by tall fences. A sign beside the entrance reads: "Remy Estate."
+<</if>>
+<<if Weather.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		Black rain pours from the heavens.
+	<<elseif Weather.isSnow>>
+		Dark snow smothers the plains.
+	<<elseif !Weather.isOvercast>>
+		The stars are clear, so far from artificial light.
+	<<else>>
+		Darkness blankets the plains.
+	<</if>>
+<<elseif Weather.dayState is "dusk">>
+	<<if Weather.precipitationr is "rain">>
+		Evening sunlight glimmers off pools, agitated by the rain.
+	<<elseif Weather.precipitation is "snow">>
+		Snow settles for the night.
+	<<elseif !Weather.isOvercast>>
+		The sun dips beneath a hillock.
+	<<else>>
+		Oppressive clouds descend.
+	<</if>>
+<<elseif Weather.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		The dawn's sun glimmers off pools, agitated by the rain.
+	<<elseif Weather.isSnow>>
+		A blanket of snow reflects the dawn's light.
+	<<elseif !Weather.isOvercast>>
+		The sun rises over hillocks.
+	<<else>>
+		Fog hangs in the valleys.
+	<</if>>
+<<else>>
+	<<if Weather.precipitation is "rain">>
+		There are few places to hide from the rain.
+	<<elseif Weather.isSnow>>
+		A sheet of snow covers everything.
+	<<elseif !Weather.isOvercast>>
+		The sun feels weaker, pale and cold.
+	<<else>>
+		The clouds hang low, bathing the hilltops in fog.
+	<</if>>
+<</if>>
+
+<br><br>
+
+<<if $moor is 20>>
+	You see a faded sign. You can make out a little: "D--ger. W--d ani-a-s."
+	<br><br>
+<<elseif $moor is 50>>
+	You see a faded sign. You can make out little: "D----- Q--c-s--d"
+	<br><br>
+<<elseif $moor is 0>>
+	You see a sign beside a trail leading into the heather. It reads: "Danger. Keep out."
+	<br><br>
+<</if>>
+
+<<if $moormove is "horse">>
+	<<if $moor gte 100>>
+		<<link [[Hop off|Moor Horse Riding]]>><<set $phase to 3>><</link>>
+		<br>
+	<<else>>
+		<<set $horseDifficulty += 50>>
+		<<set _difficultyMax to $horseDifficulty*2>>
+		<<link [[Keep your steed calm|Moor Horse Riding]]>><<set $phase to 0>><</link>><<tendingdifficulty $horseDifficulty _difficultyMax>>
+		<br>
+		<<link [[Get a better grip with your thighs|Moor Horse Riding]]>><<set $phase to 1>><</link>><<skill_difficulty `currentSkillValue("thighskill")` "Thigh Skill" $horseDifficulty _difficultyMax>>
+		<br>
+		<<link [[Just try to stay on|Moor Horse Riding]]>><<set $phase to 2>><</link>><<athleticsdifficulty $horseDifficulty _difficultyMax>>
+		<br>
+		<<link [[Hop off|Moor Horse Riding]]>><<set $phase to 3>><</link>>
+		<br>
+	<</if>>
+	<<exit>>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	You've pushed yourself too much.
+	<br><br>
+	<<passout_moor>>
+<<elseif $moor_hunt gte 10>>
+	<<moor_hunt>>
+<<elseif $eventskip is 0>>
+	<<if $moor gte 51>>
+		<<eventsmoorhigh>>
+	<<elseif $moor gte 21>>
+		<<eventsmoormid>>
+	<<else>>
+		<<eventsmoorlow>>
+	<</if>>
+<<else>>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "moor">>
+	<</if>>
+	<<if $moor gte 100>>
+		<<birdicon "tower">><<link [[Enter the castle (0:10)|Castle]]>><<pass 10>><</link>>
+		<br><br>
+	<</if>>
+	<<if $moor gte 80 and $moor lte 90 and $bogProgress gte 1>>
+		<<foresticon "bog">><<link [[Enter the bog (0:15)|Bog]]>><<unset $moor_hunt>><<pass 15>><<set $bogdepth to 1>><<set $bogwater to 0>><</link>>
+		<br><br>
+	<</if>>
+	<<if $moor gte 51 and $moor lte 60>>
+		<<if canStartFishing()>>
+			<<if !$fishing.locationsFound.includes("fishingMoor")>>
+				<<run V.fishing.locationsFound.pushUnique("fishingMoor")>>
+				<span class="gold">Looks like this could be a good spot for fishing</span>.
+				<br>
+			<</if>>
+			<<fishingRodIcon>><<link [[Start fishing|Fishing Moor Wait]]>><<set $fishingAmbientOverride to "castOut">><</link>>
+			<br><br>
+		<<elseif !$fishing.locationsFound.includes("fishingMoor")>>
+			<span class="gold">If you had a fishing rod, you could probably catch fish here</span>.
+			<<run V.fishing.locationsFound.pushUnique("fishingMoor")>>
+			<br><br>
+		<</if>>
+		<<if $pubtask is "moor" and $pubtask2 isnot 1>>
+			<<if $pubtasksetting is "lurkers" and $settings.bestialityEnabled and $settings.lurkersEnabled>>
+				<<crimeicon "black box">><<link [[Search for Landry's black box|Moor Box Lurkers]]>><</link>>
+			<<elseif $pubtasksetting is "person">>
+				<<crimeicon "black box">><<link [[Search for Landry's black box|Moor Box]]>><</link>>
+			<<elseif random(1, 2) is 2 and $settings.bestialityEnabled and $settings.lurkersEnabled>>
+				<<crimeicon "black box">><<link [[Search for Landry's black box|Moor Box Lurkers]]>><</link>>
+			<<else>>
+				<<crimeicon "black box">><<link [[Search for Landry's black box|Moor Box]]>><</link>>
+			<</if>>
+			<br><br>
+		<</if>>
+	<</if>>
+	<<if $moor is 10>>
+		<<mooricon "remy">><<link [[Approach the estate|Estate Approach]]>><</link>>
+		<br><br>
+	<</if>>
+	<<if $moor is undefined>>
+		<<set $moor to 0>>
+	<</if>>
+	<<if $harpy gte 6 and $birdFly gte 1 and !$plucked>>
+		<<flight_time_check 4>>
+		<br>
+	<</if>>
+	<<if $moor lt 100>>
+		Go deeper into the moor
+		<br>
+		<<if $harpy gte 6 and $birdFly gte 1 and !$plucked>>
+			<<glideicon>><<link [[Fly (<<print getTimeString(_hoursPassed, _minutesPassed)>>)|Moor]]>><<set $fatigueMod to _fatigueMod>><<set $flightTime to _flightTime>><<bird_pass _flightTime>><<set $moor += 5>><<set $forestmod to 1>><<set $moormove to "fly">><</link>><<flight_text>><<gtiredness>>
+			<br>
+		<</if>>
+		<<if $worn.feet.type.includes("heels") and !$possessed>>
+			<<heelsicon "hobble">><<link [[Hobble in heels (0:30)|Moor]]>><<bird_pass 30>><<set $moor += 5>><<set $forestmod to 3>><<set $moormove to "hobble">><<if $moor_hunt gte 1>><<set $moor_hunt += 2>><</if>><</link>><<gharass>>
+		<<else>>
+			<<if !$worn.feet.type.includes("shackle")>>
+				<<runicon>><<link [[Quickly (0:05)|Moor]]>><<bird_pass 5>><<set $moor += 5>><<set $forestmod to 3>><<set $moormove to "quick">><<if $moor_hunt gte 1>><<set $moor_hunt += 0.5>><</if>><</link>><<gharass>>
+				<br>
+			<</if>>
+			<<walkicon>><<link [[Normally (0:10)|Moor]]>><<bird_pass 10>><<set $moor += 5>><<set $forestmod to 1>><<set $moormove to "normal">><<if $moor_hunt gte 1>><<set $moor_hunt += 1>><</if>><</link>>
+			<br>
+			<<sneakicon>><<link [[Carefully (0:30)|Moor]]>><<bird_pass 30>><<set $moor += 5>><<set $moormove to "careful">><<set $forestmod to 0.5>><<if $moor_hunt gte 1>><<set $moor_hunt += 2>><</if>><</link>><<lharass>>
+		<</if>>
+		<br><br>
+	<</if>>
+		Search nearby <<gtreasure>>
+		<br>
+		<<if $harpy gte 6 and $birdFly gte 1 and !$plucked>>
+			<<glideicon>><<link [[Fly (<<print getTimeString(_hoursPassed, _minutesPassed)>>)|Moor]]>><<set $fatigueMod to _fatigueMod>><<set $flightTime to _flightTimeSearch>><<bird_pass _flightTimeSearch>><<set $forestmod to 0.5>><<set $moormove to "fly_search">><</link>><<flight_text>><<gtiredness>><<lharass>>
+			<br>
+		<</if>>
+		<<if !$worn.feet.type.includes("shackle")>>
+			<<runicon>><<link [[Quickly (0:05)|Moor]]>><<bird_pass 5>><<set $forestmod to 3>><<set $moormove to "quick_search">><<if $moor_hunt gte 1>><<set $moor_hunt += 0.5>><</if>><</link>><<gharass>>
+			<br>
+		<</if>>
+		<<walkicon>><<link [[Normally (0:10)|Moor]]>><<bird_pass 10>><<set $forestmod to 1>><<set $moormove to "normal_search">><<if $moor_hunt gte 1>><<set $moor_hunt += 1>><</if>><</link>>
+		<br>
+		<<sneakicon>><<link [[Carefully (0:30)|Moor]]>><<bird_pass 30>><<set $forestmod to 0.5>><<set $moormove to "careful_search">><<if $moor_hunt gte 1>><<set $moor_hunt += 2>><</if>><</link>><<lharass>>
+		<br><br>
+	<<if $moor gt 0>>
+		Go towards the coast
+		<br>
+		<<if $harpy gte 6 and $birdFly gte 1 and !$plucked>>
+			<<glideicon>><<link [[Fly (<<print getTimeString(_hoursPassed, _minutesPassed)>>)|Moor]]>><<set $fatigueMod to _fatigueMod>><<set $flightTime to _flightTime>><<bird_pass _flightTime>><<set $moor -= 5>><<set $forestmod to 1>><<set $moormove to "fly">><</link>><<flight_text>><<gtiredness>>
+			<br>
+		<</if>>
+		<<if $worn.feet.type.includes("heels") and !$possessed>>
+			<<heelsicon "hobble">><<link [[Hobble in heels (0:30)|Moor]]>><<bird_pass 30>><<set $moor -= 5>><<set $forestmod to 3>><<set $moormove to "hobble">><<if $moor_hunt gte 1>><<set $moor_hunt += 2>><</if>><</link>><<gharass>>
+		<<else>>
+			<<if !$worn.feet.type.includes("shackle")>>
+				<<runicon>><<link [[Quickly (0:05)|Moor]]>><<bird_pass 5>><<set $moor -= 5>><<set $forestmod to 3>><<set $moormove to "quick">><<if $moor_hunt gte 1>><<set $moor_hunt += 0.5>><</if>><</link>><<gharass>>
+				<br>
+			<</if>>
+			<<walkicon>><<link [[Normally (0:10)|Moor]]>><<bird_pass 10>><<set $moor -= 5>><<set $forestmod to 1>><<set $moormove to "normal">><<if $moor_hunt gte 1>><<set $moor_hunt += 1>><</if>><</link>>
+			<br>
+			<<sneakicon>><<link [[Carefully (0:30)|Moor]]>><<bird_pass 30>><<set $moor -= 5>><<set $forestmod to 0.5>><<set $moormove to "careful">><<if $moor_hunt gte 1>><<set $moor_hunt += 2>><</if>><</link>><<lharass>>
+		<</if>>
+		<br><br>
+	<<else>>
+		<<farmicon>><<link [[Enter the farmlands (0:05)|Farmland]]>><<bird_pass 5>><<set $moor to 0>><<unset $moor_hunt>><<set $forestmod to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+<<set $eventskip to 0>>
+<<unset $moormove>>
+
+:: Castle
+<<set $location to "castle">><<effects>>
+
+당신은 폐허가 된 성의 안뜰에 있습니다. 버려지고 반쯤 가라앉았음에도, 폐허는 당신 주위로 높이 솟아 있습니다.
+<<if Weather.precipitation is "rain">>
+	빗물에 닳은 홈통을 따라 물이 졸졸 흐릅니다.
+<<elseif Weather.isSnow>>
+	성벽 위에는 눈이 쌓여 있습니다.
+<</if>>
+<br><br>
+<<switch $phase>>
+	<<case "lurker">><<wearProp "lurker">>
+	<<case "junk">><<wearProp "junk">>
+	<<default>>
+<</switch>>
+
+<<if $treasure_map is 1>>
+	<span class="gold">당신이 찾은 보물 지도가 이곳을 가리키고 있었습니다.</span>
+	<br><br>
+	<<getouticon "dig">><<link [[보물 파기 (2:00)|Castle Treasure]]>><<pass 120>><<unset $treasure_map>><<tiredness 6>><</link>><<gtiredness>>
+	<br>
+<</if>>
+<<if $bird and $bird.upgrades and $bird.upgrades.snare gte 1>>
+	당신의 덫이 여기에 있습니다.
+	<<if $bird.lurkerSnareState is "captured">>
+		<span class="green">럴커 한 마리가 밧줄에 걸려 버둥거리고 있습니다.</span>
+		<br>
+		<<birdicon "snare_lurker">><<link [[가져간다|Castle]]>><<set $phase to "lurker">><<set $bird.materials.lurkers++>><<set $bird.lurkerSnareState to "empty">><</link>>
+		<br>
+	<<elseif $bird.lurkerSnareState is "empty">>
+		<span class="purple">비어 있습니다.</span> <<birdicon "snare">>
+		<br>
+		<<if $bird.materials.junk gte 1>>
+			<<birdicon "junk">><<link [[반짝이는 잡동사니를 미끼로 사용하기 (0:02)|Castle]]>><<set $phase to "junk">><<pass 2>><<set $bird.materials.junk-->><<set $bird.lurkerSnareState to "ready">><</link>>
+			<br>
+		<</if>>
+		<<for _valuable, _amount range $bird.materials.valuables>>
+			<<if _amount lt 1 or _valuable is "wallet">><<continue>><</if>>
+			<<set _shiny to true>>
+			<<capture _valuable>>
+				<<birdicon _valuable>><<link [["" + _valuable + "【을를】 미끼로 사용하기 (0:02)"|Castle]]>><<pass 2>><<set $bird.materials.valuables[_valuable]-->><<set $bird.lurkerSnareState to "ready">><</link>>
+				<br>
+			<</capture>>
+		<</for>>
+		<<if $bird.materials.junk is 0 and !_shiny>>
+			<span class="red">미끼로 쓸 만한 반짝이는 물건이 없습니다.</span>
+			<br>
+		<</if>>
+	<<else>>
+		<span class="blue">미끼가 놓여 있습니다.</span> <<birdicon "snare_bait">>
+		<br>
+	<</if>>
+	<br>
+<</if>>
+<<if $harpy gte 6 and $syndromebird is 1 and $birdFly gte 1 and !$plucked>>
+	<<glideicon>><<link [[가장 높은 탑으로 날아가기 (0:02)|Castle Fly]]>><<bird_pass 2>><</link>><<flight_text>>
+	<br>
+<<elseif $syndromebird is 1>>
+	<<npc "Great Hawk">>
+	<<your_bird_text "cap">>【이가】 당신을 집까지 데려다줄 수 있을 겁니다.
+	<<endevent>>
+	<br><br>
+	<<glideicon>><<link [[부른다|Castle Call]]>><</link>>
+	<br>
+<</if>>
+<<getouticon>><<link [[떠난다|Moor]]>><<set $moor to 100>><</link>>
+<br>
+
+:: Castle Fly
+<<set $location to "tower">><<effects>>
+
+<<npc "Great Hawk">>
+당신은 탑 꼭대기로 날아가 둥지 옆에 착지합니다.
+<<if $bird.state is "home">>
+	<<if $monster is 1>>
+		<<beasttype>>【이가】 일어서서 <<bhis>> 팔과 날개로 당신을 감쌉니다. "집에 온 걸 환영해, <<wife>>."
+	<<else>>
+		<<beasttype>>【이가】 날갯짓하며 일어나, 애정 어린 인사로 당신을 쪼아댑니다.
+	<</if>>
+<<else>>
+	<<beasttype>>【은는】 집에 없습니다.
+<</if>>
+<br><br>
+
+<<link [[다음|Bird Tower]]>><<endevent>><</link>>
+<br>
+
+:: Castle Call
+<<effects>>
+
+<<npc "Great Hawk">>
+당신은 탑을 향해 소리칩니다.
+
+<<if $bird.state isnot "home" and $bird.timer gte 0>>
+	아무런 응답이 없습니다. <<bHe>>【은는】 외출한 게 틀림없습니다.
+	<br><br>
+
+	<<link [[기다린다|Castle Call Wait]]>><<bird_pass $bird.timer>><</link>>
+	<br>
+	<<link [[그만둔다|Castle]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<set $location to "tower">>
+	곧바로, <<beasttype>>【이가】 당신의 둥지에서 급강하합니다. <<bHe>>【은는】 <<bhis>> 발톱으로 당신의 어깨를 붙잡고 집으로 데려갑니다.
+	<br><br>
+	<<if pcAreArmsBound("any") or $feetuse is "bound">>
+		<<bHe>>【은는】 당신의 결박을 호기심 어린 눈으로 보더니, 날카롭게 <<bhis>> 발톱으로 당신을 향해 찹니다. <span class="green">당신의 결박이 너덜너덜해져 발치에 떨어집니다.</span>
+		<<unbind>>
+		<br><br>
+	<</if>>
+	<<if $monster is 1>>
+		<<bHe>>【은는】 <<bhis>> 팔과 날개로 당신을 감쌉니다. "집에 온 걸 환영해, <<wife>>." <<bhe>>【은는】 말하고 둥지로 돌아갑니다.
+	<<else>>
+		<<bHe>>【은는】 당신에게 애정 어린 쪼기를 하고 둥지로 돌아갑니다.
+	<</if>>
+	<br><br>
+	<<bird_hunt_timer>>
+	<<set $bird.state to "home">>
+	<<link [[다음|Bird Tower]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Castle Call Wait
+<<set $location to "tower">><<effects>>
+
+당신은 하늘을 바라보며 기다리다가, 황야 위를 나는 <<beasttype>>【을를】 봅니다. <<bhe>>【이가】 머리 위를 지날 때 당신은 소리칩니다. <<bHe>>【은는】 당신을 향해 급강하하여 어깨를 붙잡고 집으로 데려갑니다.
+<br><br>
+
+<<if pcAreArmsBound("any") or $feetuse is "bound">>
+	<<bHe>>【은는】 당신의 결박을 호기심 어린 눈으로 보더니, 날카롭게 <<bhis>> 발톱으로 당신을 향해 찹니다. <span class="green">당신의 결박이 너덜너덜해져 발치에 떨어집니다.</span>
+	<<unbind>>
+	<br><br>
+<</if>>
+
+<<if $monster is 1>>
+	<<bHe>>【은는】 <<bhis>> 팔과 날개로 당신을 감쌉니다. "집에 온 걸 환영해, <<wife>>." <<bhe>>【은는】 말하고 둥지로 돌아갑니다.
+<<else>>
+	<<bHe>>【은는】 당신에게 애정 어린 쪼기를 하고 둥지로 돌아갑니다.
+<</if>>
+<br><br>
+<<bird_hunt_timer>>
+<<set $bird.state to "home">>
+<<link [[다음|Bird Tower]]>><<endevent>><</link>>
+<br>
+
+:: Castle Treasure
+<<effects>>
+
+당신은 이탄층을 파헤치는 작업을 시작합니다. 중앙이 시작하기에 좋은 장소인 것 같습니다.
+<br><br>
+당신은 곧 지도가 더 구체적이었으면 좋았을 것이라고 생각하게 됩니다. 결국, 여기에 무언가 있다는 보장은 없습니다.
+<br><br>
+
+<<link [[다음|Castle Treasure 2]]>><</link>>
+<br>
+
+:: Castle Treasure 2
+<<effects>>
+
+당신 뒤로 구멍 자국이 남았지만, 안뜰의 5분의 1도 채 탐색하지 못했습니다.
+<br><br>
+포기할까 고민하던 중, 손가락에 딱딱한 것이 스칩니다. 당신은 새로운 활력으로 이탄층을 파헤쳐 물건을 꺼냅니다. 그냥 통나무입니다.
+<br><br>
+
+<<link [[다음|Castle Treasure 3]]>><</link>>
+<br>
+
+:: Castle Treasure 3
+<<effects>><<wearProp "log">>
+
+그 아래에 무언가 있습니다. 당신은 통나무를 옆으로 던지고 구멍 속으로 다시 손을 뻗습니다. 흙 속에서 나무 상자를 들어 올립니다. 잠겨 있지 않습니다.
+<br><br>
+
+안에는 검은 철제 종이 있습니다. 바깥쪽에는 신전에서 흔히 볼 수 있는 상징들이 표시되어 있습니다. 도난당한 것일까요? 보기보다 훨씬 무겁습니다. 당신은 종을 울립니다. 처음에는 소리가 나지 않아, 아직 작동하는지 의심스럽습니다. 그러다 깊고 낭랑한 종소리가 울려 퍼집니다. 두려움이 당신을 덮칩니다. 당신은 몸을 떱니다.<<gstress>><<stress 6>>
+<br><br>
+
+당신은 그것을 묻어두고 싶어지지만, 수집가에게는 큰 가치가 있을 수 있습니다.
+<br><br>
+
+<<earnFeat "Buried Treasure">><<wearProp "antique bell">>
+<<set $antiquemoney += 10000>><<museumAntiqueStatus "antiquebell" "found">>
+
+<<link [[다음|Castle]]>><</link>>
+<br>
+
+:: Moor Box Lurkers
+<<effects>>
+
+<<if $pubtasksetting is "lurkers">>
+	당신은 검은 상자를 발견합니다. 여전히 어두운 물로 둘러싸인 섬 위에 놓여 있습니다.
+	<br><br>
+<<else>>
+	<<set $pubtasksetting to "lurkers">>
+	당신은 작은 언덕에 올라 주변 지형을 살피며 검은 상자를 찾습니다.
+	<br><br>
+
+	당신은 그것이 근처에 있는 것을 발견합니다. 어두운 연못 한가운데 있는 섬 위에 놓여 있습니다. 수면 위로 흔적이 보입니다. 무언가 아래에서 헤엄치고 있습니다.
+	<br><br>
+<</if>>
+<<skinicon "wade">><<link [[걸어서 건너간다|Moor Box Lurkers 2]]>><</link>>
+<br>
+<<getouticon>><<link [[떠난다|Moor]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Moor Box Lurkers 2
+<<water waist>><<effects>>
+
+당신은 물속으로 뛰어들어 헤쳐 나갑니다. 당신이 일으킨 물결이 닿자 생물들이 당신을 향해 돌진합니다.
+<br><br>
+
+<<link [[다음|Moor Box Struggle]]>><<set $struggle_start to 1>><</link>>
+<br>
+
+:: Moor Box Struggle
+<<water waist>><<effects>>
+
+<<if $struggle_start is 1>>
+	<<struggle_init>>
+	<<set $struggle.creature to "lurker">>/*Creature species*/
+	<<struggle_creatures 2 1>>/*How many creatures will be involved, and their health.*/
+	<<set $combat to 1>>
+	<<controlloss>>
+	<<violence 1>>
+	<<molested>>
+
+	<<unset $struggle_start>>
+	<<set $timer to 3>>
+<</if>>
+
+<<if $timer is 2>>
+	<<struggle_add 1 1>>
+	<span class="pink">세 번째 생물이 당신을 향해 헤엄쳐 옵니다!</span>
+	<br><br>
+<<elseif $timer is 1>>
+	<<struggle_add 1 1>>
+	<span class="pink">네 번째 생물이 당신을 향해 헤엄쳐 옵니다!</span>
+	<br><br>
+<</if>>
+
+<<struggle>>
+
+<<if $struggle.done gte $struggle.number>>
+	<span id="next"><<link [[다음|Moor Box Struggle End]]>><</link>></span>
+	<br>
+<<else>>
+	<span id="next"><<link [[다음|Moor Box Struggle]]>><</link>></span>
+	<br>
+<</if>>
+
+:: Moor Box Struggle End
+<<water waist>><<effects>>
+
+생물들이 수면 아래로 사라집니다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+<<wearProp "black box">>
+
+당신은 섬에 도착합니다. 검은 상자가 찢어진 가방 위에 놓여 있습니다. 당신은 그것을 집어 듭니다.
+<<set $pubtask2 to 1>>
+<br><br>
+
+해안으로 돌아가는 길은 더 안전합니다.
+<br><br>
+
+<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Moor Box
+<<effects>>
+
+<<if $pubtasksetting is "person">>
+	<<loadNPC 0 moor>><<person1>>
+	당신은 작은 언덕을 올라, 바위 위에 앉아 있는 <<person>>【을를】 발견합니다. <<covered>> <<He>>【은는】 검은 상자를 들고 있습니다. "마음이 바뀌었나?" <<he>>【이가】 묻습니다.
+	<br><br>
+
+	<<link [[다음|Moor Box 2]]>><</link>>
+	<br>
+<<else>>
+	<<set $pubtasksetting to "person">>
+	당신은 바위 더미로 왕관을 쓴 작은 언덕에 올라, 주변 지형을 살피며 랜드리의 검은 상자를 찾습니다.
+	<br><br>
+
+	<<generate1>><<person1>>
+	<<saveNPC 0 moor>>
+	"귀여운 <<girl>>【이가】 여긴 어쩐 일이지?" 뒤에서 목소리가 들립니다. 놀란 당신은 서둘러 돌아서다 거의 넘어질 뻔합니다. 한 <<person>>【이가】 바위 위에 앉아 당신을 지켜보고 있습니다. <<covered>>
+	<br>
+
+	<<if $speech_attitude is "meek">>
+		"저, 저는 무언가를 찾고 있어요." 당신이 말합니다. "검은 상자요."
+	<<elseif $speech_attitude is "bratty">>
+		"잃어버린 물건을 찾고 있어." 당신이 말합니다. "검은 상자 말이야."
+	<<else>>
+		"검은 상자를 찾고 있어요." 당신이 말합니다.
+	<</if>>
+	<br>
+	"정말?" <<person>>【이가】 대답합니다. <<He>>【은는】 몸을 숙입니다. "이거 말인가?" <<He>>【은는】 바위 뒤에서 검은 상자를 꺼냅니다.
+	<br><br>
+
+	당신은 고개를 끄덕입니다. <<person>>【은는】 미소 짓습니다.
+	<br><br>
+
+	<<link [[다음|Moor Box 2]]>><</link>>
+	<br>
+<</if>>
+
+:: Moor Box 2
+<<effects>>
+
+<<if $exposed gte 2>>
+	"기꺼이 넘겨주지." <<person>>【이가】 말합니다. "하지만 대가를 받고 싶군.
+
+	<<if pcAreArmsBound("both")>>
+		황야를 뛰어다니는 걸 엿봤지. 제대로 날 봐. 네 <<if $player.gender_appearance is "m">>자지<<else>>보지<</if>>【을를】 보고 싶어."
+		<br><br>
+	<<else>>
+		팔을 움직여. 네 <<if $player.gender_appearance is "m">>자지<<else>>보지<</if>>【을를】 보고 싶어."
+		<br><br>
+	<</if>>
+
+	<<if hasSexStat("exhibitionism", 4)>>
+		<<ind>><<link [[응한다|Moor Box Naked]]>><</link>><<exhibitionist4>>
+		<br>
+	<<else>>
+		<<insufficientStat "exhibitionism" "그런 짓을 하기엔">> <i>아마 <<his>> 요청에 맞게 옷을 입는다면 더 합리적일 것입니다.</i>
+		<br><br>
+	<</if>>
+	<<getouticon>><<link [[떠난다|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<else>>
+	"기꺼이 넘겨주지." <<person>>【이가】 말합니다. "하지만 대가를 받고 싶군. 네 속옷."
+	<br>
+
+	<<if $speech_attitude is "meek">>
+		"제, 제 속옷이요?" 당신이 묻습니다.
+		<br>
+		<<person>>【은는】 고개를 끄덕입니다. "들었잖아."
+		<br><br>
+	<<elseif $speech_attitude is "bratty">>
+		"상자를 어디서 찾았는지 먼저 말해." 당신이 말합니다. "내용물을 가져가지 않았는지 어떻게 알아."
+		<br>
+		"내가 찾았어. 열 수가 없더군. 믿어, 시도해 봤으니까."
+		<br><br>
+	<<else>>
+		"제 속옷을 원한다고요?" 당신이 묻습니다.
+		<br>
+		<<person>>【은는】 고개를 끄덕입니다. "들었잖아."
+		<br><br>
+	<</if>>
+
+	<<if $worn.under_lower.name is "naked">>
+		<<ind>><<link [[안 입었다고 말한다|Moor Box No Undies]]>><</link>>
+		<br>
+	<<elseif $worn.lower.type.includes("naked")>>
+		<<if hasSexStat("exhibitionism", 5)>>
+			<<skinicon "strip">><<link [[벗는다|Moor Box Undies]]>><</link>><<exhibitionist5>>
+			<br>
+		<<else>>
+			<<him>>에게 <<underbottoms>>【을를】 주면 가릴 것이 아무것도 없게 됩니다. <<insufficientStat "exhibitionism" "그렇게 하기엔">>
+		<</if>>
+	<<elseif $worn.upper.type.includes("naked") and ($player.gender_appearance is "f" or $player.sex is "f")>>
+		<<if hasSexStat("exhibitionism", 4)>>
+			<<skinicon "strip">><<link [[벗는다|Moor Box Undies]]>><</link>><<exhibitionist4>>
+			<br>
+		<<else>>
+			<<him>>에게 $worn.under_upper.name【을를】 주면 상의를 벗게 됩니다. <<insufficientStat "exhibitionism" "그렇게 하기엔">>
+			<br><br>
+		<</if>>
+	<<else>>
+		<<skinicon "strip">><<link [[벗는다|Moor Box Undies]]>><</link>><<exhibitionist1>>
+		<br>
+	<</if>>
+	<<getouticon>><<link [[떠난다|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Moor Box Naked
+<<effects>>
+
+<<if !pcAreArmsBound("both")>>
+	<<flaunting>>당신은 팔을 움직입니다. <<person>>【은는】 당신의 <<genitals>>【을를】 훑어봅니다.
+<<else>>
+	<<flaunting>>당신은 <<person>>【을를】 마주 봅니다. <<He>>【은는】 당신의 <<genitals>>【을를】 훑어봅니다.
+<</if>>
+<<exhibitionism4>>
+<<if playerChastity("hidden")>>
+	"이런 젠장." <<He>>【은는】 얼굴을 찌푸리며, 명백히 실망한 표정입니다. "아무것도 안 보이잖아."
+<<else>>
+	<<if $player.penisExist and $player.vaginaExist>>
+		"둘 다?" <<he>>【이가】 묻습니다. "운 좋은 날이군. 카메라가 없는 게 아쉽네."
+	<<elseif $player.penisExist>>
+		<<if $player.gender_appearance is "f">>
+			"이거 놀라운데." <<he>>【이가】 말합니다.
+			<<if $player.penissize gte 6>>
+				"게다가 엄청 크잖아. 카메라가 없는 게 아쉽네."
+				<<insecurity "penis_big" 1>><<ginsecurity "penis_big">>
+			<<elseif $player.penissize lte 3>>
+				"여기선 거의 안 보이지만."
+				<<insecurity "penis_small" 1>><<ginsecurity "penis_small">>
+			<<else>>
+			<</if>>
+		<<else>>
+			"멋진 자지로군." <<he>>【이가】 말합니다.
+			<<if $player.penissize gte 6>>
+				"엄청 크잖아. 카메라가 없는 게 아쉽네."
+				<<insecurity "penis_big" 1>><<ginsecurity "penis_big">>
+			<<elseif $player.penissize lte 3>>
+				"여기선 거의 안 보이지만." <<He>>【은는】 웃습니다.
+				<<insecurity "penis_small" 1>><<ginsecurity "penis_small">>
+			<<else>>
+			<</if>>
+		<</if>>
+	<<else>>
+		<<if $player.gender_appearance is "m">>
+			"이거 놀라운데." <<he>>【이가】 말합니다.
+		<<else>>
+			"멋진 보지로군." <<he>>【이가】 말합니다.
+		<</if>>
+	<</if>>
+	<br>
+<</if>>
+
+<<if !pcAreArmsBound("both")>>
+	당신은 몸을 가리고 손을 내밉니다.
+<</if>>
+<<if $speech_attitude is "meek">>
+	"이제 상자를 주시겠어요?" 당신이 묻습니다.
+<<elseif $speech_attitude is "bratty">>
+	"상자 말이야." 당신이 말합니다. "나한테 줘."
+<<else>>
+	"요구한 대로 했어요." 당신이 말합니다.
+<</if>>
+<br>
+<<person>>【은는】 한숨을 쉽니다. "알았어." <<He>>【은는】 그것을 당신 옆 땅에 던집니다. 당신은 몸을 굽혀 그것을 집습니다. 당신이 일어섰을 때, <<person>>【은는】 사라지고 없습니다.
+<br><br>
+<<set $pubtask2 to 1>>
+<<wearProp "black box">>
+
+<<link [[다음|Moor]]>><<endevent>><<clearNPC moor>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Moor Box No Undies
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"하, 하지만 안 입었어요." 당신이 말합니다.
+<<elseif $speech_attitude is "bratty">>
+	"안 입었어." 당신이 말합니다.
+<<else>>
+	"안 입었어요." 당신이 말합니다.
+<</if>>
+<br><br>
+
+"좋아." <<person>>【이가】 말합니다. "증명해 봐. 네 <<if $player.gender_appearance is "m">>자지<<else>>보지<</if>>【을를】 보여줘."
+<br><br>
+
+<<if hasSexStat("exhibitionism", 4)>>
+	<<link [[보여준다|Moor Box Show]]>><</link>><<exhibitionist4>>
+	<br>
+<<else>>
+	<<insufficientStat "exhibitionism" "낯선 사람에게 몸을 드러내기엔">>
+	<br><br>
+<</if>>
+
+<<link [[떠난다|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Moor Box Show
+<<effects>>
+
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+	<<flaunting>>당신은 치마를 들어 올립니다.
+<<elseif $worn.upper.set is $worn.lower.set>>
+	<<flaunting>>당신은 $worn.upper.name【을를】 가슴 아래로, 허리를 지나, 그리고 허벅지까지 내립니다.
+<<else>>
+	<<flaunting>>당신은 $worn.lower.name【을를】 허벅지 아래로 내립니다.
+<</if>>
+<<person>>【은는】 당신의 <<genitals>>【을를】 훑어봅니다.
+<<exhibitionism4>>
+
+<<if $player.penisExist and $player.vaginaExist>>
+	"둘 다?" <<he>>【이가】 묻습니다. "운 좋은 날이군. 카메라가 없는 게 아쉽네."
+<<elseif $player.penisExist>>
+	<<if $player.gender_appearance is "f">>
+		"이거 놀라운데." <<he>>【이가】 말합니다.
+		<<if $player.penissize gte 6>>
+			"게다가 엄청 크잖아. 카메라가 없는 게 아쉽네."
+			<<insecurity "penis_big" 1>><<ginsecurity "penis_big">>
+		<<elseif $player.penissize lte 3>>
+			"여기선 거의 안 보이지만."
+			<<insecurity "penis_small" 1>><<ginsecurity "penis_small">>
+		<<else>>
+
+		<</if>>
+	<<else>>
+		"멋진 자지로군." <<he>>【이가】 말합니다.
+		<<if $player.penissize gte 6>>
+			"엄청 크잖아. 카메라가 없는 게 아쉽네."
+			<<insecurity "penis_big" 1>><<ginsecurity "penis_big">>
+		<<elseif $player.penissize lte 3>>
+			"여기선 거의 안 보이지만." <<He>>【은는】 웃습니다.
+			<<insecurity "penis_small" 1>><<ginsecurity "penis_small">>
+		<<else>>
+
+		<</if>>
+	<</if>>
+<<else>>
+	<<if $player.gender_appearance is "m">>
+		"이거 놀라운데." <<he>>【이가】 말합니다.
+	<<else>>
+		"멋진 보지로군." <<he>>【이가】 말합니다.
+	<</if>>
+<</if>>
+<br>
+
+<<if !pcAreArmsBound("both")>>
+	당신은 몸을 가리고 손을 내밉니다.
+<</if>>
+<<if $speech_attitude is "meek">>
+	"이제 상자를 주시겠어요?" 당신이 묻습니다.
+<<elseif $speech_attitude is "bratty">>
+	"상자 말이야." 당신이 말합니다. "나한테 줘."
+<<else>>
+	"요구한 대로 했어요." 당신이 말합니다.
+<</if>>
+<br>
+<<person>>【은는】 한숨을 쉽니다. "알았어." <<He>>【은는】 그것을 당신 옆 땅에 던집니다. 당신은 몸을 굽혀 그것을 집습니다. 당신이 일어섰을 때, <<person>>【은는】 사라지고 없습니다.
+<br><br>
+<<set $pubtask2 to 1>>
+
+<<wearProp "black box">>
+
+<<link [[다음|Moor]]>><<endevent>><<clearNPC moor>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Moor Box Undies
+<<effects>>
+
+<<if $worn.lower.type.includes("naked")>>
+
+	당신은
+	<<if $worn.upper.type.includes("naked")>>
+		알몸으로 남게 됩니다.
+	<<else>>
+		하의를 벗은 채로 남게 됩니다.
+	<</if>>
+	"돌아서." 당신이 말합니다. <<person>>【은는】 순순히 뒤돌아서서 <<his>> 손을 <<his>> 엉덩이에 얹습니다.
+	<br><br>
+	<<if $worn.under_upper.set is $worn.under_lower.set>>
+		당신은 $worn.under_upper.name【을를】 가슴 아래로 당겨 허리춤에 뭉치게 합니다. 더 아래로, 허벅지를 지나 무릎, 그리고 발목까지 끌어내립니다. 옷에서 발을 빼낸 뒤, 그것을 들어 <<person>> 쪽으로 내밉니다.
+		<<exhibitionism5>>
+		흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_upper.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+		<br><br>
+		<<underupperruined>><<underlowerruined undefined "given">>
+	<<else>>
+		당신은 $worn.under_lower.name【을를】 허벅지 아래로, 무릎을 지나, 그리고 발목까지 끌어내립니다. 옷에서 발을 빼낸 뒤, 그것을 들어 <<person>> 쪽으로 내밉니다.
+		<<exhibitionism5>>
+		흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_lower.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+		<br><br>
+		<<underlowerruined undefined "given">>
+	<</if>>
+<<elseif setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+	<<if $worn.under_upper.set is $worn.under_lower.set>>
+		<<if $worn.upper.type.includes("naked")>>
+			상의 속옷을 벗은 채로 남게 될 겁니다. "돌아서." 당신이 말합니다. <<person>>【은는】 순순히 뒤돌아서서 <<his>> 손을 <<his>> 엉덩이에 얹습니다.
+			<br><br>
+			당신은 $worn.under_upper.name【을를】 가슴 아래로 당겨 허리춤에 뭉치게 합니다. 치마를 걷어 올리고, 허벅지를 지나 무릎, 그리고 발목까지 나머지 부분을 끌어내리기 시작합니다. 옷에서 발을 빼낸 뒤 <<person>> 쪽으로 내밉니다.
+			<<if $player.sex is "f" or $player.gender_appearance is "f">>
+				<<exhibitionism4>>
+			<<else>>
+				<<exhibitionism1>>
+			<</if>>
+			흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_upper.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+			<br><br>
+			<<underupperruined>><<underlowerruined undefined "given">>
+		<<else>>
+			당신은 $worn.under_upper.name【을를】 가슴 아래로 당겨 허리춤에 뭉치게 합니다. 치마를 걷어 올리고, 허벅지를 지나 무릎, 그리고 발목까지 나머지 부분을 끌어내리기 시작합니다. 옷에서 발을 빼낸 뒤 <<person>> 쪽으로 내밉니다.
+			<<exhibitionism1>>
+
+			흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_upper.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+			<br><br>
+			<<underupperruined>><<underlowerruined undefined "given">>
+		<</if>>
+	<<else>>
+		치마 양옆을 걷어 올리고, $worn.under_lower.name【을를】 허벅지 아래로, 무릎을 지나, 발목까지 끌어내립니다. <<person>>【은는】 뚫어지게 쳐다봅니다.
+		<<exhibitionism1>>
+
+		당신은 옷에서 발을 빼고, 땅에서 집어 들어 <<person>> 쪽으로 내밉니다. 흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_lower.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+		<br><br>
+		<<underlowerruined undefined "given">>
+	<</if>>
+<<else>>
+	<<if $worn.under_upper.set is $worn.under_lower.set>>
+		<<if $worn.upper.set is $worn.lower.set>>
+			먼저 $worn.upper.name【을를】 벗어야 합니다. "돌아서." 당신이 말합니다. <<person>>【은는】 순순히 뒤돌아서서 <<his>> 손을 <<his>> 엉덩이에 얹습니다.
+			<br><br>
+
+			당신은 상의와 하의를 벗은 뒤, $worn.under_upper.name【을를】 가슴 아래로 당겨 허리춤에 뭉치게 합니다. 계속해서 허벅지를 지나 무릎, 그리고 발목까지 끌어내립니다. 옷에서 발을 빼낸 뒤, $worn.upper.name【을를】 다시 입습니다.
+			<<exhibitionism1>>
+
+			당신은 옷가지를 <<person>> 쪽으로 내밉니다. 흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_upper.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+			<br><br>
+			<<underupperruined>><<underlowerruined undefined "given">>
+		<<else>>
+			먼저 $worn.lower.name【을를】 벗어야 합니다. "돌아서." 당신이 말합니다. <<person>>【은는】 순순히 뒤돌아서서 <<his>> 손을 <<his>> 엉덩이에 얹습니다.
+			<br><br>
+
+			당신은 하의를 내린 뒤, $worn.under_upper.name【을를】 가슴 아래로 당겨 허리춤에 뭉치게 합니다. 계속해서 허벅지를 지나 무릎, 그리고 발목까지 끌어내립니다. 옷에서 발을 빼낸 뒤, $worn.lower.name【을를】 다시 입습니다.
+			<<exhibitionism1>>
+
+			당신은 옷가지를 <<person>> 쪽으로 내밉니다. 흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_upper.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+			<br><br>
+			<<underupperruined>><<underlowerruined undefined "given">>
+
+		<</if>>
+	<<else>>
+		<<if $worn.upper.set is $worn.lower.set>>
+			먼저 $worn.upper.name【을를】 벗어야 합니다. "돌아서." 당신이 말합니다. <<person>>【은는】 순순히 뒤돌아서서 <<his>> 손을 <<his>> 엉덩이에 얹습니다.
+			<br><br>
+
+			당신은 상의와 하의를 벗은 뒤, $worn.under_lower.name【을를】 허벅지를 지나 무릎, 그리고 발목까지 끌어내립니다. 옷에서 발을 빼낸 뒤, $worn.upper.name【을를】 다시 입습니다.
+			<<exhibitionism1>>
+
+			당신은 옷가지를 <<person>> 쪽으로 내밉니다. 흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_lower.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+			<br><br>
+			<<underlowerruined undefined "given">>
+		<<else>>
+			먼저 $worn.lower.name【을를】 벗어야 합니다. "돌아서." 당신이 말합니다. <<person>>【은는】 순순히 뒤돌아서서 <<his>> 손을 <<his>> 엉덩이에 얹습니다.
+			<br><br>
+
+			당신은 하의를 벗은 뒤, $worn.under_lower.name【을를】 허벅지를 지나 무릎, 그리고 발목까지 끌어내립니다. 옷에서 발을 빼낸 뒤, $worn.lower.name【을를】 다시 입습니다.
+			<<exhibitionism1>>
+
+			당신은 옷가지를 <<person>> 쪽으로 내밉니다. 흥분한 <<he>>【은는】 바위를 타고 내려와 당신의 손에서 $worn.under_lower.name【을를】 낚아챕니다. <<He>>【은는】 다시 올라가면서 검은 상자는 잊어버린 듯 땅에 떨어뜨립니다.
+			<br><br>
+			<<underlowerruined undefined "given">>
+		<</if>>
+	<</if>>
+<</if>>
+
+당신은 상자를 줍기 위해 몸을 웅크립니다. 당신이 일어섰을 때 <<person>>【은는】 이미 사라지고 없습니다. <<covered>>
+<br><br>
+
+<<set $pubtask2 to 1>>
+<<wearProp "black box">>
+
+<<link [[다음|Moor]]>><<endevent>><<clearNPC moor>><<set $eventskip to 1>><</link>>
+<br>

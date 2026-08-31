@@ -1,0 +1,1284 @@
+:: Docks Sneak Start
+<<effects>><<set $lock to 400>>
+<<generateSecurity 1>><<person1>>
+당신은 문에 있는 경비원을 본다. <<he>>【은는】 <<his>> 책상에 <<his>> 발을 올리고 <<his>> 휴대폰을 만지작거리고 있다.
+<br><br>
+<<his>> 주의가 산만함에도 불구하고, 당신이 다가가면 <<he>>【은는】 당신을 발견할 것이다. 옆에 더 작은 문이 있지만, 자물쇠로 잠겨 있다.
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		자물쇠를 딸 수 있을 것 같지만, <span class="blue">팔이 묶여 있지 않다면 말이다.</span>
+		<br><br>
+	<<else>>
+		<span class="green">자물쇠는 따기 쉬워 보인다.</span>
+		<br><br>
+		<<lockicon "pick">><<link [[침입한다 (0:05)|Docks Sneak Pick]]>><<pass 5>><<crimeUp 5 "trespassing">><<endevent>><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+<<getouticon>><<link [[떠난다|Docks]]>><<endevent>><<set $bus to "mer">><</link>>
+<br>
+
+:: Docks Sneak Pick
+<<effects>><<wearProp "lockpick">>
+당신은 성공적으로 자물쇠를 따고, 부두의 제한 구역으로 몰래 들어간다.
+<br><br>
+<<link [[다음|Docks Sneak]]>><</link>>
+<br>
+
+:: Docks Sneak
+<<effects>>
+<<skul_dock_init>>
+당신은 부두에 있다.
+
+<<if $stress gte $stressmax>>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "docksSneak">>
+	<<else>>
+		너무 무리했다.
+		<br><br>
+		<<passout>>
+
+		<<if dangerEvent()>>
+			<<link [[다음|Passout Docks]]>><</link>>
+			<br>
+		<<else>>
+			<<ambulance>>
+		<</if>>
+	<</if>>
+<<elseif Time.dayState isnot "night">>
+	지평선 위로 해가 떠오른다. 입구에서 목소리들과 금속이 부딪히는 소리가 들린다. 첫 노동자들이 하루 일과를 위해 도착하고 있다.
+	<br><br>
+	대낮에는 아무것도 훔칠 수 없을 것이다.
+	<<if $exposed gte 1>>
+		당신은 <<lewdness>> 상태를 숨기기 위해 입구로 몰래 돌아간다. 당신은 들키지 않고 옆문을 통과한다.
+	<<else>>
+		당신은 입구로 걸어 돌아간다. 아무도 당신에게 별다른 주의를 기울이지 않는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Docks]]>><<pass 5>><<set $bus to "mer">><</link>>
+	<br>
+<<elseif $eventskip is 0>>
+	<<events_skul_dock>>
+<<else>>
+	<<switch $bus>>
+	<<case "NW">>
+		당신은 정박된 배 옆으로 몰래 움직인다.
+	<<case "N">>
+		당신은 정박된 배 위로 이어지는 통로로 몰래 올라간다.
+	<<case "NE">>
+		당신은 물가의 창고로 몰래 다가간다. 창고는 기계로 가득 차 있지만, 많은 컨테이너가 바깥에 높이 쌓여 있다.
+	<<case "W">>
+		당신은 멈춰 있는 크레인들 사이로 몰래 움직인다.
+	<<case "M">>
+		당신은 머리 위로 솟은 두 줄의 화물 컨테이너 사이로 몰래 움직인다.
+	<<case "E">>
+		당신은 사무실 건물 옆으로 몰래 움직인다.
+	<<case "SW">>
+		당신은 트럭 하역 구역을 통해 몰래 움직인다. 여러 차량이 밤새 이곳에 보관되어 있다.
+	<<case "S">>
+		당신은 정문을 몰래 지나간다.
+	<<case "SE">>
+		당신은 열린 주차장을 통해 몰래 움직인다.
+	<</switch>>
+	<br><br>
+	<<dock_security_text>>
+	<br><br>
+	<<if $skul_dock[$bus].state is "empty">>
+		이곳의 컨테이너는 이미 수색했다.
+		<br><br>
+	<<elseif $skul_dock[$bus].state is "known" and $skul_dock[$bus].contents is "none">>
+		이곳의 컨테이너에는 당신에게 가치 있는 것이 없다.
+		<br><br>
+	<<else>>
+		<<if pcAreArmsBound("both")>>
+			컨테이너를 부수고 들어갈 수 있을 것 같지만, <span class="blue">팔이 묶여 있지 않다면 말이다.</span>
+			<br><br>
+		<<else>>
+			<<icon "cargo.png">><<link [[컨테이너를 부수고 들어간다 (0:30)|Docks Search]]>><<pass 30>><<crimeUp 5 "trespassing">><<dock_security 1>><</link>><<crime "trespassing">><<gsecurity>><<skul_dock_state $bus>>
+			<br><br>
+		<</if>>
+	<</if>>
+	<<skul_dock_nav>>
+	<<if $bus is "NW" or $bus is "N" or $bus is "NE">>
+		<<swimicon "dive">><<link [[바다로 뛰어든다|Docks Dive]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Docks Search
+<<effects>><<wearProp "lockpick">>
+<<skul_dock_init>>
+컨테이너들은 거의 똑같이 생겼다. 당신은 자물쇠를 하나씩 따고 컨테이너 안으로 들어간다.
+
+<br><br>
+
+<<skulduggeryuse 500 "locks">>
+
+<<rng 6>>
+<<if $rng is 1>>
+	많은 건설 자재를 발견한다.
+<<elseif $rng is 2>>
+	많은 과일과 채소를 발견한다.
+<<elseif $rng is 3>>
+	많은 농기구를 발견한다.
+<<elseif $rng is 4>>
+	많은 차량 부품을 발견한다.
+<<elseif $rng is 5>>
+	모두 비어 있다.
+<<else>>
+	원유가 든 통을 발견한다.
+<</if>>
+<<if $rng isnot 5>>
+	대량으로 있으면 가치가 있겠지만, 많이 들고 갈 수는 없다.
+<</if>>
+
+<br><br>
+
+<<if $skul_dock[$bus].contents is "gold">>
+	<<if $skul_dock[$bus].state is "known">>
+		이곳 어딘가에 금이 있다는 것을 알고 있다. 다른 컨테이너에 침입한다. 갈색 꾸러미들로 가득 차 있다. 당신은 그것들을 알아본다. 꾸러미들 사이를 뒤지자, 마침내 찾아낸다. 다른 것들보다 더 무겁다. 당신이 그것을 찢어 열자, 작은 금괴가 보인다.
+		<br><br>
+		<<earnFeat "Employee Benefits">>
+		<<link [[가져간다 (0:05)|Docks Gold]]>><<pass 5>><<crimeUp 3000 "thievery">><<set $blackmoney += 3000>><</link>><<crime "thievery">>
+		<br>
+	<<else>>
+		계속 수색하다 보니 갈색 꾸러미로 가득 찬 컨테이너에 도착했다.
+		<br><br>
+
+		<<link [[조심스럽게 수색한다 (1:00)|Docks Gold Careful]]>><<pass 60>><</link>>
+		<br>
+		<<link [[마구 찢어본다 (0:05)|Docks Gold Tear]]>><<crimeUp 100 "thievery">><<pass 5>><</link>><<crime "thievery">>
+		<br>
+	<</if>>
+
+<<elseif $skul_dock[$bus].contents is "aphrodisiacs">>
+	<<if $skul_dock[$bus].state is "known">>
+		그 이상한 액체가 여기 어딘가에 있다는 것을 알고 있다. 다른 컨테이너에 침입하자 보라색 빛이 당신을 맞이한다. 위험 경고 표시가 붙은 여러 개의 용기가 안에 놓여 있다. 하지만 빛을 내는 것은 단 하나뿐이다. 유리 뒤에서 이상한 액체가 소용돌이치고 있다.
+		<br><br>
+	<<else>>
+		수색을 계속한다. 다른 컨테이너에 침입하자 보라색 빛이 당신을 맞이한다. 위험 경고 표시가 붙은 여러 개의 용기가 안에 놓여 있다. 하지만 빛을 내는 것은 단 하나뿐이다. 유리 뒤에서 이상한 액체가 소용돌이치고 있다.
+		<br><br>
+	<</if>>
+
+	<<link [[가져간다 (0:05)|Docks Aphrodisiacs]]>><<pass 5>><<crimeUp 1200 "thievery">><<set $blackmoney += 1200>><</link>><<crime "thievery">>
+	<br>
+
+<<elseif $skul_dock[$bus].contents is "mechanisms">>
+	<<if $skul_dock[$bus].state is "known">>
+		<<= $compound.symbol.includesAny("wraith", "machine") ? "그 복합 시설" : "지역 회사">>【을를】 위해 맞춤 제작된 기계 장치가 여기 어딘가에 있다는 것을 알고 있다. 다른 컨테이너에 침입한다. <<= $compound.symbol.length ? "익숙한" : "분홍색">> 상징이 찍힌 상자들로 가득 차 있다.
+		<br><br>
+	<<else>>
+		다른 컨테이너를 수색한다. 내부는 <<= $compound.symbol.length ? "익숙한" : "분홍색">> 상징이 찍힌 상자들로 가득 차 있다.
+		<br><br>
+	<</if>>
+	<<if !$compound.symbol.length and $catsuit_found>>
+		<<run $compound.symbol.pushUnique("catsuit")>>
+		<span class="blue">어딘가 익숙해 보인다.</span> 그때는 제대로 보지 못했지만, 비슷한 분홍색 상징이 있는 상자로 가득 찬 컨테이너에서 캣슈트를 발견했던 것을 기억한다.
+		<br><br>
+		복잡한 모양을 해독하려 고개를 갸웃거린다. 뼈 기둥으로 양분된 세 개의 동심원 호. 그 안에 자리 잡은 세 개의 맞물린 호. 가장 안쪽 고리에서 바깥으로 갈라져 나온 갈래들. 실용적이기보다는 난해해 보인다.
+	<<elseif $compound.symbol.includes("catsuit")>>
+		캣슈트를 발견했을 때 봤던 것과 비슷해 보인다.
+	<</if>>
+	<br><br>
+	상자를 억지로 연다. 안에는 복잡한 기계들이 가득한데, 대부분 너무 무거워서 들고 갈 수 없다. 작은 기계 장치 중 일부는 암시장에서 꽤 가치가 있을 것 같다.
+	<br><br>
+
+	<<link [[가져간다 (0:05)|Docks Machinery Parts]]>><<world_corruption "soft" -5>><<pass 5>><<crimeUp 1000 "thievery">><<set $blackmoney += 1000>><</link>><<crime "thievery">>
+	<br>
+<<elseif $skul_dock[$bus].contents is "electronics">>
+	<<if $skul_dock[$bus].state is "known">>
+		이 중 하나에 실제로 들고 갈 수 있는 물건이 있다는 것을 알고 있다. 다른 컨테이너에 침입한다. 내부는 전자제품으로 가득 차 있다. 텔레비전은 너무 커서 들고 갈 수 없지만, 더 작은 물건들도 있다. 암시장에서 제값을 받지는 못하겠지만, 수고할 만한 가치는 충분히 있을 것이다.
+		<br><br>
+	<<else>>
+		다른 컨테이너를 수색한다. 내부는 전자제품으로 가득 차 있다. 텔레비전, 스피커 등 대부분 너무 커서 들고 갈 수 없다. 하지만 더 작은 물건들도 있다. 암시장에서 제값을 받지는 못하겠지만, 수고할 만한 가치는 충분히 있을 것이다.
+		<br><br>
+	<</if>>
+
+	<<link [[가져간다 (0:05)|Docks Electronics]]>><<pass 5>><<crimeUp 300 "thievery">><<set $blackmoney += 300>><</link>><<crime "thievery">>
+	<br>
+<<elseif $skul_dock[$bus].contents is "fertiliser">>
+	<<if currentSkillValue('tending') gte 400>>
+		<<if $skul_dock[$bus].state is "known">>
+			이 중 하나에 실제로 들고 갈 수 있는 물건이 있다는 것을 알고 있다. 다른 컨테이너에 침입한다. 내부는 비료 포대로 가득 차 있다. 많이 들고 갈 수는 없지만, 조금 가지고 있으면 유용할 수 있다는 것을 알고 있다.
+			<br><br>
+		<<else>>
+			다른 컨테이너를 수색한다. 내부는 비료 포대로 가득 차 있다. 많이 들고 갈 수는 없지만, 조금 가지고 있으면 유용할지도 모른다.
+			<br><br>
+		<</if>>
+		<<link [[조금 가져간다 (0:05)|Docks fertiliser]]>><<pass 5>><<crimeUp 200 "thievery">><<set $fertiliser.current++>><</link>><<crime "thievery">>
+	<<else>>
+		다른 컨테이너를 수색한다. 내부는 흙처럼 보이는 것이 담긴 포대들로 가득 차 있다.
+		<br><br>
+	<</if>>
+	<br>
+<<elseif $skul_dock[$bus].contents is "equipment">>
+	<<if $skul_dock[$bus].state is "known">>
+		여기에 특수 장비가 있다는 것을 알고 있다. 다른 컨테이너에 침입한다. 내부는 분홍색 상징이 찍힌 상자들로 가득 차 있다. 뒤쪽에 있는 무언가에 빛이 반사된다.
+		<br><br>
+	<<else>>
+		다른 컨테이너를 수색한다. 내부는 분홍색 상징이 찍힌 상자들로 가득 차 있다. 뒤쪽에 있는 무언가에 빛이 반사된다. 검은 캣슈트다.
+		<br><br>
+	<</if>>
+
+	<<link [[조사한다|Docks Catsuit]]>><</link>>
+	<br>
+<<else>>
+	마지막 컨테이너를 연다. 비어 있다.
+	<br><br>
+<</if>>
+
+
+<<link [[떠난다|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+<<set $skul_dock[$bus].state to "empty">>
+
+:: Docks Gold
+<<effects>><<wearProp "gold bar">>
+
+당신은 금괴를 챙기고 컨테이너를 떠난다. 암시장에서 꽤 비싸게 팔릴 것이다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Gold Careful
+<<effects>>
+
+당신은 각 소포의 내용물을 추측해 본다. 필요 이상의 관심을 끌고 싶지는 않다. 대부분 가볍다. 아마도 값싼 플라스틱 잡동사니일 것이다. 그러다 다른 것들보다 무거운 작은 소포를 들어 올린다.
+<br><br>
+
+안을 들여다볼 수 있을 만큼만 열어본다. 노란색 빛이 당신을 맞이한다. 작은 금괴다.
+<br><br>
+
+<<link [[가져간다|Docks Gold]]>><<crimeUp 3000 "thievery">><<set $blackmoney += 3000>><</link>><<crime "thievery">>
+<br>
+<<link [[내버려 둔다|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Gold Tear
+<<effects>>
+
+첫 번째 포장을 뜯는다. 값싼 장난감이다. 다음 포장을 뜯고, 또 다음 포장을 뜯는다. 대부분 값싼 플라스틱 잡동사니다. 처음에는 가치 있는 것이 없다.
+<br><br>
+
+무거운 소포를 연다. 내용물이 바닥에 쨍그랑 소리를 내며 떨어진다. 작은 금괴다.
+<br><br>
+
+<<link [[가져간다|Docks Gold]]>><<crimeUp 3000 "thievery">><<set $blackmoney += 3000>><</link>><<crime "thievery">>
+<br>
+<<link [[내버려 둔다|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Aphrodisiacs
+<<effects>>
+
+당신은 이상한 액체를 챙기고 컨테이너를 떠난다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Electronics
+<<effects>><<wearProp "mobile phone">>
+
+당신은 모든 휴대폰, 카메라, 그리고 다른 작은 기기들을 낚아채고 컨테이너를 떠난다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks fertiliser
+<<effects>><<wearProp "fertiliser">>
+
+당신은 비료 한 포대를 집어 들고 컨테이너를 떠난다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Catsuit
+<<effects>>
+<<npc Wren>><<person1>>
+
+You step forward, intent on examining the catsuit.
+<br><br>
+
+Instead, you hear a click, <span class="red">and the end of a pistol emerges from the dark</span>. A <<personsimple>> with <<if $pronoun is "m">>short<<else>>shoulder-length<</if>> hair follows.
+<<if $wrenSeen.includesAny("cards", "letter", "catsuit", "winter", "prison")>>
+	<span class="gold">It's Wren.</span> "Not who I was expecting," <<he>> says, lowering <<his>> gun. <<covered>>
+	<br><br>
+
+	<<if $exposed gte 1>>
+		<<He>> laughs. "<<= $wrenSeen.includes("prison") ? "I'm afraid I have nothing for sale" : "You seem prone to losing your clothes">>, but you're in the right place."
+	<<elseif $wrenSeen.includes("prison")>>
+		"I'm shocked prison didn't reform you. Shocked."
+	<<else>>
+		"And here I thought you were just some <<girl>> in over <<pher>> head," <<he>> says. "Or did Bailey send you? Either way, I won't interfere."
+	<</if>>
+	<<He>> points <<his>> gun at the black catsuit. "Should fit you."
+	<br><br>
+
+	"Hope you <<= $wrenSeen.includes("prison") ? "stay a step ahead of them" : "visit the estate soon">>," <<he>> says as <<he>> brushes past you. "Work keeps me busy, <<= $wrenSeen.includes("prison") ? "but I look forward to meeting again" : "and it's good to let my hair down">>."
+	<br><br>
+
+	<<if isPubfameTaskAccepted("wren")>>
+		You remember Mickey's favour. You have a letter to give to Wren. <<Hes>> already starting to walk away.
+	<<else>>
+		<<He>> disappears into the night. You turn back to the catsuit.
+	<</if>>
+	<br><br>
+<<else>>
+	<<set $wren_intro to true>>
+	"Well well," <<he>> says. "Not who I was expecting." <<He>> lowers <<his>> gun, and examines you from head to toe. <<covered>>
+	<br><br>
+	<<if $exposed gte 1>>
+		The <<personsimple>> laughs. "You're in the right place." <<He>> points <<his>> gun at the black catsuit. "Should fit you."
+	<<elseif $wrenSeen.includes("pregnancy")>>
+		"I guess caves aren't the only place you like to sneak around," <<he>> says. "<<= playerBellyVisible() ? "And you're already knocked up again. Try not to pass out this time." : "At least you're not knocked up this time.">>" <<He>> points <<his>> gun at the black catsuit. "Should fit."
+	<<else>>
+		"Thought I knew all the rats in town," <<he>> says. "I won't stop you." <<He>> points <<his>> gun at the black catsuit. "Should fit."
+	<</if>>
+	<br><br>
+
+	<span class="gold">"The name's Wren,"</span> <<he>> says as <<he>> brushes past you. "Work keeps me busy, but maybe we'll meet again."
+	<br><br>
+
+	<<if isPubfameTaskAccepted("wren")>>
+		You remember Mickey's favour. You have a letter to give to a <<personsimple>> called Wren, and this must be <<him>>. <<Hes>> already starting to walk away.
+	<<else>>
+		<<He>> disappears into the night. You turn back to the catsuit.
+	<</if>>
+	<br><br>
+<</if>>
+
+<<if isPubfameTaskAccepted("wren")>>
+	<<link [[Give Wren the letter|Docks Catsuit Letter]]>><</link>>
+	<br>
+<</if>>
+<<link [[Wear the catsuit|Docks Catsuit Wear]]>><<endevent>><<set $wrenSeen.pushUnique("catsuit")>><<set $wrenSeenLast to "catsuit">><</link>>
+<br>
+<<link [[Take the catsuit|Docks Catsuit Take]]>><<endevent>><<set $wrenSeen.pushUnique("catsuit")>><<set $wrenSeenLast to "catsuit">><</link>>
+
+:: Docks Catsuit Letter
+<<effects>><<wearProp "manila envelope">>
+<<set $wrenSeen.pushUnique("letter")>><<set $wrenSeenLast to "letter">>
+
+당신은 렌을 불러 세운다. <<He>>【은는】 호기심 어린 미소를 지으며 당신을 돌아본다. "음, 무슨 일이지?"
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"이, 이건 그 노인분이 주신 거예요." 당신은 마닐라 봉투를 <<him>>에게 내밀며 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"그 노인분이 보냈어요." 당신은 마닐라 봉투를 <<him>>에게 내밀며 말한다. "여기요."
+<<else>>
+	"그 노인분이 이걸 당신에게 주라고 했어요." 당신은 마닐라 봉투를 <<him>>에게 내밀며 말한다.
+<</if>>
+<br><br>
+
+렌은 당신의 손에서 편지를 낚아채 양면을 살펴보고는 씨익 웃는다. "기다리고 있었어. 이번엔 뭘 준비했을지 궁금하군."
+
+<<if !$pubfame.seen.includes("wrenOldman")>>
+	<<set $pubfame.seen.pushUnique("wrenOldman")>><<set $pubfame.detail to "wrenOldman">>
+	<<He>>【은는】 편지를 집어넣고 당신의 어깨에 손을 얹는다. "그건 그렇고, '미키'는 이제 '노인' 행세는 그만둬도 돼. 그들을 만나면 그렇게 전해줘."
+
+<<elseif !$pubfame.seen.includes("wrenLandry")>>
+	<<set $pubfame.seen.pushUnique("wrenLandry")>><<set $pubfame.detail to "wrenLandry">>
+	<<He>>【은는】 편지를 집어넣고 당신의 어깨에 손을 얹는다. "'미키'에게 랜드리 대신 왜 널 보냈는지 물어봐 줄래? 좀 돌아가는 것 같아서 말이야."
+<<else>>
+	<<He>>【은는】 편지를 집어넣는다.
+<</if>>
+<br><br>
+
+<<pubfameComplete "wren">>
+<<He>>【은는】 밤 속으로 사라진다. 당신은 다시 캣수트를 본다.
+<br><br>
+
+<<link [[캣수트를 입는다|Docks Catsuit Wear]]>><<endevent>><</link>>
+<br>
+<<link [[캣수트를 가져간다|Docks Catsuit Take]]>><<endevent>><</link>>
+
+:: Docks Catsuit Wear
+<<effects>>
+
+<<set $catsuit_found to true>>
+<<upperwear "catsuit" black>>
+
+꽉 끼지만, 당신은 캣수트를 입는다. 캣수트가 피부에 착 감기며 몸매를 드러낸다.
+<br><br>
+
+<i>캣수트를 입는 동안에는 흔적을 덜 남기게 됩니다. 범죄도가 더 느리게 증가합니다.</i>
+<br><br>
+<<specialClothesUnlock "item" "catsuit">>
+
+<<link [[상자를 조사한다|Docks Catsuit Crates]]>><</link>>
+<br>
+<<link [[떠난다|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Catsuit Take
+<<effects>>
+
+<<set $catsuit_found to true>>
+<<uppersend 75 wardrobe black>>
+
+당신은 캣수트를 가져간다. 나중에 유용할지도 모른다.
+<br><br>
+
+<i>캣수트를 입는 동안에는 흔적을 덜 남기게 됩니다. 범죄도가 더 느리게 증가합니다.</i>
+<br><br>
+<<specialClothesUnlock "item" "catsuit">>
+
+<<link [[상자를 조사한다|Docks Catsuit Crates]]>><</link>>
+<br>
+<<link [[떠난다|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Catsuit Crates
+<<effects>>
+<<run $compound.symbol.pushUnique("catsuit")>>당신은 상자들을 살펴본다. 상자에는 야한 분홍색 기호가 찍혀 있다. 복잡한 모양을 해독하려 고개를 갸웃거린다. 뼈 기둥으로 양분된 세 개의 동심원 호. 그 안에 자리 잡은 세 개의 얽힌 호. 가장 안쪽 고리에서 바깥쪽으로 갈라지는 갈래들. 실용적이라기보다는 난해해 보인다.
+<br><br>
+
+몇몇 상자는 이미 강제로 열려 뒤져진 상태다. 렌의 솜씨라고 추측한다. 안을 들여다본다. 복잡한 기계들로 가득 차 있고, 대부분은 너무 무거워서 운반할 수 없다. 작은 기계들 중 일부는 암시장에서 돈이 될 것 같다.
+<br><br>
+
+<<link [[가져간다 (0:05)|Docks Machinery Parts]]>><<world_corruption "soft" -5>><<pass 5>><<crimeUp 1000 "thievery">><<set $blackmoney += 1000>><</link>><<crime "thievery">>
+
+:: Docks Machinery Parts
+<<effects>>
+<<run $compound.symbol.pushUnique("docks")>>
+
+당신은 운반할 수 있는 만큼 기계 부품을 챙겨 컨테이너를 떠난다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Hide
+<<effects>><<wearProp "lockpick">>
+
+당신은 화물 컨테이너 중 하나에 침입하려고 시도한다.
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+
+	<span class="green">당신은 자물쇠를 따는 데 성공한다</span> 때마침. 당신은 문을 닫고, 발소리가 지나가기를 기다린다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<else>>
+
+	<span class="red">당신이 아직 더듬거리고 있을 때,</span> 한 <<person>>【이가】 모퉁이를 돌아 걸어온다. <<He>>【은는】 놀라서 손전등을 떨어뜨리고 <<his>> 무전기에 손을 뻗는다. 당신은 돌아서서 달린다.<<gsecurity>><<dock_security 1>>
+	<br><br>
+
+	<<skulduggeryuse>>
+	<<athleticsdifficulty 1 1100 true>>
+	<<if $athleticsSuccess>>
+		경비원이 당신을 쫓아오지만, <span class="green">당신은 <<him>>【을를】 앞지르는 데 성공한다.</span><<gtiredness>><<gstress>><<stress 6>><<tiredness 6>>
+		<br><br>
+
+		<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		경비원이 당신을 쫓아오고, <span class="red">거리를 좁히더니,</span> 마침내 당신을 바닥으로 넘어뜨린다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+		<br><br>
+
+		"잡았다." <<he>>【이가】 당신을 누르며 말한다. "지원이 곧 올 거야." <<He>>【은는】 더 가까이 기댄다. "하지만 그전에, 좀 재미 좀 볼까?"
+		<br><br>
+
+		<<link [[다음|Docks Sneak Rape]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<</if>>
+
+<</if>>
+
+:: Docks Run
+<<effects>>
+
+당신은 돌아서서 달린다. 모퉁이를 거의 다 돌았을 때, 뒤에서 <<personssimple>> 목소리가 들린다.
+<br><br>
+
+"멈춰!" <<he>>【이가】 소리친다. 당신은 뒤를 힐끗 본다. 그 <<person>>【은는】 손전등을 버리고 무전기에 손을 뻗으며 당신을 쫓아온다. 당신은 충분히 앞서 있었고, 컨테이너 미로 속에서 <<him>>【을를】 따돌리는 데 성공한다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Squeeze
+<<effects>>
+
+당신은 두 컨테이너 사이를 비집고 들어가 반대편으로 탈출한다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Sneak Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Docks Sneak Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Docks Sneak Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Docks Sneak Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	그 <<person>>【은는】 당신을 <<him>> 앞으로 민다. "곧 올 거야." <<he>>【이가】 말한다. "널 내 손에서 데려가려고."
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	경비원의 말이 맞다. 다른 두 명, <<generate1>><<person1>><<person>>【와과】 <<generate2>><<person2>><<person>>【이가】 모퉁이를 돌아 걸어온다.
+	<<if $exposed gte 1>>
+		그들이 당신의 <<nudity>>【을를】 훑어보는 것이 느껴진다. <<covered>>
+	<</if>>
+	<br><br>
+	"이게 누구야?" <<person1>><<person>>【이가】 당신의 한쪽 팔을 잡으며 묻는다.
+	<br>
+
+	"보아하니 악당이군." <<person2>><<person>>【이가】 당신의 다른 쪽 팔을 잡으며 대답한다. 그들은 함께 당신을 입구 쪽으로 끌고 간다.
+	<br><br>
+	<<link [[다음|Docks Caught]]>><</link>>
+	<br>
+
+<<else>>
+	당신은 그 <<person>>【을를】 걷어찬다. <<His>> 등이 금속에 부딪히고, <<he>>【은는】 바닥에 쓰러진다.
+	<br><br>
+	<<tearful>> 당신은 기회를 잡는다. 당신은 달려서 컨테이너 미로 속에서 <<him>>【을를】 따돌리는 데 성공한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Docks Caught
+<<effects>>
+
+당신은 정문 옆 경비실에 앉아 있다. <<person2>><<person>>【이가】 경찰에 전화하는 동안 <<person1>><<person>>【이가】 당신을 지켜본다.
+<br><br>
+
+<<if crimeSumCurrent() gte 5000>>
+	"그래?" <<he>>【이가】 말한다. "알았어. <<phim>>【을를】 여기 붙잡아 둘게." <<He>>【은는】 전화를 끊는다. "너한테 체포 영장이 발부된 것 같군. 아주 나쁜 <<girl>>【이었였】구나."
+	<br><br>
+
+	<<loitericon>><<link [[기다린다 (0:10)|Docks Caught Wait]]>><<pass 10>><</link>>
+	<br>
+	<<runicon>><<link [[도망친다 (0:02)|Docks Caught Run]]>><<pass 2>><<if $athleticsSuccess>><<pass 10>><</if>><<crimeUp 100 "resisting">><</link>><<athleticsdifficulty 600 1200>><<crime "resisting">>
+	<br>
+<<elseif crimeSumCurrent() gte 1000>>
+	"그래?" <<he>>【이가】 말한다. "알았어. <<phim>>【을를】 여기 붙잡아 둘게." <<He>>【은는】 전화를 끊는다. "너한테 체포 영장이 발부된 것 같군. 들어보니, 꽤 골칫거리였나 보네."
+	<br><br>
+
+	<<loitericon>><<link [[기다린다 (0:10)|Docks Caught Wait]]>><<pass 10>><</link>>
+	<br>
+	<<runicon>><<link [[도망친다 (0:02)|Docks Caught Run]]>><<pass 2>><<if $athleticsSuccess>><<pass 10>><</if>><<crimeUp 100 "resisting">><</link>><<athleticsdifficulty 600 1200>><<crime "resisting">>
+	<br>
+<<else>>
+	"그래." <<he>>【이가】 말한다. "알았어." <<He>>【은는】 전화를 끊는다. "네가 그럴 만한 가치는 없는 것 같군. 운 좋은 줄 알아."
+	<br><br>
+
+	<<if $exposed gte 1>>
+		그들은 당신에게 수건 몇 장을 주고 문 밖으로 호송한다.
+		<<towelup>>
+	<<else>>
+		그들은 당신을 문 밖으로 호송한다.
+	<</if>> "다시는 무단 침입하는 걸 보고 싶지 않아." <<person1>><<person>>【이가】 말한다. "가봐. 어서."
+	<br><br>
+	<<endcombat>>
+
+	<<link [[다음|Docks]]>><</link>>
+	<br>
+<</if>>
+
+:: Docks Caught Wait
+<<effects>>
+
+<<if $exposed gte 1>>
+	당신은 경비실에서 기다리며, <<person1>><<persons>> 음흉한 시선을 무시하려고 애쓴다. 밖에서 차가 멈추는 소리가 들린다.
+<<else>>
+	당신은 경비실에서 기다리다가, 밖에서 차가 멈추는 소리를 듣는다.
+<</if>>
+<br><br>
+
+"그들이야." <<person2>><<person>>【이가】 당신을 일으켜 세우며 말한다. "너무 쉽게 봐주지 않았으면 좋겠군." 당신은 밖으로 밀려나고, 두 명의 경찰관이 기다리고 있다.
+<br><br>
+
+<<link [[다음|Hospital Arrest Journey]]>><<endcombat>><<generatePolice 1>><<generatePolice 2>><<person1>><</link>>
+<br>
+
+:: Docks Caught Run
+<<effects>>
+
+당신은 자리에서 벌떡 일어나 문으로 달려간다.
+<<if $athleticsSuccess>>
+	<<person1>><<person>>【이가】 당신을 잡으려 하지만, <span class="green">당신이 너무 빠르다.</span> 당신은 경비실을 탈출한다. 경비가 뒤쫓지만, 당신은 화물 컨테이너 미로 속에서 그들을 따돌린다.
+	<br><br>
+
+	<<link [[다음|Docks Sneak]]>><<endcombat>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<<person1>><<person>>【이가】 당신을 잡으려 하고, <span class="red">결국 <<his>> 팔로 당신의 허리를 잡는 데 성공한다.</span> <<He>>【와과】 <<person2>><<person>>【은는】 당신이 다시는 도망치지 못하게 한다.
+	<br><br>
+	<<if $exposed gte 1>>
+		당신은 경비실에서 기다리며, <<person1>><<persons>> 음흉한 시선을 무시하려고 애쓴다. 밖에서 차가 멈추는 소리가 들린다.
+	<<else>>
+		당신은 경비실에서 기다리다가, 밖에서 차가 멈추는 소리를 듣는다.
+	<</if>>
+	<br><br>
+
+	"그들이야." <<person2>><<person>>【이가】 당신을 일으켜 세우며 말한다. "너무 쉽게 봐주지 않았으면 좋겠군." 당신은 밖으로 밀려나고, 두 명의 경찰관이 기다리고 있다.
+	<br><br>
+
+	<<link [[다음|Hospital Arrest Journey]]>><<endcombat>><<generatePolice 1>><<generatePolice 2>><<person1>><</link>>
+	<br>
+<</if>>
+
+:: Docks Sacrifice
+<<effects>>
+
+당신은
+<<if $phase is 0>>
+	$worn.upper.name
+	<<upperruined>><<lowerruined>>
+<<elseif $phase is 1>>
+	$worn.upper.name
+	<<upperruined>>
+<<elseif $phase is 2>>
+	$worn.lower.name
+	<<lowerruined>>
+<<elseif $phase is 3>>
+	$worn.under_upper.name
+	<<underupperruined>><<underlowerruined>>
+<<elseif $phase is 4>>
+	$worn.under_upper.name
+	<<underupperruined>>
+<<else>>
+	$worn.under_lower.name
+	<<underlowerruined>>
+<</if>>【을를】 벗어 2층 높이의 화물 컨테이너 더미 위로 던져버린다.
+<br><br>
+
+당신은 <<beasttype>>【이가】 도착하기 전에 달린다.
+<<if $monster is 1>>
+	곧이어 "저 위다!"라고 외치는 <<bhim>>의 목소리가 들린다.
+<<else>>
+	곧이어 <<bhe>>【이가】 짖는 소리가 들린다.
+<</if>>
+<br><br>
+<<generate2>><<person2>>
+"그럼 사다리가 필요하겠군." 하고 <<personssimple>> 목소리가 대답한다. <<He>>【은는】 체념한 듯한 목소리다.
+
+이 정도면 그들의 주의를 돌릴 수 있을 것이다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><<unset $dock_dog>><</link>>
+<br>
+
+:: Docks Ambush
+<<effects>>
+
+당신은 모퉁이에서 기다리며 발소리를 듣는다. <<beasttype>>【이가】 곧 도착할 것이다. 도움이 오기 전에 <<bhim>>【을를】 제압해야 한다.
+<br><br>
+
+당신은 <<bhe>>【이가】 나타나자마자 덮친다. <<if $monster is 1>>"침입자다!" <<bhe>>【이가】 소리친다.<</if>>
+
+<<if $monster is 1 or $settings.bestialityEnabled>>
+	<br><br>
+	<<link [[다음|Docks Dog]]>><<set $molestationstart to 1>><</link>>
+<<else>>
+	<<beastescape>>
+	<br><br>
+	힘든 싸움이었지만, 당신은 <<bhim>>【을를】 굴복시켜 <<bhis>> 등을 대고 눕게 만들고, 도움이 오기 전에 탈출한다. 이 정도면 당분간 그들을 따돌릴 수 있을 것이다.
+	<br><br>
+	<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><<unset $dock_dog>><</link>>
+<</if>>
+
+:: Docks Dog
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $timer to 10>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or $timer lte 0>>
+	<span id="next"><<link [[다음|Docks Dog Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Docks Dog]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Docks Dog Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation knot>>
+
+	<<if _knotted>>
+		<<set $dock_knot to _knotted>>
+		<span class="red">발소리가 가까워지는 동안 당신은 서로 엉켜 있다.</span>
+		<br><br>
+
+		<<endcombat>>
+		<<link [[다음|Docks Knot]]>><</link>>
+		<br>
+	<<else>>
+		<<beasttype>>【이가】 땅에 헐떡이며 누워 있다. 이 정도면 당분간 그들을 따돌릴 수 있을 것이다.
+		<br><br>
+
+		<<tearful>> 당신은 컨테이너 미로 속으로 도망친다.
+		<br><br>
+
+		<<clotheson>>
+		<<endcombat>>
+
+		<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><<unset $dock_dog>><</link>>
+		<br>
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+
+	<<beasttype>>【이가】 굴복하여 <<bhis>> 등을 대고 눕는다.
+	<br><br>
+
+	<<tearful>> 당신은 몸을 추스른다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><<unset $dock_dog>><</link>>
+	<br>
+
+<<else>>
+	<<set _fucked to ($anusfucked or $vaginafucked or $penisfucked)>>
+	<<endcombat>>
+	<<set $NPCList[1] to $dock_dog>>
+	<<generate1>><<person1>>
+	<span class="red">"이게 누구야?"</span> 한 <<person>>【이가】 말한다.
+
+	<<if _fucked is 1>>
+		<<dockdogfucked>>
+	<<else>>
+		<<He>>【이가】 당신에게 손전등을 비추고 웃는다.
+		"진정해, <<bboy 1>>." <<he>>【이가】 <<beasttype 1>>의 목덜미를 잡고 당신에게서 <<bhim 1>>【을를】 떼어내며 말한다. "나중에 간식 줄게." <<bHe 1>>【은는】 기뻐서 펄쩍펄쩍 뛴다.
+		<<generate2>>
+		"넌 말이야." 그 <<person>>【은는】 말을 이으며, 다른 경비원인 <<person2>><<person>>【이가】 도착하자마자 다시 당신을 마주 본다. "우릴 따라와야겠어."
+		<br><br>
+
+		그들은 당신의 팔을 잡고, 당신을 일으켜 세워 컨테이너 미로를 통해 끌고 간다.
+		<<if $exposed gte 1>>
+			그들이 당신의 <<nudity>>【을를】 훑어보는 것이 느껴진다. <<covered>>
+		<</if>>
+		<br><br>
+		<<link [[다음|Docks Caught]]>><<clotheson>><<unset $dock_dog>><</link>>
+		<br>
+	<</if>>
+
+<</if>>
+
+:: Docks Knot
+<<effects>>
+<<set $NPCList[1] to $dock_dog>>
+<<generate1>><<person1>>
+<span class="red">"이게 누구야?"</span> 한 <<person>>【이가】 말한다. 당신은 빠져나오려 하지만, 노트가 당신을 꽉 붙잡고 있다.
+
+<<dockdogfucked>>
+
+:: Docks Beg
+<<effects>>
+
+"제-제발 도와주세요." 당신은 흐느낀다. "나쁜 짓을 하려던 게 아니에요. 그냥 길을 잃었어요. 다-다-다른 사람들이 절 보는 건 싫어요."
+<br><br>
+
+그 <<person>>【은는】 망설이다가 다시 무전기에 손을 뻗는다. "나야. 오인 신고였어. 침입자는 잡았지만, 다른 사람은 데려올 필요 없어. 알았어." <<He>>【은는】 한숨을 쉬며 <<beasttype 1>>의 목줄을 잡고 당신에게서 떼어낸다. "나중에 간식 줄게." <<bHe 1>>【은는】 기쁨에 겨워 거의 펄쩍펄쩍 뛴다.
+<br><br>
+<<generate2>>
+"넌 말이야." 그 <<person>>【은는】 말을 이으며, 다른 경비원인 <<person2>><<person>>【이가】 도착하자마자 다시 당신을 마주 본다. "우릴 따라와야겠어."
+<br><br>
+
+그들은 당신의 팔을 잡고, 당신을 일으켜 세워 컨테이너 미로를 통해 끌고 간다.
+<<if $exposed gte 1>>
+	그들이 당신의 <<nudity>>【을를】 훑어보는 것이 느껴진다. <<covered>>
+<</if>>
+<br><br>
+<<link [[다음|Docks Caught]]>><<clotheson>><<unset $dock_dog>><</link>>
+<br>
+
+:: Docks Plead
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"도-도와주세요." 당신은 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"이것 좀 떼어내." 당신은 말한다. "당장."
+<<else>>
+	"도와주세요." 당신은 말한다.
+<</if>>
+<br><br>
+
+그 <<person>>【은는】 웃는다. "물론이지." <<He>>【은는】 <<his>> 주머니에 손을 넣는다. "지원이 오면 말이야." <<He>>【은는】 <<his>> 휴대폰을 꺼낸다. "그리고 네 무단 침입에 대한 적절한 증거도 확보하고."
+<br><br>
+
+<<link [[다음|Docks Watch]]>><<endevent>><</link>>
+<br>
+
+:: Docks Silent
+<<effects>>
+
+당신은 그 <<person>>【이가】 <<his>> 주머니에 손을 넣어 <<his>> 휴대폰을 꺼내는 동안 조용히 있는다.
+<br><br>
+
+<<link [[다음|Docks Watch]]>><<endevent>><</link>>
+<br>
+
+:: Docks Watch
+<<effects>>
+<<set $NPCList[0] to $dock_dog>>
+<<set $enemyno to 1>>
+
+더 많은 발소리. 당신은 <<beasttype>>에게서 벗어나기 위해 마지막으로 약하게 몸부림치지만, 소용없다. 당신은 곧 포위된다. 그들은 <<beasttype>>【이가】 당신을 범하는 것을 지켜본다.<<ggtrauma>><<ggstress>><<trauma 12>><<stress 12>>
+<br><br>
+
+"믿을 수가 없어."
+<br>
+"정말 굴욕적이군."
+<br>
+"무단 침입하면 어떻게 되는지 <<phim>>에게 좋은 교훈이 될 거야."
+<br>
+"<<pshe>>【은는】 개한테 박히는 걸 좋아할 거야."
+<br><br>
+그들이 계속해서 모욕적인 말을 하는 동안 주머니에서 더 많은 휴대폰이 나온다.
+
+마침내,
+<<if $dock_knot>>
+	<<unset $dock_knot>>
+	노트가 <<beasttype>>【이가】 꿈틀거리며 빠져나올 수 있을 만큼 줄어든다. 관중은 환호하지만, 아직 끝나지 않았다.
+<<else>>
+	<<beasttype>>【이가】 당신을 놓아주자, 관중의 환호가 터져 나온다.
+<</if>>
+그들은 <<bhim>>【을를】 부추기고 다시 당신에게 올라타도록 격려한다. 효과가 있다. <<beasttype>>【이가】 다시 한번 당신 위로 뛰어오른다.
+<br><br>
+
+<<link [[다음|Docks Watch Dog]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Docks Watch Dog
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $timer to 10>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Docks Watch Dog Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Docks Watch Dog]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Docks Watch Dog Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+
+	모여든 경비원들은 그 생물이 사정하자 환호한다. 한 명이 <<beasttype>>【을를】 붙잡고 당신에게서 떼어낸다.
+	<br><br>
+
+<<else>>
+	<<beasttype>>【이가】 낑낑거리며 물러서지만, 당신은 여전히 포위되어 있다.
+	<br><br>
+
+<</if>>
+
+<<tearful>> 당신은 딱딱한 바닥에 누워 있다.
+<br><br>
+
+<<endcombat>>
+
+<<generate1>><<generate2>>
+<<fullGroup>>【이가】 당신의 팔을 잡고 일으켜 세운다.
+<<if $exposed gte 1>>
+	<<covered>>
+<</if>>
+그들은 당신을 컨테이너 미로 속으로 끌고 가고, 관중은 그들의 영상을 확인하기 위해 남는다.
+<br><br>
+<<link [[다음|Docks Caught]]>><<clotheson>><<unset $dock_dog>><</link>>
+<br>
+
+:: Docks Slip
+<<effects>>
+
+어떻게든 낙법을 쳤지만, 손이 약간 얼얼하다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Upright
+<<effects>>
+
+균형을 되찾으려 애쓴다.
+<<if $danceSuccess>>
+	<span class="green">간신히 몸을 바로 세운다.</span>
+	<br><br>
+
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<span class="red">하지만 발을 헛디딘다.</span> 그 기세에 화물 컨테이너 중 하나에 부딪힌다. 쾅 하는 소리와 함께 튕겨 나온다.<<gsecurity>><<ggpain>><<gstress>><<dock_security 1>><<pain 8>><<stress 6>>
+	<br><br>
+
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Docks Dive
+<<effects>>
+
+<<if $bus is "N">>배<<else>>부두<</if>> 가장자리로 걸어가 심호흡을 한 뒤, 차가운 물속으로 뛰어든다.
+<br><br>
+
+여기까지는 따라오지 못할 것이다.
+<br><br>
+
+<<link [[다음|Sea Docks]]>><</link>>
+<br>
+
+:: Docks Find
+<<effects>>
+
+미로 같은 화물 컨테이너 사이로 다른 길을 찾는다.
+<br><br>
+
+<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Docks Sneak By
+<<effects>>
+
+저 앞에 두 사람, <<fullGroup>>【이가】 보인다. 몸을 낮추고 그들이 다른 곳을 볼 때 컨테이너 사이를 잽싸게 지나간다.
+<br><br>
+
+<<rng 5>>
+<<if $rng is 1>>
+	"...달콤한 냄새가 나," <<person1>><<person>>【이가】 말한다. "뭐든지 간에 말이야."
+	<br>
+	"신경 꺼," <<person2>><<person>>【이가】 대답한다. "파고들 가치도 없어."
+	<br>
+	<<person1>><<person>>【은는】 고개를 끄덕인다.
+	<br><br>
+<<elseif $rng is 2>>
+	"야간 근무는 조용하네," <<person1>><<person>>【이가】 말한다. "뭔가 좀 일어났으면 좋겠는데."
+	<br>
+	"그런 말 마," <<person2>><<person>>【이가】 대답한다. "내가 겪은 엿 같은 일들보단 지루한 게 나아."
+	<br><br>
+<<elseif $rng is 3>>
+	"...위험을 감수할 가치는 없어," <<person1>><<person>>【이가】 말한다. "그들이 우리를 지켜보고 있잖아, 알지."
+	<br>
+	<<person2>><<person>>【은는】 <<person1>><<person>>【이가】 말 그대로를 의미하는 것처럼 <<his>> 어깨 너머를 본다.
+	<br><br>
+<<elseif $rng is 4>>
+	"단지에서 멀리 떨어져 일하니 좋군," <<person1>><<person>>【이가】 말한다.
+	<br>
+	<<person2>><<person>>【은는】 고개를 끄덕인다. "회사 방침이 뭔지는 상관없어," <<he>>【이가】 말한다. "그 연기 때문에 어지럽단 말이야."
+	<br><br>
+<<else>>
+	그들은 조용히 있다.
+	<br><br>
+<</if>>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+
+	당신은 그들을 몰래 지나쳐, 미로 같은 컨테이너 사이를 계속 나아간다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Docks Sneak]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<else>>
+
+	발밑에서 바삭하는 소리가 들린다. 경비원들이 손전등으로 당신을 비추며 휙 돌아본다. "얌전히 따라오는 게 좋을 거야," <<person1>><<person>>【이가】 한 걸음 앞으로 나오며 말한다.<<gsecurity>><<dock_security 1>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[얌전히 따른다|Docks Quiet]]>><</link>>
+	<br>
+	<<link [[싸운다|Docks Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Docks Quiet
+<<effects>>
+
+두 사람이 다가오는 동안 가만히 있는다. 그들이 당신의 팔을 잡고 입구 쪽으로 끌고 간다.
+<br><br>
+
+<<link [[다음|Docks Caught]]>><</link>>
+<br>
+
+:: Docks Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	경비원들이 가까이 올 때까지 기다렸다가, 기습하여 <<person2>><<person>>의 얼굴을 후려친다.<<set $enemyhealth -= 20>>
+	<br><br>
+	<<person1>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Docks Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Docks Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Docks Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	당신은 땅에 쓰러진 경비원들을 남겨두고 달린다. <<tearful>> 당신은 화물 컨테이너 미로 속으로 탈출한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	경비원들이 당신에게서 물러선다. 당신은 그 기회를 포착하고 달린다. <<tearful>> 당신은 화물 컨테이너 미로 속으로 탈출한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<else>>
+	너무 다쳐서 더 이상 싸울 수 없어 땅에 쓰러진다.
+	<br><br>
+	경비원들이 당신의 팔을 잡고 억지로 일으켜 세운다. <<tearful>> 당신은 화물 컨테이너 미로를 통해 끌려간다.
+	<br><br>
+	<<link [[다음|Docks Caught]]>><<clotheson>><</link>>
+	<br>
+<</if>>
+
+:: Docks Machine Dodge
+<<effects>>
+
+<<if $danceSuccess>>
+	당신은 옆으로 뛰어 피한다. <span class="green">기계 팔이 허공을 더듬는다.</span> 경보가 울리지만, 당신은 컨테이너 미로 속으로 탈출한다.<<gsecurity>><<dock_security 1>>
+	<br><br>
+
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	피하려고 하지만, <span class="red">금속 팔이 손목을 휘감는다.</span> 경보가 울리는 가운데 당신을 땅으로 내리누른다.<<gsecurity>><<dock_security 1>>
+	<br><br>
+
+	다른 해치가 열리고, 남근 모양의 기구가 튀어나온다.
+	<br><br>
+
+	<<link [[다음|Docks Machine]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Docks Machine Struggle
+<<effects>>
+
+<<if $physiqueSuccess>>
+	금속 팔이 당신의 손목을 잡고 땅으로 내리누르려 한다. 당신은 저항하며, <span class="green">그 손아귀에서 벗어난다.</span> 경보가 울리지만, 당신은 컨테이너 미로 속으로 탈출한다.<<gsecurity>><<dock_security 1>>
+	<br><br>
+
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	금속이 당신의 손목을 잡는다. 당신은 저항하지만, <span class="red">기계가 너무 강하다.</span> 경보가 울리는 가운데 당신을 땅으로 내리누른다.<<gsecurity>><<dock_security 1>>
+	<br><br>
+
+	다른 해치가 열리고, 남근 모양의 기구가 튀어나온다.
+	<br><br>
+
+	<<link [[다음|Docks Machine]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Docks Machine Brace
+<<effects>>
+
+기계가 손목을 잡고 땅으로 내리누르는 동안 몸을 단단히 한다. "대상 구속 완료." 목소리가 읊조린다. "지원 대기 중."
+<br><br>
+
+<<generate1>><<generate2>><<person1>>
+오래 기다릴 필요는 없었다. <<fullGroup>>【이가】 모퉁이를 돌아 당신을 보고 히죽거린다.
+
+<<if $exposed gte 1>>
+	그들의 시선이 당신의 <<nudity>>에 꽂히는 것이 느껴진다.
+<</if>>
+<br><br>
+
+"착한 로봇이네," <<person>>【이가】 기계 옆에 쭈그려 앉으며 웃는다. <<He>>【이가】 버튼을 누르자 기계가 당신을 풀어준다. <<person2>><<person>>【이가】 당신의 팔을 잡고 일으켜 세운다.
+<br><br>
+
+그들이 당신을 입구 쪽으로 민다.
+<br><br>
+
+<<link [[다음|Docks Caught]]>><</link>>
+<br>
+
+:: Docks Machine
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+
+	<<set $machine_health to 10>><<set $machine_ammo to 8>>
+	<<if $player.vaginaExist>>
+		<<machine_init vaginal arm_chains>>
+		<<set $machine.vaginal.armed to 1>>
+	<<else>>
+		<<machine_init anal arm_chains>>
+		<<set $machine.anal.armed to 1>>
+	<</if>>
+	<<set $timer to 10>>
+<</if>>
+
+<<effects>>
+
+<<if $timer gte 7>>
+	경보가 울린다.
+<<elseif $timer gte 4>>
+	<span class="purple">고함 소리가 들린다.</span>
+<<elseif $timer gte 2>>
+	<span class="pink">발소리가 다가오는 것이 들린다.</span>
+<<else>>
+	<span class="red">경비가 가까이 왔다!</span>
+<</if>>
+<br><br>
+
+<<machine_effects>><<machine_combat>>
+<<machine_state>>
+
+<br><br>
+<<machine_actions>>
+
+<<if $machine.number lte 0 or $finish is 1 or $timer lte 0>>
+	<span id="next"><<link [[다음|Docks Machine End]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Docks Machine]]>><</link>></span><<nexttext>>
+<</if>>
+<br>
+
+:: Docks Machine End
+<<effects>>
+
+<<if $timer lte 0>>
+
+	<<if $anusfucked is 1 or $vaginafucked is 1 or $penisfucked is 1>>
+		<<machine_end>>
+		<<generate1>><<generate2>>
+		웃음소리가 들린다. 경비 제복을 입은 <<fullGroup>>【이가】 옆에 서 있다. 얼마나 오래 지켜보고 있었는지는 모르겠지만, 개입할 생각은 없어 보인다. 그들은 휴대폰을 들고, <span class="red">카메라를 당신에게 똑바로 향하고 있다.</span>
+		<br><br>
+		<<famesex 20>>
+
+		"쇼 잘 봤어," <<person1>><<person>>【이가】 말한다. "범죄자년이 기계한테 박히는 걸 매일 보는 건 아니니까."
+		<br><br>
+
+		<<person2>><<person>>【이가】 앞으로 나와 해치 옆에 쭈그려 앉는다. <<He>>【이가】 손을 뻗자 딸깍하는 소리가 들리고 기계가 멈춘다. 당신이 정신을 차리기도 전에 <<person1>><<person>>【이가】 당신 위로 올라타 팔을 잡고 억지로 일으켜 세운다.
+		<br><br>
+
+	<<else>>
+		<<machine_end>>
+		<<generate1>><<generate2>>
+
+		경비 제복을 입은 <<fullGroup>>【이가】 도착한다. <<person1>><<person>>【은는】 히죽거리며 해치 옆에 쭈그려 앉는다. <<He>>【이가】 손을 뻗자 딸깍하는 소리가 들리고 기계가 멈춘다.
+		<br><br>
+
+		당신이 정신을 차릴 틈도 없이 <<person2>><<person>>【이가】 덮쳐와 팔을 잡고 일으켜 세운다.
+		<br><br>
+	<</if>>
+	그들이 당신을 입구 쪽으로 민다.
+	<br><br>
+	<<link [[다음|Docks Caught]]>><<clotheson>><</link>>
+	<br>
+<<else>>
+
+	기계가 물러나고, 당신은 일어설 수 있게 된다. <<tearful>> 당신은 달린다. 지원 병력이 도착하기 전에 컨테이너 미로 속으로 탈출한다.
+	<br><br>
+
+	<<machine_end>>
+	<<clotheson>>
+
+	<<link [[다음|Docks Sneak]]>><<set $eventskip to 1>><</link>>
+	<br>
+
+<</if>>

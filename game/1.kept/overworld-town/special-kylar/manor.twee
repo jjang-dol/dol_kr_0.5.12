@@ -1,0 +1,760 @@
+:: Manor Garden
+<<set $outside to 1>><<location "kylarmanor_outside">><<effects>>
+
+당신은 카일라 저택의 앞마당에 있다. 숨 막히는 잡초와 가시덤불이 잔디를 둘러싸고 있다.
+<br><br>
+
+<<if $daily.manorGarden is undefined and $kylar_parents_trust lt 100>>
+	<<choreicon "trim">><<link [[울타리를 다듬는다 (1:00)|Manor Garden Trim]]>><<kylar_parents_trust 1>><<set $daily.manorGarden to 1>><<pass 60>><</link>><<tendingdifficulty 1 1000>><<gtrust>>
+	<br><br>
+<</if>>
+
+<<kylarmanoricon "hall">><<link [[저택에 들어간다 (0:01)|Manor Hall]]>><<pass 1>><</link>>
+<br>
+<<kylarmanoricon "grounds">><<link [[저택 옆으로 돌아간다 (0:01)|Manor Grounds]]>><<pass 1>><</link>>
+<br><br>
+<<danubeicon>><<link [[떠난다 (0:02)|Danube Street]]>><<pass 2>><</link>>
+<br>
+
+:: Manor Hall
+<<set $outside to 0>><<location "kylarmanor">><<effects>>
+<<set _state to ($kylar_parents_trust < 100) ? "pot_messy" : "pot">>
+
+당신은 카일라의 저택 현관 홀에 있다. 공기 중에 화학 약품 냄새가 남아있다. 위층에서 불길한 소리가 들린다.
+<br><br>
+
+<<kitchenicon _state>><<link [[부엌|Manor Kitchen]]>><</link>>
+<br>
+<<kylarmanoricon "lab">><<link [[실험실|Manor Lab]]>><</link>>
+<br>
+<<bedicon "kylar">><<link [[카일라의 방|Manor Kylar Room]]>><</link>>
+<br>
+<<bedicon "parents">><<link [[부모님의 방|Manor Parents Room]]>><</link>>
+<br>
+
+<<getouticon>><<link [[떠난다 (0:01)|Manor Garden]]>><<pass 1>><</link>>
+<br>
+
+:: Manor Parents Room
+<<effects>>
+
+카일라 부모님의 방은 안방처럼 보인다. 사주식 침대는 손대지 않은 채지만, 나머지 가구는 산산조각 나 있다. 나무 파편과 오래된 천 조각이 카펫 위에 널려 있다. 침대 밑에서 숨소리가 들린다.
+<br><br>
+
+<<if $daily.manorParents is undefined and $kylar_parents_trust lt 100>>
+	<<socialiseicon>><<link [[카일라의 부모를 달랜다 (1:00)|Manor Parents Room Soothe]]>><<set $daily.manorParents to 1>><<kylar_parents_trust 1>><<stress 6>><<pass 60>><</link>><<gstress>><<gtrust>>
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Manor Hall]]>><</link>>
+<br>
+
+:: Manor Lab
+<<set $outside to 0>><<location "kylarmanor">><<effects>>
+
+당신은 카일라의 저택에 있는 실험실에 있다. 후추 같은 화학 약품 냄새가 공기를 가득 채운다.
+<br><br>
+
+<<if $daily.manorLab is undefined and $kylar_parents_trust lt 100>>
+	<<choreicon "wash">><<link [[청소한다 (1:00)|Manor Lab Clean]]>><<set $daily.manorLab to 1>><<kylar_parents_trust 1>><<pass 60>><</link>><<skill_difficulty `currentSkillValue("science")` "Science" 1 1000>><<gtrust>>
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Manor Hall]]>><</link>>
+<br>
+
+:: Manor Kitchen
+<<set $outside to 0>><<location "kylarmanor">><<effects>>
+
+당신은 카일라의 저택에 있는 부엌에 있다.
+
+<br><br>
+
+<<if $daily.manorKitchen isnot 1 and $kylar_parents_trust lt 100>>
+	<<choreicon "wash">><<link [[청소한다 (1:00)|Manor Kitchen Clean]]>><<set $daily.manorKitchen to 1>><<kylar_parents_trust 1>><<pass 60>><</link>><<gtrust>>
+	<br>
+<</if>>
+
+<<kylarmanoricon "hall">><<link [[현관 홀|Manor Hall]]>><</link>>
+<br>
+<<kylarmanoricon "grounds">><<link [[밖으로 나간다 (0:01)|Manor Grounds]]>><<pass 1>><</link>>
+<br>
+
+:: Manor Grounds
+<<set $outside to 1>><<location "kylarmanor_grounds">><<effects>>
+<<set _state to ($kylar_parents_trust >= 100) ? "kylar" : "overgrown">>
+
+당신은 카일라의 저택 뒤편, 기이한 버섯으로 가득한 높은 숲 지대에 있다.
+<br><br>
+
+<<if $daily.manorForage is undefined>>
+	<<if pcAreArmsBound("both")>>
+		<span class="red">양팔이 모두 묶여 있어</span>, 버섯을 딸 수 없다.
+	<<else>>
+		<<foodstufficon "ghostshroom">> <<link [[버섯을 딴다 (1:00)|Manor Forage]]>><<set $daily.manorForage to 1>><<pass 60>><</link>><<tendingdifficulty 1 500>>
+	<</if>>
+	<br>
+<</if>>
+
+<<gardenicon _state>><<link [[앞뜰 (0:01)|Manor Garden]]>><<pass 1>><</link>>
+<br>
+<<foresticon>><<link [[숲 (0:10)|Forest]]>><<pass 10>><<set $forest to 0>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Manor Forage
+<<effects>>
+
+당신은 나무 밑동을 뒤져 잿빛 <<foodstufficon "ghostshroom">> 버섯을 찾는다. 대부분은 아직 수확할 때가 아니지만,
+<<if $tendingSuccess>>
+	<<wearProp "ghostshroom basket">>
+	<span class="green">그래도 바구니를 채울 만큼은 찾았다.</span>
+	<<tending_pick ghostshroom 12 36>>
+	<br><br>
+
+	만지면 차갑다.<<arousal -600>><<larousal>>
+	<br><br>
+
+	<<link [[다음|Manor Grounds]]>><</link>>
+	<br>
+<<else>>
+	<span class="red">나머지는 이미 썩어가고 있다.</span><<gtending>><<tending 2>>
+	<br><br>
+
+	<<link [[다음|Manor Grounds]]>><</link>>
+	<br>
+<</if>>
+
+:: Manor Kylar Room
+<<set $outside to 0>><<location "kylarmanor">><<effects>>
+
+당신은 카일라의 침실에 있다. 저편에는 여섯 개의 모니터에 연결된 컴퓨터가 계속 켜져 있다. 여러 장의 시트와 베개로 뒤덮인 커다란 침대가 있다.
+<<if Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		비가 채광창을 두드린다.
+	<<elseif !Weather.isOvercast>>
+		달빛이 채광창을 통해 쏟아져 들어온다.
+	<<else>>
+		채광창이 검은 수정처럼 보인다.
+	<</if>>
+<<else>>
+	<<if Weather.precipitation is "rain">>
+		비가 채광창을 두드린다.
+	<<elseif !Weather.isOvercast>>
+		햇빛이 채광창을 통해 쏟아져 들어온다.
+	<<else>>
+		채광창 너머로 위쪽의 구름이 보인다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<set _kylar to statusCheck("Kylar")>>
+<<if _kylar.state isnot "prison">>
+	<<if Time.hour gte 18>>
+		카일라가 <<nnpc_his "Kylar">> 컴퓨터 앞에 앉아 있다.
+		<br><br>
+
+		<<techicon "monitors">><<link [[카일라에게 다가간다|Manor Kylar]]>><</link>>
+		<br>
+	<<elseif Time.hour lte 6>>
+		카일라가 <<nnpc_his "Kylar">> 침대에 아무렇게나 비스듬히 누워 있고, 수많은 시트가 <<nnpc_him "Kylar">>【을를】 부분적으로 덮고 있다.
+		<br><br>
+	<</if>>
+
+	<<if $kylar_sleep_abduction is undefined>>
+		<<bedicon "kylar">><<link [[잠든다|Manor Sleep Abduction]]>><<set $kylar_sleep_abduction to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+<<getouticon>><<link [[떠난다 (0:01)|Manor Hall]]>><<pass 1>><</link>>
+<br>
+
+:: Manor Kylar
+<<effects>><<set $bus to "kylarmanor">>
+
+<<run statusCheck("Kylar")>>
+
+<<npc Kylar>><<person1>>
+당신이 다가가자 카일라는 본능적으로 <<his>> 창을 모두 최소화한 다음, <<his>> 의자를 돌려 당신을 마주 본다.
+<br><br>
+
+<<kylaroptions>>
+
+:: Manor Kylar Word
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"이-이런 건물을 혼자 돌보는 게 힘들 거라는 건 알지만," 당신은 말한다. "그래도 깨끗하게 유지하는 걸 도와줄 수 있을까?"
+<<elseif $speech_attitude is "bratty">>
+	"이곳은 쓰레기장이야." 당신은 말한다. "적어도 부엌은 깨끗하게 유지해야지."
+<<else>>
+	"저택이 좀 지저분하네." 당신은 말한다. "깨끗하게 유지하는 걸 도와줄 수 있을까?"
+<</if>>
+<br><br>
+
+카일라는 부끄러워 보인다. "내-내가 어지른 건 내가 치워." <<he>>【은는】 말한다. "조금 밀리긴 했지만. 부-부모님이 많이 어지르셔서."
+<br><br>
+
+<<kylaroptions>>
+<br>
+
+:: Manor Kylar Word 2
+<<effects>>
+
+"나-나는..." <<Hes>>【은는】 당신을 쳐다보려 애쓴다. "모르겠어. 어느 날 밤 부모님이 엄청 신나셨어. 나를 일찍 재우셨지. 그러다 창문 깨지는 소리가 들렸어. 나-나는 이불 밑에 숨었어. 아침에 일어나니, 이렇게 되어 있었어."
+<br><br>
+<<kylaroptions>>
+
+:: Manor Kylar Secret
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"너-널 위해 저택을 멋지고 깨끗하게 해놨어." 당신은 말한다. "이제 네가 잘 관리할 수 있을 거야."
+<<elseif $speech_attitude is "bratty">>
+	"네가 몇 년 동안 쌓아둔 오물을 내가 다 치웠어." 당신은 말한다. "다시는 이런 일 없었으면 좋겠네."
+<<else>>
+	"저택을 정돈했어." 당신은 말한다. "이제 네가 관리하기 충분히 쉬울 거야."
+<</if>>
+<br><br>
+"고마워." 카일라가 말한다. "네가 하는 걸 봤는데, 방해하고 싶지 않았어. 나-나는 청소하는 법을 잘 몰라. 특히 실험실은. 호스를 써야 하나?"
+<br><br>
+
+<<link [[다음|Manor Kylar Secret 2]]>><</link>>
+<br>
+
+:: Manor Kylar Secret 2
+<<effects>>
+
+당신은 카일라를 아래층으로, 실험실 안으로 이끈다. <<him>>에게 어떻게 하는지 보여주고 싶어서다. <span class="red">도착하자 이미 그곳에 무언가가 기다리고 있다.</span>
+<br><br>
+
+카일라의 부모 중 하나가 테이블 위에 웅크리고 앉아, 당신을 똑바로 바라보고 있다. "우-우리 나중에 다시 오자," 카일라가 말한다. <<He>>【은는】 돌아서다가 <<his>> 다른 부모와 거의 부딪힐 뻔한다. 둘을 구분할 만한 차이는 거의 없다. 그들을 덮은 검은 누더기마저 비슷하다.
+<br><br>
+
+"무-무슨 일이야?" 카일라가 묻는다. <<He>>【은는】 당신을 구석으로 밀어 넣고, 보호하려는 듯 당신 앞에 선다. "행동이 이상해."
+<br><br>
+
+첫 번째 부모가 테이블에서 뛰어내려 방 한가운데로 들어온다. 그것은 위쪽 조명으로 손을 뻗어 잡아당긴다. <span class="green">숨겨진 문이 열리고 사다리가 내려온다.</span>
+<br><br>
+
+<<link [[다음|Manor Kylar Secret 3]]>><</link>>
+<br>
+
+:: Manor Kylar Secret 3
+<<effects>>
+
+"이-이런 게 여기 있는 줄 몰랐어." 카일라가 어둠 속을 응시하며 말한다. "우-우리 올라가 볼까?" <<His>> 부모가 비명을 지르며 대답하자, <<him>>【은는】 깜짝 놀란다. 그들은 방에서 뛰쳐나간다. 한 명은 손톱으로 문틀에 깊은 상처를 낸다.
+<br><br>
+
+카일라가 계단을 올려다본다. "네-네가 먼저 갈래?"
+<br><br>
+
+<<link [[먼저 간다|Manor Kylar Secret 4]]>><<set $phase to 0>><<stress 6>><</link>><<gstress>>
+<br>
+<<link [[카일라를 먼저 보낸다|Manor Kylar Secret 4]]>><<set $phase to 1>><<npcincr Kylar love -1>><</link>><<llove>>
+<br>
+
+:: Manor Kylar Secret 4
+<<effects>>
+
+<<if $phase is 0>>
+	당신은 어둠 속으로 계단을 오른다. 먼지 때문에 거의 기침이 날 지경이다. 카일라가 뒤따라온다. <<He>>【이가】 기침한다.
+	<br><br>
+<<else>>
+	카일라가 계단을 오른다. "아무것도 안-"— <<He>>【은는】 기침을 한다. "아무것도 안 보여." 꼭대기에 다다르자 당신도 먼지 때문에 기침이 나올 뻔한다.
+	<br><br>
+<</if>>
+눈이 어둠에 익숙해진다. 손이 닿는 곳에 당김 스위치가 있다. 당신이 잡아당기자, 전등이 윙 하고 켜진다.
+<br><br>
+
+당신 앞에는 당신만큼 키가 큰 기묘한 성체 현시대가 서 있다. 은과 청동으로 된 수많은 가시가 중앙 공간을 둘러싸고 있어 태양처럼 보인다. 위쪽 금속은 누군가 일부를 찍어낸 듯 일그러져 있다. 밑동에서는 청동 촉수들이 솟아나 가시의 하반부를 타고 올라가며 핥듯 감싸고 있다.
+<br><br>
+
+"이-이게 뭐야?" 카일라가 묻는다.
+<br><br>
+<<if currentSkillValue("history") gte 600>>
+	<span class="green">당신은 역사 수업에서 본 것을 알아본다.</span> "성찬용 빵을 담는 그릇이야." 당신은 설명한다. <span class="gold">"이건 신전에서 더 잘 알지도 몰라."</span>
+	<br><br>
+<<else>>
+	<span class="red">당신도 확실히는 잘 모른다.</span> "종교적인 물건 같은데." 당신은 말한다. <span class="gold">"아마 신전에서 더 잘 알 거야."</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Manor Kylar Secret 5]]>><</link>>
+<br>
+
+:: Manor Kylar Secret 5
+<<effects>>
+
+"우리 부모님이 종교적인 줄은 몰랐는데." 당신이 실험실로 돌아오자 카일라가 말한다. "왜 우리한테 이걸 보여주셨을까? 왜 지금?" <<He>>【은는】 불편해 보인다.
+<br><br>
+
+당신은 카일라의 침실로 돌아온다. <<He>>【은는】 그 수수께끼를 <<him>> 뒤로 밀어두고 싶어 하는 듯하다.
+<br><br>
+
+<<link [[다음|Manor Kylar Room]]>><<endevent>><</link>>
+<br>
+
+:: Manor Sleep Abduction
+<<effects>>
+
+<<npc Kylar>><<person1>>
+<<if Time.hour gte 18>>
+	당신은 이불 밑으로 들어간다. 모니터의 빛을 등진 실루엣이 된 카일라의 머리가 당신 쪽으로 돌아간다. <<He>>【은는】 지켜보다가, 소리를 내는 것이 두려운 듯 살금살금 가까이 온다. <<He>>【은는】 당신 곁으로 침대에 올라와, 떨리는 두 팔로 당신의 허리를 감싼다.
+	<br><br>
+<<elseif Time.hour lte 6>>
+	당신은 이불 밑으로 들어간다. 카일라는 벌떡 일어나 잠시 당신을 빤히 보다가, 다시 누워 떨리는 두 팔로 당신의 허리를 감싼다.
+	<br><br>
+<<else>>
+	당신은 이불 속으로 기어 들어간다. 놀랍도록 편안하다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Manor Sleep Abduction 2]]>><</link>>
+<br>
+
+:: Manor Sleep Abduction 2
+<<location "kylarmanor_grounds">><<effects>>
+
+당신은 잠에서 깬다. 하얀 눈 한 쌍이 당신의 눈을 똑바로 들여다보고 있다. 날카로운 비명과 함께, 카일라의 부모가 당신을 침대에서 낚아채 출구로 내달린다.
+<br><br>
+
+"안 돼!" 카일라가 비명을 지른다. "<<phim>>【을를】 놔줘!" 카일라의 부모는 <<him>>【을를】 무시하고 계단을 내달린다. 당신은 발버둥치려 하지만, 그것의 손아귀는 쇠처럼 단단하다.<<ggstress>><<gtrauma>><<stress 12>><<trauma 6>>
+<br><br>
+
+<<link [[다음|Manor Sleep Abduction 3]]>><</link>>
+<br>
+
+:: Manor Sleep Abduction 3
+<<effects>>
+<<pass 10>>
+그것은 부엌에 있는 문을 통해 무성하게 자란 뒷마당으로 달려간다. 생물체가 저택을 뒤로하고 숲 속 깊이 달려가자 나무들이 스쳐 지나간다. 당신은 속수무책으로 붙잡혀 있다가, 그것이 갑자기 멈춰 선다.
+<br><br>
+
+당신 앞에 돌 제단이 보이고, 그것은 놀라울 만큼 부드럽게 당신을 그 위에 내려놓는다. 그러고는 돌아서서 덤불 속으로 사라진다.
+<br><br>
+
+당신은 잠시 가만히 누워 있다. 아무 일도 일어나지 않는다. 돌은 커다란 원반 모양이다. 담쟁이가 표면을 타고 뻗어 있다. 당신은 가장자리로 기어가 아래 잔디밭으로 내려선다. 돌 원반은 굵은 다리 하나 위에 높이 받쳐져 있다. 제단처럼 보인다.
+<br><br>
+
+<<link [[다음|Manor Sleep Abduction 4]]>><</link>>
+<br>
+
+:: Manor Sleep Abduction 4
+<<effects>>
+
+카일라가 도착한다. <<his>> 옷은 찢어지고 잔가지에 찔려 있다. <<He>>【은는】 안도하며 무릎을 꿇고 당신의 허벅지를 붙잡는다. "미-미," <<he>>【은는】 말을 더듬는다. "미안해! 전에는 이-이런 짓을 한 적이 없었는데." <<Hes>>【은는】 울고 있다.
+<br><br>
+
+<<link [[안심시킨다|Manor Sleep Abduction Reassure]]>><<npcincr Kylar love 1>><</link>><<glove>>
+<br>
+<<link [[화낸다|Manor Sleep Abduction Angry]]>><<npcincr Kylar love -3>><</link>><<lllove>>
+<br>
+<<link [[침묵한다|Manor Sleep Abduction Silent]]>><<npcincr Kylar love -1>><</link>><<llove>>
+<br>
+
+:: Manor Sleep Abduction Reassure
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"우-울지 마." 당신은 <<his>> 머리카락을 쓰다듬으며 말한다. "난 괜찮아."
+<<elseif $speech_attitude is "bratty">>
+	"걱정이 너무 많아." 당신은 <<his>> 머리카락을 쓰다듬으며 말한다.
+<<else>>
+	"걱정 마." 당신은 <<his>> 머리카락을 쓰다듬으며 말한다. "난 괜찮아."
+<</if>>
+<br><br>
+
+카일라는 당신을 올려다보고 고개를 끄덕인다. 당신은 <<him>>【을를】 <<his>> 발로 일으킨다. "거기서는 더 자면 안 돼," <<he>>【이가】 말한다. "안전하지 않아. 그-그래도 방문은 해도 돼! 제-제발 그만 오지는 마."
+<br><br>
+
+<<link [[다음|Manor Sleep Abduction 5]]>><</link>>
+<br>
+
+:: Manor Sleep Abduction Angry
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"그-그만 울어." 당신은 말한다. "네가 더 힘들게 만들고 있어."
+<<elseif $speech_attitude is "bratty">>
+	"네가 날 위험에 빠뜨렸잖아." 당신은 말한다. "이제 와서 위로를 구걸하는 거야?"
+<<else>>
+	"다칠 뻔했잖아!" 당신은 말한다.
+<</if>>
+<br><br>
+
+카일라는 일어서서 <<his>> 눈물을 참으려 애쓴다. "미-미-미안해." <<he>>【은는】 흐느낀다. "더는 거기서 잘 수 없어. 안전하지 않아. 그-그래도 방문은 계속할 수 있어! 제-제발 계속 와줘."
+<br><br>
+
+<<link [[다음|Manor Sleep Abduction 5]]>><</link>>
+<br>
+
+:: Manor Sleep Abduction Silent
+<<effects>>
+
+카일라는 일어서서 <<his>> 눈물을 참으려 애쓴다. "미-미안해." <<he>>【은는】 흐느낀다. "더는 거기서 잘 수 없어. 안전하지 않아. 그-그래도 방문은 계속할 수 있어! 제-제발 계속 와줘."
+<br><br>
+
+<<link [[다음|Manor Sleep Abduction 5]]>><</link>>
+<br>
+
+:: Manor Sleep Abduction 5
+<<effects>>
+
+당신은 카일라와 함께 숲을 지나 걷는다. 가는 내내 카일라는 말이 없다. 저택에 돌아오자 <<He>>【은는】 슬쩍 사라진다. <<Hes>> 죄책감을 느끼고, 당신에게서 숨고 싶어 한다.
+<br><br>
+
+<<link [[다음|Manor Grounds]]>><<endevent>><</link>>
+<br>
+
+:: Manor Kylar Pounce
+<<effects>>
+
+당신은 카일라에게 살금살금 다가간다. <<He>>【은는】 시트로 <<his>> 얼굴을 가리고 있어, <<his>> 눈만 보인다. 당신은 <<him>> 위로 몸을 던져 <<him>>【을를】 침대에 눌러 고정한다. <<He>>【은는】 금방이라도 기절할 것 같다.
+<<promiscuity1>>
+
+<<link [[다음|Manor Kylar Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Manor Kylar Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 100>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend>>
+	<span id="next"><<link [[다음|Manor Kylar Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Manor Kylar Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Manor Kylar Sex Finish
+
+<<set $outside to 0>><<effects>><<run statusCheck("Kylar")>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<He>>【은는】 만족스러운 듯 눈을 감고 뒤로 눕는다. <<npcincr Kylar lust -20>><<lllust>>
+	<br><br>
+	<<if $orgasmcurrent is 0 and !playerChastity()>>
+		<<if _kylarStatus.includes("Rage")>>
+			몇 초 뒤, <<he>>【은는】 <<hes>> 당신의 <<genitals>> 쪽을 향할 때까지 뒤로 물러난다. "넌 사정하지 않았어," <<he>>【이가】 중얼거린다. "내가... 부족했어?" <<He>>【은는】 <<his>> 머리를 격하게 젓는다. "내가 갚을게. 보여줄게."
+		<<else>>
+			몇 초 뒤, <<he>>【은는】 <<hes>> 당신의 <<genitals>> 쪽을 향할 때까지 뒤로 물러난다. "넌 사정하지 못했어," <<he>>【이가】 중얼거린다. "그건 너한테 불공평해. 네가 날 초대한 건데. 자, 내가 갚을게."
+		<</if>>
+		<br><br>
+		<<kylarFinish>>
+		<<if Time.hour lt 18>>
+			<<He>>【은는】 다시 <<his>> 눈을 감고 코를 골기 시작한다.
+		<<else>>
+			<<He>>【은는】 결국 다시 일어나 앉아 <<his>> 컴퓨터로 돌아간다.
+		<</if>>
+	<<else>>
+		<<if Time.hour lt 18>>
+			<<He>>【은는】 코를 골기 시작한다.
+		<<else>>
+			<<He>>【은는】 결국 다시 일어나 앉아 <<his>> 컴퓨터로 돌아간다.
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<tearful>> 당신은 침대에서 내려온다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyhealth lte 0>>
+	당신은 카일라를 밀쳐낸다.
+	<<if Time.hour lt 18>>
+		<<He>>【은는】 이불 뭉치 밑으로 사라진다. 어두운 틈 사이로 <<him>>【이가】 당신을 엿보고 있는 것이 느껴진다.
+	<<else>>
+		<<He>>【은는】 일어나 앉아 경계하듯 당신을 흘깃거리며 <<his>> 컴퓨터로 돌아간다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 침대에서 내려온다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<else>>
+	<<if Time.hour lt 18>>
+		<<He>>【은는】 이불 뭉치 밑으로 사라진다. 어두운 틈 사이로 <<him>>【이가】 당신을 엿보고 있는 것이 느껴진다.
+	<<else>>
+		<<He>>【은는】 일어나 앉아 <<his>> 컴퓨터로 돌아간다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 침대에서 내려온다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<</if>>
+
+<<link [[다음|Manor Kylar Room]]>><</link>>
+<br>
+
+:: Manor Kylar Goodnight
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"자-잘 자, 내 사랑." 당신은 속삭인다.
+<<elseif $speech_attitude is "bratty">>
+	"잘 자, 자기." 당신은 말한다.
+<<else>>
+	"잘 자, 자기." 당신은 말한다.
+<</if>>
+<br><br>
+카일라는 시트로 <<himself>>【을를】 덮는다. 어두운 틈 사이에서 <<his>> 눈이 당신을 바라보는 것이 느껴진다.
+<br><br>
+
+<<link [[다음|Manor Kylar Room]]>><<endevent>><</link>>
+<br>
+
+:: Manor Garden Trim
+<<effects>><<wearProp "hedge shears">>
+
+당신은 가위를 이용해 정원 주변에 야생처럼 자란 울타리를 다듬는다.
+<<if $tendingSuccess>>
+	가시 돋친 가지들이 거세게 저항하지만, <span class="green">당신은 그것들을 길들일 수 있었다.</span>
+<<else>>
+	가시 돋친 가지들이 당신을 더듬으려는 듯하다.
+	<<if $exposed gte 2>>
+		<span class="red">당신의 피부를 스친다.</span><<gpain>><<pain 4>>
+	<<else>>
+		<span class="red">당신의 옷을 찢는다.</span>
+		<<set $worn.upper.integrity -= 10>>
+		<<set $worn.lower.integrity -= 10>>
+		<<set $worn.under_upper.integrity -= 10>>
+		<<set $worn.under_lower.integrity -= 10>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $kylar_parents_trust gte 80>>
+	시야 끝에서 움직임이 보인 듯하다. 마치 울타리에서 팔 하나가 뻗어 나와 당신이 가시를 자르는 걸 돕는 것 같다. 하지만 돌아보면 아무것도 없다.
+<<elseif $kylar_parents_trust gte 60>>
+	나뭇가지 사이로 반쯤 보이는 창백한 눈을 보고 심장이 멎을 뻔한다. 아니면 상상이었을까?
+<<elseif $kylar_parents_trust gte 40>>
+	바람결에 노래의 일부가 들려온다.
+<<elseif $kylar_parents_trust gte 20>>
+	등 뒤에서 뭔가 소리가 들리는 것 같다. 그냥 바람 소리일지도 모른다.
+<<else>>
+	몸을 떨자, 저택 2층 창문에서 어떤 형체가 지켜보는 것이 보인다.<<gstress>><<stress 6>>
+<</if>>
+<br><br>
+
+<<if $kylar_parents_trust gte 100>>
+	<span class="green">저택은 당신이 도착했을 때보다 훨씬 더 말끔해졌다. <<nnpc_his "Kylar">> 방에 있는 카일라를 찾아가야 한다.</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Manor Garden]]>><</link>>
+<br>
+
+:: Manor Lab Clean
+<<effects>><<wearProp "sponge">>
+
+장비는 조금 낡았지만, 종류도 많고 튼튼하다. 카일라는 그중 일부로 후추 스프레이를 만들고, 청소는 제대로 하지 않는다. 나머지는 먼지투성이다.
+<br><br>
+
+당신은 소독용 알코올 한 병을 들고 일을 시작한다. 커다란 비커의 외부부터 닦기 시작한다.
+<<if currentSkillValue("science") gte random(1, 1000)>>
+	<span class="green">흠 하나 없이 깨끗하게 닦아낸 뒤,</span> 더 복잡한 장치로 넘어간다.
+<<else>>
+	<span class="red">하마터면 그것을 테이블에서 떨어뜨릴 뻔하지만,</span>
+	<<if $exposed gte 1>>
+		간신히 제때에 안정시키는 데 성공한다.<<gstress>><<stress 6>>
+	<<else>>
+		부식성 액체가 옷에 조금 묻는다.
+		<<set $worn.upper.integrity -= 10>>
+		<<set $worn.lower.integrity -= 10>>
+		<<set $worn.under_upper.integrity -= 10>>
+		<<set $worn.under_lower.integrity -= 10>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $kylar_parents_trust gte 80>>
+	실험실은 당신이 도착했을 때보다 훨씬 깨끗해졌다. 카일라에게 도움이 될 것이다.
+<<elseif $kylar_parents_trust gte 60>>
+	벽을 닦는다. 벽은 벗겨지는 주황색 물질, 검은 타르 같은 물질, 그리고 더 끔찍한 것들로 뒤덮여 있다.
+<<elseif $kylar_parents_trust gte 40>>
+	당신은 구리 증류기에서 화학 슬러지를 퍼낸다. 증류기 자체는 골동품처럼 보이지만, 너무 무거워 옮길 수 없다.
+<<elseif $kylar_parents_trust gte 20>>
+	당신은 바닥에 흩어진 종이 몇 장을 치우고, 서류들을 찬장에 넣어둔다. 종이에는 복잡한 화학식이 적혀 있다. 아직 누군가에게 쓸모가 있을지는 모르겠다.
+<<else>>
+	당신은 바닥에 흩어진 종이를 치운다. 종이들은 짙고 피처럼 붉은 화학 얼룩으로 뒤덮여 있다. 적어도 화학 얼룩이길 바랄 뿐이다.<<gstress>><<stress 6>>
+<</if>>
+<br><br>
+
+<<if $kylar_parents_trust gte 100>>
+	<span class="green">저택은 당신이 도착했을 때보다 훨씬 더 말끔해졌다. <<nnpc_his "Kylar">> 방에 있는 카일라를 찾아가야 한다.</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Manor Lab]]>><</link>>
+<br>
+
+:: Manor Kitchen Clean
+<<effects>>
+
+카일라는 <<nnpc_himself "Kylar">> 뒷정리를 잘하지 못한다.
+
+<<if $kylar_parents_trust gte 80>>
+	<<wearProp "broom">>
+	나무 바닥을 청소하지만, 일부 얼룩은 그대로 남을 것 같아 걱정이다.
+<<elseif $kylar_parents_trust gte 60>>
+	<<wearProp "sponge">>
+	스펀지로 조리대를 닦아 온갖 종류의 오물을 제거한다.
+<<elseif $kylar_parents_trust gte 40>>
+	<<wearProp "sponge">>
+	조리대 위에서 위태롭게 쌓여 있는 설거지 더미를 처리한다. 적어도 수도는 나온다.
+<<elseif $kylar_parents_trust gte 20>>
+	<<wearProp "feather duster">>
+	당신은 찬장에서 유통기한이 지난 음식을 확인한다. 아주 많다. 당신은 빈 선반의 먼지를 턴다.
+<<else>>
+	<<wearProp "trash bag">>
+	바닥에 흩어진 쓰레기 일부를 치우고, 여러 개의 쓰레기봉투에 담아 밖으로 옮긴다. 쓰레기 더미에 집을 지은 쥐를 놀라게 하고, 당신도 덩달아 놀란다.<<gstress>><<stress 6>>
+<</if>>
+<br><br>
+
+<<if $kylar_parents_trust gte 100>>
+	<span class="green">저택은 당신이 도착했을 때보다 훨씬 더 말끔해졌다. <<nnpc_his "Kylar">> 방에 있는 카일라를 찾아가야 한다.</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Manor Kitchen]]>><</link>>
+<br>
+
+:: Manor Parents Room Soothe
+<<effects>>
+
+침대 밑에 하나가 있는지 둘 다 있는지는 모르겠지만, 당신은 침대 위에 앉아 자신에 대해 이야기한다. 당신은 결국 그들의 <<nnpc_daughter "Kylar">>의 <<girlfriend>> 아닌가. 그들도 당신을 알아야 한다.
+<br><br>
+<<if $kylar_parents_trust gte 80>>
+	침대 밑에서 한 형체가 일어나고, 수척한 얼굴이 당신을 맞이한다. 그것은 은색 못 한 줌을 당신에게 내밀고 당신의 피부를 쓰다듬는다. 당신은 그것이 어둠 속으로 물러날 때까지 감히 움직이지 못한다.
+<<elseif $kylar_parents_trust gte 60>>
+	당신이 말하는 동안 침대 밑에서 손이 뻗어 나와 당신 옆 시트 위에 놓인다. 당신은 차가운 은과 더 차가운 살갗을 만지고, 이내 손은 다시 들어간다.
+<<elseif $kylar_parents_trust gte 40>>
+	침대 밑에서 머리가 솟아오른다. 창백한 눈이 잠시 당신을 관찰하다가 다시 사라진다.
+<<elseif $kylar_parents_trust gte 20>>
+	아무런 반응이 없다, 쉭 하는 무시하는 소리만 빼고.
+<<else>>
+	아무런 반응이 없다.
+<</if>>
+<br><br>
+
+<<if $kylar_parents_trust gte 100>>
+	<span class="green">저택은 당신이 도착했을 때보다 훨씬 더 말끔해졌다. <<nnpc_his "Kylar">> 방에 있는 카일라를 찾아가야 한다.</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Manor Parents Room]]>><</link>>
+<br>
+
+:: Manor Kylar Invite
+<<effects>>
+
+<<if $phase is 1>>
+	당신은 카일라를 번쩍 들어 올려 <<him>>【을를】 꺅 소리치게 만들고, <<him>>【을를】 침대로 옮긴다. <<He>>【은는】 가는 내내 당신에게 매달려 <<his>> 얼굴을 당신의 몸에 비빈다. 침대에 도착하자, 당신은 카일라와 함께 그 위로 몸을 낮춘다.
+<<else>>
+	당신은 부드럽게 카일라를 의자에서 끌어내고, <<he>>【은는】 당신과 함께 침대로 걸어간다. <<He>>【은는】 침대 위로 털썩 쓰러져 애원하는 눈으로 당신을 바라본다.
+<</if>>
+<br><br>
+
+<<link [[다음|Manor Kylar Sex]]>><<set $sexstart to 1>><</link>>
+
+:: Kylar Walk Manor
+<<effects>><<location "kylarmanor">>
+
+<<if $speech_attitude is "bratty">>
+	"나 없이는 안 되지." 당신은 카일라의 팔을 잡으며 말한다. "길 잃으면 안 되잖아."
+<<elseif $speech_attitude is "meek">>
+	"나도 같이 가도 돼?" 당신은 카일라에게 팔을 내밀고, <<he>>【은는】 <<hers>> 팔을 당신의 팔에 감는다.
+<<else>>
+	"나도 같이 갈게." 당신은 카일라의 팔을 잡으며 말한다.
+<</if>>
+당신은 함께 저택으로 걸어간다. 카일라는 <<his>> 컴퓨터에 앉기 전에 당신을 안아준다.
+<br><br>
+
+<<kylaroptions>>
+
+:: Manor Kylar Wallpaper
+<<effects>>
+
+당신은 카일라에게 <<his>> 바탕화면 배경에 대해 말해달라고 부탁한다.
+<br><br>
+<<if C.npc.Kylar.rage gte 80>>
+	<<He>>【은는】 당신이 물어본 것에 놀란 듯하다. "정말?" <<he>>【이가】 말한다. "그-그러니까, 응, 애니에서 나온 거야."
+<<else>>
+	<<He>>【은는】 얼굴이 환해진다.
+	<br><br>
+	"이-이거 내가 좋아하는 애니메이션에 나오는 거야!" <<he>>【은는】 말한다.
+<</if>>
+<br><br>
+"메인 악당과의 마지막 전투 장면이야... 주인공의 동료들이 모두 <<him>>【을를】 응원하고 있어. 그들은 <<his>> 최고의 친구들이야." 당신은 동료 중 한 명이 당신과 닮았다는 것을 알아차린다.
+<br><br>
+"이-이거 사실 엄청 심오해. 서로 안 지 얼마 안 됐는데, 엄청 아껴줘. 서-서로 사랑하거든." 카일라가 미소 짓는다. "가족 같아."
+<br><br>
+<<link [[듣는다|Manor Kylar Listen]]>><</link>>
+<br>
+<<link [[놀린다|Manor Kylar Tease]]>><</link>><<npcincr Kylar lust 1>><<glust>>
+
+:: Manor Kylar Listen
+<<effects>>
+
+당신은 카일라가 작품의 줄거리와 등장인물을 설명하는 동안 계속 듣는다. <<He>>【은는】 한동안 주제를 이리저리 건너뛰며 장황하게 떠든다. 따라가기 어렵다. <<hes>> 끝내자 <<He>>【은는】 당신에게 미소 짓는다.
+<br><br>
+<<kylaroptions>>
+
+:: Manor Kylar Tease
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	당신은 조심스럽게 앞으로 나아가 <<his>> 무릎 위로 미끄러져 앉는다.
+<<elseif $speech_attitude is "bratty">>
+	당신은 <<him>> 위로 다리를 넘겨 <<his>> 무릎 위에 올라앉아, <<his>> 다리 위에 걸터앉는다.
+<<else>>
+	당신은 <<his>> 무릎 위에 앉는다.
+<</if>>
+<br><br>
+<<He>>【은는】 얼굴을 붉히며 거의 숨이 막힐 듯한다.
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"하-하고 싶으면 계속해도 돼," 당신은 가까이 몸을 기대며 제안한다.
+<<elseif $speech_attitude is "bratty">>
+	"계속해 봐." 당신은 씨익 웃으며 <<his>> 어깨에 팔을 두르고 <<him>>【을를】 꽉 껴안는다. "궁금하네."
+<<else>>
+	"계속해." 당신은 <<him>> 주위로 팔을 감으며 말한다.
+<</if>>
+<br><br>
+
+카일라는 <<his>> 나머지 설명을 더듬거리며 이어간다. 혼란스러운 엉망진창이라, 당신은 따라가기 힘들다.
+<br><br>
+<<His>> 얼굴이 새빨갛다.
+<br><br>
+<<link [[키스한다|Manor Kylar Tease End]]>><<set $phase to "kiss">><</link>><<npcincr Kylar love 1>><<glove>><<kissvirginitywarning>><<NPCvirginitywarning "Kylar" "kiss">>
+<br>
+<<link [[일어선다|Manor Kylar Tease End]]>><<set $phase to "stand">><</link>>
+
+:: Manor Kylar Tease End
+<<effects>>
+
+<<if $phase is "kiss">>
+	당신은 몸을 기울여 카일라의 입술에 입을 맞춘다. <<He>>【은는】 놀라서 얼어붙었다가 당신 주위로 <<his>> 팔을 감싼다.
+	<br><br>
+	당신들은 한동안 키스한다. 당신이 몸을 떼자 <<hes>> 숨이 가빠져 있고, <<he>>【은는】 <<his>> 얼굴을 당신의 어깨에 묻는다. 당신은 미소 지으며 <<his>> 머리를 쓰다듬는다. <<He>>【은는】 몸을 떨며 더 가까이 파고든다.
+	<br><br>
+	결국 당신은 일어나야 한다.<<if C.npc.Kylar.rage gte 80>> 당신이 일어서자 <<He>>【은는】 당신의 손목을 움켜쥐지만, 곧 놓아준다.<</if>>
+<<else>>
+	카일라의 눈이 당신의 입술로 향하지만, 당신이 일어서자 <<he>>【은는】 재빨리 <<his>> 시선을 피한다.
+<</if>>
+<br><br>
+<<kylaroptions>>

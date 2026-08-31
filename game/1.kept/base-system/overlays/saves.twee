@@ -1,0 +1,464 @@
+:: Saves overlay [widget]
+<<widget "saves">>
+	<<if StartConfig.sneaky>>
+		<div class="sneaky-warning">
+			<h3>경고</h3>
+
+			<p>
+				이 <b>비공식 버전</b>을 플레이하기 전에 사용할 세이브를 모두 내보내 주세요.
+				버그나 오류가 발생하면 디스코드 서버에 직접 제보하는 것을 강력히 권장합니다.
+				특히 문제가 게임 진행에 영향을 준다면 저장할 때 주의하세요.
+			</p>
+		</div>
+		<br>
+	<</if>>
+	<<if $ironmanmode is true>>
+		<span style="background-color: #ffffff1a;">철인 모드 활성화:</span>
+		<ul class="ironman-ul"><li>철인 모드에서도 게임을 저장할 수 있지만, 저장 후 시작 메뉴로 돌아갑니다.</li>
+			<li style="text-decoration: underline;">철인 모드 세이브를 불러오면, 불러온 뒤 <span style="color: #ff0000;">해당 세이브가 삭제됩니다</span>.</li>
+			<li>게임 내 시간으로 5~8일마다 자동 저장됩니다. 이 자동 저장은 불러와도 삭제되지 않습니다. 수면 후 생성되던 일반 자동 저장은 비활성화됩니다. </li>
+			<li>치트 비활성화</li>
+			<li>철인 모드 세이브는 옆에 표시되는 <img src="img/ui/coin-silver.gif" style="max-width: 16px;filter: brightness(2.2);"> 아이콘으로 구분할 수 있습니다.</li>
+		</ul>
+	<</if>>
+
+	<div id="saveList">
+		<<if idb.active and !$ironmanmode and !sessionStorage.getItem("noidb")>>
+			<<run setTimeout(() => idb.saveList())>>
+		<<else>>
+			/* record idb status between page reloads within the same session */
+			<<run sessionStorage.setItem("noidb", true); idb.active = false>>
+			<<saveList>>
+		<</if>>
+	</div>
+	<<if $saveDetails isnot undefined>>
+		<br>
+		<div>
+			데이터를 내보낸 후 며칠 뒤에 내보내기 경고를 표시할지 설정:
+			<br>
+			<label><<radiobutton "$saveDetails.exported.frequency" 5 autocheck>>5</label> |
+			<label><<radiobutton "$saveDetails.exported.frequency" 10 autocheck>>10</label> |
+			<label><<radiobutton "$saveDetails.exported.frequency" 15 autocheck>>15</label> |
+			<label><<radiobutton "$saveDetails.exported.frequency" 20 autocheck>>20</label> |
+			<label><<radiobutton "$saveDetails.exported.frequency" 30 autocheck>>30</label> |
+			<label><<radiobutton "$saveDetails.exported.frequency" 60 autocheck>>60</label> |
+			<label><<radiobutton "$saveDetails.exported.frequency" 365 autocheck>>365</label>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "saveList">>
+	<<run prepareSaveDetails()>>
+	<<if !tags().includes("nosave") && $replayScene is undefined>>
+		<<set _saveUnlock to true>>
+	<</if>>
+	<<if $replayScene isnot undefined>>
+		<h3 class="red">현재 장면 뷰어를 사용 중이라 세이브 시스템을 사용할 수 없습니다.</h3>
+	<<elseif tags().includes("nosave")>>
+		<h3 class="red">여기서는 저장할 수 없습니다!</h3>
+	<</if>>
+	<p>이곳의 세이브는 브라우저 캐시가 지워지면 사라집니다. 세이브 손실을 막으려면 내보내기를 권장합니다.</p>
+	<p>
+		<i class="description">__내 세이브는 어디에 있나요?__</i>
+		<mouse class="tooltip linkBlue">(?)<span>
+			세이브를 찾을 수 없다면 다른 저장 방식으로 저장했을 수 있습니다. 세이브 목록 아래의 "IndexedDB 활성화" 옵션을 전환해 보세요.
+		</span></mouse>
+	</p>
+	<<set _saveDetails = getSaveDetails()>>
+	<!--Extra checks in case the above fails for some reason-->
+	<<if _saveDetails eq null>>
+		<<set _saveDetails to returnSaveDetails()>>
+	<<elseif _saveDetails.autosave is undefined or _saveDetails.slots is undefined>>
+		<<set _saveDetails to returnSaveDetails()>>
+	<</if>>
+	<<set _lastSlot to _saveDetails.autosave ? { slot: "autosave", date: _saveDetails.autosave.date } : { slot: "", date: 0 }>>
+	<<for _slot, _data range _saveDetails.slots>>
+		<<if _data and _data.date gt _lastSlot.date>>
+			<<set _lastSlot to { slot: _slot, date: _data.date }>>
+		<</if>>
+	<</for>>
+	<<set _currentTime to new Date().getTime()>>
+	<div id="savesListContainer">
+		<div class="savesListRow">
+			<div class="saveGroup">
+				<div class="saveId">#</div>
+				<div class="saveButton">저장/로드</div>
+				<div class="saveName">ID/이름</div>
+				<div class="saveDetails">상세</div>
+			</div>
+			<div class="deleteButton"></div>
+		</div>
+		<<for _i to 0; _i lt 11; _i++>>
+			<<if _i != 9 or (_i == 9 and _saveDetails.slots[_i - 1] != null)>>
+				<div class="savesListRow">
+					<<if _i is 0>>
+						<<if _saveDetails.autosave neq null>>
+							<<if _lastSlot.slot is "autosave">>
+								<<set _highlight to " green">>
+							<<elseif _saveDetails.autosave.date gte _currentTime - 1800000>>
+								<<set _highlight to " gold">>
+							<<else>>
+								<<set _highlight to "">>
+							<</if>>
+							<div class="saveGroup">
+								<div class="saveId">A</div>
+								<div class="saveButton">
+									<input type="button" class="saveMenuButton" value="로드" onclick="DoLSave.loadHandler('auto')"/>
+								</div>
+
+								<<if _saveDetails.autosave.metadata isnot undefined>>
+									<div @class="'saveName' + ($saveId is _saveDetails.autosave.metadata.saveId ? ' gold' : '')">
+										<<if _saveDetails.autosave.metadata.saveName isnot "">>
+											<<print _saveDetails.autosave.metadata.saveName.slice(0,10)>>
+										<<else>>
+											<<print _saveDetails.autosave.metadata.saveId>>
+										<</if>>
+									</div>
+								<<else>>
+									<div class="saveName"></div>
+								<</if>>
+								<div class="saveDetails">
+									<span><<print Util.escapeMarkup(_saveDetails.autosave.title.replace(/</g, "< "))>></span>
+									<span @class="'datestamp' + _highlight"><<print new Date(_saveDetails.autosave.date).toLocaleString(returnTimeFormat())>></span>
+								</div>
+							</div>
+							<div class="deleteButton">
+								<input type="button" class="saveMenuButton right" value="삭제" onclick="deleteSave('auto')"/>
+							</div>
+						<<else>>
+							<div class="saveGroup">
+								<div class="saveId">A</div>
+								<div class="saveButton">
+									<input type="button" value="로드" disabled/>
+								</div>
+								<div class="saveName"></div>
+								<div class="saveDetails"></div>
+							</div>
+							<div class="deleteButton">
+								<input class="right" type="button" value="삭제" disabled/>
+							</div>
+						<</if>>
+					<<elseif _i lt 10>>
+						<<set _slot to _i - 1>>
+						<<set _ironmanSlot to 9>>
+						<<if _saveDetails.slots[_slot] neq null>>
+							<<if _lastSlot.slot eq _slot>>
+								<<set _highlight to " green">>
+							<<elseif _saveDetails.slots[_slot].date gte _currentTime - 1800000>>
+								<<set _highlight to " gold">>
+							<<else>>
+								<<set _highlight to "">>
+							<</if>>
+							<div class="saveGroup">
+								<<if _saveDetails.slots[_slot].metadata.ironman === true>>
+									<div class="saveId" style="width: 10px;">
+										<img src="img/ui/coin-silver.gif" class="ironman-icon" @onclick="'IronMan.UI.exportHandler(' + _slot + ')'">
+									</div>
+								<<else>>
+									<div class="saveId" style="width: 10px;">
+										<<print _i>>
+									</div>
+								<</if>>
+								<div class="saveButton">
+									<<if _i lt 9>>
+										<<if _saveUnlock>>
+											<<set _onclick to "save("+_slot+", false, "+_saveDetails.slots[_slot].metadata.saveId+", `"+$saveName+"`)">>
+											<input type="button" class="saveMenuButton" value="저장" @onclick="clone(_onclick)"/>
+										<<else>>
+											<input type="button" value="저장" disabled/>
+										<</if>>
+									<</if>>
+									<input type="button" class="saveMenuButton" value="로드" @onclick="'DoLSave.loadHandler('+ _slot +')'"/>
+								</div>
+								<div @class="'saveName' + ($saveId is _saveDetails.slots[_slot].metadata.saveId ? ' gold' : '')">
+									<<if _saveDetails.slots[_slot].metadata.saveName isnot "">>
+										<<print _saveDetails.slots[_slot].metadata.saveName.slice(0,10)>>
+									<<else>>
+										<<print _saveDetails.slots[_slot].metadata.saveId>>
+									<</if>>
+								</div>
+								<div class="saveDetails">
+									<span><<print Util.escapeMarkup(_saveDetails.slots[_slot].title.replace(/</g, "< "))>></span>
+									<span @class="'datestamp' + _highlight"><<print new Date(_saveDetails.slots[_slot].date).toLocaleString(returnTimeFormat())>></span>
+								</div>
+							</div>
+							<<if _i is _ironmanSlot>>
+								<div id="exportButton" class="exportButton"><input type="button" class="saveMenuButton right" value="내보내기" @onclick="'IronMan.export('+ _slot +')'"/></div>
+							<</if>>
+							<div class="deleteButton"><input type="button" class="saveMenuButton right" value="삭제" @onclick="'deleteSave('+ _slot +')'"/></div>
+						<<else>>
+							<div class="saveGroup">
+								<div class="saveId"></div>
+								<div class="saveButton">
+								<<if _saveUnlock>>
+									<input type="button" class="saveMenuButton" value="저장" @onclick="'save('+ _slot +',true,'+$saveId+', `'+$saveName+'`)'"/>
+								<<else>>
+									<input type="button" value="저장" disabled/>
+								<</if>>
+									<input type="button" value="로드" disabled/>
+								</div>
+								<div class="saveName"></div>
+								<div class="saveDetails"></div>
+							</div>
+							<div class="deleteButton">
+								<input class="right" type="button" value="삭제" disabled/>
+							</div>
+						<</if>>
+					<<else>>/* */
+						<div class="saveGroup">
+<span style="margin: 0;">[[Degrees of Lewdity를 후원| "https://subscribestar.adult/vrelnir"]]해 주시는 모든 분들께 특별히 감사드립니다</span>
+							<div class="saveId"></div>
+							<div class="saveButton"></div>
+							<div class="saveName"></div>
+							<div class="saveDetails"></div>
+						</div>
+						<div class="saveButton"><input type="button" class="saveMenuButton right" value="모두 삭제" onclick="deleteSave('all')"/></div>
+					<</if>>
+				</div>
+			<</if>>
+		<</for>>
+	</div>
+	<label>
+		<<checkbox "$compressSave" false true autocheck>>
+		세이브 압축
+	</label>
+	<br>
+	<label>
+		<<checkbox "$confirmSave" false true autocheck>>
+		저장 시 확인 필요
+	</label>
+	<br>
+	<label>
+		<<checkbox "$confirmLoad" false true autocheck>>
+		로드 시 확인 필요
+	</label>
+	<br>
+	<label>
+		<<checkbox "$confirmDelete" false true autocheck>>
+		삭제 시 확인 필요
+	</label>
+	<br>
+	<label id="idbToggleSaves">
+		/* checkbox macro doesn't allow changing variables that do not start with "$" or "_". this is a bypass hack. */
+		<<run setTimeout(() => jQuery(document.createElement("input"))
+			.attr({ id: "checkbox-idbactive", name: "checkbox-idbactive", type: "checkbox", checked: idb.active && !V.ironmanmode, disabled: idb.lock || V.ironmanmode })
+			.addClass("macro-checkbox")
+			.on("change.macros", () => { idb.active = document.getElementById("checkbox-idbactive").checked; if (idb.active) { sessionStorage.removeItem("noidb"); idb.saveList() } })
+			.prependTo("#idbToggleSaves"))>> IndexedDB 활성화<<if $ironmanmode>> (철인 모드에서는 사용 불가)<</if>>
+	</label>
+	<br><br>
+	<<if $debug is 1>>
+		<br>
+		<label><<print '<<checkbox "$prepareSaveDetails" false true '+($prepareSaveDetails is true ? "checked" : "")+'>>'>>
+			`prepareSaveDetails`를 실행합니다. 비활성화하면 구버전에서 저장/삭제한 내용이 신버전의 세이브 목록에 반영되지 않을 수 있지만, 새로고침 로딩 속도가 빨라질 수 있습니다.
+		</label>
+	<</if>>
+<</widget>>
+
+<<widget "clearAllWarning">>
+	<div class="saveBorder">
+		<h4><span class="red">경고</span> - 정말로 모든 세이브 데이터를 삭제하시겠습니까?</h4>
+
+		<input type="button" class="close saveMenuConfirm" value="모두 삭제 확인" onclick="deleteSave('all', true)"/>
+
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "saveWarning">>
+	<div class="saveBorder">
+		<<if _saveDetails.slots[_args[0]] isnot null>>
+			<<if _saveDetails.slots[_args[0]].metadata isnot undefined>>
+				<<if _saveDetails.slots[_args[0]].metadata.saveId isnot $saveId>>
+					<<set _showSaveId to true>>
+				<<else>>
+					<<set _showSaveId to false>>
+				<</if>>
+			<<else>>
+				<<set _showSaveId to "noId">>
+			<</if>>
+		<</if>>
+		<<if _saveDetails.slots[_args[0]] is null>>
+			<h4 class="red">슬롯 <<print (_args[0] is "auto"? "자동": _args[0] + 1)>>에 저장</h4>
+			<<if _showSaveId is true>>
+			<span class="red">세이브 ID가 일치하지 않습니다. 계속 덮어쓸까요?</span>
+			<br>
+			<</if>>
+			<<if _showSaveId is "noId">>
+			<span class="red">이전 세이브에서 세이브 ID를 찾을 수 없습니다. 계속 덮어쓸까요?</span>
+			<br>
+			<</if>>
+		<<else>>
+			<h4 class="red">슬롯 <<print (_args[0] is "auto"? "자동": _args[0] + 1)>>의 세이브를 덮어쓸까요?</h4>
+			<<if _showSaveId is true>>
+			<span class="red">세이브 ID가 일치하지 않습니다. 계속 덮어쓸까요?</span>
+			<br>
+			<</if>>
+			<<if _showSaveId is "noId">>
+			<span class="red">이전 세이브에서 세이브 ID를 찾을 수 없습니다. 계속 덮어쓸까요?</span>
+			<br>
+			<</if>>
+			이전 세이브: <<print Util.escapeMarkup(_saveDetails.slots[_args[0]].title)>>
+			<br>
+			<<print new Date(_saveDetails.slots[_args[0]].date).toLocaleString(returnTimeFormat())>>
+			<br>
+		<</if>>
+		<<if _saveDetails.slots[_args[0]].metadata isnot undefined>>
+			<<if _saveDetails.slots[_args[0]].metadata.saveName isnot undefined>>
+				이전 세이브 이름: <<print _saveDetails.slots[_args[0]].metadata.saveName>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if _showSaveId is true>>
+			이전 세이브 ID: <<print _saveDetails.slots[_args[0]].metadata.saveId>>
+			<br><br>
+			<<if $saveName isnot undefined>>
+				현재 세이브 이름: <<print $saveName>>
+				<br>
+			<</if>>
+			현재 세이브 ID: <<print $saveId>>
+			<br>
+		<</if>>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="저장" @onclick="'save('+ _args[0] +', true,'+$saveId+', `'+$saveName+'`)'"/>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "loadWarning">>
+	<div class="saveBorder">
+		<h4 class="red">슬롯 <<print (_args[0] is "auto"? "자동": _args[0] + 1)>> 로드</h4>
+		<<if _args[0] is "auto">>
+			<<print Util.escapeMarkup(_saveDetails.autosave.title)>>
+			<br>
+			<<print new Date(_saveDetails.autosave.date).toLocaleString(returnTimeFormat())>>
+			<br>
+			<input type="button" class="saveMenuButton saveMenuConfirm" value="로드" onclick="DoLSave.loadHandler('auto', true)"/>
+		<<else>>
+			<<print Util.escapeMarkup(_saveDetails.slots[_args[0]].title)>>
+			<br>
+			<<print new Date(_saveDetails.slots[_args[0]].date).toLocaleString(returnTimeFormat())>>
+			<br>
+			<input type="button" class="saveMenuButton saveMenuConfirm" value="로드" @onclick="'DoLSave.loadHandler('+ _args[0] +', true)'"/>
+		<</if>>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "loadwarningcompat">>
+	<!-- Wrap auto in strings, for the onclick fn further down. Planned to change in future. -->
+	<<set $_slot to _args[0] is "auto" ? "'auto'" : _args[0]>>
+	<div class="saveBorder">
+		<h4 class="red">세이브를 이전 버전으로 불러옵니다!</h4>
+		세이브를 이전 버전으로 불러오면 의도치 않은 문제가 많이 발생할 수 있습니다.
+		앞으로의 호환성을 보장하지 않으므로 버그가 발생할 수 있습니다.
+		<br>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="로드" @onclick="'DoLSave.load(' + $_slot + ')'"/>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "deleteWarning">>
+	<div class="saveBorder">
+		<h4 class="red">세이브 삭제: 슬롯 <<print (_args[0] is "auto"? "자동": _args[0] + 1)>></h4>
+		<<if _args[0] is "auto">>
+			<<set _title to _saveDetails.autosave.title>>
+			<<print Util.escapeMarkup(_title)>>
+			<br>
+			<<print new Date(_saveDetails.autosave.date).toLocaleString(returnTimeFormat())>>
+			<br>
+			<input type="button" class="saveMenuButton" value="자동 저장 삭제" onclick="deleteSave('auto', true)"/>
+		<<else>>
+			<<set _title to _saveDetails.slots[_args[0]].title>>
+			<<print Util.escapeMarkup(_title)>>
+			<br>
+			<<print new Date(_saveDetails.slots[_args[0]].date).toLocaleString(returnTimeFormat())>>
+			<br>
+			<input type="button" class="saveMenuButton" value="삭제" @onclick="'deleteSave('+ _args[0] +', true)'"/>
+		<</if>>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "loadBoxIronmanCheater">>
+	<div class="saveBorder">
+		<h4 class="red">치트 감지됨</h4>
+		<ul>
+			<li>이 세이브에서는 치트와 세이브 로드 반복을 방지하기 위해 철인 모드를 활성화했습니다.</li>
+			<li>게임 내 상황이 불공평하거나 좌절스럽더라도, 이 모드를 활성화하여 이를 받아들이기로 선택했습니다.</li>
+			<li>변경된 변수를 되돌리면, 이 플레이를 계속 진행할 수 있습니다. 문제가 발생하면 디스코드에서 저희에게 질문할 수 있습니다.</li>
+		</ul>
+		<<print Util.escapeMarkup(_saveDetails.slots[_args[0]].title)>>
+		<br>
+		<<print new Date(_saveDetails.slots[_args[0]].date).toLocaleString(returnTimeFormat())>>
+		<br>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "loadBoxIronmanSafetyCancel">>
+	<div class="saveBorder">
+		<h4 class="orange">로드 취소됨.</h4>
+		<ul>
+			<li>철인 모드가 활성화된 상태에서 게임 중에 세이브를 로드하면 현재 게임을 잃게 됩니다.</li>
+			<li style="text-decoration: underline;">게임을 저장한 후, 원하는 세이브를 로드할 수 있습니다.</li>
+		</ul>
+		<input type="button" class="saveMenuButton saveMenuConfirm" value="취소" onclick="resetSaveMenu();"/>
+		<br>
+	</div>
+<</widget>>
+
+<<widget "resetSaveMenu">>
+	<<if document.getElementById("saveList") != null>>
+		<<replace #saveList>>
+			<<saveList>>
+		<</replace>>
+	<</if>>
+<</widget>>
+
+<<widget "clearSaveMenu">>
+	<<replace #saveList>>
+		<<clearAllWarning>>
+	<</replace>>
+<</widget>>
+
+<<widget "saveConfirm">>
+	<<replace #saveList>>
+		<<saveWarning _args[0]>>
+	<</replace>>
+<</widget>>
+
+<<widget "loadConfirm">>
+	<<replace #saveList>>
+		<<loadWarning _args[0]>>
+	<</replace>>
+<</widget>>
+
+<<widget "loadconfirmcompat">>
+	<<replace #saveList>>
+		<<loadwarningcompat _args[0]>>
+	<</replace>>
+<</widget>>
+
+<<widget "loadIronmanSafetyCancel">>
+	<<replace #saveList>>
+		<<loadBoxIronmanSafetyCancel _args[0]>>
+	<</replace>>
+<</widget>>
+
+<<widget "loadIronmanCheater">>
+	<<replace #saveList>>
+		<<loadBoxIronmanCheater _args[0]>>
+	<</replace>>
+<</widget>>
+
+<<widget "deleteConfirm">>
+	<<replace #saveList>>
+		<<deleteWarning _args[0]>>
+	<</replace>>
+<</widget>>

@@ -1,0 +1,644 @@
+:: Bog Intro
+<<set $location to "bog">><<set $outside to 1>><<effects>>
+<<if !$bogProgress>>
+	<<set $bogProgress to 1>>
+	시냇물을 따라 하류로 내려가니 바위가 돌출된 가장자리에 다다른다. 흠뻑 젖은 나뭇잎 벽이 앞쪽 시야를 가리고 있다.
+	<br><br>
+
+	당신은 조심스럽게 가장자리 너머를 들여다본다. 오른쪽 아래에 낡아빠진 나무 길이 보이고, 시냇물 끝에서 흘러나오는 물줄기에 닳아 있다. 그 너머의 물은 고여 있지만, 뛰어들기에 충분히 깊어 보인다.
+	<br><br>
+
+	<span class="gold">늪지대를 발견했습니다.</span>
+<<else>>
+	시냇물을 따라 하류로 내려가 늪지대 가장자리에 도착한다.
+<</if>>
+<br><br>
+
+<<if $harpy gte 6 or $angel gte 6 or $demon gte 6 or $fallenangel gte 2>>
+	<<link [[활강해 내려가기 (0:01)|Bog Intro Glide]]>><<pass 1>><</link>><<flight_text>>
+	<br>
+<</if>>
+<<link [[기어 내려가기 (0:05)|Bog Intro Climb]]>><<pass 5>><</link>><<athleticsdifficulty 200 800>>
+<br>
+<<link [[물속으로 뛰어들기 (0:01)|Bog Intro Jump]]>><<pass 1>><</link>>
+<br>
+
+:: Bog Intro Glide
+<<effects>>
+
+뛰어내리자, 몇 피트쯤 떨어진 뒤 고여 있는 공기가 날개를 붙잡는다. 나무 길 위에 세게 착지했지만, 다치지는 않았다.
+<br><br>
+
+<<link [[다음|Bog]]>><<set $bogdepth to 4>><<set $bogwater to 0>><</link>>
+<br>
+
+:: Bog Intro Climb
+<<effects>>
+바위턱을 넘어 암벽에 발 디딜 곳을 찾는다.
+<<if $athleticsSuccess>>
+	<<unset $athleticsSuccess>>
+	천천히 시간을 들여 내려가, 마침내 <span class="green">발이 나무 길에 닿는다.</span>
+	<br><br>
+
+	<<if $worn.lower.name isnot "naked">>
+		$worn.lower.name에 손의 흙을 털어낸다.
+	<<elseif $worn.upper.name isnot "naked">>
+		$worn.upper.name에 손의 흙을 털어낸다.
+	<<else>>
+		손에 묻은 흙을 털어낸다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Bog]]>><<set $bogdepth to 4>><<set $bogwater to 0>><</link>>
+	<br>
+<<else>>
+	천천히 시간을 들여 내려가지만 <span class="red">중간쯤에서 미끄러진다</span>. 그대로 추락해 수렁 속으로 빠진다. <<pain 4>><<stress 12>><<trauma 6>><<gpain>><<gstress>><<gtrauma>>
+	<br><br>
+
+	<<water>><<waterbr 2>><<effects>>
+
+	<<if Time.season is "winter">>
+		얼음장 같은 물이 폐에서 숨을 빼앗아간다. 본능적으로 숨을 헐떡일 뻔했지만, 그러기 전에 수면 위로 올라오는 데 성공한다.
+	<<else>>
+		물은 탁하고 불쾌하다. 떠다니는 식물 부스러기를 뒤집어쓴 채 수면 위로 올라온다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Bog]]>><<set $bogdepth to 4>><<set $bogwater to 1>><</link>>
+	<br>
+<</if>>
+
+:: Bog Intro Jump
+심호흡을 하고, 한 걸음 뒤로 물러서서 마음을 가다듬는다.
+<br><br>
+
+도움닫기해 절벽 너머로 뛰어올라 나무 길을 지나 탁한 물속으로 뛰어든다.
+<br><br>
+
+<<water>><<waterbr 2>><<effects>>
+
+<<if Time.season is "winter">>
+	얼음장 같은 수렁이 폐에서 숨을 빼앗아간다. 본능적으로 숨을 헐떡일 뻔했지만, 그러기 전에 수면 위로 올라오는 데 성공한다.
+<<else>>
+	떠다니는 식물 부스러기를 뒤집어쓴 채 수면 위로 올라온다.
+<</if>>
+<br><br>
+
+<<link [[다음|Bog]]>><<set $bogdepth to 4>><<set $bogwater to 1>><</link>>
+<br>
+
+:: Bog
+<<set $location to "bog">><<set $outside to 1>>
+
+숲과 황야 사이의 늪지대에 있다.
+<<if $bogwater gte 1>>
+	<<water>><<waterbr 2>><<effects>><<set _bogmod to 1.5>>
+
+	이곳의 물은 서 있을 수 있을 정도로 얕다.
+<<else>>
+	<<set _bogmod to 1>><<effects>>
+	나무 길이 있어 수렁을 가로지르지 않아도 된다.
+<</if>>
+<<switch Weather.precipitation>>
+	<<case "none">>
+		<<switch Time.dayState>>
+			<<case "dawn">>
+				아침의 낮은 태양이 나무들 사이로 매혹적인 빛을 드리운다.
+			<<case "day">>
+				햇살이 나뭇잎 지붕을 뚫고 들어오려 애쓴다.
+			<<case "dusk">>
+				기묘한 모양의 빛이 길 위에서 춤추고 물에 반사된다.
+			<<case "night">>
+				<<if Weather.bloodMoon>>
+					고인 물이 붉은빛을 나뭇잎 지붕으로 되비춘다.
+				<<else>>
+					고인 물이 앞을 간신히 볼 만큼의 달빛을 반사한다.
+				<</if>>
+		<</switch>>
+		동쪽 먼 곳에 돌탑이 보인다.
+	<<case "rain">>
+		빽빽한 나뭇잎 지붕 사이로 빗방울이 드문드문 떨어지며 길을 두드려 타악기 같은 리듬을 만들어낸다.
+	<<case "snow">>
+		나뭇잎 지붕이 대부분의 눈을 받아내, 머리 위에 초현실적인 <<if Weather.bloodMoon>>붉은<<else>>하얀<</if>> 담요를 펼쳐 놓은 듯하다.
+<</switch>>
+<<if $bogdepth is 4>>
+	바위 절벽이 숲으로 돌아가는 길을 막고 있다. <span class="red">올라갈 길이 없다.</span>
+<<elseif $bogdepth is 1>>
+	나무가 드문드문 있어, 여기서 황야가 보인다.
+<</if>>
+<br><br>
+
+<<if $arousal gte $arousalmax>>
+	<<orgasmbog>>
+<</if>>
+
+<<if $stress gte $stressmax and !$possessed>>
+	<<passoutbog>>
+<<else>>
+
+	<<if $eventskip is 0>>
+		<<rng>>
+		<<if dangerEvent(_bogmod)>>
+			<<eventbog>>
+		<<else>>
+			<<eventbogsafe>>
+		<</if>>
+	<<else>>
+		<<if $bogwater gte 1>>
+			<<link [[몸을 끌어올려 길로 돌아가기|Bog]]>><<set $bogwater to 0>><<set $eventskip to 1>><</link>>
+			<br>
+		<<else>>
+			길 따라가기
+			<br>
+			<<if $bogdepth lte 3>>
+				<<foresticon>><<link [[서쪽, 숲 방향으로 (0:10)|Bog]]>><<set $bogdepth += 1>><<pass 10>><</link>>
+				<br>
+			<</if>>
+			<<if $bogdepth gte 2>>
+				<<mooricon>><<link [[동쪽, 황야 방향으로 (0:10)|Bog]]>><<set $bogdepth -= 1>><<pass 10>><</link>>
+				<br>
+			<<elseif $bogdepth lte 1>>
+				<<mooricon>><<link [[동쪽, 황야로 (0:05)|Moor]]>><<set $bogdepth to 0>><<set $bogwater to 0>><<set $moor to 85>><<set $eventskip to 1>><<pass 5>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Bog Lizard Stand
+<<effects>>
+
+다리를 벌려 버티고 <<beasttype>>【을를】 쏘아본다.
+<<if $physiqueSuccess>>
+	<<bHe>> 쉭 소리를 내며 몇 걸음 앞으로 나아오자, <<bhis>> 발소리에 나무판자가 흔들린다. <span class="green"><<bHe>>【은는】 당신이 상대하기엔 귀찮다고 판단했는지, 갑자기 멈춰 선다.</span>
+	<br><br>
+
+	<<link [[다음|Bog]]>><<set $eventskip to 1>><<endevent>><</link>>
+	<br>
+<<else>>
+	<span class="red"><<bHe>>【이가】 당신에게 돌진한다.</span> 돌아서서 도망치려 하지만, 거의 곧장 <<bhe>>에게 붙잡혀 물속으로 끌려 들어간다.<<silently>><<water>><</silently>>
+	<br><br>
+
+	<<link [[다음|Bog Lizard Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Bog Lizard Run
+<<effects>>
+
+<<beasttype>>에게서 전속력으로 달아난다. <<bHis>> 발톱이 나무를 파고들고, <<bhe>>【이가】 돌진한다.
+<<if $athleticsSuccess>>
+	<span class="green">충분히 빨리 달린 덕분에 <<beasttype>>【이가】 포기한다.</span> 돌아보니 <<bhim>>【이가】 수렁 속으로 슬그머니 돌아가는 것이 보인다.
+	<br><br>
+
+	<<link [[다음|Bog]]>><<set $eventskip to 1>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<set _waterDoesNotAttractAttention to true>>
+	<span class="red">충분히 빠르지 않다.</span> <<beasttype>>【이가】 당신을 쉽게 넘어뜨리고 물속으로 끌고 들어간다.<<water>>
+	<br><br>
+
+	<<link [[다음|Bog Lizard Rape]]>><<set $molestationstart to 1>><<set $bogwater to 1>><</link>>
+	<br>
+<</if>>
+
+:: Bog Lizard Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $water to 1>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Bog Lizard Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Bog Lizard Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Bog Lizard Rape Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<beasttype>>【은는】 만족한 듯 쉭 소리를 내고는 고여 있는 물속으로 다시 뛰어든다.
+<<elseif $enemyhealth lte 0>>
+	<<beasttype>>【은는】 고통에 쉭 소리를 내며 고여 있는 물속으로 다시 뛰어든다.
+<</if>>
+<br><br>
+
+<<tearful>> 몸을 추스른다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Bog Tentacles
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+	<<tentaclestart 10 15 "root" "vine" true>>
+<<elseif $molestationstart is 2>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<consensual>>
+	<<set $consensual to 1>>
+
+	물속에서 그것들을 더 가까이 끌어당긴다.
+	<<deviancy5>>
+
+	<<set _randomtentacles to (6 + random(1, 10))>>
+	<<tentaclestart _randomtentacles 15 "root" "vine" true>>
+<</if>>
+<<statetentacles>>
+
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<actionstentacles>>
+
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Bog Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Bog Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Bog Tentacles Finish
+<<effects>>
+
+덩굴들이 흥미를 잃고 숲의 지붕 속으로 물러난다. <<tearful>> 주변을 둘러싼 식물과 덩굴에서 몸을 풀어낸다.
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Bog Lost
+<<effects>>당신은 
+<<switch $phase>>
+	<<case 0>>마지막
+	<<case 1>>첫 번째
+	<<case 2>>두 번째
+	<<case 3>>세 번째
+	<<case 4>>네 번째
+	<<case 5>>다섯 번째
+	<<case 6>>여섯 번째
+	<<case 7>>일곱 번째
+	<<case 8>>여덟 번째
+	<<case 9>>아홉 번째
+<</switch>>
+길을 따라 이동한다.
+
+<<rng>>
+<<if $boglost gte 5>>
+	<<pass 1 hour>><<pain 2>>
+	달리고, 또 달린다. 발밑의 길에서 점점 더 많은 길이 돋아난다. 나뭇가지나 터무니없이 거대한 사슴뿔의 가지처럼 보인다.
+	<br><br>
+
+	<<link [[계속 나아간다 (?:??)|Bog Lost Follow]]>><</link>><<willpowerdifficulty 600 1000>>
+	<br>
+	<<link [[모든 것을 차단한다|Bog Lost Block]]>><<trauma 30>><</link>><<gggtrauma>>
+	<br>
+<<elseif $rng lte 15>>
+	등 뒤의 길은 완전히 달라 보이지만, 길이 익숙해 보이기 시작한다. 올바른 길을 찾은 것 같다.
+	<br><br>
+
+	<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<<switch $boglost>>
+		<<case 0>>원래 경로의 흔적이 보이지 않는다.
+		<<case 1>>어떤 지형지물도 알아볼 수 없다. <<stress 6>><<gstress>>
+		<<case 2>>심장이 미친 듯이 뛰기 시작한다. <<stress 12>><<ggstress>>
+		<<case 3>>걷는 동안 등 뒤의 나무들이 변하는 것 같다. 당신은 길을 안내해 줄 무언가를 찾기 위해 되돌아간다. <<stress 12>><<ggstress>>
+		<<case 4>>방향도 없이, 길을 잃은 채 달린다. 아무것도 현실 같지 않다. <<stress 12>><<ggstress>><<trauma 12>><<ggtrauma>>
+	<</switch>>
+	<<set $boglost++>>
+	<br><br>
+
+	앞쪽에 더 많은 길이 갈라져 있다.
+	<br><br>
+
+	<<link [[되돌아가 본다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 0>><</link>>
+	<br>
+	<<link [[첫 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 1>><</link>>
+	<br>
+	<<link [[두 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 2>><</link>>
+	<br>
+	<<link [[세 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 3>><</link>>
+	<br>
+	<<link [[네 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 4>><</link>>
+	<br>
+	<<link [[다섯 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 5>><</link>>
+	<br>
+	<<if $boglost gte 2>>
+		<<link [[여섯 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 6>><</link>>
+		<br>
+		<<if $boglost gte 3>>
+			<<link [[일곱 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 7>><</link>>
+			<br>
+			<<if $boglost gte 4>>
+				<<link [[여덟 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 8>><</link>>
+				<br>
+				<<link [[아홉 번째 길을 따라간다 (0:10)|Bog Lost]]>><<pass 10>><<set $phase to 9>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Bog Lost Follow
+<<effects>>
+<<set _lost to random(80, 240)>>
+<<pass _lost>>
+<<if $willpowerSuccess>>
+	길에서 벗어나지 않고, 무슨 일이 있어도 이 길의 끝까지 따라가기로 결심한다. 계속 직진하기만 하면 언젠가는 출구를 찾을 수 있을 것이다.
+	<br><br>
+
+	각 샛길은 두 갈래로, 그리고 그 두 갈래는 다시 네 갈래로 나뉜다. <span class="green">무시한다.</span> 각각의 길은 늪의 미지의 심연으로 나선형으로 이어지며 당신을 유혹한다. 각각의 길이 구원처럼 보인다. <span class="green">무시한다.</span>
+	<br><br>
+
+	앞쪽에서 길이 끝난다. 신경 쓰지 않는다. 계속 앞으로 걸어간다. <span class="green">수렁 깊은 곳에서 널빤지들이 솟아올라 당신의 단호한 발걸음에 맞춰 나타난다.</span> 길은 오직 하나뿐이며, 당신 앞에 있다.
+	<br><br>
+
+	나무들이 갈라지기 시작한다. 늪이 당신 앞에 펼쳐진다. 당신 뒤의 길은 평범하고 끊어지지 않았다. 다시는 그 덫에 걸리지 않을 것이다.
+	<br><br>
+
+	<<link [[다음|Bog]]>><<endevent>><<set $bogdepth to 1>><<set $eventskip to 1>><<set $boglost to 10>><</link>>
+	<br>
+<<else>>
+	당신은 계속 앞으로 나아간다. 각 샛길은 세 갈래로, 그리고 그 세 갈래는 다시 여섯 갈래로 나뉜다. 각각의 길은 늪의 미지의 심연으로 나선형으로 이어지며 당신을 유혹한다. 각각의 길이 구원처럼 보인다. <span class="red">너무 벅차다.</span>
+	<br><br>
+
+	당신의 정신은 각 길을 지도로 그리려 하고, 당신에게 일어나는 일을 이성적으로 이해하려 애쓴다. 불가능하다. 각 길이 당신의 주의를 끌기 위해 다투며, 마음속으로 파고든다. 너무 많다. 평생을 바쳐도 모든 길을 다 밟을 수 없다. 한 사람의 정신으로는 그 목적지를 전부 그릴 수 없다.
+	<br><br>
+
+	머리를 감싸 쥔 채 무너져 내린다. 길은 당신을 받아주지 않는다.
+	<br><br>
+
+	<<water>>
+	<<waterbr 2>>
+
+	물이 정신을 되돌려 놓는다. 수면 위로 올라와 숨을 헐떡이며, 필사적으로 가장자리에 매달린다. 헐떡이며 주위를 둘러본다. 길은 오직 하나뿐이다.
+	<br><br>
+
+	몸을 끌어올려 다시 위로 올라간다.
+	<br><br>
+
+	<<link [[다음|Bog]]>><<endevent>><<set $eventskip to 1>><<unset $boglost>><</link>>
+	<br>
+<</if>>
+
+:: Bog Lost Block
+<<effects>>
+
+수백 개의 길이 사방으로 뻗어 나가 완전한 어둠 속으로 뒤틀려 들어간다. 귀가 울린다. 당신은 귀를 막는다.
+<br><br>
+
+무릎을 꿇고 쓰러진다. 길은 더 이상 당신 발밑에만 있지 않다. 길들은 굵은 나무줄기를 따라 나선형으로 뻗어 올라가고, 수면 아래로 내려가며, 머리 위 캐노피에 거꾸로 매달려 있다.
+<br><br>
+
+일제히, 그것들이 무너지기 시작한다. 나무판자들이 비처럼 쏟아져 물속으로 첨벙거린다. 나무들은 가공된 목재를 껍질 속으로 되찾아 부숴버린다. 물은 남은 것을 삼키고, 그 표면에 부패와 조류를 퍼뜨려 아무것도 남지 않게 만든다.
+<br><br>
+
+눈이 거짓말을 한다. 눈을 감는다.
+<br><br>
+
+호흡을 가다듬는다. 얼마나 오랫동안 무릎을 꿇고 있었는지 모른다. 눈을 떴을 때, 남은 것은 당신 앞의 길뿐이다.
+<br><br>
+
+<<link [[다음|Bog]]>><<endevent>><<set $eventskip to 1>><<unset $boglost>><</link>>
+<br>
+
+:: Bog Lost Stay
+<<effects>>
+늪의 속임수를 안다. 앞의 물속으로 발을 들인다. 길이 모습을 드러낸다. 길에서 벗어나지 않는다.
+<br><br>
+
+<<link [[다음|Bog]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Bog Swing
+<<effects>>
+
+양손으로 덩굴을 잡고, 도움닫기할 준비를 하며 한 걸음 뒤로 물러선다.
+<<if $rng gte 71 and $settings.plantsEnabled and $settings.tentaclesEnabled and ($hallucinations gte 2 or $backgroundTraits.includes("plantlover"))>>
+	<<generatePlant1>><<person1>>
+	<span class="green">거리를 넘어 반대편에 도달하지만</span>, <span class="red">손이 덩굴에 달라붙는다.</span> 놓을 수가 없어 다시 뒤로 흔들린다.
+	<br><br>
+
+	점점 속도가 줄어 끊어진 구간 위에 매달리게 된다. <span class="red">덩굴이 캐노피 위쪽으로 스스로를 끌어올리기 시작한다.</span>
+	<br><br>
+
+	"이번엔 정말 예쁜 작은 꽃을 잡았네," 위에서 목소리가 들린다. 당신은 소리가 난 곳을 쳐다본다. <<person>>【이가】 캐노피에서 거꾸로 매달려 있고, <<his>> 머리카락에는 <<plant_details>>【이가】 땋아져 있다. "넌 정말 귀한 손님이야. 잠시 즐기게 해줘. 아니면 떨어뜨릴 수도 있고. 네 선택이야." 수많은 덩굴이 쏘아져 내려와 당신을 둘러싼다!
+	<br><br>
+
+	<<link [[다음|Bog Plant Suspended Sex]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<<elseif $athleticsSuccess>>
+	거리를 넘어 반대편에 도달하고, <span class="green">문제없이 착지한다.</span>
+	<br><br>
+
+	<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	버티지 못하고 <span class="red">덩굴에서 미끄러진다.</span> 수렁 속으로 떨어진다.
+	<br><br>
+
+	<<water>>
+	<<waterbr 2>>
+
+	<<link [[다음|Bog]]>><<set $bogwater to 1>><</link>>
+	<br>
+<</if>>
+
+:: Bog Plant Tentacle Passout
+<<effects>><<set $location to "bog">>
+<<generatePlant1>><<person1>>
+
+몸이 앞으로 쏠리는 느낌에 잠에서 깨어난다. 추락하는 기분이다. 떨어지는 몸을 멈추려 움직여 보지만, 덩굴에 완전히 얽혀 있다는 사실만 깨닫는다. 당신은 공중에 매달려 있다. 아래를 내려다보니 단단한 땅은 보이지 않는다. 물속으로 한참을 떨어져야 할 높이다.
+<br><br>
+
+"이런 곳에서 이렇게 예쁜 꽃을 발견할 줄이야." 위에서 목소리가 들려온다. 몸을 묶은 것에서 벗어나려 발버둥 치다가 간신히 소리가 나는 쪽을 쳐다본다. 한 <<person>>【이가】 캐노피에 거꾸로 매달려 있다. <<his>> 머리카락에는 <<plant_details>>【이가】 땋여 있다.
+<<if $exposed lte 1>>
+	당신의 $worn.lower.name【은는】 <<lowerhas>> <<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>들춰 올려졌고<<else>>끌어내려졌다<</if>>, <<if !$worn.under_lower.type.includes("naked")>>당신의 $worn.under_lower.name【은는】 <<underlowerhas>> 옆으로 치워져,<</if>> <span class="pink">당신의 <<genitals>>【이가】 드러났다.</span>
+<</if>>
+<<if $bogwater is 1>>
+	"늪 한가운데서 쓰러질 정도로 지쳐 있었잖아. 내가 아니었다면, 물에 빠져 죽었을지도 몰라!
+<<else>>
+	"기절할 정도로 지쳐 있었잖아. 내가 아니었다면, 그대로 물속으로 굴러떨어져 익사했을지도 몰라!
+<</if>>
+<<set $bogwater to 0>>
+당연히 네 안전을 확보해야 했지." 마치 명령을 받은 듯 당신 주위의 덩굴이 조여온다. <<He>>【은는】 캐노피 사이를 손쉽게 이동하며 당신 주위를 맴돈다. 어디까지가 <<he>>【이】고 어디부터가 나무인지 분간하기 어렵다.
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>><<set $worn.lower.skirt_down to 0>><<else>><<set $worn.lower.state to "thighs">><</if>>
+<<set $worn.lower.vagina_exposed to 1>><<set $worn.lower.anus_exposed to 1>><<set $worn.lower.exposed to 2>>
+<<set $worn.under_lower.vagina_exposed to 1>><<set $worn.under_lower.anus_exposed to 1>><<set $worn.under_lower.exposed to 1>><<set $worn.under_lower.state to "thighs">>
+<br><br>
+
+"넌 정말 보기 드문 진미야. 잠시만 즐기게 해줘. 아니면 떨어뜨릴 수도 있고. 네 선택에 달렸어."
+<br><br>
+
+<<link [[다음|Bog Plant Suspended Sex]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Bog Plant Suspended Sex
+<<if $sexstart is 1 or $molestationstart is 1>>
+	<<if $sexstart is 1>>
+		<<set $sexstart to 0>>
+		<<consensual>><<set $consensual to 1>>
+		<<neutral 1>>
+	<<elseif $molestationstart is 1>>
+		<<set $molestationstart to 0>>
+		<<controlloss>>
+		<<violence 1>>
+		<<neutral 1>>
+		<<molested>>
+	<</if>>
+	<<maninit "plant">><<npcexpose>>
+	<<set $enemyarousalmax to 800>>
+	<<set _randomtentacles to random(10, 12)>>
+	<<makeAbomination _randomtentacles 8 "vine" "vine" true>>
+	<<set $tentacles[0].shaft to "tummy">>
+	<<if $player.breastsize gte 2 and $chestuse is 0>>
+		<<set $tentacles[1].shaft to "breasts">><<set $chestuse to "squeezed">>
+	<<else>>
+		<<set $tentacles[1].shaft to "chest">>
+	<</if>>
+	<<set $tentacles[2].shaft to "waist">>
+	<<set $tentacles[3].shaft to "neck">><<set $head to "grappled">>
+	<<set $tentacles[4].shaft to "leftleg">><<set $leftleg to "grappled">>
+	<<set $tentacles[5].shaft to "rightleg">><<set $rightleg to "grappled">><<set $feettarget to "tentacles">>
+<</if>>
+
+<<effects>>
+<<effectsabomination>>
+<<abomination>>
+<<stateabomination>>
+<br><br>
+<<actionsabomination>>
+
+<<if _combatend or $tentacles.active lte 3>>
+	<span id="next"><<link [[다음|Bog Plant Suspended Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Bog Plant Suspended Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Bog Plant Suspended Sex Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $tentacles.active lte 4>>
+		남은 촉수들은 <<his>> 절정의 경련을 버텨낼 만큼 강하지 못했고, 당신은 물속으로 떨어진다.
+		<<water>>
+		<br><br>
+
+		"어머나, 내 사냥감을 놓쳐버렸네!" 몇 가닥의 덩굴이 더 내려와 당신을 물에서 들어 올려 근처 길가에 조심스럽게 내려놓는다. "미안해, 작은 꽃아, 내가 너무 흥분했나 봐! 다음엔 더 조심할게, 곧 다시 와!"
+	<<else>>
+		<<if $tentacles.active lte $tentacles.max>>남아 있는 <</if>>덩굴이 느슨해지며, 당신을 나무 둘레를 따라 부드럽게 내려 길 위에 놓아준다.
+		"어울려줘서 고마워, 작은 꽃아." <<person>>【이가】 명랑하게 말한다. "곧 다시 와!"
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 <<his>> 덩굴들과 함께 캐노피 속으로 사라진다.
+	<br><br>
+<<elseif $enemyhealth lte 0>>
+	당신이 반격하자, <<persons>> 촉수들이 갑자기 모두 움츠러들며 당신을 물속으로 떨어뜨린다. <<stress 12>><<pain 6>><<ggstress>><<gpain>>
+	<br><br>
+
+	<<water>>
+	<<waterbr 2>>
+
+	"이 작은 꽃은 가시로 뒤덮여 있군." <<He>>【은는】 새로 생긴 멍을 어루만지며 캐노피 속으로 사라진다. 몸을 끌어올려 다시 길 위로 올라온다.
+<<elseif $tentacles.active lte 3>>
+	남은 촉수들은 당신의 무게를 지탱하지 못하고, 당신은 물속으로 떨어진다. <<stress 12>><<pain 6>><<ggstress>><<gpain>>
+	<br><br>
+
+	<<water>>
+	<<waterbr 2>>
+
+	"어머나, 내 사냥감을 놓쳐버렸네!" 몇 가닥의 덩굴이 더 내려와 당신을 물에서 들어 올려 근처 길가에 조심스럽게 내려놓는다. "미안해, 작은 꽃아, 내가 너무 흥분했나 봐! 다음엔 더 조심할게, 곧 다시 와!"
+	<br><br>
+
+	<<He>>【은는】 <<his>> 덩굴들과 함께 캐노피 속으로 사라진다.
+	<br><br>
+<<else>>
+	<<if $tentacles.active lte $tentacles.max>>남아 있는 <</if>>덩굴이 느슨해지며, 당신을 길 위에 부드럽게 내려놓는다.
+	"어울려줘서 고마워, 작은 꽃아." <<person>>【이가】 명랑하게 말한다. "곧 다시 와!"
+	<br><br>
+
+	<<He>>【은는】 <<his>> 덩굴들과 함께 캐노피 속으로 사라진다.
+	<br><br>
+<</if>>
+<<tearful>> 정신을 차린다.
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+
+:: Bog Passout
+<<effects>><<hallucinogen 40>>
+
+질퍽거리는 소리에 잠에서 깬다. 벌떡 일어나 주위를 둘러본다.
+<<if Time.dayState is "night">>
+	너무 어두워서 아무것도 보이지 않는다.
+<<else>>
+	소리의 근원을 찾을 수 없다.
+<</if>>
+<br><br>
+
+등골이 오싹해진다. 이유는 모르겠지만, 움직여야 할 것 같은 기분이 든다.
+<<if $bogwater gte 1>>
+	물을 헤치고 나아가, 몸을 끌어올려 길 위로 올라간다.
+<<else>>
+	본능을 믿고 허둥지둥 일어선다.
+<</if>>
+<br><br>
+
+한 걸음 뒤로 물러선다. 바로 그 순간. 탁한 물속에서 진흙투성이의 검은 부속지가 솟아올라, 방금 전 당신의 다리가 있던 곳을 움켜쥔다. <<stress 12>><<ggstress>>
+<br><br>
+
+나무들 사이의 어둠 속에서 희미한 노란 불빛들이 깜빡이며 나타난다. 수십 개. 수백 개의 팔다리가 솟아올라, 마치 늪과 하나가 되려는 듯 길을 움켜쥔다. 나무가 삐걱거리며 신음한다. 진흙 덩어리들이 깊은 곳에서 솟아오른다. 울부짖는 비명 소리가 죽은 공기를 가득 메운다. <<trauma 30>><<gggtrauma>>
+<br><br>
+
+마침내 아드레날린이 마비된 근육을 풀어주고, 달리기 시작한다.
+<br><br>
+
+<<link [[다음|Bog Passout 2]]>><</link>>
+<br>
+
+:: Bog Passout 2
+<<effects>>
+계속해서 달린다. 어디로 가는지도 모른다. 앞쪽 물에서 더 많은 형체들이 나타난다. 사방에서 더 많은 눈들이 응시한다. 폐가 타는 듯하다.
+<br><br>
+
+계속 나아간다. 소리는 거의 견딜 수 없을 정도다. 시야에 별이 보이기 시작한다. 길은 마치 당신을 지치게 하려는 듯 발을 밀어내는 것 같다.
+<br><br>
+
+길 끝에서 몸을 던져 황야로 굴러떨어질 때까지 달린다. 늪 쪽을 돌아보지만, 쫓아오는 것은 아무것도 보이지 않는다.
+<br><br>
+
+마침내 탈진하여 등을 대고 쓰러진다. 숨을 고르고 마음을 진정시키는 데 시간이 좀 걸린다. <<gtiredness>><<tiredness 8>>
+<br><br>
+
+<<link [[다음|Moor]]>><<set $bogdepth to 0>><<set $bogwater to 0>><<set $moor to 85>><<set $eventskip to 1>><</link>>
+<br>

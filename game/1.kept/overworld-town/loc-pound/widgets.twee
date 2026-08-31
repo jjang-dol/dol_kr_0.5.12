@@ -1,0 +1,257 @@
+:: Widgets Pound [widget]
+<<widget "pound_init">>
+	<<set $pound to {}>>
+	<<set $pound.status to 0>>
+	<<set $pound.sneak to 0>>
+	<<set $pound.progress to 0>>
+	<<set $pound.tasks to []>>
+<</widget>>
+
+<<widget "pound_text">>
+	<<if ($settings.monsterChance gte $rng and $hallucinations gte 1) or ($settings.monsterChance gte $rng and !$settings.monsterHallucinationsOnly)>>
+		<<if $settings.monsterChance gte 100 or $settings.bestialityEnabled>>
+			<<if beastMaleChance() is 100>>
+				<<set _text_output to "개 소년들">>
+			<<elseif beastMaleChance() is 0>>
+				<<set _text_output to "개 소녀들">>
+			<<else>>
+				<<set _text_output to "수인들">>
+			<</if>>
+		<<else>>
+			<<set _text_output to "사냥개들">>
+		<</if>>
+	<<else>>
+		<<set _text_output to "개들">>
+	<</if>>
+	<<if _args[0] is "cap">>
+		<<set _text_output to _text_output.toUpperFirst()>>
+	<</if>>
+	<<print _text_output>>
+<</widget>>
+
+<<widget "pound_punishment_links">>
+	<<if Time.hour is 12 and !$pound.compete>>
+		<<link [[다음|Pound Show Crawl]]>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Pound Food]]>><<detach_leash>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "pound_stats">>
+	<<if $pound.status gte 100>>
+		<<pound_text>>【은는】 당신을 <span class="green">알파</span>로 본다.
+		<<earnFeat "Pound Alpha">>
+	<<elseif $pound.status gte 80>>
+		<<pound_text>>【은는】 당신을 <span class="teal">지배적</span>이라 여긴다.
+	<<elseif $pound.status gte 60>>
+		<<pound_text>>【은는】 당신을 <span class="lblue">강하다</span>고 생각한다.
+	<<elseif $pound.status gte 40>>
+		<<pound_text>>【은는】 당신을 <span class="blue">평범한 무리 일원</span>으로 본다.
+	<<elseif $pound.status gte 20>>
+		<<pound_text>>【은는】 당신을 <span class="purple">약하다</span>고 생각한다.
+	<<elseif $pound.status gte 1>>
+		<<pound_text>>【은는】 당신을 <span class="pink">복종적</span>이라 여긴다.
+	<<else>>
+		<<pound_text>>【은는】 당신을 <span class="red">꼬맹이</span>로 본다.
+		<<earnFeat "Pound Runt">>
+	<</if>>
+<</widget>>
+
+<<widget "pound_status">>
+	<<if _args[0]>>
+		<<set $pound.status += (_args[0] * 2)>>
+		<<set $pound.status to Math.clamp($pound.status, 0, 100)>>
+	<</if>>
+<</widget>>
+
+<<widget "stray_happiness">>
+	<<if _args[0]>>
+		<<set $stray_happiness += _args[0]>>
+		<<set $stray_happiness to Math.clamp($stray_happiness, 0, 100)>>
+	<</if>>
+<</widget>>
+
+<<widget "gstray_happiness">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ 떠돌이들의 만족도</span>
+	<</if>>
+<</widget>>
+
+<<widget "ggstray_happiness">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + 유기견 만족도</span>
+	<</if>>
+<</widget>>
+
+<<widget "gggstray_happiness">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + + 유기견 만족도</span>
+	<</if>>
+<</widget>>
+
+<<widget "lstray_happiness">>
+   <<if !$settings.blindStatsEnabled>> |
+       <span class="green">- 유기견 만족도</span>
+   <</if>>
+<</widget>>
+
+<<widget "llstray_happiness">>
+   <<if !$settings.blindStatsEnabled>> |
+       <span class="green">- - 유기견 만족도</span>
+   <</if>>
+<</widget>>
+
+<<widget "lllstray_happiness">>
+   <<if !$settings.blindStatsEnabled>> |
+       <span class="green">- - - 유기견 만족도</span>
+   <</if>>
+<</widget>>
+
+<<widget "gpound_status">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ 보호소 평판</span>
+	<</if>>
+<</widget>>
+
+<<widget "ggpound_status">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + 보호소 평판</span>
+	<</if>>
+<</widget>>
+
+<<widget "gggpound_status">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + + 보호소 평판</span>
+	<</if>>
+<</widget>>
+
+<<widget "lpound_status">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">- 보호소 존중도</span>
+	<</if>>
+<</widget>>
+
+<<widget "llpound_status">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">- - 보호소 평판</span>
+	<</if>>
+<</widget>>
+
+<<widget "lllpound_status">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">- - - 보호소 평판</span>
+	<</if>>
+<</widget>>
+
+<<widget "pound_compete_text">>
+	<<if $pound.compete gte 5>>
+		<span class="green">당신은 1등이다.</span>
+	<<elseif $pound.compete is 4>>
+		<span class="teal">당신은 2등이다.</span>
+	<<elseif $pound.compete is 3>>
+		<span class="lblue">당신은 3등이다.</span>
+	<<elseif $pound.compete is 2>>
+		<span class="blue">당신은 4등이다.</span>
+	<<else>>
+		<span class="purple">당신은 꼴찌다.</span>
+	<</if>>
+<</widget>>
+
+<<widget "stray_happiness_text">>
+	<<if $stray_happiness gte 100>>
+		<span class="green"><<pound_text>>【이가】 활기차다.</span>
+	<<elseif $stray_happiness gte 80>>
+		<span class="teal"><<pound_text>>【이가】 만족해한다.</span>
+	<<elseif $stray_happiness gte 60>>
+		<span class="lblue"><<pound_text>>【이가】 시무룩하다.</span>
+	<<elseif $stray_happiness gte 40>>
+		<span class="blue"><<pound_text>>【이가】 어두운 구석에 음침하게 있다.</span>
+	<<elseif $stray_happiness gte 20>>
+		<span class="purple"><<pound_text>>【이가】 불안해한다.</span>
+	<<elseif $stray_happiness gte 1>>
+		<span class="pink"><<pound_text>>【이가】 반항적이다.</span>
+	<<else>>
+		<span class="red"><<pound_text>>【이가】 흉포하다.</span>
+	<</if>>
+	<i>만족도가 높을수록 마을의 떠돌이 개들과 관련된 이벤트가 덜 위험해집니다.</i>
+<</widget>>
+
+<<widget "pound_walk_end">>
+	<<wearProp "dog leash">>
+	당신은 <<moneyGain $pound.money>>【을를】 벌었다.<<if $phase isnot 2>><<pass 60>><</if>>
+	<br><br>
+	<<exposure>>
+	<<if $exposed gte 1>>
+		마지막 우리를 닫고 몸을 내려다본다. <span class="pink">당신의 옷이 흠뻑 젖어 속이 다 비친다!</span>
+		<br><br>
+		<<link [[다음|Pound Exposed]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Pound]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "pound_muzzle">>
+	<<if $wolfgirl gte 6>>
+		<<facewear "wolf muzzle">>
+	<<elseif $cat gte 6 or $fox gte 6>>
+		<<facewear "kitty muzzle">>
+	<<else>>
+		<<facewear "muzzle">>
+	<</if>>
+<</widget>>
+
+<<widget "earSlimePoundLinks">>
+    <<set _linkName to _args[0] or "다음">>
+    <<set _linkText to (_linkName is "Obey" ? "따른다" : _linkName)>>
+    <<switch $slimePoundTask>>
+        <<case "Sweep">>
+            <<link [[_linkText|Pound Work Sweep]]>>
+                <<if !$pound.tasks.includes("sweep")>><<stray_happiness 1>><<set $pound.tasks.push("sweep")>><</if>><<set $pound.money to 5>>
+                <<if _linkName is "Obey">><<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>><</if>>
+            <</link>><<if _linkName is "Obey">><<gcorruption>><<lpain>><<lltrauma>><<lstress>><</if>>
+        <<case "Feed">>
+            <<link [[_linkText|Pound Work Feed]]>>
+                <<if !$pound.tasks.includes("feed")>><<stray_happiness 1>><<set $pound.tasks.push("feed")>><</if>><<set $pound.money to 8>>
+                <<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>>
+                <<if _linkName is "Obey">><<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>><</if>>
+            <</link>><<if _linkName is "Obey">><<gcorruption>><<lpain>><<lltrauma>><<lstress>><</if>>
+        <<case "Brush">>
+            <<link [[_linkText|Pound Work Brush]]>>
+                <<if !$pound.tasks.includes("brush")>><<stray_happiness 2>><<set $pound.tasks.push("brush")>><</if>><<set $pound.money to 10>>
+                <<if _linkName is "Obey">><<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>><</if>>
+            <</link>><<if _linkName is "Obey">><<gcorruption>><<lpain>><<lltrauma>><<lstress>><</if>>
+        <<case "Wash">>
+            <<link [[_linkText|Pound Work Wash]]>>
+                <<if !$pound.tasks.includes("wash")>><<stray_happiness 2>><<set $pound.tasks.push("wash")>><</if>><<set $pound.money to 12>>
+                <<if _linkName is "Obey">><<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>><</if>>
+            <</link>><<if _linkName is "Obey">><<gcorruption>><<lpain>><<lltrauma>><<lstress>><</if>>
+        <<case "Walk">>
+            <<link [[_linkText|Pound Work Walk]]>>
+                <<if !$pound.tasks.includes("walk")>><<stray_happiness 3>><<set $pound.tasks.push("walk")>><</if>><<set $pound.money to 15>>
+                <<if _linkName is "Obey">><<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>><</if>>
+            <</link>><<if _linkName is "Obey">><<gcorruption>><<lpain>><<lltrauma>><<lstress>><</if>>
+    <</switch>>
+<</widget>>
+
+<<widget "poundEndEvent">>
+	<<if $exposed gte 1>>
+		<<covered>> <span class="pink">이런 모습으로 들키면 위험해질 것이다.</span>
+		<br><br>
+
+		<<link [[다음|Pound Exposed]]>><<endevent>><</link>>
+	<<else>>
+		<<pass 60>>
+		당신은 <<moneyGain $pound.money>>【을를】 벌었다.
+		<br><br>
+
+		<<if _args[0] or Time.hour gte $closinghour>>
+			<<link [[다음|Pound]]>><<endevent>><</link>>
+		<<else>>
+			<<link [[다음|Pound Work]]>><<endevent>><</link>>
+		<</if>>
+	<</if>>
+<</widget>>

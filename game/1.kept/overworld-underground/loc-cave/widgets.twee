@@ -1,0 +1,536 @@
+:: Widgets Cave [widget]
+<<widget "eventscavetreasure">>
+	<<if $rng gte 91 and $cave gte 30>>
+		당신의 발에 딱딱하면서도 속이 빈 듯한 무언가가 차인다. 그것을 물에서 끄집어낸다. 길고 가느다란 상자다.
+		<br><br>
+		<<set $skulduggerydifficulty to 600>>
+		<<caveicon "treasure">><<link [[연다 (0:10)|Beach Cave Hollow Open]]>><<pass 10>><</link>><<skulduggerydifficulty>>
+		<br>
+		<<getouticon>><<link [[내버려둔다|Beach Cave]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<elseif $rng gte 51>>
+		바위만큼 딱딱하지는 않은 묵직한 뭔가가 당신 발에 차인다. 당신은 그것을 물 위로 들어올린다. 길고 가느다란 상자다.
+		<br><br>
+		<<set $skulduggerydifficulty to 400>>
+		<<caveicon "treasure">><<link [[연다 (0:10)|Beach Cave Heavy Open]]>><<pass 10>><</link>><<skulduggerydifficulty>>
+		<br>
+		<<getouticon>><<link [[내버려둔다|Beach Cave]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<elseif $rng gte 31>>
+		본동굴에서 벗어나 있는 터널 하나가 눈에 띈다. 터널 천장이 수면 아래로 내려가 있다.
+		<br><br>
+
+		<<caveicon "west">><<link [[탐험한다 (0:05)|Beach Cave Explore]]>><<pass 5>><</link>><<swimmingdifficulty 400 1000>>
+		<br>
+		<<getouticon>><<link [[무시한다|Beach Cave]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		동굴이 양 갈래로 나뉘어 있다.
+		<<if random(1, 2) is 2>>
+			<<if currentSkillValue('history') gte random(1, 1000)>>
+				<span class="green">당신은 벽에 새겨진 표식들을 알아본다.</span> 오른쪽은 바다로 이어지고 왼쪽 통로 끝에는 무언가가 숨겨져 있었다.
+				<br><br>
+			<<else>>
+				<br><br>
+			<</if>>
+			<<set $phase to 0>>
+			<<caveicon "left">><<link [[왼쪽으로 간다|Beach Cave Treasure]]>><</link>>
+			<br>
+			<<caveicon "right">><<link [[오른쪽으로 간다|Beach Cave Back]]>><</link>>
+			<br>
+		<<else>>
+			<<if currentSkillValue('history') gte random(1, 1000)>>
+				<span class="green">당신은 벽에 새겨진 표식들을 알아본다.</span> 왼쪽은 바다로 이어지고 오른쪽 통로 끝에는 무언가가 숨겨져 있었다.
+				<br><br>
+			<<else>>
+				<br><br>
+			<</if>>
+			<<set $phase to 1>>
+			<<caveicon "left">><<link [[왼쪽으로 간다|Beach Cave Back]]>><</link>>
+			<br>
+			<<caveicon "right">><<link [[오른쪽으로 간다|Beach Cave Treasure]]>><</link>>
+			<br>
+		<</if>>
+
+	<</if>>
+<</widget>>
+
+<<widget "eventscavesafe">>
+	<<if $rng gte 61>>
+		<<if $cave gte 50>>
+			발가의 물살이 훅 치솟으며, 발이 걸려 넘어진다.
+			<<dancedifficulty 1 1000 true>>
+			<<if $danceSuccess>>
+				<span class="green">가까스로 중심을 잡는다.</span>
+			<<elseif playerIsPregnant() and playerAwareTheyArePregnant()>>
+				<span class="red">당신은 동굴 바닥에 처박힌다. 한 팔로는 넘어지는 충격을 완화하고 다른 팔로는 당신의 <<bellyDescription "pc">>【을를】 감싼다.</span><<gstress>><<gpain>><<stress 6>><<pain 6>>
+			<<else>>
+				<span class="red">당신은 동굴 바닥에 엎어지고 팔로 충격을 흡수한다.</span><<gstress>><<gpain>><<stress 6>><<pain 6>>
+			<</if>>
+			<br><br>
+			<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<elseif $cave gte 20>>
+			허리 아래로 물이 넘실댄다. 당신은 물에 휩쓸리지 않도록 돌출된 바위를 꽉 붙잡는다.
+			<<if $worn.lower.name is "naked" and $worn.over_lower is "naked">>
+				<<if $worn.under_lower.name is "naked">>
+					<<if $worn.genitals.name is "naked">>
+
+					<<else>>
+						<<set $worn.genitals.integrity -= 10>>
+						<<if $worn.genitals.integrity lte 0>>
+							버티던 마지막 천마저 찢겨나가고, 장치가 <span class="pink">당신의 몸에서 뜯겨나간다.</span>
+							<<integritycheck no_text>><<exposure>>
+						<<else>>
+							거센 물살이 당신의 $worn.genitals.name【을를】 찢어발기려 하는 것이 느껴진다.
+						<</if>>
+					<</if>>
+				<<else>>
+					<<set $worn.under_lower.integrity -= 10>>
+					<<if $worn.under_lower.integrity lte 0>>
+						거센 물살이 당신 몸에서 <span class="pink">$worn.under_lower.name【을를】 찢어발기고, 당신의 <<genitals>>【이가】 드러난다.</span>
+						<<integritycheck no_text>><<exposure>>
+					<<else>>
+						거센 물살이 당신의 $worn.under_lower.name【을를】 찢어발기려 한다.
+					<</if>>
+				<</if>>
+			<<elseif $worn.over_lower is "naked">>
+				<<set $worn.lower.integrity -= 10>>
+				<<if $worn.lower.integrity lte 0>>
+					거센 물살이 당신 몸에서 <span class="pink">$worn.lower.name【을를】 찢어발기고, 당신의 <<undies>>【이가】 드러난다.</span>
+				<<else>>
+					거센 물살이 당신의 $worn.lower.name【을를】 찢어발기려 한다.
+				<</if>>
+			<<elseif $worn.lower is "naked">>
+				<<set $worn.over_lower.integrity -= 10>>
+				<<if $worn.over_lower.integrity lte 0>>
+					거센 물살이 당신 몸에서 <span class="pink">$worn.over_lower.name【을를】 찢어발긴다<<if $worn.lower.exposed gte 2>>. 그리고 당신의 <<undies>>【이가】 드러난다<</if>>.</span>
+				<<else>>
+					거센 물살이 당신의 $worn.lower.name【을를】 찢어발기려 한다.
+				<</if>>
+			<</if>>
+			<br><br>
+
+			<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<else>>
+			주변 물살이 소용돌이치며, 해안을 향해 당신을 거세게 밀어붙인다.
+			<br><br>
+
+			<<link [[물살에 휩쓸려 간다|Beach Cave Carry]]>><</link>>
+			<br>
+			<<link [[물살을 거슬러 헤엄친다|Beach Cave Swim]]>><</link>><<swimmingdifficulty 400 1000>>
+			<br>
+
+		<</if>>
+		<br><br>
+
+	<<elseif $rng gte 41>>
+		동굴이 금방이라도 무너져 내릴 것처럼 위쪽에서 육중하게 으르렁거리는 소리가 들린다. 불행 중 다행으로, 무너지지는 않았다.<<gstress>><<stress 6>>
+		<br><br>
+
+		<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<elseif $rng gte 21>>
+		무언가가 발목을 스치고 지나간다. 당신은 시선을 아래로 향하지만 아무것도 보이지 않는다.<<stress 6>><<gstress>>
+		<br><br>
+
+		<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		이곳의 벽에는 보석들이 박혀 있다.
+		<br><br>
+		<<if $awareness gte 400>>
+			마치 천 개의 꿰뚫어보는 눈동자들 같다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[그만 쳐다보라고 말한다|Beach Cave Eyes]]>><<awareness 1>><<trauma -6>><</link>><<gawareness>><<ltrauma>>
+			<br>
+			<<link [[무시한다|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<else>>
+			이끼가 내뿜는 빛 아래서 꽤 예쁘장하게 빛난다.<<lstress>><<stress -6>>
+			<br><br>
+
+			<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "eventscave">>
+	<<if $rng gte 81>>
+		<<beach_cave_caught>>
+	<<elseif $rng gte 61>>
+		<<if $pursuit is 0>>
+			<<set $pursuit += 1>>
+			머리칼이 쭈뼛 선다. <span class="purple">무언가가 당신을 지켜보고 있다.</span>
+			<br><br>
+			<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<elseif $pursuit is 1>>
+			<<set $pursuit += 1>>
+			당신은 몸을 떤다. <span class="pink">무언가가 당신을 따라오고 있다. 혼자가 아니다.</span>
+			<br><br>
+			<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<elseif $settings.tentaclesEnabled and $hallucinations gte 2>>
+			<<if currentSkillValue('skulduggery') gte random(400, 1200)>>
+				<span class="green">머리칼이 쭈뼛 선다.</span> 당신은 잠시 멈춰 전방의 바닥을 살펴본다. 이내 발견한다. 어두운 하늘에 떠 있는 듯한 무언가의 촉수다.
+				<br><br>
+				당신은 다치지 않고 그 주위를 비켜 간다.
+				<br><br>
+
+				<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				질척거리는 소리가 들리더니, 똬리 모양의 촉수가 당신의 위로 떨어진다. <span class="red">그것은 당신의 위팔을 휘감아</span> 옆구리에 묶어버린 뒤, 공중으로 들어 올린다.<<gstress>><<stress 6>>
+				<br><br>
+
+				동굴의 희미한 빛 속에서, 촉수가 번들거리며 당신의 살갗 위로 미끄러지듯 움직인다.
+
+				<<outfitChecks>>
+				<<if _top>>
+					그것은 당신의 <<allTopsUnderwear>> 속으로 파고들어, 당신의 <<breasts>>【을를】 향해 간다.
+					<br><br>
+
+					<span class="pink">어떤 존재가 가까워지는 것을 느낀다.</span><<set $pursuit += 1>>
+					<br><br>
+
+					<<if !pcAreArmsBound("both") and $angel gte 4 and $angelBanish gte 1>>
+						<<link [[촉수를 내쫓는다|Beach Cave Tentacle Banish]]>><<angelBanishUse>><</link>><<angelBanishNote>>
+						<br>
+					<</if>>
+					<<link [[기다린다|Beach Cave Tentacle]]>><</link>>
+					<br>
+					<<link [[몸을 비틀어 빠져나온다|Beach Cave Tentacle Top]]>><</link>>
+					<br>
+				<<else>>
+					<br><br>
+
+					<span class="pink">어떤 존재가 가까워지는 것을 느낀다.</span><<set $pursuit += 1>>
+					<br><br>
+
+					<<if !pcAreArmsBound("both") and $angel gte 4 and $angelBanish gte 1>>
+						<<link [[촉수를 내쫓는다|Beach Cave Tentacle Banish]]>><<angelBanishUse>><</link>><<angelBanishNote>>
+						<br>
+						<<link [[기다린다|Beach Cave Tentacle]]>><</link>>
+						<br>
+					<<else>>
+						<<link [[다음|Beach Cave Tentacle]]>><</link>>
+						<br>
+					<</if>>
+				<</if>>
+			<</if>>
+		<<else>>
+			<<if currentSkillValue('skulduggery') gte random(400, 1200)>>
+				<span class="green">머리칼이 쭈뼛 선다.</span> 당신은 멈춰 서서 앞을 살핀다. 그때 보았다. 어둠 속에 매달린 채 똬리를 튼 밧줄 하나를. 그 밑에는 의심스러운 돌덩이가 하나 놓여 있다.
+				<br><br>
+				당신은 다치지 않고 그 주위를 비켜 간다.
+				<br><br>
+
+				<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				당신의 발이 무언가를 누른다. 휙 하는 소리가 들리더니 똬리가 당신 위로 떨어져 내린다. <span class="red">그것은 당신의 양팔에 얽혀</span> 옆구리에 바짝 붙이더니 당신을 허공으로 끌어올린다.
+				<br><br>
+
+				밧줄이 단단히 조여 있다.
+				<<outfitChecks>>
+				<<if _shirtless>>
+					<<if $worn.under_upper.type.includes("naked")>>
+						<br><br>
+
+						<span class="pink">어떤 존재가 가까워지는 것을 느낀다.</span><<set $pursuit += 1>>
+						<br><br>
+
+						<<link [[기다린다|Beach Cave Rope]]>><</link>>
+						<br>
+					<<else>>
+						그것은 당신의 $worn.under_upper.name 안으로 파고들어, 당신의 <<breasts>>【을를】 향한다.
+						<br><br>
+
+						<span class="pink">어떤 존재가 가까워지는 것을 느낀다.</span><<set $pursuit += 1>>
+						<br><br>
+
+						<<link [[기다린다|Beach Cave Rope]]>><</link>>
+						<br>
+						<<link [[몸을 비틀어 빠져나온다|Beach Cave Rope Top]]>><</link>>
+						<br>
+					<</if>>
+				<<else>>
+					그것은 당신의 <<allTopsUnderwear>> 속으로 파고들어, 당신의 <<breasts>>【을를】 향해 간다.
+					<br><br>
+
+					<span class="pink">어떤 존재가 가까워지는 것을 느낀다.</span><<set $pursuit += 1>>
+					<br><br>
+
+					<<link [[기다린다|Beach Cave Rope]]>><</link>>
+					<br>
+					<<link [[몸을 비틀어 빠져나온다|Beach Cave Rope Top]]>><</link>>
+					<br>
+				<</if>>
+			<</if>>
+		<</if>>
+	<<elseif $rng gte 41>>
+		<<if $settings.tentaclesEnabled and $hallucinations gte 2>>
+			무언가가 발목을 잡는다. 촉수들이 발목을 휘감는다. 세 번째 촉수는 수면 위로 솟아나 당신의 다리 사이로 다가온다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<if !pcAreArmsBound("both") and $angel gte 4 and $angelBanish gte 1>>
+				<<link [[내쫓는다|Beach Cave Tentacles Banish]]>><<angelBanishUse>><</link>><<angelBanishNote>>
+				<br>
+			<</if>>
+			<<link [[진정시킨다|Beach Cave Soothe]]>><</link>><<tendingdifficulty 200 1200>>
+			<br>
+			<<link [[발버둥친다|Beach Cave Tentacles]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<else>>
+			무언가가 발목을 잡는다. 당신은 밑을 내려다본다. 무해한 해파리다. 당신은 그것을 털어낸다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[다음|Beach Cave]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</if>>
+	<<elseif $rng gte 21>>
+		당신은 앞 벽면의 갈라진 틈을 발견한다. 어둠 속에 무엇이 도사리고 있을지 모른다.<<gstress>><<stress 6>>
+		<br><br>
+		<<set _difficulty to (100 - ($pursuit * 15))>>
+		<<set _difficulty to Math.clamp(_difficulty, 0, 100)>>
+		<<link [[평소처럼 걷는다|Beach Cave Ignore]]>><</link>><<difficulty _difficulty>>
+		<br>
+		<<link [[서둘러 지나간다|Beach Cave Rush]]>><<stress 6>><</link>><<athleticsdifficulty 200 1200>><<gstress>>
+		<br>
+	<<else>>
+		바닥이 푹 꺼지고, 당신의 발이 진흙 속에 깊숙이 박힌다.<<gstress>><<stress 6>>
+		<br><br>
+
+		<<link [[잡아 뜯어낸다|Beach Cave Wrest]]>><<pain 10>><</link>><<ggpain>>
+		<br>
+		<<link [[천천히 빼낸다 (0:05)|Beach Cave Take]]>><<pass 5>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "beach_cave_init">>
+	<<set $pursuit to 0>>
+<</widget>>
+
+<<widget "beach_cave_end">>
+	<<unset $pursuit>>
+	<<unset $cave>>
+<</widget>>
+
+<<widget "beach_cave_pursuit">>
+	<<switch $pursuit>>
+		<<case 0>>
+			<span class="green">당신은 동굴 안에 혼자 있다.</span>
+		<<case 1>>
+			<span class="teal">누군가 쳐다보는 느낌이 든다.</span>
+		<<case 2>>
+			<span class="lblue">누군가 미행하는 느낌이 든다.</span>
+		<<case 3>>
+			<span class="blue">누군가 쫓아오는 느낌이 든다.</span>
+		<<case 4>>
+			<span class="purple">추적당하는 느낌이 든다.</span>
+		<<case 5>>
+			<span class="pink">추격당하는 느낌이 든다.</span>
+		<<default>>
+			<span class="red">어떤 존재가 당신을 짓누르는 느낌이 든다.</span>
+	<</switch>>
+<</widget>>
+
+<<widget "slug_init">>
+	<<set $pursuit to 1>>
+	<<set $cave_exit to random(1, 4)>>
+	<<set $cave_current to 0>>
+	<<set $cave_seen to []>>
+	<<set $stress -= 3000>>
+<</widget>>
+
+<<widget "slug_end">>
+	<<unset $cave_exit>>
+	<<unset $cave_current>>
+	<<unset $cave_seen>>
+	<<set $pursuit to 0>>
+<</widget>>
+
+<<widget "slug_text">>
+	<<if $pursuit gte 3>>
+		<span class="red">거대 민달팽이가 바로 당신 뒤에 있다!</span>
+	<<elseif $pursuit is 2>>
+		<span class="pink">거대 민달팽이가 매우 가까이 있다!</span>
+	<<elseif $pursuit is 1>>
+		<span class="purple">거대 민달팽이가 가까이 있다.</span>
+	<<else>>
+		<span class="blue">거대 민달팽이가 약간 떨어져 있다.</span>
+	<</if>>
+<</widget>>
+
+<<widget "gpursuit">> |
+	<span class="red"> - 거리</span>
+<</widget>>
+
+<<widget "lpursuit">> |
+	<span class="green"> + 거리</span>
+<</widget>>
+
+<<widget "slug_caught">>
+	<<if $settings.voreEnabled>>
+		마지막으로 한 번 펄쩍 뛰어올라 거대 민달팽이가 따라붙고, 당신을 강제로 바닥에 눕힌다. 민달팽이의 입이 당신을 휘감고, 당신을 안으로 빨아들인다.
+		<br><br>
+
+		<<link [[다음|Beach Slug Vore]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		마지막으로 한 번 펄쩍 뛰어올라 거대 민달팽이가 따라붙고, 당신을 강제로 바닥에 눕힌다. 세상이 새까매지고, 당신은 의식을 잃는다.
+		<br><br>
+		<<slug_end>>
+		<<link [[다음|Passout Beach]]>><<clotheson>><<pass 1 hour>><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "passoutcave">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "cave">>
+	<<else>>
+		한계다. 당신은 정신을 잃는다.
+		<br><br>
+		<<passout>>
+		<<pass 1 hour>>
+		<<trauma 6>><<set $stress -= 2000>>
+
+		<<if dangerEvent()>>
+			<<if random(1, 2) is 2 and ($settings.bestialityEnabled or $settings.voreEnabled or $settings.swarmsEnabled) and $settings.slugsEnabled>>
+				<<slug_cave_intro>>
+			<<else>>
+				<<pub_cave_intro>>
+			<</if>>
+		<<else>>
+			<<beach_cave_end>>
+			<<ambulance>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "slug_cave_intro">>
+	수면 아래로 당겨지는 느낌에 당신은 잠에서 깬다. 쏟아지는 물이 숨겨진 틈새를 지나 당신을 끌고 내려간다. 당신은 곧 나타나 수 피트 아래로 떨어지고 무언가 부드러운 것에 추락을 멈춘다. 부드럽고 끈적끈적한 것에.
+	<br><br>
+
+	<<if $settings.voreEnabled>>
+		바닥이 부르르 떨린다. 일어서려고 해보지만 끈적한 슬라임 때문에 힘들다.<<gstress>><<stress 6>>
+		<br><br>
+
+		주변에서 살덩어리로 된 벽이 솟아올라 동굴과 당신을 떼어 놓는다. <span class="red">먹히기 일보 직전이다.</span>
+		<br><br>
+		<<outfitChecks>>
+		<<if _fullyNaked>>
+			당신은 몸을 일으켜 닫히고 있는 입에서 빠져나온다. 당신은 분홍빛 이끼가 밝게 비추는 높고 깊은 동굴에 와있다. 천장에서 떨어진 점액들이 모여 커다란 웅덩이를 이루고 있다.
+			<br><br>
+
+			뒤에서 괴물이 일어선다. 말보다 더 큰 초거대 민달팽이다. <span class="red">민달팽이는 놀라운 속도로 꿈틀거리며 다가온다.</span>
+			<br><br>
+
+			<<link [[도망친다|Beach Slug Start]]>><</link>>
+			<br>
+		<<else>>
+			몸을 떼어내려 해보지만 점액이 옷을 꽉 붙잡고 있다. 당신은 잡아당겨 보지만 풀려날 수가 없다.
+			<br><br>
+
+			<<link [[계속 노력한다|Beach Slug Try]]>><</link>><<physiquedifficulty 1 20000>>
+			<br>
+			<<link [[옷을 벗는다|Beach Slug Remove]]>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		당신은 일어선다. 분홍색 이끼가 밝게 비추는 높고 다른 동굴 안에 있다. 천장에서는 점액이 뚝뚝 떨어지며 커다란 웅덩이를 만들고 있다.
+		<br><br>
+
+		바닥이 부르르 떨리며, 당신을 앞으로 넘어뜨린다. 거대한 형체가 당신 앞에서 솟아오르자 당신은 서둘러 일어선다. 말보다 더 큰 거대 민달팽이다. <span class="red">민달팽이는 놀라운 속도로 꿈틀거리며 다가온다.</span>
+		<br><br>
+
+		<<link [[도망친다|Beach Slug Start]]>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "pub_cave_intro">>
+	<<facewear "blindfold">>
+	당신은 누군가의 강한 팔에 잡혀 물속을 끌려가고 있음을 느끼며 깨어난다. 당신은 눈이 가려져 있고 두 팔은 묶여 있다. <<if $worn.handheld.name isnot "naked">>당신의 $worn.handheld.name【은는】 어디에서도 찾을 수 없다.<</if>><<bind>>
+	<br><br>
+
+	<<generate1>><<generate2>><<person1>>
+	"깨어났군." 거친 <<personssimple>> 목소리가 말한다. "좋아. 속도를 좀 낼 수 있겠어." 누군가의 손이 당신의 머리채를 잡는다. 당신의 귀에 숨결이 느껴진다. "기절한 너를 찾았지. 우리 동굴 근처를 어슬렁거리고 있었지? 나쁜 아이로군. 글쎄, 이젠 안전할 거야." 다른 <<personsimple>>【이가】 웃는다.
+	<br><br>
+
+	<<link [[다음|Beach Cave Rape Finish 2]]>><</link>>
+	<br>
+<</widget>>
+
+<<widget "pub_cave_arrival">>
+	<<tearful>> 당신은 터널을 따라 밀려나간다. 당신의 포획자들은 당신의 양옆에서 잡담을 나누다가, <<person1>><<person>>【이가】 당신이 듣고 있을지도 모른다고 지적하고 나서야 조용해진다.
+	<br><br>
+
+	물이 얕아지더니 완전히 사라진다. 소리로 미루어 여전히 동굴 안인 듯하지만, 저 앞에서 말소리가 들려온다. 수많은 목소리가. 가까이 다가가자, 납치범들이 당신을 당겨 세운다. 커다란 환호성이 터져 나온다. 시끌벅적한 소란 사이로 몇 마디가 귀에 들어온다.
+	<br><br>
+
+	"존나 죽여주네."
+	<br>
+	"저건 어디서 주웠냐?"
+	<br>
+	"내가 먼저야."
+	<br><br>
+
+	당신은 다시 앞으로 밀쳐져 군중 한가운데로 들어간다.
+	<br><br>
+	<<beach_cave_end>>
+	<<endcombat>>
+	<<link [[다음|Smuggler Pub Intro]]>><</link>>
+<</widget>>
+
+<<widget "beach_cave_caught">>
+	<<if $pursuit gte 6>>
+		<<if $settings.bestialityEnabled and $settings.slugsEnabled and random(1, 2) is 2>>
+			<span class="red">형체 하나가 물속에서 달려든다.</span> 당신을 빗나가 당신 뒤의 동굴 벽에 떨어진다. 거대한 민달팽이다. 다른 하나가 당신을 향해 헤엄쳐 온다.
+			<br><br>
+			<<link [[다음|Beach Cave Struggle]]>><<endevent>><<set $struggle_start to 1>><</link>>
+			<br>
+		<<else>>
+			<<endevent>>
+			<<generate1>><<generate2>><<generate3>><<generate4>><<generate5>><<generate6>><<person1>>
+
+			앞쪽 모퉁이에서 누군가가 나타난다. 잠수복을 입은 <<person>>【이가】 있다. <<He>>【은는】 당신을 노려보며, 미소를 짓고 있다. 다른 두 명이 <<him>>【와과】 합류한다.
+			<br><br>
+			"너처럼 귀여운 <<lass>>【이가】 우리 동굴엔 무슨 일일까?"
+			<br>
+			"<<pshe>>한테는 참교육이 필요할 것 같은데."
+			<br>
+			"아무 데도 갈 생각 마라, <<girl>>."
+			<br><br>
+
+			그들이 가까이 다가온다. 당신은 돌아섰다가 <<person4>><<person>>【와과】 얼굴을 마주친다. 다른 두 명도 <<him>>【을를】 호위하고 있다. 당신은 포위되었다.
+			<br><br>
+
+			<<link [[다음|Beach Cave Rape]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<</if>>
+	<<elseif $pursuit is 0>>
+		<<set $pursuit += 1>>
+		당신은 머리칼이 쭈뼛 선다. <span class="purple">무언가가 당신을 지켜보고 있다.</span>
+		<br><br>
+		<<link [[다음|Beach Cave]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<br>
+	<<elseif $pursuit is 1>>
+		<<set $pursuit += 1>>
+		당신은 몸을 떤다. <span class="pink">무언가가 당신을 쫓아오고 있다. 혼자가 아니다.</span>
+		<br><br>
+		<<link [[다음|Beach Cave]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<set $pursuit += 1>>
+		당신은 몸을 떤다. <span class="pink">또 다른 위협이 쫓아온다.</span>
+		<br><br>
+		<<link [[다음|Beach Cave]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<br>
+	<</if>>
+<</widget>>

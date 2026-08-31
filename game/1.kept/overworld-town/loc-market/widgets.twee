@@ -1,0 +1,1003 @@
+:: Widgets Market [widget]
+<<widget "stall_actions">>
+	<<outfitChecks>>
+	<<if $stress gte $stressmax>>
+		<<passoutstreet>>
+	<<elseif _shirtless and $player.gender_appearance is "f">>
+		<<breasts>>【을를】 드러낸 채로는 이 일을 할 수 없다. <<if $player.sex is "m">>여자처럼 보이는 동안은 안 된다.<</if>> 당신은 몸을 숙이고 도망친다.
+		<br><br>
+
+		<<link [[다음|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<silently>><<stall_inventory>><</silently>>
+		<<stall_chance>>
+		<br><br>
+		<<if random(1, 10000) is 10000>>
+			<<stallicon "open">><<link [[자본주의 만세! (0:20)|Stall]]>><<endevent>><<endstall>><<pass 20>><</link>>
+			<br>
+		<<else>>
+			<<stallicon "open">><<link [[계속한다 (0:20)|Stall]]>><<endevent>><<endstall>><<pass 20>><</link>>
+			<br>
+		<</if>>
+		<<icon "project-maths.png">><<link [[가판대 관리|Stall Manage]]>><</link>>
+		<br>
+		/* Stall Manage used instead
+		<<ind>><<link [[진열된 농산물 변경|Stall Rent Return]]>><</link>>
+		<br> */
+		<<if $worn.lower.name isnot "naked">>
+			<<if $worn.under_lower.name isnot "naked">>
+				<<if $worn.upper.set isnot $worn.lower.set>>
+					<<if hasSexStat("exhibitionism", 2)>>
+						<<skinicon "strip">> <<link [[하의를 벗는다|Stall Bottoms Strip]]>><<endevent>><<endstall>><</link>><<if $daily.ex.stall isnot 1>><<exhibitionist2>><</if>>
+						<br>
+					<</if>>
+				<</if>>
+			<<else>>
+				<<if $worn.upper.set isnot $worn.lower.set>>
+					<<if hasSexStat("exhibitionism", 4)>>
+						<<skinicon "strip">><<link [[하의를 벗는다|Stall Bottoms Strip]]>><<endevent>><<endstall>><</link>><<if $daily.ex.stall isnot 1>><<exhibitionist4>><</if>>
+						<br>
+					<</if>>
+				<</if>>
+			<</if>>
+		<<elseif $worn.under_lower.name isnot "naked">>
+			<<if $worn.under_lower.set isnot $worn.under_upper.set>>
+				<<if hasSexStat("exhibitionism", 4)>>
+					<<skinicon "strip">><<link [[속옷을 벗는다|Stall Undies Strip]]>><<endevent>><<endstall>><</link>><<if $daily.ex.stall isnot 1>><<exhibitionist4>><</if>>
+					<br>
+				<</if>>
+			<</if>>
+		<</if>>
+		<<if hasSexStat("exhibitionism", 3)>>
+			<<skinicon "masturbate">><<link [[자위한다|Stall Masturbation]]>><<endevent>><<endstall>><<set $phase to 0>><<set $masturbationstart to 1>><</link>><<if $daily.ex.stall isnot 1>><<exhibitionist3>><</if>><<if $daily.stall_lewdity is 0>><<glewdity>><</if>>
+			<br>
+		<</if>>
+		<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><<set $eventskip to 1>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "stall_setup">>
+		<<set $foodstuff_stall to []>>
+		<<set _foodstuffKeys to Object.keys($foodstuff)>>
+		<<stall_setup_interior>>
+<</widget>>
+
+<<widget "stall_setup_interior">>
+	<span id="stall_setup">
+	당신의 농산물:
+	<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+		<<set _foodstuffKey to _foodstuffKeys[_t]>>
+		<<set _foodstuffNameText to setup.foodstuff[_foodstuffKey].name>>
+
+		<<if $foodstuff[_foodstuffKey].amount and !$foodstuff_stall.includes(_foodstuffKey)>>
+			<<foodstufficon _foodstuffKey>>
+			<<capture _foodstuffKey>>
+				<<link _foodstuffNameText>><<set $foodstuff_stall.push(_foodstuffKey)>><<replace #stall_setup>><<stall_setup_interior>><</replace>><</link>> |
+			<</capture>>
+		<</if>>
+	<</for>>
+	<br>
+	<<link "모두 추가">>
+		<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+			<<set _foodstuffKey to _foodstuffKeys[_t]>>
+			<<if $foodstuff[_foodstuffKey].amount and !$foodstuff_stall.includes(_foodstuffKey)>>
+				<<set $foodstuff_stall.push(_foodstuffKey)>>
+			<</if>>
+		<</for>>
+		<<replace #stall_setup>><<stall_setup_interior>><</replace>>
+	<</link>>
+	<br><br>
+	가판대에 올린 것:
+	<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+		<<set _foodstuffKey to _foodstuffKeys[_t]>>
+		<<set _foodstuffNameText to setup.foodstuff[_foodstuffKey].name>>
+		<<if $foodstuff[_foodstuffKey].amount and $foodstuff_stall.includes(_foodstuffKey)>>
+			<<foodstufficon _foodstuffKey>>
+			<<capture _foodstuffKey>>
+				<<link _foodstuffNameText>><<set $foodstuff_stall.delete(_foodstuffKey)>><<replace #stall_setup>><<stall_setup_interior>><</replace>><</link>> |
+			<</capture>>
+		<</if>>
+	<</for>>
+	<br>
+	<<link "모두 제거">>
+		<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+			<<set _foodstuffKey to _foodstuffKeys[_t]>>
+			<<if $foodstuff[_foodstuffKey].amount and $foodstuff_stall.includes(_foodstuffKey)>>
+				<<set $foodstuff_stall.delete(_foodstuffKey)>>
+			<</if>>
+		<</for>>
+		<<replace #stall_setup>><<stall_setup_interior>><</replace>>
+	<</link>>
+	<br><br>
+	<<if $foodstuff_stall.length gte 1>>
+		<<link [[개시한다|Stall Rent 2]]>><</link>>
+		<br>
+	<<else>>
+		<<link [[지금은 내버려둔다|Connudatus Street]]>><</link>>
+		<br>
+	<</if>>
+	<br>
+	</span>
+<</widget>>
+
+<<widget "stall_inventory">>
+	<<silently>>
+		<<set $foodstuff_inventory to []>>
+		<<set _foodstuffKeys to Object.keys($foodstuff)>>
+		<<set _total_worth to 0>>
+		<<set _total_amount to 0>>
+		<<set _total_sold_amount to 0>>
+		<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+			<<if ndef $stall_stats[_foodstuffKeys[_t]]>>
+				<<set $stall_stats[_foodstuffKeys[_t]] to { inventory:{amount:0, price:0, total:0}, sold:{amount:0, total:0, amountHistory: 0, totalHistory: 0} }>>
+			<</if>>
+			<<if $foodstuff[_foodstuffKeys[_t]].amount gte 1>>
+				<<set _inventory_found to 1>>
+				<<if $foodstuff[_foodstuffKeys[_t]].marketStall is false>>
+					<<continue>>
+				<</if>>
+				<<set _foodstuffValue to Math.round(setup.foodstuff[_foodstuffKeys[_t]].shop.sell_price)>>
+				<<set _total_worth += $foodstuff[_foodstuffKeys[_t]].amount * _foodstuffValue>>
+				<<set _total_amount += $foodstuff[_foodstuffKeys[_t]].amount>>
+				<<set _inventory_in_stall to 1>>
+				<<run $foodstuff_inventory.push(_foodstuffKeys[_t])>>
+				<<if ($stall_expensive is undefined) or ($foodstuff[$stall_expensive].amount lte 0) or (setup.foodstuff[_foodstuffKeys[_t]].shop.sell_price gte setup.foodstuff[$stall_expensive].shop.sell_price)>>
+					<<set $stall_expensive to clone(_foodstuffKeys[_t])>>
+				<</if>>
+				<<set $stall_stats[_foodstuffKeys[_t]].inventory to {amount:$foodstuff[_foodstuffKeys[_t]].amount, price:_foodstuffValue, total:($foodstuff[_foodstuffKeys[_t]].amount * _foodstuffValue)}>>
+			<<else>>
+				<<set $stall_stats[_foodstuffKeys[_t]].inventory to {amount:0, price:Math.round(setup.foodstuff[_foodstuffKeys[_t]].shop.sell_price), total:0}>>
+			<</if>>
+			<<set _total_sold_amount += $stall_stats[_foodstuffKeys[_t]].sold.amount>>
+		<</for>>
+	<</silently>>
+
+<<if _inventory_found isnot 1>>
+		재고가 다 떨어졌다!<br>
+	<<elseif _inventory_in_stall isnot 1>>
+		진열한 상품이 다 떨어졌다!<br>
+	<</if>>
+	<<if $stall_money is 0>>
+		<<if _inventory_found is 1>>
+			현재 진열된 상품은 총 <<printmoney _total_worth>>어치다.
+		<</if>>
+		아직 아무것도 팔지 못했다.
+	<<else>>
+		<<if _inventory_found is 1>>
+			현재 남은 상품은 총 <<printmoney _total_worth>>어치다.
+		<</if>>
+		오늘은 <<printmoney $stall_money>>어치를 판매했다.
+	<</if>>
+<</widget>>
+
+<<widget "endstall">>
+	<<unset $foodstuff_inventory>>
+	<<unset $stall_amount>>
+	<<unset $stall_foodstuff>>
+	<<unset $stall_cost>>
+	<<unset $stall_expensive>>
+<</widget>>
+
+<<widget "stall_sell">>
+	<<if ndef $stall_stats[$stall_foodstuff]>>
+		<<set $stall_stats[$stall_foodstuff] to { inventory:{amount:0, price:0, total:0}, sold:{amount:0, total:0} }>>
+	<</if>>
+	<<set $stall_stats[$stall_foodstuff].sold.amount += $stall_amount>>
+	<<set $stall_stats[$stall_foodstuff].sold.total += Math.round($stall_cost * $stall_amount)>>
+	<<set $stall_stats[$stall_foodstuff].sold.amountHistory = ($stall_stats[$stall_foodstuff].sold.amountHistory or 0) + $stall_amount>>
+	<<set $stall_stats[$stall_foodstuff].sold.totalHistory = ($stall_stats[$stall_foodstuff].sold.totalHistory or 0) + Math.round($stall_cost * $stall_amount)>>
+
+	<<set $foodstuff[$stall_foodstuff].amount -= $stall_amount>>
+	<<money `Math.round($stall_cost * $stall_amount)` "marketStall">>
+	<<set $stall_money += Math.round($stall_cost * $stall_amount)>>
+	<<set $produce_sold += $stall_amount>>
+	당신은
+	<<if $stall_amount gte 2>>
+		<<print setup.foodstuff[$stall_foodstuff].name || setup.foodstuff[$stall_foodstuff].name>> $stall_amount개를
+	<<else>>
+		<<print setup.foodstuff[$stall_foodstuff].name || setup.foodstuff[$stall_foodstuff].name>> 한 개를
+	<</if>>
+	<<printmoney `$stall_cost * $stall_amount`>>에 팔았다.
+	<<if $stall_cost * $stall_amount / 100 gte 10000>>
+		한 번에 이렇게 많은 돈을 버니 기분이 좋다.
+		<<ltrauma>><<lstress>>
+	<</if>>
+	<<famebusiness 1>>
+<</widget>>
+
+<<widget "eventsstall">>
+   /* $stall_rejected is now a dead variable, but kept in case it is reintroduced later. */
+	<<rng 10>>
+   <<if $daily.stall_lewdity gt 0 and $daily.stall_lewdity+2 gte random(1, 18)>>
+       /* Bad events happen between 1/6 and 1/3 of the cases */
+		<<if $rng is 1>>
+			<<generate1>><<person1>>
+			뒤에서 움직이는 소리가 들린다.
+			<<if $worn.lower.type.includes("naked")>>
+				<<if $worn.under_lower.type.includes("naked")>>
+					당신이 돌아서기도 전에, 한 쌍의 손이 허리를 감고 당신의 <<genitals>>【을를】 더듬는다.
+					<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+					<br><br>
+
+					"이 가판대 주인이 걸레란 소문은 들었지." <<personssimple>> 목소리가 말한다. "그래도 아래에 아무것도 안 입고 있을 줄은 몰랐네." <<He>>【은는】 당신을 계속 애무한다.
+					<br><br>
+
+				<<else>>
+					당신이 돌아서기도 전에, 한 쌍의 손이 허리를 감고 당신의 $worn.under_lower.name 위로 <<genitals>>【을를】 더듬는다.
+					<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+					<br><br>
+
+					"이 가판대 주인이 걸레란 소문은 들었지." <<personssimple>> 목소리가 말한다. "그래도 아래에 팬티만 입고 있을 줄은 몰랐네." <<He>>【은는】 당신을 계속 애무한다.
+					<br><br>
+				<</if>>
+			<<else>>
+				<<if $player.gender_appearance is "f">>
+					당신이 돌아서기도 전에, 어깨 밑에서 나타난 한 쌍의 손이 당신의 <<breasts>>【을를】 꽉 움켜쥔다.
+					<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+					<br><br>
+
+					"거짓말 하지 마." <<personssimple>> 목소리가 말한다. <<His>> 손이 당신의 <<genitals>>【으로로】 내려간다. "넌 주목받으려고 일부러 이 자리를 마련했잖아. 이걸 원하는 거잖아." <<He>>【은는】 당신을 계속 애무한다.
+					<br><br>
+				<<else>>
+					당신이 돌아서기도 전에, 어깨 밑에서 나타난 한 쌍의 손이 당신의 <<genitals>>【을를】 꽉 움켜쥔다.
+					<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+					<br><br>
+
+					"거짓말 하지 마." <<personssimple>> 목소리가 말한다. "넌 주목받으려고 일부러 이 자리를 마련했잖아. 이걸 원하는 거잖아." <<He>>【은는】 당신을 계속 애무한다.
+					<br><br>
+				<</if>>
+			<</if>>
+           <<link [[견딘다 (0:05)|Stall Endure]]>><<pass 5>><<trauma 6>><<stress 6>><<arousal 300 "genitals">><<arousal 300 "breasts">><<lewdity 1>><</link>><<glewdity>><<gtrauma>><<gstress>><<garousal>>
+			<br>
+           <<link [[밀쳐낸다|Stall Shove]]>><<trauma -6>><</link>><<ltrauma>>
+			<br>
+		<<elseif $rng is 2>>
+			<<generate1>><<person1>>
+			뒤에서 움직이는 소리가 들린다. 당신이 미처 돌아보기도 전에 입 위로 손이 덮인다. "소문 들었어." <<personsimple>>【이가】 속삭인다. "걸레년." <<He>>【이가】 다리를 걷어차 당신을 바닥으로 쓰러트린다.
+			<br><br>
+
+			<<link [[다음|Stall Rape]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<elseif $rng is 3>>
+			<<generate1>><<person1>>
+			<<outfitChecks>>
+			<<if _shirtless and $worn.under_upper.type.includes("naked")>>
+				한 <<person>>【이가】 당신의 진열품을 구경하며 가판대로 다가온다. 아무 예고도 없이, <<he>>【은는】 테이블 너머로 손을 뻗어 당신의 <<breasts>>【을를】 더듬고는 도망친다.
+				<<gtrauma>><<gstress>><<garousal>><<trauma 6>><<stress 6>><<arousal 600 "breasts">>
+				<br><br>
+			<<else>>
+				<<set _top.integrity -= 20>>
+				한 <<person>>【이가】 당신의 진열품을 구경하며 가판대로 다가온다. 아무 예고도 없이, <<he>>【은는】 테이블 너머로 손을 뻗어 당신의 _top.name【을를】 꽉 쥔다.
+				<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+				<br>
+				<<if _top.integrity lte 0>>
+					<<He>>【은는】 천 조각을 움켜쥔 채 달아난다. <<covered>>
+					<br><br>
+				<<else>>
+			당신이 그립을 풀기도 전에 <<He>>【이가】 <<it _top.slot>>【을를】 잡아당겨 당신의 <<= _topLower || '<<breasts>>'>>【을를】 드러낸다. <<He>>【은는】 돌아서서 도망친다.
+					<br><br>
+				<</if>>
+				<<integritycheck>><<exposure>>
+			<</if>>
+			<<stall_actions>>
+		<<elseif $rng is 4>>
+			<<generate1>><<person1>>
+			길 건너편에 카메라를 얼굴에 들이대고 있는 <<person>>【이가】 보인다. 카메라 렌즈가 당신을 향하고 있는 것 같다. 불쾌한 기분이 든다.
+			<<gstress>><<stress 6>>
+			<br><br>
+
+			<<stall_actions>>
+		<<elseif $rng is 5>>
+			<<generate1>><<person1>>
+           <<stall_init>><<stallCustomerArousal>><<set $enemytrust -= 20>>
+			한 <<person>>【이가】 진열대 앞으로 다가온다. <<He>>【은는】 <<stall_check_text>>. "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?" <<he>>【이가】 묻는다. <<He>>【은는】 노골적으로 당신을 쳐다본다.
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<stall_sell_actions>>
+		<<elseif $rng is 6>>
+			<<generate1>><<person1>>
+           <<stall_init>><<stallCustomerArousal>><<set $enemytrust -= 20>>
+			한 <<person>>【이가】 진열대 앞으로 다가온다. <<He>>【은는】 <<stall_check_text>>. "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?" <<he>>【이가】 묻는다. "나한테 꼬리 칠 생각은 마. 네 소문은 다 들었으니까."
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<stall_sell_actions>>
+		<<elseif $rng is 7>>
+			<<generate1>><<person1>>
+           <<stall_init>><<stallCustomerArousal>><<set $enemytrust -= 20>>
+			한 <<person>>【이가】 멀리서 당신을 주시하고 있는 것이 보인다. 눈이 마주치자 <<he>>【이가】 다가온다. <<He>>【은는】 <<stall_check_text>>. "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?" <<he>>【이가】 묻는다.
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<stall_sell_actions>>
+		<<elseif $rng is 8>>
+			<<generate1>><<person1>>
+           <<stall_init>><<stallCustomerArousal>><<set $enemytrust -= 20>>
+			지나가던 한 <<person>>【이가】 당신의 가판대 앞에 멈춰 선다. <<His>> 시선이 당신의 얼굴과 가슴을 훑더니 <<stall_check_text>>. "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?" <<he>>【이가】 묻는다.
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<stall_sell_actions>>
+		<<elseif $rng is 9>>
+			<<generate1>><<person1>>
+           <<stall_init>><<stallCustomerArousal>><<stallCustomerArousal>><<set $stall_seduced to 1>><<set $enemytrust -= 20>>
+			한 <<person>>【이가】 당신의 진열대로 건들거리며 다가온다. 아무 예고 없이, <<he>>【은는】 손을 뻗어 당신의 팔을 잡는다. <<He>>【은는】 당신이 테이블 위로 몸을 숙일 때까지 앞으로 잡아당기더니, 몸을 기울여 당신의 뺨을 핥는다.
+			<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+			<br><br>
+			<<He>>【은는】 당신을 놓아주고는 <<stall_check_text>>. 테이블에 기대어, "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?" <<he>>【이가】 묻는다.
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<stall_sell_actions>>
+		<<else>>
+			<<generate1>><<person1>>
+           <<stall_init>><<stallCustomerArousal>><<set $enemytrust -= 20>>
+			한 <<person>>【이가】 진열대 앞으로 다가온다. <<He>>【은는】 <<stall_check_text>>. 테이블에 기대며, "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?" <<he>>【이가】 묻는다.
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<stall_sell_actions>>
+		<</if>>
+	<<elseif $rng is 1>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		한 <<person>>【이가】 발을 질질 끌며 지나가다 예리한 눈빛으로 당신의 상품을 살펴본다.
+		<br><br>
+
+		<<link [[말을 건다|Stall Shuffle Talk]]>><</link>>
+		<br>
+		<<link [[조용히 있는다|Stall Shuffle Silent]]>><</link>>
+		<br>
+	<<elseif $rng is 2>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		한 <<person>>【이가】 당신의 상품을 무심하게 훑어보며 지나간다.
+		<br><br>
+
+		<<link [[말을 건다|Stall Walk Talk]]>><</link>>
+		<br>
+		<<link [[조용히 있는다|Stall Walk Silent]]>><</link>>
+	<<elseif $rng is 3>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		<<set _produce to setup.foodstuff[$stall_foodstuff].name || $stall_foodstuff.replace(/_/g," ")>>
+		<<person>> 한 명이 당신의 가판대로 다가온다. <<He>>【은는】 <span class="green"><<a _produce>></span> 하나를 들어 냄새를 맡는다.
+		<br><br>
+		<<if $stall_amount gte 2>>
+			"얼마죠?" <<he>>【이가】 묻고는 바구니에 <span class="green"><<stall_amount>>개</span>개가 찰 때까지 몇 개를 더 집어든다.
+		<<else>>
+			"<span class="green">하나</span>에 얼마죠?" <<he>>【이가】 묻는다.
+		<</if>>
+		<br><br>
+
+		<<stall_trust>>
+		<br><br>
+
+		<<stall_sell_actions>>
+	<<elseif $rng is 4>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		<<set _produce to setup.foodstuff[$stall_foodstuff].name || $stall_foodstuff.replace(/_/g," ")>>
+		<<person>> 한 명이 손을 등 뒤로 감춘 채 걸어온다. "아하." <<he>>【은는】 <span class="green"><<a _produce>></span>【을를】 발견하고 말한다. <<He>>【은는】 더 가까이 몸을 기울이고, 그 상품에 대해 이야기하기 시작한다. <<He>>【은는】 꽤 많이 아는 것 같다.
+		<br><br>
+
+		<<link [[예의 바르게 듣는다 (0:10)|Stall Listen]]>><<set $enemytrust += 20>><</link>><<gtrust>>
+		<br>
+		<<link [[`<<him>>【을를】 재촉한다`|Stall Hurry]]>><<set $enemytrust -= 20>><</link>><<ltrust>>
+		<br>
+		<<link [[대화를 나눈다|Stall Converse]]>><</link>><<tendingdifficulty 1 400>>
+		<br>
+	<<elseif $rng is 5>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		<<set _produce to setup.foodstuff[$stall_foodstuff].singular || $stall_foodstuff.replace(/_/g," ")>>
+		가판대를 따라 이동하는 <<person>>【이가】 보인다. <<He>>【은는】 무엇을 팔고 있든 가판대마다 멈춰 서서 주인들과 이야기를 나눈다. 마침내 <<he>>【이가】 당신의 가판대에 다다른다.
+		<br><br>
+		오호. <<he>>【은는】 <span class="green"><<a _produce>></span>【을를】 들어 올리며 말한다. "아주 좋네요. 직접 생산한 건가요?"
+		<br><br>
+		<<link [[솔직하게 대답한다|Stall Honest]]>><<set $enemytrust += 20>><</link>><<gtrust>>
+		<br>
+		<<link [[얼버무린다|Stall Evasive]]>><<set $enemytrust -= 20>><</link>><<ltrust>>
+		<br>
+	<<elseif $rng is 6>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+       <<stallCustomerArousal>>
+		한 <<person>>【이가】 건들거리며 다가와 테이블에 기댄다. "안녕 이쁜이." <<he>>【이가】 말한다. "물건 좋네." <<His>> 눈은 당신을 향해 고정되어 있다. 진열대는 쳐다보지도 않는다.
+		<br><br>
+
+		<<link [[`<<him>>에게 뭔가 사라고 권한다`|Stall Encourage]]>><</link>>
+		<br>
+		<<link [[추파를 던진다|Stall Flirt]]>><<set $enemytrust += 20>><<stallCustomerArousal>><<set $stall_seduced to 1>><</link>><<promiscuous1>><<gtrust>><<glust>>
+		<br>
+		<<link [[`<<him>>에게 떠나라고 말한다`|Stall Leave]]>><</link>>
+		<br>
+	<<elseif $rng is 7>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		한 <<person>>【이가】 가판대 앞에 멈춰 선다. "<<spouse>>에게 줄 걸 찾고 있어." <<he>>【이가】 말한다. <<He>>【은는】 몸을 굽혀 <<stall_check_text>>. "이거 <span class="green"><<stall_amount>>개</span>에 얼마지?"
+		<br><br>
+
+		<<stall_trust>>
+		<br><br>
+
+		<<stall_sell_actions>>
+	<<elseif $rng is 8>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		한 <<person1>><<person>>【이가】 지나가면서 <span class="green"><<print setup.foodstuff[$stall_expensive].name>></span> 하나를 낚아채더니 냅다 달리기 시작한다.
+		<br><br>
+
+		<<if $worn.lower.type.includes("naked")>>
+			<<if $worn.under_lower.type.includes("naked")>>
+				순간 이성을 잃고 <<him>>【을를】 쫓아가려다, 지금 당신은 <span class="lewd">하반신이 나체</span>라는 사실을 떠올린다.
+				<br><br>
+				<<if hasSexStat("exhibitionism", 5)>>
+					<<link [[그래도 쫓아간다|Stall Chase Naked]]>><</link>><<exhibitionist5>><<athleticsdifficulty 1 1200>>
+					<br>
+				<</if>>
+			<<else>>
+				순간 이성을 잃고 <<him>>【을를】 쫓아가려다, 지금 당신은 <span class="lewd">하반신에 속옷만 입고 있다</span>는 사실을 떠올린다.
+				<br><br>
+
+				<<if hasSexStat("exhibitionism", 3)>>
+					<<link [[그래도 쫓아간다|Stall Chase Undies]]>><</link>><<exhibitionist3>><<athleticsdifficulty 1 1200>>
+					<br>
+				<</if>>
+			<</if>>
+		<<else>>
+			<<link [[쫓아간다|Stall Chase]]>><</link>><<athleticsdifficulty 1 1200>>
+		<</if>>
+		<br>
+		<<link [[`<<him>>【을를】 보내준다`|Stall Go]]>><</link>>
+		<br>
+	<<elseif $rng is 9>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+		한 <<person1>><<person>>【이가】 근처를 어슬렁거린다.
+		<br><br>
+
+		<<link [[`<<his>> 주의를 끈다`|Stall Attention]]>><</link>>
+		<br>
+		<<link [[무시한다|Stall Ignore]]>><</link>>
+		<br>
+	<<else>>
+		<<generate1>><<person1>>
+		<<stall_init>>
+
+		한 <<person1>><<person>>【이가】 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span>【을를】 보고 감탄한다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마죠?" <<he>>【이가】 묻는다.
+		<br><br>
+
+		<<stall_trust>>
+		<br><br>
+
+		<<stall_sell_actions>>
+	<</if>>
+<</widget>>
+
+<<widget "stall_chance">>
+	<<if $attractiveness gte 5000>>
+		당신의 <span class="green">눈부신 매력</span> 덕분에 손님이 줄을 잇는다.
+	<<elseif $attractiveness gte 4000>>
+		당신의 <span class="teal">뛰어난 매력</span>이 손님을 부르는 데 큰 몫을 한다.
+	<<elseif $attractiveness gte 3000>>
+		당신의 <span class="lblue">매력적인 외모</span>가 손님을 끌어 모으는 데 꽤 도움이 된다.
+	<<elseif $attractiveness gte 2000>>
+		당신의 <span class="blue">준수한 외모</span>가 손님을 부르는 데 어느 정도 효과가 있다.
+	<<elseif $attractiveness gte 1000>>
+		당신의 <span class="purple">평범한 외모</span>로는 손님을 끌어 모으기가 쉽지 않다.
+	<<else>>
+		당신의 <span class="pink">수수한 외모</span> 탓에 손님들의 관심을 받기 어렵다.
+	<</if>>
+	사업 명성은
+	<<if $fame.business gte 1000>>
+		<span class="green">엄청난 도움</span>이 되고 있고,
+	<<elseif $fame.business gte 800>>
+		<span class="teal">큰 도움</span>이 되고 있고,
+	<<elseif $fame.business gte 600>>
+		<span class="lblue">상당한 도움</span>이 되고 있고,
+	<<elseif $fame.business gte 400>>
+		<span class="blue">어느 정도 도움</span>이 되고 있고,
+	<<elseif $fame.business gte 200>>
+		<span class="purple">약간의 도움</span>을 주는 데 그치고,
+	<<else>>
+		<span class="pink">거의 도움이 되지 않고,</span>
+	<</if>>
+	관리 스킬은
+	<<if currentSkillValue('tending') gte 1200>>
+		<span class="gold">결정적</span>인 역할을 하고 있다.
+	<<elseif currentSkillValue('tending') gte 1000>>
+		<span class="green">막대한 영향</span>을 끼치고 있다.
+	<<elseif currentSkillValue('tending') gte 800>>
+		<span class="teal">큰 힘</span>을 발휘하고 있다.
+	<<elseif currentSkillValue('tending') gte 600>>
+		<span class="lblue">상당히 기여</span>하고 있다.
+	<<elseif currentSkillValue('tending') gte 400>>
+		<span class="blue">어느 정도 기여</span>하고 있다.
+	<<elseif currentSkillValue('tending') gte 200>>
+		<span class="purple">조금이나마 기여</span>하고 있다.
+	<<else>>
+		<span class="pink">별다른 역할을 하지 못하고 있다.</span>
+	<</if>>
+	<<if $foodstuff_inventory.length gte 10>>
+		진열된 상품의 다양성은 <span class="green">단연 돋보인다.</span>
+	<<elseif $foodstuff_inventory.length gte 8>>
+		진열된 상품의 다양성은 <span class="teal">꽤나 훌륭하다.</span>
+	<<elseif $foodstuff_inventory.length gte 6>>
+		진열된 상품의 다양성은 <span class="lblue">나쁘지 않은 수준이다.</span>
+	<<elseif $foodstuff_inventory.length gte 4>>
+		진열된 상품의 다양성은 <span class="blue">그저 그런 편이다.</span>
+	<<elseif $foodstuff_inventory.length gte 2>>
+		진열된 상품의 다양성은 <span class="purple">다소 부족하다.</span>
+	<<elseif $foodstuff_inventory.length is 1>>
+		판매 중인 상품이 <span class="pink">단 하나뿐이라</span> 손님을 모으기 어렵다.
+	<<else>>
+		<span class="red">팔 수 있는 물건이 하나도 없다!</span>
+	<</if>>
+	<<if $daily.stall_lewdity gte 1>>
+		<br>
+		주변에 <span class="lewd">음란한</span> 분위기가 맴돌고 있다.
+		<<switch $daily.stall_lewdity>>
+			<<case 1>>
+			<<case 3>><span class="pink">멀리서 당신을 지켜보는 것 같은 시선이 느껴지지만, 마주치면 이내 사라진다.</span>
+			<<case 2>><span class="purple">사람들이 가끔씩 당신에게 묘한 눈길을 보낸다.</span>
+			<<default>><span class="red">사람들이 떼 지어 서서 멀리서부터 당신을 대놓고 훔쳐본다.</span>
+		<</switch>>
+		이러한 분위기 덕에 음란한 행동이 손님을 부르는 데
+		<<if $daily.stall_lewdity gte 4>>
+			<span class="lewd">가히 결정적인</span>
+		<<elseif $daily.stall_lewdity gte 3>>
+			<span class="teal">상당한</span>
+		<<elseif $daily.stall_lewdity gte 2>>
+			<span class="lblue">괜찮은</span>
+		<<else>>
+			<span class="blue">약간의</span>
+		<</if>>
+		도움이 되고 있다.
+	<</if>>
+<</widget>>
+
+<<widget "stall_trust">>
+	<<He>>【은는】 
+	<<if $enemytrust gte 50>>
+		<span class="green">넋이 나가 있다.</span>
+	<<elseif $enemytrust gte 30>>
+		<span class="teal">열성적이다.</span>
+	<<elseif $enemytrust gte 10>>
+		<span class="lblue">흡족해하고 있다.</span>
+	<<elseif $enemytrust gte -10>>
+		<span class="blue">흥미를 보이고 있다.</span>
+	<<elseif $enemytrust gte -30>>
+		<span class="purple">짜증을 내고 있다.</span>
+	<<else>>
+		<span class="pink">화가 나 있다.</span>
+	<</if>>
+   <<if $enemyarousal gte 10>>
+	또한 <<He>>【은는】 
+		<<if $enemyarousal gte 100>>
+			<span class="red">음흉하게 굴고 있다.</span>
+           /* Will ask for sex. */
+       <<elseif $enemyarousal gte 90>>
+           <span class="lewd">당장이라도 덮치고 싶어 안달이 나 있다.</span>
+           /* Guaranteed to ask for sex at the next sale. */
+       <<elseif $enemyarousal gte 60>>
+			<span class="pink">호색적인 태도를 보이고 있다.</span>
+           /* Has a chance to ask for sex at the next sale. */
+       <<elseif $enemyarousal gte 40>>
+			<span class="purple">달아올라 있다.</span>
+       <<elseif $enemyarousal gte 20>>
+			<span class="blue">흥분해 있다.</span>
+		<<else>>
+			<span class="lblue">추파를 던지고 있다.</span>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "stall_sell_actions">>
+	<<link [[정가를 부른다|Stall Sell]]>><</link>><<note "(<<printmoney `$stall_cost * $stall_amount`>>)" "gold">>
+	<br>
+	<<link [[할인해 준다|Stall Sell]]>><<set $stall_cost *= 0.8>><<set $enemytrust += 20>><</link>><<note "(<<printmoney `$stall_cost * $stall_amount * 0.8`>>)" "gold">><<gtrust>>
+	<br>
+	<<link [[비싸게 부른다|Stall Sell]]>><<set $enemytrust -= 20>><<set $stall_cost *= 1.2>><</link>><<note "(<<printmoney `$stall_cost * $stall_amount * 1.2`>>)" "gold">><<ltrust>>
+	<br>
+	<<if $stall_foodstuff isnot $stall_expensive and $stall_expensive isnot undefined>>
+		<<link [[제일 비싼 걸 보여준다|Stall Sell Push]]>><<set $stall_foodstuff to $stall_expensive>><<set $enemytrust -= 20>><</link>><<ltrust>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "stall_sell_man">>
+   <<if $enemyarousal gte 100>>
+       <<person1>><<person>>【이가】 가판대 너머로 몸을 기울여 당신의 팔을 움켜쥔다. "돈은 낼 만큼 냈잖아." <<he>>【이가】 속삭인다. "이제 진짜 상품을 내놓을 시간이야."<<glewdity>><<lewdity 1>>
+		<br><br>
+
+		<<if hasSexStat("promiscuity", 4)>>
+			<<link [[입으로 봉사하겠다고 제안한다|Stall Oral]]>><</link>><<promiscuous4>>
+			<br>
+		<<else>>
+			<<insufficientStat "promiscuity" "무엇이든 제안하기엔">>
+			<br>
+		<</if>>
+       <<link [[뿌리친다|Stall Pull]]>><</link>>
+		<br>
+	<<elseif $enemytrust gte random(-50, 50)>>
+		<<person1>><<person>>【이가】 수긍한다.
+		<<stall_sell>>
+		<br><br>
+		<<endstall>>
+		<<stall_inventory>>
+		<br><br>
+
+		<<if _inventory_found isnot 1>>
+			팔 물건이 없으니 가판대를 지킬 이유가 별로 없다.
+			<br><br>
+
+			<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+			<br>
+		<<elseif _inventory_in_stall isnot 1>>
+			진열할 물건이 없으니 가판대를 지킬 이유가 별로 없다.
+			<br><br>
+			<<icon "project-maths.png">><<link [[가판대 관리|Stall Manage]]>><</link>>
+			<br>
+			<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+			<br>
+		<<else>>
+
+			<<He>>【은는】 돌아선다.
+			<br><br>
+
+			<<stall_trust>>
+			<br><br>
+
+			<<if $stall_seduced is 0>>
+               <<link [[추파를 던져 <<him>>【을를】 다시 유혹한다 (0:05)|Stall Seduce]]>><<pass 5>><</link>><<promiscuous1>><<glust>>
+				<br>
+			<<elseif $stall_seduced is 1>>
+               <<link [[몸매를 과시하여 <<him>>【을를】 다시 유혹한다 (0:05)|Stall Seduce]]>><<pass 5>><</link>><<exhibitionist1>><<glust>>
+				<br>
+			<<elseif $stall_seduced is 2 and hasSexStat("promiscuity", 2)>>
+               <<link [[키스로 <<him>>【을를】 다시 유혹한다 (0:05)|Stall Seduce]]>><<pass 5>><</link>><<promiscuous2>><<glust>>
+				<br>
+           <<elseif $stall_seduced is 3 and $worn.lower.type.includes("naked")>>
+				<<if $worn.under_lower.type.includes("naked") and hasSexStat("exhibitionism", 3)>>
+                   <<link [[속옷을 입지 않은 것을 보여주며 <<him>>【을를】 다시 유혹한다 (0:05)|Stall Seduce]]>><<pass 5>><</link>><<exhibitionist3>><<gglust>>
+					<br>
+				<<elseif !$worn.under_lower.type.includes("naked") and hasSexStat("exhibitionism", 2)>>
+                   <<link [[속옷을 입지 않았다는 걸 보여주며 <<him>>【을를】 다시 유혹한다 (0:05)|Stall Seduce]]>><<pass 5>><</link>><<exhibitionist2>><<glust>>
+					<br>
+				<</if>>
+           <<elseif $stall_seduced is 4 and $worn.lower.type.includes("naked") and $worn.under_lower.type.includes("naked") and hasSexStat("exhibitionism", 4)>>
+               <<link [[더 잘 보이게 해 주며 <<him>>【을를】 다시 유혹한다 (0:05)|Stall Seduce]]>><<pass 5>><</link>><<exhibitionist4>><<gglust>>
+                   <br>
+			<</if>>
+
+           <<link [[<<him>>【을를】 보내준다|Stall]]>><<endevent>><<endstall>><</link>>
+			<br>
+			<<link [[가판대를 떠난다|Connudatus Street]]>><<endevent>><<endstall>><<set $eventskip to 1>><<clotheson>><</link>>
+			<br>
+		<</if>>
+	<<elseif $enemytrust gte -50>>
+		<<set $enemytrust -= 10>>
+		<<person1>><<person>>【이가】 흥정하려 든다.
+		<br><br>
+
+		<<stall_trust>>
+		<br><br>
+
+		<<link [[물러서지 않는다|Stall Sell]]>><</link>><<note "(<<printmoney `$stall_cost * $stall_amount`>>)" "gold">>
+		<br>
+		<<link [[가격을 낮춰준다|Stall Sell]]>><<set $stall_cost *= 0.8>><<set $enemytrust += 20>><</link>><<note "(<<printmoney `$stall_cost * $stall_amount * 0.8`>>)" "gold">><<gtrust>>
+		<br>
+		<<link [[가격을 올린다|Stall Sell]]>><<set $enemytrust -= 20>><<set $stall_cost *= 1.2>><</link>><<note "(<<printmoney `$stall_cost * $stall_amount * 1.2`>>)" "gold">><<ltrust>>
+		<br>
+	<<else>>
+		<<person1>><<person>>【은는】 비웃으며 떠났다.
+		<br><br>
+
+		<<stall_actions>>
+
+	<</if>>
+<</widget>>
+
+<<widget "stall_init">>
+	<<set $stall_foodstuff to $foodstuff_inventory.random()>>
+	<<set $enemytrust to 0>>
+	<<set $enemyarousal to 0>>
+	<<set $stall_seduced to 0>>
+	<<stall_update>>
+<</widget>>
+
+<<widget "stall_update">>
+   <<set _stall_multiplier to Math.max(1,Math.pow(2,Math.max(0,$stall_seduced-2)))>>
+   /* Range of 2-5 becomes 1-8, for a gentle exponential scaling */
+	<<if setup.foodstuff[$stall_foodstuff].shop.stall_size is "large">>
+       <<set $stall_amount to random(1,2 * _stall_multiplier)>>
+	<<elseif setup.foodstuff[$stall_foodstuff].shop.stall_size is "small">>
+       <<set $stall_amount to random(25 * _stall_multiplier, 75 * _stall_multiplier)>>
+	<<else>>
+		<<if $stall_seduced lte 1>>
+			<<set $stall_amount to random(1, 10)>>
+		<<else>>
+			<<set $stall_amount to random(5 * _stall_multiplier, 15 * _stall_multiplier)>>
+			/* At most 120 products in one unlikely sale. Averages are (5,10,20,40,80) */
+		<</if>>
+	<</if>>
+	<<if $stall_amount gte $foodstuff[$stall_foodstuff].amount>>
+		<<set $stall_amount to clone($foodstuff[$stall_foodstuff].amount)>>
+	<</if>>
+	<<set $stall_cost to Math.round(clone(setup.foodstuff[$stall_foodstuff].shop.sell_price))>>
+<</widget>>
+
+<<widget "stall_amount">>
+	<<if $stall_amount is 1>>
+		<<set _text_output to "한 ">>
+	<<else>>
+		<<number $stall_amount silent>>
+	<</if>>
+	<<print _text_output>>
+<</widget>>
+
+<<widget "stall_check_text">><<silently>>
+	<<set $_examines to ["살펴본다","들어 올린다","집어 든다","냄새를 맡는다"].pluck()>>
+	<<switch $stall_foodstuff>>
+		<<case "blood_lemon" "bottle_of_breast_milk" "baby_bottle_of_breast_milk" "bottle_of_semen" "strange_flower" "wolfshroom">>
+			<<if $_examines is "sniffs">>
+				<<set $_reacts to " 그러다 얼굴을 붉힌다">>
+			<<else>>
+				<<set $_reacts to "">>
+			<</if>>
+		<<case "apple" "banana" "cabbage" "orange" "peach" "pear" "plum" "strawberry">>
+			<<if $_examines is "examines">>
+				<<set $_reacts to " 멍든 곳이 있는지">>
+			<<elseif ["lifts","picks up"].includes($_examines)>>
+				<<set $_reacts to " 멍든 곳이 있는지 확인하려고">>
+			<<else>>
+				<<set $_reacts to "">>
+			<</if>>
+		<<case "chicken_egg" "bird_egg">>
+			<<if $_examines is "sniffs">>
+				<<set $_examines to "examines">>
+				<<set $_reacts to " 금 간 곳이 있는지">>
+			<<elseif $_examines is "examines">>
+				<<set $_reacts to " 금 간 곳이 있는지">>
+			<<elseif ["lifts","picks up"].includes($_examines)>>
+				<<set $_reacts to " 금 간 곳이 있는지 확인하려고">>
+			<</if>>
+		<<default>>
+			<<set $_reacts to "">>
+	<</switch>>
+
+	<<set _text_output to "한 개의 <span class='green'>" + (setup.foodstuff[$stall_foodstuff].name) + "</span>【을를】 " + $_examines + $_reacts>>
+<</silently>><<print _text_output>><</widget>>
+
+<<widget "stallCustomerArousal">>
+	<<set $enemyarousal += 10*random(1,2)*random(1,2)>>
+	/*
+	25% +10 arousal
+	50% +20 arousal
+	25% +40 arousal
+	*/
+<</widget>>
+
+<<widget "stall_autosale">>
+	/* 1/3 no sale, 1/3 normal sale, 1/3 double sale. Averages to 1 sale. */
+	<<silently>><<stall_inventory>><</silently>>
+	<<stall_init>>
+
+	<<if Math.min(10000,3000 + $attractiveness/2 + $fame.business + (currentSkillValue('tending') * 2) + (Math.min($foodstuff_inventory.length,10) * 500)) gte random(1, 15000)>>
+		/* No sale in 1/3 of the cases. */
+		<<set _stall_attention to 2>>
+		<<set $stall_foodstuff to $foodstuff_inventory.random()>>
+
+		/* Decide between 1 item, doubled amount, or 2 different items. */
+		<<if random(1, 2) is 2>>
+			<<if random(1, 2) is 2>>
+				<<set $stall_seduced to 2>>  /* Doubles the amount sold. */
+			<<else>>
+				/* Try to sell two different products */
+				<<if $foodstuff_inventory.length gte 2>>
+					<<set $_food2 to $foodstuff_inventory.random()>>
+					<<if $_food2 is $stall_foodstuff>>
+						<<set $stall_seduced to 2>>  /* Fallback to doubling if same. */
+					<</if>>
+				<<else>>
+					<<set $stall_seduced to 2>>  /* Not enough variety. */
+				<</if>>
+			<</if>>
+		<</if>>
+
+		<<stall_update>>
+		<<generate1>><<person1>>
+
+
+		<<silently>><<stall_sell>><</silently>>
+		<<person>>【이가】
+		<<if $stall_amount gte 2>>
+			<span class="green"><<print window.KR.getFoodstuffCountKr($stall_foodstuff, $stall_amount)>></span>
+		<<else>>
+			<span class="green"><<print setup.foodstuff[$stall_foodstuff].name>> 하나</span>
+		<</if>>
+		【을를】
+		<<if $_food2 is undefined>>
+			<<printmoney `$stall_cost * $stall_amount`>>에 구매한다.
+		<<else>>
+			<<printmoney `$stall_cost * $stall_amount`>>에, 그리고
+			<<set $stall_foodstuff to $_food2>>
+			<<stall_update>>
+			<<silently>><<stall_sell>><</silently>>
+			<<if $stall_amount gte 2>>
+				<span class="green"><<print window.KR.getFoodstuffCountKr($stall_foodstuff, $stall_amount)>></span>
+			<<else>>
+				<span class="green"><<print setup.foodstuff[$stall_foodstuff].name>> 하나</span>
+			<</if>>
+			【을를】 <<printmoney `$stall_cost * $stall_amount`>>에 구매한다.
+		<</if>>
+		<br>
+
+		<<set $stall_seduced to 0>>
+		<<endstall>>
+		<<silently>><<stall_inventory>><</silently>>
+		<<famebusiness 1>>
+		<<endevent>>
+	<</if>>
+<</widget>>
+
+<<widget "marketStockDisplay">>
+	<div id="marketStockDisplay" class="food_ui no-numberify">
+		<div id="body">
+			<div id="mainSection">
+				<div id="search">
+					검색:
+					<<textbox "_marketSearch" "">>
+					<<run $(() => {
+						var marketTimer = null;
+						$('#textbox--marketsearch').on('input change keypress', e => {
+							_marketSearch = e.target.value;
+							clearTimeout(marketTimer);
+							marketTimer = setTimeout(updateUI, 300);
+						});
+						var updateUI = () => {
+							Wikifier.wikifyEval('<<replace "#itemList">><<marketStockDisplayItems>><</replace>>');
+						}
+					})>>
+				</div>
+				<div id="itemList">
+					<<marketStockDisplayItems>>
+				</div>
+			</div>
+			<div id="altSection" class="mobileHidden">
+				<<if $lastRecipeViewed and setup.foodstuff[$lastRecipeViewed]>>
+					<<marketStockDisplayItemDetail $lastRecipeViewed>>
+				<</if>>
+			</div>
+			<div id="mobileCloser" class="mobileOnly mobileHidden" onclick="wikifier('addclass', '#altSection', 'mobileHidden'); wikifier('addclass', '#mobileCloser', 'mobileHidden');"></div>
+		</div>
+	</div>
+	<br>
+<</widget>>
+
+<<widget "marketStockDisplayItems">>
+	<<marketFilter>>
+	<<set _groupNameMap to {
+		"ingredient": "재료",
+		"sweets": "디저트",
+		"savouries": "요리",
+		"drinks": "음료",
+		"produce": "농산물",
+		"meat": "고기",
+		"seafood": "해산물",
+		"vegetable": "채소",
+		"fruit": "과일",
+		"mushroom": "버섯",
+		"flower": "꽃",
+		"dish": "요리",
+		"materials": "재료"
+	}>>
+	<<for _category range _marketGroups>>
+		<<if !_marketKeys.find(key => key.group is _category)>><<continue>><</if>>
+		<<set _categoryVar to "_" + _category.replace(" ", "")>>
+		<<foldout false _categoryVar>>
+			<span class="gold"><<print _groupNameMap[_category] || _category.toLocaleUpperFirst()>></span>
+			<<set _filteredItems to _marketKeys.filter(key => key.group is _category)>>
+			<div class="text-align-center">
+				<<if _filteredItems.length gt 1>>
+					모두 선택:
+					<<capture _filteredItems>>
+						<<link "끄기">>
+							<<run _filteredItems.forEach(key => {
+								let control = $(`#${key.key} input`)[0];
+								if (control) {
+									control.checked = false;
+									$foodstuff[key.key].marketStall = false;
+								}
+							})>>
+						<</link>> |
+						<<link "켬">>
+							<<run _filteredItems.forEach(key => {
+								let control = $(`#${key.key} input`)[0];
+								if (control) {
+									control.checked = true;
+									$foodstuff[key.key].marketStall = true;
+								}
+							})>>
+						<</link>>
+					<</capture>>
+				<</if>>
+			</div>
+			<<for $_i, $_keyObject range _filteredItems>>
+				<div @id="$_keyObject.key" class="item"><<marketStockDisplayItem $_keyObject.key>></div>
+				<<if $_i < _filteredItems.length - 1>><hr><</if>>
+			<</for>>
+		<</foldout>>
+	<</for>>
+<</widget>>
+
+<<widget "marketStockDisplayItem">>
+	<<set $_setupItem to setup.foodstuff[_args[0]]>>
+	<div class="details">
+		<div>
+			<<foodstufficon _args[0]>> <<recipe_name _args[0] "cap">> |
+			보유 중: <span class="gold"><<print $foodstuff[_args[0]].amount>></span> |
+			가치: <<printmoney `$_setupItem.shop.sell_price`>> |
+			총계: <<printmoney `$_setupItem.shop.sell_price * $foodstuff[_args[0]].amount`>>
+			<br>
+			<<set $_variable to `$foodstuff['${_args[0]}'].marketStall`>>
+			<label>가판대에 진열됨: <<checkbox $_variable false true autocheck>></label>
+		</div>
+	</div>
+	<div class="recipe">
+		<<capture _args[0]>>
+			<<if $options.images is 1>>
+				<<set _file to setup.foodstuff[_args[0]].kitchen_item_type_icon>>
+				<<link "<<iconUi _file>>">>
+					<<replace "#altSection">><<marketStockDisplayItemDetail _args[0]>><</replace>>
+					<<removeclass "#altSection, #mobileCloser" "mobileHidden">>
+				<</link>>
+			<<else>>
+				<<link "상세">>
+					<<replace "#altSection">><<marketStockDisplayItemDetail _args[0]>><</replace>>
+					<<removeclass "#altSection, #mobileCloser" "mobileHidden">>
+				<</link>>
+			<</if>>
+		<</capture>>
+	</div>
+<</widget>>
+
+<<widget "marketStockDisplayItemDetail">>
+	<<set $lastRecipeViewed to _args[0]>>
+	<<set $_setupItem to setup.foodstuff[_args[0]]>>
+	<div id="basket">
+		<div>
+		<<foodstufficon _args[0]>>
+			<div class="recipeTitle"><<recipe_name _args[0] "cap">>:</div>
+		</div>
+		<div class="mobileOnly">
+			<<link "닫기">>
+				<<addclass "#altSection, #mobileCloser" "mobileHidden">>
+			<</link>>
+		</div>
+	</div>
+	<div id="basketItems">
+		<<if setup.foodstuff[_args[0]].recipe?.ingredients.length gt 0>>
+			<div id="requiredForRecipe">
+				<<requiredForRecipe _args[0]>>
+			</div>
+		<</if>>
+		<<knownFoodRecipes _args[0]>>
+	</div>
+<</widget>>

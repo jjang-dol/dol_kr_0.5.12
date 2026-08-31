@@ -1,0 +1,537 @@
+:: Widgets Lake [widget]
+<<widget "lakeeffects">>
+	<<set $laketeenspresent to teensPresentCheck("lake")>>
+
+	<<if Weather.precipitation is "none" and Time.hour gte 18>>
+		<<set $laketeensfire to 1>>
+	<<else>>
+		<<set $laketeensfire to 0>>
+	<</if>>
+
+	<<wPersist "forest">><<getTarget true>>
+<</widget>>
+
+<<widget "destinationlake">>
+	<<if $bus is "lakeshallows">>
+		<<link [[다음|Lake Shallows]]>><</link>>
+		<br>
+	<<elseif $bus is "lakedepths">>
+		<<link [[다음|Lake Depths]]>><</link>>
+		<br>
+	<<elseif $bus is "lakefirepit">>
+		<<link [[다음|Lake Firepit]]>><</link>>
+		<br>
+	<<elseif $bus is "lakefishingrock">>
+		<<link [[다음|Lake Fishing Rock]]>><</link>>
+		<br>
+	<<elseif $bus is "lakecampsite">>
+		<<link [[다음|Lake Campsite]]>><</link>>
+		<br>
+	<<elseif $bus is "lakewaterfall">>
+		<<link [[다음|Lake Waterfall]]>><</link>>
+		<br>
+	<<elseif $bus is "lakebus">>
+		<<link [[다음|Lake Bus]]>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Lake Shore]]>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "passoutlake">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "lake">>
+	<<else>>
+		당신은 너무 무리했다.
+		<br><br>
+		<<passout>>
+
+		<<if $exposed gte 1 and $syndromeeden is 1 and random(1,2) is 2>>
+			<<link [[다음|Eden Passout Lake Rescue]]>><</link>>
+		<<elseif C.npc.Mason.init is 1 and !Time.schoolDay and Weather.precipitation is "rain" and Time.dayState is "day" and random(1,2) is 1>>
+			<<link [[모든 것이 어둠 속으로 희미해진다...|Mason CPR]]>><</link>>
+		<<elseif dangerEvent()>>
+			<<if $laketeenspresent is 1 and !Weather.isSnow>>
+				<<link [[다음|Lake Mermaid]]>><</link>>
+				<br>
+			<<else>>
+				<<link [[다음|Lake Ritual]]>><</link>>
+				<br>
+			<</if>>
+		<<else>>
+			<<set $foresthunt to 0>>
+			<<ambulance>>
+		<</if>>
+		<<pass 1 hour>>
+		<<trauma 6>><<set $stress -= 2000>>
+	<</if>>
+<</widget>>
+
+<<widget "lakejourney">>
+	<<beastNEWinit 1 wolf>>
+	누군가 비명을 지른다. 다른 사람들과 함께 고개를 돌리자, <<beasttype>>【이가】 나무 사이에서 나타난 것이 보인다. 비명 소리가 몇 번 더 울리고, 사람들은 뒷걸음질 치기 시작한다.
+	<br><br>
+	<<if $monster is 1>>
+		적나라한 <<bHis>> 나체는 상상력을 자극할 여지조차 주지 않고, <<bhis>> 성기가 군중에게 고스란히 노출되어 있다. <<bHe>>【은는】 <<bhimself>>【을를】 가리려는 시도조차 하지 않으며, 몇몇 사람들은 눈을 가리는 반면 다른 사람들은 초조하게 웃음을 터뜨린다.
+		<br><br>
+	<</if>>
+	<<bHe>>【은는】 조금 떨어진 곳에 서서 지켜본다.
+	<br><br>
+	<!-- Modified for Monster People -->
+	<<if hasSexStat("deviancy", 2) and ($monster is 1 or $settings.bestialityEnabled)>>
+		<<link [[<<bhim>>【와과】 상대한다|Lake Wolf Sex]]>><<set $sexstart to 1>><</link>><<deviant2>><<status 2>><<gcool>>
+		<br>
+	<</if>>
+
+	<<link [[도망친다|Lake Wolf Run]]>><<stress 3>><</link>><<gstress>>
+	<br>
+<</widget>>
+
+<<widget "lakereturnjourney">>
+	<<if $laketeenspresent is 1 and Time.hour is 20>>
+		시간이 늦어지며, 숲의 그림자가 점점 길어진다. 사람들은 마을로 돌아갈 준비를 하고 있다. 아무도 혼자 남아 이동하고 싶어 하지 않는다.
+		<br><br>
+
+		<<if $earSlime.forcedCommando isnot undefined and $worn.under_lower.name isnot "naked">>
+		<<elseif $exposed lte 0>>
+			<<entertownicon>><<link [[그들과 함께 간다 (0:30)|Lake Return Journey]]>><<set $foresthunt to 0>><<pass 30>><</link>>
+			<br><br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "eventlakesafe">>
+	<<if random(1, 20) is 1 and !$possessed>>
+		<<eventAmbient>>
+	<</if>>
+<</widget>>
+
+<<widget "eventlakewater">>
+	<<if npcCanHunt("Ivory Wraith") and $wraith.state and $wraith.hunt is 0 and $wraith.timer gte random(0, 10)>>
+		<<wHunt "lake">>
+	<<elseif $bus is "lakeshallows">>
+		<<if $laketeenspresent is 1>>
+			<<generatey1>><<person1>> 한 <<person>>【이가】 호숫가에서 당신을 지켜보고 있다.
+			<br><br>
+			<<link [[손을 흔든다 (0:01)|Lake Wave]]>><<stress -2>><<pass 1>><</link>><<lstress>>
+			<br>
+			<<link [[무시한다|Lake Shallows]]>><<endevent>><<set $eventskip to 1>><</link>>
+			<br>
+			<<if $player.gender_appearance is "f" and hasSexStat("exhibitionism", 3)>>
+				<<link [[몸을 보여준다|Lake Flash]]>><</link>><<exhibitionist3>>
+				<br>
+			<</if>>
+		<<else>>
+			다리가 수초에 엉켜버린다. 발버둥 치며 수초를 풀어내는 데 몇 분이나 걸린다.
+			<<gtiredness>><<tiredness 2>>
+			<br><br>
+			<<pass 3>>
+			<<link [[다음|Lake Shallows]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if $rng gte 91 and Weather.precipitation is "rain" and $settings.bestialityEnabled and $settings.voreEnabled and $hallucinations gte 2 and $controlled is 0>>
+		발밑의 물속에서 무언가 커다란 것이 솟구쳐 오른다. 크게 벌어진 아가리가 당신의 허벅지를 콱 움켜쥔다.
+		<br><br>
+
+		<<link [[다음|Lake Vore]]>><<set $molestationstart to 1>><</link>>
+		<br>
+		<<elseif $rng gte 81 and $settings.swarmsEnabled>>
+			<<if $settings.slimesEnabled and Time.isBloodMoon()>>
+				물결이 요동친다. 창백한 슬라임 떼가 당신을 에워싼다.
+			<<else>>
+				물결이 요동친다. 작은 물고기 떼가 당신을 에워싼다.
+			<</if>>
+			<br><br>
+
+			<<link [[다음|Lake Depths Swarm]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<else>>
+			<<if Time.dayState is "night" and Weather.precipitation is "rain">>
+			무언가 다리를 스치며 당신을 깜짝 놀라게 한다. 어둡고 사나운 물밑을 내려다보지만, 아무것도 보이지 않는다. 묘한 기분이 든다.
+			<<garousal>><<arousal 600>><<gstress>><<stress 6>>
+			<br><br>
+			<<else>>
+			무언가 다리를 스치며 당신을 깜짝 놀라게 한다. 물밑을 내려다보지만, 아무것도 보이지 않는다.
+			<<garousal>><<arousal 600>><<gstress>><<stress 6>>
+			<br><br>
+			<</if>>
+
+		<<link [[다음|Lake Depths]]>><<set $eventskip to 1>><</link>>
+		<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "eventlakeice">>
+	<<rng>>
+	<<if npcCanHunt("Ivory Wraith") and $wraith.state and $wraith.hunt is 0 and $wraith.timer gte random(0, 10)>>
+		<<wHunt "lake">>
+	<<elseif $rng gte 81>>
+		<<dancedifficulty 1 1000 true>>
+		<<if $danceSuccess>>
+			바람이 거세져 당신을 거의 넘어뜨릴 뻔하지만, <span class="green">당신은 어떻게든 균형을 유지한다.</span>
+		<<else>>
+			바람이 거세져, <span class="red">당신은 균형을 잃고</span> 얼음 위에서 미끄러진다.
+			<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+				거칠게 착지하느라 손과 무릎이 아프지만, 적어도 당신의 <<pregnancyBabyText "pc">>【을를】 보호할 수 있었다.
+			<</if>>
+			<<gstress>><<gpain>><<stress 6>><<pain 4>>
+		<</if>>
+		<br><br>
+		<<destination_lake_ice>>
+	<<elseif $rng gte 61>>
+		갑작스러운 공포가 당신을 덮친다. <span class="pink">누군가 당신을 지켜보는 느낌이 든다.</span>
+		<<if $laketeenspresent is 1>>
+			학생들의 목소리가 잦아들더니, 어느새 당신 혼자 남는다.
+		<</if>>
+		<br><br>
+		아래에 무언가가 있다.
+		<br><br>
+
+		<<link [[무시한다|Lake Ice Ignore]]>><<def 1>><</link>><<willpowerdifficulty 1 $willpowermax>>
+		<br>
+		<<link [[내려다본다|Lake Ice Look]]>><</link>>
+		<br>
+	<<elseif $rng gte 41>>
+		무거운 신음 소리가 들린다. 그리고 또 한 번. 얼음이 위험할지도 모른다.
+		<br><br>
+
+		<<link [[조심한다 (0:10)|Lake Ice Careful]]>><<pass 10>><</link>>
+		<br>
+		<<link [[평소처럼 걷는다|Lake Ice Normal]]>><</link>>
+		<br>
+	<<elseif $rng gte 21>>
+		<<if Weather.precipitation is "snow">>
+			눈이 거세게 내리며, 호수 주변의 나무들을 가린다.
+			<<if currentSkillValue('history') gte random(1, 1000)>>
+				<span class="green">눈은 곧 그친다.</span>
+				<br><br>
+			<<else>>
+				방향을 잡을 나무들이 보이지 않아, 거센 눈보라가 곧 그쳤음에도 <span class="red">당신은 방향을 잃는다.</span><<gstress>><<stress 6>>
+				<br><br>
+			<</if>>
+		<<elseif Weather.is("clear")>>
+			<<if Time.dayState is "night">>
+				<<if Time.isBloodMoon()>>
+					붉은 달이 얼음에 반사된다. 두려움이 당신을 찌른다.<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+					<br><br>
+				<<else>>
+					달이 얼음에 반사된다. 차갑고 아름답다.<<lstress>><<stress -6>>
+					<br><br>
+				<</if>>
+			<<else>>
+				햇빛이 얼음에 반사되어 눈이 부시다. 당신은 눈을 가린다.
+				<br><br>
+			<</if>>
+		<<else>>
+			<<if Time.dayState is "night">>
+				주변 나무들이 어둠 속에서 거의 보이지 않는다.<<gstress>><<stress 6>>
+				<br><br>
+			<<else>>
+				<<beastNEWinit 1 fox>>
+				당신은 호숫가 흙바닥을 뒤지는 <<beasttype>>【을를】 발견한다. <<bHis>> 귀가 쫑긋 서더니, <<bhe>>【은는】 나무들 사이로 튀어간다.
+				<br><br>
+				<<endevent>>
+			<</if>>
+		<</if>>
+		<<destination_lake_ice>>
+	<<else>>
+		얼음 위에서 미끄러진다!<<gstress>><<stress 6>>
+		<br><br>
+
+		<<link [[몸을 가눈다|Lake Ice Brace]]>><<status -10>><</link>><<if $laketeenspresent is 1 and $bus is "lakeshallows">><<llcool>><</if>><<gstress>>
+		<br>
+		<<link [[넘어지지 않으려 애쓴다|Lake Ice Stay]]>><</link>><<dancedifficulty 1 600>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "destination_lake_ice">>
+	<<if $bus is "lakedepths">>
+		<<link [[다음|Lake Depths Ice]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Lake Shallows Ice]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "eventlake">>
+	<<if npcCanHunt("Ivory Wraith") and $wraith.state and $wraith.hunt is 0 and $wraith.timer gte random(0, 10)>>
+		<<wHunt "lake">>
+	<<elseif $rng gte 81>>
+		<!-- Modified for Monster People -->
+		<<beastNEWinit 1 boar>>
+		당신은 나무 밑동에서 쓰레기를 뒤지고 있는 <<beasttype>>【을를】 본다. <<bHe>>【이가】 당신을 발견한다.
+		<br><br>
+		<<if $monster is 1 or $settings.bestialityEnabled>>
+			<<link [[물러서지 않는다|Lake Boar Stand]]>><</link>>
+			<br>
+			<<link [[도망친다|Lake Boar Run]]>><</link>><<athleticsdifficulty>>
+			<br>
+		<<else>>
+			당신은 돌아서서 숲으로 달려간다. 발이 걸려 넘어져 쓰러질 때까지 나뭇가지들이 당신을 할퀴어댄다. 무사히 빠져나온 것 같지만, 당신의 심장은 계속해서 쿵쾅거린다.<<beastescape>>
+			<br><br>
+			<<endevent>>
+			<<set $eventskip to 1>>
+			<<destinationlake>>
+		<</if>>
+	<<elseif $rng gte 51>>
+		<<if $wraith.state or $hallucinations gte 1>>
+			누군가 당신의 이름을 부르는 소리를 들은 것 같았지만, 그곳엔 아무도 없다.
+			<<gtrauma>><<trauma 3>>
+		<<else>>
+			나무 사이를 지나는 바람이 낮게 울부짖는 소리를 낸다. <<if $awarelevel gte 1>>순간, 나무들이 모두 호수에서 멀어지는 방향으로 휘날리는 것처럼 보인다.<</if>>
+			<<gstress>><<stress 1>>
+		<</if>>
+		<br><br>
+		<<set $eventskip to 1>>
+		<<destinationlake>>
+	<<else>>
+		나무 사이에서 두 눈동자가 당신을 빤히 응시하다 이내 사라진다.
+		<<gstress>><<stress 6>>
+		<br><br>
+		<<set $eventskip to 1>>
+		<<destinationlake>>
+	<</if>>
+<</widget>>
+
+<<widget "meditateoptions">>
+	<<link [[생각을 가라앉힌다 (1:00)|Lake Meditate]]>><<pass 60>><<set $phase to 2>><<willpower 1>>
+		<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+			<<stress -6>><<awareness -2>><<arousal -1200>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+			<<stress -6>><<awareness -1>><<arousal -1000>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+			<<stress -5>><<awareness -1>><<arousal -800>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+			<<stress -4>><<awareness -1>><<arousal -600>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+			<<stress -3>><<awareness -1>><<arousal -500>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+			<<stress -2>><<awareness -1>><<arousal -400>>
+		<<else>>
+			<<stress -1>><<awareness -1>><<arousal -300>>
+		<</if>>
+	<</link>><<lawareness>><<gwillpower>><<lstress>><<larousal>>
+	<br>
+
+	<<if insecurityExists("penis_small") and $daily.lakeMeditate isnot 1>>
+		<<link [[작은 자지를 두고 명상한다 (1:00)|Lake Meditate]]>><<pass 60>><<set $phase to $player.penissize lt 2 ? 4 : 5>><<willpower 1>><<set $daily.lakeMeditate to 1>>
+			<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+				<<stress 5>><<acceptance "penis_small" 20>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+				<<stress 5>><<acceptance "penis_small" 18>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+				<<stress 6>><<acceptance "penis_small" 16>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+				<<stress 7>><<acceptance "penis_small" 14>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+				<<stress 8>><<acceptance "penis_small" 12>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+				<<stress 10>><<acceptance "penis_small" 10>>
+			<<else>>
+				<<stress 12>><<acceptance "penis_small" 8>>
+			<</if>>
+		<</link>><<gstress>><<gwillpower>><<gacceptance>>
+		<br>
+	<</if>>
+	<<if insecurityExists("penis_big") and $daily.lakeMeditate isnot 1>>
+		<<link [[큰 자지를 두고 명상한다 (1:00)|Lake Meditate]]>><<pass 60>><<set $phase to 6>><<willpower 1>><<set $daily.lakeMeditate to 1>>
+			<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+				<<stress 5>><<acceptance "penis_big" 20>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+				<<stress 5>><<acceptance "penis_big" 18>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+				<<stress 6>><<acceptance "penis_big" 16>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+				<<stress 7>><<acceptance "penis_big" 14>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+				<<stress 8>><<acceptance "penis_big" 12>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+				<<stress 10>><<acceptance "penis_big" 10>>
+			<<else>>
+				<<stress 12>><<acceptance "penis_big" 8>>
+			<</if>>
+		<</link>><<gstress>><<gwillpower>><<gacceptance>>
+		<br>
+	<</if>>
+
+	<<if insecurityExists("breasts_small") and $daily.lakeMeditate isnot 1>>
+		<<link [[작은 가슴을 두고 명상한다 (1:00)|Lake Meditate]]>><<pass 60>><<set $phase to $player.breastsize ? 7 : 8>><<willpower 1>><<set $daily.lakeMeditate to 1>>
+			<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+				<<stress 5>><<acceptance "breasts_small" 20>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+				<<stress 5>><<acceptance "breasts_small" 18>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+				<<stress 6>><<acceptance "breasts_small" 16>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+				<<stress 7>><<acceptance "breasts_small" 14>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+				<<stress 8>><<acceptance "breasts_small" 12>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+				<<stress 10>><<acceptance "breasts_small" 10>>
+			<<else>>
+				<<stress 12>><<acceptance "breasts_small" 8>>
+			<</if>>
+		<</link>><<gstress>><<gwillpower>><<gacceptance>>
+		<br>
+	<</if>>
+	<<if insecurityExists("breasts_big") and $daily.lakeMeditate isnot 1>>
+		<<link [[큰 가슴을 두고 명상한다 (1:00)|Lake Meditate]]>><<pass 60>><<set $phase to 9>><<willpower 1>><<set $daily.lakeMeditate to 1>>
+			<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+				<<stress 5>><<acceptance "breasts_big" 20>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+				<<stress 5>><<acceptance "breasts_big" 18>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+				<<stress 6>><<acceptance "breasts_big" 16>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+				<<stress 7>><<acceptance "breasts_big" 14>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+				<<stress 8>><<acceptance "breasts_big" 12>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+				<<stress 10>><<acceptance "breasts_big" 10>>
+			<<else>>
+				<<stress 12>><<acceptance "breasts_big" 8>>
+			<</if>>
+		<</link>><<gstress>><<gwillpower>><<gacceptance>>
+		<br>
+	<</if>>
+	<<if insecurityExists("pregnancy") and $daily.lakeMeditate isnot 1>>
+		<<set _pregnancyLink to (playerAwareTheyArePregnant() ? "Meditate on your pregnant belly (1:00)" : "Meditate on your pregnant looking belly (1:00)")>>
+		<<link [[_pregnancyLink|Lake Meditate]]>><<pass 60>><<set $phase to 10>><<willpower 1>><<set $daily.lakeMeditate to 1>>
+			<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+				<<stress 5>><<acceptance "pregnancy" 20>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+				<<stress 5>><<acceptance "pregnancy" 18>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+				<<stress 6>><<acceptance "pregnancy" 16>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+				<<stress 7>><<acceptance "pregnancy" 14>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+				<<stress 8>><<acceptance "pregnancy" 12>>
+			<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+				<<stress 10>><<acceptance "pregnancy" 10>>
+			<<else>>
+				<<stress 12>><<acceptance "pregnancy" 8>>
+			<</if>>
+		<</link>><<gstress>><<gwillpower>><<gacceptance>>
+		<br>
+	<</if>>
+
+	<<link [[생각을 관찰한다 (1:00)|Lake Meditate]]>><<pass 60>><<set $phase to 3>><<willpower 1>>
+		<<if currentSkillValue('willpower') gte (($willpowermax / 7) * 6)>>
+			<<stress 5>><<awareness 2>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 5)>>
+			<<stress 5>><<awareness 1>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 4)>>
+			<<stress 6>><<awareness 1>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 3)>>
+			<<stress 7>><<awareness 1>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 2)>>
+			<<stress 8>><<awareness 1>>
+		<<elseif currentSkillValue('willpower') gte (($willpowermax / 7) * 1)>>
+			<<stress 10>><<awareness 1>>
+		<<else>>
+			<<stress 12>><<awareness 1>>
+		<</if>>
+	<</link>><<gawareness>><<gstress>><<gwillpower>>
+	<br>
+	<<link [[멈춘다|Lake Fishing Rock]]>><</link>>
+	<br>
+<</widget>>
+
+<<widget "lakeclothes">>
+	<<if !$possessed>>
+		<br>
+		<<storeactions "lakeshore">>
+		<<wardrobeSelection true>>
+		<<set _store_location to "lakeshore">>
+		<<storeon _store_location "check">>
+		<<if _store_check is 1>>
+			<<set _clothes to clothingInStorage(_store_location)>>
+			<<if _clothes.length gt 0>>
+				<<if _clothes.length gt 2>>
+					당신의 옷이 바위 뒤 땅바닥에 놓여 있다.
+					<br>
+				<<elseif _clothes.length is 2>>
+					당신의 _clothes[0].name【와과】 _clothes[1].name【이가】 바위 뒤 땅바닥에 놓여 있다.
+					<br>
+				<<else>>
+					당신의 _clothes[0].name【이가】 바위 뒤 땅바닥에 놓여 있다.
+					<br>
+				<</if>>
+				<<clothingicon _clothes[0] _clothes[0].slot>><<link [[옷을 입는다|$passage]]>><<set $eventskip to 1>><<storeload _store_location>><</link>>
+				<br><br>
+			<</if>>
+		<</if>>
+		//수영복 세트://
+		<br>
+		<<listswimoutfits $wardrobe_location _store_location true>>
+		<br>
+		<<unset $wearoutfittext>>
+	<</if>>
+<</widget>>
+
+<<widget "lakecampfirewarmth">>
+	<<set _outsideTemp to Weather.Temperature.getCelsius()>>
+	<<set _weatherOverride to {outside: sigmoid(3, 37, 0.25, -4, _outsideTemp)}>>
+	/* Increases ambient temp by ~3c to ~40c based on current ambient temp */
+	/* This allows people to make use of it as a source for warmth */
+	/* without causing massive exhaustion during warm days */
+	/* Update the parameters as needed to improve user experience */
+	<<set Weather.Temperature.override.increase.outside(_weatherOverride.outside, "근처의 불이 당신의 몸을 녹여준다.")>>
+<</widget>>
+
+<<widget "destinationlakeruin">>
+	<<switch $bus>>
+		<<case "lakeunderwater">>
+			<<link [[다음|Lake Underwater]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<<case "lake_ruin">>
+			<<link [[다음|Lake Ruin]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<<case "lake_ruin_deep">>
+			<<link [[다음|Lake Ruin Deep]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<<case "lake_ruin_prison">>
+			<<link [[다음|Lake Ruin Prison]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<<default>>
+			<<link [[다음|Lake Ruin Deep]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<</switch>>
+	<br>
+<</widget>>
+
+<<widget "halloween_lake_invite">>
+	<<set $halloween_lake to 1>>
+	<<generates1>><<generates2>>당신은 어느 <<person1>><<person>> 곁을 지나간다.
+	<<if $location is "school">>
+		<<his>> 팔 밑으로 전단지 뭉치가 끼워져 있다.
+	<<else>>
+		<<his>> 어깨에 쿨러가 메여 있다.
+	<</if>>
+	<<his>> 곁에 있는 <<person2>><<person>>【은는】 전화 통화에 깊이 빠져 있다. <<he>>【이가】 할로윈 파티에 대해 언급한다.
+	<br><br>
+
+	<<link [[문의한다|Lake Halloween Invite Inquire]]>><</link>>
+	<br>
+	<<link [[무시한다|Lake Halloween Invite Ignore]]>><</link>>
+	<br>
+<</widget>>
+
+<<widget "plinthroom">>
+	입구 반대편에 고대의 문이 있다.
+	<<if $lakeRuin.key isnot 2>>
+		문은 닫혀 있다.
+	<<else>>
+		문은 열려 있다.
+	<</if>>
+	<br>
+	<<if $lakeRuin.key is 1>>
+		<<lockicon "bronze key">><<link [[청동 열쇠를 사용한다|Lake Ruin Door]]>><<wateraction>><</link>><<loxygen>>
+		<br>
+	<</if>>
+	<<if $lakeRuin.key is 2>>
+		<<lakeicon "plinth">><<link [[주춧돌의 방 안으로 헤엄쳐 간다|Lake Ruin Plinth]]>><<wateraction>><</link>><<loxygen>>
+		<br>
+	<</if>>
+<</widget>>

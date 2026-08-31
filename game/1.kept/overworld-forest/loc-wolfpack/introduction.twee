@@ -1,0 +1,459 @@
+:: Forest Wolf Cave Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<if $phase is 1>>
+		<<beastTrainGenerate>>
+		<<set $enemyanger += 30>>
+	<<else>>
+		<<beastTrainGenerate>>
+	<</if>>
+	<<set $noFinish to 1>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Forest Wolf Cave Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Forest Wolf Cave Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Forest Wolf Cave Rape Finish
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<if $combatTrain.length gt 0>>
+		만족한 <<beasttype>>【은는】 당신을 내버려 둔다. 다른 녀석이 그 자리를 차지한다.
+		<<combatTrainAdvance>>
+		<<wolfpacktrust>><<gstockholm>>
+		<br><br>
+		<<link [[다음|Forest Wolf Cave Rape]]>><</link>>
+	<<else>>
+		만족한 짐승은 당신을 내버려 둔다.
+		<<combatTrainAdvance>>
+		<<wolfpacktrust>><<gstockholm>>
+		<br><br>
+		<<link [[다음|Forest Wolf Cave Rape End]]>><</link>>
+	<</if>>
+<<else>>
+	<<beastwound>>
+	<<if $combatTrain.length gt 0>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러들지만, 다른 녀석이 그 자리를 차지한다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Forest Wolf Cave Rape]]>><</link>>
+	<<else>>
+		짐승은 고통과 공포에 움츠러든다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Forest Wolf Cave Rape End]]>><</link>>
+	<</if>>
+<</if>>
+
+:: Forest Wolf Cave Rape End
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+<<if $enemywounded gte 2 and $enemyejaculated is 0>>
+	힘을 과시하며, 당신은 무리를 물리친다. <<tearful>> 당신은 동굴에서 탈출한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<badEndTrackingEnd "Wolf Cave" { reason: "wolfCaveDefeated" }>>
+
+	<<link [[다음|Forest]]>><<set $stress -= 1000>><<set $eventskip to 1>><<set $eventskip to 1>><</link>>
+
+<<elseif $enemywounded is 0 and $enemyejaculated gte 2>>
+	당신에게 볼일을 마친 <<beastsplural>>【은는】 당신을 내버려 둔다. 하지만, 그들은 당신과 동굴 입구 사이에 쉬고 있어, 당신의 탈출을 쉽게 막을 수 있다. <<tearful>> 당신은 자리를 잡는다.
+	<br><br>
+
+	<<if $phase is 1>>
+	다른 <<wolf_cave_plural>>들이 곧 사냥에서 돌아온다.
+	<</if>>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Forest Wolf Cave]]>><<set $eventskip to 1>><</link>>
+
+<<elseif $enemywounded gte 1 and $enemyejaculated gte 1>>
+	당신에게 볼일을 마친 <<beastsplural>>【은는】 당신을 내버려 둔다. 하지만, 그들은 당신과 동굴 입구 사이에 쉬고 있어, 당신의 탈출을 쉽게 막을 수 있다. <<tearful>> 당신은 자리를 잡는다.
+	<br><br>
+
+	<<if $phase is 1>>
+	다른 <<wolf_cave_plural>>들이 곧 사냥에서 돌아온다.
+	<</if>>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Forest Wolf Cave]]>><<set $eventskip to 1>><</link>>
+<</if>>
+
+:: Forest Wolf Cave
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+<<if $eventskip is 0>>
+	<<eventwolfcave>>
+<<else>>
+	<<wolf_cave_plural>>들이 동굴 밖으로 나가는 길을 막고 있다. 뒤쪽에서 외풍이 불어온다.
+	<br><br>
+	<<wolfcaveicon "sleep">><<link [[휴식 (2:00)|Forest Wolf Cave Wait]]>><<set $tiredness -= 480>><<pass 2 hours>><</link>>
+	<br>
+
+	<<wolfcaveicon "outside">><<link [[탈출 시도|Forest Wolf Cave Escape]]>><</link>>
+	<br><br>
+	<<if $wolfcavedig gte 13>>
+		<<getouticon "hole">><<link [[구멍으로 내려가기|Forest Wolf Cave Hole]]>><</link>>
+		<br>
+	<<elseif $wolfcavedig gte 12 and $physiquesize lte 12000>>
+		<<getouticon "hole">><<link [[구멍으로 내려가기|Forest Wolf Cave Hole]]>><</link>><<small_text>>
+		<br>
+	<<elseif $wolfcavedig gte 11 and $physiquesize lte 9000>>
+		<<getouticon "hole">><<link [[구멍으로 내려가기|Forest Wolf Cave Hole]]>><</link>><<small_text>>
+		<br>
+	<<elseif $wolfcavedig gte 10 and $physiquesize lte 6000>>
+		<<getouticon "hole">><<link [[구멍으로 내려가기|Forest Wolf Cave Hole]]>><</link>><<small_text>>
+		<br>
+	<<elseif $wolfcavedig gte 1>>
+		<<getouticon "dig">><<link [[동굴 뒤쪽 파기 (1:00)|Forest Wolf Cave Dig]]>><<pass 1 hour>><<set $wolfcavedig += 1>><</link>>
+		<br>
+	<<else>>
+		<<investigateicon>><<link [[동굴 뒤쪽 조사하기|Forest Wolf Cave Examine]]>><<set $wolfcavedig to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Forest Wolf Cave Wait
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+동굴 뒤쪽에 웅크리고 있자, 무리는 한동안 당신에게 거의 신경 쓰지 않는다.
+<br><br>
+<<link [[다음|Forest Wolf Cave]]>><</link>>
+<br>
+
+:: Forest Wolf Cave Escape
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+<<if $wolfpacktrust gte 12>>
+	<<badEndTrackingEnd "Wolf Cave" { reason: "wolfCaveTrusted" }>>
+	당신이 떠나려 하자 무리가 당신을 쳐다보지만, 막으려는 움직임은 보이지 않는다. 당신을 보내줄 만큼 충분히 신뢰하는 것 같다.
+	<<lstress>>
+
+	<br><br>
+	<<link [[다음|Forest]]>><<set $stress -= 1000>><<set $eventskip to 1>><<set $forest to 80>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $wolfpackfear gte 12>>
+	<<badEndTrackingEnd "Wolf Cave" { reason: "wolfCaveFeared" }>>
+	당신이 떠나려 하자 무리가 으르렁거리지만, 막으려는 움직임은 보이지 않는다. 당신을 너무 두려워해서 막으려 하지 않는 것 같다.
+	<<lstress>>
+
+	<br><br>
+	<<link [[다음|Forest]]>><<set $stress -= 1000>><<set $eventskip to 1>><<set $forest to 80>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<else>>
+	당신이 떠나려 하자 무리가 즉시 동요하며 길을 막는다. 무리는 경고하듯 으르렁거리며 당신을 쳐다본다.
+	<<stress 6>><<gstress>>
+	<br><br>
+	<<link [[그래도 탈출 시도|Forest Wolf Cave Rape]]>><<beastNEWinit 6 wolf>><<set $molestationstart to 1>><</link>>
+	<br>
+	<<link [[물러선다|Forest Wolf Cave]]>><</link>>
+	<br>
+<</if>>
+
+:: Forest Wolf Cave Pair
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+당신이 떠나려 하자 무리가 즉시 동요하며 길을 막는다. 두 마리가 경고하듯 으르렁거리며 당신을 쳐다본다.
+<<stress 3>><<gstress>>
+<br><br>
+<<link [[그래도 탈출 시도|Forest Wolf Cave Rape]]>><<beastNEWinit 2 wolf>><<set $molestationstart to 1>><<set $phase to 1>><</link>>
+<br>
+<<link [[물러선다 (0:30)|Forest Wolf Cave Hunt]]>><<pass 30>><</link>>
+<br>
+
+:: Forest Wolf Cave Hunt
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+위험을 감수하지 않기로 한다. 당신은 동굴 뒤쪽에서 기다린다. 무리는 곧 사냥에서 돌아온다. <<wolfpacktrust>>
+<br><br>
+<<link [[다음|Forest Wolf Cave]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Forest Wolf Cave Molestation
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Forest Wolf Cave Molestation Finish]]>><</link>></span><<nexttext>>
+
+<<else>>
+	<span id="next"><<link [[다음|Forest Wolf Cave Molestation]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Forest Wolf Cave Molestation Finish
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+
+	<<beasttype>>【은는】 만족스럽게 킁킁거리며 무리의 나머지에게로 돌아간다.
+	<<wolfpacktrust>>
+	<br><br>
+
+	<<tearful>> 당신은 자리를 잡는다.
+	<<gstockholm>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Forest Wolf Cave]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	<<beasttype>>【은는】 고통스럽게 낑낑거리며 무리의 나머지에게로 돌아간다.
+	<<wolfpackfear>>
+	<br><br>
+
+	<<tearful>> 당신은 자리를 잡는다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Forest Wolf Cave]]>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Forest Wolf Cave Dig
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+<<if $wolfcavedig gte 13>>
+	바위를 치우자 남은 돌들이 무너지며 <span class="green">땅에 구멍이 드러난다</span>. 세차게 흐르는 물소리가 들린다.
+<<elseif $wolfcavedig gte 12 and $physiquesize lte 12000>>
+	바위를 치우자 남은 돌들이 무너지며 <span class="green">땅에 구멍이 드러난다</span>. 세차게 흐르는 물소리가 들린다.
+<<elseif $wolfcavedig gte 11 and $physiquesize lte 9000>>
+	바위를 치우자 남은 돌들이 무너지며 <span class="green">땅에 구멍이 드러난다</span>. 세차게 흐르는 물소리가 들린다.
+<<elseif $wolfcavedig gte 10 and $physiquesize lte 6000>>
+	바위를 치우자 남은 돌들이 무너지며 <span class="green">땅에 구멍이 드러난다</span>. 세차게 흐르는 물소리가 들린다.
+<<elseif $wolfcavedig gte 9>>
+	바위를 치우자 세차게 흐르는 물소리가 들리는 것 같다. 이제 얼마 남지 않았다.
+<<elseif $wolfcavedig gte 6>>
+	바위 몇 개를 치우자, 외풍이 더 강해진다.
+<<elseif $wolfcavedig gte 4>>
+	바위 몇 개를 치우자, 외풍이 더 강해진 것 같다.
+<<else>>
+	길을 막고 있는 바위 몇 개를 옮겼지만, 아직 할 일이 많이 남았다.
+<</if>>
+<br><br>
+
+<<if $wolfcavedig gte 13>>
+	<<getouticon "hole">><<link [[조사한다|Forest Wolf Cave Hole]]>><</link>>
+	<br>
+<<elseif $wolfcavedig gte 12 and $physiquesize lte 12000>>
+	<<getouticon "hole">><<link [[조사한다|Forest Wolf Cave Hole]]>><</link>><<small_text>>
+	<br>
+<<elseif $wolfcavedig gte 11 and $physiquesize lte 9000>>
+	<<getouticon "hole">><<link [[조사하기|Forest Wolf Cave Hole]]>><</link>><<small_text>>
+	<br>
+<<elseif $wolfcavedig gte 10 and $physiquesize lte 6000>>
+	<<getouticon "hole">><<link [[조사한다|Forest Wolf Cave Hole]]>><</link>><<small_text>>
+	<br>
+<<elseif $syndromewolves gte 1>>
+	<<link [[다음|Wolf Cave]]>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Forest Wolf Cave]]>><</link>>
+	<br>
+<</if>>
+
+:: Forest Wolf Cave Examine
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+동굴 뒤편의 어둠 속을 더듬으며 외풍의 근원지를 찾는다. 느슨하게 쌓인 돌무더기 뒤에서 바람이 불어오는 것 같다.
+<br><br>
+
+<<if $syndromewolves gte 1>>
+	<<link [[다음|Wolf Cave]]>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Forest Wolf Cave]]>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Forest Wolf Cave Hole
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+
+동굴 뒤편의 구멍을 들여다보지만 아무것도 보이지 않는다. 세차게 흐르는 물소리가 들린다. 안으로 기어 들어가면 왔던 길로 돌아올 수 없을 것이다.
+<br><br>
+
+<<getouticon "hole">><<link [[기어 들어간다|Wolf Cave Descent]]>><</link>>
+<br>
+
+<<if $syndromewolves gte 1>>
+	<<getouticon>><<link [[물러난다|Wolf Cave]]>><</link>>
+	<br>
+<<else>>
+	<<getouticon>><<link [[물러난다|Forest Wolf Cave]]>><</link>>
+	<br>
+<</if>>
+
+:: Wolf Cave Accept
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+	<<if $phase is 0>>
+		당신은 <<beasttype>>의 아래로 손을 뻗어 그것을 손에 쥔다.
+		<<npchand>><<deviancy1>>
+	<<elseif $phase is 2>>
+		<<clothesstrip>><<deviancy5>>
+		당신은 앞으로 몸을 숙여 손과 무릎을 꿇고 복종적인 자세를 취한 뒤, 어깨를 낮춰 엉덩이를 치켜들고 <<print ($player.vaginaExist ? '<<pussy>>' : '항문')>>【을를】 <<beasttype>>에게 노출시킨다. <<bHe>>【이가】 당신을 짓누르며 거대한 몸집으로 꼼짝 못하게 한다.<<if $NPCList[0].monster>> "<<pPackbrother>>【은는】 <<pher>> 자리를 잘 아는군. 훌륭한 무리의 어미가 될 거다." <<bhe>>【이가】 음탕한 미소를 지으며 말한다.<</if>>
+		<<npc_attempt_sex>>
+		<<set $position to "doggy">>
+		<<set $position_lock to 1>>
+		<<set $NPCList[0].location.head to "head">>
+		<<set $NPCList[0].location.genitals to "genitals">>
+	<<elseif $phase is 3>>
+		<<clothesstrip>><<deviancy5>>
+		당신은 검은 늑대에게 다가가 <<bhis>> 검은 털에 입을 가져다 댄다. 장난스럽게 <<bhim>>【을를】 물려 하지만, 검은 늑대가 <<bhis>> <<if $NPCList[0].monster>>손<<else>>발<</if>>【을를】 당신의 가슴에 얹더니 거의 힘들이지 않고 땅으로 넘어뜨린다. <<bHis>> 압도적인 무게와 크기 때문에 다른 선택지가 거의 없다.<<if $NPCList[0].monster>> "<<pPackbrother>>【은는】 <<pher>> 자리를 잘 아는군. 자랑스러운 무리의 아비가 될 거다." <<bhe>>【이가】 음탕한 미소를 지으며 말한다.<</if>>
+		<<npc_attempt_sex>>
+		<<set $position to "missionary">>
+		<<set $position_lock to 1>>
+		<<set $NPCList[0].location.head to "head">>
+		<<set $NPCList[0].location.genitals to "genitals">>
+	<<else>>
+		당신은 <<beasttype>>의 아래로 몸을 숙인다.
+		<<npcoral>><<deviancy4>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Wolf Cave Accept Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Wolf Cave Accept]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Wolf Cave Refuse
+<<set $outside to 0>><<set $location to "wolf_cave">><<effects>>
+당신은 또 다른 공격에 대비하며 검은 늑대에게서 물러난다. 하지만 공격은 오지 않는다. <<bHe>>【이가】 몸을 돌려 걸어간다. <<if $monster is 1>>"상관없다. 배우게 될 테니."<</if>>
+<br><br>
+<<badEndTrackingEnd "Wolf Cave" { reason: "wolfCaveAccepted" }>>
+<<set $syndromewolves to 1>>
+<<set $wolfevent to 0>>
+<<set $wolfstate to "cave">>
+<<set $wolfpackferocity to 10>>
+<<set $wolfpackharmony to 10>>
+<<if $settings.bestialityEnabled>>
+	<span class="red"><i>그들 잘못이 아니야. 그냥 귀여운 동물일 뿐인걸.</i> "스톡홀름 증후군: 늑대" 특성을 얻었습니다.</span>
+<<else>>
+	<span class="red"><i>그들 잘못이 아니야. 그냥 귀여운 마물일 뿐인걸.</i> "스톡홀름 증후군: 늑대 인간" 특성을 얻었습니다.</span>
+<</if>>
+<br><br>
+<<specialClothesUnlock "item" "loincloth">>
+<<npc "Black Wolf">>/*<<beastNNPCinit>>*/
+<<if hasSexStat("deviancy", 3)>>
+	<<loveInterestAdd "Black Wolf">>
+<<else>>
+	<span class="blue"><<beasttype>>【이가】 좋은 연인이 될 수 있을지 확신이 서지 않습니다...</span>
+<</if>>
+<br><br>
+<<link [[다음|Wolf Cave]]>><<endevent>><</link>>
+<br>
+
+:: Wolf Cave Accept Finish
+<<set $outside to 1>><<set $location to "wolf_cave">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<if $phase is 3 and $orgasmcurrent is 0 and $NPCList[0].vagina is "penis">>
+		<<set _forcedOrgasm to true>>
+		<<set $orgasmdown to 3>>
+	<</if>>
+	<<beastejaculation>><<wolfpacktrust>>
+	<br>
+
+	<<if _forcedOrgasm>>
+		절정에 달했음에도 불구하고, 검은 늑대는 당신의 <<penis>>【을를】 계속해서 희롱한다.
+		<<set $penisuse to "othervagina">>
+		<<orgasm>>
+	<</if>>
+
+	<<tearful>> 당신은 검은 늑대가 하품하며 눕는 것을 지켜본다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyhealth lte 0>>
+	<<tearful>> 당신은 검은 늑대가 하품하며 눕는 것을 지켜본다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<else>>
+	<<tearful>> 당신은 검은 늑대가 하품하며 눕는 것을 지켜본다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<</if>>
+<<if $monster is 1>>
+	"졸리다. 잘했다... <<ppackbrother>>."
+<</if>>
+<<badEndTrackingEnd "Wolf Cave" { reason: "wolfCaveAccepted" }>>
+<<set $syndromewolves to 1>>
+<<set $wolfevent to 0>>
+<<set $wolfstate to "cave">>
+<<set $wolfpackferocity to 10>>
+<<set $wolfpackharmony to 10>>
+<<if $settings.bestialityEnabled>>
+	<span class="red"><i>그들 잘못이 아니야. 그냥 귀여운 동물일 뿐인걸.</i> "스톡홀름 증후군: 늑대" 특성을 얻었습니다.</span>
+<<else>>
+	<span class="red"><i>그들 잘못이 아니야. 그냥 귀여운 마물일 뿐인걸.</i> "스톡홀름 증후군: 늑대 인간" 특성을 얻었습니다.</span>
+<</if>>
+<br><br>
+<<specialClothesUnlock "item" "loincloth">>
+<<npc "Black Wolf">>/*<<beastNNPCinit>>*/
+<<if hasSexStat("deviancy", 3)>>
+	<<loveInterestAdd "Black Wolf">>
+<<else>>
+	<span class="blue"><<beasttype>>【이가】 좋은 연인이 될 수 있을지 확신이 서지 않습니다...</span>
+<</if>>
+<br><br>
+<<link [[다음|Wolf Cave]]>><<endevent>><</link>>
+<br>

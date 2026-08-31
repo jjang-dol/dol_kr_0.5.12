@@ -1,0 +1,1207 @@
+:: Police Pillory Start
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<pass 5>><<person1>><<person>>【이가】 당신의 수갑을 잡고 밖으로 민다. <<He>>【은는】 당신을 다른 경찰관, <<endevent>><<generatePolice 1>><<person1>><<person>>에게 넘기고, 그 경찰관은 당신을 길 아래로 민다. 형틀은 시청 밖에 있으며, 짧은 도보 거리다. 당신이 그곳으로 끌려가자 구경꾼들이 당신을 멍하니 쳐다보고, <<person>>【은는】 당신의 수갑을 풀어준다.
+<br><br>
+
+탈출할 기회가 있지만, <<person>>【은는】 그것을 알고 한 손으로 당신의 팔을 꽉 잡고 있다. 도망치려면 싸워야 할 것이다.
+<br><br>
+
+<<link [[몸부림쳐 벗어난다|Police Pillory Fight]]>><<set $fightstart to 1>><<crimeUp 200 "resisting">><</link>><<crime "resisting">>
+<br>
+<<link [[순순히 고정당한다|Police Pillory Start 2]]>><</link>>
+<br>
+
+:: Police Pillory Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Police Pillory Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Police Pillory Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Police Pillory Start 2
+
+<<set $outside to 1>><<set $location to "town">><<effects>>
+<<earnFeat "You're the Laughingstock">>
+<<set _hours to Math.round(Math.clamp(8, 30, ((crimeSumCurrent() - 500) / 250) * 2))>>
+<<set $pillory.time to {
+	start: Time.date.timeStamp,
+	end: new DateTime(Time.date).addHours(_hours).addMinutes(60 - Time.date.minute).timeStamp
+}>>
+<<crimeDown 5000>>
+
+<<person>>【은는】 당신의 팔과 머리를 제자리에 맞춘 후 윗부분을 들어 올려 당신을 구속한다. <<He>>【은는】 그것을 잠그고 열쇠를 <<his>> 벨트의 사슬에 건다.
+<<seize_stolen_goods>>
+<br><br>
+
+<<He>>【은는】 뒤로 물러선다. "<span class="gold">_hours시간</span> 후에 누군가 와서 풀어줄 거다." <<if $worn.handheld.name isnot "naked">><<He>>【은는】 당신의 $worn.handheld.name【을를】 본다. "그건 풀려날 때 돌려받을 거다.<</if>><<bindtemp>><<He>>【은는】 뒤도 돌아보지 않고 떠난다.
+<br><br>
+
+<<him>>【이가】 사라지자, 일부 구경꾼들은 흥미를 잃고 일상으로 돌아간다. 하지만 다른 사람들은 여전히 멍하니 쳐다본다. 만약 누군가 당신을 학대하려 한다면 막을 방법이 거의 없겠지만, 사람들은 첫발을 내딛기를 주저하는 것 같다. 당신은 이 상태가 유지되기를 바란다.
+<br><br>
+<<endcombat>>
+
+<<link [[다음|Pillory]]>><<endevent>><<set $pillory.audience to 1>><</link>>
+<br>
+
+:: Police Pillory Fight Finish
+<<set $location to "town">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">>
+
+	<<person>>【은는】 공공장소에서 사정했다는 사실에 몹시 당황한 듯 보인다. 어떤 사람들은 손가락질하며 웃고, 다른 사람들은 서로 속삭이지만, 그들이 무엇에 대해 이야기하는지는 분명하다. "그-그건 보이는 것과 달라!" <<he>>【은는】 당신을 거의 잊은 채 항의한다. <<tearful>> 당신은 슬그머니 자리를 뜬다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<cliffquick>>
+
+<<elseif $enemyhealth lte 0>>
+
+	당신은 <<person>>【을를】 쓰러뜨려 필요한 기회를 얻는다. <<tearful>> 당신은 탈출한다. 어떤 사람들은 당신을 응원한다.
+	<<ltrauma>><<lstress>><<trauma -6>><<stress -12>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<cliffquick>>
+
+<<else>>
+
+	너무 고통스러워 저항할 수 없는 당신은, <<person>>【이가】 <<his>> 일을 계속하는 동안 무력하다.
+	<br><br>
+
+	<<link [[다음|Police Pillory Start 2]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Pillory
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $pillory.audience lte 1>>
+<<set $pillory.audience to 1>>
+<</if>>
+
+<<if $pillory.time?.end is undefined>>
+	<<set $pillory.time to {
+		start: Time.date.timeStamp,
+		end: new DateTime(Time.date).addMinutes(60 - Time.date.minute).timeStamp
+	}>>
+<</if>>
+
+<<set _endTime to new DateTime($pillory.time.end)>>
+<<set _timeLeft to Math.round(Time.date.compareWith(_endTime, true) / TimeConstants.secondsPerHour)>>
+
+You are stuck in a pillory on Cliff Street, in front of the town hall.
+
+<<if _timeLeft gte 1>>
+You have <<number _timeLeft>> hours left until release.
+<<else>>
+You should be released any moment from now.
+<</if>>
+
+<<switch $pillory.audience + $exposed>>
+<<case 1>><span class="teal">A few people stop to look at you but most just glance then continue their business.</span>
+<<case 2>><span class="lblue">You've attracted a small crowd of onlookers.</span>
+<<case 3>><span class="blue">You've attracted a growing crowd of onlookers.</span>
+<<case 4>><span class="purple">A large group has gathered around you, big enough that the crowd itself is attracting more people to see what the fuss is about.</span>
+<<case 5>><span class="pink">A large crowd has gathered around you. People throw jeers and insults your way.</span>
+<<default>><span class="red">A huge crowd has gathered around you. People jeer and insult you. Some throw litter.</span>
+<</switch>>
+
+<<if $exposed gte 1>>
+	You can do nothing about your <<lewdness>> displayed for everyone to see, humiliating you further.<<if $exposed gte 2>> <<trauma 1>><<gtrauma>><br><br><</if>>
+	<<fameexhibitionism `$pillory.audience * 2`>>
+<</if>>
+
+<<if $exposed gte 1 and $pillory.audience and random(0, 9) gte 7>>
+	<br><br>
+	A person pulls out their <<print ["camera", "phone"].pluck()>> and takes a photo.
+	"<<print [
+		"Now your <<undies 2>> can be exposed forever.",
+		"I can't wait to post this online.",
+		"I can't wait to share this with my friends.",
+		"If you didn't want your <<undies 2>> photographed you shouldn't be such a slut.",
+		"If you didn't want your <<undies 2>> photographed you shouldn't have broken the law.",
+		"Aww, is it embarrassing having your <<undies 2>> photographed?",
+		"Is it embarrassing, not being able to cover up?",
+		"If you don't want your <<undies 2>> photographed, don't break the law.",
+		"If you don't want people taking photos of your <<undies 2>> then don't break the law.",
+		"I bet <<pshes>> getting off on this.",
+		"Is it embarrassing being exposed like this? Too bad.",
+		"Is it embarrassing being exposed like this? Too bad, criminal.",
+		"I bet <<pshe>> gets off on the humiliation anyway.",
+		"Do you like having your <<undies 2>> photographed?"
+	].pluck()>>"
+	<<trauma `$exposed===1 ? 1 : 2`>><<gtrauma>><br><br>
+	<<fameexhibitionism 10 "pic">>
+<</if>>
+<<if $exposed gte 2 and $pillory.audience and $player.penisExist and random(0, 9) gte 7>><br><br><<pillorypeniscomment>><</if>>
+
+<br><br>
+
+<<if _endTime.timeStamp lte Time.date.timeStamp>>
+	A <<generatePolice 1>><<person1>><<person>> in a police uniform arrives.
+	<<if $worn.neck.collaredpolice and !$community_service>>
+		<<if ["collar", "collar with leash"].includes($worn.neck.name)>>
+			<<set $worn.neck.cursed to 0>><<neckruined>>
+			<<He>> removes your collar and unlocks the pillory, freeing you.
+		<</if>>
+		<<set $worn.neck.collaredpolice to 0>>
+	<<else>>
+		<<He>> unlocks the pillory, freeing you.
+	<</if>>
+	The crowd boos its disappointment as the officer disperses them.
+	<br><br>
+	<<set $pillory.audience to 0>>
+	<<unbindtemp>>
+	<<clotheson>>
+	<<set $stress -= 1000>>
+	<<endevent>>
+	<<cliffeventend>>
+	<br>
+<<else>>
+	<<rng 5>>
+	<<if $pillory.audience + $exposed + $rng gte 10>>
+	<<rng>>
+		<<beastNEWinit 1 dog>>
+		<<if $rng gte 51 and ($monster is 1 or $settings.bestialityEnabled)>><!-- Modified for Monster People -->
+			You feel something prod your <<bottom>>. A <<beasttype>> is sniffing you curiously.
+			<br><br>
+
+			<<link [[Next|Pillory Dog]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<else>>
+			<<endevent>>
+			<<generate1>><<person1>>A <<person>> walks right up to the pillory.
+			<br><br>
+
+			<<link [[Next|Pillory Molestation]]>><<set $molestationstart to 1>><<set $molestationstart to 1>><</link>>
+			<br>
+		<</if>>
+
+	<<elseif $pillory.audience + $exposed + $rng gte 6>>
+	<<rng>>
+		<<if $rng gte 86>>
+			<<if $worn.upper.exposed gte 2 and $worn.under_upper.exposed gte 1>>
+				A <<generate1>><<person1>><<person>> crouches beside you, and reaches for your <<breasts>>.
+				<br><br>
+
+				<<link [[Spit on <<him>>|Pillory Spit]]>><<stress -12>><<trauma -6>><<attackstat>><<set $pillory.audience += 1>><</link>><<ltrauma>><<llstress>><<gattention>>
+				<br>
+				<<link [[Stay still|Pillory Chest]]>><<trauma 6>><<stress 6>><<arousal 600 "breasts">><</link>><<gtrauma>><<gstress>><<garousal>>
+				<br>
+
+			<<elseif $worn.upper.exposed gte 2 and $worn.under_upper.exposed lte 0>>
+				<<if $worn.under_upper.open is 1 or $worn.under_upper.set isnot $worn.under_lower.set>>
+					A <<generate1>><<person1>><<person>> approaches, and grasps your $worn.under_upper.name.
+					<br><br>
+
+					<<link [[Spit on <<him>>|Pillory Spit]]>><<stress -12>><<trauma -6>><<attackstat>><<set $pillory.audience += 1>><</link>><<ltrauma>><<llstress>><<gattention>>
+					<br>
+					<<link [[Stay still|Pillory Under Upper]]>><<trauma 6>><<stress 6>><<arousal 600>><</link>><<gtrauma>><<gstress>><<garousal>>
+					<br>
+				<<else>>
+					A <<generate1>><<person1>><<person>> approaches with a camera in hand. <<He>> snaps a couple of pictures before returning to the crowd.<<gstress>><<stress 6>>
+					<br><br>
+
+					<<if $exposed gte 2>>
+						<<fameexhibitionism 2 "pic">>
+					<<elseif $exposed gte 1>>
+						<<fameexhibitionism 1 "pic">>
+					<</if>>
+					<<endevent>>
+					<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+					<br>
+				<</if>>
+			<<elseif $worn.upper.exposed lte 1>>
+				<<if $worn.under_upper.exposed lte 0 and ($worn.upper.open is 1 or $worn.upper.set isnot $worn.lower.set)>>
+					A <<generate1>><<person1>><<person>> approaches, and grasps your $worn.upper.name.
+					<br><br>
+
+					<<link [[Spit on <<him>>|Pillory Spit]]>><<stress -12>><<trauma -6>><<attackstat>><<set $pillory.audience += 1>><</link>><<ltrauma>><<llstress>><<gattention>>
+					<br>
+					<<link [[Stay still|Pillory Upper]]>><<trauma 6>><<stress 6>><<arousal 600>><</link>><<gtrauma>><<gstress>><<garousal>>
+					<br>
+				<<else>>
+					A <<generate1>><<person1>><<person>> approaches with a camera in hand. <<He>> snaps a couple of pictures before returning to the crowd.<<gstress>><<stress 6>>
+					<br><br>
+
+					<<if $exposed gte 2>>
+						<<fameexhibitionism 2 "pic">>
+					<<elseif $exposed gte 1>>
+						<<fameexhibitionism 1 "pic">>
+					<</if>>
+					<<endevent>>
+					<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				A <<generate1>><<person1>><<person>> approaches with a camera in hand. <<He>> snaps a couple of pictures before returning to the crowd.<<gstress>><<stress 6>>
+				<br><br>
+
+				<<if $exposed gte 2>>
+					<<fameexhibitionism 2 "pic">>
+				<<elseif $exposed gte 1>>
+					<<fameexhibitionism 1 "pic">>
+				<</if>>
+				<<endevent>>
+				<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+				<br>
+			<</if>>
+		<<elseif $rng gte 61>>
+			<<rng>>
+			<<if $rng gte 96 and $settings.toyWhipEnabled and $adultshopunlocked and $adultshopdegree >= 5 and
+				($worn.lower.name isnot "naked" and $worn.lower.state is "waist") or ($worn.under_lower.name isnot "naked" and $worn.lower.state is "waist")>>
+				A <<generate1>><<person1>><<person>> emerges from the crowd, dressed in a flamboyant ringmaster's costume.
+				<<He>> takes off <<his>> hat and lays it in front of the onlookers, before unfurling a whip and striding behind you. Everyone watches for a moment in fascination.
+				<br><br>
+
+				<<link [[Dodge|Pillory Whip Master]]>><<set $phase to 1>><</link>><<skill_difficulty `currentSkillValue("danceskill")` "Dance" 1 1000>>
+				<br>
+				<<link [[Brace|Pillory Whip Master]]>><<stress 6>><<trauma 6>><</link>><<gstress>><<gtrauma>>
+				<br>
+			<<elseif $rng gte 91 and $settings.analEnabled and $settings.toyDildoEnabled and $adultshopunlocked and $worn.lower.exposed gte 2 and $worn.under_lower.exposed gte 1 and
+				!playerHasButtPlug() and countCarriedSextoys() lt 5 and $worn.genitals.anal_shield !== 1>>
+				<<run sexShopOnBuyClick(4, false, clone(setup.sextoys[4].colour_options).pluck(), false)>>
+				<<generate1>><<person1>>
+				A <<person>> emerges from the crowd, a gigantic
+				<<print V.player.inventory.sextoys['butt plug'][V.player.inventory.sextoys['butt plug'].length - 1].colour>>
+				butt plug in hand. <<He>> approaches you from behind.
+				<br><br>
+
+				<<link [[Warn them off|Pillory Butt Plug]]>><<set $phase to 1>><</link>><<skill_difficulty `Math.abs($submissive - 1000)` "" 1 850>>
+				<br>
+				<<link [[Brace yourself|Pillory Butt Plug]]>><</link>>
+				<br>
+			<<elseif $worn.lower.skirt_down is 1>>
+				A <<generate1>><<person1>><<person>> walks behind you and grabs the hem of your $worn.lower.name.
+				<br><br>
+
+				<<link [[Kick <<him>>|Pillory Kick]]>><<stress -12>><<trauma -6>><<attackstat>><<set $pillory.audience += 1>><</link>><<ltrauma>><<llstress>><<gattention>>
+				<br>
+				<<link [[Stay still|Pillory Skirt]]>><<trauma 6>><<stress 6>><</link>><<gtrauma>><<gstress>>
+				<br>
+			<<elseif $worn.lower.exposed lte 1 and $worn.lower.set isnot "upperset" and setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt isnot 1>>
+				A <<generate1>><<person1>><<person>> walks behind you and grabs the hem of your $worn.lower.name.
+				<br><br>
+				<<link [[Kick <<him>>|Pillory Kick]]>><<stress -12>><<trauma -6>><<attackstat>><<set $pillory.audience += 1>><</link>><<ltrauma>><<llstress>><<gattention>>
+				<br>
+				<<link [[Stay still|Pillory Lower]]>><<trauma 6>><<stress 6>><</link>><<gtrauma>><<gstress>>
+				<br>
+			<<elseif $worn.lower.exposed gte 2 and $worn.under_lower.exposed is 0>>
+				A <<generate1>><<person1>><<person>> walks behind you and grabs the hem of your $worn.under_lower.name.
+				<br><br>
+				<<link [[Kick <<him>>|Pillory Kick]]>><<stress -12>><<trauma -6>><<attackstat>><<set $pillory.audience += 1>><</link>><<ltrauma>><<llstress>><<gattention>>
+				<br>
+				<<link [[Stay still|Pillory Under]]>><<trauma 6>><<stress 6>><</link>><<gtrauma>><<gstress>>
+				<br>
+
+			<<else>>
+
+				A <<generate1>><<person1>><<person>> walks behind you and gives your exposed <<bottom>> a hard spank. The crowd cheers.
+				<<gtrauma>><<gstress>><<trauma 6>><<stress 6>><<pain 5>>
+				<br><br>
+
+				<<endevent>>
+				<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+				<br>
+
+			<</if>>
+		<<elseif $rng gte 51 and $settings.analingusGivingEnabled>>
+			<<generate1>><<person1>>A <<person>> approaches you and pulls down <<his>> <<npcClothesText $NPCList[0] "lower">>. <<He>> turns around and backs up against your face.
+			<br>
+			"<<print ["Eat up!", "Kiss my ass!"].pluck()>>" <<he>> says with a snicker.
+			<br><br>
+
+			<<link [[Keep your mouth closed|Pillory Analingus]]>><<def 1>><<set $phase to 0>><</link>><<defianttext>>
+			<br>
+			<<link [[Lick grudgingly|Pillory Analingus]]>><<trauma 6>><<set $phase to 1>><</link>><<gtrauma>>
+			<br>
+			<<if hasSexStat("promiscuity", 3)>>
+				<<link [[Lick willingly|Pillory Analingus]]>><<arousal 600>><<set $phase to 2>><</link>><<promiscuous3>><<garousal>>
+			<</if>>
+
+		<<elseif $rng gte 31>>
+			<<generate1>><<person1>>A <<person>> approaches you and presses <<his>> crotch against your helpless face.
+			<br><br>
+
+			<<link [[Next|Pillory Oral]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<else>>
+			A number of people disembark from a bus nearby. Some of them gather round to gawk. <span class="pink">The crowd becomes larger and bolder.</span>
+			<br><br>
+
+			<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+			<br>
+		<</if>>
+	<<elseif $pillory.audience + $exposed + $rng gte 3 and $settings.bodyWritingLevel gte 2>>
+		<<generate1>><<person1>>
+		<<if $rng gte 81>>
+			<<set $phase to 1>>
+			A <<person>> approaches you and <span class="pink">pulls the lid off a permanent marker.</span>
+			<br><br>
+		<<else>>
+			<<set $phase to 0>>
+			A <<person>> approaches you and <span class="purple">pulls the lid off a pen.</span>
+			<br><br>
+		<</if>>
+		<<link [[Warn <<him>> off|Pillory Pen Warn]]>><<set $pillory.audience += 1>><</link>><<gattention>>
+		<br>
+		<<link [[Brace|Pillory Pen]]>><</link>><<gbodywriting>>
+		<br>
+	<<else>>
+		<<rng>>
+		<<if $rng gte 96 and $settings.watersportsEnabled>>
+		<<generate1>><<person1>>A <<person>> approaches you and <<npcUndressText $NPCList[0] "lower" "self">>,
+		<span class="purple"><<npcRevealText $NPCList[0] "lower">>.</span>
+		<br><br>
+		Without warning, <<he>> begins to urinate on your face. The crowd watches in excitement.<<ggtrauma>><<trauma 12>><<gstress>><<stress 6>><<urinestat>>
+		<br><br>
+		<<endevent>>
+		<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+		<br>
+		<<elseif $rng gte 66>>
+		<<generatey1>><<generatey2>>A <<person1>><<person>> whispers something to <<his>> friend, a <<person2>><<person>>, who laughs and produces a piece of fruit from <<his>> bag.
+		<br><br>
+
+		<<link [[Warn them off|Pillory Warn]]>><<set $pillory.audience += 1>><</link>><<gattention>>
+		<br>
+		<<link [[Brace yourself|Pillory Brace]]>><</link>>
+		<br>
+		<<elseif $rng gte 31>>
+		<<generate1>><<person1>>A <<person>> takes a picture of you with <<his>> phone.
+		<br><br>
+		<<endevent>>
+		<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+		<br>
+		<<else>>
+		A number of people disembark from a bus nearby. Some of them gather round to gawk. <span class="pink">The crowd becomes larger and bolder.</span>
+		<br><br>
+
+		<<link [[Next (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+		<br>
+		<</if>>
+	<</if>>
+
+<</if>>
+
+:: Pillory Dog
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $position to "wall">>
+	<<set $walltype to "pillory">>
+	<<set $head to "grappled">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Pillory Dog Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Pillory Dog]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Pillory Dog Finish
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<beastejaculation>>
+
+	<<beasttype>>【이가】 만족스럽게 짖더니, 군중 속으로 사라진다.
+	<br><br>
+	<<if $pillory.audience gte 1>>
+		<<set _audienceFactor to $pillory.audience * 10>>
+		<<famebestiality _audienceFactor>>
+	<</if>>
+
+	"꼴좋다, 이 <<bitch>>【아야】." 누군가 외치는 소리가 들린다.
+	<br>
+	"저 <<beasttype>>한테 가게 만들다니, 대단하네."
+	<br>
+	"벌도 아니지, 저 더러운 <<slut>>【은는】 분명 즐겼을 거야."
+	<br>
+	<span class="pink">군중이 더 커지고 대담해집니다.</span>
+	<<set $pillory.audience += 1>>
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+
+	<<beasttype>>【이가】 포기하고 군중 속으로 도망친다.
+	<br><br>
+
+	"무고한 <<beastsplural>>【을를】 때리다니. 저기 묶여 있는 게 당연해." 누군가 외치는 소리가 들린다.
+	<br>
+	<span class="teal">군중이 더 작아지고 조심스러워집니다.</span>
+	<<set $pillory.audience -= 1>>
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<br>
+<</if>>
+
+:: Pillory Molestation
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+
+	<<maninit>>
+	<<set $position to "wall">>
+	<<set $walltype to "pillory">>
+	<<set $head to "grappled">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Pillory Molestation Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Pillory Molestation]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Pillory Molestation Finish
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<ejaculation>>
+
+	<<person>>【이가】 당신의 <<bottom>>【을를】 찰싹 때리고는 형틀에서 물러난다.
+	<br><br>
+	<<if $pillory.audience gte 1>>
+		<<set _audienceFactor to $pillory.audience * 10>>
+		<<famerape _audienceFactor>>
+	<</if>>
+
+	"꼴좋다, 이 <<bitch>>【아야】." 누군가 외치는 소리가 들린다.
+	<br>
+	"적어도 사회에 쓸모는 있네."
+	<br>
+	"벌도 아니지, 저 더러운 <<slut>>【은는】 분명 즐겼을 거야."
+	<br>
+	<span class="pink">군중이 더 커지고 대담해집니다.</span>
+	<<set $pillory.audience += 1>>
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+
+	<<person>>【이가】 형틀에서 물러난다.
+	<br><br>
+
+	"정말 폭력적이군. 저기 묶여 있는 게 당연해." 누군가 외치는 소리가 들린다.
+	<br>
+	<span class="teal">군중이 더 작아지고 조심스러워집니다.</span>
+	<<set $pillory.audience -= 1>>
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<br>
+<</if>>
+
+:: Pillory Whip Master
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<He>>【이가】 바닥에 채찍을 두어 번 내리쳐 소리를 낸 뒤, 당신에게 휘두른다.
+<br><br>
+<<if $phase is 1>>
+	<<if currentSkillValue('danceskill') gte random(1, 1000)>>
+		몇 번의 채찍질이 당신의 <<bottom>>에 날카로운 통증과 함께 꽂히지만, <span class="green">대부분은 피할 수 있었다.</span>
+		관객 몇몇이 서로 수군거린다. 당신이 <<personssimple>> 공연을 망치고 있는 것이 분명하다.
+		결국 <<he>>【은는】 포기하고, <<his>> 모자를 챙겨 씩씩거리며 떠난다. 군중은 야유를 보내고, 불량배 몇몇이 <<him>>에게 과일을 던진다.
+		<<violence_noncombat 5 0.3>>
+		<br><br>
+
+		<<endevent>>
+		<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<<else>>
+		<span class="red">당신은 <<his>> 채찍질을 피할 수 없다.</span> 채찍이 당신의 <<bottom>>【을를】 때릴 때마다 울음을 참으려 애쓴다.
+		당신 뒤에서, 단장이 숨을 들이마신다. 당신의 서툰 몸짓이 <<he>>【이가】 의도했던 것보다 상황을 악화시키는 것 같다.
+		<<violence_noncombat 20 0.3>>
+		<br><br>
+
+		<<link [[다음|Pillory Whip Master 2]]>><</link>>
+	<</if>>
+<<else>>
+	고통스러운 채찍질이 쏟아질 것에 대비해 몸을 움츠린다. <span class="green">하지만 예상했던 것만큼 강렬하지는 않다.</span>
+	<<His>> 채찍질이 살짝 따끔거리지만, 단장이 당신을 다치게 하려는 의도가 없다는 것이 분명하다.
+	<<violence_noncombat 4 0.5 0.5 0.5>>
+	<br><br>
+
+	<<link [[다음|Pillory Whip Master 2]]>><</link>>
+<</if>>
+<br>
+
+:: Pillory Whip Master 2
+<<effects>>
+
+<<set _articles = []>>
+<<if $worn.lower.name isnot "naked" and $worn.lower.state is "waist">>
+	<<run _articles.push($worn.lower.name)>>
+	<<set _plural to $worn.lower.plural>>
+	<<lowerruined>>
+<</if>>
+<<if $worn.under_lower.name isnot "naked" and $worn.under_lower.state is "waist">>
+	<<run _articles.push($worn.under_lower.name)>>
+	<<set _plural to _plural || $worn.under_lower.plural>>
+	<<underlowerruined>>
+<</if>>
+마지막 일격을 가한 후, <<he>>【은는】 재빨리 채찍을 거둔다. 군중이 조용해진다.
+갑자기, 끔찍하게도, 당신의 <span class="red"><<print _articles.join(" and ")>>
+<<if _plural>>들이 땅으로 떨어진다
+<<else>>【이가】 땅으로 떨어진다<</if>>, 채찍에 맞아 갈기갈기 찢어진 채로.</span>
+구경꾼들이 박수갈채를 보낸다. 몇몇은 <<his>> 모자에 돈을 던져 넣는다.
+단장은 당신의 노출된 하반신 앞에서 절을 하고, <<his>> 수입을 챙겨 떠난다.
+<<fameexhibitionism 7>><<stress 6>><<bruise bottom>>
+
+<br><br>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Butt Plug
+<<set $outside to 1>><<set $location to "town">><<effects>>
+<<set _toys = $player.inventory.sextoys["butt plug"]>>
+<<set _toy = _toys[_toys.length - 1]>>
+<<set _mod = $phase ? 1 : 0.5>>
+
+<<if $phase is 1>>
+	<<if $speech_attitude is "bratty">>
+		"꿈도 꾸지 마." 당신은 <<personsimple>>【을를】 쏘아보며 말한다.
+	<<elseif $speech_attitude is "meek">>
+		"제-제발 그러지 마세요." 당신은 고개를 숙이며 말한다.
+	<<else>>
+		"제발 그러지 마세요." 당신은 말한다.
+	<</if>>
+	<br><br>
+	<<if Math.abs($submissive - 1000) - 150 gte random(1, 850)>> <!-- Bonus for bratty or meek but not neutral -->
+		<<personsimple>>【이가】 망설이며 버트 플러그를 내려다본다. "아, 됐어." <<he>>【이가】 중얼거린다. <<He>>【은는】 군중 속으로 다시 사라진다.
+		<<set _skipplug to true>>
+	<<else>>
+		<<personsimple>>【이가】 당신을 비웃는다. "닥쳐, 이 멍청한
+		<<if $player.gender_appearance is 'm'>>
+			새끼야.
+		<<else>>
+			년아.
+		<</if>>
+		네까짓 게 나한테 이래라저래라 할 처지는 아니지." <<stress 2>>
+	<</if>>
+<<else>>
+	다가올 일에 대비하며 몸을 움츠린다.
+<</if>>
+<br><br>
+
+<<if _skipplug>>
+	<<run _toys.splice(-1,1)>>
+	<<if !_toys.length>>
+		<<run delete V.player.inventory.sextoys["butt plug"]>>
+	<</if>>
+<<else>>
+	<<He>>【이가】 당신에게 다가와 버트 플러그를 당신의 <<bottom>>에 쑤셔 넣는다. 당신의 편의 따위는 아랑곳하지 않는다. 갑작스러운 삽입에 고통으로 비명을 지른다.
+	군중 중 일부는 역겨워하며 놀란 듯 보이지만, 다른 이들은 욕정에 찬 눈으로 바라본다.
+	<<person>>【은는】 플러그를 당신 안에 남겨둔 채, <<he>>【이가】 가한 불쾌감에 만족하며 떠나간다.
+	<<set _toy.state = "worn">><<set _toy.carried = true>><<set _toy.worn = true>><<set $worn["butt_plug"] = _toy>>
+	<<violence 50 _mod _mod _mod>><<bruise anus>>
+<</if>>
+<br><br>
+
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Kick
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+당신은 <<person>>의 정강이를 걷어찬다. "아야!" <<he>>【이가】 말한다. "씨발 <<bitch>>." <<He>>【은는】 절뚝거리며 당신에게서 멀어진다.
+<br><br>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Skirt
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $rng gte 51>>
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+	<<He>>【이가】 당신의 치마 밑단을 들어 올려, 당신의 <<undies>>【을를】 모두가 볼 수 있도록 드러낸다. "그래." <<he>>【이가】 말한다. "이게 너한테 더 어울리는 것 같군." <<He>>【은는】 당신을 노출시킨 채 군중 속으로 돌아간다.
+<<else>>
+	<<He>>【이가】 당신의 바지 앞 단추를 풀어, 당신의 <<undies>>【을를】 모두가 볼 수 있도록 드러낸다. "그래." <<he>>【이가】 말한다. "이게 너한테 더 어울리는 것 같군." <<He>>【은는】 당신을 노출시킨 채 군중 속으로 돌아간다.
+<</if>>
+<br><br>
+
+<<set $worn.lower.skirt_down to 0>><<set $worn.lower.vagina_exposed to 1>><<set $worn.lower.anus_exposed to 1>><<set $worn.lower.exposed to 2>>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+<<else>>
+
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+	<<He>>【이가】 당신의 치마 밑단을 살짝 들어 올려 안을 엿본다.
+<<else>>
+	<<He>>【이가】 당신의 허리띠를 살짝 당겨 안을 엿본다.
+<</if>>
+
+	<<if $worn.under_lower.type.includes("naked") and !playerChastity()>>
+		<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+			"<<pher>> 치마 밑에 아무것도 안 입었어!" <<person>>【이가】 큰 소리로 외친다.
+		<<else>>
+			"저 안에 아무것도 안 입었어!" <<person>>【이가】 큰 소리로 외친다.
+		<</if>>
+		<br><br>
+	"변태 같으니." 군중 속 누군가가 말한다.
+	<br><br>
+	<<elseif $worn.under_lower.type.includes("naked") and playerChastity()>>
+	"$worn.genitals.name【을를】 차고 있어!" <<person>>【이가】 큰 소리로 외친다.
+	<br><br>
+	"잠기는 걸 좋아하나 보네." 군중 속 누군가가 말한다. "인생 최고의 시간을 보내고 있겠지, 분명."
+	<br><br>
+	<<else>>
+	"$worn.under_lower.colour $worn.under_lower.name【을를】 입고 있어!" <<person>>【이가】 큰 소리로 외친다.
+	<br><br>
+		<<if $player.gender_appearance isnot $worn.under_lower.gender and $worn.under_lower.gender isnot "n">>
+		"변태 같으니." 군중 속 누군가가 말한다. "이렇게 많은 사람들 앞에서 여장/남장이라니!"
+		<br><br>
+		<</if>>
+	<</if>>
+
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+<</if>>
+
+:: Pillory Lower
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $rng gte 51>>
+
+<<He>>【이가】 당신의 $worn.lower.name【을를】 허벅지까지 끌어내려, 모두가 볼 수 있도록 당신의 <<undies>>【을를】 드러낸다.
+
+	<<if $worn.under_lower.type.includes("naked")>>
+	"속옷도 안 입었잖아!" <<he>>【이가】 말한다. "변태 같으니."
+	<<else>>
+
+	<</if>>
+<<He>>【은는】 당신을 노출시키고 굴욕감을 준 채 군중 속으로 돌아간다.
+<br><br>
+
+<<set $worn.lower.vagina_exposed to 1>><<set $worn.lower.anus_exposed to 1>><<set $worn.lower.exposed to 2>><<set $worn.lower.state to "thighs">>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+<<elseif $rng gte 1>>
+
+<<He>>【이가】 당신의 $worn.lower.name【을를】 허벅지까지 끌어내려, 모두가 볼 수 있도록 당신의 <<undies>>【을를】 드러낸다.
+
+	<<if $worn.under_lower.type.includes("naked")>>
+	"속옷도 안 입었잖아!" <<person>>【이가】 큰 소리로 외친다.
+	<br><br>
+	"변태 같으니." 군중 속 누군가가 말한다.
+	<br><br>
+	<<elseif playerChastity()>>
+	"$worn.genitals.name【을를】 차고 있어!" <<person>>【이가】 큰 소리로 외친다.
+	<br><br>
+	"잠기는 걸 좋아하나 보네." 군중 속 누군가가 말한다. "인생 최고의 시간을 보내고 있겠지, 분명."
+	<br><br>
+	<<else>>
+	"$worn.under_lower.colour $worn.under_lower.name【을를】 입고 있어!" <<person>>【이가】 큰 소리로 외친다.
+	<br><br>
+		<<if $player.gender_appearance isnot $worn.under_lower.gender and $worn.under_lower.gender isnot "n">>
+		"변태 같으니." 군중 속 누군가가 말한다. "이렇게 많은 사람들 앞에서 여장/남장이라니!"
+		<br><br>
+		<</if>>
+	<</if>>
+<<He>>【이가】 당신의 $worn.lower.name【을를】 다시 올려주고 군중 속으로 돌아간다.
+<br><br>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+<</if>>
+
+:: Pillory Under
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $rng gte 51>>
+
+<<He>>【이가】 당신의 $worn.under_lower.name【을를】 허벅지까지 끌어내려, 모두가 볼 수 있도록 당신의 <<genitals>>【을를】 드러낸다.
+
+<<He>>【은는】 당신을 노출시키고 굴욕감을 준 채 군중 속으로 돌아간다.
+<<if $player.penisExist>><<pillorypeniscomment>><</if>>
+<br><br>
+
+<<set $worn.under_lower.vagina_exposed to 1>><<set $worn.under_lower.anus_exposed to 1>><<set $worn.under_lower.exposed to 1>><<set $worn.under_lower.state to "thighs">>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+<<elseif $rng gte 1>>
+
+<<He>>【이가】 당신의 $worn.under_lower.name【을를】 위로 당겨 팽팽하게 만들어 당신의 <<bottom>> 뺨을 강조한다. <<He>>【은는】 당신에게 세게 스팽킹을 한 번 하고 군중 속으로 돌아간다.
+<br><br>
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+<</if>>
+
+:: Pillory Warn
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<if $speech_attitude is "bratty">>
+
+"감히. 나중에 나가면 찾아낼 줄 알아." 당신은 <<person>>【을를】 쏘아보며 말한다. <<He>>【은는】 당신에게서 시선을 피하고 과일을 치운다.
+<br><br>
+
+<<elseif $speech_attitude is "meek">>
+
+"제-제발 그러지 마세요." 당신은 고개를 숙이며 말한다. <<person>>【이가】 당신을 불쌍히 여겨 과일을 치운다.
+<br><br>
+
+<<else>>
+
+"제발 그러지 마세요." 당신은 말한다. <<He>>【이가】 잠시 망설인다. <<His>> 친구가 <<him>>【을를】 쿡 찌르자 <<he>>【은는】 과일을 던지지만, 형틀을 벗어나 날아간다.
+<br><br>
+
+<</if>>
+
+<<endevent>>
+
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Brace
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+과일이 당신을 향해 날아올 때 충격에 대비한다.
+
+	<<if $rng gte 81>>
+
+	그것은 당신의 얼굴에 부딪혀, 예상보다 더 아프다. 몇몇 사람들이 박수를 친다.
+	<<gtrauma>><<gstress>><<trauma 6>><<stress 6>><<pain 10>>
+	<br><br>
+
+	<<else>>
+
+	그들의 조준이 빗나가 당신 머리 옆 형틀에 쿵 하고 부딪힌다. 산산조각이 나지만 당신은 거의 깨끗하다.
+	<br><br>
+
+	<</if>>
+
+<<endevent>>
+
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Analingus
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<switch $phase>>
+	<<case 2>>
+		당신은 열정적으로 따르며 <<his>> 항문을 <<oraltext>> 핥고, 축축한 키스도 몇 번 해준다.
+		<br>
+		<<if currentSkillValue("oralskill") gte 400>>
+			당신의 혀는 곧 <<him>>【을를】 절정으로 이끌고, <<he>>【은는】 
+			<<if $NPCList[0].penis isnot "none">>
+				바닥에 사정한다.
+			<<else>>
+				무릎이 꺾인다.
+			<</if>>
+			<<arousal 600>><<garousal>>
+		<<else>>
+			당신은 그다지 능숙하지 않지만, <<he>>【은는】 작은 신음과 탄성으로 당신을 격려한다. <<He>>【은는】 사정하지는 않지만, 그럼에도 만족스러워 보인다.
+		<</if>>
+		<br><br>
+		"착한 <<girl>>【이】네." <<he>>【이가】 말한다. <<He>>【은는】 바지를 올리고 떠난다.
+	<<case 1>>
+		당신은 마지못해 혀를 내밀고, 억지로 따른다. 당신은 <<his>> 항문을 직접 핥지 않으려고 최선을 다한다. <<He>>【은는】 당신에게 몸을 눌러 당신의 입을 다른 방향으로 돌리려 한다.
+		<br>
+		마침내, <<he>>【은는】 좌절하며 포기한다. "노력은 했네, 뭐." <<he>>【이가】 투덜거린다. <<He>>【은는】 바지를 올리고 떠난다.
+	<<default>>
+		당신은 입을 다물고 침입으로부터 고개를 돌린다. 잠시 후, <<he>>【은는】 포기하고 당신의 뺨을 때린다.<<gpain>><<gtrauma>><<trauma 6>><<pain 4>><<bruise face>>
+<</switch>>
+<br><br>
+
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Oral
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<stuck_in_wall_oral>>
+	<<set $walltype to "pillory">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Pillory Oral Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Pillory Oral]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Pillory Oral Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<ejaculation>>
+
+	<<person>>【이가】 당신의 머리를 쓰다듬고는 형틀에서 물러난다.
+	<br><br>
+	<<if $pillory.audience gte 1>>
+		<<set _audienceFactor to $pillory.audience * 10>>
+		<<famerape _audienceFactor>>
+	<</if>>
+
+	"꼴좋다, 이 <<bitch>>【아야】." 누군가 외치는 소리가 들린다.
+	<br>
+	"적어도 사회에 쓸모는 있네."
+	<br>
+	"벌도 아니지, 저 더러운 <<slut>>【은는】 분명 즐겼을 거야."
+	<br>
+	<span class="pink">군중이 더 커지고 대담해집니다.</span>
+	<<set $pillory.audience += 1>>
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+
+	자존심에 상처를 입은 <<person>>【이가】 형틀을 떠난다.
+	<br><br>
+
+	"정말 폭력적이군. 저기 묶여 있는 게 당연해." 누군가 외치는 소리가 들린다.
+	<br>
+	<span class="teal">군중이 더 작아지고 조심스러워집니다.</span>
+	<<set $pillory.audience -= 1>>
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+	<br>
+<</if>>
+
+
+:: Pillory Pen Warn
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제-제발 그러지 마세요." 당신은 말한다. "이-이것만으로도 충분히 힘들어요." <<person>>【이가】 당신을 불쌍히 여기고, 떠나간다.
+<<elseif $speech_attitude is "bratty">>
+	"해보기만 해." 당신은 말한다. "나중에 찾아낼 테니까." <<person>>【이가】 잠시 멈칫하더니, 고개를 숙이고 물러난다.
+<<else>>
+	"제발 그러지 마세요." 당신은 말한다. <<person>>【이가】 망설이더니, 뚜껑을 다시 닫고 떠나간다.
+<</if>>
+<br><br>
+
+<<link [[다음 (1:00)|Pillory]]>><<endevent>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Pen
+<<effects>>
+
+<<person>>【이가】 당신에게 다가온다,
+<<if $phase is 1>>
+	<<his>> 마커 펜을 준비한 채로.
+	<<set _pen to "marker">>
+<<else>>
+	<<his>> 펜을 준비한 채로.
+	<<set _pen to "pen">>
+<</if>>
+<br><br>
+<<rng 10>>
+<<set _hasWritten = true>>
+<<if $rng gte 10 and $worn.lower.anus_exposed gte 1 and $worn.over_lower.anus_exposed gte 1 and $worn.under_lower.anus_exposed gte 1 and !$skin.left_bottom.pen>>
+	<<He>>【이가】 뒤로 돌아가, 당신의 <<bottom>>에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "left_bottom" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "left_bottom" _pen>>
+	<</if>>
+<<elseif $rng gte 9 and $worn.lower.anus_exposed gte 1 and $worn.over_lower.anus_exposed gte 1 and $worn.under_lower.anus_exposed gte 1 and !$skin.right_bottom.pen>>
+	<<He>>【이가】 뒤로 돌아가, 당신의 <<bottom>>에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "right_bottom" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "right_bottom" _pen>>
+	<</if>>
+<<elseif $rng gte 8 and ($worn.lower.type.includes("naked") or setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1) and ($worn.over_lower.type.includes("naked") or setup.clothes.over_lower[clothesIndex('over_lower', $worn.over_lower)].skirt is 1) and !$skin.left_thigh.pen>>
+	<<He>>【이가】 뒤로 돌아가, 당신의 왼쪽 허벅지에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "left_thigh" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "left_thigh" _pen>>
+	<</if>>
+<<elseif $rng gte 7 and ($worn.lower.type.includes("naked") or setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1) and ($worn.over_lower.type.includes("naked") or setup.clothes.over_lower[clothesIndex('over_lower', $worn.over_lower)].skirt is 1) and !$skin.right_thigh.pen>>
+	<<He>>【이가】 뒤로 돌아가, 당신의 오른쪽 허벅지에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "right_thigh" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "right_thigh" _pen>>
+	<</if>>
+<<elseif $rng gte 6 and $worn.upper.open is 1 and $worn.under_upper.open is 1 and $worn.over_upper.open is 1 and !$skin.left_shoulder.pen>>
+	<<He>>【이가】 당신 앞에 멈춰 서서, 당신의 왼쪽 어깨에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "left_shoulder" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "left_shoulder" _pen>>
+	<</if>>
+<<elseif $rng gte 5 and $worn.upper.open is 1 and $worn.under_upper.open is 1 and $worn.over_upper.open is 1 and !$skin.right_shoulder.pen>>
+	<<He>>【이가】 당신 앞에 멈춰 서서, 당신의 오른쪽 어깨에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "right_shoulder" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "right_shoulder" _pen>>
+	<</if>>
+<<elseif $rng gte 4 and $worn.upper.open is 1 and $worn.under_upper.open is 1 and $worn.over_upper.open is 1 and !$skin.breasts.pen>>
+	<<He>>【이가】 당신 앞에 멈춰 서서, 당신의 <<breasts>>에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "breasts" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "breasts" _pen>>
+	<</if>>
+<<elseif $rng gte 3 and !$worn.face.type.includes("mask") and !$skin.left_cheek.pen>>
+	<<He>>【이가】 당신 앞에 멈춰 서서, 당신의 왼쪽 뺨에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "left_cheek" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "left_cheek" _pen>>
+	<</if>>
+<<elseif $rng gte 2 and !$worn.face.type.includes("mask") and !$skin.right_cheek.pen>>
+	<<He>>【이가】 당신 앞에 멈춰 서서, 당신의 오른쪽 뺨에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "right_cheek" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "right_cheek" _pen>>
+	<</if>>
+<<elseif !$skin.forehead.pen>>
+		<<He>>【이가】 당신 앞에 멈춰 서서, 당신의 이마에 글씨를 쓴다.
+	<<if random(1, 2) is 2>>
+		<<bodywriting_criminal "forehead" _pen>>
+	<<else>>
+		<<bodywriting_npc_normal "forehead" _pen>>
+	<</if>>
+<<else>>
+	<<He>>【이가】 당신 주위를 몇 바퀴 돌더니, <span class="lblue">결국 당신에게 글씨를 쓰지 않기로 결정한다.</span> 대신 <<He>>【은는】 당신의 <<bottom>>【을를】 날카롭게 한 대 때린다.<<gtrauma>><<gstress>><<gpain>><<stress 6>><<trauma 6>><<pain 4>>
+	<<set _hasWritten = false>>
+<</if>>
+<br><br>
+
+<<He>>【은는】 뒤로 물러나<<if _hasWritten>> <<his>> 작품을 감상한다<</if>>, 그리고는 점점 늘어나는 관중에게로 돌아간다.
+<br><br>
+
+<<link [[다음 (1:00)|Pillory]]>><<endevent>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Spit
+<<effects>>
+
+당신은 <<persons>> 얼굴에 침을 뱉는다. <<He>>【은는】 놀라서 움찔하며, 하마터면 뒤로 넘어질 뻔한다. <<He>>【은는】 다시 시도하지 않는다.
+<br><br>
+
+<<endevent>>
+
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Chest
+<<effects>>
+
+<<person>>【이가】 당신의 <<breasts>>【을를】 움켜쥐고, 꽉 조인다. 당신은 <<his>> 애무를 최대한 견뎌낸다.
+<br><br>
+
+<<if $lactating is 1 and $milk_amount gte 30>>
+	당신의 몸이 자극에 반응하여, <span class="purple">유두에서 우유가 새어 나온다,</span><<persons>> 손 위로 흘러 바닥으로 떨어진다.
+	<<breastfeed>>
+	<br><br>
+
+	<<if random(1, 2) is 2>>
+		"저거 우유야?"
+	<<else>>
+		"젖이 나오는 거야?"
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"젖소 같네."
+	<<else>>
+		"농장에나 가야 할 것 같은데."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"양동이라도 있었으면."
+	<<else>>
+		"분명 달콤할 거야."
+	<</if>>
+	<br><br>
+
+	<<if $arousal gte $arousalmax>>
+		너무 과하다. <<orgasm>>
+
+		관중들이 야유하고 조롱하며 더 많은 관심을 끈다. 당신은 굴욕감을 느낀다. <span class="red">군중이 훨씬 더 커지고 대담해집니다.</span>
+		<<set $pillory.audience += 2>><<ggtrauma>><<trauma 12>>
+		<br><br>
+	<<else>>
+
+		<span class="pink">군중이 더 커지고 대담해집니다.</span>
+		<<set $pillory.audience += 1>>
+		<br><br>
+	<</if>>
+
+<<elseif $arousal gte $arousalmax>>
+	너무 과하다. <<orgasm>>
+
+	<<if random(1, 2) is 2>>
+		"방금 가버린 거야?"
+	<<else>>
+		"저렇게 경련하는 것 좀 봐."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"<<slut>>인 줄 알았어."
+	<<else>>
+		"정말 <<slut>>【이】네."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"더 괴롭혀."
+	<<else>>
+		"분명 즐기고 있을 거야."
+	<</if>>
+	<br><br>
+
+	당신은 굴욕감을 느낀다. <span class="pink">군중이 더 커지고 대담해집니다.</span>
+	<<set $pillory.audience += 1>><<ggtrauma>><<trauma 12>>
+	<br><br>
+<</if>>
+
+<<endevent>>
+
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Under Upper
+<<effects>>
+
+<<if $rng gte 51>>
+	<<if $worn.under_upper.open is 1>>
+		<<He>>【이가】 당신의 $worn.under_upper.name 윗부분을 잡고, <span class="pink">가슴 아래로 끌어내려,</span> 모두가 볼 수 있도록 당신의 <<breasts>>【을를】 드러낸다.
+		<br><br>
+		<<He>>【은는】 당신을 노출시키고 굴욕감을 준 채 군중 속으로 돌아간다.
+		<br><br>
+		<<set $worn.under_upper.exposed to 1>>
+		<<set $worn.under_upper.state_top to "midriff">>
+	<<else>>
+		<<He>>【이가】 당신의 $worn.under_upper.name 밑단을 잡고, <span class="pink">가슴 위로 끌어올린다,</span> 모두가 볼 수 있도록 당신의 <<breasts>>【을를】 드러낸다.
+		<br><br>
+		<<He>>【은는】 당신을 노출시키고 굴욕감을 준 채 군중 속으로 돌아간다.
+		<br><br>
+		<<set $worn.under_upper.exposed to 1>>
+		<<set $worn.under_upper.state to "chest">>
+	<</if>>
+<<else>>
+	<<He>>【이가】 당신의 $worn.under_upper.name 뒷부분을 잡아당겨, 당신의 <<breasts>>【을를】 강조한다. <<He>>【은는】 당신의 얼굴을 때리고 군중 속으로 돌아간다.
+	<br><br>
+<</if>>
+
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>
+
+:: Pillory Upper
+<<if $rng gte 51>>
+	<<if $worn.upper.open is 1>>
+		<<He>>【이가】 당신의 $worn.upper.name 윗부분을 잡고, <span class="pink">가슴 아래로 끌어내려,</span> 모두가 볼 수 있도록 당신의 <<undertop>>【을를】 드러낸다.
+		<br><br>
+		<<He>>【은는】 당신을 노출시키고 굴욕감을 준 채 군중 속으로 돌아간다.
+		<br><br>
+		<<set $worn.upper.exposed to 1>>
+		<<set $worn.upper.state_top to "midriff">>
+	<<else>>
+		<<He>>【이가】 당신의 $worn.upper.name 밑단을 잡고, <span class="pink">가슴 위로 끌어올린다,</span> 모두가 볼 수 있도록 당신의 <<undertop>>【을를】 드러낸다.
+		<br><br>
+		<<He>>【은는】 당신을 노출시키고 굴욕감을 준 채 군중 속으로 돌아간다.
+		<br><br>
+		<<set $worn.upper.exposed to 1>>
+		<<set $worn.upper.state to "chest">>
+	<</if>>
+<<else>>
+	<<He>>【이가】 당신의 $worn.upper.name 뒷부분을 잡아당겨, 당신의 <<breasts>>【을를】 강조한다. <<He>>【은는】 당신의 얼굴을 때리고 군중 속으로 돌아간다.
+	<br><br>
+<</if>>
+
+<<endevent>>
+<<link [[다음 (1:00)|Pillory]]>><<pass 1 hour>><</link>>
+<br>

@@ -1,0 +1,649 @@
+:: Balloon Stand [exitCheckBypass]
+<<clearsinglenpc 0>><<loadNPC 0 "stall_owner">><<person1>>
+
+<div id="clothingShop-div" class="main-shop-div">
+	<<stallShop-main>>
+</div>
+
+:: Balloon Purchase
+<<effects>>
+<<if $balloonStand.owner is "angry" and ["hot drink","cold drink"].includes($phase)>>
+	<<person>>【은는】 한숨을 쉬기 전 한참 동안 당신을 바라본다. "물론이죠." <<he>>【이가】 체념한 듯 말한다. "저기, 냉정을 잃어서 미안해요. 도와주겠다고 약속해놓고 제 음료를 팔기 시작한 건 좀 비겁한 짓이었죠. 하지만 솔직히 말해서, 당신도 절 가게 해주겠다고 약속해놓고 절 아프게 했잖아요. 그래도 화내는 건 싫어요. 우리 괜찮은 거 맞죠?"
+	<br><br>
+	<<He>>의 말에도 일리가 있다. 당신은 고개를 끄덕인다. "괜찮아요."
+	<<set $balloonStand.owner to "appeased">>
+<<else>>
+	<<set _sir to $player.gender_appearance is 'f' ? 'miss' : 'sir'>>
+	"<<print $balloonStand.owner is "angry" ? "네, 뭐든지요." : either("물론이죠,", "바로 준비해 드리겠습니다, _sir,", "물론이죠,", "바로 나옵니다,", "물론입니다!")>>" <<person>>【이가】 말한다.
+<</if>>
+<br><br>
+<<switch $phase>>
+	<<case "popcorn">>
+		<<He>>【이가】 갓 튀긴 팝콘을 퍼 담는다. <<he>>【이가】 건네줄 때 봉지는 아직 따뜻하다.
+		<<set $daily.ex.popcorn to ($daily.ex.popcorn or 0) + 1>>
+		<<wearProp "popcorn">>
+
+		<<if $daily.ex.popcorn is 2 and $balloonStand.owner isnot "angry">>
+			"배가 많이 고프신가 봐요." <<he>>【이가】 말한다. <<print playerBellyVisible() ? `"두 사람 몫을 먹는 셈이네요." <<He>>【은는】 당신의 부른 배를 다정하게 흘긋 보며 미소 짓는다.` : `"집에서 충분히 못 먹고 있나요?" <<His>> 눈썹이 잠시 찌푸려지지만, <<he>>【은는】 곧 털어낸다.`>>
+		<<elseif $daily.ex.popcorn is 3>>
+			"다른 손님들을 위해 남겨둬야 하니, 이번까지만 드릴게요." <<print $balloonStand.owner is "angry" ? "<<His>>의 목소리는 퉁명스럽다" : "<<He>>【은는】 미안한 듯 미소를 짓는다">>.
+		<</if>>
+	<<default>>
+		<<set $daily.ex.balloonDrink to ($daily.ex.balloonDrink or 0) + 1>>
+		<<switch $phase2>>
+			<<case "hotcocoa">>
+				<<wearProp "travel cup">>
+			<<case "strawberrylemonade">>
+				<<wearProp "strawberry lemonade">>
+			<<case "hotcider">>
+				<<wearProp "travel cup cider">>
+			<<default>>
+				<<wearProp "lemonade">>
+		<</switch>>
+
+		<<if $phase is "cold drink">>
+			<<He>>【은는】 당신에게 얼음처럼 차가운 <<seasonal_beverage>> 한 잔을 따라준다. 플라스틱 컵이 손안에서 후끈거린다.
+		<<else>>
+			<<He>>【은는】 당신에게 김이 나는 <<seasonal_beverage>> 한 잔을 따라준다. 종이컵이 손을 따뜻하게 해준다.
+		<</if>>
+
+		<<if $daily.ex.balloonDrink is 2>>
+			"목마르셨군요?" <<he>>【이가】 말한다. "<<print playerBellyVisible() ? "그 작은 아이에게도 수분을 공급해야 하니까요" : "수분 보충을 잘하시는 걸 보니 다행이네요">>." <<He>>【이가】 당신에게 미소 짓는다.
+		<<elseif $daily.ex.balloonDrink is 3>>
+			"다른 손님들을 위해 남겨둬야 하니, 이번까지만 드릴게요." <<He>>【은는】 미안한 듯 미소를 짓는다.
+		<</if>>
+<</switch>>
+"<<print $balloonStand.owner is "angry" ? "자. 꺼져." : either("또 뵙네요, 손님.", "남은 하루도 즐겁게 보내세요.", "이용해 주셔서 감사합니다.", "맛있게 드세요!")>>"
+<br><br>
+<<switch $phase>>
+	<<case "popcorn">>
+		<<link [[팝콘을 먹는다 (0:15)|Balloon Consume]]>><<set $phase to $balloonStand.robin.status is "help needed" ? "ask_eat" : "popcorn">><<trauma -3>><</link>><<ltrauma>><br>
+		<<if $balloonStand.robin.status is "help needed">>
+			<<link [[나중에 먹기 위해 챙겨둔다|Balloon Consume]]>><<set $phase to "ask">> <<set $popcorn += 1>><</link>><br>
+		<<else>>
+			<<link [[나중에 먹기 위해 챙겨둔다|Beach]]>><<set $eventskip to 1>><<set $popcorn += 1>><<endevent>><</link>>
+		<</if>>
+	<<default>>
+		<<link [[한 모금 마신다 (0:15)|Balloon Consume]]>><<stress -9>><<pass 15>><</link>><<lstress>><br>
+<</switch>>
+
+:: Balloon Consume
+<<effects>>
+
+<<switch $phase>>
+	<<case "cold drink">>한 모금 마신다. <<seasonal_beverage>>【은는】 <<print Time.season is "spring" ? "기분 좋은 과일 맛이 나고" : "톡 쏘면서도">> 상쾌해서, 스트레스가 녹아내리는 것이 느껴진다.
+	<<case "popcorn" "park" "ask_eat">>팝콘 한 줌을 입에 넣는다. 버터 맛과 짠맛이 어우러져, 영화관에 갔던 향수를 불러일으킨다.
+	<<case "ask">>팝콘이 사방으로 쏟아지지 않도록 봉지 윗부분을 접어 주머니에 넣는다.
+	<<default>>혀를 데지 않도록 조심스럽게 한 모금 마신다. <<seasonal_beverage>>【은는】 <<print Time.season is "winter" ? "진하고 크리미하며" : "향신료가 풍부하고">>, 스트레스가 녹아내리는 것이 느껴진다.
+<</switch>>
+<br><br>
+<<if ["ask","ask_eat"].includes($phase)>>
+	"물어볼 게 있었는데," 그 <<person>>【이가】 가판대에 <<his>> 팔꿈치를 기대고 당신과 대화하려고 몸을 기울이며 말한다. "팝콘은 어때요? 맛있죠, 그렇죠?"
+	<br><br>
+	<<if $speech_attitude is "meek">>
+		"아주 맛있어요, <<sir>>." 당신은 <<him>>에게 말한다. "그런데, 음, 좀 짠 것 같아요?"
+	<<elseif $speech_attitude is "bratty">>
+		"네, 인정해야겠네요, 잘 만드셨어요. 근데 짜네요. 목말라 죽겠어요." 당신은 솔직하게 입맛을 다신다.
+	<<else>>
+		"맛있어요, 네! 굳이 비평하자면, 좀 짜긴 하네요."
+	<</if>>
+	<br><br>
+	"소금은 중독성이 있죠. 그렇게 손님들을 다시 오게 만드는 거예요." <<he>>【이가】 윙크하며 말한다. "하지만 알려줘서 고마워요. 개선할 점은 언제나 환영이니까요."
+	<br><br>
+	<<link [[가판대 주인이 로빈과 협력하도록 제안한다|Balloon Partner]]>><<set $phase to "help">><</link>><br>
+	<<link [[가판대 주인이 음료를 팔도록 제안한다|Balloon Partner]]>><<set $phase to "sabotage">><</link>>
+<<elseif $phase is "park">>
+	<<link [[다음|Park]]>><<set $eventskip to 1>><<endevent>><</link>>
+<<else>>
+	<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+<</if>>
+
+:: Balloon Partner
+<<effects>>
+<<location "beach">><<npc Robin 2>><<person2>>
+<<set _boyfriend to ($robinromance ? `<<nnpc_girlfriend "Robin">>` : "친구")>>
+
+<<switch $phase>>
+	<<case "help">>
+		<<if getRobinLocation() is "beach">>
+			"제 _남자친구가 저 건너편에서 레모네이드를 팔고 있어요." 당신은 로빈의 레모네이드 가판대를 가리킨다. "정말 맛있어요. 아저씨네 팝콘을 먹고 난 손님들이 시원한 음료를 마시면 좋아할 것 같아요."
+		<<else>>
+			"<<print Time.season is "winter" ? "날이 춥지 않을 때," : "<<He>>【은는】 지금은 없지만,">> 제 _남자친구가 주말마다 저 건너편에서 레모네이드를 팔아요. 아마 보신 적 있을 거예요." 당신은 로빈이 평소에 가게를 차리는 장소를 가리킨다. "<<print Time.season is "winter" ? "지금은 겨울이라, <<he>>【은는】 공원에서 핫초코를 팔고 있어요." : "정말 맛있어요.">> 아저씨네 팝콘을 먹고 나면 딱 좋을 것 같아요."
+		<</if>>
+		<br><br>
+		<<person1>><<person>>【은는】 당신의 말을 곱씹으며 고개를 갸웃거린다.
+		<<if C.npc.Robin.crossdressing gte 2 and getRobinLocation() is "beach" and $robinromance>>
+			"<<print (_boyfriend.toUpperFirst())>>?" <<He>>【은는】 로빈의 <<= C.npc.Robin.pronoun is "f" ? "압박된 가슴" : "<<npcClothesText statusCheck('Robin') 'upper'>>">>【을를】 힐끗 본다. "깜빡 속을 뻔했네. 뭐, 네가 좋으면 그만이지, 안 그래?" <<He>>【은는】 짓궂게 웃으며 말을 잇는다.
+			<<set _boyfriend to C.npc.Robin.pronoun is "f" ? "'Girlfriend'" : "'Boyfriend'">>
+		<</if>>
+		"<<person2>><<hers>> 레모네이드는 전에 마셔봤지." <<person1>><<he>>【이가】 말한다. "설탕물이더군. 안 된다는 건 아니지만, 네 그 꼬마 _남자친구와 동업하는 게 끔찍한 생각이 아니라는 걸 설득하려면 좀 더 노력해야 할 거야."
+		<br><br>
+		<<link [[설득한다|Balloon Convince]]>><<set $phase to "persuade">><</link>><<englishdifficulty 1 1000>><br>
+		<<if hasSexStat("promiscuity", 4)>>
+			<<link [[유혹한다|Balloon Convince]]>><<set $phase to "seduce">><</link>><<promiscuous4>>
+			<br>
+		<</if>>
+		<<if $money gte 30000>>
+			<<link [[뇌물을 준다 (£300)|Balloon Convince]]>><<set $phase to "bribe">><<money -30000 "bribe">><</link>>
+		<</if>>
+
+	<<case "sabotage">>
+		"팝콘이랑 같이 음료도 팔아볼 생각은 없으세요?" 당신이 묻는다.
+		<br><br>
+		<<person1>><<person>>【은는】 가판대를 닦으며 애매하게 흥얼거린다. "<<print getRobinLocation() is "beach" ? "저기 있는" : Time.season is "winter" ? "공원에서 핫초코 파는" : "레모네이드 파는">> 네 친구처럼?" <<He>>【은는】 비밀을 말하듯 몸을 기울인다. "<<person2>><<his>> 레모네이드는 전에 마셔봤어. <<He>>【은는】 설탕을 좀 많이 넣는 편이던데, 제대로 된 착즙기나 하나 장만해야 할 거야."
+		<br><br>
+		<<person1>><<He>>【은는】 다시 몸을 바로 세운다. "네 친구는 얼마에 팔아?" <<he>>【은는】 <<print getRobinLocation() is "beach" ? "로빈의 가판대" : "로빈이 평소에 가게를 차리는 곳">> 쪽을 힐끗 보며 중얼거린다. "£1? 그렇게 해서는 먹고살 수 없지. 뭐, 어쩌면 선의의 경쟁이 <<person2>><<him>> 장사에 도움이 될지도 모르고." <<person1>><<person>>【은는】 킥킥 웃는다. "벌써 계절 메뉴도 생각 중이야. 가을엔 사과주, 봄엔 딸기 레모네이드... 재밌겠는데. 내일 한번 들러, 어때? 음료수 한 잔 공짜로 줄게." <<set $balloonStand.freeDrink to true>>
+		<br><br>
+		<<if $speech_attitude is "meek">>
+			"정말 친절하시네요, <<sir>>." 당신은 <<him>>에게 살짝 미소 짓는다. "감사합니다."
+		<<elseif $speech_attitude is "bratty">>
+			"좋아요, 저도 껴주세요." 당신은 활짝 웃는다. "공짜라면 언제나 환영이죠."
+		<<else>>
+			"정말 좋을 것 같아요." 당신은 미소 짓는다. "감사합니다."
+		<</if>>
+		<br><br>
+		"그렇다고 맨날 공짜로 줄 거라고 기대하진 마. 나도 먹고살아야 하니까." <<he>>【이가】 윙크하며 말한다. "너, 제법 수완이 좋은데, <<girl>>. 계속 그렇게 하면 언젠가 훌륭한 사업가가 될 거야." <<stress -6>><<lstress>>
+
+		<<balloonRobinSabotaged>>
+		<br><br>
+		<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+<</switch>>
+
+:: Balloon Convince
+<<effects>>
+<<npc Robin 2>><<person2>>
+
+<<switch $phase>>
+	<<case "persuade">>
+		당신은 로빈의 <<print Time.season is "winter" ? "핫초코" : "레모네이드">>【이가】 얼마나 훌륭한지 길게 이야기한다. 거기에 더해, 로빈이 고아였다는 슬픈 사연까지 덧붙인다.
+		<br><br>
+		<<if $englishSuccess>>
+			"정말 <<person2>><<him>>에게 큰 도움이 될 거예요, <<person1>><<sir>>." 당신은 눈을 동그랗게 뜨고 진심 어린 표정으로 말한다. "<<person2>><<He>>【은는】 좋은 사람이에요. 그저 한 번만 기회를 줄 사람이 필요할 뿐이죠. 그리고 이건 일방적인 게 아니에요, 장담하건대. <<He>>도 기꺼이 손님들을 이쪽으로 보내줄 거예요. 게다가 이 잔인한 세상에서 불행한 고아가 자립할 수 있도록 돕는 거니, 얼마나 좋은 업보를 쌓는 거겠어요!"
+			<br><br>
+			<<person1>><<person>>【은는】 당신의 열정적인 말에 감동한 듯 보인다. <<balloonRobinHelped>>
+			<br><br>
+			<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+		<<else>>
+			<<person1>><<person>>【은는】 감동하지 않은 표정이다. "그래서, <<person2>><<personssimple>>【이가】 힘든 삶을 살았다고. 안 그런 사람이 어디 있나? 여긴 자선 사업하는 곳이 아니고, <<he>>【이가】 나한테 무슨 이득을 줄 수 있을지 모르겠군."
+			<br><br>
+			<<person1>><<He>>【은는】 한숨을 쉰다. "이봐, 나도 나쁜 놈은 아니야." <<personsimple>>【이가】 말한다. "썩 내키진 않지만, 넌 마음에 드는군. 다른 때에 가판대에 들르면, 네 얘기를 기꺼이 들어주지."
+			<<set $daily.ex.balloonConvince to 1>>
+			<<set $balloonStand.robin.status to "convince">>
+			<br><br>
+			<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+		<</if>>
+
+	<<case "seduce">>
+		<<set $seductiondifficulty to 8000>>
+		<<seductioncheck>>
+		<<seductionskilluptext>>
+		<<seductionskilluse>>
+
+		"정말 설득이 안 될까요?" 당신은 <<person1>><<his>> 가판대 위로 몸을 기울이며 속삭인다. 입술을 핥고는 <<his>> 가랑이를 노골적으로 쳐다본다. "전 입을 아주 잘 쓰는데... 분명 합의점을 찾을 수 있을 거예요." <<promiscuity4>>
+
+		<<if $seductionrating gte $seductionrequired>>
+			<<He>>【은는】 잠시 갈등하는 듯했지만, 이내 마음을 누그러뜨린다. "아, 알았어." <<He>>【은는】 재빨리 주변을 살피고 당신을 가판대 밑으로 들여보낸다. "그 입을 잘 써준다면, 도와주지. 서둘러, 누가 보기 전에. 저쪽에 손님이 될 만한 사람들이 보이는 것 같군."
+			<br><br>
+			<<link [[다음|Balloon Sex]]>><<set $sexstart to 1>><</link>>
+		<<else>>
+			<<person>>【은는】 당신을 보더니 웃음을 터뜨려, 당신을 무안하게 만든다. "어림도 없지, 미안. 이봐, 나도 나쁜 놈은 아니야." <<he>>【이가】 말한다. "관심은 없지만, 넌 마음에 드는군. 내일 다시 가판대에 들르면, 네 얘기를 기꺼이 들어주지. 다음엔 말로 해, 이런... 거 말고." <<He>>【은는】 혼자 킬킬 웃고는 손을 흔들어 당신을 돌려보낸다.
+			<<set $daily.ex.balloonConvince to 1>>
+			<<set $balloonStand.robin.status to "convince">>
+			<br><br>
+			<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+		<</if>>
+
+	<<case "bribe">>
+		<<if $speech_attitude is "meek">>
+			"이러면 거래가 좀 더 달콤해질까요?" 당신은 £300를 세어 <<person1>><<him>>에게 건넨다.
+		<<elseif $speech_attitude is "bratty">>
+			"돈이면 말이 통하겠지, 안 그래? £300면 어때?" 당신은 돈을 세어 <<person1>><<his>> 손에 쥐여준다.
+		<<else>>
+			"£300면 설득이 될까요?" 당신은 돈을 세어 <<person1>><<him>>에게 건넨다.
+		<</if>>
+		<br><br>
+		<<He>>【은는】 감탄한 듯한 표정으로 돈을 주머니에 넣는다. <<balloonRobinHelped>>
+		<br><br>
+		<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+<</switch>>
+
+:: Balloon Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<set $enemyno to 1>><<set $enemynomax to 1>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+
+	<<maninit>>
+	당신은 가판대 밑으로 기어들어가 <<him>>【을를】 장난스럽게 핥는다.
+	<<promiscuity4>><<npcoral>><<set $NPCList[0].mouth to "none">>
+	<<set $enemytrust += 10>>
+<</if>>
+<<effects>>
+<<personsimple>>【은는】 손님과 대화를 나누며, 목소리가 떨리지 않도록 최선을 다한다.
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Balloon Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Balloon Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Balloon Sex Finish
+<<location "beach">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<He>>【은는】 <<his>> 절정의 여운에서 내려오며 헐떡인다. <<He>>【은는】 서툴게 당신의 뺨을 톡톡 두드리고, 당신은 입가를 닦으며 가판대 밑에서 기어나온다.
+	<br><br>
+	<<balloonRobinHelped>>
+<<elseif $enemyhealth lte 0>>
+	"아야, 이 씨발년아!" <<person>>【이가】 소리치며 당신을 <<him>>에게서 걷어찬다. 당신은 가판대 밑에서 허둥지둥 기어 나온다. 당신이 가판대에서 전력으로 달아나자 <<he>>【이가】 뒤에서 소리친다. "네 그 꼬맹이 친구 도와줄 생각은 이제 접어!" 당신이 가판대에서 멀어져 달리는 동안 <<he>>【이가】 뒤쫓아 외친다. "사실, <span class="red">내가 직접 레모네이드를 팔기 시작할 거다</span>! 다음부턴 먹여주는 손을 물지 마라, 이 개자식아."
+
+	<<balloonRobinSabotaged "angry">>
+<<elseif $finish is 1>>
+	<<He>>【은는】 당신이 가판대에서 기어 나오자 실망한 표정을 짓는다. "그게 날 설득하려던 거였나?" <<He>>【은는】 고개를 젓는다. "이봐, 난 네가 마음에 들어. 다른 때에 가판대에 들르면, 네 얘기를 기꺼이 들어줄게. 다음엔 말로 해, 이런... 거 말고." <<He>>【은는】 손을 흔들어 당신을 돌려보낸다.
+	<<set $balloonStand.robin.status to "convince">>
+	<<set $daily.ex.balloonConvince to 1>>
+<</if>>
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Beach]]>><</link>>
+
+:: Balloon Robin Check-In
+<<effects>>
+<<loadNPC 0 "stall_owner">><<npc Robin 2>>
+<<set $balloonStand.robin.talked to true>>
+<<set $balloonStand.robin.knows to ($phase is "confess_helped" or $phase is "confess_sabotaged" ? true : false)>>
+<<set _lemonade to Time.season is "winter" ? "핫초코" : "레모네이드">>
+<<set _botchedHelp to ["angry", "appeased"].includes($balloonStand.owner)>>
+
+<<switch $phase>>
+	<<case "confess_helped">>
+		<<if $speech_attitude is "meek">>
+			"음," 당신은 수줍게 말한다. "뭐가 원인인지 알 것 같아..." 로빈이 눈을 동그랗게 뜨고 당신을 보자, 당신은 간신히 웃음을 참는다. "새로운 사업 파트너가 생겼어! 팝콘 파는 <<person1>><<personsimple>>에게 <<his>> 목마른 손님들을 너에게 보내달라고 부탁했거든. <<He>>【은는】 너도 관심 있는 손님들을 <<his>> 가게로 보내주기만 하면 된대."
+		<<elseif $speech_attitude is "bratty">>
+			"오, 네 사업이 왜 잘되는지 정확히 말해줄 수 있어." 당신은 활짝 웃으며 말한다. 로빈은 의아한 듯 눈을 동그랗게 뜨고 당신을 쳐다본다. "내가 천재라서 그렇지. 팝콘 파는 그 얼간이를 설득해서 <<person1>><<his>> 목마른 손님들을 너한테 보내게 했거든. 배고파 보이는 사람이 있으면 <<him>>에게 보내주기만 하면 돼."
+		<<else>>
+			"음," 당신은 로빈에게 미소를 지으며 말을 시작한다. "팝콘 파는 가판대 알지? 내가 <<person1>><<him>>【을를】 설득해서 <<his>> 목마른 손님들을 너한테 보내라고 했어. <<He>>【은는】 그냥 가끔 <<his>> 가게로 손님을 좀 보내주길 바랄 뿐이야."
+		<</if>>
+		<br><br>
+		<<balloonRobinGrateful>>
+
+	<<case "confess_sabotaged">>
+		<<if _botchedHelp>>
+			당신은 심호흡을 하고
+			<<if $speech_attitude is "meek">>
+				로빈에게서 시선을 피한다. "저... 그게... 내가 이유를 알 것 같아. 있잖아, 내가 팝콘 파는 <<person1>><<personsimple>>에게 <<his>> 목마른 손님들을 너한테 보내라고 설득하려 했는데... 결국 <<him>>【을를】 화나게 만들었어. 내 생각에 <<he>>【이가】 보복으로 _lemonade【을를】 팔기 시작한 것 같아."
+			<<elseif $speech_attitude is "bratty">>
+				로빈의 눈을 똑바로 쳐다본다. "무슨 일인지 알아. 있잖아, 내가 팝콘 파는 그 얼간이를 설득해서 <<person1>><<his>> 목마른 손님들을 너한테 보내라고 했거든. 실수로 <<him>>【을를】 열 받게 했더니, <<he>>【이가】 나한테 엿 먹이려고 _lemonade【을를】 팔기 시작했어."
+			<<else>>
+				로빈에게 말한다. "안 좋은 소식이 있어. 팝콘 파는 가판대 알지? 내가 <<person1>><<him>>【을를】 설득해서 <<his>> 목마른 손님들을 너한테 보내라고 했는데, 잘 안 됐어. 내가 <<him>>【을를】 화나게 해서, <<he>>【이가】 보복으로 직접 레모네이드를 팔고 있어."
+			<</if>>
+			<br><br>
+			로빈은 복잡한 표정을 짓는다. "내가 손님을 잃는 게 너 때문이라고?"
+		<<else>>
+			당신은 심호흡을 하고
+			<<if $speech_attitude is "meek">>
+				로빈에게서 시선을 피한다. "저... 그게... 내가 이유를 알 것 같아.
+			<<elseif $speech_attitude is "bratty">>
+				로빈의 눈을 똑바로 쳐다본다. "무슨 일인지 알아.
+			<<else>>
+				로빈에게 말한다. "왜 그런지 알 것 같아.
+			<</if>>
+			내가 풍선 가판대를 운영하는 <<person1>><<personsimple>>에게 음료수를 팔기 시작하라고 말했기 때문이야."
+			<br><br>
+			<<person2>><<print C.npc.Robin.trauma gte 20 ? "로빈이 멍하니 당신을 쳐다본다" : C.npc.Robin.dom gte 50 ? "로빈이 주먹을 꽉 쥔다" : "로빈의 눈에 눈물이 고이고, <<he>>【은는】 눈을 깜박여 눈물을 털어낸다">>. <<He>>【은는】 할 말을 잃은 듯 보인다. "네가 뭘 했다고?" <<he>>【이가】 마침내 속삭인다. "왜 그런 짓을 한 거야? 내 <<if $robinromance is 1>><<girlfriend>><<else>>가장 친한 친구<</if>>【이가】 내 경쟁자에게 아이디어를 주지 않아도 이미 돈 벌기 힘든데. 우린 함께라고 생각했는데."
+		<</if>>
+
+	<<case "quiet_helped">>
+		당신은 조용히 있기로 한다. 로빈은 들뜬 에너지를 <<his>> 재료들을 재배치하는 데 쏟느라 당신의 침묵을 거의 눈치채지 못한다.
+		<br><br>
+		"실례합니다?" 한 <<generate3>><<person3>><<person>>【이가】 당신의 말을 가로막는다. "<<print Time.season is "winter" ? "해변에 있는 <<person1>><<personsimple>>【이가】 " : "저기 있는 <<person1>><<personsimple>>【이가】 ">> _lemonade【을를】 판다고 하던데요? 좀 살 수 있을까요?"
+		<br><br>
+		로빈의 두 눈이 살짝 커진다. "거기서 손님들이 오고 있던 거였구나!" <<person2>><<he>>【이가】 신이 난 목소리로 당신에게 속삭인다. "정말 좋으신 <<person1>><<lady_npc>>【이】셔... 역시 세상엔 좋은 분들이 있나 봐! 나도 내 손님들을 <<his>> 쪽으로 보내드려야겠어." 로빈은 <<person3>><<person>>【을를】 위해 _lemonade【을를】 만들기 시작하고, 그러는 동안 <<person2>><<he>>【은는】 콧노래를 흥얼거린다. <<llrtrauma>><<npcincr Robin trauma -5>><<ggdom Robin>><<npcincr Robin dom 5>>
+		<br><br>
+		당신이 한 역할을 모른 채 손님을 돕는 로빈을 보자 따뜻한 기운이 당신을 채운다. 남들이 알아주든 말든 좋은 일을 하니 기분이 좋다. <<stress -12>><<trauma -6>><<lstress>><<ltrauma>>
+
+	<<case "quiet_sabotaged">>
+		당신은 아무 말도 하지 않기로 한다. 로빈은 당신의 <<print ["angry", "appeased"].includes($balloonStand.owner) ? "<<him>>【을를】 돕지 못한 실패" : "배신">>에 대해 알 필요가 없다. 로빈은 안절부절못하며 <<his>> 재료들을 불안하게 재배치한다. "오, 뭐," <<he>>【이가】 마침내 한숨을 쉬며 말한다. "어쩔 수 없지. 그냥 계속 열심히 일해야겠어."
+		<br><br>
+		당신은 잠시 이야기를 나누고, 작별 인사를 할 때쯤 로빈의 기분은 약간 나아진 듯 보인다.
+<</switch>>
+<br><br>
+<<if $phase is "confess_sabotaged">>
+	<<set $robin.hurtReason to "풍선 가판대 일">>
+	<<set $robin.timer.hurt to _botchedHelp ? 8 : 15>>
+	<<set _trauma to _botchedHelp ? 3 : 6>>
+	<<set _robin_trauma to _botchedHelp ? 2 : 15>>
+	<<set _robin_love to _botchedHelp ? -1 : -10>>
+
+	<<link [[사과한다|Balloon Robin Check-In 2]]>><<set $phase to 0>><</link>><br>
+	<<capture _robin_trauma _robin_love>>
+		<<link [[소리친다|Balloon Robin Check-In 2]]>><<set $phase to 1>><<trauma -6>><<npcincr Robin trauma _robin_trauma>><<npcincr Robin love _robin_love>><<npcincr Robin dom -1>><</link>><<ltrauma>><<lstress>><<grtrauma>><<llove Robin>><<ldom Robin>><br>
+	<</capture>>
+	<<capture _trauma>>
+		<<link [[아무 말도 하지 않는다|Balloon Robin Check-In 2]]>><<set $phase to 2>><<trauma _trauma>><</link>><<gtrauma>><<if !_botchedHelp>><<grtrauma>><</if>>
+	<</capture>>
+<<else>>
+	<<switch $location>>
+		<<case "park">><<link [[다음|Park]]>><<endevent>><</link>>
+		<<default>><<link [[다음|Beach]]>><<endevent>><</link>>
+	<</switch>>
+<</if>>
+
+:: Balloon Robin Check-In 2
+<<if ["angry", "appeased"].includes($balloonStand.owner)>>
+	<<if $phase is 0>>
+		"<<print $speech_attitude is "meek" ? "사, 사고였어요! 죄송해요..." : $speech_attitude is "bratty" ? "내 실수야, 됐어? 그냥 도우려고 한 거라고." : "제가 망쳤어요. 죄송해요,">>" 당신은 <<person2>><<him>>에게 말한다.
+	<<elseif $phase is 1>>
+		당신은 로빈을 꾸짖으며, <<person2>><<him>>에게 최선을 다해 도왔다고 상기시킨다. <<He>>【은는】 <<print C.npc.Robin.dom gte 80 ? "당신이 장광설을 늘어놓기 전에 말을 끊는다" : "당신이 쏘아붙이자 <<his>> 고개를 숙인다. 당신이 말을 마치자, <<he>>【은는】 고개를 든다">>.
+	<<else>>
+		당신은 입을 다문다. 로빈은 말을 잇기 전에 당신을 원망스럽게 쳐다본다.
+	<</if>>
+	"네 잘못이 아니란 거 알아." 로빈이 말한다. <<person2>><<He>>【은는】 <<print C.npc.Robin.dom gte 50 ? "주먹을 꽉 쥔 채 당신을 노려본다" : "당신과 눈을 잘 마주치지 못한다">>. "도와주려 한 건 고맙지만, <<print C.npc.Robin.dom gte 50 ? "내 몸은 내가 챙길 수 있어" : "도움보다는 방해가 된 것 같아">>." <<He>>【이가】 한숨을 쉰다. "그냥... 시간이 좀 필요해, 알았지?"
+	<br><br>
+<<else>>
+	<<if $phase is 0>>
+		"<<print $speech_attitude is "meek" ? "죄, 죄송해요..." : $speech_attitude is "bratty" ? "내 실수야, 됐어?" : "죄송해요,">>" 당신은 <<person2>><<him>>에게 말한다. "전 그냥 돕고 싶었어요."
+		<br><br>
+		"누굴 도와? <<person1>><<Him>>? 아니면 나?" 로빈이 묻는다. <<person2>><<He>>【은는】 울음이 터지기 직전인 목소리다. "날 돕고 싶었다면, <<person1>><<him>>더러 자기 음료를 팔 게 아니라 손님들을 나한테 보내라고 했어야지."
+		<br><br>
+		"미안해." 당신은 속수무책으로 되풀이한다. "네 말이 맞아, 그러지 말았어야 했어. 난 아마..." 당신은 말을 멈추고 고개를 젓는다. "널 상처 주려던 건 아니었어."
+		<br><br>
+		"알아." <<person2>><<He>>【은는】 땅을 쳐다본다. "도와주려고 한 건 고마워."
+	<<elseif $phase is 1>>
+		당신은 목소리를 높여 로빈을 몰아붙이며, <<his>> 순진함을 꾸짖는다. 당신은 <<him>>에게 호의를 베푼 것이며, <<print $robinpaid gte 1 ? "자기 앞가림을 하려면 제대로 된 직업을 구해야 한다" : "레모네이드만 팔아서는 생계를 꾸릴 수 없다">>고 말한다. 당신이 말을 마칠 때쯤, <<he>>【은는】 울고 있다.
+		<br><br>
+		"내가 더 잘할게." <<he>>【이가】 중얼거린다. "네가 계속 날 부양하지 않아도 되도록..." <<He>>【은는】 마음을 추스르기 위해 잠시 시간이 필요하다.
+	<<else>>
+		당신은 적절한 말을 찾지 못하고 입을 다문다.
+		<br><br>
+		로빈은 당신의 침묵에 더욱 화가 난 듯하다. "이유도 말 못 해?" <<person2>><<he>>【이가】 눈물로 떨리는 목소리로 말한다. <<npcincr Robin trauma 5>><<grtrauma>>
+	<</if>>
+	<br><br>
+	마침내, 로빈은 떨리는 숨을 삼킨다. "<<print C.npc.Robin.dom gte 50 ? "이제 가줬으면 좋겠어" : "제, 제발, 그냥 가줘">>." <<person2>><<he>>【이가】 말한다. "그냥... 지금은 혼자 있고 싶어."
+<</if>>
+
+<<He>>【은는】 가판대로 돌아가, 당신이 마침내 떠날 때까지 시선을 피한다.
+<br><br>
+
+<<switch $location>>
+	<<case "park">><<link [[다음|Park]]>><<endevent>><</link>>
+	<<default>><<link [[다음|Beach]]>><<endevent>><</link>>
+<</switch>>
+
+:: Balloon Decline
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"죄송하지만, 지금은 안 될 것 같아요. 그래도 공짜 풍선은 고마워요, 정말 친절하시네요." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"아뇨, 괜찮아요. 그래도 공짜는 고맙네요." 당신이 말한다.
+<<else>>
+	"괜찮아요, 그래도 풍선은 고맙네요." 당신이 말한다.
+<</if>>
+<br><br>
+당신은 자리를 뜨고 <<person>>【이가】 <<his>> 가판대 설치를 마치도록 내버려 둔다.
+<br><br>
+<<if getRobinLocation() is "beach">>
+	<<clearsinglenpc 0>>
+	<<balloonRobinIntro>>
+<<else>>
+	<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+<</if>>
+
+:: Balloon Robin Response
+<<if $phase is 0>>
+	<<set _lemonade to Time.season is "winter" ? "핫초코" : "레모네이드">>
+	당신은 로빈에게 걱정할 것 없다고 말한다. 가판대 주인은 _lemonade【을를】 파는 게 아니라서 다른 손님들을 끌 것이라고.
+	<br><br>
+	"그건 그렇네." 로빈이 말한다. <<He>>【은는】 <<print Time.season is "winter" ? "해변 쪽을" : "가판대를">> 힐끗 본다. <<person1>>"<<He>>【은는】 팝콘을 팔고 있지, 맞아? 목마른 손님들을 나한테 보내줄지도 몰라." <<person2>><<he>>【이가】 <<print C.npc.Robin.trauma gte 40 ? "불가능한 일을 스스로에게 납득시키려는 듯한" : "희망에 찬">> 목소리로 말한다.
+	<br><br>
+	당신은 격려하듯 고개를 끄덕인다. <span class="blue">팝콘을 사면 가판대 주인이 로빈을 돕도록 설득할 수 있을지도 모른다.</span>
+	<br><br>
+	두 사람은 잠시 잡담을 나눈다. 이윽고 로빈은 <<his>> 가판대로 돌아가야 한다고 말한다.
+	<br>
+	<<if C.npc.Robin.trauma gte 40>>
+		<<He>>【은는】 땅에 시선을 고정한 채 천천히 터덜터덜 걸어간다.
+	<<else>>
+		<<He>>【은는】 미소 지으며 손을 흔들어 작별 인사를 한다.
+	<</if>>
+<<else>>
+	당신은 대답하지 않는다. 두 사람 사이에 어색한 침묵이 흐른다. 로빈은 안절부절못한다.
+	<br><br>
+	"응." <<person2>><<he>>【이가】 마침내 말한다. "아무래도 걱정해야 할 것 같아."
+	<<if C.npc.Robin.trauma gte 40>>
+		<<He>>【은는】 한숨을 쉬며, 멍하니 가판대를 응시한다. "음, 그럼 다시 일하러 가봐야겠네." <<He>>【은는】 땅에 시선을 고정한 채 천천히 터덜터덜 걸어간다.
+	<<else>>
+		<<He>>【은는】 한숨을 쉬며 잠시 낙담한 듯 보이다가, 이내 평소의 태평한 모습으로 돌아온다. "음, 어쩌겠어? 그냥 계속 열심히 일해야지." <<He>>【은는】 미소 지으며 손을 흔들어 작별 인사를 한다.
+	<</if>>
+<</if>>
+<<set $balloonStand.robin.status to "help needed">>
+<br><br>
+<<switch $location>>
+	<<case "park">><<link [[다음|Park]]>><<set $eventskip to 1>><<endevent>><</link>>
+	<<default>><<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+<</switch>>
+
+:: Balloon Widgets [widget]
+<<widget "stallShop-text">>
+	<<set _popcorn to $balloonStand.robin.status is "sabotaged" ? "팝콘과 <<print Time.season is 'winter' ? '핫초코' : '레모네이드'>>" : "팝콘">>
+
+	<<if (getRobinLocation() is "beach")>>
+		<<if $balloonStand.robin.status is "sabotaged">>
+			<<set _robinText to "당신 주위로 손님들이 몰려든다. 길 건너편에서는 시달린 로빈이 필사적으로 사람들을 <<nnpc_his Robin>> 가판대로 끌어들이려 애쓰고 있다.">>
+		<<elseif $balloonStand.robin.status is "helped">>
+			<<set _robinText to "길 건너편에 평소보다 더 많은 손님들이 로빈을 둘러싸고 있다. 당신이 쳐다보는 것을 발견한 <<nnpc_He Robin>>【이가】 당신에게 손을 흔든다.">>
+		<<else>>
+			<<set _robinText to "길 건너편에서 로빈이 혼자 온 손님과 이야기하고 있다. 당신이 쳐다보는 것을 발견한 <<nnpc_He Robin>>【이가】 머뭇거리며 미소를 짓는다.">>
+		<</if>>
+	<<elseif $robinmissing isnot 0>>
+		<<if $balloonStand.robin.status is "sabotaged">>
+			<<set _robinText to "당신 주위로 손님들이 몰려든다. 당신은 평소 로빈이 가판대를 세웠던 곳을 힐끗 바라본다. <<nnpc_his Robin>> 부재에 당신은 책임을 느끼지 않을 수 없다.">>
+		<<elseif $balloonStand.robin.status is "helped">>
+			<<set _robinText to "<<personsimple>>【이가】 마실 것을 찾는 다른 손님에게 로빈의 가판대 방향을 가리키려 한다. <<He>>【은는】 자기 자신을 재빨리 바로잡아 방향을 고쳐 가리키지만, 로빈이 없다는 사실에 낙담한 듯 보인다.">>
+		<<else>>
+			<<set _robinText to "당신은 평소 로빈이 가판대를 세웠던 곳을 힐끗 바라본다.">>
+		<</if>>
+	<<elseif $balloonStand.robin.status is "sabotaged">>
+		<<set _robinText to "당신 주위로 손님들이 몰려든다.">>
+	<<else>>
+		<<set _robinText to "">>
+	<</if>>
+
+	<<if $phase is "firstcustomer">>
+		"훌륭해요!" <<person>>【이가】 기뻐하며 박수를 친다. "어떤 걸로 드릴까요?"
+	<<elseif $balloonStand.freeDrink>>
+		"이봐!" <<person1>><<person>>【이가】 재빨리 미소를 지어 보이며 말한다. "사업 아이디어 줘서 정말 고마워. 벌써 손님들이 밀려오고 있어." 자, 약속했던 무료 음료 한 잔이야." <<set $balloonStand.freeDrink to false>>
+	<<else>>
+		당신이 가판대를 자세히 살펴보자, <<person>>【이가】 당신을 보며 <<print $balloonStand.owner is "angry" ? "노려본다" : "미소 짓는다">>. 신선한 _popcorn 냄새가 공기를 채운다. <<print _robinText>>
+	<</if>>
+	<br><br>
+<</widget>>
+
+<<widget "stallShop-main">>
+	<<if $balloonStand.freeDrink>>
+		<<set $balloonStand.freeDrink to false>>
+		<<switch Time.season>>
+			<<case "winter">>
+				<<wearProp "travel cup">>
+			<<case "spring">>
+				<<wearProp "strawberry lemonade">>
+			<<case "autumn">>
+				<<wearProp "travel cup cider">>
+			<<default>>
+				<<wearProp "lemonade">>
+		<</switch>>
+
+		"이봐!" <<person1>><<person>>【이가】 재빨리 미소를 지어 보이며 말한다. "사업 아이디어 줘서 정말 고마워. 벌써 손님들이 밀려오고 있어. 자, 약속했던 무료 음료 한 잔이야."
+		<br><br>
+
+		<<switch _cold>>
+			<<case "hot">>당신은 혀를 데지 않도록 조심하며 건네받은 음료를 한 모금 마신다. <<seasonal_beverage>>【은는】 <<print Time.season is "winter" ? "풍미가 깊고 부드럽다" : "향신료의 풍미가 가득하다">>.
+			<<case "ice-cold">>당신은 건네받은 음료를 한 모금 마신다. _cold <<seasonal_beverage>>【은는】 상쾌하고 <<print Time.season is "spring" ? "과일 향이 기분 좋게 난다" : "새콤하다">>.
+		<</switch>>
+		<<stress -9>><<lstress>>
+		<br><br>
+
+		당신은 다른 손님이 끼어들 때까지 가판대 주인과 가벼운 담소를 나눈다. 당신은 무료 음료에 대해 <<him>>에게 고맙다고 말한 뒤 자리에서 벗어난다.
+		<br><br>
+
+		<<link [[다음|Beach]]>><<set $eventskip to 1>><<endevent>><</link>>
+
+	<<else>>
+		<<if $tryOn.autoReset isnot false>><<tryOnReset>><</if>><<unset $tempDisable>>
+		<<set $outside to 0>><<effects>>
+		<<set $shopName = "stall">>
+		<<stallShop-text>>
+
+		<div id="tryonstats-div"><<tryOnStats>></div>
+		<<unset $shopListStartCount>>
+		<<unset $clothes_choice>>
+		<<set $shopPage = 0>>
+
+		<div id="warmth-description" class="hidden">
+			<<warmthscale>>
+			<<warmth_description>>
+		</div>
+
+		<<gifticon "balloons">><<link "물건을 둘러본다">><<replace "#clothingShop-div">><<HandheldShop>><</replace>><<set $phase to 0>><</link>>
+		<<run linkifyDivs('.button-back-to-shop')>>
+		<<if ndef $popcorn>><<set $popcorn to 0>><</if>>
+		<<if ndef $daily.ex.popcorn>><<set $daily.ex.popcorn to 0>><</if>>
+		<<if $popcorn gte 3>>
+			<br>
+			<span class="blue">한 번에 <<foodicon "popcorn">>팝콘을 세 봉지까지만 들고 다닐 수 있습니다.</span>
+		<<elseif $money gte 600 and $daily.ex.popcorn lt 3>>
+			<br>
+			<<foodicon "popcorn">><<link [[팝콘을 산다 (0:02 £6)|Balloon Purchase]]>><<money -600>><<set $phase to "popcorn">><<pass 2>><</link>>
+		<</if>>
+		<<if $balloonStand.robin.status is "sabotaged" and $money gte 300 and !($daily.ex.balloonDrink gte 3)>>
+			<<switch Time.season>>
+				<<case "winter">><<set _drink to "hotcocoa">><<set _phase to "hot cocoa">>
+				<<case "spring">><<set _drink to "strawberrylemonade">><<set _phase to "cold drink">>
+				<<case "summer">><<set _drink to "lemonade">><<set _phase to "cold drink">>
+				<<default>><<set _drink to "hotcider">><<set _phase to "hot cider">>
+			<</switch>>
+			<br>
+			<<foodicon _drink>><<link [[마실 것을 산다 (0:02 £3)|Balloon Purchase]]>><<money -300>><<set $phase to _phase>><<set $phase2 to _drink>><<pass 2>><</link>>
+		<</if>>
+		<<if $balloonStand.robin.status is "convince" and !$daily.ex.balloonConvince>>
+			<br>
+			<<socialiseicon>><<link [[로빈과 동업하도록 가판대 주인을 설득한다|Balloon Convince]]>><<set $phase to "persuade">><</link>><<englishdifficulty 1 1000>>
+		<</if>>
+		<br><br>
+
+		<<if $tryOn.value gt 0>>
+			<<if $tryOn.value lte $money>>
+				<<sendItemsToDropdown>>
+				<<shopicon "register">><<link "물건을 산다">><<buyTryOnClothes "wear">><<updateclothingshop>><</link>>
+				<br>
+				<<wardrobeicon>><<link "물건을 사서 옷장으로 보낸다">>
+					<<buyTryOnClothes "wardrobe">>
+					<<updatesidebarmoney>>
+					<<updatewarmthscale>>
+					<<updatewarmthdescription>>
+					<<updatesidebarimg>>
+					<<updatesidebardescription>>
+					<<updateallure>>
+					<<updatetryonstats>>
+					<<updateclothingshop>>
+					<<run updateMoment()>>
+				<</link>>
+				<br>
+			<</if>>
+		<<else>>
+			<<getouticon>><<link [[떠난다|Beach]]>><<shopClothingFilterReset>><<set $tryOn.autoReset to true>><<endevent>><</link>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "balloonRobinHelped">>
+	<<set _boyfriend to ($robinromance ? "<<person2>><<girlfriend_npc>>" : "친구")>>
+
+	"당신은 <<print $robinromance ? "<<person2>><<him>>【을를】 정말 사랑하거나" : "정말 좋은 친구거나">>, 아니면 <<person2>><<his>> 물건의 품질을 진짜 믿는 거겠지. 어느 쪽이든 받아들이지. 좋아, 거래가 성립됐군. 네 _boyfriend의 가판대에 손님들을 보내줄게, <<he>>【이가】 출출한 손님들을 내 쪽으로 보내준다면 말이야."
+
+	<<set $robin.moneyModifier += 50>>
+	<<set $balloonStand.robin.status to "helped">>
+	<<set $robin.timer.customer to 5>> /*Give Robin a few days to notice the effects on their stall*/
+<</widget>>
+
+<<widget "balloonRobinSabotaged">>
+	<<set $robin.moneyModifier -= 50>>
+	<<set $balloonStand.robin.status to "sabotaged">>
+	<<set $balloonStand.owner to _args[0] or "friendly">>
+	<<set $robin.timer.customer to 5>> /*Give Robin a few days to notice the effects on their stall*/
+	<<set $daily.ex.balloonDrink to 3>> /*So the balloon owner doesn't start selling lemonade three seconds after*/
+<</widget>>
+
+<<widget "balloonRobinGrateful">>
+	<<set _boyfriend to ($robinromance ? "<<person2>><<girlfriend_npc>>" : "가장 친한 친구")>>
+	<<set _lemonade to Time.season is "winter" ? "핫초코" : "레모네이드">>
+	<<set _stall to Time.season is "winter" ? "해변에 있는 <<person1>><<personsimple>>" : "저기 있는 <<person1>><<personsimple>>">>
+
+	로빈은 몇 초 동안 입을 떡 벌리고 있다. "너... 날 위해 그런 거야?"
+	<br><br>
+	"당연하지," 당신이 말한다. "넌 내 _boyfriend【이】니까."
+	<br><br>
+	로빈은 잠시 당신을 쳐다보더니, 당신의 목에 <<his>> 팔을 두르고
+	<<if $robinromance is 1>>
+		당신에게 키스한다. <<takeKissVirginity "Robin" "loveInterest">>
+		<<if _pcKissVirginityTaken>>
+			<br><br>
+		<</if>>
+		<<He>>【은는】 헉 하고 숨을 들이쉬며, 당황한 표정으로 떨어져 나간다.
+	<<else>>
+		아플 정도로 세게 당신을 안는다. 눈에 띄게 목이 멘 채로, <<He>>【이가】 먼저 떨어진다.
+	<</if>>
+	<<his>> 눈에 눈물이 고인 채로, <<he>>【이가】 속삭인다, "고마워. 날 위해 이렇게까지 해주다니... 너 없으면 난 어떡해?" <<He>>【은는】 당신을 <<print $robinromance is 1 ? "부드럽게" : "다시">> 안아주고, 두 사람은 잠시 그렇게 있는다.
+	<br><br>
+	"실례합니다?" 한 <<generate3>><<person3>><<person>>【이가】 포옹을 가로막는다. "<<print _stall>>【이가】 _lemonade【을를】 팔고 있다고 하던데? 저도 살 수 있을까요?"
+	<<if $location isnot "park">>
+		<br><br>
+		당신은 풍선 가판대를 힐끗 쳐다본다. 그 <<person>>【은는】 당신에게 윙크를 한다.
+		<br><br>
+	<</if>>
+	"아, 물론이죠!" 로빈이 말한다. "지금 바로 만들어 드릴게요, <<person3>><<sir>>!" <<person2>><<He>>【은는】 당신에게 마지막으로 고마운 미소를 지어 보이고는 _lemonade 준비로 분주해진다. <<ggglove "Robin">><<llrtrauma>><<npcincr Robin trauma -10>><<npcincr Robin love 10>>
+	<br><br>
+	따뜻한 기운이 당신을 채운다. 로빈이 손님을 도운 뒤 작별 인사하는 모습을 당신은 지켜본다. 당신이 떠나기 전, <<He>>【은는】 입술로 고맙다는 인사를 한 번 더 전한다. <<famegood 5>><<stress -3>><<trauma -3>><<lstress>><<ltrauma>>
+<</widget>>
+
+<<widget "balloonRobinAngryHelp">>
+	"난 괜찮아. 지금은 네 도움이 <<print ["angry", "appeased"].includes($balloonStand.owner) ? "더 이상" : "">> 필요 없어." 로빈이 꼼지락거린다. "잠깐 혼자 있게 해줄래?" <<he>>【은는】 여전히 <<npcHurt "Robin">> 상태인 게 분명하다.
+	<br><br>
+	<<endevent>>
+<</widget>>
+
+<<widget "balloonRobinAngryPurchase">>
+	"구매해 줘서 고마워," <<he>>【이가】 말한다. <<He>>【은는】 당신에게 쌀쌀맞게 군 것이 마음에 걸렸는지, 돈을 계산대 아래에 넣으며 얼굴을 누그러뜨린다.
+<</widget>>
+
+<<widget "balloonRobinTalk">>
+	로빈이 당신을 힐끗 본다.
+	<<if $balloonStand.robin.status is "helped" and $balloonStand.robin.talked is false and $robin.timer.customer is 0>>
+		"너도 눈치챘는지 모르겠지만, 나 요즘 손님이 엄청 늘었어!" <<He>>【은는】 조금 당황한 듯하면서도 기뻐 보인다. "무엇 때문인지는 모르겠지만... 와우!"
+	<<elseif $balloonStand.robin.status is "sabotaged" and $balloonStand.robin.talked is false and $robin.timer.customer is 0>>
+		"있잖아, 요즘 들어 손님이 별로 없어." <<His>> 표정이 어두워진다. "<<print getRobinLocation() is "beach" ? "저기 저 가판대에서 레모네이드를 팔기 시작하더니" : "해변에서 팝콘이랑 풍선 팔던 가판대가 <<seasonal_beverage>>【을를】 팔기 시작하더니">>..." <<He>>【이가】 한숨을 쉰다. "왜 그런지 알면 좋을 텐데."
+	<</if>>
+<</widget>>
+
+<<widget "balloonRobinIntro">>
+	<<loadNPC 0 "stall_owner">><<npc Robin 2>><<person2>>
+	<<set _lemonade to Time.season is "winter" ? "핫초코" : "레모네이드">>
+
+	당신은 로빈이 <<his>> _lemonade 가판대 뒤에 서 있는 것을 본다. <<he>>【이가】 당신을 알아차리자, <<he>>【은는】 가판대에서 나와
+	<<if C.npc.Robin.trauma gte 40>>
+		당신에게 터덜터덜 걸어온다. "안녕," <<he>>【이가】 중얼거린다. "혹시... <<print Time.season is "winter" ? "해변에 있는 그 가판대에 대해 들었어" : "저기 저 가판대 봤어">>? 풍선이랑 팝콘 파는 곳 말이야. 내가 걱정해야 할까? 지금도 손님 찾기 충분히 힘든데."
+	<<else>>
+		당신에게 다가온다. "안녕, 여기서 널 보니 너무 좋다! 나중에 내 가판대에도 들러주면 좋겠어." 로빈이 <<his>> 입술을 깨문다. "<<print Time.season is "winter" ? "해변에" : "이곳에">> 새로 생긴 저 다른 가판대 봤어? 나 걱정해야 할까? 내 손님들이 팝콘에 정신이 팔리지 않았으면 좋겠는데!"
+	<</if>>
+	<br><br>
+	<<link [[로빈을 안심시킨다|Balloon Robin Response]]>><<set $phase to 0>><</link>><br>
+	<<link [[아무 말도 하지 않는다|Balloon Robin Response]]>><<set $phase to 1>><</link>>
+<</widget>>

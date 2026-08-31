@@ -1,0 +1,122 @@
+:: Widgets Underground [widget]
+<<widget "dungeonescape">>
+	<<if $baileySold>>
+		<<set $baileyReunionScene to "dungeon">>
+	<</if>>
+
+	<<if $whitneyromance is 1>>
+		<<set $whitneyReunionScene to "dungeon">>
+	<</if>>
+
+	<<if C.npc.Kylar.love gte 50>>
+		<<set $kylarReunionScene to "dungeon">>
+	<</if>>
+
+	<<if C.npc.Robin.init is 1>>
+		<<if $hoursGoneFromHome gte 4 and !$undergroundbrothel.robin>>
+			<<set $robinReunionScene to "dungeon">>
+		<<elseif $undergroundbrothel.robinGone>>
+			<<set $robinReunionScene to "dungeonRobin">>
+		<</if>>
+	<</if>>
+
+	<<if $undergroundbrothel.robin>>
+		<<set $robinmissing to 0>>
+	<</if>>
+
+	<<unset $baileySold>>
+	<<unset $wraithUnderground>>
+	<<set $undergroundbrothelescaped to true>>
+	<<set $undergroundbrothel to {"escape": $undergroundbrothel.escape}>>
+	<<unset $underground_shirt>>
+<</widget>>
+
+<<widget "undergroundCellOptions">>
+	<<bedicon "zzz">><<link [[휴식 (1:00)|Underground Cell Rest]]>><<pass 1 hour>><<set $tiredness -= 1000>><</link>><<ltiredness>>
+	<br>
+	<<if $undergroundbrothel.robin and !$undergroundbrothel.robinSpoke>>
+		<<ind>><<link [[로빈과 대화한다 (0:10)|Underground Cell Robin Talk]]>><<pass 10>><<stress -4>><<trauma -4>><<npcincr Robin trauma -2>><</link>><<lstress>><<ltrauma>><<lrtrauma>>
+		<br>
+	<</if>>
+	<<if $undergroundbrothel.escape is 0>>
+		<<investigateicon>><<link [[나갈 길을 찾아본다|Underground Cell Look]]>><</link>>
+	<<elseif $undergroundbrothel.escape gte 19>>
+		<<getouticon "hole">><<link [[탈출한다|Underground Escape]]>><</link>>
+	<<elseif $undergroundbrothel.escape gte 18 and $physiquesize lte 12000>>
+		<<getouticon "hole">><<link [[탈출한다|Underground Escape]]>><</link>><<small_text>>
+	<<elseif $undergroundbrothel.escape gte 17 and $physiquesize lte 9000>>
+		<<getouticon "hole">><<link [[탈출한다|Underground Escape]]>><</link>><<small_text>>
+	<<elseif $undergroundbrothel.escape gte 16 and $physiquesize lte 6000>>
+		<<getouticon "hole">><<link [[탈출한다|Underground Escape]]>><</link>><<small_text>>
+	<<else>>
+		<<getouticon "dig">><<link [[판다 (1:00)|Underground Cell Dig]]>><<pass 1 hour>><</link>>
+	<</if>>
+	<br>
+	<<investigateicon>><<link [[문을 살펴본다|Underground Cell Lock]]>><</link>>
+<</widget>>
+
+<<widget "undergroundEscapeForestStart">>
+	<<clotheson>>
+	<<endcombat>>
+
+	등골이 오싹해지며, 원초적인 본능이 경고를 보낸다. <span class="red">무언가가 당신을 사냥하고 있다.</span>
+	<<set $foresthunt to 1>><<set $forestHunter to "Eden">><<badEndTrackingEnd "Underground Dungeon" { reason: "uDungeonDefeated" }>><<dungeonescape>>
+	<br><br>
+	<<specialClothesUnlock "set" "underground_brothel">>
+
+	<<link [[다음|Forest]]>><<set $forest to 40>><</link>>
+<</widget>>
+
+<<widget "undergroundReturnToCell">>
+	<<clearNPC handler>>
+
+	<<tearful>> 당신은 매트리스 위에 앉는다.
+	<<if _args[0] is "Robin">>
+		적어도 로빈은 도망쳤다.
+	<</if>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<if _args[0] is "skip">>
+		<<set $eventskip to 1>>
+	<</if>>
+
+	<<if _args[0] is undefined or _args[0]>>
+		<<link [[다음|Underground Cell]]>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "undergroundPlantFakeChoice">>
+	"머리라도 다쳤어?" <<person2>><<person>>【이가】 투덜거린다. "<<pshe>> 원하든 말든 상관없어. <<pShes>> 네 거야."
+	<br><br>
+
+	"아, 맞다! 이곳이 그런 식으로 돌아가는 걸 잊고 있었네!" <<person1>><<person>>【이가】 양손을 마주치더니 당신을 향해 달려든다.
+	<br><br>
+
+	<<link [[다음|Underground Plant Molestation]]>><<set $molestationstart to 1>><</link>>
+<</widget>>
+
+<<widget "averyUndergroundReunionReaction">>
+	<<He>>【은는】 당신의 멱살을 <<if C.npc.Avery.rage gte 60>>홱 잡아채<<else>>붙잡아<</if>> 자신에게 끌어당긴다. <<He>>【이가】 다가와 귓가에 속삭인다.
+	<<if C.npc.Avery.state is "dismissed">>
+		"날 버린 건 큰 실수였어, 이 걸레야."
+	<<elseif C.npc.Avery.rage gte 60>>
+		<<if C.npc.Avery.love gte 60>>
+			"너 같은 창녀가 착한 <<girl>>【이가】 되는 법을 배운 적이 없다니 참 유감이군."
+		<<else>>
+			"업보라고 생각해라, 이 건방진 걸레야. 이게 네게 착한 <<girl>>【이가】 되는 법을 가르쳐주겠지."
+		<</if>>
+	<<elseif C.npc.Avery.love gte 60>>
+		<<if isLoveInterest("Avery")>>
+			"이런 딱하기도 하지, <<pcpetname "Avery">>. 이번 주말엔 널 밖으로 데리고 나갈까 기대하고 있었는데."
+		<<else>>
+			"아쉽군, 너한테는 아주 훌륭한 잠재력이 있었는데 말이야."
+		<</if>>
+	<<else>>
+		"네가 결국 오게 된 곳이 여기라니 안됐군. 언제나 창녀처럼 보이긴 했어."
+	<</if>>
+	<br><br>
+<</widget>>

@@ -1,0 +1,1159 @@
+:: Industrial Drain
+<<set $outside to 0>><<set $location to "drain">><<effects>><<set $bus to "industrialdrain">><<wPersist>><<getTarget true>>
+당신은 공업 지구 아래의 빗물 배수구 안에 있다.
+<<draindescription>>
+<<drainlinks>>
+<<set $eventskip to 0>>
+
+:: Commercial Drain
+<<set $outside to 0>><<set $location to "drain">><<effects>><<set $bus to "commercialdrain">><<wPersist>><<getTarget true>>
+당신은 상업 지구 아래의 빗물 배수구 안에 있다.
+<<draindescription>>
+<<drainlinks>>
+<<set $eventskip to 0>>
+
+:: Residential Drain
+<<set $outside to 0>><<set $location to "drain">><<effects>><<set $bus to "residentialdrain">><<wPersist>><<getTarget true>>
+당신은 주거 지구 아래의 빗물 배수구 안에 있다.
+<<draindescription>>
+<<drainlinks>>
+<<set $eventskip to 0>>
+
+:: Passout Drain
+<<if isPregnancyEnding()>>
+	<<pregnancyPassout "drain">>
+<<else>>
+	너무 무리했다.
+	<br><br>
+	<<passout>>
+	<<beastNEWinit 4 lizard>>
+
+	<<if dangerEvent()>>
+		<<if $rng gte 51 and ($monster is 1 or $settings.bestialityEnabled)>>
+			<<link [[깨어난다|Passout Beast Drain]]>><<set $molestationstart to 1>><</link>>
+		<<elseif $rng gte 1>>
+			<<link [[깨어난다|Passout Drain Abduction]]>><<endevent>><<set $molestationstart to 1>><</link>>
+		<</if>>
+	<<else>>
+		<<ambulance>>
+	<</if>>
+	<<pass 1 hour>>
+	<<trauma 6>><<set $stress -= 2000>>
+<</if>>
+
+:: Passout Beast Drain
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<beastTrainGenerate>>
+	쉬익거리는 소리에 잠에서 깬다. 네 마리의 <<beastsplural>>【이가】 당신 위로 솟아 있다!
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if $alarm is 1>>
+	<<if $rescue is 0>>
+		<<set $alarm to 0>>
+		<br><br>
+		<<if $enemyarousal gte $enemyarousalmax>>
+			<span id="next"><<link [[다음|Passout Beast Drain Ejaculation]]>><</link>></span><<nexttext>>
+		<<elseif $enemyhealth lte 0>>
+			<span id="next"><<link [[다음|Passout Beast Drain Escape]]>><</link>></span><<nexttext>>
+		<<else>>
+			<span id="next"><<link [[다음|Passout Beast Drain]]>><</link>></span><<nexttext>>
+		<</if>>
+	<</if>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<span id="next"><<link [[다음|Passout Beast Drain Ejaculation]]>><</link>></span><<nexttext>>
+<<elseif $enemyhealth lte 0>>
+	<span id="next"><<link [[다음|Passout Beast Drain Escape]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Passout Beast Drain]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Passout Beast Drain Ejaculation
+<<effects>>
+<<beastejaculation>>
+<<if $combatTrain.length gt 0>>
+	만족한 <<beasttype>>【은는】 당신을 내버려 둔다. 다른 놈이 그 자리를 차지한다.
+	<<combatTrainAdvance>>
+	<br><br>
+	<<link [[다음|Passout Beast Drain]]>><</link>>
+<<else>>
+	만족한 <<beasttype>>【은는】 당신을 내버려 둔다.
+	<<combatTrainAdvance>>
+	<br><br>
+	<<link [[다음|Passout Beast Drain End]]>><</link>>
+<</if>>
+
+:: Passout Beast Drain Escape
+<<effects>>
+<<beastwound>>
+<<if $combatTrain.length gt 0>>
+	<<beasttype>>【은는】 고통과 두려움에 움츠러들지만, 다른 놈이 그 자리를 차지한다.
+	<<combatTrainAdvance>>
+	<br><br>
+	<<link [[다음|Passout Beast Drain]]>><</link>>
+<<else>>
+	<<beasttype>>【은는】 고통과 공포에 움찔 물러난다.
+	<<combatTrainAdvance>>
+	<br><br>
+	<<link [[다음|Passout Beast Drain End]]>><</link>>
+<</if>>
+
+:: Passout Beast Drain End
+<<effects>>
+<<if $enemywounded is 1 and $enemyejaculated is 0>>
+	<<beasttype>>【은는】 쉬익 소리를 내며 어둠 속으로 도망친다.
+<<elseif $enemywounded is 0 and $enemyejaculated is 1>>
+	<<beasttype>>【은는】 당신을 시멘트 바닥에 널브러진 채 내버려 둔다.
+<<elseif $enemywounded gte 2 and $enemyejaculated is 0>>
+	당신이 생각보다 성가시다고 느낀 <<beastsplural>>【은는】 어둠 속으로 도망친다.
+<<elseif $enemywounded is 0 and $enemyejaculated gte 2>>
+	<<beastsplural>>【은는】 당신을 기진맥진하게 만들고 어둠 속에 떨게 내버려 둔다.
+<<elseif $enemywounded gte 1 and $enemyejaculated gte 1>>
+	<<beastsplural>>【은는】 당신을 기진맥진하게 만들고 어둠 속에 떨게 내버려 둔다. 한 마리는 다리를 저는 것 같다.
+<</if>>
+<br><br>
+<<tearful>> 당신은 몸을 추스른다.
+<br><br>
+<<clotheson>>
+<<endcombat>>
+<<set $stress -= 1000>>
+<<destinationeventend>>
+
+:: Storm Drain Entrance
+<<set $outside to 1>><<effects>>
+맨홀 아래를 들여다본다. 마을 아래의 폭풍 배수관망으로 이어진다.
+<<if Weather.precipitation is "rain">>
+	급류 소리가 들린다.
+<</if>>
+<br><br>
+<<switch $bus>>
+<<case "nightingale">>
+	<<commercialdrainquick>>
+<<case "domus">>
+	<<residentialdrainquick>>
+<<case "elk">>
+	<<industrialdrainquick>>
+<<case "high">>
+	<<commercialdrainquick>>
+<<case "starfish">>
+	<<commercialdrainquick>>
+<<case "barb">>
+	<<residentialdrainquick>>
+<<case "connudatus">>
+	<<commercialdrainquick>>
+<<case "wolf">>
+	<<residentialdrainquick>>
+<<case "harvest">>
+	<<industrialdrainquick>>
+<<case "oxford">>
+	<<commercialdrainquick>>
+<<case "danube">>
+	<<residentialdrainquick>>
+<<case "mer">>
+	<<industrialdrainquick>>
+<<case "cliff">>
+	<<commercialdrainquick>>
+<<case "industrial">>
+	<<industrialdrainquick>>
+<<case "residential">>
+	<<residentialdrainquick>>
+<<case "commercial">>
+	<<commercialdrainquick>>
+<<case "park">>
+	<<commercialdrainquick>>
+<</switch>>
+<br>
+<<destination>>
+
+:: Drain Exit
+<<set $outside to 0>><<set $location to "drain">><<effects>><<set $bus to "drainexit">><<wPersist>><<getTarget true>>
+당신은 폭풍 배수 시스템 안에 있으며, 바다로 흘러나가는 곳과 가깝다.
+<<if Weather.precipitation is "rain">>
+	물이 중앙으로 쏟아져 내려 양쪽의 좁은 보도를 덮친다.
+<<else>>
+	물이 중앙으로 쏟아져 내리고, 양쪽에는 좁은 보도가 있다.
+<</if>>
+<<wHunt "drain">>
+<br><br>
+<<drainlinks>>
+
+<<set $eventskip to 0>>
+
+:: Passout Drain Abduction
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<generate1>><<generate2>><<maninit>>
+	<<npcClothesType $NPCList[0] "worker">><<npcClothesType $NPCList[1] "worker">>
+	<<set $leftarm to "bound">><<set $rightarm to "bound">><<upperruined>><<lowerruined>><<underruined>>
+	창문 없는 방에서 눈을 뜬다. 긴 관이 허리에 감겨 양팔을 등 뒤로 묶은 채 당신을 천장에 매달고 있다. <<fullGroup>>【이가】 당신 앞에 앉아 있다. <<if $worn.handheld.name isnot "naked">>당신의 $worn.handheld.name【은는】 어디에도 보이지 않는다.<<handheldruined>><</if>> "<<pShes>> 깨어났어," <<person>>【은는】 당신 뒤로 걸어와 엉덩이를 세게 때린다. "우린 일하다 찾은 건 뭐든 가져도 되거든. 그러니 네 몸도 마음대로 좀 써야겠어. 저항할 생각은 하지 마."
+	<br><br>
+<</if>>
+<<effects>>
+<<effectsman>><<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
+	<span id="next"><<link [[다음|Passout Drain Abduction]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Passout Drain Abduction Finish]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Passout Drain Abduction Finish
+<<if $enemyhealth lte 0>>
+	<<set $stress -= 1000>>
+	<<effects>>
+	당신은 <<fullGroup>>【을를】 밀쳐낸다. 그들이 정신을 차리기 전에, 당신은 배관에서 몸을 비틀어 빼내 방에서 탈출한다. <<tearful>> 당신은 계단을 뛰어 올라가고, 또 다른 문을 지나 밖으로 나온다.
+	<br><br>
+	<<endcombat>>
+	<<industrialeventend>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<clotheson>>
+	<<if $enemyanger gte 1>>
+		<<person1>><<person>>【은는】 당신을 천장에서 풀기 시작하고, <<person2>><<person>>【은는】 당신 아래 바닥의 해치를 연다. 당신은 해치 아래 얼음장 같은 물속으로 떨어진다.
+		<br><br>
+		<<endcombat>>
+		<<link [[다음|Drain Water]]>><<set $bus to "industrialdrain">><</link>>
+	<<else>>
+		재미를 다 본 그들은 당신을 천장에서 풀어주고 밖으로 밀어낸다. "행운을 빌어!" 그들은 당신 뒤로 문을 쾅 닫는다.
+		<br><br>
+		<<tearful>> 당신은 몸을 추스른다.
+		<br><br>
+		<<endcombat>>
+		<<industrialeventend>>
+	<</if>>
+<</if>>
+<<set $stress -= 1000>>
+
+:: Drain Water
+<<set $outside to 0>><<set $location to "drain">><<water>><<waterbr 2>><<wPersist>><<effects>>
+
+당신은 <<if Weather.precipitation is "rain">>난폭한<<else>>거세게 흐르는<</if>> 물살에 휩쓸린 채 빗물 배수구 안에 있다.
+<br><br>
+<<if $unbindattempt is 1>><<set $unbindattempt to 0>>
+	<<if $rng gte 51>>
+		<<unbind>>당신은 터널 벽에 결박을 문질러 약하게 만들려 한다. 결박이 느슨해지고, 가까스로 팔을 풀어낸다!
+	<<else>>
+		터널 벽에 결박을 문질러 약하게 만들려 하지만, 팔을 푸는 데 실패한다.
+	<</if>>
+	<br><br>
+<</if>>
+<<if $stress gte $stressmax>>
+	더는 버틸 수 없다. 당신은 기절한다.
+	<br><br>
+	<<link [[다음|Drain Water Passout]]>><</link>>
+<<else>>
+
+	<<if dangerEvent() and $eventskip isnot 1>>
+		<<rng>>
+		<<if $rng gte 76 and $settings.slimesEnabled and $hallucinations gte 2>>
+			물이 당신 주위에서 엉겨 붙기 시작한다.
+			<br><br>
+			<<link [[다음|Drain Water Slime]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<elseif $rng gte 51 and $settings.swarmsEnabled>>
+			장어 떼가 당신을 향해 움직인다.
+			<br><br>
+			<<link [[다음|Drain Water Eels]]>><<set $molestationstart to 1>><</link>>
+		<<elseif $rng gte 26 and $worn.upper.exposed gte 2 and $parasite.nipples.name is undefined and $settings.parasitesEnabled>>
+			당신은 통로 쪽으로 헤엄치려 하지만, <<nipples>>에 꼬집히는 감각이 끼어든다. 기묘한 연체동물 두 마리가 당신에게 달라붙어, 젖을 빨려는 듯 빨아댄다. 만지자 더 세게 달라붙어 수치스러운 감각을 끌어낸다. 떼어내려면 도움이 필요할 것이다.
+			<<parasite nipples urchin>><<garousal>><<arousal 600 "breasts">>
+			<br><br>
+			<<link [[다음|Drain Water]]>>
+				<<movealongdrainwater>>
+			<</link>>
+			<br>
+		<<elseif $rng gte 11>>
+			<<beastNEWinit 1 lizard>>
+			<<if $monster is 1 or $settings.bestialityEnabled>>
+				물속의 그림자가 당신을 향해 움직인다.
+				<br><br>
+				<<link [[다음|Drain Water Lizard]]>><<set $molestationstart to 1>><</link>>
+				<br>
+			<<else>>
+				물속의 그림자가 당신을 향해 움직인다. 당신은 물을 튀겨 그것이 무엇이든 간에 겁을 주어 쫓아내는 데 성공한다.<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+				<br><br>
+
+				<<link [[다음|Drain Water]]>><<endevent>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<else>>
+			보도로 헤엄쳐 가려 하지만, 물살이 너무 세다.
+			<<if $bus is "drainexit">>
+				당신은 바깥 공기 중으로 휩쓸려 나가 아래 바다로 떨어진다.
+				<br><br>
+				<<link [[다음|Sea Cliffs]]>><<set $worn.over_upper.integrity -= 20>><<set $worn.over_lower.integrity -= 20>><<set $worn.upper.integrity -= 20>><<set $worn.lower.integrity -= 20>><<set $worn.under_lower.integrity -= 20>><</link>>
+			<<else>>
+				그것은 당신을 배수 시스템의 더 깊은 곳으로 끌고 간다.
+				<br><br>
+				<<link [[다음|Drain Water]]>><</link>>
+				<br>
+			<</if>>
+			<<movealongdrainwater>>
+		<</if>>
+	<<else>>
+		<<if pcAreArmsBound("both")>>
+			수면 위로 머물기 위해 안간힘을 쓴다.
+			<<if $bus isnot "drainexit">>
+				<br><br>
+				<<link [[팔을 푼다|Drain Water]]>>
+					<<movealongdrainwater>>
+					<<set $unbindattempt to 1>>
+				<</link>>
+			<<else>>
+				물이 당신을 배수구 끝으로 데려간다. 당신은 제한된 팔로 배수구 옆에 매달리려 하지만 소용없다. 당신은 바깥 공기 중으로 휩쓸려 나가 아래 바다로 떨어진다.
+				<br><br>
+				<<link [[다음|Sea Cliffs]]>><<set $worn.over_upper.integrity -= 20>><<set $worn.over_lower.integrity -= 20>><<set $worn.upper.integrity -= 20>><<set $worn.lower.integrity -= 20>><<set $worn.under_lower.integrity -= 20>><</link>>
+			<</if>>
+		<<else>>
+			터널 가장자리에 매달려 몸을 끌어올려 안전한 곳으로 간다.
+			<br><br>
+			<<if $bus is "residentialdrain">>
+				<<residentialdraineventend>>
+				<br>
+			<<elseif $bus is "commercialdrain">>
+				<<commercialdraineventend>>
+				<br>
+			<<elseif $bus is "industrialdrain">>
+				<<industrialdraineventend>>
+				<br>
+			<<elseif $bus is "drainexit">>
+				<<drainexiteventend>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Drain Water Eels
+
+<<set $outside to 0>><<set $location to "drain">><<effects>>
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<molested>>
+	<<controlloss>>
+	<<set $combat to 1>>
+	<<set $enemytype to "swarm">>
+	<<swarminit "eels" "장어" "당신을 향해 다가온다" "당신을 포위한다" "뿌리친다" 1 7>>
+	<<if $bus is "residentialdrain">>
+		<<set $timer to 40>>
+	<<elseif $bus is "commercialdrain">>
+		<<set $timer to 30>>
+	<<elseif $bus is "industrialdrain">>
+		<<set $timer to 20>>
+	<<else>>
+		<<set $timer to 10>>
+	<</if>>
+	<<set $water to 1>>
+	<<set $swimdistance to 7>>
+<</if>>
+<<if $bus is "drainexit">>
+	앞쪽에 배수구 출구가 보인다. 곧 안전한 곳에 닿지 못하면 바다로 휩쓸려 들어갈 것이다!
+	<br><br>
+<</if>>
+<<swarmeffects>>
+<<set $swimdistance += 1>>
+<<if $swimdistance gte 10>><<set $swimdistance to 10>><</if>>
+물이 당신을 터널을 따라 더 멀리 끌고 간다.
+<<if $swimdistancecheck is $swimdistance>>
+	물살에 맞서 싸우지만, 너무 강해서 앞으로 나아갈 수 없다. 양팔을 모두 사용해야 한다.
+<<elseif $swimdistancecheck gt $swimdistance>>
+	물살에 맞서 싸우며 안전한 곳으로 더 가까이 이동한다.
+<<elseif $swimdistancecheck lt $swimdistance>>
+	안전한 곳에서 더 멀리 끌려간다.
+<</if>>
+<<if $swimdistance gte 8>>
+	보도에서 멀리 떠내려왔다.
+<<elseif $swimdistance gte 6>>
+	보도가 당신에게서 꽤 멀리 떨어져 있다.
+<<elseif $swimdistance gte 4>>
+	보도가 가깝다.
+<<elseif $swimdistance gte 2>>
+	보도가 거의 손에 닿을 거리에 있다.
+<<else>>
+	<span class="teal">통로가 손에 닿는다!</span>
+<</if>>
+<<set $swimdistancecheck to $swimdistance>>
+<br><br>
+<<swarm>>
+<<swarmactions>>
+<<if $stress gte $stressmax>>
+	<span id="next"><<link [[다음|Drain Water Eels Finish]]>><</link>></span><<nexttext>>
+<<elseif $timer lte 0>>
+	<span id="next"><<link [[다음|Drain Water Eels Finish]]>><</link>></span><<nexttext>>
+<<elseif $swimdistance lte 0>>
+	<span id="next"><<link [[다음|Drain Water Eels Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Drain Water Eels]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Drain Water Lizard
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	커다란 <<beasttype>>【이가】 물 밖으로 몸을 치켜든다!
+	<<if $bus is "residentialdrain">>
+		<<set $timer to 40>>
+	<<elseif $bus is "commercialdrain">>
+		<<set $timer to 30>>
+	<<elseif $bus is "industrialdrain">>
+		<<set $timer to 20>>
+	<<else>>
+		<<set $timer to 10>>
+	<</if>>
+<</if>>
+<<if $bus is "drainexit">>
+	앞쪽에 배수구 출구가 보인다.
+	<br><br>
+<</if>>
+<<effects>>
+<<effectsman>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend or $timer lte 0>>
+	<span id="next"><<link [[다음|Drain Water Lizard Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Drain Water Lizard]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Drain Water Eels Finish
+
+<<effects>>
+<<if $swimdistance lte 0>>
+	<<tearful>> 당신은 물 밖으로 몸을 끌어올리고, 뱀장어 떼를 뒤에 남겨둔다. 뱀장어들은 바깥 공기를 피해 당신 몸에서 꿈틀거리며 떨어져 나간다.
+	<br><br>
+	<<if $timer gte 30>>
+		<<set $bus to "residentialdrain">>
+	<<elseif $timer gte 20>>
+		<<set $bus to "commercialdrain">>
+	<<elseif $timer gte 10>>
+		<<set $bus to "industrialdrain">>
+	<<else>>
+		<<set $bus to "drainexit">>
+	<</if>>
+	<<clotheson>>
+	<<endcombat>>
+	<<destinationeventend>>
+<<elseif $timer lte 0>>
+	물이 당신을 배수구 끝으로 데려간다. 터널 옆에 매달리려 하지만 소용없다. 당신은 바깥 공기 중으로 휩쓸려 나가 아래 바다로 떨어진다. <<tearful>> 당신은 수면 위로 올라오기 위해 발버둥 친다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<clotheson>>
+	<<endcombat>>
+	<<seacliffseventend>>
+<<else>>
+	이 모든 것이 당신에게는 너무 벅차다. 당신은 기절한다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<endcombat>>
+	<<link [[다음|Drain Water Passout]]>><<pass 1 hour>><</link>>
+<</if>>
+
+:: Drain Water Passout
+<<effects>>
+<<if isPregnancyEnding()>>
+	<<pregnancyPassout "drain">>
+<<else>>
+	<<passout>>
+	의식을 잃은 당신의 몸은 배수구를 따라 흘러가다 바다에 떨어진다. 그 충격에 잠에서 깬다.
+	<br><br>
+	<<link [[다음|Sea Cliffs]]>><</link>>
+	<<set $stress -= 2000>><<trauma 6>>
+<</if>>
+
+:: Drain Water Lizard Finish
+<<effects>>
+<<if $timer gte 30>>
+	<<set $bus to "residentialdrain">>
+<<elseif $timer gte 20>>
+	<<set $bus to "commercialdrain">>
+<<elseif $timer gte 10>>
+	<<set $bus to "industrialdrain">>
+<<else>>
+	<<set $bus to "drainexit">>
+<</if>>
+<<if $timer lte 0>>
+	물이 당신을 배수구 끝으로 데려간다. 터널 옆에 매달리려 하지만 소용없다. 당신은 바깥 공기 중으로 휩쓸려 나가 아래 바다로 떨어진다. <<tearful>> 당신은 수면 위로 올라오기 위해 발버둥 친다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<clotheson>>
+	<<endcombat>>
+	<<seacliffseventend>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	만족한 <<beasttype>>【은는】 당신에게 흥미를 잃는다.
+	<br><br>
+	<<tearful>> 당신은 몸을 추스른다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Drain Water]]>><<set $eventskip to 1>><</link>>
+<<else>>
+	<<bHe>>【은는】 낑낑거리며 어둠 속으로 달아난다.
+	<br><br>
+	<<tearful>> 당신은 몸을 추스른다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Drain Water]]>><<set $eventskip to 1>><</link>>
+<</if>>
+
+:: Drain Water Slime
+
+<<set $outside to 0>><<set $location to "drain">><<effects>>
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<molested>>
+	<<controlloss>>
+	<<set $combat to 1>>
+	<<set $enemytype to "swarm">>
+	<<swarminit "slimes" "슬라임 덩어리" "당신을 향해 다가온다" "당신을 포위한다" "뿌리친다" 1 8>>
+	<<if $bus is "residentialdrain">>
+		<<set $timer to 40>>
+	<<elseif $bus is "commercialdrain">>
+		<<set $timer to 30>>
+	<<elseif $bus is "industrialdrain">>
+		<<set $timer to 20>>
+	<<else>>
+		<<set $timer to 10>>
+	<</if>>
+	<<set $water to 1>>
+	<<set $swimdistance to 8>>
+<</if>>
+<<if $bus is "drainexit">>
+	앞쪽에 배수구 출구가 보인다. 곧 안전한 곳에 닿지 못하면 바다로 휩쓸려 들어갈 것이다!
+	<br><br>
+<</if>>
+<<swarmeffects>>
+<<set $swimdistance += 1>>
+<<if $swimdistance gte 10>><<set $swimdistance to 10>><</if>>
+물이 당신을 터널을 따라 더 멀리 끌고 간다.
+<<if $swimdistancecheck is $swimdistance>>
+	물살에 맞서 싸우지만, 너무 강해서 앞으로 나아갈 수 없다. 양팔을 모두 사용해야 한다.
+<<elseif $swimdistancecheck gt $swimdistance>>
+	물살에 맞서 싸우며 안전한 곳으로 더 가까이 이동한다.
+<<elseif $swimdistancecheck lt $swimdistance>>
+	안전한 곳에서 더 멀리 끌려간다.
+<</if>>
+<<if $swimdistance gte 8>>
+	보도에서 멀리 떠내려왔다.
+<<elseif $swimdistance gte 6>>
+	보도가 당신에게서 꽤 멀리 떨어져 있다.
+<<elseif $swimdistance gte 4>>
+	보도가 가깝다.
+<<elseif $swimdistance gte 2>>
+	보도가 거의 손에 닿을 거리에 있다.
+<<else>>
+	<span class="teal">통로가 손에 닿는다!</span>
+<</if>>
+<<set $swimdistancecheck to $swimdistance>>
+<br><br>
+<<swarm>>
+<<swarmactions>>
+<<if $stress gte $stressmax>>
+	<span id="next"><<link [[다음|Drain Water Slime Finish]]>><</link>></span><<nexttext>>
+<<elseif $timer lte 0>>
+	<span id="next"><<link [[다음|Drain Water Slime Finish]]>><</link>></span><<nexttext>>
+<<elseif $swimdistance lte 0>>
+	<span id="next"><<link [[다음|Drain Water Slime Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Drain Water Slime]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Drain Water Slime Finish
+
+<<effects>>
+<<if $swimdistance lte 0>>
+	<<tearful>> 당신은 물 밖으로 몸을 끌어올리고, 슬라임을 뒤에 남겨둔다.
+	<br><br>
+	<<if $timer gte 30>>
+		<<set $bus to "residentialdrain">>
+	<<elseif $timer gte 20>>
+		<<set $bus to "commercialdrain">>
+	<<elseif $timer gte 10>>
+		<<set $bus to "industrialdrain">>
+	<<else>>
+		<<set $bus to "drainexit">>
+	<</if>>
+	<<clotheson>>
+	<<endcombat>>
+	<<destinationeventend>>
+<<elseif $timer lte 0>>
+	물이 당신을 배수구 끝으로 데려간다. 터널 옆에 매달리려 하지만 소용없다. 당신은 바깥 공기 중으로 휩쓸려 나가 아래 바다로 떨어진다. <<tearful>> 당신은 수면 위로 올라오기 위해 발버둥 친다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<clotheson>>
+	<<endcombat>>
+	<<seacliffseventend>>
+<<else>>
+	이 모든 것이 당신에게는 너무 벅차다. 당신은 기절한다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<endcombat>>
+	<<link [[다음|Drain Water Passout]]>><<pass 1 hour>><</link>>
+<</if>>
+
+:: Drain Tentacles Banish
+<<effects>>
+당신은 정신을 집중하고 손으로 복잡한 몸짓을 취한다. <span class="green">눈앞의 촉수가 희미하게 빛나며 격렬하게 움츠러들고,</span> 물속으로 물러난다. 다른 촉수들도 고통에 몸부림치며 주의가 흩어진다.
+<br><br>
+기회를 틈타 그들을 지나쳐 달아난다.
+<br><br>
+<<destinationeventend>>
+
+:: Drain Tentacles
+<<set $outside to 0>><<set $location to "drain">>
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+	<<tentaclestart 8 15>>
+	<<set $timer to 30>>
+<</if>>
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<statetentacles>>
+<<actionstentacles>>
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Drain Tentacles Finish]]>><</link>></span><<nexttext>>
+<<elseif $timer lte 1>>
+	<span id="next"><<link [[다음|Drain Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Drain Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Drain Tentacles Finish
+<<effects>>
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	그 생물은 당신에게 흥미를 잃고 깊은 곳으로 돌아간다. <<tearful>> 당신은 비틀거리며 일어선다.
+	<<clotheson>>
+	<<endcombat>>
+	<<destinationeventend>>
+<<else>>
+	당신 아래의 보도가 무게를 이기지 못하고 무너져, 당신은 아래 물속으로 떨어진다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Drain Water]]>><</link>>
+	<br>
+<</if>>
+
+:: Drain Lichen
+<<set $outside to 0>><<set $location to "drain">><<effects>><<set $bus to "drainexit">>
+<<wearProp "lichen" "violet">>
+벽은 보랏빛 이끼로 뒤덮여 있다. 당신은 조금 떼어낸다. <span class="gold">방이나 학교 도서관의 과학 프로젝트에 추가할 수 있다.</span>
+<br><br>
+<<link [[다음|Drain Exit]]>><</link>>
+<br>
+
+:: Drain Ladder
+<<effects>><<set $location to "sewers">>
+<<if $historytrait gte 1>>
+	당신은 빗물 배수관 아래에 있는 오래된 하수도에 대해 읽은 적이 있다. 그곳은 100년 넘게 사용되지 않았으며 위험하다고 한다. 괴물과 보물이 있다는 소문이 있다.
+<<else>>
+	당신은 빗물 배수관 아래에 있는 오래된 하수도에 대한 소문을 기억한다. 그곳에는 보물과 괴물이 있는 것 같다. 당신은 의심스럽지만, 어쨌든 경계를 늦추지 않는다.
+<</if>>
+
+<br><br>
+<<laddericon>><<link [[내려간다|Sewers Descend]]>><</link>>
+<br>
+<<if $bus is "residentialdrain">>
+	<<getouticon>><<link [[떠난다|Residential Drain]]>><</link>>
+	<br>
+<<elseif $bus is "commercialdrain">>
+	<<getouticon>><<link [[떠난다|Commercial Drain]]>><</link>>
+	<br>
+<<else>>
+	<<getouticon>><<link [[떠난다|Industrial Drain]]>><</link>>
+	<br>
+<</if>>
+
+:: Drain Struggle
+<<effects>>
+
+<<if $struggle_start is 1>>
+	<<struggle_init>>
+	<<set $struggle.creature to "slime">>
+	<<struggle_creatures 1 1>>
+	<<set $combat to 1>>
+	<<controlloss>>
+	<<violence 1>>
+	<<molested>>
+	<<if $phase is 1>>
+		<<set $struggle.anus.creature to "slime">><<set $anususe to "struggle">><<set $anusstate to "struggle">><<set $struggle.enemy[0].location to "anus">>
+	<<elseif $player.penisExist>>
+		<<set $struggle.penis.creature to "slime">><<set $penisuse to "struggle">><<set $penisstate to "struggle">><<set $struggle.enemy[0].location to "penis">>
+	<<else>>
+		<<set $struggle.vagina.creature to "slime">><<set $vaginause to "struggle">><<set $vaginastate to "struggle">><<set $struggle.enemy[0].location to "vagina">>
+	<</if>>
+	<<unset $struggle_start>>
+<</if>>
+
+<<struggle>>
+
+<<if $struggle.done gte $struggle.number>>
+	<span id="next"><<link [[다음|Drain Struggle End]]>><</link>></span>
+	<br>
+<<else>>
+	<span id="next"><<link [[다음|Drain Struggle]]>><</link>></span>
+	<br>
+<</if>>
+
+:: Drain Struggle End
+<<effects>>
+
+슬라임이 수로로 뛰어들어 물속으로 사라진다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<set $eventskip to 1>>
+<<destinationstormdrain>>
+
+:: Drain Slime Physique
+<<effects>>
+
+<<if $physiqueSuccess>>
+	당신은 어깨 너머로 손을 뻗어, 슬라임의 따뜻한 덩어리에 손가락을 박아 넣고 잡아당긴다. 그것은 더 강하게 달라붙으며 버티다가, <span class="green">한꺼번에 벗겨져 떨어진다.</span> 그 힘에 슬라임은 통로 건너편으로 날아가 벽에 철썩 들러붙고, 다른 배수구로 사라진다.
+	<br><br>
+	<<destinationstormdrain>>
+<<else>>
+	당신은 어깨 너머로 손을 뻗어, 슬라임의 따뜻한 덩어리에 손가락을 박아 넣고 잡아당긴다. 그것은 더 강하게 달라붙으며 버티더니, <span class="red">당신의 손까지 휘감아 버린다.</span>
+	<br><br>
+
+	당신이 발버둥치는 사이, 슬라임은 등 위로 퍼져 나간다,
+	<<if !$worn.upper.type.includes("naked")>>
+		<span class="pink">김이 나는 쉭쉭 소리와 함께 당신의 <<print $worn.upper.name>>【을를】 녹인다.</span>
+		<<set $worn.upper.integrity -= 1000>>
+		<<integritycheck>>
+		<<exposure>>
+		<br><br>
+	<<elseif !$worn.under_upper.type.includes("naked")>>
+		<span class="pink">김이 나는 쉭쉭 소리와 함께 당신의 <<print $worn.under_upper.name>>【을를】 녹인다.</span>
+		<<set $worn.under_upper.integrity -= 1000>>
+		<<integritycheck>>
+		<<exposure>>
+		<br><br>
+	<<else>>
+		당신의 피부를 간질인다.<<garousal>><<arousal 600>>
+		<br><br>
+	<</if>>
+
+	<<link [[잡아당겨 벗는다|Drain Slime Physique 2]]>><</link>><<physiquedifficulty 1 30000>>
+	<br>
+	<<link [[틈을 노린다|Drain Slime Watch]]>><<arousal 1800>><</link>><<ggarousal>>
+	<br>
+	<<if !$worn.under_upper.type.includes("naked")>>
+		<<link [[속옷을 희생한다|Drain Slime Sacrifice Under]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Drain Slime Physique 2
+<<effects>>
+
+<<if $physiqueSuccess>>
+	당신은 다른 손으로 슬라임을 붙잡고 다시 시도한다. 이번에는 <span class="green">그것을 몸에서 뜯어내는 데 성공한다.</span> 그 힘에 슬라임은 수로 위로 날아가 벽에 철썩 부딪힌 뒤 배수구로 도망친다.
+	<br><br>
+
+	<<destinationstormdrain>>
+<<else>>
+	당신은 다른 손으로 슬라임을 붙잡고 다시 시도한다. <span class="red">그것은 또다시 당신을 옭아매고, 팔을 무력하게 만든 채</span> 몸 아래쪽으로 더 퍼져 나간다,
+	<<if !$worn.under_upper.type.includes("naked")>>
+		쉭 소리와 함께 당신의 <<print $worn.under_upper.name>>【을를】 녹인다.
+		<<set $worn.under_upper.integrity -= 1000>>
+		<<integritycheck>>
+		<<exposure>>
+	<<else>>
+		당신의 피부를 간질인다.<<garousal>><<arousal 600>>
+	<</if>>
+	<br><br>
+	그것이 <<bottom>>에 닿자, 지렛대로 삼으려는 듯 가까운 벽에 달라붙고 당신을 바닥에 쓰러뜨린다.
+	<br><br>
+
+	<<link [[다음|Drain Struggle]]>><<set $phase to 1>><<set $struggle_start to 1>><</link>>
+	<br>
+<</if>>
+
+:: Drain Slime Watch
+<<effects>>
+
+당신은 슬라임이 등을 타고 퍼지는 것을 관찰합니다.
+<<if !$worn.upper.type.includes("naked")>>
+	<span class="pink">그것은 김이 나는 쉭쉭 소리와 함께 당신의 <<print $worn.upper.name>>【을를】 녹인다.</span>
+	<<set $worn.upper.integrity -= 1000>>
+	<<integritycheck>>
+	<<exposure>>
+<<elseif !$worn.under_upper.type.includes("naked")>>
+	<span class="pink">그것은 김이 나는 쉭쉭 소리와 함께 당신의 <<print $worn.under_upper.name>>【을를】 녹인다.</span>
+	<<set $worn.under_upper.integrity -= 1000>>
+	<<integritycheck>>
+	<<exposure>>
+<<else>>
+	그것이 당신의 피부를 간질인다.<<ggarousal>><<arousal 600>>
+	<br>
+<</if>>
+<br>
+당신은 패턴을 알아차린다. 슬라임은 점프할 때마다 몸을 납작하게 만들며 퍼져나간다.
+<br><br>
+<<if $arousal gte 10000>>
+	당신은 기회를 기다리지만, 사악한 온기가 피부를 타고 퍼진다. <<orgasm>>
+
+	무릎에 힘이 풀려 땅에 쓰러집니다. 슬라임은 당신의 약점을 이용합니다.
+	<br><br>
+
+	<<link [[다음|Drain Struggle]]>><<set $phase to 1>><<set $struggle_start to 1>><</link>>
+	<br>
+<<else>>
+	당신은 기회를 기다리다가, 그것이 약해진 순간을 붙잡아 수로 건너편으로 던져 버린다. 슬라임은 맞은편 벽에 철썩 부딪히고, 다른 배수구로 사라진다.
+	<br><br>
+
+	<<destinationstormdrain>>
+<</if>>
+
+:: Drain Slime Sacrifice Upper
+<<effects>>
+
+You tear off your <<print $worn.upper.name>>, and the slime with it. The fabric dissolves in a hiss as you make your escape.
+<br><br>
+
+<<set $worn.upper.integrity -= 1000>>
+<<integritycheck>>
+<<exposure>>
+<br>
+<<destinationstormdrain>>
+
+:: Drain Slime Sacrifice Under
+<<effects>>
+
+You tear off your <<print $worn.under_upper.name>>, and the slime with it. The fabric dissolves in a hiss as you make your escape.
+<br><br>
+
+<<set $worn.under_upper.integrity -= 1000>>
+<<integritycheck>>
+<<exposure>>
+<br>
+<<destinationstormdrain>>
+
+:: Widgets Drain Descriptions [widget]
+<<widget "draindescription">>
+	<<if Weather.precipitation is "rain">>
+		배수로 중앙으로 물이 세차게 밀려들어, 양옆의 좁은 보행로까지 물에 잠길 지경이다.
+	<<elseif Weather.isFreezing>>
+		얼음덩어리들이 섞인 채 배수로 중앙으로 거칠게 흘러내려가고 있다.
+	<<else>>
+		배수로 중앙으로 물이 콸콸 흘러내리고 있고, 양옆으로는 좁은 보행로가 나 있다.
+	<</if>>
+	<<wHunt "drain">>
+	<br><br>
+	이곳에서 마을 여러 구역으로 접근할 수 있다.
+	<br><br>
+	<<if isPubfameTaskAccepted("morgan")>>
+		'미키'는 그 USB가 하수도 어딘가에 있고, 아마 <<if $sewersintro is 1>>모건이 갖고 있을 거라고 했다.<<else>>아래의 누군가가 갖고 있을 거라고 했다. 밑으로 내려가는 사다리가 보인다.<</if>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "drainlinks">>
+	<<if $stress gte $stressmax and !$possessed>>
+		<<passoutdrain>>
+	<<else>>
+		<<rng>>
+		<<if Weather.precipitation isnot "none" and $rng gte 76 and $eventskip is 0>>
+			<<eventsdrain>>
+		<<elseif ($rng gte 92 or $eventforced) and $eventskip is 0>>
+			<<eventsdrain>>
+		<<else>>
+			<<if $arousal gte $arousalmax and $bus isnot "drainexit">>
+				<<orgasmLocation "sewers">>
+			<</if>>
+			<<switch $bus>>
+				<<case "industrialdrain">>
+					<<industrialdrainlinks>>
+				<<case "commercialdrain">>
+					<<commercialdrainlinks>>
+				<<case "residentialdrain">>
+					<<residentialdrainlinks>>
+				<<case "drainexit">>
+					<<drainexitlinks>>
+			<</switch>>
+		<</if>>
+		<<displayLinks>>
+	<</if>>
+<</widget>>
+
+<<widget "industrialdrainlinks">>
+	<<drainladderdownlink "industrial">>
+	<<commercialdrain>>
+	<br>
+	<<drainexit>>
+	<br>
+	<<if $exposed gte 1 and Time.dayState isnot "night">>
+	<<else>>
+		<<elk>>
+		<<mer>>
+		<<harvest>>
+	<</if>>
+	<br>
+	<<industrial>>
+<</widget>>
+
+<<widget "commercialdrainlinks">>
+	<<drainladderdownlink "commercial">>
+	<<residentialdrain>>
+	<br>
+	<<industrialdrain>>
+	<<if $exposed gte 1 and Time.dayState isnot "night">>
+	<<else>>
+		<<high>>
+		<<connudatus>>
+		<<cliff>>
+		<<nightingale>>
+		<<starfish>>
+		<<oxford>>
+	<</if>>
+	<br>
+	<<commercial>>
+	<<park>>
+	<br>
+	<<if $historytrait gte 2 and $schooldrainintro gte 1>>
+		<<bathroomicon "toilet">><<link [[학교 화장실로 이어지는 비밀 통로 (0:02)|School Toilets]]>><<pass 2>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "residentialdrainlinks">>
+	<<drainladderdownlink "residential">>
+	<<commercialdrain>>
+	<br>
+	<<if $exposed gte 1 and Time.dayState isnot "night">>
+	<<else>>
+		<<domus>>
+		<<barb>>
+		<<danube>>
+		<<wolf>>
+	<</if>>
+	<br>
+	<<residential>>
+	<<if $loft_wren gte 2>>
+		<<gardenicon>><<link [[사다리를 타고 고아원 정원으로 올라간다|Garden]]>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "drainexitlinks">>
+	<<if $scienceproject is "ongoing" and $sciencelichendrain is 0>>
+		<<scienceicon "violet lichen">><<link [[이끼를 조사한다|Drain Lichen]]>><<set $sciencelichendrain to 1>><</link>>
+		<br>
+	<</if>>
+	<<industrialdrain>>
+	<br><br>
+<</widget>>
+
+<<widget "drainladderdownlink">>
+	<<if $sewersintro is 1>>
+		<<laddericon>>
+		<<set _dest to "Sewers " + _args[0].toLocaleUpperFirst()>>
+		<<link [[내려간다|_dest]]>> <<sewersstart>><<set $eventskip to 1>><</link>>
+		<br><br>
+	<<elseif $historytrait gte 1 or isPubfameTaskAccepted("morgan")>>
+		<<laddericon>><<link [[내려가는 사다리를 조사한다|Drain Ladder]]>><</link>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+:: Widgets Drain Water [widget]
+<<widget "movealongdrainwater">>
+	<<if $bus is "residentialdrain">>
+		<<set $bus to "commercialdrain">>
+	<<elseif $bus is "commercialdrain">>
+		<<set $bus to "industrialdrain">>
+	<<elseif $bus is "industrialdrain">>
+		<<set $bus to "drainexit">>
+	<</if>>
+<</widget>>
+
+:: Drain Lights Work
+<<effects>>
+
+당신은 벽과 물을 조사한다.
+<<if currentSkillValue("history") gte random(1, 1000)>>
+	<<if $bus is "residentialdrain">>
+		<<set $drains_rescue_location to "residential">>
+		나뭇잎, 풀, 그리고 다른 정원 부스러기들이 떠내려간다. 공원 관리인들이 쓰레기를 그렇게 함부로 처리하지는 않을 테니까. 당신은 주거 구역 아래에 있다.
+	<<elseif $bus is "commercialdrain">>
+		<<set $drains_rescue_location to "commercial">>
+		물에 쓰레기가 많이 떠다닌다. 당신은 상업 구역 아래에 있다.
+	<<else>>
+		<<set $drains_rescue_location to "industrial">>
+		이상한 얼룩들. 틀림없는 오염 물질의 냄새. 당신은 공업 구역 아래에 있다.
+	<</if>>
+	격자무늬 틈으로 건물의 벽을 이루는 벽돌들을 바라본다. 그런 식으로 지어진 건물은 단 하나뿐이다. <span class="green">어디인지 알 것 같다.</span>
+	<br><br>
+
+	구조가 필요할지도 모르겠다.
+	<br><br>
+<<else>>
+	하지만 빗물 배수로는 상당히 똑같이 생겼다. <span class="red">어디에 있는지 알 수 없다.</span>
+	<br><br>
+
+	당신은 조명과 불쾌한 소리들을 뒤로한 채 빗물 배수로를 계속 나아간다.
+	<br><br>
+<</if>>
+
+<<if $bus is "residentialdrain">>
+	<<getouticon>><<link [[다음|Residential Drain]]>><</link>>
+	<br>
+<<elseif $bus is "commercialdrain">>
+	<<getouticon>><<link [[다음|Commercial Drain]]>><</link>>
+	<br>
+<<else>>
+	<<getouticon>><<link [[나간다|Industrial Drain]]>><</link>>
+	<br>
+<</if>>
+
+:: Drain Lights Leave
+<<effects>>
+
+당신은 조명과 불쾌한 소리들을 뒤로한 채 빗물 배수로를 계속 나아간다.
+<br><br>
+
+<<if $bus is "residentialdrain">>
+	<<getouticon>><<link [[다음|Residential Drain]]>><</link>>
+	<br>
+<<elseif $bus is "commercialdrain">>
+	<<getouticon>><<link [[다음|Commercial Drain]]>><</link>>
+	<br>
+<<else>>
+	<<getouticon>><<link [[다음|Industrial Drain]]>><</link>>
+	<br>
+<</if>>
+
+:: Drain Deluge Hide
+<<effects>>
+
+당신은 벽을 따라 난 물때 자국 위, 커다란 파이프 위로 올라간다.
+<<if $rng lt 70>>
+	그리고 지나갈 때까지 기다린다.
+	<br><br>
+<<else>>
+	그리고 기다린다. 처음에는 아무 일도 일어나지 않는다. 그러다 물이 코너를 돌아 쇄도해 온다. 물이 지나갈 때까지 발이 젖지 않도록 무릎을 바짝 굽히고 있는다.
+	<br><br>
+<</if>>
+
+<<drainlinks>>
+
+:: Drain Deluge Chance
+<<effects>>
+
+<<if $rng lt 70>>
+	당신은 소리를 무시하고 길을 계속 나아간다. <span class="green">당신을 휩쓸어 갈 홍수는 오지 않는다.</span>
+	<br><br>
+
+	<<drainlinks>>
+<<else>>
+	당신은 소리를 무시하고 길을 계속 나아간다. <span class="red">물이 굉음을 내며 덮쳐와 당신을 수로로 휩쓸어 버린다.</span>
+	<br>
+	<<silently>><<water>><</silently>>
+	<br>
+	<<set $worn.over_upper.integrity -= 10>><<set $worn.over_lower.integrity -= 10>><<set $worn.upper.integrity -= 10>><<set $worn.lower.integrity -= 10>><<set $worn.under_lower.integrity -= 10>><<pain 1>>
+	<<link [[다음|Drain Water]]>><</link>>
+<</if>>

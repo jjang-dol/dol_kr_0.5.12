@@ -1,0 +1,2593 @@
+:: Farm Assault
+<<set $outside to 1>><<set $location to "alex_farm">><<effects>>
+<<farm_work_update>>
+<<if $farm_assault.movement is "field">>
+	당신은 농장을 가로질러 서둘러 가면서 몸을 낮춘다.
+<<elseif $farm_assault.movement is "tower">>
+	당신은 감시탑을 향해 서둘러 가면서 몸을 낮춘다.
+<<elseif $farm_assault.movement is "climb">>
+	당신은 감시탑에 들어간다. 계단을 오를 때 삐걱거리는 소리가 난다.
+<<elseif $farm_assault.movement is "wait">>
+	당신은 그림자 속에서 침입자를 경계하며 기다린다.
+<<elseif $farm_assault.movement is "struggle">>
+	<<if $farm_assault.bindings lte 0>>
+		당신은 결박에 저항한다. <span class="green">결박이 풀린다.</span>
+		<<if $worn.face.type.includes("gag")>>당신은 입에서 재갈을 뜯어낸다.<</if>>
+		<<if $farm_assault.alex is "bound">>
+			<<npc Alex>><<person1>>
+			당신은 멀지 않은 곳에서 알렉스를 발견하고, <<his>> 입에서 재갈을 제거하고, <<his>> 결박을 풀어준다. "개자식들." <<he>>【이가】 말한다. "시간 낭비할 틈이 없어."
+			<<set $farm_assault.bindings_alex to 0>>
+			<<set $farm_assault.alex to "patrol">>
+			<<endevent>>
+		<</if>>
+		<<farm_assault_unbind>>
+	<<else>>
+		당신은 결박에 저항한다. <span class="teal">결박이 약간 느슨해진 것 같다.</span>
+	<</if>>
+<<else>>
+	당신은 침입자를 경계하며 고개를 계속 돌린다.
+<</if>>
+<<set $farm_assault.movement to "none">>
+<br><br>
+<<wearProp "walkie talkie">>
+<<farm_assault_progress>>
+
+<<farm_assault_alex>>
+
+<<if _smoke>>
+	<span class="red">바람에 연기 냄새가 실려온다.</span>
+	<br><br>
+<</if>>
+
+<<if $farm_assault.tower is "manned" or $farm_assault.tower is "attacked" or _guard_won is true or _guard_lost is true>>
+	<<farm_assault_info guard>>
+<<elseif $farm_assault.tower is "defeated">>
+	<span class="red">$farm.tower_guard【이가】 패배하여, 남은 습격 동안 도움을 줄 수 없습니다.</span>
+	<br><br>
+<</if>>
+
+<<if $bus is "tower_top">>
+	<<farm_assault_info>>
+<</if>>
+
+<<if _dogs_status is "victorious">>
+	<span class="green">승리에 찬 울음소리가 들린다.</span>
+	<br><br>
+<<elseif _dogs_status is "defeated">>
+	<span class="red">당황한 울음소리가 들린다.</span>
+	<br><br>
+<</if>>
+
+<<if $farm_destroyed is true>>
+	<<farm_assault_unbind>>
+	<<if $fields_damaged.length is 0>>
+		<span class="purple">불태울 밭이 없자, 폭력배들이 들판에서 도망친다.</span><<lcontrol>><<gtrauma>><<control -10>><<trauma 6>>
+		<br><br>
+		<<npc Remy>><<person1>>
+		레미가 근처 언덕에서 지켜본다. <<He>>【은는】 <<his>> 말을 돌려 타고 떠난다.
+		<br><br>
+		<<link [[다음|Farm Assault Victory]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<span class="red">일을 마친 폭력배들은 들판에서 도망치며, 뒤에는 그을린 폐허만 남긴다.</span>
+		<<lllcontrol>><<gggtrauma>><<control -50>><<trauma 24>>
+		<<world_corruption "soft" 15>>
+		<br><br>
+		<<npc Remy>><<person1>>
+		레미가 근처 언덕에서 지켜본다. <<He>>【은는】 <<his>> 말을 돌려 타고 떠난다.
+		<br><br>
+		<<link [[다음|Farm Assault Defeat]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif _farm_assault_active isnot true>>
+	<<farm_assault_unbind>>
+	<span class="green">격퇴당한 폭력배들이 농장에서 도망친다.</span>
+	<<if $fields_damaged.length gte 2>>
+		<span class="pink">그들은 <<ordinalList $fields_damaged.map(x=>x+1).toSorted()>>번째 밭을 불태우는 데 성공했다.</span><<llcontrol>><<ggtrauma>><<control -25>><<trauma 12>>
+	<<elseif $fields_damaged.length gte 1>>
+		<span class="blue">그들은 밭 하나를 불태우는 데 성공했다.</span><<lcontrol>><<gtrauma>><<control -10>><<trauma 6>>
+	<<else>>
+		<span class="green">그들은 밭 하나도 불태우지 못했다.</span><<ggcontrol>><<lltrauma>><<control 25>><<trauma -25>>
+		<<if $farm_stage gte 12>>
+			<<earnFeat "Heroic Victory">>
+			<<set $specialClothesEvents.pushUnique("farm_defended")>>
+			<<specialClothesUnlock "set" "scarecrow">>
+		<</if>>
+	<</if>>
+	<br><br>
+	<<npc Remy>><<person1>>
+	레미가 근처 언덕에서 지켜본다. <<He>>【은는】 <<his>> 말을 돌려 타고 떠난다.
+	<br><br>
+	<<link [[다음|Farm Assault Victory]]>><<endevent>><</link>>
+	<br>
+<<else>>
+
+	<<farm_assault_actions>>
+
+<</if>>
+
+:: Farm Assault Defeat
+<<effects>>
+
+<<npc Alex>><<person1>>
+당신은 알렉스가 얼굴을 파묻고 누워 있는 것을 발견한다. <<him>> 옆에는 빈 병이 있다. <<He>>【은는】 의식을 잃었다.<<llldom>><<npcincr Alex dom -15>>
+<br><br>
+
+<<if $farm_assault.tower is "defeated">>
+	당신은 <<him>>【을를】 오두막으로 데려가 <<his>> 침대에 눕히고, $farm.tower_guard【을를】 찾으러 돌아간다.
+	<<endevent>>
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	당신은 <<he>>【이가】 감시탑 아래에 앉아 있는 것을 발견한다.
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		담배꽁초에 불을 붙이려 애쓰고 있다. "생각보다 힘들었어." <<he>>【이가】 말한다. "일으켜 줄 수 있어?"
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		전화로 수다를 떨고 있다. "—보스가 여기 있어. 다시 전화할게." <<He>>【이가】 당신에게 미소 짓는다. "내가 몇 명이나 상대했는지 봤어야 했는데."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		하늘을 바라보고 있다. "미안해, 보스." <<he>>【이가】 말한다. "나도 당한 만큼 갚아줬다고 생각해."
+	<<else>>
+		당신을 지켜보고 있다. "날 데리러 온 천사야?" <<he>>【이가】 웃는다.
+	<</if>>
+	당신은 <<he>>【이가】 일어서는 것을 돕는다.
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"난 괜찮을 거야." <<he>>【이가】 계속 말한다. "스트레칭만 좀 하면 돼."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"안에 의자가 있어." <<he>>【이가】 계속 말한다. "조금 쉬면 좋을 것 같아."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"내 걱정은 마." <<he>>【이가】 계속 말한다. "걸어서 풀 거야."
+	<<else>>
+		"네 손길에 벌써 기분이 나아졌어." <<he>>【이가】 계속 말한다. "절뚝거리면서 초소로 돌아갈 수 있을 것 같아."
+	<</if>>
+	<br><br>
+	당신은 오두막으로 돌아간다. 레미가 이번 라운드는 이겼지만, 전쟁은 계속된다.
+	<br><br>
+<<elseif $farm_assault.tower is "manned" or $farm_assault.tower is "attacked">>
+	$farm.tower_guard【이가】 절뚝거리며 다가온다.
+
+	<<endevent>>
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"<<nnpc_him Alex>>【을를】 안으로 옮기자." <<he>>【이가】 알렉스를 가리키며 말한다. "그러고 나서 담배 한 대 피워야겠어."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"<<nnpc_he Alex>> 괜찮아?" <<he>>【이가】 묻고는 병을 발견한다. "아."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"미안해, 보스." <<he>>【이가】 말한다. "적어도 알렉스보다는 네가 더 잘 대처하고 있네. <<nnpc_him Alex>>【을를】 안으로 옮기자."
+	<<else>>
+		"엉망진창이었어." <<he>>【이가】 말한다. "알렉스가 좋은 생각을 했네. 침대 선택이 좀 이상하긴 하지만."
+	<</if>>
+	<br><br>
+
+	<<endevent>>
+	<<npc Alex>><<person1>>
+	함께, 당신은 알렉스를 오두막으로 데려가 <<his>> 침대에 눕힌다. 레미가 이번 라운드는 이겼지만, 전쟁은 계속된다.
+	<br><br>
+<<else>>
+	당신은 <<him>>【을를】 오두막으로 데려가 <<his>> 침대에 눕힌다. 레미가 이번 라운드는 이겼지만, 전쟁은 계속된다.
+	<br><br>
+<</if>>
+
+<<farm_assault_end>>
+
+<<link [[다음|Farm Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Victory
+<<effects>>
+
+<<npc Alex>><<person1>>
+
+<<if $farm_destroyed is true>>
+	"다시는 얼씬도 하지 마, 씨발." 알렉스가 그들을 향해 소리친다. <<He>>【이가】 당신에게 돌아선다. "그들이 시간을 낭비해서 다행이지만, 농장을 마구 돌아다니게 둬서는 안 돼."
+	<br><br>
+<<elseif $fields_damaged.length gte 1>>
+	"다시는 얼씬도 하지 마, 씨발." 알렉스가 그들을 향해 소리친다. <<He>>【이가】 당신에게, 그리고 <<him>> 뒤의 그을린 들판으로 돌아선다. "피해를 최소화했어." <<he>>【이가】 말한다. "다음번엔 더 잘 준비할 거야."
+	<br><br>
+<<else>>
+	"다시는 얼씬도 하지 마, 씨발." 알렉스가 그들을 향해 소리친다. <<He>>【이가】 당신에게 돌아선다. 진흙이 <<his>> 몸을 덮고 있지만, <<his>> 미소는 환하다. "우리가 해냈어. 그리고 또 해낼 수 있어!"
+	<br><br>
+<</if>>
+
+<<if $farm_assault.tower is "defeated">>
+	<<He>>【이가】 감시탑을 본다. "젠장, $farm.tower_guard 괜찮아?"
+	<br><br>
+	<<endevent>>
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	당신은 감시탑 아래에 앉아 있는 감시병을 발견한다.
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		담배꽁초에 불을 붙이려 애쓰고 있다. "생각보다 힘들었어." <<he>>【이가】 말한다. "일으켜 줄 수 있어?"
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		전화로 수다를 떨고 있다. "—보스들이 여기 있어. 다시 전화할게." <<He>>【이가】 당신에게 미소 짓는다. "내가 몇 명이나 상대했는지 봤어야 했는데."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		하늘을 바라보고 있다. "미안해, 보스." <<he>>【이가】 말한다. "나도 당한 만큼 갚아줬다고 생각해."
+	<<else>>
+		당신을 지켜보고 있다. "천사들이 날 데리러 온 건가?" <<he>>【이가】 웃는다.
+	<</if>>
+	당신과 알렉스는 <<he>>【이가】 일어서는 것을 돕는다.
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"난 괜찮을 거야." <<he>>【이가】 계속 말한다. "스트레칭만 좀 하면 돼."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"안에 의자가 있어." <<he>>【이가】 계속 말한다. "조금 쉬면 좋을 것 같아."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"내 걱정은 마." <<he>>【이가】 계속 말한다. "걸어서 풀 거야."
+	<<else>>
+		"네 손길에 벌써 기분이 나아졌어." <<he>>【이가】 계속 말한다. "절뚝거리면서 초소로 돌아갈 수 있을 것 같아."
+	<</if>>
+	<br><br>
+
+<<elseif $farm_assault.tower is "manned" or $farm_assault.tower is "attacked">>
+	$farm.tower_guard【이가】 다가온다.
+	<<endevent>>
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"너희들이 괜찮아서 다행이야." <<he>>【이가】 말한다. "거의 너무 흥미진진했어."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"분위기가 살아났네." <<he>>【이가】 말한다. "숨 좀 돌려야겠어."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"잘했어." <<he>>【이가】 말한다. "도움이 됐으면 좋겠네."
+	<<else>>
+		"거기서 날 봤어야 했는데." <<he>>【이가】 말한다. "세—" <<He>>【은는】 잠시 멈춘다. "아니, 다섯 명의 건장한 괴물들이 탑 옆을 기어 올라왔지만, 내가 쫓아버렸어."
+	<</if>>
+	<br><br>
+<<else>>
+
+<</if>>
+
+<<endevent>>
+<<npc Alex>><<person1>>
+당신은 오두막으로 걸어 돌아간다.
+<<if isLoveInterest("Alex")>>
+	알렉스가 당신의 어깨에 팔을 두른다.
+<<else>>
+	알렉스가 당신의 어깨를 두드린다.
+<</if>>
+"우리가 이겼지만, 레미는 다시 올 거야. 우린 준비될 거야."
+<br><br>
+<span class="red">레미는 <<number $farm_attack_timer>>일 후에 다시 공격할 것입니다.</span>
+<br><br>
+
+<<farm_assault_end>>
+
+<<link [[다음|Farm Cottage]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Intro
+<<effects>><<wearProp "walkie talkie">>
+<<set $bus to "yard">>
+<<farm_assault_init>>
+
+당신은 밖으로 달려나가, 마당에 서 있는 알렉스를 발견한다.
+<br><br>
+<<set $farm_attack_timer to random(17, 24)>>
+<<npc Alex>><<person1>>
+"이쪽 길로는 안 올 거야." <<he>>【이가】 길을 가리키며 말한다. "몰래 들어오려고 할 거야." <<He>>【이가】 당신에게 무전기를 건넨다. "둘러볼 곳이 많아서 나눠서 움직여야 해. 하지만 팀을 이뤄 싸우면 더 강할 거야."
+<br><br>
+
+<<if $farm.tower gte 2 and $farm.tower_guard>>
+	<<He>>【이가】 감시탑을 향해 손을 흔들자, $farm.tower_guard【이가】 탐조등을 깜박여 응답한다.
+	<br><br>
+<<elseif $farm.tower and $farm.tower_guard>>
+	<<He>>【이가】 감시탑을 향해 손을 흔들자, 당신은 $farm.tower_guard【이가】 손을 흔들어 응답하는 것을 알아본다.
+	<br><br>
+<<elseif $farm.tower>>
+	<<He>>【이가】 감시탑을 가리킨다. "더 잘 보려면 저 위로 올라갈 수 있어."
+	<br><br>
+<</if>>
+
+<<if pcAreArmsBound("any")>>
+	알렉스가 당신의 결박을 잘라낸다. 그런 상태로 농장을 지킬 수는 없다.
+	<<unbind>>
+	<br><br>
+<</if>>
+
+<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Wardrobe [exitCheckBypass]
+<<effects>>
+
+<<if $phase is 2>>
+	당신은 오두막에 들어가 계단을 올라가서, 소박한 옷장을 활짝 연다.
+<<elseif $phase is 1>>
+	당신은 침대에서 일어나 소박한 옷장을 활짝 연다.
+<<elseif $phase is 3>>
+	당신은 방에 들어가 소박한 옷장을 활짝 연다.
+<<else>>
+	당신은 소박한 옷장을 살펴본다.
+<</if>>
+<<set $phase to 0>>
+밖에서 고함 소리가 들린다.
+<br><br>
+<<set $wardrobe_location to "alexFarm">>
+<<wardrobeSelection>>
+<<wardrobewear>>
+<div id="wardrobeExits"><<wardrobeExits>></div>
+<<wardrobe>>
+
+:: Farm Assault Widgets [widget]
+<<widget "farm_assault_init">>
+	<<set $farm_assault to {}>>
+	<<set $farm_assault.no to [0, 1, 2, 3]>>
+	<<if $farm_stage gte 8>>
+		<<set $farm_assault.no.push(4)>>
+	<</if>>
+	<<if $farm_stage gte 9>>
+		<<set $farm_assault.no.push(5)>>
+	<</if>>
+	<<if $farm_stage gte 10>>
+		<<set $farm_assault.no.push(6)>>
+	<</if>>
+	<<if $farm_stage gte 11>>
+		<<set $farm_assault.no.push(7)>>
+	<</if>>
+	<<if $farm_stage gte 12>>
+		<<set $farm_assault.no.push(8)>>
+	<</if>>
+	<<set $farm_assault.teams to {}>>
+
+	<<if $farm_stage gte 12>>
+		<<set $farm_assault.teams.team_1 to {}>>
+		<<set $farm_assault.teams.team_2 to {}>>
+		<<set $farm_assault.teams.team_3 to {}>>
+		<<set $farm_assault.teams.team_4 to {}>>
+		<<set $farm_assault.teams.team_5 to {}>>
+		<<if $bailey_encroach>>
+			<<set $farm_assault.teams.team_6 to {}>>
+			<<set $farm_assault.teams.team_6.type to "bailey">>
+		<</if>>
+	<<elseif $farm_stage gte 10>>
+		<<set $farm_assault.teams.team_1 to {}>>
+		<<set $farm_assault.teams.team_2 to {}>>
+		<<set $farm_assault.teams.team_3 to {}>>
+		<<set $farm_assault.teams.team_4 to {}>>
+		<<if $bailey_encroach>>
+			<<set $farm_assault.teams.team_5 to {}>>
+			<<set $farm_assault.teams.team_5.type to "bailey">>
+		<</if>>
+	<<elseif $farm_stage gte 8>>
+		<<set $farm_assault.teams.team_1 to {}>>
+		<<set $farm_assault.teams.team_2 to {}>>
+		<<set $farm_assault.teams.team_3 to {}>>
+		<<if $bailey_encroach>>
+			<<set $farm_assault.teams.team_4 to {}>>
+			<<set $farm_assault.teams.team_4.type to "bailey">>
+		<</if>>
+	<<else>>
+		<<set $farm_assault.teams.team_1 to {}>>
+		<<set $farm_assault.teams.team_2 to {}>>
+		<<if $bailey_encroach>>
+			<<set $farm_assault.teams.team_3 to {}>>
+			<<set $farm_assault.teams.team_3.type to "bailey">>
+		<</if>>
+	<</if>>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<set $farm_assault.teams[_assault_keys[_s]].location to $farm_assault.no.pluck()>>
+		<<set $farm_assault.teams[_assault_keys[_s]].wall_progress to 0>>
+		<<set $farm_assault.teams[_assault_keys[_s]].field_progress to 0>>
+		<<set $farm_assault.teams[_assault_keys[_s]].number to 3>>
+		<<if $wraith.state is "haunt" and $farm_assault.wraith is undefined and $hallucinations gte 2 and random(1,15-Math.floor(C.npc["Ivory Wraith"].lust/5)) is 1>>
+			<<set $farm_assault.teams[_assault_keys[_s]].type to "wraith">>
+			<<set $farm_assault.teams[_assault_keys[_s]].number to 1>>
+			<<set $farm_assault.teams[_assault_keys[_s]].torched to 0>>
+			<<set $farm_assault.wraith to _s>>
+		<</if>>
+		<<if !$farm_assault.teams[_assault_keys[_s]].type>>
+			<<set $farm_assault.teams[_assault_keys[_s]].type to "remy">>
+		<</if>>
+	<</for>>
+	<<if $farm.kennel gte 1>>
+		<<set $farm_assault.dogs to 2>>
+	<<else>>
+		<<set $farm_assault.dogs to 1>>
+	<</if>>
+	<<set $farm_assault.dogs_state to "guarding">>
+	<<if $farm.tower_guard>>
+		<<set $farm_assault.tower to "manned">>
+	<<else>>
+		<<set $farm_assault.tower to "empty">>
+	<</if>>
+	<<set $farm_assault.alex to "patrol">>
+	<<set $fields_damaged to []>>
+<</widget>>
+
+<<widget "farm_assault_end">>
+	<<unset $farm_assault>>
+	<<unset $farm_destroyed>>
+	<<set $fields_damaged to []>>
+<</widget>>
+
+<<widget "farm_assault_progress">>
+	<<set $farm_assault_done to 0>>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $farm_assault.teams[_assault_keys[_s]].state is undefined>>
+			<<set $farm_assault.teams[_assault_keys[_s]].state to "wall">>
+		<</if>>
+		/*Fleeing checked before and after other actions. */
+		<<farm_assault_flight>>
+		<<if $farm_assault.teams[_assault_keys[_s]].location isnot "done">>
+			/*Assaulting the tower. */
+			<<if $farm_assault.teams[_assault_keys[_s]].location is "tower">>
+				<<set _tower to "threatened">>
+				<<if $farm_assault.teams[_assault_keys[_s]].state is "approach">>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "climb">>
+				<<elseif $farm_assault.teams[_assault_keys[_s]].state is "climb">>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "fight">>
+				<<elseif $farm_assault.teams[_assault_keys[_s]].state is "fight">>
+					<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+						<<if $farm.tower_guard_skill gte random(1, 2000)>>
+							<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+							<<if $farm_assault.teams[_assault_keys[_s]].number lte 0>>
+								<<set $farm_assault.tower to "manned">>
+							<</if>>
+							<<set _guard_won to true>>
+							<<unset _tower>>
+						<<else>>
+							<<set $farm_assault.tower to "defeated">>
+							<<set $farm_assault.teams[_assault_keys[_s]].location to $farm_assault.no.pluck()>>
+							<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+							<<set _guard_lost to true>>
+							<<unset _tower>>
+						<</if>>
+					<<else>>
+						<<if $farm.tower_guard_skill gte random(1, 1000)>>
+							<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+							<<if $farm_assault.teams[_assault_keys[_s]].number lte 0>>
+								<<set $farm_assault.tower to "manned">>
+							<</if>>
+							<<set _guard_won to true>>
+							<<unset _tower>>
+						<<else>>
+							<<set $farm_assault.tower to "defeated">>
+							<<set $farm_assault.teams[_assault_keys[_s]].location to $farm_assault.no.pluck()>>
+							<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+							<<set _guard_lost to true>>
+							<<unset _tower>>
+						<</if>>
+					<</if>>
+				<</if>>
+			<</if>>
+			/*Successfully burning. */
+			<<if $farm_assault.teams[_assault_keys[_s]].state is "celebrate">>
+				<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+				<<set $farm_assault.teams[_assault_keys[_s]].location to $farm_assault.no.pluck()>>
+				<<if $farm_assault.teams[_assault_keys[_s]].location is undefined or $farm_assault.teams[_assault_keys[_s]].torched gte Math.floor(C.npc["Ivory Wraith"].lust/4)>>
+					<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+				<</if>>
+			<</if>>
+			/*Burning a field. */
+			<<if $farm_assault.teams[_assault_keys[_s]].state is "field">>
+				<<if $farm_assault.teams[_assault_keys[_s]].field_progress gte 4>>
+					<<set $farm_assault.teams[_assault_keys[_s]].field_progress to 0>>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "celebrate">>
+					<<set _smoke to true>>
+					<<damage_farm "target" $farm_assault.teams[_assault_keys[_s]].location>>
+					<<if $farm_assault.teams[_assault_keys[_s]].type is "wraith">>
+						<<set $farm_assault.teams[_assault_keys[_s]].torched++>>
+					<</if>>
+				<<else>>
+					<<set $farm_assault.teams[_assault_keys[_s]].field_progress++>>
+					<<if $farm_assault.teams[_assault_keys[_s]].type is "wraith" and random(0,1) is 1>>
+						<<set $farm_assault.teams[_assault_keys[_s]].field_progress++>>
+					<</if>>
+				<</if>>
+			<</if>>
+			/*Responding to hounds. */
+			<<if $farm_assault.teams[_assault_keys[_s]].state is "dogs_recover">>
+				<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+					<<if $farm_assault.tower is "manned">>
+						<<set $farm_assault.no.push($farm_assault.teams[_assault_keys[_s]].location)>>/*Add their location back to the pool.*/
+						<<set $farm_assault.teams[_assault_keys[_s]].location to "tower">>
+						<<set $farm_assault.teams[_assault_keys[_s]].state to "approach">>
+						<<set $farm_assault.tower to "attacked">>
+					<<else>>
+						<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+					<</if>>
+				<<else>>
+					<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+				<</if>>
+				<<set $farm_assault.dogs -= 1>>
+				<<if $farm_assault.dogs gte 1>>
+					<<set $farm_assault.dogs_state to "guarding">>
+					<<set _dogs_status to "victorious">>
+				<<else>>
+					<<set $farm_assault.dogs_state to "defeated">>
+					<<set _dogs_status to "defeated">>
+				<</if>>
+				<<set $farm_assault.dogs_target to _assault_keys[_s]>>
+			<</if>>
+			/*Intercepted by hounds. */
+			<<if $farm_assault.teams[_assault_keys[_s]].state is "dogs">>
+				<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+					<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+				<</if>>
+				<<set $farm_assault.teams[_assault_keys[_s]].state to "dogs_recover">>
+			<</if>>
+			/*Entering. */
+			<<if $farm_assault.teams[_assault_keys[_s]].state is "entry">>
+				<<if $farm_assault.dogs gte 1 and $farm_assault.dogs_state is "guarding" and $farm_assault.teams[_assault_keys[_s]].type isnot "wraith">>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "dogs">>
+					<<set $farm_assault.dogs_state to "fighting">>
+				<<elseif ($farm_assault.teams[_assault_keys[_s]].type is "bailey" or random(1, 2) is 2) and $farm_assault.tower is "manned" and $farm_assault.teams[_assault_keys[_s]].type isnot "wraith">>
+					<<set $farm_assault.no.push($farm_assault.teams[_assault_keys[_s]].location)>>/*Add their location back to the pool.*/
+					<<set $farm_assault.teams[_assault_keys[_s]].location to "tower">>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "approach">>
+					<<set $farm_assault.tower to "attacked">>
+				<<else>>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+				<</if>>
+			<</if>>
+			/*Breaking in. */
+			<<if $farm_assault.teams[_assault_keys[_s]].state is "wall">>
+				<<if $farm_assault.teams[_assault_keys[_s]].wall_progress gte $farm.wall>>
+					<<set $farm_assault.teams[_assault_keys[_s]].state to "entry">>
+					<<set $farm_assault.teams[_assault_keys[_s]].wall_progress to 0>>
+				<<else>>
+					<<if $farm_assault.teams[_assault_keys[_s]].type is "wraith">>
+						<<set $farm_assault.teams[_assault_keys[_s]].wall_progress to $farm.wall>>
+					<<elseif $farm.wall gte 4 and $farm_assault.teams[_assault_keys[_s]].type isnot "bailey">>
+						<<if random(1, 3) is 3>>
+							<<set $farm_assault.teams[_assault_keys[_s]].wall_progress++>>
+						<</if>>
+					<<elseif $farm.wall gte 3 and $farm_assault.teams[_assault_keys[_s]].type isnot "bailey">>
+						<<if random(1, 3) gte 2>>
+							<<set $farm_assault.teams[_assault_keys[_s]].wall_progress++>>
+						<</if>>
+					<<else>>
+						<<set $farm_assault.teams[_assault_keys[_s]].wall_progress++>>
+					<</if>>
+				<</if>>
+			<</if>>
+		<</if>>
+		/*Fleeing. */
+		<<farm_assault_flight>>
+		/*Alex. */
+		<<if $farm_assault.alex is "patrol">>
+			<<if $farm_assault.teams[_assault_keys[_s]].location isnot "done" and $farm_assault.teams[_assault_keys[_s]].type isnot "wraith">>
+				<<set $farm_assault.alex to _assault_keys[_s]>>
+			<</if>>
+		<<elseif $farm_assault.alex is _assault_keys[_s]>>
+			<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+				<<if random(1, 100) gte 80>>
+					<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+					<<set _alex_success to true>>
+				<</if>>
+			<<else>>
+				<<if random(1, 100) gte 60>>
+					<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+					<<set _alex_success to true>>
+				<</if>>
+			<</if>>
+		<</if>>
+		/*Fleeing. */
+		<<farm_assault_flight>>
+	<</for>>
+<</widget>>
+
+<<widget "farm_assault_flight">>
+	<<if $farm_assault.teams[_assault_keys[_s]].number lte 0>>/*Flee if numbers reduced to 0.*/
+		<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<<if $farm_assault.alex is _assault_keys[_s]>>/*Alex patrols again. */
+			<<set $farm_assault.alex to "patrol">>
+		<</if>>
+	<</if>>
+	<<if $farm_assault.teams[_assault_keys[_s]].location isnot "done">>/*Assault ends when !_farm_assault_active.*/
+		<<set _farm_assault_active to true>>
+	<<elseif $farm_assault.teams[_assault_keys[_s]].location gte 0>>
+		<<set $farm_assault.no.push($farm_assault.teams[_assault_keys[_s]].location)>>/*Add their location back to the pool.*/
+		<<if $farm_assault.alex is _assault_keys[_s]>>/*Alex patrols again. */
+			<<set $farm_assault.alex to "patrol">>
+		<</if>>
+	<<elseif $farm_assault.alex is _assault_keys[_s] and $farm_assault.teams[_assault_keys[_s]].location is "done">>
+		<<set $farm_assault.alex to "patrol">>
+	<</if>>
+<</widget>>
+
+<<widget "farm_assault_info">>
+	<<if _args[0] is "guard">>
+		<<set _skill to $farm.tower_guard_skill>>
+	<<else>>
+		<<set _skill to 0>>
+	<</if>>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $farm_assault.teams[_assault_keys[_s]].location is "tower" and $farm_assault.teams[_assault_keys[_s]].state is "fight">>
+			<<set _fighting to true>>
+		<</if>>
+	<</for>>
+
+	<<if _fighting is true or _guard_won is true or _guard_lost is true>>
+		무전기에서 다른 신호가 잡힌다. <span class="red">치직거리는 잡음 사이로 몸싸움하는 소리가 들린다.</span>
+		<<if _guard_won is true>>
+			당신은 감시탑을 유심히 본다. 꼭대기에서 몸 하나가 떨어진다. <span class="green">$farm.tower_guard【은는】 아니다.</span> <<print KR.getPronounKr("he", $per_npc.farm_tower_guard.pronouns.he)>>【이가】 <<print KR.getPronounKr("his", $per_npc.farm_tower_guard.pronouns.his)>> 공격자 중 한 명을 이긴 모양이다.
+		<<elseif _guard_lost is true>>
+			당신은 감시탑을 유심히 본다. 꼭대기에서 몸 하나가 떨어진다. <span class="red">$farm.tower_guard【이가】 떨어진 것이다.</span> 이번 습격에서 더 이상 <<print toTitleCase(KR.getPronounKr("he", $per_npc.farm_tower_guard.pronouns.he))>>의 도움은 받을 수 없을 것이다.
+		<</if>>
+		<br><br>
+	<<else>>
+		<<if _args[0] is "guard">>
+			무전기에 또 다른 신호가 잡힌다. 적의 동향을 계속 알려주는 $farm.tower_guard【이가】 보낸 것이다:
+		<<else>>
+			당신은 적의 동향을 포착하기 위해 농장을 가로질러 살펴본다:
+		<</if>>
+		<br>
+		<<set _assault_keys to Object.keys($farm_assault.teams)>>
+		<<for _s to 0; _s lt _assault_keys.length; _s++>>
+			<<if $farm_assault.teams[_assault_keys[_s]].type is "wraith">>
+				<<if $farm_assault.teams[_assault_keys[_s]].location is "done">>
+					<span class="green"><<farm_assault_thugs>>【은는】 마치 <<print $wraith.seenFarm ? "그것이" : "그들이">> 흥미를 잃은 것처럼 걸어 멀어지고 있다.</span>
+					<<if $wraith.seen gte 5 and !$farm_assault.wraithStress>>
+						<<stress -6>><<lstress>><<set $farm_assault.wraithStress to true>>
+					<</if>>
+				<<else>>
+					<<if _skill gte random(400, 1400) or !$wraith.seenFarm>>
+						<<switch $farm_assault.teams[_assault_keys[_s]].state>>
+						<<case wall>>
+							<<farm_assault_thugs>>【은는】 <span class="purple"><<print $farm.wall gte 3 ? "울타리를" : "벽을">> 통과해 걸어가고 있다.</span>
+						<<case entry>>
+							<<farm_assault_thugs>>【은는】 <<farm_assault_location>>【으로로】 비틀거리며 향하고 있다.
+						<<case field>>
+							<<if $farm_assault.teams[_assault_keys[_s]].field_progress lte 1>>
+								<span class="blue"><<farm_assault_thugs>>【이가】 <<farm_assault_location>>에 들어선다.</span>
+							<<else>>
+								<span class="blue"><<farm_assault_thugs>>【이가】 <<farm_assault_location>> 주변을 서성인다.</span>
+							<</if>>
+						<<case celebrate>>
+							<<farm_assault_thugs>>【은는】 완전히 가만히 서 있다. <span class="red"><<farm_assault_location "cap">>【이가】 화염에 휩싸인다.</span>
+						<</switch>>
+					<<else>>
+						<<farm_assault_location>>에서 무언가 이상한 낌새가 느껴진다.
+					<</if>>
+				<</if>>
+			<<else>>
+				<<if $farm_assault.teams[_assault_keys[_s]].location is "done">>
+					<span class="green"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 전속력으로 도망치고 있다.</span>
+				<<elseif $farm_assault.teams[_assault_keys[_s]].state is "dogs">>
+					<<farm_assault_location>>에서 개 짖는 소리가 들린다.
+				<<elseif $farm_assault.teams[_assault_keys[_s]].state is "dogs_recover">>
+					<<farm_assault_location>>에서 개 짖는 소리와 <<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>고통에<<else>>공포에<</if>> 찬 비명이 들린다.
+				<<elseif $farm_assault.teams[_assault_keys[_s]].location is "tower">>
+					<<switch $farm_assault.teams[_assault_keys[_s]].state>>
+					<<case "approach">>
+						<span class="purple"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 감시탑으로 다가가고 있다.</span>
+					<<case "climb">>
+						<span class="pink"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 감시탑을 오르고 있다.</span>
+					<</switch>>
+				<<else>>
+					<<if _skill gte random(1, 1000)>>
+						<<switch $farm_assault.teams[_assault_keys[_s]].state>>
+						<<case wall>>
+							<<farm_assault_no>> <<farm_assault_thugs>> 무리가
+							<<if $farm.wall gte 3>>
+								<<farm_assault_location>>에서 <span class="pink">울타리를 자르고 있다.</span>
+							<<else>>
+								<<farm_assault_location>> 근처에서 벽을 넘고 있다.
+							<</if>>
+						<<case entry>>
+							<<farm_assault_no>> <<farm_assault_thugs>> 무리가 <<farm_assault_location>>【으로로】 뛰어들고 있다.
+						<<case field>>
+						<<switch $farm_assault.teams[_assault_keys[_s]].field_progress>>
+						<<case 1>>
+								<span class="blue"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 <<farm_assault_location>>에 진입하고 있다.</span>
+						<<case 2>>
+								<span class="purple"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 <<farm_assault_location>>에서 기름통을 열고 있다.</span>
+						<<case 3>>
+								<span class="pink"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 <<farm_assault_location>>에 기름을 붓고 있다.</span>
+						<<case 4>>
+								<span class="red"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 <<farm_assault_location>>에서 성냥에 불을 붙이고 있다.</span>
+						<</switch>>
+						<<case celebrate>>
+							<span class="red"><<farm_assault_no>> <<farm_assault_thugs>> 무리가 불타는 밭을 보며 환호하고 있다.</span>
+						<</switch>>
+					<<else>>
+						<<farm_assault_location>>에 움직임이 있다.
+					<</if>>
+				<</if>>
+			<</if>>
+			<br>
+		<</for>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "farm_assault_alex">>
+	<<if _farm_assault_active isnot true or $farm_destroyed is true>>
+	<<elseif $farm_assault.alex is "bound">>
+		<<if $farm_assault.bindings_alex gte 1>>
+			<<set $farm_assault.bindings_alex -= 1>>
+		<<else>>
+			<<set $farm_assault.alex to "patrol">>
+		<</if>>
+	<<elseif $farm_assault.alex is "patrol">>
+		Your walkie talkie picks up a signal. "I'm looking for intruders," Alex says. "Just checking in."
+		<br><br>
+	<<else>>
+		<<set _assault_keys to Object.keys($farm_assault.teams)>>
+		<<for _s to 0; _s lt _assault_keys.length; _s++>>
+			<<if $bus is $farm_assault.teams[_assault_keys[_s]].location and $farm_assault.alex is _assault_keys[_s]>>
+				<span class="teal">Alex crouches beside you.</span>
+				<<if $farm_assault.bindings gte 1>>
+					<span class="green">Your bindings come loose.</span>
+					<<farm_assault_unbind>>
+				<</if>>
+				"What's the plan?"
+				<br><br>
+			<<elseif $farm_assault.alex is _assault_keys[_s]>>
+				Your walkie talkie picks up a signal. "I'm <<print either("pursuing","stalking","following","hunting","harrying")>> <<farm_assault_thugs>> at <<farm_assault_location>>," Alex says in a hushed voice.
+				<<if _alex_success>>
+					<<set _rng to random(1, 5)>>
+					<<switch _rng>>
+					<<case 1>>
+						<span class="green">"Knocked one out."</span>
+					<<case 2>>
+						<span class="green">"They'll feel this in the morning."</span>
+					<<case 3>>
+						<span class="green">"Wonder when they'll realise they're missing a colleague."</span>
+					<<case 4>>
+						<span class="green">"One thug down."</span>
+					<<default>>
+						<span class="green">"Took one down."</span>
+					<</switch>>
+					<br><br>
+				<<else>>
+					<<set _rng to random(1, 5)>>
+					<<switch _rng>>
+					<<case 1>>
+						<span class="blue">"Can't get them alone."</span>
+					<<case 2>>
+						<span class="blue">"They're too watchful."</span>
+					<<case 3>>
+						<span class="blue">"Can't get close."</span>
+					<<case 4>>
+						<span class="blue">"Just waiting for my moment."</span>
+					<<default>>
+						<span class="blue">"I won't take any risks."</span>
+					<</switch>>
+					<br><br>
+				<</if>>
+			<</if>>
+		<</for>>
+	<</if>>
+<</widget>>
+
+<<widget "farm_assault_location">><<silently>>
+	<<switch $farm_assault.teams[_assault_keys[_s]].location>>
+		<<case 0>>
+			<<set _text_output to "첫 번째 밭">>
+		<<case 1>>
+			<<set _text_output to "두 번째 밭">>
+		<<case 2>>
+			<<set _text_output to "세 번째 밭">>
+		<<case 3>>
+			<<set _text_output to "네 번째 밭">>
+		<<case 4>>
+			<<set _text_output to "다섯 번째 밭">>
+		<<case 5>>
+			<<set _text_output to "여섯 번째 밭">>
+		<<case 6>>
+			<<set _text_output to "일곱 번째 밭">>
+		<<case 7>>
+			<<set _text_output to "여덟 번째 밭">>
+		<<case 8>>
+			<<set _text_output to "아홉 번째 밭">>
+		<<case tower>>
+			<<set _text_output to "감시탑">>
+		<<default>>
+			<<set _text_output to "밭">>
+	<</switch>>
+	<<if _args[0] is "cap">>
+		<<capitalise>>
+	<</if>>
+<</silently>><<print _text_output>><</widget>>
+
+<<widget "farm_assault_thugs">><<silently>>
+	<<switch $farm_assault.teams[_assault_keys[_s]].type>>
+		<<case "bailey">>
+			<<set _text_output to "<span class=\"red\">베일리의 불량배들</span>">>
+		<<case "wraith">>
+			<<if $wraith.seenFarm>>
+				<<set _text_output to "<span class=\"wraith\">창백한 인영</span>">>
+			<<else>>
+				<<set _text_output to "<span class=\"black\">수상쩍은 낯선 사람</span>">>
+			<</if>>
+		<<default>>
+			<<set _text_output to "<span class=\"pink\">레미의 불량배들</span>">>
+	<</switch>>
+	<<if _args[0] is "cap">>
+		<<capitalise>>
+	<</if>>
+<</silently>><<print _text_output>><</widget>>
+
+<<widget "farm_assault_options">>
+	<<if !_noOptions>>
+		<<link [[기다린다 (0:05)|Farm Assault]]>><<pass 5>><<set $farm_assault.movement to "wait">><</link>>
+		<br>
+		<<if $bus is "tower" and _tower isnot "threatened" and $farm_assault.tower isnot "manned">>
+			<<link [[감시탑에 오른다 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to "tower_top">><<set $farm_assault.movement to "climb">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 0>>
+			<<link [[첫 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 0>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 1>>
+			<<link [[두 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 1>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 2>>
+			<<link [[세 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 2>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 3>>
+			<<link [[네 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 3>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 4 and $farm_stage gte 8>>
+			<<link [[다섯 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 4>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 5 and $farm_stage gte 9>>
+			<<link [[여섯 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 5>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 6 and $farm_stage gte 10>>
+			<<link [[일곱 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 6>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 7 and $farm_stage gte 11>>
+			<<link [[여덟 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 7>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot 8 and $farm_stage gte 12>>
+			<<link [[아홉 번째 밭 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to 8>><<set $farm_assault.movement to "field">><</link>>
+			<br>
+		<</if>>
+		<<if $bus isnot "tower" and $bus isnot "tower_top" and $farm.tower gte 1>>
+			<<link [[감시탑 (0:05)|Farm Assault]]>><<pass 5>><<set $bus to "tower">><<set $farm_assault.movement to "tower">><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "farm_assault_actions">>
+	<<switch $bus>>
+		<<case "tower">>
+			감시탑이 당신 위로 우뚝 솟아 있다.
+		<<case 0>>
+			당신은 첫 번째 밭 근처에 있다.
+		<<case 1>>
+			당신은 두 번째 밭 근처에 있다.
+		<<case 2>>
+			당신은 세 번째 밭 근처에 있다.
+		<<case 3>>
+			당신은 네 번째 밭 근처에 있다.
+		<<case 4>>
+			당신은 다섯 번째 밭 근처에 있다.
+		<<case 5>>
+			당신은 여섯 번째 밭 근처에 있다.
+		<<case 6>>
+			당신은 일곱 번째 밭 근처에 있다.
+		<<case 7>>
+			당신은 여덟 번째 밭 근처에 있다.
+		<<case 8>>
+			당신은 아홉 번째 밭 근처에 있다.
+	<</switch>>
+	<<if $fields_damaged.includes($bus)>>
+		<span class="red">그곳은 화염에 휩싸여 있다.</span>
+	<</if>>
+	<br>
+	<<if $farm_assault.bindings gte 1>>
+		당신은 흙바닥에 누워, 거의 움직일 수 없다.
+		<br><br>
+
+		<<link [[발버둥친다 (0:05)|Farm Assault]]>><<pass 5>><<set $farm_assault.bindings -= 1>><<set $farm_assault.movement to "struggle">><</link>>
+		<br>
+	<<else>>
+		<<set _assault_keys to Object.keys($farm_assault.teams)>>
+		<<for _s to 0; _s lt _assault_keys.length; _s++>>
+			<<set $_key to _assault_keys[_s]>>
+			<<set $_team to $farm_assault.teams[$_key]>>
+			<<set $_isBaileyTeam to $_team.type is "bailey">>
+			<<set $_isWraith to $_team.type is "wraith">>
+			<<if $bus is $_team.location>>
+				<<if $bus is "tower">>
+					<<if $_team.state is "approach">>
+						<span class="blue"><<farm_assault_thugs>>【이가】 다가온다.</span>
+						<br><br>
+						<<farm_assault_attack_options>>
+					<<elseif $_team.state is "climb">>
+						<span class="purple"><<farm_assault_thugs>>【이가】 탑으로 들어가는 것이 보인다.</span>
+						<br><br>
+
+						<<link [[감시탑을 방어한다 (0:05)|Farm Assault Tower Defend]]>><<pass 5>><</link>>
+						<br>
+					<<elseif $_team.state is "fight">>
+						<span class="pink">$farm.tower_guard【이가】 탑 꼭대기에서 <<farm_assault_thugs>>【와과】 싸우는 소리가 들린다!</span>
+						<br><br>
+
+						<<link [[감시탑을 방어한다 (0:05)|Farm Assault Tower Defend]]>><<pass 5>><</link>>
+						<br>
+					<</if>>
+				<<elseif $_team.state is "wall">>
+					<<if $_isWraith>>
+						당신은 <<farm_assault_thugs>>【이가】 <span class="pink"><<print $farm.wall gte 3 ? "울타리를" : "벽을">> 통과해 걸어오는 것을</span> 본다.
+					<<else>>
+						<<if $farm.wall gte 3>>
+							당신은 <<farm_assault_thugs>>【이가】 톱으로 울타리를 자르는 것을 본다.
+						<<else>>
+							당신은 <<farm_assault_thugs>>【이가】 벽을 넘어오는 것을 본다.
+						<</if>>
+						<<if $_team.number is 1>>
+							여기에 단 한 명만 있다.
+						<<else>>
+							그들은 총 <<number $_team.number>>명이다.
+						<</if>>
+					<</if>>
+					<<if $_isBaileyTeam>>
+						<span class="red">그들은 확신에 차서 움직인다.</span>
+					<</if>>
+					<br>
+					<<if $farm_assault.alex is $_key>>
+						<<link [[알렉스와 함께 돌을 던진다 (0:05)|Farm Assault Rocks Alex]]>><<pass 5>><</link>>
+						<br>
+					<<else>>
+						<<set $_min to ($_isBaileyTeam ? 6000 : 1)>>
+						<<set $_max to ($_isBaileyTeam ? 20000 : 15000)>>
+						<<link [[돌을 던진다 (0:05)|Farm Assault Rocks]]>><<pass 5>><</link>><<physiquedifficulty $_min $_max>>
+						<br>
+					<</if>>
+					<<set $_min to ($_isBaileyTeam ? 3000 : 200)>>
+					<<set $_max to ($_isBaileyTeam ? 3000 : 1000)>>
+					<<link [[위협한다 (0:05)|Farm Assault Threaten]]>><<pass 5>><</link>><<skill_difficulty $fame.scrap "전투 명성" $_min $_max>>
+					<br>
+				<<elseif $_team.state is "entry">>
+					<<if $_isBaileyTeam>>
+						<<if $_team.number gte 2>>
+							당신은 <<number $_team.number>>명의 <<farm_assault_thugs>>【이가】 농장으로 뛰어드는 것을 본다. 그들은 당신을 무시하고 밭으로 향한다.
+							<br>
+							<<farm_assault_attack_options>>
+						<<else>>
+							당신은 <<farm_assault_thugs>> 중 한 명이 농장으로 뛰어드는 것을 본다.
+							<br>
+							<<farm_assault_attack_options>>
+						<</if>>
+					<<elseif $_isWraith>>
+						<<set _noOptions to true>>
+						당신은 <<farm_assault_thugs>>【이가】 당신에게 다가오는 것을 본다.
+						<<if !$wraithIntro>>
+							<<set $wraithIntro to true>>
+							반투명한 흰 로브를 입은, 창백하고 아름다운 인영이다. 그들은 자신의 목을 부여잡은 채 성난 붉은 눈으로 당신을 노려본다. 그들이 걷는 곳마다 기괴하고 끈적한 물질이 새어나온다.
+						<<elseif !$wraith.seenFarm>>
+							<span class="red">그들의 얼굴은 끔찍하면서도 낯익은 창백한 색이다.</span> 그것이 걷는 곳마다 기괴하고 끈적한 물질이 새어나온다.
+						<<else>>
+							그것은 끔찍하면서도 낯익은 미소를 짓는다. 그것이 걷는 곳마다 기괴하고 끈적한 물질이 새어나온다.
+						<</if>>
+						<<set $wraith.seenFarm to true>>
+						<br><br>
+
+						"<span class="wraith">연기 속에서 빠져 죽어라. 화염 속에서 빠져 죽어라.</span>"
+						<br><br>
+
+						<<if $farm_assault.alex is $_key>>
+							"돌아갈게." 알렉스가 속삭이며, <span class="red">창백한 인영을 눈치채지 못한 듯 <<nnpc_He "Alex">>【은는】 살금살금 멀어진다.</span>
+							<<set $farm_assault.alex to "patrol">>
+							<br><br>
+						<</if>>
+
+						<<generateWraith 1 true>>
+						<<initWraith "man" "arms" "abomination">><<startWraith>>
+						<br><br>
+
+						<<link [[다음|Farm Assault Wraith Fight]]>><<set $fightstart to 1>><</link>>
+					<<else>>
+						<<if $_team.number gte 2>>
+							당신은 <<number $_team.number>>명의 <<farm_assault_thugs>>【이가】 농장으로 뛰어드는 것을 본다. 그들은 당신을 무시하고 밭으로 향한다.
+							<br><br>
+
+							<<farm_assault_attack_options>>
+						<<else>>
+							당신은 <<farm_assault_thugs>> 중 한 명이 농장으로 뛰어드는 것을 본다.
+							<br><br>
+
+							<<farm_assault_attack_options>>
+						<</if>>
+					<</if>>
+				<<elseif $_team.state is "dogs">>
+					<span class="green">당신의 <<farm_text_many dog>>【이가】 어둠 속에서 나타나, <<farm_assault_thugs>>【을를】 덮친다!</span>
+					<br><br>
+				<<elseif $_team.state is "dogs_recover">>
+					<<if $_isBaileyTeam>>
+						<<if $_team.number gte 2>>
+							<<if $farm_assault.dogs gte 2>>
+								<<farm_assault_thugs>>【은는】 동요하지 않고 사냥개들과 정면으로 맞선다. 첫 번째 <<farm_text dog>>【은는】 얼굴을 강하게 걷어차이고는 낑낑대며 뒹굴어 떨어지지만, 다른 개들이 팔과 다리에 이빨을 박아넣는 데 성공한다. 불량배들은 개들을 털어내지만, 피투성이가 되고 만다. <span class="green">어떤 <<generate1>><<person1>><<person>>【이가】 밭에서 절뚝거리며 물러나고,</span> 부상이 심해 더 이상 공격을 계속할 수 없다.
+								<br><br>
+							<<else>>
+								<<farm_assault_thugs>>【은는】 동요하지 않고 사냥개들과 정면으로 맞선다. 첫 번째 <<farm_text dog>>【은는】 <span class="red">얼굴을 강하게 걷어차이고는</span> 낑낑대며 뒹굴어 떨어지지만, 다른 개들이 팔과 다리에 이빨을 박아넣는 데 성공한다.
+								<br><br>
+								불량배들은 사냥개들에게 주먹질과 발길질을 하여 <span class="red">개들을 쫓아내지만,</span> 피투성이가 되고 만다. <span class="green">어떤 <<generate1>><<person1>><<person>>【이가】 밭에서 절뚝거리며 물러나고,</span> 부상이 심해 더 이상 공격을 계속할 수 없다.
+								<br><br>
+
+							<</if>>
+						<<else>>
+							<<if $farm_assault.dogs gte 2>>
+								<<generate1>><<person1>>
+								불량배인 <<person>>【이가】 맞서 짖어대어 사냥개들을 놀라게 한다. 개 한 마리가 으르렁거리며 덤벼들더니, 이빨로 <<persons>> 팔뚝을 물어뜯는다. <<He>>【은는】 <<farm_text dog>>【을를】 떨쳐내지만, 도저히 공격을 계속할 상태가 아니다. <span class="green"><<He>>【은는】 밭에서 달아나고,</span> 한쪽 팔로 다른 쪽 팔을 감싸안는다.
+								<br><br>
+							<<else>>
+								<<generate1>><<person1>>
+								불량배인 <<person>>【이가】 맞서 짖어대어 사냥개들을 놀라게 한다. 개 한 마리가 으르렁거리며 덤벼들더니, 이빨로 <<persons>> 팔뚝을 물어뜯지만, <span class="red"><<farm_text dog>>의 코에 주먹을 날려</span> 팔을 빼낸다. 하지만 도저히 공격을 계속할 상태가 아니다. <span class="green"><<He>>【은는】 밭에서 달아나고,</span> 한쪽 팔로 다른 쪽 팔을 감싸안는다.
+								<br><br>
+							<</if>>
+						<</if>>
+					<<else>>
+						<<if $_team.number gte 2>>
+							<<if $farm_assault.dogs gte 2>>
+								<<farm_assault_thugs>>【은는】 당황하여, <span class="green">달아난다.</span> 사냥개들은 그들을 <<farm_fence>>까지 쫓아내고는, 밤하늘을 향해 승리의 하울링을 한다.
+							<<else>>
+								<<farm_assault_thugs>>【은는】 당황하여, <span class="green">달아난다.</span> 사냥개들은 조금 지나칠 정도로 기세등등하게, <span class="red">먹잇감을 쫓아 어둠 속으로 추격하여</span> 농장을 무방비 상태로 남겨둔다. 녀석들은 돌아오더라도 너무 지쳐서 도움을 줄 수 없을 것이다.
+							<</if>>
+							<br><br>
+						<<else>>
+							<<generate1>><<person1>>
+							<<if $farm_assault.dogs gte 2>>
+								홀로 남은 <<person>>【은는】 당황하여, <span class="green">달아난다.</span> 사냥개들은 <<him>>【을를】 <<farm_fence>>까지 쫓아내고는, 밤하늘을 향해 승리의 하울링을 한다.
+							<<else>>
+								홀로 남은 <<person>>【은는】 당황하여, <span class="green">달아난다.</span> 사냥개들은 조금 지나칠 정도로 기세등등하게, <span class="red">먹잇감을 쫓아 어둠 속으로 추격하여</span> 농장을 무방비 상태로 남겨둔다. 녀석들은 돌아오더라도 너무 지쳐서 도움을 줄 수 없을 것이다.
+							<</if>>
+							<br><br>
+						<</if>>
+					<</if>>
+					<<endevent>>
+					<<if $_isBaileyTeam and $_team.number gte 2>> /* Don't show attack options if team was defeated */
+						<<farm_assault_attack_options>>
+					<</if>>
+				<<elseif $_team.state is "field">>
+					<<if $_isWraith>>
+						당신은 <<farm_assault_thugs>>【이가】 밭을 어슬렁거리는 것을 본다.
+						<<if !$wraith.seenFarm>>
+							그들은 별다른 행동을 하지 않는 것 같다.
+						<<else>>
+							<span class="purple">당신은 그것이 인화성 슬라임을 뿌리고 있다고 의심한다.</span>
+						<</if>>
+					<<else>>
+						<<if $_team.field_progress gte 4>>
+							<span class="pink">당신은 <<farm_assault_thugs>>【이가】 성냥에 불을 붙이는 것을 본다!</span>
+						<<elseif $_team.field_progress gte 3>>
+							<span class="purple">당신은 <<farm_assault_thugs>>【이가】 밭에 기름을 들이붓는 것을 본다.</span>
+						<<elseif $_team.field_progress gte 2>>
+							<span class="blue">당신은 <<farm_assault_thugs>>【이가】 기름통을 여는 것을 본다.</span>
+						<<else>>
+							<span class="lblue">당신은 <<farm_assault_thugs>>【이가】 밭을 배회하는 것을 본다.</span>
+						<</if>>
+					<</if>>
+					<br>
+					<<farm_assault_attack_options>>
+				<</if>>
+			<</if>>
+		<</for>>
+
+		<br>
+
+		<<farm_assault_options>>
+	<</if>>
+<</widget>>
+
+<<widget "farm_assault_intruders">>
+	<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+		<<set _text_output to "침입자들">>
+	<<else>>
+		<<set _text_output to "침입자">>
+	<</if>>
+	<<print _text_output>>
+<</widget>>
+
+<<widget "farm_assault_no">>
+	<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+		잔혹한
+	<<else>>
+		<<switch _s>>
+		<<case 0>>
+			첫 번째
+		<<case 1>>
+			두 번째
+		<<case 2>>
+			세 번째
+		<<case 3>>
+			네 번째
+		<<case 4>>
+			다섯 번째
+		<</switch>>
+	<</if>>
+<</widget>>
+
+<<widget "farm_assault_unbind">>
+	<<unbind>>
+	<<set $farm_assault.bindings to 0>>
+	<<if $worn.face.type.includes("gag")>>
+		<<set $worn.face.type.push("broken")>>
+		<<faceruined>>
+	<</if>>
+	<<clotheson>>
+<</widget>>
+
+<<widget "farm_assault_attack_options">>
+	<<if $farm_assault.alex is _assault_keys[_s]>>
+		<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+			<<link [[알렉스와 협력해 하나를 떼어낸다 (0:05)|Farm Assault Pick Alex]]>><<pass 5>><</link>>
+			<br>
+			<<if $pain gte 100>>
+				<span class="red">고통이 너무 심해 그들과 정면으로 싸울 수 없다.</span>
+			<<else>>
+				<<link [[알렉스와 함께 돌진한다 (0:05)|Farm Assault Charge]]>><<pass 5>><</link>>
+			<</if>>
+		<<elseif $farm_assault.teams[_assault_keys[_s]].number gte 1 and $farm_assault.teams[_assault_keys[_s]].location isnot "done" and $farm_assault.teams[_assault_keys[_s]].state isnot "dogs_recover">>
+			침입자는 혼자다.
+			<br><br>
+			<<link [[제압한다|Farm Assault Overpower]]>><</link>>
+		<</if>>
+	<<elseif $pain gte 100>>
+		<span class="red">고통이 너무 심해 그들과 정면으로 싸울 수 없다.</span>
+	<<else>>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+			<<link [[정면으로 맞서 싸운다 (0:05)|Farm Assault Intercept Bailey]]>><<pass 5>><</link>>
+			<br>
+			<<set $skulduggerydifficulty to 1000>>
+			<<link [[하나를 떼어낸다 (0:05)|Farm Assault Pick Bailey]]>><<pass 5>><</link>><<skulduggerydifficulty>>
+		<<elseif $farm_assault.teams[_assault_keys[_s]].type is "wraith">>
+			<<set $_them to $wraith.seenFarm ? "그것" : "그들">>
+			<<link [[$_them + " 정면으로 맞서 싸운다"|Farm Assault Intercept Wraith]]>><</link>>
+		<<else>>
+			<<link [[정면으로 맞서 싸운다 (0:05)|Farm Assault Intercept]]>><<pass 5>><</link>>
+			<br>
+			<<set $skulduggerydifficulty to 600>>
+			<<link [[하나를 떼어낸다 (0:05)|Farm Assault Pick]]>><<pass 5>><</link>><<skulduggerydifficulty>>
+		<</if>>
+	<</if>>
+	<br>
+<</widget>>
+
+:: Farm Assault Rocks
+<<effects>><<wearProp "rock">>
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $physiqueSuccess>>
+			<<generate1>><<person1>>
+			당신과 알렉스는 그림자 속에서 <<farm_assault_intruders>>에게 돌을 던진다. 대부분 빗나가지만, <span class="green">하나가 제대로 명중하여</span> <<person>>의 머리를 정통으로 맞춘다. <<He>>【은는】 <<farm_fence>>에서 굴러떨어진다.
+			<br><br>
+			<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+		<<else>>
+			<<generate1>><<person1>>
+			당신은 그림자 속에서 <<farm_assault_intruders>>에게 돌을 던진다. 그들은 한쪽은 흙, 다른 쪽은 나무가 가려주는 은폐된 장소를 침입 지점으로 골랐다. <span class="red">당신은 아무도 맞추지 못한다.</span>
+			<br><br>
+		<</if>>
+	<</if>>
+<</for>>
+
+<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Rocks Alex
+<<effects>><<wearProp "rock">>
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey" and random(1, 2) is 2>>
+			<<generate1>><<person1>>
+			당신과 알렉스는 그림자 속에서 <<farm_assault_intruders>>에게 돌을 던진다. 그들은 한쪽은 흙, 다른 쪽은 나무가 가려주는 은폐된 장소를 침입 지점으로 골랐다. <span class="red">당신은 아무도 맞추지 못한다.</span>
+			<br><br>
+		<<else>>
+			<<generate1>><<person1>>
+			당신과 알렉스는 그림자 속에서 <<farm_assault_intruders>>에게 돌을 던진다. 대부분 빗나가지만, <span class="green">하나가 제대로 명중해</span> <<person>>의 머리를 정통으로 맞춘다. <<He>>【은는】 <<farm_fence>>에서 굴러떨어진다.
+			<br><br>
+			<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+		<</if>>
+	<</if>>
+<</for>>
+
+<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Threaten
+<<effects>>
+
+당신은 탁 트인 곳으로 걸어 나간다.
+<<if $speech_attitude is "meek">>
+	"괴-괴롭힘당하지 않을 거야." 당신이 말한다. "당장 멈춰, 그렇지 않으면 후회하게 될 거야."
+<<elseif $speech_attitude is "bratty">>
+	"내 땅에서 당장 꺼져." 당신이 말한다. "돼지들 밥으로 주기 전에."
+<<else>>
+	"지금 떠나면," 당신이 말한다. "쫓아가진 않겠어."
+<</if>>
+<br><br>
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<<generate1>><<person1>>
+				<span class="red">침입자들이 웃는다.</span>
+				<<if $fame.scrap gte 400>>
+					<span class="pink">"<<underworld_nickname>>,"</span> <<person>>【이가】 말한다. "아주 무섭네. 하지만 우리 뒤에는 더 무서운 게 있어."
+				<<else>>
+					"아주 무섭네." <<person>>【이가】 말한다. "하지만 우리 뒤에는 더 무서운 게 있어."
+				<</if>>
+				그들은 계속해서 억지로 들어온다.
+			<<else>>
+				<<generate1>><<person1>>
+				<span class="red">그 <<person>>【이가】 웃는다.</span>
+				<<if $fame.scrap gte 400>>
+					<span class="pink">"<<underworld_nickname>>,"</span> <<he>>【이가】 말한다. "아주 무섭네. 하지만 내 뒤에는 더 무서운 게 있어."
+				<<else>>
+					"아주 무섭네." <<he>>【이가】 말한다. "하지만 내 뒤에는 더 무서운 게 있어."
+				<</if>>
+				<<He>>【은는】 계속해서 억지로 들어온다.
+			<</if>>
+		<<elseif $fame.scrap gte random(200, 1000)>>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<<generate1>><<person1>><<generate2>>
+				침입자들이 서로를 힐끗 본다.
+				<br>
+				"저게 그들이 <span class="pink"><<underworld_nickname>></span>라고 부르는 녀석인가?" <<person>>【이가】 묻는다.
+				<br>
+				"그래. 그래서 우리가 돈을 많이 받는 거야." <<person2>><<person>>【이가】 대답한다.
+				<br>
+				"내 좆이 걷어차이는 데 돈 받는 거 아니야. 난 빠질래." <span class="green">그들은 돌아서서 도망친다.</span>
+
+				<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+			<<else>>
+				<<generate1>><<person1>>
+				침입자인 <<person>>【이가】 당신을 빤히 쳐다본다. "난 그냥 밭 좀 치우라고 돈 받은 거야." <<he>>【이가】 말한다. "문제 일으키고 싶지 않아." <span class="green"><<He>>【은는】 돌아서서 떠난다.</span>
+
+				<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+			<</if>>
+		<<else>>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<<generate1>><<person1>><<generate2>>
+				침입자들이 서로를 힐끗 보고는, <span class="red">웃는다.</span> "이 <<girl>>【이가】 자기가 뭐라도 되는 줄 아나 보네." <<person>>【이가】 말한다. "곧 힘든 교훈을 배우게 될 거야."
+				<br><br>
+				그들은 계속해서 억지로 들어온다.
+			<<else>>
+				<<generate1>><<person1>>
+				<span class="red">침입자가 웃는다.</span> "네가 뭐라고 생각하는 거야?" <<he>>【이가】 말한다. "내가 보기엔 그냥 <<girl>>일 뿐인데, 곧 힘든 교훈을 배우게 될 거야." <<He>>【은는】 계속해서 들어온다.
+			<</if>>
+		<</if>>
+	<</if>>
+<</for>>
+<br><br>
+
+<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Intercept
+<<effects>>
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+			<<generate1>><<generate2>><<generate3>>
+			당신은 레미의 폭력배들, <<fullGroup>>에게 돌진한다. 그들은 발을 굳게 딛고 당신을 마주할 준비를 한다.
+			<br><br>
+		<<elseif $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+			<<generate1>><<generate2>>
+			당신은 레미의 폭력배들, <<fullGroup>>에게 돌진한다. 그들은 발을 굳게 딛고 당신을 마주할 준비를 한다.
+			<br><br>
+		<<else>>
+			<<generate1>>
+			당신은 레미의 폭력배, <<person1>><<person>>에게 돌진한다. <<He>>【은는】 당신의 대담함에 놀란 듯하지만, 당신이 다가오자 발을 굳게 딛는다.
+			<br><br>
+		<</if>>
+	<</if>>
+<</for>>
+
+<<link [[다음|Farm Assault Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Farm Assault Intercept Bailey
+<<effects>>
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+			<<generate1>><<generate2>><<generate3>>
+			당신은 베일리의 폭력배들, <<fullGroup>>에게 돌진한다. 그들이 당신을 마주하기 위해 돌아선다. <<person1>><<person>>【이가】 <<his>> 손가락 마디를 꺾는다.
+			<br><br>
+		<<elseif $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+			<<generate1>><<generate2>>
+			당신은 <<fullGroup>>인 베일리의 부하들에게 돌진한다. 그들이 당신을 마주보려 돌아선다. <<person1>><<person>>【이가】 <<his>> 손가락 마디를 꺾어 소리를 낸다.
+			<br><br>
+		<<else>>
+			<<generate1>>
+			당신은 베일리의 부하인 <<person1>><<person>>에게 돌진한다. <<He>>【이가】 당신을 마주보려 돌아서며, <<his>> 손가락 마디를 꺾어 소리를 낸다.
+			<br><br>
+		<</if>>
+	<</if>>
+<</for>>
+
+<<link [[다음|Farm Assault Fight Bailey]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Farm Assault Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Assault Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $enemynomax gte 2>>
+		레미의 부하들은 너무 지치고 멍해서 싸움을 계속할 수 없어 <span class="green">들판에서 비틀거리며 물러난다.</span>
+	<<else>>
+		<<person1>><<person>>【은는】 너무 지치고 멍해서 싸움을 계속할 수 없어 <span class="green">들판에서 비틀거리며 물러난다.</span>
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 다음 수를 계획한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+<<elseif $enemyhealth lte 0>>
+	<<if $enemynomax gte 2>>
+		<span class="green">레미의 부하들이 들판에서 도망친다,</span> 당신이 쫓아오지 않는지 확인하기 위해 어깨 너머로 걱정스러운 시선을 던지면서.
+	<<else>>
+		<span class="green"><<person1>><<person>>【이가】 들판에서 도망친다,</span> 당신이 쫓아오지 않는지 확인하기 위해 <<his>> 어깨 너머로 걱정스러운 시선을 던지면서.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 다음 수를 계획한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+
+<<else>>
+	당신은 땅에 쓰러진다. 너무 다쳐서 싸움을 계속할 수 없다.
+	<br><br>
+	<<person1>><<person>>【이가】 당신 위로 웅크리더니, <span class="purple">당신의 <<breasts>>【을를】 더듬는다</span>. "할 일이 있는 게 아쉽군." <<he>>【이가】 말한다.
+	<br><br>
+	당신은 <<he>>【이가】 당신의 팔다리를 한데 묶고 입에 재갈을 물리는 것을 막을 수 없다. "나중에 보자, <<girl>>."
+	<br><br>
+	<<tearful>> 당신은 밧줄에 저항하며 몸부림친다. 엉성하게 묶여서, 풀 수 있을 것 같다.
+	<br><br>
+	<<endcombat>>
+	<<set $farm_assault.bindings to 3>>
+	<<bind>>
+	<<facewear "bit gag">>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Fight Bailey
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	<<set $enemyhealthmax *= 1.3>>
+	<<set $enemyhealth *= 1.3>>
+	<<set $enemyarousalmax *= 1.3>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Assault Fight Bailey Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Fight Bailey]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Fight Bailey Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"넌 크게 될 거야." <<person1>><<person>>【이가】 중얼거린다.
+	<<if $enemynomax gte 2>>
+		베일리의 부하들은 너무 지치고 멍해서 싸움을 계속할 수 없어 <span class="green">들판에서 비틀거리며 물러난다.</span>
+	<<else>>
+		<<He>>【은는】 너무 지치고 멍해서 싸움을 계속할 수 없어 <span class="green">들판에서 비틀거리며 물러난다.</span>
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 다음 수를 계획한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+<<elseif $enemyhealth lte 0>>
+	"젠장," <<person1>><<person>>【이가】 말한다. "베일리가 좋아하지 않을 텐데."
+	<<if $enemynomax gte 2>>
+		<span class="green">베일리의 부하들이 들판에서 도망친다,</span> 밤 속으로 사라지면서.
+	<<else>>
+		<span class="green"><<He>>【이가】 들판에서 도망친다,</span> 밤 속으로 사라지면서.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 다음 수를 계획한다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+
+<<else>>
+	당신은 땅에 쓰러진다. 너무 다쳐서 싸움을 계속할 수 없다.
+	<br><br>
+	<<person1>><<person>>【이가】 당신 위로 웅크린다. "미안," <<he>>【이가】 말한다. "하지만 이게 세상의 이치야."
+	<br><br>
+	당신은 <<he>>【이가】 당신의 팔다리를 한데 묶고 입에 재갈을 물리는 것을 막을 수 없다. "나중에 보자, <<girl>>."
+	<br><br>
+	<<tearful>> 당신은 밧줄에 저항하며 몸부림친다. 엉성하게 묶여서, 풀 수 있을 것 같다.
+	<br><br>
+	<<endcombat>>
+	<<set $farm_assault.bindings to 3>>
+	<<bind>>
+	<<facewear "bit gag">>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Pick Bailey
+<<effects>>
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+
+		<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+			당신은 그림자 속에 몸을 숨긴 채 침입자들을 미행하며 기회를 엿본다.
+		<<else>>
+			당신은 그림자 속에 몸을 숨긴 채 침입자를 미행하며 기회를 엿본다.
+		<</if>>
+		<br><br>
+
+		<<skulduggerycheck>>
+		<<if $skulduggerysuccess is 1>>
+
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<span class="green">기회를 잡았다.</span> <<generate1>><<person1>><<person>>【이가】 동료들에게서 너무 멀리 떨어졌다. 당신은 어둠 속에서 뛰쳐나와 <<him>> 머리를 후려친다. <<His>> 몸이 땅으로 쓰러지며 의식을 잃는다.
+				<<endevent>>
+				<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+			<<else>>
+				<span class="green">기회를 잡았다.</span> <<generate1>><<person1>><<person>>【이가】 울타리에 너무 가까이 서 있어, 당신이 바로 뒤로 몰래 다가갈 수 있게 해준다. 당신은 어둠 속에서 뛰쳐나와 <<him>> 머리를 후려친다. <<His>> 몸이 땅으로 쓰러지며 의식을 잃는다.
+				<<endevent>>
+				<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+			<</if>>
+			<br><br>
+
+			<<skulduggeryuse>>
+
+			<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+			<br>
+
+		<<else>>
+			<<generate1>>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<<generate2>>
+				<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+					<<generate3>>
+				<</if>>
+				<<person1>><<person>>【이가】 다른 이들과 떨어지자, 당신은 움직이기 시작하며 더 가까이 다가간다. 당신은 어둠 속에서 뛰쳐나가지만, <span class="red"><<person>>【이가】 몸을 돌려 당신의 팔을 붙잡는다.</span>
+				<br><br>
+				"<<girl>>【을를】 찾았다." <<he>>【이가】 당신을 밀쳐내며 말한다. 뒤에서 발소리가 들린다.
+			<<else>>
+				당신은 그림자 속에 몸을 숨긴 채 침입자를 미행하며 기회를 엿본다.
+			<</if>>
+			<br><br>
+
+			<<skulduggeryuse>>
+
+			<<link [[다음|Farm Assault Fight Bailey]]>><<set $fightstart to 1>><</link>>
+			<br>
+
+		<</if>>
+	<</if>>
+<</for>>
+
+:: Farm Assault Pick
+<<effects>>
+
+
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+
+		<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+			You keep to the shadows as you stalk the intruders, waiting for an opening.
+		<<else>>
+			You keep to the shadows as you stalk the intruder, waiting for an opening.
+		<</if>>
+		<br><br>
+
+		<<skulduggerycheck>>
+		<<if $skulduggerysuccess is 1>>
+
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<span class="green">You find one.</span> A <<generate1>><<person1>><<person>> strays too far from <<his>> fellows. You lunge from the dark, and smack <<him>> over the head. <<His>> body slumps to the earth, unconscious.
+				<<endevent>>
+				<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+			<<else>>
+				<span class="green">You find one.</span> The <<generate1>><<person1>><<person>> stands too close to a hedge, letting you sneak right behind <<him>>. You lunge from the dark, and smack <<him>> over the head. <<His>> body slumps to the earth, unconscious.
+				<<endevent>>
+				<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+			<</if>>
+			<br><br>
+
+			<<skulduggeryuse>>
+
+			<<link [[Next|Farm Assault]]>><<endevent>><</link>>
+			<br>
+
+		<<else>>
+
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+					<<generate1>>
+				<<else>>
+					<<generate1>>
+				<</if>>
+				<span class="red">You can't find one.</span> The thugs stay too close together. Attacking one would alert the others.
+				<br><br>
+
+				<<skulduggeryuse>>
+
+				<<link [[Next|Farm Assault]]>><<endevent>><</link>>
+				<br>
+			<<else>>
+				<<generate1>><<person1>>
+				You keep to the shadows as you stalk the intruder, a <<person>>, waiting for an opening. You creep up while <<his>> back is turned, <span class="red">but trip in the dark,</span> stumbling to the ground and alerting <<him>>.
+				<br><br>
+
+				<<He>> turns and plants <<his>> feet, though you're not sure <<he>> knows quite where you are.
+				<br><br>
+
+				<<skulduggeryuse>>
+
+				<<link [[Fight|Farm Assault Fight]]>><<set $fightstart to 1>><</link>>
+				<br>
+				<<link [[Flee|Farm Assault Flight]]>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<</for>>
+
+
+:: Farm Assault Flight
+<<effects>>
+
+당신은 몸을 돌려 어둠 속으로 도망친다.
+<br><br>
+
+<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Pick Alex
+<<effects>>
+당신과 알렉스는 침입자들을 미행하며, 한 명이 어둠에 너무 가까이 다가오기를 기다린다.
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+			<<generate1>><<person1>>
+			한 명, <<person>>【은는】 울타리에 등을 대고 서 있다. 뚫을 수 없다고 생각하는 모양이다.
+			<br><br>
+			당신이 덤불에서 나와 공격하지만, <<person>>【은는】 몸을 돌려 당신의 팔을 붙잡는다. <<He>>【은는】 너무 늦게서야 알렉스를 알아차린다. 한 방에 <<he>>【은는】 땅에 쓰러진다.
+			<br><br>
+			알렉스는 환호하고 싶은 충동을 억누른다.
+			<br><br>
+			<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+			<br>
+		<<else>>
+			그들은 순순히 따를 것 같지 않았지만, 알렉스가 빛 속으로 나와 그들을 도발한 뒤 키 큰 풀 속으로 사라진다.
+			<br><br>
+			<<generate1>><<person1>>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+				두 명이 뒤쫓아가고, <<person>>【이가】 남는다.
+			<<else>>
+				한 명이 뒤쫓아가고, <<person>>【이가】 남는다.
+			<</if>>
+			지금이 기회다. 당신은 <<him>> 뒤로 살금살금 다가가 공격한다. <<He>>【은는】 쓰러지면서 아무 소리도 내지 못한다.
+			<br><br>
+			당신은 알렉스와 다시 합류하여 다음 수를 계획한다.
+			<br><br>
+
+			<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+		<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+	<</if>>
+<</for>>
+
+:: Farm Assault Charge
+<<effects>>
+
+당신은 알렉스와 함께 침입자들에게 돌진한다.
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+			<<generate1>><<generate2>>
+			세 명이다. 한 명은 알렉스를 막기 위해 갈라지고, <<fullGroup>>【은는】 당신에게 맡겨진다.
+			<br><br>
+			<<person1>>
+		<<else>>
+			<<generate1>><<person1>>
+			두 명이다. 한 명은 알렉스를 막고, <<person>>【은는】 당신에게 맡겨진다.
+			<br><br>
+		<</if>>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+
+			<<link [[다음|Farm Assault Alex Fight Bailey]]>><<set $fightstart to 1>><</link>>
+			<br>
+		<<else>>
+			<<link [[다음|Farm Assault Alex Fight]]>><<set $fightstart to 1>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<</for>>
+
+:: Farm Assault Overpower
+<<effects>>
+
+<<generate1>><<person1>>당신은 홀로 있는 침입자인 <<person>>에게 돌진하고, 알렉스는 주위를 맴돈다.
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+			<<He>>【은는】 당신을 마주보고 몸을 돌려 <<his>> 발을 딛는다. 알렉스가 <<him>> 뒤에서 돌진한다. <<person>>【은는】 몸을 틀어 <<his>> 팔로 공격을 막아내지만, 이로 인해 당신에게 빈틈이 생긴다. 당신이 <<him>> 머리를 후려치자, <<he>>【은는】 땅에 쓰러진다.<<glove>><<npcincr Alex love 1>>
+			<br><br>
+
+			<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<He>>【은는】 당신을 마주보고 몸을 돌려 <<his>> 발을 딛는다. <<He>>【은는】 너무 늦게 알렉스를 알아차린다. <<He>>【은는】 땅에 쓰러진다.<<glove>><<npcincr Alex love 1>>
+			<br><br>
+			<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+		<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+	<</if>>
+<</for>>
+
+:: Farm Assault Alex Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+알렉스가 다른 침입자와 싸우는 소리가 들린다.
+<br><br>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Assault Alex Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Alex Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Alex Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $enemynomax gte 2>>
+		레미의 부하들은 너무 지치고 멍해서 싸움을 계속할 수 없다. <span class="green">그들은 들판에서 비틀거리며 물러난다.</span>
+	<<else>>
+		<<person1>><<person>>【은는】 너무 지치고 멍해서 싸움을 계속할 수 없다. <span class="green"><<He>>【은는】 들판에서 비틀거리며 물러난다.</span>
+	<</if>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<npc Alex>><<person1>>
+	<<tearful>> 당신은 알렉스를 도우러 달려간다. 당신이 도착했을 때, <<he>>【이가】 침입자를 쫓아내는 것을 본다. <<He>>【은는】 땀에 젖은 채 의기양양하게 당신을 향해 돌아선다. "우리가 보여줬어." 당신이 어떻게 당신의 상대를 제압했는지 <<he>>【은는】 모르는 것 같다.
+	<br><br>
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+<<elseif $enemyhealth lte 0>>
+	<<if $enemynomax gte 2>>
+		<span class="green">레미의 부하들이 들판에서 도망친다,</span> 당신이 쫓아오지 않는지 확인하기 위해 어깨 너머로 걱정스러운 시선을 던지면서.
+	<<else>>
+		<span class="green"><<person1>><<person>>【이가】 들판에서 도망친다,</span> 당신이 쫓아오지 않는지 확인하기 위해 <<his>> 어깨 너머로 걱정스러운 시선을 던지면서.
+	<</if>>
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<npc Alex>><<person1>>
+	<<tearful>> 당신은 알렉스를 도우러 달려간다. 당신이 도착했을 때, <<he>>【이가】 침입자를 쫓아내는 것을 본다. <<He>>【은는】 땀에 젖은 채 의기양양하게 당신을 향해 돌아선다. "우리가 보여줬어. 쉴 시간 없어. 가자."
+	<br><br>
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+<<else>>
+	당신은 땅에 쓰러진다. 너무 다쳐서 싸움을 계속할 수 없다.
+	<br><br>
+	<<person1>><<person>>【이가】 당신 위로 웅크리더니, <span class="purple">당신의 <<breasts>>【을를】 더듬는다</span>. "할 일이 있는 게 아쉽군." <<he>>【이가】 말한다. <<He>>【은는】 밧줄 한 뭉치를 꺼낸다.<<gstress>><<stress 6>>
+	<br><br>
+
+	"<<phim>>에게 손대지 마!" 알렉스가 소리치며 달려와, 다른 침입자를 진흙 속에 쓰러뜨린 채 둔다.
+	<br><br>
+	알렉스는 <<person>>【이가】 일어나기 전에 들이받고, 당신을 일으켜 세워준다. <<tearful>> 당신은 알렉스의 부축을 받으며 절뚝거리며 물러난다.
+	<<endcombat>>
+	<<clotheson>>
+	<<npc Alex>><<person1>>
+	"너무 위험했어." 안전하게 숨은 뒤 알렉스가 말한다. 침입자들은 아마 자신들의 부상자를 걱정하느라 쫓아오지 않는다. "필요하면 빠져도 돼." <<he>>【이가】 말한다. "내가 맡을게." <<ggdom>><<npcincr Alex dom 1>>
+	<br><br>
+
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].number -= 1>>
+		<</if>>
+	<</for>>
+<</if>>
+
+:: Farm Assault Alex Fight Bailey
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	<<set $enemyhealthmax *= 1.3>>
+	<<set $enemyhealth *= 1.3>>
+	<<set $enemyarousalmax *= 1.3>>
+<</if>>
+
+알렉스가 다른 침입자와 싸우는 소리가 들린다.
+<br><br>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Assault Alex Fight Bailey Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Alex Fight Bailey]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Alex Fight Bailey Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"넌 크게 될 거야." <<person1>><<person>>【이가】 중얼거린다.
+	<<if $enemynomax gte 2>>
+		베일리의 부하들은 너무 지치고 멍해서 싸움을 계속할 수 없어 <span class="green">들판에서 비틀거리며 물러난다.</span>
+	<<else>>
+		<<He>>【은는】 너무 지치고 멍해서 싸움을 계속할 수 없어 <span class="green">들판에서 비틀거리며 물러난다.</span>
+	<</if>>
+	<br><br>
+
+	<<endcombat>>
+	<<clotheson>>
+	<<npc Alex>><<person1>><<generate2>>
+	<<tearful>> 당신은 알렉스에게 달려간다. <<he>>【이가】 남은 침입자인 <<person2>><<person>>【와과】 씨름하는 것을 발견한다. 침입자가 우세했지만, 당신이 뒤에서 <<him>>【을를】 머리 위로 후려치자 상황이 역전된다.<<person1>><<npcincr Alex dom 1>>
+	<br><br>
+	"네가 해냈구나." 당신이 <<him>>【을를】 일으켜 세우자 알렉스가 말한다. 당신이 어떻게 당신의 상대를 제압했는지 <<he>>【은는】 모르는 것 같다.
+	<br><br>
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+<<elseif $enemyhealth lte 0>>
+	"젠장," <<person1>><<person>>【이가】 말한다. "베일리가 좋아하지 않을 텐데."
+	<<if $enemynomax gte 2>>
+		<span class="green">베일리의 부하들이 들판에서 도망친다,</span> 밤 속으로 사라지면서.
+	<<else>>
+		<span class="green"><<He>>【이가】 들판에서 도망친다,</span> 밤 속으로 사라지면서.
+	<</if>>
+	<br><br>
+	<<endcombat>>
+	<<clotheson>>
+	<<npc Alex>><<person1>><<generate2>>
+	<<tearful>> 당신은 알렉스에게 달려간다. <<he>>【이가】 남은 침입자인 <<person2>><<person>>【와과】 씨름하는 것을 발견한다. 침입자가 우세했지만, 당신이 뒤에서 <<him>>【을를】 머리 위로 후려치자 상황이 역전된다.<<person1>><<npcincr Alex dom 1>>
+	<br><br>
+	"네가 해냈구나." 당신이 <<him>>【을를】 일으켜 세우자 알렉스가 말한다.
+	<br><br>
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+<<else>>
+	당신은 땅에 쓰러진다. 너무 다쳐서 싸움을 계속할 수 없다.
+	<br><br>
+	<<person1>><<person>>【이가】 당신 위로 웅크린다. "미안," <<he>>【이가】 말한다. "하지만 이게 세상의 이치야." <<He>>【은는】 밧줄 한 뭉치와 재갈을 꺼낸다.
+	<br><br>
+	<<endcombat>>
+	<<npc Alex>><<person1>><<generate2>>
+	"감히!" 알렉스가 소리친다. <<He>>【이가】 가까이 달려오지만, <<person2>><<person>>【이가】 <<person1>><<him>>【을를】 뒤에서 덮친다.
+	<br><br>
+	"네 친구는 기운이 넘치는군. 문제없어. 밧줄은 항상 넉넉하게 가져오니까." 그들이 당신의 팔다리를 한데 묶고 입에 재갈을 물리는 것을 막을 수 없다. 근처에서 알렉스의 웅얼거리는 목소리가 들린다. "나중에 보자, <<girl>>."
+	<br><br>
+	<<tearful>> 당신은 밧줄에 저항하며 몸부림친다. 엉성하게 묶여서, 풀 수 있을 것 같다.
+	<br><br>
+	<<endevent>>
+	<<set $farm_assault.bindings to 3>>
+	<<set $farm_assault.bindings_alex to 3>>
+	<<bind>>
+	<<facewear "bit gag">>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Tower Defend
+<<effects>>
+
+당신은 탑의 기슭에 도착한다. 꼭대기에서는 이미 싸우는 소리가 들린다. 계단을 오르자 삐걱거리는 소리가 난다.
+<br><br>
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<for _s to 0; _s lt _assault_keys.length; _s++>>
+	<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+		밖으로 나오자 <<farm_assault_thugs>>【이가】 $farm.tower_guard【을를】 몰아붙이고 있는 것을 발견한다.
+		<<endevent>>
+		<<loadNPC 0 "farm_tower_guard">><<person1>>
+
+		<<if $NPCList[0].traits.includes("relaxed")>>
+			"자," <<he>>【이가】 구석에 몰렸지만, 굴하지 않고 말한다. "제대로 해봐."
+		<<elseif $NPCList[0].traits.includes("sociable")>>
+			"너희 같은 놈들보다 더한 놈들도 상대해봤어." <<he>>【이가】 말한다. "덤벼. 어떻게 되는지 보자고."
+		<<elseif $NPCList[0].traits.includes("brooding")>>
+			"내 밥값 할 시간이군." <<he>>【이가】 뱉듯이 말한다.
+		<<else>>
+			"오늘 밤 인기 많네." <<he>>【이가】 웃는다. "다들 춤추고 싶어 하는군."
+		<</if>>
+		<<endevent>>
+		<br><br>
+		<<if $farm_assault.teams[_assault_keys[_s]].type is "bailey">>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+				<<generate1>><<generate2>><<person1>><<set $skulduggerydifficulty to 1200>>
+				세 명의 부하가 경계하며 다가온다. 그들은 당신을 눈치채지 못했다.
+			<<elseif $farm_assault.teams[_assault_keys[_s]].number gte 2>>
+				<<generate1>><<person1>><<set $skulduggerydifficulty to 1000>>
+				세 명의 부하가 경계하며 다가온다. 그들은 당신을 눈치채지 못했다.
+			<<else>>
+				<<generate1>><<person1>><<set $skulduggerydifficulty to 600>>
+				부하인 <<person>>【은는】 경계하며 다가온다. <<He>>【은는】 당신을 눈치채지 못했다.
+			<</if>>
+			<br><br>
+			<<if $skulduggerydifficulty gte 1>>
+				<<link [[돌격한다|Farm Assault Charge Bailey]]>><</link>>
+				<br>
+			<</if>>
+			<<link [[몰래 다가간다|Farm Assault Sneak Bailey]]>><</link>><<skulduggerydifficulty>>
+			<br>
+		<<else>>
+			<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+				<<generate1>><<generate2>><<person1>><<set $skulduggerydifficulty to 800>>
+				세 명의 부하가 위협받는 기색 없이 웃으며 다가온다. 그들은 당신을 눈치채지 못했다.
+			<<elseif $farm_assault.teams[_assault_keys[_s]].number gte 2>><<set $skulduggerydifficulty to 600>>
+				<<generate1>><<person1>>
+				세 명의 부하가 위협받는 기색 없이 다가온다. 그들은 당신을 눈치채지 못했다.
+			<<else>><<set $skulduggerydifficulty to 0>>
+				<<generate1>><<person1>>
+				부하인 <<person>>【은는】 경계하며 다가온다. <<He>>【은는】 당신을 눈치채지 못했다.
+			<</if>>
+			<br><br>
+			<<if $skulduggerydifficulty gte 1>>
+				<<link [[돌격한다|Farm Assault Tower Charge]]>><</link>>
+				<br>
+			<</if>>
+			<<link [[몰래 다가간다|Farm Assault Sneak]]>><</link>><<skulduggerydifficulty>>
+			<br>
+		<</if>>
+	<</if>>
+<</for>>
+
+<<link [[내려간다|Farm Assault]]>><<endevent>><</link>>
+<br>
+
+:: Farm Assault Tower Charge
+<<effects>>
+
+당신은 부하들에게 돌격한다. 그들이 당신을 향해 몸을 돌리자, $farm.tower_guard에게 기회가 생긴다.
+<br><br>
+
+<<link [[다음|Farm Assault Tower Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Farm Assault Tower Fight
+<<effects>>
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+$farm.tower_guard【이가】 근처에서 싸우고 있다.
+<br><br>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Assault Tower Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Tower Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Tower Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $enemynomax gte 2>>
+		폭력배들이 당신에게서 비틀거리며 물러난다. 숨을 고를 필요가 있어 보이지만, 계속 싸울 준비는 되어 있다. 하지만 $farm.tower_guard【이가】 <<his>> 동료를 탑에서 떨어뜨리자, 그들은 돌아서서 계단을 뛰어 내려간다.
+	<<else>>
+		<<He>>【은는】 당신에게서 비틀거리며 물러난다. <<He>>【은는】 숨을 고를 필요가 있어 보이지만, 계속 싸울 준비는 되어 있다. 하지만 $farm.tower_guard【이가】 <<his>> 동료를 탑에서 떨어뜨리자, <<He>>【은는】 돌아서서 계단을 뛰어 내려간다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 난간에 기댄다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"이상한 방식으로 싸우시네요," $farm.tower_guard【이가】 말한다. "효과만 있으면 됐죠."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"성매매 쪽으로 가고 싶어 하는 친구들이 있는데," $farm.tower_guard【이가】 말한다. "당신한테 배울 게 있겠어요."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"그런 방법도 있군요," $farm.tower_guard【이가】 말한다. "전 판단하지 않아요. 우린 어떻게든 살아남아야 하니까."
+	<<else>>
+		"나한테도 그렇게 해줬으면 좋았을 텐데," $farm.tower_guard【이가】 웃는다.
+	<</if>>
+	<<gstress>><<stress 6>>
+	<<endevent>>
+	<br><br>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+	<<set $farm_assault.tower to "manned">>
+
+<<elseif $enemyhealth lte 0>>
+	<<if $enemynomax gte 2>>
+		당신은 <<person1>><<person>>【을를】 탑에서 후려쳐 떨어뜨린다. $farm.tower_guard의 상대도 똑같이 당한다. <<person2>><<person>>【은는】 돌아서서 계단을 거의 굴러떨어지다시피 뛰어 내려간다.
+	<<else>>
+		당신은 <<person1>><<person>>【을를】 탑에서 후려쳐 떨어뜨린다. $farm.tower_guard의 상대도 똑같이 당한다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 난간에 기댄다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"이렇게 끝날 수밖에 없었지." $farm.tower_guard【이가】 웃는다. "다음 놈들도 쫓아내 버릴 거야."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"거의 재미있을 뻔했네." $farm.tower_guard【이가】 웃는다. "다음번엔 땀 좀 흘릴지도 모르겠어."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"일은 끝났지만, 더 올지도 몰라." $farm.tower_guard【이가】 말한다. "도와줘서 고마워."
+	<<else>>
+		$farm.tower_guard【은는】 하이파이브를 하려고 <<his>> 손을 내민다. "우리가 저놈들에게 본때를 보여줬어." <<he>>【이가】 말한다. "나중에 보상해 줄 거지? <<girl_npc>>의 꿈이랄까."
+	<</if>>
+	<br><br>
+	<<endevent>>
+
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+	<<set $farm_assault.tower to "manned">>
+
+<<else>>
+	당신은 난간에 쓰러진다. 너무 다쳐서 더는 싸울 수 없다.
+	<<if $enemynomax gte 2>>
+		폭력배들은 $farm.tower_guard에게로 주의를 돌리고, 동료를 도우러 달려든다.
+	<<else>>
+		<<person1>><<person>>【은는】 $farm.tower_guard에게로 <<his>> 주의를 돌리고, <<his>> 동료를 도우러 달려든다.
+	<</if>>
+	<br><br>
+	<<endcombat>>
+
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			몸싸움이 벌어지다가, 마침내
+			<<if $farm.tower_guard_skill gte random(1, ($farm_assault.teams[_assault_keys[_s]].number * 500))>>
+				$farm.tower_guard【이가】 <span class="green">공격자 한 명을 주먹으로 쳐서 탑에서 떨어뜨린다.</span>
+				<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+					다른 폭력배들은 돌아서서 계단 아래로 도망친다.
+				<<else>>
+					다른 폭력배는 돌아서서 계단 아래로 도망친다.
+				<</if>>
+				<br><br>
+				$farm.tower_guard【이가】 당신이 일어서는 것을 돕는다.
+
+				<<if $NPCList[0].traits.includes("relaxed")>>
+					"괜찮아요?" <<he>>【이가】 묻는다. "필요하면 나머지는 쉬고 있어요. 알렉스에게는 제가 계속 상황을 알려줄게요."
+				<<elseif $NPCList[0].traits.includes("sociable")>>
+					"좀 쉬고 있어요," <<he>>【이가】 말한다. "제가 정신없는 동안 다른 놈들이 별 말썽 안 부렸으면 좋겠네요."
+				<<elseif $NPCList[0].traits.includes("brooding")>>
+					"너무 위험하게 굴지 말아요," <<he>>【이가】 말한다. "페이스 조절을 해요."
+				<<else>>
+					"안색이 안 좋아 보이네요," <<he>>【이가】 말한다. "다행히 주변에 이용해 먹을 변태는 없군요. 저 빼고요. 하지만 전 당신한테 고용됐잖아요."
+				<</if>>
+				<br><br>
+				<<tearful>> 당신은 계단을 내려간다.
+				<br><br>
+				<<set $farm_assault.tower to "manned">>
+				<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+			<<else>>
+				<<farm_assault_thugs>>【이가】 <span class="red">$farm.tower_guard【을를】 제압하고 탑에서 떨어뜨린다.</span> 그들은 환호성을 지르더니, 당신에게는 신경도 쓰지 않고 계단을 달려 내려간다.
+				<br><br>
+
+				<<tearful>> 당신은 몸을 일으켜 탑을 내려간다.
+				<br><br>
+				<<set $farm_assault.teams[_assault_keys[_s]].location to $farm_assault.no.pluck()>>
+				<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+				<<set $farm_assault.tower to "defeated">>
+			<</if>>
+		<</if>>
+	<</for>>
+
+	<<clotheson>>
+
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Charge Bailey
+<<effects>>
+
+당신은 부하들에게 돌격한다. 그들이 당신을 향해 몸을 돌리자, $farm.tower_guard에게 기회가 생긴다.
+<br><br>
+
+<<link [[다음|Farm Assault Tower Bailey Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Farm Assault Tower Bailey Fight
+<<effects>>
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	<<set $enemyhealthmax *= 1.3>>
+	<<set $enemyhealth *= 1.3>>
+	<<set $enemyarousalmax *= 1.3>>
+<</if>>
+
+$farm.tower_guard【이가】 근처에서 싸우고 있다.
+<br><br>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farm Assault Tower Bailey Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Tower Bailey Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Tower Bailey Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $enemynomax gte 2>>
+		폭력배들이 당신에게서 비틀거리며 물러난다. 숨을 고를 필요가 있어 보이지만, 계속 싸울 준비는 되어 있다. 하지만 $farm.tower_guard【이가】 <<his>> 동료를 탑에서 떨어뜨리자, 그들은 돌아서서 계단을 뛰어 내려간다.
+	<<else>>
+		<<He>>【은는】 당신에게서 비틀거리며 물러난다. <<He>>【은는】 숨을 고를 필요가 있어 보이지만, 계속 싸울 준비는 되어 있다. 하지만 $farm.tower_guard【이가】 <<his>> 동료를 탑에서 떨어뜨리자, <<He>>【은는】 돌아서서 계단을 뛰어 내려간다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 난간에 기댄다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"이상한 방식으로 싸우시네요," $farm.tower_guard【이가】 말한다. "효과만 있으면 됐죠."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"성매매 쪽으로 가고 싶어 하는 친구들이 있는데," $farm.tower_guard【이가】 말한다. "당신한테 배울 게 있겠어요."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"그런 방법도 있군요," $farm.tower_guard【이가】 말한다. "전 판단하지 않아요. 우린 어떻게든 살아남아야 하니까."
+	<<else>>
+		"나한테도 그렇게 해줬으면 좋았을 텐데," $farm.tower_guard【이가】 웃는다.
+	<</if>>
+	<<gstress>><<stress 6>>
+	<<endevent>>
+	<br><br>
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+	<<set $farm_assault.tower to "manned">>
+
+<<elseif $enemyhealth lte 0>>
+	<<if $enemynomax gte 2>>
+		당신은 <<person1>><<person>>【을를】 탑에서 후려쳐 떨어뜨린다. $farm.tower_guard의 상대도 똑같이 당한다. <<person2>><<person>>【은는】 히죽 웃더니, 몸을 돌려 계단을 뛰어 내려간다.
+	<<else>>
+		당신은 <<person1>><<person>>【을를】 탑에서 후려쳐 떨어뜨린다. $farm.tower_guard의 상대도 똑같이 당한다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 난간에 기댄다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"이렇게 끝날 수밖에 없었지." $farm.tower_guard【이가】 웃는다. "다음 놈들도 쫓아내 버릴 거야."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"거의 재미있을 뻔했네." $farm.tower_guard【이가】 웃는다. "다음번엔 땀 좀 흘릴지도 모르겠어."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"일은 끝났지만, 더 올지도 몰라." $farm.tower_guard【이가】 말한다. "도와줘서 고마워."
+	<<else>>
+		$farm.tower_guard【은는】 하이파이브를 하려고 <<his>> 손을 내민다. "우리가 저놈들에게 본때를 보여줬어." <<he>>【이가】 말한다. "나중에 보상해 줄 거지? <<girl_npc>>의 꿈이랄까."
+	<</if>>
+	<br><br>
+	<<endevent>>
+
+	<<link [[다음|Farm Assault]]>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+	<<set $farm_assault.tower to "manned">>
+
+<<else>>
+	당신은 난간에 쓰러진다. 너무 다쳐서 더는 싸울 수 없다.
+	<<if $enemynomax gte 2>>
+		폭력배들은 $farm.tower_guard에게로 주의를 돌리고, 동료를 도우러 달려든다.
+	<<else>>
+		<<person1>><<person>>【은는】 $farm.tower_guard에게로 <<his>> 주의를 돌리고, <<his>> 동료를 도우러 달려든다.
+	<</if>>
+	<br><br>
+	<<endcombat>>
+
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			몸싸움이 벌어지다가,
+			<<if $farm.tower_guard_skill gte random(1, ($farm_assault.teams[_assault_keys[_s]].number * 1000))>>
+				$farm.tower_guard【이가】 <span class="green">공격자 한 명을 주먹으로 쳐서 탑에서 떨어뜨린다.</span>
+				<<if $farm_assault.teams[_assault_keys[_s]].number gte 3>>
+					다른 폭력배들이 웃더니, 몸을 돌려 계단 아래로 달아난다.
+				<<else>>
+					다른 폭력배가 웃더니, 몸을 돌려 계단 아래로 달아난다.
+				<</if>>
+				<br><br>
+				$farm.tower_guard【이가】 당신이 일어서는 것을 돕는다.
+
+				<<if $NPCList[0].traits.includes("relaxed")>>
+					"괜찮아요?" <<he>>【이가】 묻는다. "필요하면 나머지는 쉬고 있어요. 알렉스에게는 제가 계속 상황을 알려줄게요."
+				<<elseif $NPCList[0].traits.includes("sociable")>>
+					"좀 쉬고 있어요," <<he>>【이가】 말한다. "제가 정신없는 동안 다른 놈들이 별 말썽 안 부렸으면 좋겠네요."
+				<<elseif $NPCList[0].traits.includes("brooding")>>
+					"너무 위험하게 굴지 말아요," <<he>>【이가】 말한다. "페이스 조절을 해요."
+				<<else>>
+					"안색이 안 좋아 보이네요," <<he>>【이가】 말한다. "다행히 주변에 이용해 먹을 변태는 없군요. 저 빼고요. 하지만 전 당신한테 고용됐잖아요."
+				<</if>>
+				<br><br>
+				<<tearful>> 당신은 계단을 내려간다.
+				<br><br>
+				<<set $farm_assault.tower to "manned">>
+				<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+			<<else>>
+				<<farm_assault_thugs>>【이가】 <span class="red">$farm.tower_guard【을를】 제압하고 탑에서 떨어뜨린다.</span> 그들은 환호성을 지르더니, 당신에게는 신경도 쓰지 않고 계단을 달려 내려간다.
+				<br><br>
+
+				<<tearful>> 당신은 몸을 일으켜 탑을 내려간다.
+				<br><br>
+				<<set $farm_assault.teams[_assault_keys[_s]].location to $farm_assault.no.pluck()>>
+				<<set $farm_assault.teams[_assault_keys[_s]].state to "field">>
+				<<set $farm_assault.tower to "defeated">>
+			<</if>>
+		<</if>>
+	<</for>>
+
+	<<clotheson>>
+
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Sneak
+<<effects>>
+
+당신은 들키지 않을 만큼 최대한 빠르게 움직인다. $farm.tower_guard【은는】 불량배들의 주의를 끌려고 애쓴다.
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+
+	<span class="green">당신은 <<person>> 바로 앞까지 다가가 밀쳐버린다.</span> <<He>>【은는】 난간 너머로 몸이 넘어가 탑에서 추락하자 놀라서 비명을 지른다.
+	<<if $enemynomax gte 2>>
+		<<His>> 동료들이 놀라서 돌아본다. $farm.tower_guard【은는】 그 틈을 타 <<person2>><<person>>의 얼굴을 후려친다. <<He>>【은는】 비틀거리다 발을 헛디뎌 계단 아래로 굴러떨어진다.
+		<br><br>
+
+		남은 불량배는 <<him>>의 뒤를 쫓아 달려간다.
+		<br><br>
+	<<else>>
+		<<His>> 동료가 놀라서 돌아본다. $farm.tower_guard【은는】 그 틈을 타 주먹을 날려 남은 불량배를 계단 아래로 굴러떨어뜨린다.
+		<br><br>
+	<</if>>
+
+	<<skulduggeryuse>>
+	<<endevent>>
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"순발력이 좋군." $farm.tower_guard【이가】 말한다. "네가 여기 있어서 다행이야."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"꼴좋다." $farm.tower_guard【이가】 탑 아래를 향해 소리친다. <<He>>【은는】 당신에게 몸을 돌린다. "도와줘서 고마워. 난 다시 망을 보러 가야겠어."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"잘했어." $farm.tower_guard【이가】 말한다. "난 다시 일하러 갈게."
+	<<else>>
+		"우리 제법 잘 맞는 팀인데." $farm.tower_guard【이가】 말한다. "나중엔 다른 방식으로도 팀을 이뤄볼까." <<He>>【은는】 웃는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+	<<set $farm_assault.tower to "manned">>
+
+<<else>>
+
+	<span class="red">바닥 널빤지가 삐걱거린다.</span> 그러자 불량배들이 당신을 향해 몸을 돌린다. $farm.tower_guard【은는】 그 틈을 타 가장 가까이 있는 녀석에게 주먹을 날린다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Farm Assault Tower Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Sneak Bailey
+<<effects>>
+
+당신은 들키지 않을 만큼 최대한 빠르게 움직인다. $farm.tower_guard【은는】 불량배들의 주의를 끌려고 애쓴다.
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+
+	<span class="green">당신은 <<person>> 바로 앞까지 다가가 밀쳐버린다.</span> <<He>>【은는】 난간 너머로 몸이 넘어가 탑에서 추락하자 놀라서 비명을 지른다.
+	<<if $enemynomax gte 2>>
+		<<His>> 동료들이 놀라서 돌아본다. $farm.tower_guard【은는】 그 틈을 타 <<person2>><<person>>의 얼굴을 후려친다. <<He>>【은는】 비틀거리다 발을 헛디뎌 계단 아래로 굴러떨어진다.
+		<br><br>
+
+		남은 불량배는 당신에게 미소를 지어 보이고는 <<him>>의 뒤를 쫓아 달려간다.
+		<br><br>
+	<<else>>
+		<<His>> 동료가 놀라서 돌아본다. $farm.tower_guard【은는】 그 틈을 타 주먹을 날려 남은 불량배를 계단 아래로 굴러떨어뜨린다.
+		<br><br>
+	<</if>>
+
+	<<skulduggeryuse>>
+	<<endevent>>
+	<<loadNPC 0 "farm_tower_guard">><<person1>>
+	<<if $NPCList[0].traits.includes("relaxed")>>
+		"순발력이 좋군." $farm.tower_guard【이가】 말한다. "네가 여기 있어서 다행이야."
+	<<elseif $NPCList[0].traits.includes("sociable")>>
+		"꼴좋다." $farm.tower_guard【이가】 탑 아래를 향해 소리친다. <<He>>【은는】 당신에게 몸을 돌린다. "도와줘서 고마워. 난 다시 망을 보러 가야겠어."
+	<<elseif $NPCList[0].traits.includes("brooding")>>
+		"잘했어." $farm.tower_guard【이가】 말한다. "난 다시 일하러 갈게."
+	<<else>>
+		"우리 제법 잘 맞는 팀인데." $farm.tower_guard【이가】 말한다. "나중엔 다른 방식으로도 팀을 이뤄볼까." <<He>>【은는】 웃는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Farm Assault]]>><<endevent>><</link>>
+	<br>
+
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<for _s to 0; _s lt _assault_keys.length; _s++>>
+		<<if $bus is $farm_assault.teams[_assault_keys[_s]].location>>
+			<<set $farm_assault.teams[_assault_keys[_s]].location to "done">>
+		<</if>>
+	<</for>>
+	<<set $farm_assault.tower to "manned">>
+
+<<else>>
+
+	<span class="red">바닥 널빤지가 삐걱거린다.</span> 그러자 불량배들이 당신을 향해 몸을 돌린다. $farm.tower_guard【은는】 그 틈을 타 가장 가까이 있는 녀석에게 주먹을 날린다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Farm Assault Tower Bailey Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Farm Assault Intercept Wraith
+<<effects>><<set _assault_keys to Object.keys($farm_assault.teams)>>
+
+<<if !$wraithIntro>>
+	<<set $wraithIntro to true>>
+	당신은 낯선 이에게 돌진한다. 반투명한 흰 옷에 은발이 흩날리는 아름답고 창백한 형상이다. 그 존재는 화난 붉은 눈으로 당신을 바라보며 자신의 목을 할퀴고 있다. 그가 걷는 곳마다 기이하고 끈적한 물질이 흘러나온다.
+<<elseif !$wraith.seenFarm>>
+	당신은 낯선 이에게 돌진한다. 그가 당신을 돌아보며 낄낄 웃는다. <span class="red">그의 얼굴은 끔찍할 정도로 익숙한 창백함이다.</span> 그가 걷는 곳마다 기이하고 끈적한 물질이 흘러나온다.
+<<else>>
+	당신은 창백한 형상에게 돌진한다. 그것이 당신을 돌아보며 낄낄 웃는다. 그것이 걷는 곳마다 기이하고 끈적한 물질이 흘러나온다.
+<</if>>
+<br><br>
+
+"<span class="wraith">재는 재로, 눈에는 눈. <<pcPetname "Wraith">>.</span>"
+<br><br>
+
+<<generateWraith 1 true>>
+<<initWraith "man" "arms" "abomination">><<startWraith>><<set $wraith.seenFarm to true>>
+<<his>> 손가락에서 불씨가 타오른다. <span class="red">슬라임이 저절로 들판을 가로질러 퍼지기 시작한다.</span>
+<br><br>
+
+<<link [[다음|Farm Assault Wraith Fight]]>><<set $fightstart to 1>><<set $phase to 1>><</link>>
+
+:: Farm Assault Wraith Fight
+<<effects>>
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<set $rescue to 0>>
+	<<set $enemytype to $wraith.type>>
+	<<set $wraith.exit to "farm_assault">>
+	<<set _assault_keys to Object.keys($farm_assault.teams)>>
+	<<set $timer to 12 - $farm_assault.teams[_assault_keys[$farm_assault.wraith]].field_progress - Math.floor(C.npc["Ivory Wraith"].lust/4)>>
+<</if>>
+<<set $enemyanger += 10>>
+
+<<if $phase is 1>>
+	<<if $timer gte 8>>
+		<span class="lblue">슬라임이 얇게 퍼져 있다.</span>
+	<<elseif $timer gte 6>>
+		<span class="blue">슬라임이 퍼져나간다.</span>
+	<<elseif $timer gte 4>>
+		<span class="purple">슬라임이 더 넓게 퍼진다.</span>
+	<<elseif $timer gte 2>>
+		<span class="pink">슬라임이 들판 전체를 거의 뒤덮었다.</span>
+	<<else>>
+		<span class="red">슬라임이 구석구석을 뒤덮었다.</span>
+	<</if>>
+<</if>>
+
+<<effectsWraith>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0) or ($timer lte 0 and $phase is 1)>>
+	<span id="next"><<link [[다음|Farm Assault Wraith Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farm Assault Wraith Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farm Assault Wraith Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<set _bind to 1>>
+	쉭 하는 소리와 함께, <span class="green">타다 남은 불씨가 꺼진다</span>.
+	<<ejaculation>>
+
+	"<span class="wraith">참으로 장관인 욕정이군.</span>"
+	<<kissWraith>>
+	<br><br>
+
+	<<if $wraith.gen is "arms">>
+		당신이 아직 비틀거리는 동안, <<he>>【은는】 <<his>> 여분의 손 두 개를 마주 잡고 반투명하게 반짝이는 에너지 가닥을 만들어낸다.
+	<<else>>
+		당신이 아직 비틀거리는 동안, <<he>>【은는】 두 개의 팔을 추가로 돋아나게 하고 반투명하게 반짝이는 에너지 가닥을 만들어낸다.
+	<</if>>
+	그 가닥은 <<his>> 손에서 저절로 날아와 당신을 감싸며, 당신의 팔을 몸 옆에 고정시킨다. <<He>>【이가】 당신의 가슴을 발로 부드럽게 밀자, 당신은 넘어진다.
+	<br><br>
+
+	"<span class="wraith">불협화음의 잿더미여. 남은 석탄 위를 걸으며, 네 귀를 막아라.</span>"
+	<br><br>
+
+	<<He>>【은는】 당신을 흙바닥에 남겨둔 채 걸어간다. 언제 <<him>> 모습이 보이지 않게 되었는지 알 수 없다. <<tearful>> 당신은 에너지 가닥에 저항하며 몸부림친다. 거미줄처럼 가늘지만, 매우 강하다.
+	<br><br>
+
+	<<endcombat>>
+	<<exitWraith>>
+
+<<elseif $enemyhealth lte 0>>
+	그 형체는 비틀거리며 뒤로 물러서면서 충격받은 듯 당신을 내려다본다. 쉭 하는 소리와 함께, <span class="green">타다 남은 불씨가 꺼진다</span>.
+	<<if $wraith.gen is "abomination">>
+		촉수들이 축 늘어진 채 어두운 물속으로 떨어진다.
+	<<elseif $wraith.gen is "arms">>
+		<<His>> 여분의 팔들이 다시 안으로 접힌다.
+	<</if>>
+	<<His>> 머리가 뒤로 젖혀지고, <<he>>【은는】 당신의 마음속에 메아리치는 짧은 비명과 함께 흔적도 없이 사라진다. 당신의 귀가 울리고, 웃음소리가 들리는 것 같다. "<span class="wraith">네가 뿌린 대로 거두리라.</span>"
+	<br><br>
+
+	<<tearful>> 당신은 다음 행동을 계획한다.
+	<br><br>
+
+	<<set $wraith.defeated++>>
+	<<clotheson>>
+	<<endcombat>>
+	<<exitWraith>>
+
+<<elseif $timer lte 0>>
+	<<set _torch to 1>>
+	창백한 형체가 손가락 끝에서 작은 불꽃 하나를 튕겨 들판을 뒤덮은 슬라임 위로 떨어뜨린다. 불꽃이 번지더니, <span class="red">들판이 화염에 휩싸인다.</span> 당신은 화상을 입지 않았지만, 들판이 눈앞에서 불타버린다. 당신의 심장이 내려앉는다.
+	<<control -10>><<stress 12>><<trauma 6>><<lcontrol>><<ggstress>><<gtrauma>>
+	<br><br>
+
+	"<span class="wraith">눈앞에서 빼앗기는 기분이 고통스러운가?</span>" 창백한 형체는 당신이 정신 팔린 틈을 타 얼굴을 붙잡는다.
+	<<set $wraith.gen to "man">><<kissWraith>>
+	<br><br>
+
+	<<He>>【은는】 당신을 불타버린 들판에 선 채로 남겨두고 걸어간다. 언제 <<him>> 모습이 보이지 않게 되었는지 알 수 없다. <<tearful>> 당신은 다음 행동을 계획한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<exitWraith>>
+
+<<else>>
+	<<set _bind to 1>><<set _torch to 1>>
+	당신은 너무 다쳐서 더 이상 싸울 수 없어 땅에 쓰러진다.
+	<br><br>
+
+	<<if $wraith.gen is "arms">>
+		창백한 형체가 <<his>> 여분의 손 두 개를 마주 잡고 반투명하게 반짝이는 에너지 가닥을 만들어낸다.
+	<<else>>
+		창백한 형체가 두 개의 팔을 추가로 돋아나게 하고 반투명하게 반짝이는 에너지 가닥을 만들어낸다.
+	<</if>>
+	그 가닥은 <<his>> 손에서 저절로 날아와 당신을 감싸며, 당신의 팔을 몸 옆에 고정시킨다. <<He>>【이가】 당신의 가슴을 발로 부드럽게 밀자, 당신은 넘어진다.
+	<br><br>
+
+	"<span class="wraith">불협화음의 잿더미여. 남은 석탄 위를 걸으며, 네 귀를 막아라.</span>"
+	<br><br>
+
+	창백한 형체가 손가락 끝에서 작은 불꽃 하나를 튕겨 들판을 뒤덮은 슬라임 위로 떨어뜨린다. 불꽃이 번지더니, <span class="red">들판이 화염에 휩싸인다.</span> 당신은 화상을 입지 않았지만, 들판이 눈앞에서 불타버린다. 당신은 몸부림치며 비명을 지른다.
+	<<control -10>><<stress 12>><<trauma 6>><<lcontrol>><<ggstress>><<gtrauma>>
+	<br><br>
+
+	창백한 형체는 당신을 흙바닥에 남겨둔 채 걸어간다. 언제 <<him>> 모습이 보이지 않게 되었는지 알 수 없다. <<tearful>> 당신은 에너지 가닥에 저항하며 몸부림친다. 거미줄처럼 가늘지만, 매우 강하다.
+	<br><br>
+
+	<<endcombat>>
+	<<exitWraith>>
+<</if>>
+<br>
+
+<<set _assault_keys to Object.keys($farm_assault.teams)>>
+<<if _bind is 1>>
+	<<set $farm_assault.bindings to 6>>
+	<<bind>>
+<</if>>
+<<if _torch is 1>>
+	<<damage_farm "target" $farm_assault.teams[_assault_keys[$farm_assault.wraith]].location>>
+<</if>>
+<<set $farm_assault.teams[_assault_keys[$farm_assault.wraith]].location to "done">>

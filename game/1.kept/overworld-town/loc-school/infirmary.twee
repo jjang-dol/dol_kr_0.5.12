@@ -1,0 +1,1521 @@
+:: School Infirmary
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if Time.schoolDay and !["early","late"].includes($schoolstate)>>
+	<<if $per_npc.school_nurse>>
+		당신은 학교 양호실에 있다. 캐비닛은 약품과 의료용품으로 가득 차 있다. 침대는 비어 있다.
+		<br><br>
+
+		<<if $phase is 1>>
+			양호교사가 <<his>> 일지에 무언가를 적으며, 이따금 당신을 힐끗 쳐다본다.
+		<<else>>
+			<<loadNPC 0 school_nurse>><<person1>>
+			양호교사가 <<his>> 일지에 글을 쓰던 것을 멈추고 당신을 쳐다본다. "무슨 일로 왔니?"
+			<<set $phase to 1>>
+		<</if>>
+	<<else>>
+		<<generate1>><<saveNPC 0 school_nurse>>
+		당신은 학교 양호실로 들어간다. 내부는 기억하던 그대로다. 작고 깨끗하며, 약품과 의료용품으로 가득 찬 캐비닛들이 줄지어 있다. 방 뒤편에는 커튼 뒤로 침대 몇 개가 놓여 있다. 몸이 좋지 않은 학생들이 이곳에 와서 쉰다.
+		<br><br>
+
+		양호교사인 <<person1>><<person>>【은는】 <<his>> 책상에 앉아 <<his>> 일지에 글을 쓰고 있다. <<He>>【은는】 당신이 들어오는 소리를 듣고 고개를 든다. "무슨 일로 왔니?"
+	<</if>>
+	<br><br>
+
+	<<school_infirmary_options>>
+<<else>>
+	당신은 학교 양호실에 혼자 있다. 캐비닛은 약품과 의료용품으로 가득 차 있다.
+	<br>
+	침대는 비어 있지만, 지금 자려고 하는 것은 좋지 않은 생각일 수 있다. 들키면 곤란해질 것이다.
+	<br><br>
+
+	<<if $weekly.theft.infirmaryDrugs is "stolen">>
+		<span class="blue">이미 약을 훔쳤습니다. 더 훔치려면 재입고될 때까지 기다려야 합니다.</span>
+	<<elseif $weekly.theft.infirmaryDrugs is "failed">>
+		<span class="purple">캐비닛 자물쇠가 부서졌습니다. 수리될 때까지 침입할 수 없습니다.</span>
+	<<else>>
+		<<schoolicon "infirmary">><<link [[캐비닛 뒤지기|School Infirmary Drugs]]>><</link>>
+	<</if>>
+	<br>
+	<<getouticon>><<link [[나가기|Hallways]]>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Ask Painkiller
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 몸이 안 좋아요." 당신은 시선을 내리깔고 말한다. "통증에 도움이 될 만한 것 좀 주실 수 있을까요?"
+<<elseif $speech_attitude is "bratty">>
+	"제가 아픈 거 안 보이세요?" 당신은 조급하게 묻는다. "알약 같은 게 필요해요."
+<<else>>
+	"몸이 아파요. 도움이 될 만한 게 있을까요?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+<<if $daily.infirmaryPainkiller is 1>>
+	"아직도 아프니? 하지만 이미 약을 줬잖니." <<He>>【은는】 고개를 젓는다. "미안하구나, <<girl>>. 더 이상 처방해 줄 수 없단다."
+	<br><br>
+
+	<<school_infirmary_options>>
+<<else>>
+	양호교사가 가까이 오라고 손짓한다. 당신은 그대로 따른다. <<He>>【은는】 의자를 돌려 당신을 마주 보고, 당신의 턱 밑에 손을 받쳐 머리를 이리저리 기울이며 머리부터 발끝까지 살핀다.
+	<br><br>
+
+	<<if $pain gte 40>>
+		<<He>>【은는】 미간을 찌푸리며 고개를 끄덕인다. "그래, 꽤 힘들었겠구나."
+		<br><br>
+
+		<<He>>【은는】 캐비닛으로 걸어가 딸깍 소리를 내며 자물쇠를 연다. <<He>>【은는】 뒤적거리다가 작은 유리병을 꺼낸다. <<He>>【은는】 병을 열고 흔든다. 하얀 알약 하나가 <<his>> 손바닥에 떨어진다.
+		<br><br>
+
+		"이걸 먹으면 통증이 사라질 거다. 조금 졸릴 수도 있지만. 괜찮겠니?"
+		<br><br>
+
+		<<link [[받는다|School Infirmary Painkiller Take]]>><<tiredness 18>><<pain -20>><<set $daily.infirmaryPainkiller to 1>><</link>><<lllpain>><<gggtiredness>>
+		<br>
+		<<link [[거절한다|School Infirmary Painkiller Decline]]>><</link>>
+		<br>
+	<<else>>
+		<<He>>【은는】 미간을 찌푸린다. "아파 보이지 않는데." 당신이 항의하려고 입을 열자, <<he>>【은는】 손을 들어 무시하듯 말한다. "정말 심하게 아플 때 다시 오렴. 몸에 약을 채워 넣는 건 좋은 생각이 아니란다."
+		<br><br>
+
+		<<school_infirmary_options>>
+	<</if>>
+<</if>>
+
+:: School Infirmary Painkiller Take
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<wearProp "solo cup">>
+양호교사가 알약과 물 한 컵을 건네준다. 당신은 둘 다 삼킨다. 거의 즉시 큰 안도감이 느껴지지만, 눈꺼풀이 조금 무거워진다.
+<br><br>
+
+양호교사는 잠시 당신을 지켜보다가 <<his>> 일지에 무언가를 적는다. <<He>>【은는】 다른 말 없이 <<his>> 책상으로 돌아간다.
+<br><br>
+
+<<school_infirmary_options>>
+<br>
+
+:: School Infirmary Painkiller Decline
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+양호교사가 어깨를 으쓱한다. "마음대로 하렴." <<He>>【은는】 병을 다시 캐비닛에 넣고 잠근 뒤 <<his>> 일로 돌아간다.
+<br><br>
+
+<<school_infirmary_options>>
+
+:: School Infirmary Ask Bed
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"여기서 낮잠 좀 자도 될까요?" 당신은 묻는다. "너무 피곤해서..."
+<<elseif $speech_attitude is "bratty">>
+	당신은 침대 하나로 다가가 커튼을 홱 젖힌다. "자러 왔어요."
+<<else>>
+	"여기서 낮잠 좀 자도 될까요?" 당신은 묻는다.
+<</if>>
+<br><br>
+
+<<if ["first","second","third","fourth","fifth"].includes($schoolstate)>>
+	<<if $daily.infirmaryBed is 1>>
+		양호교사가 고개를 젓는다. "더 오래 머물게 했다간 레이튼 교장 선생님한테 내 목이 날아갈 거다." <<He>>【은는】 고개를 돌린다. "그냥 참아내야 할 거야, 얘야. 미안하구나."
+		<br><br>
+
+		<<school_infirmary_options>>
+	<<else>>
+		양호교사가 책상에서 일어나 당신에게 걸어온다. <<He>>【은는】 당신의 턱 밑을 손으로 감싸 쥐고, 고개를 위로 젖힌다. <<He>>【은는】 눈을 가늘게 뜨고, 당신의 표정을 살피며 꿰뚫을 듯이 응시한다.
+		<br><br>
+
+		<<if $tiredness gte (C.tiredness.max / 5) * 3>>
+			마침내, <<he>>【은는】 당신에게서 물러서며 한숨을 쉰다. "밤에 파티 같은 거 하지 말고 잠 좀 자라. 알겠다. 피곤해 보이는군." <<He>>【은는】 <<his>> 시계를 힐끗 본다. "30분 뒤에 깨워주마. 그럼 남은 수업 시간은 버틸 수 있을 거다."
+			<br><br>
+
+			<<link [[수락한다 (0:30)|School Infirmary Bed]]>><<set $phase to 1>><</link>><<ltiredness>><<gdelinquency>>
+			<br>
+			<<link [[거절한다|School Infirmary Bed Decline]]>><</link>>
+			<br>
+		<<else>>
+			마침내, <<he>>【은는】 당신에게서 물러서며 고개를 젓는다. "피곤해 보이지 않는데. 수업 땡땡이칠 핑계를 찾는 것처럼 보이는군."
+			<br><br>
+
+			<<He>>【은는】 어깨 너머로 손을 흔들어 당신의 항의를 묵살하며 책상에 다시 앉는다. "더 문제 일으키기 전에 수업으로 돌아가고, 내 시간 낭비하게 하지 마라."
+			<br><br>
+
+			<<school_infirmary_options>>
+			<br>
+		<</if>>
+	<</if>>
+<<elseif $schoolstate is "morning">>
+	"벌써 피곤하다고?" 양호교사가 믿을 수 없다는 듯 묻는다. "어젯밤에 잠은 좀 잤니?"
+	<br><br>
+
+	<<He>>【은는】 당신에게 잔소리를 시작하지만, 이내 한숨을 쉬며 포기한다. <<He>>【은는】 <<his>> 시계를 힐끗 본다.
+	<br><br>
+
+	<<if Time.hour is 8 and Time.minute gte 30>>
+		"곧 수업 시작할 시간 아니냐? 그때도 계속 피곤하면 들르렴. 하지만 등교 시간도 되기 전에 수업 시간 내내 자게 놔둘 거란 생각은 마라, 어린 <<lady>>."
+		<br><br>
+
+		<<He>>【은는】 다시 <<his>> 일로 돌아간다. <<His>> 말투는 반박의 여지를 주지 않는다.
+		<br><br>
+
+		<<school_infirmary_options>>
+		<br>
+	<<else>>
+		"30분 주마. 그 정도면 하루를 버티기에 충분할 거다."
+		<br><br>
+
+		<<link [[수락한다 (0:30)|School Infirmary Bed]]>><<set $phase to 0>><</link>><<ltiredness>>
+		<br>
+		<<link [[거절한다|School Infirmary Bed Decline]]>><</link>>
+		<br>
+	<</if>>
+<<elseif $schoolstate is "lunch">>
+	양호교사가 <<his>> 시계를 보고,
+	<<if Time.minute gte 30>>
+		얼굴을 찌푸린다. "수업에 늦겠구나."
+		<<if $daily.infirmaryBed is 1>>
+			<<He>> 당신을 엄하게 쳐다본다. "오늘 이미 한 번은 규칙을 어겨줬다. 그냥 참아야 할 거다, <<girl>>."
+			<br><br>
+
+			<<school_infirmary_options>>
+		<<else>>
+			<<He>>【은는】 당신을 올려다본다. "가만히 있어라."
+			<br><br>
+
+			양호교사가 책상에서 일어나 당신에게 걸어온다. <<He>>【은는】 당신의 턱 밑을 손으로 감싸 쥐고 고개를 위로 젖힌다. <<He>>【은는】 눈을 가늘게 뜨고, 당신의 눈을 깊이 들여다본다.
+			<br><br>
+
+			<<if $tiredness gte (C.tiredness.max / 5) * 3>>
+				마침내, <<he>>【은는】 당신에게서 물러서며 한숨을 쉰다. "너희들은 파티 좀 그만해야 해. 알겠다. 피곤해 보이는군." <<He>>【은는】 <<his>> 시계를 힐끗 본다. "30분 뒤에 깨워주마. 그럼 남은 수업 시간은 버틸 수 있을 거다."
+				<br><br>
+
+				<<link [[수락한다 (0:30)|School Infirmary Bed]]>><<set $phase to 1>><</link>><<ltiredness>><<gdelinquency>>
+				<br>
+				<<link [[거절한다|School Infirmary Bed Decline]]>><</link>>
+				<br>
+			<<else>>
+				마침내, <<he>>【은는】 당신에게서 물러서며 고개를 젓는다. "피곤해 보이지 않는군. 수업 땡땡이칠 핑계를 찾는 것처럼 보이는걸." <<He>>【은는】 어깨 너머로 손을 흔들어 당신의 항의를 묵살하며 책상에 다시 앉는다. "수업 준비나 하러 가라, 내 시간 낭비하게 하지 말고."
+				<br><br>
+
+				<<school_infirmary_options>>
+			<</if>>
+		<</if>>
+	<<else>>
+		고개를 끄덕인다. "좋다. 30분 뒤에 깨워주마."
+		<br><br>
+
+		<<link [[수락한다 (0:30)|School Infirmary Bed]]>><<set $phase to 0>><</link>><<ltiredness>>
+		<br>
+		<<link [[거절한다|School Infirmary Bed Decline]]>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	양호교사가 <<his>> 눈을 굴린다. "여긴 탁아소가 아니다. 쉬고 싶으면 집에 가라." <<He>>【은는】 고개를 저으며 <<his>> 일로 돌아간다.
+	<br><br>
+
+	<<school_infirmary_options>>
+<</if>>
+
+:: School Infirmary Bed
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<pass 30>><<tiredness -12>>
+
+당신은 남는 침대에 눕는다. 매트리스는 너무 딱딱하고 담요는 너무 얇지만, 없는 것보다는 낫다.
+<br><br>
+
+양호교사가 <<his>> 일지에 무언가를 적는다.
+<<if $phase is 1>><<set $daily.infirmaryBed to 1>>
+	"네가 방문한 사실을 교직원들에게 알려야겠구나." <<he>> 말한다. "무단결석으로 처리되겠지만, 적어도 어디 있었는지는 알 테니 말이다."
+<<else>>
+	"알겠다, <<girl>>." <<he>> 말한다. "푹 자렴."
+<</if>>
+<<He>>【이가】 당신 주위로 커튼을 친다. 당신은 눈을 감고 휴식을 취한다.
+<br><br>
+
+약속대로, 양호교사는 30분의 꼭 필요한 휴식이 끝난 후 당신을 깨운다. <<He>> 또한 한동안 정신을 바짝 차릴 수 있도록 알약 하나를 준다.
+<br><br>
+
+<<school_infirmary_options>>
+
+:: School Infirmary Bed Decline
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+양호교사가 고개를 끄덕인다. "네가 그렇다면야. 너무 무리하지는 마렴, <<girl>>."
+<br><br>
+
+<<He>>【은는】 다시 <<his>> 일에 집중한다.
+<br><br>
+
+<<school_infirmary_options>>
+
+:: School Infirmary Cabinet
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 유리 캐비닛 중 하나로 다가간다. 수많은 약병과 각종 약품이 선반에 줄지어 있다.
+<<if $skulduggery gte 100 and !$weekly.theft.infirmaryDrugs>>
+	<span class="blue">혼자였다면, 몇 개 훔칠 수도 있었을 텐데.</span>
+<</if>>
+<br><br>
+
+<<if $delinquency gte 200 or $weekly.theft.infirmaryDrugs>>
+	등 뒤에서 양호교사가 헛기침하는 소리에 당신은 현실로 돌아온다. <<He>> 팔짱을 낀 채 당신을 쏘아본다. 당신은 멋쩍게 캐비닛에서 물러난다.
+	<br><br>
+
+	<<if $weekly.theft.infirmaryDrugs is "failed">>
+		"어떤 녀석이 침입하려고 했어. 자물쇠도 부쉈고." <<he>> 설명한다. "내가 좀 예민하더라도 미안하구나."<<stress 2>><<gstress>>
+	<<elseif $weekly.theft.infirmaryDrugs is "stolen">>
+		"어떤 녀석이 침입해서 약을 좀 훔쳐갔어." <<he>> 씩씩거린다. "<<nnpc_title "Leighton">>에게 또 잔소리 듣고 싶지 않으니, 그 캐비닛에서 손 떼."
+	<<else>>
+		"생각도 하지 마." <<he>> 무미건조한 톤으로 경고한다. "잠가둔 데는 이유가 있어."
+	<</if>>
+	<br><br>
+
+	<<He>> 당신을 예의주시하며 다시 일하러 간다.
+<<else>>
+	당신이 캐비닛에서 물러나도 양호교사는 신경 쓰지 않는다.
+<</if>>
+<br><br>
+
+<<school_infirmary_options>>
+
+:: School Infirmary Drugs
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 캐비닛에 다가간다. 단단히 잠겨 있다. 유리 너머로 여러 약병이 겹겹이 쌓여 있는 것이 보인다.
+<br><br>
+
+<<set $skulduggerydifficulty to 400>>
+<<if pcAreArmsBound("both")>>
+	자물쇠를 따려고 시도할 수도 있겠지만, <span class="blue">팔이 묶여 있지 않다면 말이다.</span>
+<<else>>
+	<<schoolicon "infirmary">><<link [[침입한다 (0:01)|School Infirmary Steal Drugs]]>><<pass 1>><</link>><<skulduggerydifficulty>><<crime "trespassing">>
+<</if>>
+<br>
+<<getouticon>><<link [[내버려 둔다|School Infirmary]]>><</link>>
+<br>
+
+:: School Infirmary Steal Drugs
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	<<wearProp "pills">>
+	<span class="green">당신은 손쉽게 캐비닛을 열었다.</span> 당신은 가져갈 만한 것이 있는지 내용물을 훑어본다.
+	<br><br>
+
+	<<if ($sciencetrait gte 3 and random(1, 5) is 5) or random(1, 10) is 10>>
+		선반 뒤쪽에 숨겨진 분홍색 유리병이 눈에 띈다. 라벨이 없다. 알약은 전에 본 적 없는 모양이다.
+		<<set $blackmoney += 300>><<crimeUp 300 "thievery">>
+	<<elseif $sciencetrait gte 2 and random(1, 10) gte 6>>
+		맨 위 선반에 있는 병이 눈길을 끈다. 평범해 보이지만, 당신은 그 약이 환각 작용을 일으킨다는 것을 알아챈다. 암시장에서 관심을 보일 사람이 있을지도 모른다.
+		<<set $blackmoney += 300>><<crimeUp 300 "thievery">>
+	<<elseif $sciencetrait gte 1 and random(1, 10) gte 6>>
+		당신은 특수 알레르기 약 상자를 집는다. 약국에서 살 수 있는 종류가 아니다. 누군가 돈을 내고 사려 할지도 모른다.
+		<<set $blackmoney += 200>><<crimeUp 200 "thievery">>
+	<<elseif $sciencetrait gte 1>>
+		당신은 유명 브랜드의 고품질 진통제 몇 병을 챙긴다. 누군가 돈을 내고 사려 할지도 모른다.
+		<<set $blackmoney += 150>><<crimeUp 150 "thievery">>
+	<<else>>
+		대부분의 제품에 익숙하지 않아서, 약을 한 움큼 집는다. 누군가 돈을 내고 사려 할지도 모른다.
+		<<set $blackmoney += 100>><<crimeUp 100 "thievery">>
+	<</if>>
+	<br><br>
+
+	전리품에 만족하며 캐비닛 문을 닫는다. 딸깍 소리를 내며 닫힌다.
+	<<set $weekly.theft.infirmaryDrugs to "stolen">>
+<<else>>
+	캐비닛을 억지로 열려고 하지만, <span class="red">자물쇠가 너무 복잡해서 당신의 실력으로는 역부족이다.</span> 설상가상으로, 장치 안에서 부러지는 소리가 들린다. 무언가 부서뜨린 게 틀림없다.<<stress 2>><<gstress>><<crimeUp 50 "destruction">><<crime "destruction">>
+	<<set $weekly.theft.infirmaryDrugs to "failed">>
+<</if>>
+<br><br>
+
+<<skulduggeryuse>>
+
+<<link [[다음|School Infirmary]]>><</link>>
+<br>
+
+:: School Passout Infirmary
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 낯선 침대에서 깨어난다. 얇은 커튼이 당신을 둘러싸고 있어 방의 나머지 부분을 가리고 있다. 학교 양호실로 옮겨진 것이 틀림없다.
+<br><br>
+
+<<if $trauma lt ($traumamax / 10) * 9>>
+	안도의 한숨을 내쉬며, 당신은 눈을 감고 몸을 쉬게 한다.
+	<br><br>
+
+	<<link [[잠자기|School Infirmary Wakeup]]>><</link>>
+	<br>
+<<else>>
+	몸을 일으키려 하지만, 몸이 침대에 붙은 듯 움직이지 않는다. 커튼 너머로 목소리가 들린다.
+
+	<<if $per_npc.school_nurse>>
+		학교 양호교사의 목소리 같다.
+	<</if>>
+
+	의식이 오락가락하는 와중에, 당신은 대화의 일부만 간신히 알아듣는다.
+	<br><br>
+
+	"... 제발, 이 <<girl>>에게서 명백한 징후가 보이잖습니까..."
+	<br>
+	"... '비전문적'이라고요? 아, 헛소리 집어치우..."
+	<br>
+	"... 그냥 사람 보내서 <<phim>> 데려가게 해줘요, 빨리..."
+	<br><br>
+
+	계속 들으려 하지만, 정신이 희미해지는 것을 느낀다. 당신은 다시 깊은 잠에 빠진다.
+	<br><br>
+
+	<<link [[잠자기|School Infirmary Asylum]]>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Wakeup
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+/* overrides random outcome if it's too late for anyone else to be at school, or if the pc meets conditions for unlocking Harper's therapy but hasn't yet done so */
+<<if Time.hour gte 17 or ($trauma gt ($traumamax / 10) * 2 and !$harper_appointments.enabled and !$schoolPsych)>>
+	<<set _infirmaryVisitor to "nurse">>
+<<else>>
+	<<set _possibleVisitors to []>>
+	<<set _possibleVisitors.push("none")>>
+	<<set _possibleVisitors.push("nurse")>>
+
+	<<if $dorenintro gte 1 and ["morning","lunch","third","afternoon"].includes($schoolstate)>>
+		<<set _possibleVisitors.push("Doren")>>
+	<</if>>
+	<<if $soup_kitchen_init gte 1 and ["morning","lunch","second","afternoon"].includes($schoolstate)>>
+		<<set _possibleVisitors.push("River")>>
+	<</if>>
+	<<if $museumhorseintro gte 1 and ["morning","lunch","fourth","afternoon"].includes($schoolstate)>>
+		<<set _possibleVisitors.push("Winter")>>
+	<</if>>
+	<<if C.npc.Robin.init is 1 and C.npc.Robin.trauma lte 10>>
+		<<set _possibleVisitors.push("Robin")>>
+	<</if>>
+	<<if $kylarenglish gte 1 and C.npc.Kylar.state isnot "prison">>
+		<<set _possibleVisitors.push("Kylar")>>
+	<</if>>
+	<<if C.npc.Whitney.init is 1 and C.npc.Whitney.state isnot "dungeon">>
+		<<set _possibleVisitors.push("Whitney")>>
+	<</if>>
+
+	<<set _infirmaryVisitor to _possibleVisitors.random()>>
+<</if>>
+
+얼마나 시간이 흘렀는지 모른 채 잠에서 깨어났지만, 머리는 한결 맑아진 기분이다. 커튼을 젖히고 침대에서 나온다.
+<br><br>
+
+<<switch _infirmaryVisitor>>
+	<<case "nurse">>
+		<<if $per_npc.school_nurse>>
+			<<loadNPC 0 school_nurse>><<person1>>
+
+			양호교사가 <<his>> 책상에 앉아 무언가를 읽고 있다.
+		<<else>>
+			<<generate1>><<person1>>
+			<<saveNPC 0 school_nurse>>
+
+			한 <<person>>【이가】 안내 데스크에 앉아 무언가를 읽고 있다. 학교 양호교사다.
+		<</if>>
+
+		<<He>>【은는】 당신이 깨어난 것을 알아차리고 <<his>> 인쇄물을 내려놓는다.
+		<br><br>
+
+		"진정해, <<girl>>." <<he>> 말한다. "아직 어지러우면 천천히 움직여."
+		<br><br>
+
+		짧은 대화를 나눈다. 양호교사가 쓰러진 이유를 묻자, 너무 피곤하고 학업 스트레스가 심했다는 식의 평범한 변명을 <<him>>에게 둘러댄다.
+		<<if $trauma lte ($traumamax / 10) * 2>>
+			<<him>>【을를】 만족시키기엔 충분했다. <<He>> <<his>> 수첩에 간단히 메모한 뒤, <<his>> 주머니에 넣는다.
+		<<else>>
+			<br><br>
+			양호교사가 미간을 찌푸린 채 <<his>> 수첩에 무언가를 적는다. "많이 힘든 시간을 보낸 것 같구나, 얘야."
+
+			<<if !$harper_appointments.enabled and !$schoolPsych>><<set $schoolPsych to 1>>
+				<br><br>
+				<<He>> <<his>> 책상 서랍을 뒤지더니 작은 카드를 건넨다. 위쪽에는 "하퍼 박사 - 정신과 전문의"라고 선명한 글씨로 새겨져 있다. 그 아래에는 나이팅게일 가에 있는 시립 병원 주소가 적혀 있다.
+				<br><br>
+
+				<span class="gold">"<<nnpc_He "Harper">> 선생님은 매주 금요일마다 개인 상담을 진행하신단다."</span> 양호교사가 설명한다. "너 자신을 위해서라도 <<else>>【이가】 따가<<if Time.weekDay is 6>>언제 한번<</if>> <<nnpc_him "Harper">> 선생님을 찾아가 보렴, 알았지?"
+			<<else>>
+				<<He>>【이가】 한숨을 쉰다. "어쩔 수 없지, 뭐. 너무 무리하지는 마, 알았지?"
+			<</if>>
+		<</if>>
+		<br><br>
+		<<if Time.hour gte 17>>
+			<<He>> <<his>> 시계를 흘끗 본다. "그래, 어서 집으로 서둘러야지." <<He>> 당신을 다시 본다. "그런 일을 겪은 후에 너 혼자 가게 둘 수는 없지. 태워다 줄까?"
+			<br><br>
+
+			<<link [[수락한다|School Infirmary Nurse Accept]]>><</link>>
+			<br>
+			<<link [[거절한다|School Infirmary Nurse Refuse]]>><</link>>
+			<br>
+		<<else>>
+			"알겠다." <<he>>【이가】 말한다.
+
+			<<if ["first","second","third","fourth","fifth"].includes($schoolstate)>>
+				"선생님들 기다리게 하지 않는 게 좋겠어, <<girl>>. 수업에 들어가렴."
+			<<else>>
+				"이제 가봐. 난 바쁘거든."
+			<</if>>
+			<br><br>
+
+			<<He>>【은는】 당신을 양호실 밖 복도로 내보낸다.
+			<br><br>
+
+			<<link [[나간다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+			<br>
+		<</if>>
+	<<case "Doren">>
+		<<npc Doren>><<person1>>
+
+		키 큰 인물이 침대 앞에 서 있다. <<His>> 등은 돌려져 있지만, <<his>> 어깨 너머로 쏟아지는 붉은 갈기는 틀림없이 도렌의 것이다. <<He>>【은는】 당신이 뒤척이는 소리에 돌아보더니, 당신 옆에 무릎을 꿇는다.
+		<br><br>
+
+		"우릴 모두 놀라게 했잖니, <<lass>>. 좀 괜찮아? 고아원에 연락할까?"<<npcincr Doren dom 1>><<gdom "Doren">>
+		<br><br>
+
+		도렌에게 괜찮다고 말한다. <<He>>【은는】 안도하는 표정이다. <<he>>【이가】 더 질문하기 전에, 당신은 양해를 구하고 양호실을 빠져나온다.
+		<br><br>
+		<<if $schoolstate is "third">>
+			뒤에서 도렌이 당신의 이름을 부르는 소리가 들린다. 돌아볼 틈도 없이 <<He>>【은는】 따라잡혔다.
+			<br>
+			"서두르면 아직 수업에 돌아갈 수 있어." <<He>>【은는】 잠시 멈춘다. "네가 괜찮다면 말이야."
+			<br><br>
+
+			<<link [[수업에 간다|School Infirmary Doren]]>><<set $phase to 1>><</link>>
+			<br>
+			<<link [[그냥 나간다|School Infirmary Doren]]>><<set $phase to 0>><<npcincr Doren dom -1>><</link>><<ldom "Doren">>
+			<br>
+		<<else>>
+			<<link [[나간다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+			<br>
+		<</if>>
+	<<case "River">>
+		<<npc River>><<person1>>
+
+		리버가 양호교사 책상에 앉아 <<his>> 손가락으로 책상을 두드리고 있다. <<He>> 당신을 마주보도록 몸을 돌리는데, <<his>> 시선은 여전히 엄격하다.
+		<br><br>
+
+		"밤새 파티라도 했나?" <<He>> 못마땅한 듯 <<his>> 고개를 젓는다. "대낮에 쓰러질 정도로 말이야."
+		<br><br>
+
+		리버에게 공부를 너무 오래 해서 그런 것 같다고 말한다. <<His>> 표정을 보니 <<he>> 정말로 믿는지 의심스럽다.
+		<br><br>
+
+		<<if $schoolstate is "second">>
+			리버가 당신을 따라 복도로 나와, 수학실 쪽으로 손짓한다. "자, 어서. 운이 좋으면 교실이 아직 멀쩡할 거야."
+			<br><br>
+
+			<<link [[리버와 함께 간다|School Infirmary River]]>><<set $phase to 1>><</link>>
+			<br>
+			<<link [[그냥 나간다|School Infirmary River]]>><<set $phase to 0>><<npcincr River dom -1>><<detention 1>><</link>><<gdelinquency>>
+			<br>
+		<<else>>
+			더 이상 질문에 답하고 싶지 않아, 조용히 자리를 뜬다.
+			<br><br>
+
+			<<link [[나간다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+			<br>
+		<</if>>
+	<<case "Winter">>
+		<<npc Winter>><<person1>>
+
+		윈터가 양호교사 책상 앞에 서 있다. <<He>> 조용하고 설명적인 목소리로 말하고 있다. <<He>> 당신이 깨어난 것을 보자마자 말을 멈춘다.
+		<br><br>
+
+		"일어나서 다행이군. 내 조수가 아픈 건 달갑지 않거든."
+		<br><br>
+
+		윈터의 가벼운 꾸지람을 견디며 몸 관리를 더 잘하겠다고 약속한다.
+		<br><br>
+
+		<<if $schoolstate is "fourth">>
+			<<He>> 당신을 유심히 살핀다. <<He>> 무언가 말하려는 듯 보였지만, 한숨으로 대신한다. <<He>> 양호교사에게 고개를 끄덕인 다음, 당신을 문밖으로 내보낸다.
+			<br><br>
+
+			"건강이 나쁘다고 학업을 게을리할 변명은 되지 않아." 둘만 남게 되자 <<he>> 말한다. <<He>> 당신에게 따라오라고 손짓하며 <<his>> 교실로 향한다. "따라와."
+			<br><br>
+
+			<<link [[윈터와 함께 간다|School Infirmary Winter]]>><<set $phase to 1>><</link>>
+			<br>
+			<<link [[그냥 나간다|School Infirmary Winter]]>><<set $phase to 0>><<npcincr Winter dom -1>><<detention 1>><</link>><<gdelinquency>>
+			<br>
+		<<else>>
+			<<He>> 박물관은 언제나 환영이라고 상기시켜준 뒤, 양호교사와의 대화를 재개한다. 당신은 그 틈을 타 양호실을 빠져나온다.
+			<br><br>
+
+			<<link [[나간다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+			<br>
+		<</if>>
+	<<case "Robin">>
+		<<npc Robin>><<person1>>
+
+		로빈이 창밖을 내다보고 있는 것이 보인다. <<He>> 당신이 깨어난 것을 알아차리는 순간 당신에게 달려온다.
+		<br><br>
+
+		<<if C.npc.Robin.dom gte 20>>
+			"걱정했잖아, 알면서." <<He>> 당신의 손을 <<his>> 손으로 잡고 부드럽게 쥔다. <<takeHandholdingVirginity "Robin" `($robinromance is 1 ?'romantic':'consensual')` null true>>
+		<<else>>
+			"네가 괜찮아서 다행이야." <<he>> 한숨을 쉬며, <<if $robinromance is 1>><<his>> 머리를<<else>>손을<</if>> 당신의 어깨에 기댄다.
+		<</if>>
+		"무슨 일이야?"
+		<br><br>
+
+		잠이 부족해서 기절한 것 같다고 <<him>>【을를】 안심시킨다. <<He>> 당신을 믿는 것 같지만, <<his>> 눈에는 진심 어린 걱정이 가득하다.
+		<br><br>
+
+		<<if ["morning","lunch","afternoon"].includes($schoolstate) or C.npc.Robin.dom gte 20>>
+			<<He>> 둘이 같이 고아원으로 돌아가자고 제안한다.
+			<br><br>
+
+			<<if ["morning","lunch"].includes($schoolstate)>>
+				"나는 수업 시간에 맞춰 돌아올 수 있어." <<he>> 당신을 안심시킨다. "하지만 넌 쉬어야 해."
+				<br><br>
+			<<elseif $schoolstate isnot "afternoon">>
+				"수업 빠져도 괜찮아." <<he>> 말한다. "이게 더 중요해."
+				<br><br>
+			<</if>>
+
+			<<link [[로빈과 함께 집에 간다 (0:25)|School Infirmary Robin Accept]]>><<pass 25>><<npcincr Robin love 1>><<npcincr Robin dom 1>><</link>><<glove>><<gdom>>
+			<br>
+			<<link [[거절한다|School Infirmary Robin Refuse]]>><</link>>
+			<br>
+		<<else>>
+			<<He>> 시계를 보고 얼굴을 찌푸린다.
+			<br><br>
+
+			<<if $schoolstate is "fourth">>
+				"수업에 가야 해." <<He>> 걱정스러운 표정으로 당신을 본다. "갈 수 있겠어?"
+				<br><br>
+
+				<<link [[로빈과 함께 수업에 간다|School Infirmary Robin History]]>><<set $phase to 1>><</link>>
+				<br>
+				<<link [[여기 있는다|School Infirmary Robin History]]>><<set $phase to 0>><</link>>
+				<br>
+			<<else>>
+				"나 수업에 돌아가야 해." <<he>> 말한다. "괜찮겠어?"
+				<br><br>
+
+				로빈에게 괜찮을 거라고 말한다. <<He>>【은는】 고개를 끄덕이고 떠나기 전에 당신을 안아준다. 당신은 침대에 좀 더 누워 있다가 똑같이 한다.
+				<br><br>
+
+				<<link [[나간다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+			<</if>>
+		<</if>>
+	<<case "Kylar">>
+		<<npc Kylar>><<person1>>
+		<<run statusCheck("Kylar")>>
+		무언가에 걸려 넘어질 뻔한다. 몸을 바로 세우자, 카일라가 바닥에서 튀어나오듯 일어선다. <<his>> 팔 아래에는 스케치북이 끼워져 있다. 당신은 놀라서 숨을 헐떡인다.
+		<br><br>
+
+		<<if _kylarStatus.includes("Rage")>>
+			"무슨 일이야? 누구랑 있었어? 걔네가 너한테 이런 짓을 한 거야? 누구야?"
+			<br>
+			<<His>> 숨이 거칠어지고, 질문할 때마다 조금씩 더 가까이 다가온다. 양호교사가 <<him>>【을를】 당신에게서 억지로 떼어내야 했다. <<He>>【은는】 밖에서 기다리라는 말을 듣는다. <<he>> 마지못해 따른다.
+			<br><br>
+
+			양호교사가 당신과 짧게 대화한 후, 복도로 데리고 나간다. 혼자가 되는 순간, 카일라가 다시 당신에게 달려든다.
+			<br><br>
+
+			"우리가 너무 오랫동안 떨어져 있어서, 네가 걱정했구나. 그거지, 맞지?" <<He>>【은는】 당신의 팔을 꽉 잡고 복도 아래로 끌고 가려 한다. "자, 자-잠깐. 산책하러 가자."
+			<<if $schoolstate isnot "afternoon">>
+				<br>
+				수업에 늦을 거라고 말한다. 카일라가 보여주는 유일한 반응은 킥킥거리는 웃음뿐이다.
+			<</if>>
+			<br><br>
+
+			<<link [[카일라와 함께 간다 (0:30)|School Infirmary Kylar Accept]]>><<pass 30>><<npcincr Kylar love 1>><<npcincr Kylar rage -1>><</link>><<glove>><<lksuspicion>>
+			<br>
+			<<link [[저항한다|School Infirmary Kylar Refuse]]>><<npcincr Kylar rage 3>><</link>><<gksuspicion>>
+			<br>
+		<<elseif _kylarStatus.includes("Sus")>>
+			"ㄴ-놀라지 마! 나야!" <<he>>【이가】 외치고는, 시무룩한 표정으로 고개를 돌린다. "아니면 다른 사람이랑 같이 있는 게 더 좋은가, 네가 자는 걸 지켜보는 거..."
+			<br><br>
+
+			양호교사가 당신의 건강 상태에 대해 부드럽게 질문한다. 카일라는 짜증 난 표정이지만, 방구석에서 조용히 있는다. 곧, 양호교사가 당신을 양호실에서 내보낸다.
+			<br><br>
+
+			"그런 사적인 질문은 하면 안 되는 건데." 밖으로 나오자 카일라가 중얼거린다. <<He>>【은는】 당신의 팔을 잡고 복도 아래쪽을 가리킨다. "ㅅ-산책하러 가자. 너랑 나, 단둘이서. 그럼 기분이 나아질 거야, 그렇지?"
+			<<if $schoolstate isnot "afternoon">>
+				<br>
+				수업에 늦을 거라고 말한다. 카일라의 미소는 사라지지 않는다. "우리가 없어진 거 눈치 못 챌 거야." <<He>>【은는】 당신의 팔을 잡아당긴다.
+			<</if>>
+			<br><br>
+
+			<<link [[카일라와 함께 간다 (0:30)|School Infirmary Kylar Accept]]>><<pass 30>><<npcincr Kylar love 1>><<npcincr Kylar rage -1>><</link>><<glove>><<lksuspicion>>
+			<br>
+			<<link [[거절한다|School Infirmary Kylar Refuse]]>><<npcincr Kylar rage 3>><</link>><<gksuspicion>>
+			<br>
+		<<else>>
+			"ㅁ-미안! 그냥 지나가다가 네가 여기 있다는 소리를 들어서." <<he>>【이가】 설명한다. "네가 괜찮은지 확인하고 싶었어."
+			<br><br>
+
+			양호교사가 당신의 건강 상태에 대해 질문한다. 카일라는 방구석에서 불안하게 듣고 있다. 곧, 당신은 양호실에서 퇴실 조치된다.
+			<br><br>
+
+			"네가 괜찮아서 다행이야." 밖으로 나오자 카일라가 말한다. "너한테 무슨 일이라도 생겼으면..."
+			<br>
+			<<He>>【은는】 당신의 팔에 매달려, <<his>> 머리를 당신의 어깨에 기댄다. <<He>>【은는】 둘이서 산책하자고 제안한다.
+			<br><br>
+			<<if $schoolstate is "afternoon">>
+				<<link [[카일라와 함께 간다 (0:30)|School Infirmary Kylar Accept]]>><<pass 30>><<npcincr Kylar love 1>><<npcincr Kylar rage -1>><</link>><<glove>><<lksuspicion>>
+				<br>
+				<<link [[저항한다|School Infirmary Kylar Refuse]]>><<npcincr Kylar rage 3>><</link>><<gksuspicion>>
+				<br>
+			<<else>>
+				수업에 늦을 거라고 <<him>>에게 상기시킨다. 카일라의 미소가 사라지고, <<he>>【이가】 <<his>> 손을 거둔다. "아... 맞다."
+				<<if $schoolstate is "third">>
+					<<his>> 시계를 흘끗 보더니, <<he>>【이가】 다시 기운을 차린다. "ㄱ-같이 수업에 걸어갈래?"
+					<br><br>
+
+					<<link [[카일라와 함께 간다|School Infirmary Kylar English]]>><<set $phase to 0>><<npcincr Kylar love 1>><<npcincr Kylar rage -1>><</link>><<glove>><<lksuspicion>>
+					<br>
+					<<link [[거절한다|School Infirmary Kylar English]]>><<set $phase to 1>><<npcincr Kylar love -1>><<npcincr Kylar rage 1>><</link>><<llove>><<gksuspicion>>
+					<br>
+				<<else>>
+					<<He>>【은는】 당신에게 멋쩍은 작별 인사를 한다. 당신은 <<him>>【이가】 복도 아래로 사라지는 것을 지켜본다. <<his>> 어깨너머로 당신을 힐끗 쳐다본다.
+					<br><br>
+
+					<<link [[다음|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+					<br>
+				<</if>>
+			<</if>>
+		<</if>>
+	<<case "Whitney">>
+		<<npc Whitney>><<person1>>
+
+		<<if ($whitneyromance is 1 and C.npc.Whitney.dom gte 15) or $whitneyromance isnot 1>>
+			방의 소독약 냄새에 담배 냄새가 섞여 있다. 휘트니가 <<his>> 패거리에게 둘러싸여 양호교사 책상 위에 앉아 있다.
+			<br><br>
+
+			"이런, 이런, 누가 일어났나 봐." <<He>> <<his>> 담배를 책상에 비벼 끄고 당신을 향해 거들먹거리며 다가온다. "잘 들어, 걸레년아. 지금 당장 그 예쁜 입을 잘 놀리지 않으면 큰일 날 줄 알아." <<He>> <<his>> 가랑이에 손을 얹고 주무른다.
+			<br><br>
+
+			<<if hasSexStat("promiscuity", 5)>>
+				<<link [[커튼을 열어놓고 섹스하자고 제안한다|School Infirmary Whitney Sex Open]]>><<set $sexstart to 1>><<trauma 3>><<npcincr Whitney love 1>><<npcincr Whitney dom 1>><</link>><<promiscuous5>><<gtrauma>><<glove>><<gdom>>
+				<br>
+			<</if>>
+			<<if hasSexStat("promiscuity", 4)>>
+				<<link [[커튼 뒤에서 섹스하자고 제안한다|School Infirmary Whitney Sex Closed]]>><<set $sexstart to 1>><<npcincr Whitney dom 1>><</link>><<promiscuous4>><<gdom>>
+				<br>
+			<</if>>
+			<<if $whitneyromance is 1>>
+				<<link [[사랑스럽게 따른다|School Infirmary Whitney Oral]]>><<set $sexstart to 1>><<npcincr Whitney love 1>><<npcincr Whitney dom 1>><</link>><<promiscuous1>><<glove>><<gdom>>
+				<br>
+			<</if>>
+			<<link [[마지못해 따른다|School Infirmary Whitney Oral]]>><<set $molestationstart to 1>><<trauma 6>><<stress 6>><<npcincr Whitney dom 1>><</link>><<gtrauma>><<gstress>><<gdom>>
+			<br>
+			<<link [[거절한다|School Infirmary Whitney Refuse]]>><<npcincr Whitney dom -1>><</link>><<ldom>>
+			<br>
+		<<else>>
+			휘트니가 방 안을 서성이는 것이 보인다. 양호교사가 <<him>>에게서 눈을 떼지 않는다. <<he>> 당신이 깨어난 것을 알아차리자, 당신 곁으로 달려온다.
+			<br><br>
+
+			"씨발, 너한테 무슨 일이 있었던 거야, 걸..."
+			<br>
+			"말조심해!" 양호교사가 <<him>>【을를】 꾸짖는다. 휘트니는 <<his>> 눈을 굴린다.
+			<br><br>
+
+			휘트니에게 피로나 스트레스 때문에 정신을 잃은 것 같다고 말한다. <<He>> 당신을 머리부터 발끝까지 훑어본다. <<He>> 나직이 투덜거리더니, 양호실을 박차고 나간다. 양호교사와 짧게 대화한 후, 당신도 똑같이 한다.
+			<br><br>
+
+			<<link [[나간다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+			<br>
+		<</if>>
+	<<default>>
+		아무도 없다.
+		<br><br>
+
+		양호교사에게 쓰러진 상황을 설명하고 싶지 않아, 조용히 자리를 뜬다.
+		<br><br>
+
+		<<link [[나간다|Hallways]]>><<infirmary_excused>><</link>>
+		<br>
+<</switch>>
+
+:: School Infirmary Doren
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 1>>
+	도렌은 당신을 교실까지 바래다주며 가까이 붙어 걷는다. <<he>>【은는】 대화가 필요하면 방과 후에 찾아오라고 말하고는, 당신을 문 안으로 부드럽게 밀어 넣는다.
+	<br><br>
+
+	<<if C.npc.Kylar.state is "active" and $kylarenglish gte 1>>
+		교실 뒤편에 앉아 있는 카일라가 보인다. <<nnpc_His "Kylar">> 눈이 당신을 보자 동그래진다. 미소를 지으며, <<nnpc_he "Kylar">>【은는】 자기 옆에 앉으라고 손짓한다.
+		<br><br>
+
+		<<link [[카일라 옆에 앉는다|School Infirmary Doren 2]]>><<set $kylarenglishstate to "active">><<set $phase to 0>><<npcincr Kylar love 1>><<npcincr Kylar rage -1>><</link>><<glove>><<lksuspicion>>
+		<br>
+		<<link [[다른 곳에 앉는다|School Infirmary Doren 2]]>><<set $kylarenglishstate to "watching">><<set $phase to 1>><<npcincr Kylar love -5>><<npcincr Kylar rage 5>><</link>><<lllove>><<ggksuspicion>>
+		<br>
+	<<else>>
+		빈 책상을 찾아 자리에 앉는다.
+		<br><br>
+
+		<<link [[다음|English Lesson]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	당신은 도렌에게 수업에 들어가지 못할 것 같다고 말한다. <<He>>【은는】 고개를 끄덕인다.
+	<br><br>
+
+	"괜찮아. 뼈 빠지게 일하지 않는 게 좋지." <<He>>【은는】 떠나기 전에 당신의 등을 두드려준다.
+	<br><br>
+
+	<<link [[떠난다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Doren 2
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 1>>
+	당신은 카일라를 무시하고 <<nnpc_his "Kylar">>에게서 멀리 떨어진 자리를 찾는다. 이 각도에서는 <<nnpc_him "Kylar">>【이가】 보이지 않지만, <<nnpc_he "Kylar">>【은는】 빤히 쳐다보고 있다는 것을 안다.<<stress 2>><<gstress>>
+<<else>>
+	<<run statusCheck("Kylar")>>
+	당신은 카일라 옆에 자리를 잡는다.
+	<<if _kylarStatus.includes("Rage")>>
+		<<nnpc_He "Kylar">>【은는】 즉시 질문 공세를 퍼붓는다. 어디 있었는지, 왜 늦었는지, 누구와 함께 있었는지. 당신이 대답하기도 전에, 도렌이 강의를 시작하며 당신의 주의를 교실 앞으로 끈다.
+		<br><br>
+
+		카일라가 당신을 비판적인 눈으로 계속 쳐다본다. 당신은 못 본 척한다.<<stress 2>><<gstress>>
+	<<else>>
+		도렌이 강의를 시작하자 <<nnpc_He "Kylar">>【은는】 미소를 지으며 당신에게 더 가까이 다가앉는다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: School Infirmary River
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 1>>
+	리버는 당신이 수학 교실 밖에 도착할 때까지 한마디도 하지 않는다. 문 반대편에서 소란스러운 목소리가 들린다. 리버는 한숨을 쉬고 <<his>> 고개를 저은 뒤 들어간다. 교실이 조용해진다.
+	<br><br>
+
+	<<silently>><<mathsWhitneyAttendChance>><</silently>>
+
+	<<if $whitneymaths is "seat">>
+		당신은 빈 책상을 찾아 통로를 걷는다. 자리를 찾기도 전에 누군가 당신의 팔을 잡아 옆자리에 억지로 앉힌다. 휘트니다. <<nnpc_He "Whitney">>【은는】 당신에게 윙크한다.
+	<<else>>
+		빈 책상을 찾아 자리에 앉는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Maths Lesson]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	당신은 리버를 무시하고 반대 방향으로 달린다. <<He>>【은는】 당신을 부르지만, 당신은 <<him>>에게 신경 쓰지 않는다. <<He>>【은는】 쫓아오지 않는다.
+	<br><br>
+
+	<<link [[떠난다|Hallways]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Winter
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>><<run statusCheck("Robin")>>
+
+<<if $phase is 1>>
+	윈터는 교실로 걸어가는 동안 당신과 조용히 대화를 나눈다. <<He>>【은는】 주로 말을 하는 쪽이다. 도착하자, <<he>>【은는】 문을 열어주고 당신에게 들어가라고 손짓한다.
+	<br><br>
+
+	<<if _robin_location is "school">>
+		교실 앞쪽에 앉아 있는 로빈이 보인다. 당신이 <<nnpc_him "Robin">> 옆에 앉자 <<nnpc_His "Robin">> 눈이 빛난다. <<nnpc_He "Robin">>【은는】 <<nnpc_his "Robin">> 입을 열어 말하려 하지만, 윈터의 목소리에 <<nnpc_him "Robin">> 입을 다문다.
+		<<set $robinhistory to "seat">>
+	<<else>>
+		빈 책상을 찾아 자리에 앉는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|History Lesson]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	당신은 윈터를 무시하고 반대 방향으로 달린다. <<he>>【이가】 당신의 부재를 알아차렸을 때쯤, 당신은 이미 멀리 사라진 뒤다.
+	<br><br>
+
+	<<link [[떠난다|Hallways]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Robin Accept
+<<set $outside to 1>><<set $location to "town">><<schooleffects>><<effects>>
+
+당신은 학교를 나와 로빈과 함께 마을을 걷는다<<if $robinromance is 1>>, <<his>> 팔을 당신의 팔에 건 채로<</if>>.
+<br><br>
+
+<<if C.npc.Robin.dom gte 40>>
+	<<He>>【은는】 오늘따라 활기차서, 가는 내내 당신을 웃게 하려고 계속 노력한다. 그리고 대부분 성공한다.
+<<else>>
+	<<He>>【은는】 이따금 당신을 힐끗 쳐다보지만, 그 외에는 편안한 침묵 속에서 당신과 함께 걷는 것에 만족하는 것 같다.
+<</if>>
+<<trauma -6>><<stress -6>><<ltrauma>><<lstress>>
+<br><br>
+
+집에 도착하자, 로빈은 당신을 곧장 당신의 방으로 이끈다.
+<<if ["afternoon","late"].includes($schoolstate)>>
+	<<He>>【은는】 대화가 필요하면 <<him>>【을를】 찾아오라고 상기시켜준 뒤, <<his>> 방으로 향한다.
+<<else>>
+	"나 수업에 돌아가 봐야겠다." <<He>>【은는】 당신을 껴안는다. "나중에 얘기하자.
+	<<if C.npc.Robin.dom gte 20>>
+		푹 쉬고 있어, 알았지?"
+	<<else>>
+		그때까지는 기분이 나아졌으면 좋겠다."
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 떠나면서 <<him>> 뒤로 문을 부드럽게 닫는다.
+<</if>>
+<br><br>
+
+<<link [[다음|Bedroom]]>><<endevent>><<infirmary_excused>><</link>>
+<br>
+
+:: School Infirmary Robin Refuse
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $schoolstate isnot "afternoon">>
+	<<if $delinquency lte 0 and C.npc.Robin.dom gte 10>>
+		로빈이 킥킥 웃는다. "너 정말 모범생이구나," <<he>>【이가】 놀린다. "목숨이 걸려도 수업은 안 빠뜨릴 거지, 그렇지?"
+	<<else>>
+		로빈이 고개를 끄덕인다. "이해해. 수업 빼먹으면 곤란해질 수 있으니까."
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 당신이 침대에서 나오는 것을 돕고 양호실 밖으로 바래다준다. <<He>>【은는】 복도 아래로 사라지면서 작별의 포옹과 손짓을 해준다.
+	<br><br>
+
+	<<link [[다음|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+	<br>
+<<else>>
+	로빈이 고개를 끄덕인다. "괜찮아. 그냥 좀 쉬어. 집에 오면 나 보러 올 거지, 맞지?"
+	<br><br>
+
+	<<He>>【은는】 당신을 껴안고 떠난다. 당신은 침대에서 조금 더 머무르다가 복도로 나선다.
+	<br><br>
+
+	<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Robin History
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 1>>
+	로빈이 당신을 일으켜 세워 양호실 밖으로 이끈다. <<He>>【은는】 함께 복도를 걸어가는 동안 당신의 팔을 꽉 잡는다.
+	<br><br>
+
+	당신이 들어서도 윈터는 고개를 들지 않는다. <<He>>【은는】 말없이 두 사람에게 앉으라고 손짓한다. 윈터가 <<nnpc_his "Winter">> 강의를 계속하는 동안 당신은 로빈 옆에 자리를 잡는다.
+	<br><br>
+
+	<<link [[다음|History Lesson]]>><<endevent>><<set $robinhistory to "seat">><</link>>
+	<br>
+<<else>>
+	로빈이 고개를 끄덕인다. "괜찮아. 윈터 선생님께 네가 아프다고 말해줄게." <<He>>【은는】 얼굴을 찌푸린다. "네가 곤란해지지 않았으면 좋겠는데..."
+	<br><br>
+
+	<<He>>【은는】 당신을 껴안고 작별 인사를 한다. 당신은 침대에서 조금 더 머무르다가 복도로 나선다.
+	<br><br>
+
+	<<link [[떠난다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Kylar Accept
+<<set $outside to 1>><<set $location to "town">><<schooleffects>><<effects>>
+<<run statusCheck("Kylar")>>
+
+<<if $speech_attitude is "meek">>
+	당신은 미소 짓는다. "좋아—"
+<<elseif $speech_attitude is "bratty">>
+	당신은 어깨를 으쓱한다. "음, 그럴 수도—"
+<<else>>
+	당신은 고개를 끄덕인다. "응, 그러자—"
+<</if>>
+<br><br>
+
+당신이 말을 끝내기도 전에, 카일라가 당신의 팔을 잡고 복도를 내려가기 시작한다. 당신은 아직 어지러워서, <<he>>【은는】 거의 당신을 끌고 간다. 당신은 따라가기 위해 비틀거린다.
+<br><br>
+
+<<if _kylarStatus.includes("MaxRage")>>
+	<<His>> 팔을 잡은 손아귀는 거의 고통스러울 정도로 세게 당신을 마을로 이끈다. <<He>>【은는】 언제라도 폭발할 것처럼 보인다. 행인들은 두 사람을 멀리 피하며, 걱정스러운 시선을 당신 쪽으로 보낸다.<<stress 6>><<gstress>>
+<<elseif _kylarStatus.includes("Rage")>>
+	<<His>> 팔을 잡은 손아귀는 거의 고통스러울 정도로 세게 당신을 마을로 이끈다. <<His>> 눈은 불안하게 거리를 훑는다. "사람이 너무 많아," <<he>>【이가】 중얼거린다. <<He>>【은는】 그들의 시선을 피해 당신을 골목 사이로 끌고 간다.<<stress 4>><<gstress>>
+<<elseif _kylarStatus.includes("Sus")>>
+	<<He>>【은는】 당신과 함께 걷는 것을 기뻐하지만, 행인이 지나갈 때마다 긴장한다. <<He>>【은는】 <<his>> 숨소리 아래로 무언가 중얼거리지만, 당신은 알아들을 수 없다.<<stress 2>><<gstress>>
+<<else>>
+	<<He>>【은는】 당신과 함께 걷는 것을 기뻐하며, 걸을 때 당신의 팔에 몸을 비빈다.
+	<br><br>
+
+	어느 순간, <<his>> 손이 아래로 내려가 당신의 손에 가까워지기 시작한다. 당신은 <<his>> 손가락이 당신의 손바닥을 스치는 것을 느낀다. <<He>>【은는】 숨을 헐떡이며 <<his>> 팔을 거두고, 사과를 속삭인다.
+	<br><br>
+
+	<<set _kylarWalkHandhold to true>>
+	<<link [[카일라의 손을 잡는다|School Infirmary Kylar Walk]]>><<set $phase to 1>><<npcincr Kylar love 1>><<npcincr Kylar lust 1>><<npcincr Kylar rage -3>><</link>><<glove>><<glust>><<lksuspicion>><<handholdingvirginitywarning>><<NPCvirginitywarning "Kylar" "handholding">>
+	<br>
+	<<link [[그냥 계속 걷는다|School Infirmary Kylar Walk]]>><<set $phase to 0>><</link>>
+	<br>
+<</if>>
+
+<<if !_kylarWalkHandhold>>
+	<br><br>
+
+	<<link [[다음|School Infirmary Kylar Walk]]>><<set $phase to 0>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Kylar Walk
+<<set $outside to 1>><<schooleffects>><<effects>><<run statusCheck("Kylar")>>
+
+<<if $phase is 1>>
+	당신은 카일라의 팔에 당신의 팔을 감고 <<his>> 손을 잡는다. 그 손이 당신의 손을 꽉 쥔다.
+	<<takeHandholdingVirginity "Kylar" "romantic" null true>>
+	당신은 <<him>>【을를】 힐끗 본다. <<He>>【은는】 당신에게서 시선을 돌리고 있지만, <<he>>【은는】 웃고 있다.
+	<br><br>
+<</if>>
+
+<<if Time.hour gte 17>>
+	당신은 학교에서 멀리 벗어나지 않고, 옥스포드 가를 조용히 산책하기로 한다. 얼마 후, 카일라가 <<his>> 시계를 확인한다.
+	<br><br>
+
+	"ㅁ-미안. 나 가봐야 해." <<He>>【은는】 당신에게서 떨어져 모퉁이로 서둘러 사라지고, 당신은 학교 밖에 홀로 남는다.
+	<br><br>
+
+	<<link [[다음|Oxford Street]]>><<endevent>><</link>>
+	<br>
+<<elseif $schoolstate is "afternoon">>
+	<<if Weather.precipitation isnot "none">>
+		<<set $location to "arcade">><<set $bus to "starfish">>
+		카일라는 <<print window.KR.getWeatherKr(Weather.precipitation)>>【을를】 피하기 위해 뒷골목을 고수하며 당신을 마을로 이끈다. 당신은 곧 오락실에 도착한다.
+		<br><br>
+
+		"난 여기가 좋아," <<he>>【이가】 말한다. "모두가 너무 정신이 팔려서 널 귀찮게 하지 않거든."
+		<br><br>
+
+		당신은 안으로 끌려 들어가, 손님들의 북적거림을 지나 방 구석에 있는 한적한 캐비닛으로 간다. 카일라가 슬롯에 동전을 넣는다.
+		<br><br>
+
+		<<kylaroptions>>
+	<<else>>
+		<<set $location to "park">><<set $bus to "park">>
+		카일라와의 산책은 짧고 조용하다. 당신은 곧 공원에 도착한다.
+		<br><br>
+
+		"난 모두에게서 벗어나고 싶을 때 여기 오는 걸 좋아해," <<he>>【이가】 말한다. <<He>>【은는】 당신의 팔을 잡아당긴다. "이리 와."
+		<br><br>
+
+		<<He>>【은는】 당신을 벤치로 이끌고, 두 사람은 자리에 앉는다. <<He>>【은는】 <<his>> 머리를 당신의 어깨에 기댄다.
+		<br><br>
+
+		<<kylaroptions>>
+	<</if>>
+<<else>>
+	당신은 학교에서 멀리 벗어나지 않고, 옥스포드 가를 조용히 산책하기로 한다. 얼마 후, 카일라가 <<his>> 시계를 확인한다.
+	<br><br>
+
+	"우리 돌아가야 해." <<He>>【은는】 슬퍼 보인다. "우리 둘만 영원히 있을 수 있으면 좋을 텐데..."
+	<br><br>
+
+	<<He>>【은는】 정문 너머로 사라진다,
+	<<if _kylarStatus.includes("Rage")>>
+		<<his>> 숨소리 아래로 중얼거리며
+	<<elseif _kylarStatus.includes("Sus")>>
+		<<his>> 어깨 너머로 쳐다보며
+	<<else>>
+		당신에게 손을 흔들며
+	<</if>>
+	<<he>>【이가】 간다.
+	<br><br>
+
+	<<link [[다음|School Front Courtyard]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Kylar Refuse
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<run statusCheck("Kylar")>>
+
+<<if _kylarStatus.includes("Rage")>>
+	카일라의 눈이 가늘어진다. <<He>>【은는】 한 걸음 더 다가온다. 당신은 벽에 등을 기댄다. "어서," <<he>>【이가】 반복한다. "산책하러 가자."<<stress 2>><<gstress>>
+	<br><br>
+
+	당신은
+	<<if $speech_attitude is "meek">>
+		고개를 숙이고
+	<<elseif $speech_attitude is "bratty">>
+		팔짱을 끼고
+	<<else>>
+		긴장하며 침을 삼키고
+	<</if>>
+	<<him>>에게 말한다
+	<<if $schoolstate is "afternoon">>
+		바쁘다고.
+	<<else>>
+		수업을 뺄 수 없다고.
+	<</if>>
+	카일라는 아무 말도 하지 않는다. <<He>>【은는】 <<his>> 주머니에 손을 넣지만, 복도에서 들려오는 발소리에 멈춘다. <<He>>【은는】 알아들을 수 없게 중얼거리더니 복도 아래로 서둘러 사라진다.
+	<br><br>
+
+	당신은 재빨리 반대 방향으로 떠난다.
+<<elseif _kylarStatus.includes("Sus")>>
+	카일라는 입을 삐죽거리지만, 소란을 피우지는 않는다. "알았어," <<he>>【이가】 씁쓸한 어조로 말한다. "다음에 보자."
+	<br><br>
+
+	<<He>>【은는】 복도를 따라 터덜터덜 걸어가며, <<his>> 어깨 너머로 당신에게 이상한 시선을 보낸다.
+<<else>>
+	카일라가 미소 짓는다. 어색해 보인다. "ㄱ-괜찮아," <<he>>【이가】 말한다. "다음에 보자."
+	<br><br>
+
+	<<He>>【은는】 바닥에 시선을 고정한 채 복도 아래로 사라진다.
+<</if>>
+<br><br>
+
+<<link [[떠난다|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+<br>
+
+:: School Infirmary Kylar English
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 1>>
+	카일라는 긴장하지만, 고개를 끄덕인다.
+	<br><br>
+
+	"다음에," <<he>>【이가】 걸어가면서 중얼거리는 소리가 들린다.
+	<br><br>
+
+	<<link [[다음|Hallways]]>><<endevent>><<infirmary_excused>><</link>>
+	<br>
+<<else>>
+	카일라는 당신을 복도로 이끌며 미소 짓는다. <<He>>【은는】 쾌활하게 잡담을 나누며, 당신의 신경쇠약은 거의 잊혀진 듯하다.
+	<br><br>
+
+	당신은 곧 도렌의 교실에 도착한다. <<nnpc_He "Doren">>【은는】 당신의 어깨에 부드럽게 손을 얹으며 인사한다. "간호사에게서 전화 받았어," <<nnpc_he "Doren">>【이가】 말한다. "기분이 나아졌으면 좋겠구나, <<lassie>>."
+	<br><br>
+
+	카일라는 <<nnpc_him "Doren">>【을를】 무시하고 당신을 교실 뒤편으로 이끈다. 당신은 빈 책상 한 쌍을 찾아 카일라와 함께 자리에 앉는다.
+	<br><br>
+
+	<<link [[다음|English Lesson]]>><<endevent>><<set $kylarenglishstate to "active">><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Whitney Refuse
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 휘트니의 변덕에 따르기를 거부한다. <<his>> 눈에 잔인한 불꽃이 인다. 분위기는 무겁고, <<he>>【이가】 당신에게 <<himself>>【을를】 강요할 것 같은 느낌이 든다.
+
+<<if $whitneyromance is 1>>
+	대신, <<he>>【은는】 분개하며 한숨을 쉬고 <<his>> 무리에게 양호실에서 나가라고 손짓한다.
+	<br><br>
+
+	"운 좋은 줄 알아. 우리가 사귀는 사이가 아니었다면, 두 번 생각할 것도 없이 네 엉덩이를 강간했을 거야," <<he>>【이가】 당신의 귀에 속삭이고 당신이 반응하기 전에 입술에 강제로 키스한다. 담배 맛이 난다<<if isLoveInterest("Whitney")>>. 하지만 당신은 조금도 신경 쓰지 않는다.<<arousal 100 "mouth">><<garousal>><<else>>.<<stress 2>><<gstress>><</if>>
+	<br><br>
+
+	휘트니는 <<his>> 친구들을 따라 밖으로 나간다. 얼마 지나지 않아, 당신도 양호실을 떠난다.
+	<br><br>
+
+	<<link [[떠난다 (0:01)|Hallways]]>><<endevent>><<pass 1>><<infirmary_excused>><</link>>
+	<br>
+<<else>>
+	한순간의 망설임도 없이, <<he>>【은는】 당신을 침대에 눕힌다.
+	<br><br>
+
+	<<link [[다음|School Infirmary Whitney Sex Open]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: School Infirmary Whitney Sex Open
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+
+	<<enable_rescue>>
+	<<maninit>>
+	<<set $enemyanger += 100>>
+<<elseif $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+
+	<<enable_rescue>>
+	<<maninit>>
+
+	<<if $speech_attitude is "meek">>
+		"ㅈ-저기, 난 더 나아가도 괜찮은데..." 당신은 다리를 조금 더 벌리며 더듬거린다.
+	<<elseif $speech_attitude is "bratty">>
+		"아쉽네. 난 그것보다 더한 걸 바라고 있었는데." 당신은 윗입술을 핥고 다리를 벌린다.
+	<<else>>
+		"내 입으로 충분하겠어?" 당신은 교태 섞인 목소리로 물으며 다리를 살짝 벌린다.
+	<</if>>
+	<<promiscuity5>>
+
+	휘트니는 활짝 웃으며 침대 위로 당신과 합류한다. <<his>> 친구들 앞에서 섹스를 한다는 생각에 당신의 심장은 기대로 두근거린다.
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|School Infirmary Whitney Sex Open Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|School Infirmary Whitney Sex Open]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: School Infirmary Whitney Sex Open Finish
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $alarm is 1 and $rescue is 1>>
+	<<set $rescued += 1>>
+	양호실 밖에서 발소리가 다가온다. 휘트니는 <<his>> 입술을 비틀고 당신에게서 밀쳐낸다.
+	<br><br>
+
+	"이게 끝이 아니야, 걸레년아," <<he>>【이가】 뱉어낸다. <<He>>【은는】 <<his>> 친구들과 함께 방을 나선다. 잠시 후, 간호사가 문가에 나타난다.
+	<br><br>
+
+	<<tearful>> 당신은 그 경험을 잊고 싶어 간호사의 걱정을 일축한다. 당신은 곧 복도로 안내된다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	<<if $consensual is 1>>
+		"넌 이걸 위해 태어났어, 걸레년아," <<he>>【이가】 말한다. <<He>>【은는】 당신의 <<bottom>>【을를】 소리 나게 때려, 군중의 웃음을 자아낸다.<<llust>><<npcincr Whitney lust -20>>
+		<br><br>
+
+		잠깐의 휴식 후, <<he>>【은는】 침대에서 일어나 당신을 돌아보지도 않고 <<his>> 친구들과 함께 양호실을 떠난다.
+	<<else>>
+		휘트니는 당신의 유순한 몸 위에 잠시 누워, <<his>> 오르가즘의 여운을 즐긴다. <<his>> 호흡이 안정되자, <<he>>【은는】 일어선다.<<llust>><<npcincr Whitney lust -20>>
+		<br><br>
+
+		"경고했잖아, 멍청한 창녀야."
+		<br><br>
+
+		그 말과 함께, <<he>>【은는】 <<his>> 얼굴에 비웃음을 띤 채 양호실을 떠난다. <<His>> 친구들이 그 뒤를 따른다.
+	<</if>>
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	당신은 간호사가 돌아오기 전에 떠나기로 결심한다.
+<<elseif $enemyhealth lte 0>>
+	당신은 휘트니를 밀쳐내고, <<his>> 머리가 금속 침대 프레임에 부딪힌다. <<He>>【은는】 큰 소리로 저주한다.<<npcincr Whitney dom -1>><<ldom>>
+	<br><br>
+
+	휘트니는 건방진 미소를 지으며 <<his>> 발로 일어선다. "이 <<bitch>>【은는】 광견병에 걸렸어," <<he>>【이가】 <<his>> 친구들에게 말한다. "<<pshe>>【은는】 주사 맞으러 여기 온 게 틀림없어. 뭐 옮기 전에 여기서 나가자." 그들은 웃으며 방을 나간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	당신이 방을 어지럽힌 상태를 보고, 간호사에게 설명해야 하기 전에 떠나기로 결심한다.
+<<else>>
+	휘트니는 한숨을 쉬며 당신을 밀쳐낸다.
+	<br><br>
+
+	"뭐든지, 걸레년아." <<He>>【은는】 어깨 너머로 쏘아보며 거들먹거리며 걸어간다. "계속 그렇게 애태우는 척해봐. 어떻게 되는지 보자." <<He>>【은는】 <<his>> 패거리와 함께 떠나, 당신을 양호실에 홀로 남겨둔다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	당신은 간호사가 돌아오기 전에 떠나기로 결심한다.
+<</if>>
+<br><br>
+
+<<link [[떠난다 (0:01)|Hallways]]>><<pass 1>><<infirmary_excused>><</link>>
+<br>
+
+:: School Infirmary Whitney Sex Closed
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+
+	<<enable_rescue>>
+	<<maninit>>
+
+	<<if $speech_attitude is "meek">>
+		"커튼 뒤라면, 그것보다 더한 것도 할 수 있는데..." 당신은 중얼거린다.
+	<<elseif $speech_attitude is "bratty">>
+		"더 좋은 생각이 있어." 당신은 <<him>>에게 손짓한다. "관심 있으면 이리 와서 커튼 쳐."
+	<<else>>
+		"커튼 치자, 그럼 훨씬 더 좋은 시간을 보여줄게," 당신은 말한다.
+	<</if>>
+	<<promiscuity4>>
+
+	휘트니는 미소를 지으며 침대 위로 당신과 합류한다. 커튼 뒤에 숨자, 두 사람은 본론으로 들어간다.
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|School Infirmary Whitney Sex Closed Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|School Infirmary Whitney Sex Closed]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: School Infirmary Whitney Sex Closed Finish
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $alarm is 1 and $rescue is 1>>
+	<<set $rescued += 1>>
+	양호실 밖에서 발소리가 다가온다. 휘트니는 <<his>> 입술을 비틀고 당신에게서 밀쳐낸다.
+	<br><br>
+
+	"이게 끝이 아니야, 걸레년아." <<He>>【은는】 커튼을 열어젖히고 <<his>> 친구들과 함께 방을 나선다. 잠시 후, 간호사가 문가에 나타난다.
+	<br><br>
+
+	<<tearful>> 당신은 그 경험을 잊고 싶어 간호사의 걱정을 일축한다. 당신은 곧 복도로 안내된다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	"씨발, 좋았어," <<he>>【이가】 한숨을 쉬며, 당신의 허벅지를 부드럽게 쓰다듬는다.<<llust>><<npcincr Whitney lust -20>>
+	<br><br>
+
+	잠깐의 휴식 후, <<he>>【은는】 커튼을 열고, 침대에서 일어나 당신을 돌아보지도 않고 <<his>> 친구들과 함께 양호실을 떠난다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	당신은 간호사가 돌아오기 전에 떠나기로 결심한다.
+<<elseif $enemyhealth lte 0>>
+	당신은 휘트니를 밀쳐내고, <<him>>【을를】 커튼 너머로 비틀거리게 만든다. <<His>> 친구들은 어리둥절하게 지켜본다.<<npcincr Whitney dom -1>><<ldom>>
+	<br><br>
+
+	휘트니는 건방진 미소를 지으며 <<his>> 발로 일어선다. "이 <<bitch>>【은는】 광견병에 걸렸어," <<he>>【이가】 <<his>> 친구들에게 말한다. "<<pshe>>【은는】 주사 맞으러 여기 온 게 틀림없어. 뭐 옮기 전에 여기서 나가자." 그들은 웃으며 방을 나간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	당신이 방을 어지럽힌 상태를 보고, 간호사에게 설명해야 하기 전에 떠나기로 결심한다.
+<<else>>
+	휘트니는 한숨을 쉬며 당신을 밀쳐낸다.
+	<br><br>
+
+	"뭐든지, 걸레년아." <<He>>【은는】 커튼을 확 열고 어깨 너머로 쏘아보며 발을 구르며 걸어간다. "계속 그렇게 애태우는 척해봐. 어떻게 되는지 보자." <<He>>【은는】 <<his>> 패거리와 함께 떠나, 당신을 양호실에 홀로 남겨둔다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	당신은 간호사가 돌아오기 전에 떠나기로 결심한다.
+<</if>>
+<br><br>
+
+<<link [[떠난다 (0:01)|Hallways]]>><<pass 1>><<infirmary_excused>><</link>>
+<br>
+
+:: School Infirmary Whitney Oral
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+
+	<<enable_rescue>>
+	<<maninit>>
+
+	당신은 고개를 숙이고 끄덕인다. 당신의 반응에 만족한 휘트니는 가까이 다가와 당신의 머리 뒤를 잡는다. <<He>>【은는】 당신의 얼굴을 <<his>> 가랑이에 억지로 갖다 댄다.
+	<br><br>
+
+	<<npcoral>><<set $NPCList[0].lefthand to "hair">><<set $enemyanger += 70>>
+<<elseif $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+
+	<<enable_rescue>>
+	<<maninit>>
+
+	당신은 휘트니에게 요염한 미소를 지으며 봉사할 준비가 되었다는 듯 <<him>>에게 혀를 보여준다. <<promiscuity1>>
+
+	당신의 반응에 만족한 휘트니는 가까이 다가와 당신의 머리를 <<his>> 가랑이 쪽으로 이끈다.
+	<br><br>
+
+	<<npcoral>><<set $NPCList[0].lefthand to "hair">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|School Infirmary Whitney Oral Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|School Infirmary Whitney Oral]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: School Infirmary Whitney Oral Finish
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $alarm is 1 and $rescue is 1>>
+	<<set $rescued += 1>>
+	양호실 밖에서 발소리가 다가온다. 휘트니는 <<his>> 입술을 비틀고 당신에게서 밀쳐낸다.
+	<br><br>
+
+	"이걸로 끝난 거 아니야, 이 걸레야." <<he>>【이가】 뱉어낸다. <<He>>【은는】 친구들과 함께 방을 뛰쳐나간다. 잠시 후, 간호사가 문가에 나타난다.
+	<br><br>
+
+	<<tearful>> 당신은 이 경험을 잊고 싶은 마음에 간호사의 걱정을 물리친다. 당신은 곧 복도로 안내된다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>> <<He>>【은는】 당신의 머리카락을 움켜쥐고 숨을 고르려 애쓴다. <<his>> 호흡이 안정되자, <<he>>【은는】 당신을 놓아준다.<<llust>><<npcincr Whitney lust -20>>
+	<br><br>
+
+	"아주 잘했어, 이 걸레야.
+	<<if $whitneyromance is 1>>
+		다음에 또 보자."
+	<<else>>
+		조만간 또 하게 될 거야."
+	<</if>>
+	<br><br>
+
+	그 말을 남기고, <<he>>【은는】 몸을 돌려 양호실을 나간다. <<His>> 친구들도 그 뒤를 따른다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<tearful>> 당신은 간호사가 돌아오기 전에 자리를 뜬다.
+<<elseif $enemyhealth lte 0>>
+	당신이 휘트니를 밀쳐내자, <<his>> 머리가 금속 침대 프레임에 부딪히며 쨍 하는 소리를 낸다. <<He>>【은는】 큰 소리로 욕을 한다.<<npcincr Whitney dom -1>><<ldom>>
+	<br><br>
+
+	휘트니는 건방진 미소를 지으며 일어선다. "이 <<bitch>>【은는】 광견병에 걸렸나 봐." <<he>>【이가】 친구들에게 말한다. "주사 맞으러 온 게 틀림없어. 뭐 옮기 전에 여기서 나가자." 그들은 웃으며 방을 나간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	방이 엉망이 된 것을 보고, 당신은 간호사에게 설명해야 하기 전에 자리를 뜨기로 결심한다.
+<<else>>
+	휘트니가 한숨을 쉬며 당신을 밀어낸다.
+	<br><br>
+
+	"마음대로 해, 이 걸레야." <<He>>【은는】 커튼을 확 열어젖히고 어깨너머로 쏘아보며 쿵쿵거리며 걸어간다. "계속 그렇게 내숭이나 떨어보시지. 어떻게 되나 보자고." <<He>>【은는】 <<his>> 패거리와 함께 떠나고, 당신은 양호실에 홀로 남겨진다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<tearful>> 당신은 간호사가 돌아오기 전에 자리를 뜬다.
+<</if>>
+<br><br>
+
+<<link [[떠난다 (0:01)|Hallways]]>><<pass 1>><<infirmary_excused>><</link>>
+<br>
+
+:: School Infirmary Nurse Accept
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+간호사가 고개를 끄덕이며 당신을 밖으로 이끈다. 당신은 <<his>> 차 조수석에 올라탄다.
+<br><br>
+
+차를 타고 가는 동안 침묵이 흐른다. <<He>>【은는】 고아원으로 가는 길을 물어볼 필요가 없다. 잠시 후, <<he>>【은는】 고아원 밖에 차를 세운다.
+<br><br>
+
+"다 왔습니다." <<he>>【이가】 문 잠금을 풀며 말한다. 당신은 보도로 뛰어내린다. 간호사가 당신 뒤에서 소리친다. "잊지 마세요, 무리하지 마시고요."
+<br><br>
+
+<<He>>【은는】 당신이 현관문 앞에 도착할 때까지 기다렸다가 차를 몰고 떠난다.
+<br><br>
+
+<<link [[다음|Orphanage]]>><<endevent>><</link>>
+<br>
+
+:: School Infirmary Nurse Refuse
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+간호사가 얼굴을 찌푸리더니 어깨를 으쓱한다. "마음대로 하세요. 하지만 그냥 여기에 두고 갈 수는 없습니다." <<He>>【은는】 당신의 팔을 잡아 침대에서 끌어낸다. "일어나세요."
+<br><br>
+
+<<He>>【은는】 당신을 정문으로 이끌고 나가, 등 뒤에서 문을 잠근다. "잊지 마세요, 무리하지 마시고요."
+<br><br>
+
+당신은 학교 밖에 홀로 남겨진다.
+<br><br>
+
+<<link [[다음|Oxford Street]]>><<endevent>><</link>>
+<br>
+
+:: School Infirmary Asylum
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<npc Harper>><<person1>>
+
+깨어나 보니, 당신은 낯선 곳의 다른 침대에 누워 있다. 병실처럼 보인다.
+<br><br>
+
+침대 옆에는 흰 가운을 입은 사람이 다른 흐릿한 인물과 이야기하고 있다. 머리가 여전히 멍해서, 그들이 무슨 말을 하는지 알아들을 수 없다.
+<br><br>
+
+두 사람은 한동안 이야기를 나누다가 한 명이 떠나고, 다른 한 명이 돌아선다. 시야가 점차 맑아지면서 그 <<personsimple>>의 모습을 제대로 볼 수 있게 된다.
+
+<<if !$harperSeen.includes("hospital")>>
+	<br><br>
+
+	<<if $harperSeen.includes("livestock")>>
+		농장에 있던 의사다. 당신에게 실험을 했던 그 사람.
+	<<elseif $harperSeen.includes("party")>>
+		에이버리의 파티에 있던 의사다. 분홍색 가루를 가지고 있던 그 사람.
+	<</if>>
+
+	<<He>>【이가】 당신을 보며 미소 짓는다. "안녕하세요, 저는 하퍼 의사입니다." <<he>>【이가】 말한다.
+
+	<<if $harperSeen.includes("livestock")>>
+		<<his>> 얼굴에는 알아보는 기색이 없다. <<He>>【은는】 손에 클립보드를 들고 당신의 침대 옆에 앉는다.
+	<<elseif $harperSeen.includes("party")>>
+		<<He>>【은는】 순진한 미소를 지으며 손에 클립보드를 들고 당신의 침대 옆에 앉는다.
+	<<else>>
+		<<He>>【은는】 당신의 침대 옆에 앉아 <<his>> 금발 앞머리를 눈가에서 치운다. <<He>>【은는】 의사치고는 젊어 보이며, 25살을 넘지 않은 것 같다. <<He>>【은는】 손에 클립보드를 들고 있다.
+	<</if>>
+
+	<<set $harperSeen.pushUnique("hospital")>>
+<<else>>
+	하퍼 의사다. <<He>>【은는】 <<his>> 클립보드를 꺼내며 미소 짓는다.
+<</if>>
+<br><br>
+
+"학교에서 정신을 잃었다고 들었습니다." <<he>>【이가】 말한다. "걱정할 만한 일은 아닐 겁니다만, 몇 가지 질문을 하고 싶군요."
+<br><br>
+
+<<link [[다음|Hospital Bed Examination]]>><</link>>
+<br>

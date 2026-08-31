@@ -1,0 +1,152 @@
+:: Forest Shop [exitCheckBypass]
+<div id="clothingShop-div" class="main-shop-div">
+	<<forestShop-main>>
+</div>
+
+:: Forest Shop Widgets [widget]
+<<widget "forestShopLeave">>
+	<<shopClothingFilterReset>><<unset $clothes_choice>><<ShowUnderEquip "normal">><<ShowUnderEquip "over">>
+	<<set $tryOn.autoReset to true>><<set $eventskip to 1>><<unset $tempDisable>><<shopCommandoCheck>>
+	<<unset $enteringForestShop>>
+<</widget>>
+
+<<widget "forestShop-main">>
+	<<set $outside to 0>><<set $location to "forest_shop">><<effects>>
+	<<set $shopName = "forest">>
+	<<if $tryOn.autoReset isnot false>><<tryOnReset>><</if>>
+
+	<div id="tryonstats-div"><<tryOnStats>></div>
+	<<unset $shopListStartCount>>
+	<<unset $clothes_choice>>
+	<<set $shopPage = 0>>
+
+	<span>보온성:</span>
+	<<warmthscale>>
+	<div id="warmth-description">
+		<<warmth_description>>
+	</div>
+	<br><br>
+
+	<<clothingcategoryicon "all-alt">>
+	<<link "모두 보기">><<replace "#clothingShop-div">><<AllShop>><</replace>><</link>>
+	<br><br>
+	<!-- Purposefully does not use the actual shop location icons used in the shopHunt sequence.
+	Clarity of clothing type is more important, given the links themselves don't specify. -->
+	/*
+	<<clothingcategoryicon "over-outfit">>
+	<<link "넘쳐흐르는 상자 안을 들여다본다">><<replace "#clothingShop-div">><<OverOutfitShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "over-head">>
+	<<link "매달려 있는 바구니 안을 들여다본다">><<replace "#clothingShop-div">><<OverHeadShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "over-upper">>
+	<<link "썩어가는 옷장 안을 들여다본다">><<replace "#clothingShop-div">><<OverTopShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "over-lower">>
+	<<link "삐걱거리는 회전식 랙을 살펴본다">><<replace "#clothingShop-div">><<OverBottomShop>><</replace>><</link>>
+	<br>
+	*/
+	<<clothingcategoryicon "outfit">>
+	<<link "어두운 가림막 뒤를 살펴본다">><<replace "#clothingShop-div">><<OutfitShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "upper">>
+	<<link "골동품 옷장 안을 들여다본다">><<replace "#clothingShop-div">><<TopShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "lower">>
+	<<link "기묘한 다리미판 위를 살펴본다">><<replace "#clothingShop-div">><<BottomShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "under-outfit">>
+	<<link "곰팡이가 핀 수납장 안을 들여다본다">><<replace "#clothingShop-div">><<UnderOutfitShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "under-upper">>
+	<<link "녹슨 옷걸이들을 살펴본다">><<replace "#clothingShop-div">><<UnderTopShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "under-lower">>
+	<<link "거무스름한 서랍 안을 들여다본다">><<replace "#clothingShop-div">><<UnderBottomShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "head">>
+	<<link "가느다란 모자걸이를 살펴본다">><<replace "#clothingShop-div">><<HeadShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "face">>
+	<<link "옹이진 벽을 살펴본다">><<replace "#clothingShop-div">><<FaceShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "neck">>
+	<<link "빛이 나는 상자 안을 들여다본다">><<replace "#clothingShop-div">><<NeckShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "handheld">>
+	<<link "기울어진 우산꽂이 안을 들여다본다">><<replace "#clothingShop-div">><<HandheldShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "hand">>
+	<<link "기울어진 화장대 안을 들여다본다">><<replace "#clothingShop-div">><<HandsShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "legs">>
+	<<link "헤진 스타킹 안을 들여다본다">><<replace "#clothingShop-div">><<LegsShop>><</replace>><</link>>
+	<br>
+	<<clothingcategoryicon "feet">>
+	<<link "썩어가는 선반 밑을 들여다본다">><<replace "#clothingShop-div">><<FeetShop>><</replace>><</link>>
+	<br>
+
+	<<run statusCheck("Gwylan")>>
+	<<if ["shop", "garden"].includes(gwylanSchedule()) and (_gwylanStatus?.includesAny("aroused", "lust") or $gwylanSeen.includes("strapOnGifted")) and !$gwylanSeen.includes("sexToys")>>
+		<br>
+		낯선 캐비닛 문이 경첩에 매달려 조용히 흔들린다.
+		<br>
+		<<mysteryicon>><<link [[삐걱거리는 캐비닛 안을 들여다본다|Forest Shop Sex Toys Intro]]>><</link>>
+		<br>
+	<<elseif $gwylanSeen.includes("sexToys")>>
+		<<clothingcategoryicon "strapon">><<link [[삐걱거리는 캐비닛 안을 들여다본다|Forest Shop Sex Toys]]>><</link>>
+		<br>
+	<</if>>
+	<br>
+	<<run linkifyDivs('.button-back-to-shop')>>
+
+	<<if $tryOn.value isnot 0>>
+		<<icon "hanger.png">><<link "옷을 반납한다">><<clothingReset>>
+			<<updatesidebarimg>>
+			<<updatesidebardescription>>
+			<<updateallure>>
+			<<updatewarmthscale>>
+			<<updatewarmthdescription>>
+			<<updateclothingshop>>
+			<<run updateMoment()>>
+		<</link>>
+		<br>
+		<<if $tryOn.value gt 0 and $tryOn.value lte $money>>
+			<<sendItemsToDropdown>>
+			<<shopicon "forest">><<link "옷을 산다">><<buyTryOnClothes "wear">><<updatesidebarmoney>><<updateclothingshop>><</link>>
+			<br>
+			<<wardrobeicon>><<link "옷을 사서 옷장으로 보낸다">>
+				<<buyTryOnClothes "wardrobe">>
+				<<updatesidebarmoney>>
+				<<updatesidebarimg>>
+				<<updatesidebardescription>>
+				<<updateallure>>
+				<<updatewarmthscale>>
+				<<updatewarmthdescription>>
+				<<updateclothingshop>>
+			<</link>>
+			<br>
+		<</if>>
+	<<elseif $tryOn.value is 0>>
+		<<getouticon>><<link [[옷 구경을 그만둔다|Forest Shop Entrance]]>><<forestShopLeave>><</link>>
+		<br>
+	<</if>>
+	<<if $tryOn.value gt 0 and !$robin_in_forest_shop>>
+		<<if Object.values(V.tryOn.tryingOn).some(slot => slot?.type.includes("heavy"))>>
+			<span class="red">입어본 옷이 너무 무거워서 훔칠 수 없습니다!</span>
+		<<else>>
+			<<getouticon>><<link [[훔친 옷을 들고 떠난다|Forest Shop Stolen]]>>
+				<<shopClothingFilterReset>>
+				<<ShowUnderEquip "normal">>
+				<<ShowUnderEquip "over">>
+				<<buyTryOnClothes "wear" "steal">>
+				<<set $tryOn.autoReset to true>>
+				<<crimeUp `$tryOn.value / 100` "thievery">>
+				<<shopHoodCheck>>
+				<<shopCommandoCheck>>
+			<</link>><<crime "thievery">>
+		<</if>>
+		<br>
+	<</if>>
+
+<</widget>>

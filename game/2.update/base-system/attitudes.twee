@@ -1,0 +1,1033 @@
+:: Widgets Attitudes [widget]
+
+<<widget "attitudes">>
+	<div class="settingsGrid">
+		<div class="settingsHeader">태도</div>
+		<div class="settingsToggleItem">
+			<span class="gold bold">합의된 성관계에 대해 어떻게 생각합니까?</span>
+			<br>
+			<span class="black small-description"><i>당신이 얼마나 적극적이었느냐에 따라 합의 성관계 후 보너스를 제공합니다.</i></span>
+			<br>
+			<label>
+				<<radiobutton "$assertiveaction" "submissive" autocheck>>
+				<span class="meek">상대를 기분 좋게 하는 것이 좋다</span> (순종 증가)
+			</label>
+			<br>
+			<label>
+				<<radiobutton "$assertiveaction" "defiant" autocheck>>
+				<span class="brat">상대를 통제하는 것이 좋다</span> (반항 증가)
+			</label>
+			<br>
+			<label>
+				<<radiobutton "$assertiveaction" "trauma" autocheck>>
+				<span class="green">야하다</span> (트라우마 감소)
+			</label>
+			<br>
+			<label>
+				<<radiobutton "$assertiveaction" "stress" autocheck>>
+				<span class="green">재미있다</span> (스트레스 감소)
+			</label>
+		</div>
+		<div class="settingsToggleItem">
+			<span class="gold bold">어떤 태도로 다른 사람들과 대화합니까?</span>
+			<br>
+			<label><<radiobutton "$speech_attitude" "neutral" autocheck>> 중립적</label>
+			<br>
+			<<if $submissive gt 850>>
+				<label><<radiobutton "$speech_attitude" "meek" autocheck>> <span class="meek">순종적</span></label>
+				<br>
+			<<else>>
+				<input type="radio" disabled /> <span class="black"><i>고분고분한 태도를 취하기에는 당신은 너무 반항적입니다.</i></span>
+				<br>
+			<</if>>
+			<<if $submissive lt 1150>>
+				<label><<radiobutton "$speech_attitude" "bratty" autocheck>> <span class="brat">반항적</span></label>
+				<br>
+			<<else>>
+				<input type="radio" disabled /> <span class="black"><i>건방진 태도를 취하기에는 당신은 너무 순종적입니다.</i></span>
+				<br>
+			<</if>>
+			<<if $avery_mansion and $avery_fate isnot "fallen" and $avery_fate isnot "kicked">>
+				<<if $attitudesControl.unlockAveryMeek>>
+					<label><<checkbox "$speech_attitude_avery" false true autocheck>> 에이버리에게는 고분고분한 예외를 둡니다.</label>
+					<br>
+				<</if>>
+				<<if $attitudesControl.unlockAveryKneel or $attitudesControl.unlockAveryBow>>
+					<span class="gold bold">에이버리에게 자신을 어떻게 표현합니까?</span>
+					<br>
+					<<if $attitudesControl.unlockAveryKneel>>
+						<label><<radiobutton "$avery_mansion.kneel" "refuse" autocheck>> <span class="brat">스스로를 깎아내리길 거부한다</span></label>
+						<br>
+						<label><<radiobutton "$avery_mansion.kneel" "kneel" autocheck>> <span class="meek">무릎을 꿇는다</span></label>
+						<br>
+						<label><<radiobutton "$avery_mansion.kneel" "prostrate" autocheck>> <span class="sub">엎드린다</span></label>
+						<br>
+					<</if>>
+					<<if $attitudesControl.unlockAveryBow>>
+						<label><<checkbox "$avery_mansion.bow" false true autocheck>>
+						퇴근한 에이버리를 
+						<<if $player.gender_appearance is "m">>
+							집사처럼 맞이한다.
+						<<else>>
+							메이드처럼 맞이한다.
+						<</if>>
+						</label>
+						<br>
+					<</if>>
+				<</if>>
+			<</if>>
+		</div>
+
+		<div class="settingsToggleItem">
+			<span class="gold bold">당신을 불편하게 하는 것은 무엇입니까?</span>
+			<br>
+			/* some events can force the switches to false without actually unlocking them */
+			<<if $attitudesControl.unlockExhibitionismUnderwear or $uncomfortable.underwear is false>>
+				<label><<checkbox "$uncomfortable.underwear" false true autocheck>> 남들이 내 속옷을 보는 것</label>
+			<<else>>
+				<input type="checkbox" checked disabled /> <span class="black">남들이 내 속옷을 보는 것</span>
+				<br>
+				<span class="blue small-description"><i>더 높은 노출증이 필요합니다.</i></span>
+			<</if>>
+			<br>
+			<<if $attitudesControl.unlockExhibitionismNude or $uncomfortable.nude is false>>
+				<label><<checkbox "$uncomfortable.nude" false true autocheck>> 남들 앞에서 나체가 되는 것</label>
+			<<else>>
+				<input type="checkbox" checked disabled /> <span class="black">남들 앞에서 나체가 되는 것</span>
+				<br>
+				<span class="blue small-description"><i>더 높은 노출증이 필요합니다.</i></span>
+			<</if>>
+			<br>
+
+			<<if $attitudesControl.unlockProstitution>>
+				<label><<checkbox "$uncomfortable.prostituting" false true autocheck>> 베일리의 고문을 피하기 위해 성매매를 하는 것
+				<br>
+				<span class="black small-description"><i>이 옵션을 해제하면 음란함이 충분치 않아도 매춘이 가능해집니다. 이 경우 통제력이 감소합니다.</i></span></label>
+			<<else>>
+				<input type="checkbox" checked disabled /> <span class="black">베일리의 고문을 피하기 위해 성매매를 하는 것</span>
+				<br>
+				<span class="blue small-description"><i>베일리가 당신을 충분히 겁주지 않았습니다.</i></span>
+			<</if>>
+			<br>
+
+			<<if $gamemode isnot "hard">>
+				<<if $attitudesControl.unlockLewd>>
+					<label><<checkbox "$uncomfortable.lewd" false true autocheck>> 그동안 저지른 행동을 돌아보는 것
+					<br>
+					<span class="black small-description"><i>이 옵션을 해제하면 노출증, 음란, 이상성욕이 감소하지 않습니다. 따라서 통제력 관리가 까다로워질 수 있습니다.</i></span></label>
+				<<else>>
+					<input type="checkbox" checked disabled /> <span class="black">그동안 저지른 행동을 돌아보는 것</span>
+					<br>
+					<span class="blue small-description"><i>더 높은 노출증, 이상성욕, 또는 음란함이 필요합니다.</i></span>
+				<</if>>
+				<br>
+			<</if>>
+
+			<<if $attitudesControl.unlockHypnosis>>
+				<label><<checkbox "$uncomfortable.hypnosis" false true autocheck>> 성관계 중 최면에 걸리는 것
+				<br>
+				<span class="black small-description"><i>이 옵션을 해제하면 전투 중 의지력과 무관하게 최면 시도를 받아들이게 됩니다.</i></span></label>
+				<br>
+			<</if>>
+		</div>
+		<<set _loveIntStart1 to $loveInterest.primary>>
+		<<set _loveIntStart2 to $loveInterest.secondary>>
+		<<set _loveIntStart3 to $loveInterest.tertiary>>
+		<div id="loveInterest" class="settingsToggleItem">
+			<div class="gold bold">당신은 누구를 연인으로 생각합니까?</div>
+			<<loveInterest>>
+		</div>
+		<<loveInterestFunction>>
+	</div>
+	<hr>
+	<div class="settingsGrid">
+		<div class="settingsHeader">기본 전투 행동</div>
+		<div class="settingsToggleItemWide">
+			<<setupDefaults>>
+			<span class="gold bold">당신은 타인을 어떻게 생각합니까?</span>
+			<br>
+			<<if $moleststat gt 0 or $debug is 1>>
+				<<set _options to ["Everyone","Strangers","Animals","Tentacles","Acquaintances","Robin","Bailey"]>>
+				<<set _named to ["Whitney","Kylar","Eden","Avery","Leighton","Sydney","Alex","Ivory Wraith","Black Wolf","Great Hawk"]>>
+
+				<<for _i to 0; _i lt _named.length; _i++>>
+					<<set _index to $NPCNameList.indexOf(_named[_i])>>
+					<<if $NPCName[_index].init is 1>>
+						<<run _options.push(_named[_i])>>
+					<</if>>
+				<</for>>
+				<<run _options.push("Alternative")>>
+				<<run _options.push("Defiant")>>
+				<<run _options.push("Submissive")>>
+
+				/*Data for the later loops*/
+				<<set _titles to ["왼손","오른손","발","입","자지","보지","애널"]>>
+				<<set _dataName to ["leftaction","rightaction","feetaction","mouthaction","penisaction","vaginaaction","anusaction"]>>
+				<<set _data to ["_leftHand","_rightHand","_feet","_mouth","_penis","_vagina","_anus"]>>
+				<<set _defaultActions = DefaultActions.load(DefaultActions.create())>>
+
+				/* 일반 범주 번역 사전 */
+				<<set _categoryKr to {
+					"Everyone": "모든 사람",
+					"Strangers": "낯선 사람",
+					"Animals": "동물",
+					"Tentacles": "촉수",
+					"Acquaintances": "지인",
+					"Alternative": "대안",
+					"Defiant": "반항적",
+					"Submissive": "복종적"
+				}>>
+
+				/* 드롭다운용 [한글표시, 영문값] 배열 변환 */
+				<<set _translatedOptions to Object.fromEntries(_options.map(opt => [
+					_categoryKr[opt] || window.KR?.personNameDict?.[opt] || opt,
+					opt
+				]))>>
+
+				<<listbox "_defaultoption" autoselect>>
+					<<optionsfrom _translatedOptions>>
+				<</listbox>>
+				<<combatDefaults>>
+				<br>
+				<<set _currentActionSet to 0>>
+				<div id="othersFeelings">
+					<<othersFeelings 0>>
+				</div>
+			<<else>>
+				<span class="black"><i>기본 행동은 첫 인카운터 이후 개방됩니다.</i></span>
+			<</if>>
+		</div>
+	</div>
+<</widget>>
+
+<<widget "othersFeelings">>
+	<<set _currentOptions to _args[0]>>
+	<<set _stringDefault to "_defaultActions.consensual['"+_options[_currentOptions]+"']">>
+
+	<<switch _options[_currentOptions]>>
+		<<case "Everyone">><span class="red small-description">"모두"는 "관련 설정 재정의" 링크를 사용할 때만 기본값을 적용합니다. 모든 NPC의 기본값을 덮어씁니다.</span>
+		<<set _requireConfirm to true>>
+		<<case "Acquaintances">><span class="red small-description">"관련 설정 재정의"를 사용하면 목록에 있는 다른 지인들의 설정을 덮어씁니다.</span>
+		<<set _requireConfirm to true>>
+		<<case "Alternative" "Defiant" "Submissive">>전투 중 행동을 교체하는 데 사용할 수 있습니다. "관련 설정 재정의"로는 변경되지 않습니다.
+		<<set _requireConfirm to false>>
+		<<default>><<set _requireConfirm to false>>
+	<</switch>>
+	<br><br>
+	<span class="gold bold">선택된 행동 세트:</span>
+	<br>
+	당신의 첫 번째 행동 세트가 가장 높은 우선순위를 가집니다. 낮은 우선순위 세트의 기본 행동을 사용할 수 없을 경우, 더 높은 우선순위 세트의 기본 옵션이 사용됩니다.
+	<div class="featButtonContainer no-numberify">
+		<<if _currentActionSet gt 0>>
+			<div class="featButton">
+				<<button "<span class='fa-icon fa-left'></span>">>
+					<<set _currentActionSet-->>
+					<<replace #othersFeelings>><<othersFeelings _currentOptions>><</replace>>
+				<</button>>
+			</div>
+		<<else>>
+			<div class="featButtonGrey">
+				<<button "<span class='fa-icon fa-left'></span>">><</button>>
+			</div>
+		<</if>>
+		<div class="gold featButton buttonDisable">
+			<<set _selectedActionSet to _currentActionSet + 1>>
+			<<button "_selectedActionSet / 10">><</button>>
+		</div>
+		<<if _currentActionSet lt 9>>
+			<div class="featButton">
+				<<button "<span class='fa-icon fa-right'></span>">>
+					<<set _currentActionSet++>>
+					<<replace #othersFeelings>><<othersFeelings _currentOptions>><</replace>>
+				<</button>>
+			</div>
+		<<else>>
+			<div class="featButtonGrey">
+				<<button "<span class='fa-icon fa-right'></span>">><</button>>
+			</div>
+		<</if>>
+	</div>
+	<hr>
+	합의된 성관계:
+	<br>
+	<span class="black small-description">어떤 행동은 충분한 음란함이 필요합니다.</span>
+	<br>
+	<<if _options[_currentOptions] is "Tentacles">>
+		<<tentacleDefaults false>>
+	<<else>>
+		<<sexDefaults false>>
+	<</if>>
+	<ul class="listMargin">
+		<<for _i to 0; _i lt _titles.length; _i++>>
+			<<if (_titles[_i] is "Penis" and !$player.penisExist) or (_titles[_i] is "Vagina" and !$player.vaginaExist)>>
+				<<continue>>
+			<</if>>
+			<!-- This creates the consensual list of items. -->
+			<li>
+				<<print _titles[_i]>>:
+				<<print '<<listbox "'+_stringDefault+'.'+_dataName[_i]+'['+_currentActionSet+']" autoselect>><<optionsfrom '+_data[_i]+'>><</listbox>>'>>
+			</li>
+		<</for>>
+		<<if _options[_currentOptions] is "Tentacles">>
+			<li>
+				<label>현재 촉수가 점유 중일 때 잡기 행동을 위해 다른 촉수를 자동 선택 <<print '<<checkbox "_defaultActions.consensual.Tentacles.regrab[0]" false true ' + (_defaultActions.consensual.Tentacles.regrab[0] is 1 ? "checked" : "") + '>>'>></label>
+			</li>
+		<</if>>
+		<<if _defaultActions.consensual[_options[_currentOptions]].askActions isnot undefined>>
+			<li>
+				<label>부탁하기:
+				<<print '<<listbox "'+_stringDefault+'.askActions['+_currentActionSet+']" autoselect>><<optionsfrom _askActions>><</listbox>>'>></label>
+			</li>
+		<</if>>
+	</ul>
+
+	<<set _stringDefault to "_defaultActions.rape['"+_options[_currentOptions]+"']">>
+
+	<<if _options[_currentOptions] isnot "Robin">>
+		<<if _options[_currentOptions] is "Tentacles">>
+			<<tentacleDefaults true>>
+		<<else>>
+			<<sexDefaults true>>
+		<</if>>
+		<br><br>
+		강간:
+		<br>
+
+		<ul class="listMargin">
+			<<for _i to 0; _i lt _titles.length; _i++>>
+				<<if (_titles[_i] is "Penis" and !$player.penisExist) or (_titles[_i] is "Vagina" and !$player.vaginaExist)>>
+					<<continue>>
+				<</if>>
+				<li>
+					<<print _titles[_i]>>:
+					<<print '<<listbox "'+_stringDefault+"."+_dataName[_i]+'['+_currentActionSet+']" autoselect>><<optionsfrom '+_data[_i]+'>><</listbox>>'>>
+				</li>
+			<</for>>
+			<<if _options[_currentOptions] is "Tentacles">>
+				<li>
+					<label>현재 촉수가 점유 중일 때 잡기 행동을 위해 다른 촉수를 자동 선택 <<print '<<checkbox "_defaultActions.rape.Tentacles.regrab[0]" false true ' + (_defaultActions.rape.Tentacles.regrab[0] is 1 ? "checked" : "") + '>>'>></label>
+				</li>
+			<</if>>
+			<<if _defaultActions.rape[_options[_currentOptions]].askActions isnot undefined>>
+				<li>
+					<label>부탁하기:
+					<<print '<<listbox "'+_stringDefault+'.askActions['+_currentActionSet+']" autoselect>><<optionsfrom _askActions>><</listbox>>'>></label>
+				</li>
+			<</if>>
+		</ul>
+	<</if>>
+	<br>
+
+	<<if _requireConfirm is true>>
+		<br>
+		<<link [[관련 설정 재정의|$passage]]>>
+			<<run DefaultActions.save(T.defaultActions)>>
+			<<switch _options[_currentOptions]>>
+				<<case "Everyone">>
+					<<set _options to ["Strangers","Animals","Acquaintances","Robin", "Bailey","Whitney","Kylar","Eden","Avery","Leighton","Sydney","Alex","Ivory Wraith","Black Wolf","Great Hawk"]>>
+					<<for _option range _options>>
+						<<if !$actionDefaults.consensual>>
+							<<set $actionDefaults.consensual to {}>>
+						<</if>>
+						<<if !$actionDefaults.rape>>
+							<<set $actionDefaults.rape to {}>>
+						<</if>>
+						<<set _index to $NPCNameList.indexOf(_option)>>
+						<<if $NPCName[_index] && $NPCName[_index].init isnot 1>>
+							<<continue>>
+						<</if>>
+						<<set $actionDefaults.consensual[_option] to clone($actionDefaults.consensual.Everyone)>>
+						<<set $actionDefaults.rape[_option] to clone($actionDefaults.rape.Everyone)>>
+					<</for>>
+				<<case "Acquaintances">>
+					<<set _options to ["Robin","Bailey","Whitney","Kylar","Eden","Avery","Leighton","Sydney","Alex","Ivory Wraith","Black Wolf","Great Hawk"]>>
+					<<for _option range _options>>
+						<<if !$actionDefaults.consensual>>
+							<<set $actionDefaults.consensual to {}>>
+						<</if>>
+						<<if !$actionDefaults.rape>>
+							<<set $actionDefaults.rape to {}>>
+						<</if>>
+						<<set _index to $NPCNameList.indexOf(_option)>>
+						<<if $NPCName[_index] && $NPCName[_index].init isnot 1>>
+							<<continue>>
+						<</if>>
+						<<set $actionDefaults.consensual[_option] to clone($actionDefaults.consensual.Acquaintances)>>
+						<<set $actionDefaults.rape[_option] to clone($actionDefaults.rape.Acquaintances)>>
+					<</for>>
+			<</switch>>
+		<</link>>
+	<</if>>
+<</widget>>
+
+<<widget "setupDefaults">>
+	<<set $actionDefaults = DefaultActions.check(DefaultActions.setup())>>
+<</widget>>
+
+<!-- _args[0] As Boolean: false is consensual, true is non-consensual. -->
+<<widget "sexDefaults">>
+	<<set _leftHand to {
+		"쉰다": "rest",
+		"쓰다듬는다": "leftchest",
+		"뒤로 감춘다": "behind",
+		"감춘 것을 멈춘다": "stopbehind"
+	}>>
+
+	<<if _args[0] is true>>
+		<<set _leftHand["주먹질한다"] to "lefthit">>
+		<<set _leftHand["목에서 손을 떼어낸다"] to "stopchokenoncon">>
+	<<else>>
+		<<set _leftHand["상대의 손을 목에 누른다"] to "keepchoke">>
+		<<set _leftHand["목에서 손을 치운다"] to "stopchoke">>
+	<</if>>
+	<<set _leftHand["얼굴을 가린다"] to "leftcoverface">>
+	<<set _leftHand["카메라를 향해 포즈를 취한다"] to "leftcamerapose">>
+	<<set _leftHand["필기 도구를 쳐낸다"] to "penwhack">>
+	<<set _leftHand["최면 도구를 쳐낸다"] to "hypnosiswhack">>
+	<<if currentSkillValue('skulduggery') gte 200>>
+		<<set _leftHand["훔친다"] to "steal">>
+	<</if>>
+	<<set _leftHand["버둥거린다"] to "leftstruggle">>
+
+	<<set _leftHand["상대의 자지를 쓰다듬는다"] to "leftstroke">>
+
+	<<if hasSexStat("promiscuity", 3) or hasSexStat("deviancy", 3) or _args[0] is true>>
+		<<set _leftHand["상대의 자지를 움켜쥔다"] to "leftgrab">>
+		<<set _leftHand["상대의 자지를 다룬다"] to "leftwork">>
+
+		<<set _leftHand["상대의 보지를 만진다"] to "leftplay">>
+		<<set _leftHand["상대의 클리토리스를 문지른다"] to "leftclit">>
+	<</if>>
+
+	<<if hasSexStat("promiscuity", 2)>>
+		<<if $player.penisExist>>
+			<<set _leftHand["자신의 자지를 만진다"] to "leftmasturbatepenis">>
+		<</if>>
+		<<if $player.vaginaExist>>
+			<<set _leftHand["자신의 보지를 만진다"] to "leftmasturbatepussy">>
+		<</if>>
+	<</if>>
+	<<if hasSexStat("promiscuity", 3) and $awareness gte 200>>
+		<<set _leftHand["자신의 애널을 만진다"] to "leftmasturbateanus">>
+	<</if>>
+	<<set _leftHand["애널 플러그를 뺀다"] to "removebuttplug">>
+
+	<<set _leftHand["움켜쥔다"] to "leftgrip">>
+	<<set _leftHand["보호한다"] to "leftprotect">>
+
+	<<set _rightHand to {
+		"쉰다":"rest",
+		"쓰다듬는다":"rightchest",
+		"뒤로 감춘다": "behind",
+		"감춘 것을 멈춘다": "stopbehind"
+	}>>
+
+	<<if _args[0] is true>>
+		<<set _rightHand["주먹질한다"] to "righthit">>
+		<<set _rightHand["목에서 손을 떼어낸다"] to "stopchokenoncon">>
+	<<else>>
+		<<set _rightHand["상대의 손을 목에 누른다"] to "keepchoke">>
+		<<set _rightHand["목에서 손을 치운다"] to "stopchoke">>
+	<</if>>
+	<<set _rightHand["얼굴을 가린다"] to "rightcoverface">>
+	<<set _rightHand["카메라를 향해 포즈를 취한다"] to "rightcamerapose">>
+	<<set _rightHand["필기 도구를 쳐낸다"] to "penwhack">>
+	<<set _rightHand["최면 도구를 쳐낸다"] to "hypnosiswhack">>
+	<<if currentSkillValue('skulduggery') gte 200>>
+		<<set _rightHand["훔친다"] to "steal">>
+	<</if>>
+	<<set _rightHand["버둥거린다"] to "rightstruggle">>
+
+	<<set _rightHand["상대의 자지를 쓰다듬는다"] to "rightstroke">>
+
+	<<if hasSexStat("promiscuity", 3) or hasSexStat("deviancy", 3) or _args[0] is true>>
+		<<set _rightHand["상대의 자지를 움켜쥔다"] to "rightgrab">>
+		<<set _rightHand["상대의 자지를 다룬다"] to "rightwork">>
+
+		<<set _rightHand["상대의 보지를 만진다"] to "rightplay">>
+		<<set _rightHand["상대의 클리토리스를 문지른다"] to "rightclit">>
+	<</if>>
+
+	<<if hasSexStat("promiscuity", 2)>>
+		<<if $player.vaginaExist>>
+			<<set _rightHand["자신의 보지를 만진다"] to "rightmasturbatepussy">>
+		<</if>>
+		<<if $player.penisExist>>
+			<<set _rightHand["자신의 자지를 만진다"] to "rightmasturbatepenis">>
+		<</if>>
+	<</if>>
+	<<if hasSexStat("promiscuity", 3) and $awareness gte 200>>
+		<<set _rightHand["자신의 애널을 만진다"] to "rightmasturbateanus">>
+	<</if>>
+	<<set _rightHand["애널 플러그를 뺀다"] to "removebuttplug">>
+
+	<<set _rightHand["움켜쥔다"] to "rightgrip">>
+	<<set _rightHand["보호한다"] to "rightprotect">>
+
+	<<set _feet to {
+		"쉰다":"rest",
+	}>>
+	<<if _args[0] is true>>
+		<<set _feet["발로 찬다"] to "kick">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 3) or hasSexStat("deviancy", 3) or _args[0] is true>>
+		<<set _feet["상대의 자지를 움켜쥔다"] to "grab">>
+		<<set _feet["상대의 자지를 문지른다"] to "grabrub">>
+
+		<<set _feet["상대의 보지에 누른다"] to "vaginagrab">>
+		<<set _feet["상대의 보지를 문지른다"] to "vaginagrabrub">>
+	<</if>>
+	<<if (_args[0] is false and (hasSexStat("promiscuity", 3) or hasSexStat("deviancy", 3))) or (_args[0] is true and (hasSexStat("promiscuity", 6) or hasSexStat("deviancy", 6)))>>
+		<<set _feet["다리로 얽어맨다"] to "legLock">>
+	<</if>>
+
+	<<set _feet["발가락을 오므린다"] to "feetCurl">>
+
+	<<set _mouth to {
+		"쉰다":"rest",
+		"키스한다":"kiss",
+		"키스에 응한다":"kissback",
+		"피부에 입 맞춘다": "kissskin",
+	}>>
+
+	<<if _args[0] is true>>
+		<<set _mouth["비명을 지른다"] to "scream">>
+		<<set _mouth["애원한다"] to "plead">>
+	<</if>>
+
+	<<if $wolfgirl gte 2>>
+		<<set _mouth["으르렁댄다"] to "growl">>
+	<</if>>
+
+	<<if $submissive gte 1150 or (hasSexStat("promiscuity", 3) and _args[0] is false)>>
+		<<set _mouth["신음한다"] to "moan">>
+	<</if>>
+	<<if $angel gte 6 and $angelforgive isnot 1 and _args[0] is true>>
+		<<set _mouth["용서한다"] to "forgive">>
+	<</if>>
+	<<if $fallenangel gte 4 and $angelforgive isnot 1 and _args[0] is true>>
+		<<set _mouth["깎아내린다"] to "disparage">>
+	<</if>>
+	<<if $submissive lte 850 and _args[0] is true>>
+		<<set _mouth["요구한다"] to "demand">>
+	<</if>>
+
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _mouth["상대의 자지 쪽으로 입술을 옮긴다"] to "mouth">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 3) or hasSexStat("deviancy", 3) or _args[0] is true>>
+		<<set _mouth["가슴 사이로 자지를 끼운다"] to "grasp">>
+	<</if>>
+	<<set _mouth["떨어진다"] to "pullaway">>
+	<<set _mouth["상대의 자지를 핥는다"] to "lick">>
+	<<if hasSexStat("promiscuity", 5) or hasSexStat("deviancy", 5) or _args[0] is true>>
+		<<set _mouth["상대의 자지를 입에 넣는다"] to "swallow">>
+	<</if>>
+	<<set _mouth["상대의 자지를 빤다"] to "suck">>
+	<<if _args[0] is true>>
+		<<set _mouth["상대의 자지를 문다"] to "bite">>
+	<</if>>
+	<<if _args[0] is false>>
+		<<set _mouth["상대의 정액을 삼킨다"] to "ejacswallow">>
+		<<set _mouth["상대의 정액을 뱉는다"] to "ejacspit">>
+	<</if>>
+	<<set _mouth["상대의 자지에서 떨어진다"] to "pullaway">>
+
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _mouth["상대의 보지 쪽으로 입술을 옮긴다"] to "othervagina">>
+	<</if>>
+	<<set _mouth["상대의 보지를 핥는다"] to "vaginalick">>
+
+	<<if _args[0] is true>>
+		<<set _mouth["상대의 보지를 문다"] to "bitepussy">>
+	<</if>>
+	<<set _mouth["상대의 보지에서 떨어진다"] to "pullawayvagina">>
+
+	<<if hasSexStat("promiscuity", 3) or _args[0] is true>>
+		<<set _mouth["상대의 가슴 쪽으로 입술을 옮긴다"] to "movetochest">>
+	<</if>>
+
+	<<set _mouth["상대의 가슴을 핥는다"] to "breastlick">>
+	<<set _mouth["상대의 가슴에서 떨어진다"] to "breastpull">>
+
+	<<set _mouth["상대의 가슴을 빤다"] to "breastsuck">>
+	<<if _args[0] is true>>
+		<<set _mouth["상대의 가슴을 문다"] to "breastbite">>
+	<</if>>
+	<<set _mouth["입을 다문다"] to "breastclosed">>
+	<<if hasSexStat("promiscuity", 4) or $deviancy gt 55 or _args[0] is true>>
+		<<set _mouth["절정 직전까지 몰아간다"] to "oraledge">>
+	<</if>>
+
+	<<set _mouth["엉덩이를 핥는다"] to "anallick">>
+	<<if $submissive gte 1150>>
+		<<set _mouth["엉덩이에 입 맞춘다"] to "analkiss">>
+	<</if>>
+	<<if _args[0] is false>>
+		<<set _mouth["상대의 엉덩이에서 떨어진다"] to "analpull">>
+	<</if>>
+
+	<<if _args[0] is true>>
+		<<set _mouth["박치기한다"] to "headbutt">>
+	<</if>>
+
+	<<set _mouth["참지 않는다 (고통)"] to "letout">>
+	<<set _mouth["참지 않는다 (절정)"] to "letoutorgasm">>
+
+	<<set _mouth["부탁한다:"] to "ask">>
+
+	<<set _askActions to {"아무것도 하지 않음":"rest"}>>
+	<<if _args[0] is false>>
+		<<set _askActions["멈추라고"] to "finish">>
+		<<if $player.vaginaExist>>
+			<<set _askActions["보지에 아무것도 넣지 말라고"] to "novaginal">>
+		<</if>>
+		<<if $player.penisExist>>
+			<<set _askActions["당신의 자지를 어디에도 넣지 말라고"] to "nopenile">>
+		<</if>>
+		<<set _askActions["애널에 아무것도 넣지 말라고"] to "noanal">>
+		<<if $settings.asphyxiaLevel gte 1>>
+			<<set _askActions["목을 조르지 말라고"] to "nochoke">>
+		<</if>>
+	<</if>>
+	<<if (_args[0] is false and ($choketrait or ($chokeorgasm gte 1 and $submissive gt 850))) or ($awarelevel gte 2 and $submissive gte 1150)>>
+		<<set _askActions["목을 조르라고"] to "askchoke">>
+	<</if>>
+	<<if (_args[0] is false and $masochism_level gte 1) or $masochism_level gte 3>>
+		<<set _askActions["더 거칠게 해달라고"] to "askrough">>
+	<</if>>
+	<<if $settings.condomLevel gte 2>>
+		<<set _askActions["콘돔을 쓰라고"] to "condoms">>
+		<<set _askActions["콘돔을 쓰지 말라고"] to "noCondoms">>
+	<</if>>
+	<<set _askActions["상의는 벗기지 말라고"] to "noupper">>
+
+	<<if $settings.asphyxiaLevel gte 1 and _args[0] is false and
+	($choketrait or ($chokeorgasm gte 1 and $submissive gt 850) or ($awarelevel gte 2 and $submissive gte 1150))>>
+		<<set _askActions["목을 조르라고"] to "askchoke">>
+	<</if>>
+
+	<<if $consensual is 1 and $masochism_level gte 1 or $masochism_level gte 3>>
+		<<set _askActions["더 거칠게 해달라고"] to "askrough">>
+	<</if>>
+
+	<<set _penis to {
+		"쉰다":"rest",
+	}>>
+
+	<<if hasSexStat("promiscuity", 5) or hasSexStat("deviancy", 5) or _args[0] is true>>
+		<<set _penis["상대의 보지에 누른다"] to "penistovagina">>
+
+		<<set _penis["상대의 보지를 꿰뚫는다"] to "penisvaginafuck">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _penis["상대의 클리토리스에 비빈다"] to "bay">>
+	<</if>>
+	<<set _penis["보지를 애태운다"] to "tease">>
+	<<set _penis["상대의 보지에서 떨어진다"] to "escape">>
+
+	/*After bay*/
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _penis["상대의 보지에 비빈다"] to "rub">>
+	<</if>>
+
+	/*After penisvaginafuck*/
+	<<set _penis["보지를 취한다"] to "take">>
+	<<set _penis["상대의 보지에 맞춰 움직인다"] to "cooperate">>
+	<<if (hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true) and currentSkillValue("penileskill") gte 800>>
+		<<set _penis["상대의 보지를 절정 직전까지 몰아간다"] to "vaginaEdging">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 5) or hasSexStat("deviancy", 5) or _args[0] is true>>
+		<<set _penis["상대의 엉덩이에 누른다"] to "penistoanus">>
+
+		<<set _penis["상대의 엉덩이를 꿰뚫는다"] to "penisanusfuck">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _penis["상대의 엉덩이에 비빈다"] to "otheranusbay">>
+	<</if>>
+	<<set _penis["엉덩이를 애태운다"] to "otheranustease">>
+	<<set _penis["상대의 엉덩이에서 떨어진다"] to "otheranusescape">>
+
+	/*After otheranusbay*/
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _penis["상대의 엉덩이에 비빈다"] to "otheranusrub">>
+	<</if>>
+
+	/*After penisanusfuck*/
+	<<set _penis["엉덩이를 취한다"] to "otheranustake">>
+	<<set _penis["상대의 엉덩이에 맞춰 움직인다"] to "otheranuscooperate">>
+	<<if (hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true) and currentSkillValue("penileskill") gte 800>>
+		<<set _penis["상대의 엉덩이를 절정 직전까지 몰아간다"] to "otheranusEdging">>
+	<</if>>
+	<<set _penis["허벅지를 상대의 입에 누른다"] to "thighbay">>
+	<<set _penis["상대의 얼굴에 비빈다"] to "othermouthtease">>
+
+	<<set _penis["상대의 입술에 비빈다"] to "othermouthrub">>
+	<<set _penis["상대의 입에서 떨어진다"] to "othermouthescape">>
+
+	<<set _penis["상대의 입에 맞춰 움직인다"] to "othermouthcooperate">>
+
+	<<set _vagina to {
+		"쉰다":"rest",
+		"대신 엉덩이를 내민다":"penisanus",
+	}>>
+
+	<<if hasSexStat("promiscuity", 5) or hasSexStat("deviancy", 5) or _args[0] is true>>
+		<<set _vagina["상대의 자지 위에 올라탄다"] to "vaginatopenis">>
+
+		<<set _vagina["상대의 자지를 감싼다"] to "vaginapenisfuck">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _vagina["허벅지로 상대의 자지를 밀어낸다"] to "penisthighs">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 5) or hasSexStat("deviancy", 5) or _args[0] is true>>
+		<<set _vagina["상대의 보지에 당신의 보지를 누른다"] to "vaginatovagina">>
+	<</if>>
+	<<set _vagina["상대의 자지에서 떨어진다"] to "escape">>
+	<<set _vagina["끝을 애태운다"] to "penistease">>
+
+	/*After penisthighs*/
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _vagina["상대의 자지에 비빈다"] to "rub">>
+	<</if>>
+
+	/*After vaginapenisfuck*/
+	<<set _vagina["받아들인다"] to "take">>
+	<<set _vagina["맞춰 움직인다"] to "cooperate">>
+	<<if (hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true) and currentSkillValue("vaginalskill") gte 800>>
+		<<set _vagina["보지로 상대의 자지를 절정 직전까지 몰아간다"] to "penisEdging">>
+	<</if>>
+	<<set _vagina["허벅지를 상대의 입에 누른다"] to "thighbay">>
+	<<set _vagina["상대의 얼굴에 비빈다"] to "othermouthtease">>
+
+	<<set _vagina["상대의 입술에 비빈다"] to "othermouthrub">>
+	<<set _vagina["상대의 입에서 떨어진다"] to "othermouthescape">>
+
+	<<set _vagina["상대의 입에 맞춰 움직인다"] to "othermouthcooperate">>
+
+	<<set _anus to {
+		"쉰다":"rest",
+	}>>
+	<<if $player.vaginaExist>>
+		<<set _anus["대신 보지를 내민다"] to "penispussy">>
+	<</if>>
+
+	<<if hasSexStat("promiscuity", 5) or hasSexStat("deviancy", 5) or _args[0] is true>>
+		<<set _anus["상대의 자지 위에 올라탄다"] to "anustopenis">>
+
+		<<set _anus["상대의 자지를 감싼다"] to "anuspenisfuck">>
+	<</if>>
+	<<if hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true>>
+		<<set _anus["엉덩이로 상대의 자지를 밀어낸다"] to "penischeeks">>
+	<</if>>
+	<<set _anus["끝을 애태운다"] to "penistease">>
+
+	<<set _anus["상대의 자지에서 떨어진다"] to "escape">>
+
+	/*After penischeeks*/
+	<<set _anus["상대의 자지에 비빈다"] to "rub">>
+
+	/*After anuspenisfuck*/
+	<<set _anus["받아들인다"] to "take">>
+	<<set _anus["맞춰 움직인다"] to "cooperate">>
+	<<if (hasSexStat("promiscuity", 4) or hasSexStat("deviancy", 4) or _args[0] is true) and currentSkillValue("analskill") gte 800>>
+		<<set _anus["엉덩이로 상대의 자지를 절정 직전까지 몰아간다"] to "penisEdging">>
+	<</if>>
+	<<set _anus["엉덩이를 상대의 입에 누른다"] to "bottombay">>
+	<<set _anus["상대의 얼굴에 비빈다"] to "othermouthtease">>
+
+	<<set _anus["상대의 입술에 비빈다"] to "othermouthrub">>
+	<<set _anus["상대의 입에서 떨어진다"] to "othermouthescape">>
+
+	<<set _anus["상대의 입에 맞춰 움직인다"] to "othermouthcooperate">>
+
+	<<set _anus["엉덩이로 상대의 손을 문지른다"] to "bottomhandbay">>
+	<<set _anus["애널을 상대의 손에 문지른다"] to "handtease">>
+
+	<<set _anus["상대의 손가락에 문지른다"] to "handrub">>
+	<<set _anus["상대의 손에서 떨어진다"] to "handescape">>
+
+	<<set _anus["상대의 손가락에 맞춰 움직인다"] to "handcooperate">>
+<</widget>>
+
+<<widget "tentacleDefaults">>
+	<<set _leftHand to {
+		"쉰다":"rest",
+		"붙잡는다":"leftgrab"
+	}>>
+	<<if hasSexStat("deviancy", 5)>>
+		<<set _leftHand["당신의 자지로 이끈다"] to "showpenis">>
+		<<set _leftHand["당신의 보지로 이끈다"] to "showvagina">>
+		<<set _leftHand["당신의 엉덩이로 이끈다"] to "showbottom">>
+	<</if>>
+	<<if _args[0] is true>>
+		<<set _leftHand["공격한다"] to "lefthittentacle">>
+	<</if>>
+	<<set _leftHand["쥐어짠다"] to "leftrub">>
+
+	<<set _rightHand to {
+		"쉰다":"rest",
+		"붙잡는다":"rightgrab"
+	}>>
+	<<if hasSexStat("deviancy", 5)>>
+		<<set _rightHand["당신의 자지로 이끈다"] to "showpenis">>
+		<<set _rightHand["당신의 보지로 이끈다"] to "showvagina">>
+		<<set _rightHand["당신의 엉덩이로 이끈다"] to "showbottom">>
+	<</if>>
+	<<if _args[0] is true>>
+		<<set _rightHand["공격한다"] to "righthittentacle">>
+	<</if>>
+	<<set _rightHand["쥐어짠다"] to "rightrub">>
+
+	<<set _feet to {
+		"쉰다":"rest",
+		"붙잡는다":"feetgrab"
+	}>>
+	<<if hasSexStat("deviancy", 5)>>
+		<<set _feet["당신의 자지로 이끈다"] to "showpenis">>
+		<<set _feet["당신의 보지로 이끈다"] to "showvagina">>
+		<<set _feet["당신의 엉덩이로 이끈다"] to "showbottom">>
+	<</if>>
+	<<if _args[0] is true>>
+		<<set _feet["발로 찬다"] to "feethit">>
+	<</if>>
+	<<set _feet["쥐어짠다"] to "feetrub">>
+
+	<<set _mouth to {
+		"쉰다":"rest",
+		"핥는다":"mouthlick",
+		"떨어진다":"mouthpullaway",
+		"입 맞춘다":"mouthkiss",
+		"받아들인다":"take",
+		"맞춰 움직인다":"mouthcooperate"
+	}>>
+	<<if _args[0] is true>>
+		<<set _mouth["문다"] to "mouthbite">>
+	<</if>>
+
+	<<set _penis to {
+		"쉰다":"rest",
+		"문지른다":"penisrub",
+		"떨어진다":"penispullaway",
+		"받아들인다":"take",
+		"맞춰 움직인다":"peniscooperate"
+	}>>
+
+	<<set _vagina to {
+		"쉰다":"rest",
+		"문지른다":"vaginarub",
+		"떨어진다":"vaginapullaway",
+		"받아들인다":"take",
+		"맞춰 움직인다":"vaginacooperate"
+	}>>
+
+	<<set _anus to {
+		"쉰다":"rest",
+		"문지른다":"anusrub",
+		"떨어진다":"anuspullaway",
+		"받아들인다":"take",
+		"맞춰 움직인다":"anuscooperate"
+	}>>
+<</widget>>
+
+<<widget "loveInterest">>
+	첫 번째 연인:
+	<br>
+	<<set _npc = ["None"].concat(setup.loveInterestNpc)>>
+	/* Love interest requirements defined in function isPossibleLoveInterest() */
+	<<set _potentialLoveInterests = ["None"].concat(setup.loveInterestNpc.filter(LI => isPossibleLoveInterest(LI)))>>
+	
+	/* 드롭다운 표시용 한글 변환 함수 */
+	<<set _formatLI to function(list) {
+		return Object.fromEntries(list.map(id => [id === "None" ? "없음" : (window.KR?.personNameDict?.[id] || id), id]));
+	}>>
+
+	<<if _potentialLoveInterests.length lte 1>>
+		<span class="black"><i>아직 마음이 가는 사람이 없습니다.</i></span>
+	<<else>>
+		<<listbox "$loveInterest.primary" autoselect>>
+			<<optionsfrom _formatLI(_potentialLoveInterests)>>
+		<</listbox>>
+		<<if $loveInterest.primary isnot "None">>
+			<<run _potentialLoveInterests.delete($loveInterest.primary)>>
+		<</if>>
+		<br><br>
+		두 번째 연인:
+		<br>
+		<<if $awarelevel gte 2>>
+			<<if $loveInterest.primary is "None">>
+				<<set $loveInterest.secondary to "None">>
+				<span class="black">두 번째 연인을 선택하기 전에 첫 번째 연인을 선택해야 합니다.</span>
+			<<else>>
+				<<listbox "$loveInterest.secondary" autoselect>>
+					<<optionsfrom _formatLI(_potentialLoveInterests)>>
+				<</listbox>>
+				<<if $loveInterest.secondary isnot "None">>
+					<<run _potentialLoveInterests.delete($loveInterest.secondary)>>
+				<</if>>
+			<</if>>
+		<<else>>
+			<span class="black">연인이 두 명일 수 없다고 생각합니다.</span>
+			<<set $loveInterest.secondary to "None">>
+		<</if>>
+		<br><br>
+		세 번째 연인:
+		<br>
+		<<if $awarelevel gte 3>>
+			<<if $loveInterest.secondary is "None">>
+				<<set $loveInterest.tertiary to "None">>
+				<span class="black">세 번째 연인을 선택하기 전에 두 번째 연인을 선택해야 합니다.</span>
+			<<else>>
+				<<listbox "$loveInterest.tertiary" autoselect>>
+					<<optionsfrom _formatLI(_potentialLoveInterests)>>
+				<</listbox>>
+			<</if>>
+		<<else>>
+			<span class="black">연인이 세 명일 수 없다고 생각합니다.</span>
+			<<set $loveInterest.tertiary to "None">>
+		<</if>>
+	<</if>>
+	<<if $transformationParts.traits.mateForLife isnot "disabled" and (!isLoveInterest(_loveIntStart1) or (_loveIntStart2 isnot "None" and !isLoveInterest(_loveIntStart2)) or (_loveIntStart3 isnot "None" and !isLoveInterest(_loveIntStart3)))>>
+		<<set $LIChanged to true>>
+		<br>
+		<span class="red">파트너를 바꾸는 것은 평생의 짝을 찾으려는 본능에 어긋납니다. 정신 상태에 타격이 올 겁니다.</span>
+	<<else>>
+		<<unset $LIChanged>>
+	<</if>>
+<</widget>>
+
+<<widget "loveInterestAdd">>
+	<<set $_LI to _args[0]>>
+	<<if setup.loveInterestNpc.includes($_LI)>>
+		<span class="gold">
+		<<if $loveInterest.primary is "None">>
+			<<set $loveInterest.primary to $_LI>><<set $_assigned to true>>
+		<<elseif $loveInterest.secondary is "None" and $awarelevel gte 2>>
+			<<set $loveInterest.secondary to $_LI>><<set $_assigned to true>>
+		<<elseif $loveInterest.tertiary is "None" and $awarelevel gte 3>>
+			<<set $loveInterest.tertiary to $_LI>><<set $_assigned to true>>
+		<</if>>
+		<<if $_assigned>>
+			<<= $_LI>>【이가】 이제 당신의 연인입니다!
+		<<else>>
+			이제 <<= $_LI>>【을를】 연인으로 삼을 수 있습니다!
+		<</if>>
+		<<switch $_LI>>
+			<<case "Robin">>그 생각만으로도 마음이 따뜻해집니다.
+			<<case "Whitney">>【이가】 문제에 대해선 당신에게 선택권이 없는 것 같습니다.
+			<<case "Kylar">>
+				<<if _args[1] is "consensual">>
+					당신은 <<nnpc_he "Kylar">>【이가】 항상 당신의 뒤를 지켜볼 것이라는 것을 알고 있습니다. 항상.
+				<<else>>
+					당신은 이에 동의했는지 확신할 수 없습니다.
+				<</if>>
+			<<case "Sydney">><<nnpc_him "Sydney">>【을를】 순수하게 지킬 것인가요, 아니면 함께 타락할 것인가요?
+			<<case "Eden">>위험하다는 느낌은 지나갔고, 당신은 여기서 더 안전하다고 느낍니다.
+			<<case "Avery">>당신들은 세상에서 출세하고 있다는 느낌을 받습니다.
+			<<case "Black Wolf">><<nnpc_He "Black Wolf">>【은는】 짝을 찾게 되어 기뻐하는 것 같습니다.
+			<<case "Great Hawk">>이런 식으로 <<if $monster is 1>><<nnpc_wife "Great Hawk">><<else>>짝을<</if>> 찾게 될 줄은 몰랐지만, 어쨌든 기분이 고양됩니다.
+			<<case "Alex">>어쨌든, 함께 살 수 있습니다.
+			<<case "Gwylan">>
+				<<if $gwylanSeen?.includes("romance")>>
+					당신은 영원할 준비가 되었고, <<nnpc_he "Gwylan">> 역시 마찬가지입니다.
+				<<else>>
+					영원히는 아니지만, 지금 당장은 말입니다. 지금 당장이 가장 중요합니다.
+				<</if>>
+		<</switch>>
+		<br>
+		"태도" 메뉴에서 연인<<if $awarelevel gte 2>>들<</if>>【을를】 변경할 수 있습니다.
+		</span>
+	<</if>>
+<</widget>>
+
+<<widget "loveInterestRemove">>
+	<<set $_LI to _args[0]>>
+	<<if setup.loveInterestNpc.includes($_LI) and isLoveInterest($_LI)>>
+		<<if $loveInterest.primary is $_LI>>
+			<<set $loveInterest.primary to "None">>
+		<<elseif $loveInterest.secondary is $_LI>>
+			<<set $loveInterest.secondary to "None">>
+		<<elseif $loveInterest.tertiary is $_LI>>
+			<<set $loveInterest.tertiary to "None">>
+		<</if>>
+		<<if $loveInterest.primary is "None" and $loveInterest.secondary isnot "None">>
+			<<set $loveInterest.primary to $loveInterest.secondary>>
+			<<set $loveInterest.secondary to "None">>
+		<</if>>
+		<<if $loveInterest.secondary is "None" and $loveInterest.tertiary isnot "None">>
+			<<set $loveInterest.secondary to $loveInterest.tertiary>>
+			<<set $loveInterest.tertiary to "None">>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "debugUnlockAllLoveInterests">>
+	/* Debug widget that unlocks all love interests  */
+	<<for _li range setup.loveInterestNpc>>
+		<<npc _li>> /* Declares the LI */
+
+		/* fulfill specific conditions here to not bug the rest */
+		<<switch _li>>
+			<<case "Robin">>
+				<<set $robinromance to 1>>
+			<<case "Whitney">>
+				<<set $whitneyromance to 1>>
+				<<npcset Whitney state "active">>
+			<<case "Kylar">>
+				<<set $kylarenglish to 1>>
+				<<npcset Kylar state "active">>
+			<<case "Sydney">>
+				<<set $sydneyromance to 1>>
+			<<case "Eden">>
+				<<set $syndromeeden to 1>>
+			<<case "Avery">>
+				<<npcset Avery state "active">>
+				<<world_corruption "hard" 1>>
+				<<set $auriga_artefact to "Avery">>
+			<<case "Black Wolf">>
+				<<set $syndromewolves to 1>>
+				<<if $deviancy lt 35>>
+					<<set $deviancy to 35>>
+				<</if>>
+			<<case "Great Hawk">>
+				<<set $syndromebird to 1>>
+			<<case "Alex">>
+				<<farm_init>>
+				<<set $farm_stage to 7>>
+				<<set $alex_countdown to undefined>>
+			<<case "Gwylan">>
+				<<set $gwylanSeen to []>>
+				<<set $gwylanSeen.pushUnique("partners")>>
+		<</switch>>
+
+		/* Finally add the LI as selectable */
+		<<loveInterestAdd _li>>
+	<</for>>
+<</widget>>
+<<widget "attitudesControlCheck">>
+	/* highlight the attitudes button when new attitude controls are available */
+	<<script>>
+		/* back up the old variable for later comparison */
+		T.oldControl = clone(V.attitudesControl);
+		/* update available controls */
+		V.attitudesControl.unlockExhibitionismUnderwear = V.exhibitionism >= 55;
+		V.attitudesControl.unlockExhibitionismNude = V.exhibitionism >= 95;
+		V.attitudesControl.unlockDemonFlaunt = V.demon >= 6 && V.exhibitionism >= 95;
+		V.attitudesControl.unlockProstitution = V.soldCount >= 1 || V.docksrobinintro === 1;
+		/* getting the first LI automatically assigns them as a primary one, indicating that now there's options */
+		V.attitudesControl.unlockLoveInterest1 = V.loveInterest.primary !== "None";
+		/* there's no point in highlighting that you can assign the second LI if you've not assigned the first one */
+		V.attitudesControl.unlockLoveInterest2 = V.awarelevel >= 2 && V.loveInterest.primary !== "None" && V.loveInterest.secondary === "None";
+		V.attitudesControl.unlockLoveInterest3 = V.awarelevel >= 3 && V.loveInterest.primary !== "None" && V.loveInterest.secondary !== "None" && V.loveInterest.tertiary === "None";
+		V.attitudesControl.unlockDefaultActions = V.moleststat > 0;
+		V.attitudesControl.unlockLewd = V.exhibitionism >= 35 || V.promiscuity >= 35 || V.deviancy >= 35;
+		V.attitudesControl.unlockHypnosis = Object.keys(V.hypnosis_traits).length >= 1;
+		V.attitudesControl.unlockAveryMeek = V.avery_mansion?.jobs.includes("meek");
+		V.attitudesControl.unlockAveryKneel = V.avery_mansion?.jobs.includes("knees");
+		V.attitudesControl.unlockAveryBow = V.avery_mansion?.jobs.includes("bow");
+		/* set the highlight flag when one of the controls switches to true */
+		for (const c in V.attitudesControl) {
+			if (V.attitudesControl[c] && !T.oldControl[c]) { V.attitudesControl.showGoldLink = true; break }
+		}
+	<</script>>
+<</widget>>

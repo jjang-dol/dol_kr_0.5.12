@@ -1,0 +1,716 @@
+:: Adult Shop Widgets [widget]
+
+<<widget "adultShopEvents">>
+	<<endevent>><<generateAdultShopCustomer 1>>
+
+	<<set _reactTone to either("코웃음 친다","외친다","조용히 한탄한다","얼굴을 감싼다","노려보고 <<his>> 눈을 굴린다")>>
+	<<set _reactSpeech to ["그건 부적절합니다,"]>>
+	<<set _reactPerson to "Sirris">>
+	<<set _reactTitle to "과학 교사">>
+
+	<<if $adultshopstate is "sydney" and random(0,1) is 1>>
+		<<set _reactSpeech to [
+			"맙소사!",
+			"무엇을 도와드릴까요?",
+			"그건 부적절해요.",
+			"흠?",
+			"흠?",
+			"ㅁ-뭐... 조심 좀 해주세요."
+		]>>
+		<<set _reactTone to either("코웃음 친다","외친다","<<nnpc_his \"Sydney\">> 눈을 가리며 중얼거린다","카운터 뒤로 물러난다")>>
+		<<run statusCheck("Sydney")>>
+		<<if _sydneyStatus.includes("corrupt")>>
+			<<set _reactPerson to "Sydney">>
+				<<set _reactSpeech to [
+					"이거 아주 멋지군,",
+					"그건 부적절해요,",
+					"꺼져, 이 패배자야!",
+					"뭐라도 사든가 비켜,",
+					"뭘 사든지 아니면 꺼져!",
+					"제기랄!",
+					"못된 아이네! 너를 어떻게 해야 할까?",
+					"와. 진짜 와,",
+					"쯧, 쯧,",
+					"내 거나 빨아!",
+					"장난감 추천이라도 필요하신가요?"
+				]>>
+			<<set _reactTone to either("코웃음 친다","외친다","얼굴을 감싼다","한탄한다","제안한다","노려보고 <<nnpc_his Sydney>> 눈을 굴린다","야유한다")>>
+		<</if>>
+		<<set _reactTitle to window.KR.getNpcTitleKr(C.npc.Sydney.title) + (C.npc.Sydney.gender is "m" ? " 소년" : " 소녀")>>
+		<<set _reactTitle to "Sydney">>
+		<<set _reactPerson to "Sydney">>
+	<<else>>
+		<<set _reactSpeech.push(
+			"못된 아이네! 너를 어떻게 해야 할까?",
+			"이것보단 잘할 수 있잖아, 자 어서,",
+			"도움이 필요하신가요? 신기한 모양의 애널 플러그에 관심 있으신가요?",
+			"오, 얌전히 굴어!",
+			"맙소사!",
+			"쯧, 쯧,",
+			"다른 손님들을 배려해주세요!"
+		)>>
+		<<set _reactTone to either("코웃음 친다","외친다","얼굴을 감싼다","킬킬 웃는다","어이없다는 듯 숨을 내쉰다","선의로 한숨을 쉰다","제안한다","활짝 웃는다","딜도로 가리킨다","손가락을 까딱인다")>>
+		<<set _reactPerson to "Sirris">>
+		<<set _reactTitle to C.npc.Sirris.title>>
+		<<set _reactTitle to "Sirris">>
+	<</if>>
+
+	<<if $adultshopintro is 0 or ($adultshopintro is 1 and random(2) is 0)>>
+		<<adultShopBackgroundEvent>>
+		<<if $adultshopstate is "sydney">>
+			<br><br>
+			<<set _reactPerson to (_reactPerson is "Sydney" ? "Sirris" : "Sydney")>>
+			<<adultShopPersonEvent>>
+		<</if>>
+	<<else>>
+		<<adultShopPersonEvent>>
+		<<if $adultshopstate is "sydney">>
+			<<set _reactPerson to (_reactPerson is "Sydney" ? "Sirris" : "Sydney")>>
+			<<adultShopPersonEvent>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "adultShopBackgroundEvent">>
+	<<endevent>><<generateAdultShopCustomer 1>>
+	/*<<set _reactTone to _args[0]>>
+	<<set _reactSpeech to _args[1]>>
+	<<set _reactPerson to _args[2]>>
+	<<set _reactTitle to _args[3]>>*/
+	<!-- Background event pool -->
+	<<switch random(0,12)>>
+		<<case 0 1>>
+			<<print window.KR.getDescriptionKr($NPCList[0].fullDescription)>>【이가】 딜도를 도발적으로 들어 올리며 당신을 음흉하게 바라본다.
+			<<if $adultshopstate is "sydney" and _sydneyStatus.includes("corrupt")>>
+				<<set _reactSpeech.push("뭐라도 사든가 비켜.","그건 부적절해요.","변태 출몰!")>>
+			<</if>>
+		<<case 2 3>>
+			<<person1>><<person>>【이가】 초조한 듯 몸을 뒤척이며, <<his>> 가랑이에 <<print either("딜도","DVD","잡지","애널 플러그")>>【을를】 문지르며 신음을 흘린다.
+			<<if $adultshopstate is "sydney" and _sydneyStatus.includes("corrupt") and _reactPerson is "Sydney">>
+				<<set _reactSpeech to ["그건 부적절해요.","변태 출몰!","그거 계산은 해야 할 거야.","그거 계산은 해야 할 거야.","써 보기 전에 먼저 사, 변태야.","뭐라도 사든가 꺼져!","뭐라도 사든가 비켜."]>>
+			<</if>>
+			<<if _reactPerson is "Sydney">>
+				<<set $_purityLoss to true>>
+			<</if>>
+		<<case 4 5>>
+			<<person1>><<person>>【이가】 _reactTitle에게 <<print either("말한다","부드럽게 속삭인다","<<laughs>>")>>,
+			<<print either("\"이봐 자기, 이것 좀 모델해 줄래?\"",
+			"\"이봐 자기, 이 기구 어떻게 쓰는지 좀 보여줄래?\"",
+			"\"끝내주네, 자기!\" <<He>>【이가】 늑대 휘파람을 분다.")>>
+			<<if $adultshopstate is "sydney" and _sydneyStatus.includes("corrupt") and _reactPerson is "Sydney">>
+				<<set _reactSpeech.push("그건 부적절해요.","내 엉덩이나 빨아, 오줌 싸개야!","변태 출몰!","꿈 깨, 병신아!")>>
+			<<elseif $adultshopstate is "sirris">>
+				<<set _reactSpeech.push("여기서 무슨 일이죠?")>>
+			<</if>>
+			<<if _reactPerson is "Sydney">>
+				<<set $_purityLoss to true>>
+			<</if>>
+		<<case 6 7>>
+			<<person1>><<person>>【이가】 코트 깃을 여미며 은밀하게 주위를 살핀다. <<He>>【은는】 _reactTitle에게 달려가 코트를 활짝 열어젖히며, <<his>> 생식기를 노출한다.
+			<<if $adultshopstate is "sydney" and _sydneyStatus.includes("corrupt") and _reactPerson is "Sydney">>
+				<<set _reactSpeech.push("변태 출몰!","제기랄!","출입 금지, 금지라고, 꺼져! 출입 금지야!")>>
+				<<set _reactTone to "<<nnpc_his Sydney>> 얼굴을 가리고 카운터 뒤로 물러난다">>
+			<<elseif $adultshopstate is "sydney" and _reactPerson is "Sydney">>
+				<<set _reactSpeech.push("아, 또야!")>>
+				<<set _reactTone to "<<nnpc_his Sydney>> 얼굴을 가리고 카운터 뒤로 물러난다">>
+			<</if>>
+			<<if _reactPerson is "Sydney">>
+				<<set $_purityLoss to true>>
+			<</if>>
+		<<case 8 9>>
+			한 커플이 딜도를 비교하고 있다. <<person1>><<person>>【이가】 장난스럽게 <<generateAdultShopCustomer 2 "couple">><<person2>><<person>>의 얼굴을 후려친다.
+		<<case 10 11>>
+			잡지에 푹 빠져 있던 <<person1>><<person>>【이가】 딜도가 가득 찬 선반을 넘어뜨린다.
+
+		<<case 12>>
+			<!-- Wraith? -->
+			<<rngWraith 1>>
+			<<if _wraithEvent is true>>
+				당신의 귀에 숨 가쁜 목소리가 속삭이는 것이 들린다.
+				<br>
+				"<span class="wraith"><<print either("너의 매력에 짓눌린 채. 사냥감처럼 맴도는구나","우리는 죽지 않았다. 우리는 계속 살아있었다.","하늘의 불꽃이 꺼졌구나","한때 있었던 것들은 이제 사라졌네. 모든 갈망과 고통이여","내 품으로 떨어지렴, 최면에 걸린 듯한 흔들림을 간직한 채","나는 너의 외로움을 위한 기도란다","꿈의 연못에서, 물이 검게 물드는구나","나의 <<pcPetname \"Wraith\">>")>>.</span>"
+				<br>
+				깜짝 놀란 당신은 <<print either("윤활제","볼 개그","오나홀","딜도")>> 진열대를 쓰러뜨린다. 휙 돌아보지만, 당신 뒤에는 아무도 없다.
+				<<stress 12>><<ggstress>><<trauma 4>><<gtrauma>>
+			<<else>>
+				무언가 당신의 등을 찌른다. 뒤돌아보니, 입이 귀에 걸리도록 웃고 있는 <<person1>><<person>>【이가】 딜도로 당신을 찌르고 있다.
+				<<stress 5>><<gstress>>
+			<</if>>
+			<<if $adultshopstate is "sydney" and $sydneyromance gte 1>>
+				<<set _reactSpeech to ["괜찮아요?","저쪽 괜찮으세요?", "도와드릴까요?"]>>
+				<<if $adultshopstate is "sydney" and $sydneyromance gte 1 and _reactPerson is "Sydney">>
+					<<set _reactTone to either("묻는다","외친다","어이없다는 듯 숨을 내쉰다","선의로 한숨을 쉰다","제안한다","따뜻하게 미소 짓는다")>>
+				<</if>>
+			<</if>>
+	<</switch>>
+	<br>
+
+	"<<print _reactSpeech.random()>>" _reactPerson【이가】 _reactTone.
+	<<if $adultshopstate is "sydney" and $_purityLoss>>
+		<<npcincr Sydney purity -1>><<lspurity>>
+	<</if>>
+<</widget>>
+
+<<widget "adultShopPersonEvent">>
+	<<endevent>><<generateAdultShopCustomer 1>>
+	<<if _reactPerson is "Sirris">>
+		<<switch random(0,8)>>
+		<<case 0>>
+			<<set $_topic to either("자기 사업 운영하기","페깅","다양한 윤활제 브랜드","애널 플러그","위생","바디 페인트","딜도","스트로커","다양한 콘돔 종류","바이브레이터","콘돔과 페서리의 차이")>>
+			<<if random(1) is 0>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 <<person1>><<person>>【와과】 $_topic의 장점에 대해 의논한다.
+			<<else>>
+			<<generateAdultShopCustomer 2 "partner">>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 <<fullGroup>>【와과】 $_topic의 장점에 대해 의논한다.
+			<</if>>
+		<<case 1 2 3>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 계산대에서 일한다.
+		<<case 4 5>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【이가】 손님들에게 다양한 <<print either("딜도","페니스 밴드","애널 플러그","윤활제","볼 개그","라텍스 의상","정조대 기구")>>【을를】 보여주고 있다.
+		<<case 6>>
+			<<generateAdultShopCustomer 2 "partner">>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【이가】 <<fullGroup>>【와과】 커플용 <<print either("페니스 밴드","롤플레이","의상","딜도","본디지 웨어")>>에 대해 상의하고 있다.
+		<<case 7>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 소포에 서명한다.
+		<<case 8>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 서류들을 꼼꼼히 살펴본다.
+		<</switch>>
+	<<else>>
+		<<switch random(0,7)>>
+		<<case 0 1 2>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 카운터를 깨끗하게 닦는다.
+		<<case 3>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 부지런히 창문을 닦는다.
+		<<case 3>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 선반을 채우고 있다.
+		<<case 4>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 재고가 실린 손수레를 밀며 창고에서 나온다.
+		<<case 5>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 클립보드를 자세히 들여다본다.
+		<<case 6>>
+			<<if !_sydneyStatus.includes("corrupt")>>
+				<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 손버릇이 나쁜 손님을 피해 카운터 뒤로 물러난다.
+			<<else>>
+				<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 손님의 손을 찰싹 쳐내고는 <<nnpc_his "Sydney">> 일을 계속한다.
+			<</if>>
+		<<case 7>>
+			<<print window.KR.gatPersonNameDictKR(_reactPerson)>>【은는】 상품의 먼지를 턴다.
+		<</switch>>
+	<</if>>
+<</widget>>
+
+<<widget "getadultshopstate">>
+	<<sydneySchedule>>
+	<<if Time.hour gte 21 or Time.weekDay is 1 or (Time.weekDay is 7 ? Time.hour lt 9 : Time.hour lt 16) or $adultshophelped is 1>>
+		<<set $adultshopstate to "closed">>
+	<<elseif _sydney_location is "shop">>
+		<<set $adultshopstate to "sydney">>
+	<<else>>
+		<<set $adultshopstate to "sirris">>
+	<</if>>
+<</widget>>
+
+<<widget "generateAdultShopCustomer">>
+	/* Generates random customers with descriptors unique to the store. _args[1] turns the NPC into a partner */
+
+	<<set $_customertype to [{description:"저속한",hp:220},{description:"수상한",hp:220},{description:"음침한",hp:220},{description:"뚱뚱한",hp:250},{description:"머리를 번들거리게 넘긴",hp:200},{description:"근육질의",hp:275},{description:"노년의",hp:175},{description:"화려한",hp:200},{description:"입을 벌리고 숨 쉬는",hp:200},{description:"소름끼치는",hp:250},{description:"가느다란",hp:200},{description:"키득거리는",hp:200},{description:"뼈마디가 도드라진",hp:175}]>>
+
+	<<if _args[1] isnot undefined>>
+		<<set _generate_partner to 1>>
+	<</if>>
+	<<generateNPC _args[0]>>
+
+	<<set $_npc to $NPCList[_args[0]-1]>>
+	<<if $_npc.pronoun is "m">>
+		<<set $_customertype.push({description:"잘생긴",hp:200},{description:"거친",hp:250},{description:"난폭한",hp:275},{description:"멋쟁이 같은",hp:175},{description:"탄탄한",hp:250})>>
+	<<else>>
+		<<set $_customertype.push({description:"예쁜",hp:200},{description:"귀여운",hp:200},{description:"포동포동한",hp:250},{description:"가슴이 큰",hp:220},{description:"굴곡진",hp:220})>>
+	<</if>>
+	<<set $_chosentype to $_customertype.random()>>
+	<<set $_npc.description to $_chosentype.description>>
+	<<set $_npc.fullDescription to $_chosentype.description + ($_npc.pronoun is "m" ? " 남자" : " 여자")>>
+	<<set $_npc.healthmax to $_chosentype.hp>>
+<</widget>>
+
+<<widget "adultShopClear">>
+	<<set $adultshopintro to 0>>
+	<<endevent>>
+<</widget>>
+
+<<widget "adultshopentryevent">>
+	/* Events which take you to a specific passage instead of the usual store */
+	<<endevent>><<cleareventpool>><<getadultshopstate>>
+
+	<<addinlineevent "entershop" 20>>
+		<<shopicon "adult">><<link [[성인용품점 (0:01)|Adult Shop]]>><<pass 1>><</link>>
+	<</addinlineevent>>
+
+	<<if $adultshopstate is "sirris">>
+		<<addinlineevent "sirrisshopassist" 1>>
+			<<shopicon "adult">><<link [[성인용품점 (0:01)|Sirris Shop Assistant 1]]>><<pass 1>><</link>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $adultshopstate is "sydney" and C.npc.Whitney.state is "active">>
+		<<addinlineevent "whitneydildothief" 1>>
+			<<shopicon "adult">><<link [[성인용품점 (0:01)|Whitney Dildo Thief]]>><<pass 1>><</link>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $adultshopstate is "sydney">>
+		<<addinlineevent "customerdildoflirtingsydney" 1>>
+			<<shopicon "adult">><<link [[성인용품점 (0:01)|Adult Shop Customer Dildo Flirt Sydney]]>><<pass 1>><</link>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $adultshopstate is "sydney" and !$daily.sydney.adultshop>>
+		<<addinlineevent "sydneybackroominvitation" 5>>
+			<<shopicon "adult">><<link [[성인용품점 (0:01)|Sydney Backroom Invitation Enter]]>><<pass 1>><</link>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "giveNPCsextoy">>
+	/* args[0] = NPC index */
+	/* args[1] = Toy name. Possible toys: ("dildo","length of anal beads","riding crop","flog") */
+	/* args[2] = Hand. Left blank it will select a random hand */
+
+	<<if _args[0] isnot undefined and _args[1]>>
+		<<set $_npc to _args[0]>>
+		<<set $_toy to _args[1]>>
+
+		<<if _args[2] isnot undefined>>
+			<<set $NPCList[$_npc][_args[2]+"tool"] to $_toy>>
+			<<set $NPCList[$_npc][_args[2]+"hand"] to "dildo_reveal">>
+		<<else>>
+			<<if random(0,1) is 0>>
+				<<set $NPCList[$_npc].lefttool to $_toy>>
+				<<set $NPCList[$_npc].lefthand to "dildo_reveal">>
+			<<else>>
+				<<set $NPCList[$_npc].righttool to $_toy>>
+				<<set $NPCList[$_npc].righthand to "dildo_reveal">>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "adultshopclerkevents">>
+	<<cleareventpool>>
+	<<adultShopWage>>
+
+	<<addinlineevent "uneventful" 0.5>>
+		교대 시간은 별일 없이 지나간다. 당신은 <<moneyGain _wage>>【을를】 번다.<<glove "Sirris">><<npcincr Sirris love 1>>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "uneventful2" 0.5>>
+		<<set $_tip to _wage>>
+		<<if $awareness gte 300 and hasSexStat("promiscuity", 5)>>
+			당신은 손님들에게 좋은 조언을 제공하고 자연스럽게 대화를 나눴다.
+			<br><br>
+			<<set $tipmod to random(1,3)*random(1,3)*random(1,2)/10>>
+			<<tipset>>
+			<<set $tip += _wage*100>>
+			손님들이 당신에게 팁을 조금 주었다. <<tipreceive "adultShop">><<control 1>><<stress -1>><<gcontrol>><<lstress>><<glove "Sirris">><<npcincr Sirris love 1>>
+		<<else>>
+			당신은 대화를 주도하지만, 그럼에도 불구하고 불편함을 느낀다.<<stress -1>><<lstress>><<gtiredness>><<tiredness 2>>
+			<br><br>
+			당신은 <<moneyGain _wage>>【을를】 벌었다.
+		<</if>>
+			<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "vipnope" 0.1>>
+		비싸 보이는 정장 차림의 <<generateAdultShopCustomer 1>><<person1>><<person>>【이가】 문을 열고 들어온다. 당신과 눈이 마주치자, <<he>>【은는】 발길을 돌려 콧노래를 흥얼거리며 문 밖으로 걸어 나간다.
+		<br><br>
+		당신은 <<moneyGain _wage>>【을를】 번다.<<npcincr Sirris love 1>><<glove "Sirris">>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "stockingshelves" 1>>
+		선반을 채우던 중
+		<<set $_randomitem to either("딜도 몇 개","애널 비즈 몇 개","볼 개그 몇 개","애널 에그","애널 플러그","윤활제 웅덩이","윤활제 병들")>>
+		<<if $worn.feet.type.includes("heels")>>
+			당신은 $_randomitem에 미끄러져 넘어져 발목을 삔다.<<gpain>><<gstress>><<pain 4>><<stress 5>>
+		<<elseif $worn.feet.type.includes("rugged")>>
+			당신은 무거운 신발로 <<= $_randomitem >>【을를】 짓밟지만, 다행히 균형은 잡는다.<<gstress>><<stress 3>>
+		<<else>>
+			당신은 하마터면 $_randomitem에 미끄러질 뻔하지만, 중심을 잡는다.<<gstress>><<stress 3>>
+		<</if>>
+		<br><br>
+		당신은 <<moneyGain _wage>>【을를】 번다.<<glove "Sirris">><<npcincr Sirris love 1>><<gtiredness>><<tiredness 3>>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "outfitcompliment" 1>>
+		/*Customer compliments you on your costume/fetish wear/school uniform/formal outfit/compliments your service skills*/
+		<<generateAdultShopCustomer 1>><<person1>>
+		<<if $worn.upper.type.includesAny("fetish", "costume", "school") and random(0,3) is 0>>
+			"옷이 참 예쁘네. 아주 <<cute>>," <<person>>【이가】 당신의 $worn.upper.name【와과】 <<breasts>>【을를】 음흉하게 쳐다보며 말한다.<<gstress>><<gcontrol>><<control 5>><<stress 3>>
+		<<elseif $worn.upper.type.includes("school")>>
+			"학교 <<girl>>, 좋지. 바로 여기서 가르쳐 줄 게 있는데!" <<He>>【은는】 <<his>> 가랑이를 움켜쥐고 <<laughs>>.<<gstress>><<stress 5>>
+		<<else>>
+			<<switch random(0,2)>>
+			<<case 0 1>>
+				"일 잘하고 있네," <<person>>【이가】 칭찬한다.<<lstress>><<gcontrol>><<control 5>><<stress -5>>
+			<<case 2>>
+				<<person>>【이가】 당신의 가슴을 유심히 살펴본다.
+				<<stress 5>>
+				<<if $player.perceived_breastsize lte 1>>
+					"그 젖꼭지 핥아주고 싶네, 귀염둥이," <<he>>【이가】 지껄인다.<<gstress>><<stress 5>><<insecurity "breasts_small" 10>><<ginsecurity "breasts_small">>
+				<<elseif $player.perceived_breastsize lte 5>>
+					"작고 귀여운 젖탱이네!" <<he>>【이가】 함박웃음을 지으며 소리친다.<<gstress>><<stress 5>><<insecurity "breasts_small" 5>><<ginsecurity "breasts_small">>
+				<<elseif $player.perceived_breastsize lte 7>>
+					"저 엄청난 젖통 좀 보라고," <<he>>【이가】 조롱한다.<<gstress>><<stress 5>><<insecurity "breasts_big" 5>><<ginsecurity "breasts_big">>
+				<<else>>
+					"멋진 젖소 가슴이네. 하루 종일 빨아줄 수도 있는데," <<he>>【이가】 조롱한다. <<He>>【은는】 <<his>> 입술을 오므리며 빠는 시늉을 한다.<<gstress>><<stress 5>><<insecurity "breasts_big" 5>><<ginsecurity "breasts_big">>
+				<</if>>
+			<</switch>>
+		<</if>>
+		<br><br>
+       <<set $tipmod to random(1,3)*random(1,3)*random(1,2)/10>>
+       <<tipset>>
+       <<set $tip += _wage*100>>
+       <<He>>【이가】 당신에게 팁을 남겼다. <<tipreceive "adultShop">><<npcincr Sirris love 1>><<glove "Sirris">>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "customerthankyoutip" 1>>
+       /*tip is now \$_shoptip=random(1,3)*random(1,3)*random(1,2)*(1+($mathstrait / 4))*(1+($attractiveness / 10000))*/
+		<<generateAdultShopCustomer 1>><<person1>>
+		당신은 <<person>>【와과】 시간을 보내며, <<he>>【이가】 다양한 상품을 고르도록 돕는다. <<He>>【은는】 당신에게 거듭 감사 인사를 하며 수작을 부리려 하지만, 당신은 간신히 <<him>>【을를】 쳐낸다.<<gstress>><<gtiredness>>
+		<br><br>
+       <<set $tipmod to random(1,3)*random(1,3)*random(1,2)/10>>
+       <<tipset>>
+       <<set $tip += _wage*100>>
+       서비스에 대한 감사의 표시로, <<he>>【이가】 당신에게 팁을 남겼다. <<tipreceive "adultShop">><<npcincr Sirris love 1>><<glove "Sirris">>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "students" 1>>
+		/* Low school status event */
+		<<generatey1>><<generatey2>><<generatey3>>
+		소규모의 학생 무리가 가게로 들어온다. 당신은 그들이 같은 학교 학생임을 알아본다.
+		<br><br>
+		<<if $cool lte 80>>
+			"어, 너 학교에 그 괴짜잖아," <<person1>><<person>>【이가】 조롱한다.
+			<br>
+			<<if $worn.upper.type.includes("school")>>
+				"아직도 교복을 입고 있잖아. 불쌍한 고아 패배자 새끼!" <<person2>><<person>>【이가】 <<print either("웃는다","낄낄거린다","키득거린다")>>.
+			<<else>>
+				"그렇게 구린 옷을 입고 일한다고? 괴짜 자식."
+			<</if>>
+			<br>
+			"<<pShe>>【은는】 저렇게 입으니까 <<cute>>," <<person3>><<person>>【이가】 당신을 위아래로 훑어보며 끼어든다.
+			<br>
+			"닥쳐, <<pshe>>【이가】 괴짜라고!" <<person2>><<person>>【이가】 호통친다.
+			<br>
+			"어쨌든, 이 괴상한 놈 가게에서 나가자," <<person1>><<person>>【이가】 말한다.<<gstress>><<gtrauma>><<trauma 5>><<stress 5>><<status -1>><<lcool>>
+			<br>
+		<<elseif $cool lt 140>>
+			"어디서 본 적 있지 않나? 학교? 허," <<person1>><<person>>【이가】 <<if random(1) is 1>><<himself>>에게 <<laughs>>.<<else>><<person2>><<person>>【와과】 함께 <<laughs>>.<</if>><<gstress>><<stress 5>>
+			<br>
+		<<else>>
+			"멋진데 친구!" <<person1>><<person>>【이가】 칭찬한다.<<lstress>><<ltrauma>><<gcontrol>><<stress -5>><<trauma -5>><<control 5>>
+			<br>
+		<</if>>
+		<br>
+		당신은 <<moneyGain _wage>>【을를】 번다.<<npcincr Sirris love 1>><<glove "Sirris">>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<addinlineevent "gimp1" 1>>
+		<<generateAdultShopCustomer 1>><<generateyv2>>
+		<<person2>><<person>>【은는】 목줄에 끌려 가게 안을 돌아다니며 눈을 내리깔고 있다. <<person1>><<person>>【은는】 <<person2>><<personsimple>>【이가】 방심한 틈을 타 사슬을 홱 잡아당기는 것을 즐긴다.
+		<br>
+		<<person1>><<person>>【이가】 여러 개의 <<print either("거대한 딜도","커다란 딜도","딜도","채찍과 가죽끈","아주 커다란 애널 플러그와 애널 비즈")>>【을를】 구매한다. 당신이 계산을 마칠 때, <<He>>【은는】 동행자에게 음탕한 미소를 짓는다.
+		<<if $awareness gte 300>>
+			<<person2>><<personssimple>> 거래가 이루어지는 내내 눈을 내리깔고 있지만, 당신은 <<he>>【이가】 성적 쾌감에 떨고 있다는 것을 눈치채지 않을 수 없다.
+		<<else>>
+			<<person2>><<personssimple>> 공허한 눈동자는 거래가 이루어지는 내내 아래를 향해 있다.
+		<</if>>
+		<br><br>
+       <<set $tipmod to random(1,3)*random(1,3)*random(1,2)/10>>
+       <<tipset>>
+       <<set $tip += _wage*100>>
+       <<person1>><<He>>【이가】 당신에게 팁을 남겼다. <<tipreceive "adultShop">><<npcincr Sirris love 1>><<glove "Sirris">>
+		<br><br>
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+	<</addinlineevent>>
+
+	<<if $cool lt 80 or $debug is 1>>
+		/* school status event */
+		<<addinlineevent "studentbully" 1>>
+			<<endevent>>
+			<<generatey1>><<person1>>
+			<<person>>【이가】 당신에게 이리 오라고 손짓한다.
+			<br><br>
+			"반에서 널 본 기억이 나. 성인용품점에서 일하고 있었네!" <<He>>【은는】 당신의 면전에 대고 웃음을 터뜨린다. "다른 애들이 이 얘길 들으면 어떨지 기대되는데! 만약..."
+			<<He>>【은는】 당신을 위아래로 훑어보며 말끝을 흐린다.
+			<br><br>
+			<<if hasSexStat("promiscuity", 4)>>
+				<<link [[몸을 바친다|Adult Shop School Bully Offer Your Body]]>><<stress 12>><<trauma 12>><</link>><<promiscuous4>><<ggstress>><<ggtrauma>>
+				<br>
+			<</if>>
+			<<if $speech_attitude is "bratty">>
+				<<link [[<<he>>에게 떠나라고 요구한다|Adult Shop School Bully Assertive]]>><<status -15>><<stress 5>><<control 5>><</link>><<llcool>><<gstress>><<gcontrol>>
+				<br>
+			<</if>>
+			<<link [[견뎌낸다|Adult Shop School Bully Endure]]>><<status -5>><<stress 5>><<trauma 5>><</link>><<lcool>><<gstress>><<gtrauma>>
+
+		<</addinlineevent>>
+	<</if>>
+
+	<<if C.npc.Whitney.state isnot "dungeon" and $whitneyromance gte 1 and !$weekly.adultShopWhitney and $adultshopstate isnot "sydney" and C.npc.Whitney.dom gte 10>>
+		<<addinlineevent "whitneytoysex" 1>>
+			/*Whitney arm locks you, forces you outside, spanks you with a flog.*/
+			<<set $weekly.adultShopWhitney to true>> /* this event will only happen once a week */
+			<<npc Whitney>>
+			당신이 선반에 상품을 채우기 위해 허리를 숙이고 있을 때, 누군가 당신의 팔을 등 뒤로 비튼다. 희미한 담배 냄새가 코끝을 찌른다.
+			<br><br>
+			"안녕, <<slut>>," 휘트니가 당신의 귀를 핥으며 조롱한다. 무언가 뭉툭한 물건이 당신의 <<bottom>>【을를】 찌르는 것이 느껴진다.<<pain 3>><<gpain>>
+			<br><br>
+			<<if C.npc.Whitney.dom gte 15>>
+				"넌 나랑 같이 가는 거야."
+			<<elseif C.npc.Whitney.dom gte 10 and C.npc.Whitney.love gte 20>>
+				/*"이리 와서 내가 네게 이걸 쓰게 해 주는 건 어때?"*/
+				"착한 걸레답게 날 따라오는 게 어때?"
+			<<else>>
+				"착한 <<bitch>>답게 날 따라와."
+			<</if>>
+			<br>
+			<br>
+			<<link [[휘트니와 함께 간다|Adult Shop Whitney Spank Agree]]>><<npcincr Whitney dom 3>><<npcincr Whitney love 3>><<npcincr Sirris love -3>><</link>><<ggdom "Whitney">><<gglove "Whitney">><<llove "Sirris">>
+			<br>
+			<<link [[거절한다|Adult Shop Whitney Spank Refuse]]>><<npcincr Whitney dom -3>><<npcincr Whitney love -3>><</link>><<lldom "Whitney">><<lllove "Whitney">>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $adultshopstate is "sydney">>
+		<<addevent "sydneyEvent1AnalBeads" 1>>
+		<<addevent "sydneyEvent2CuffedSydney" 1>>
+		<<addevent "sydneyEvent3HumblePeddlerofHonestWares" 1>>
+		<<addevent "sydneyEvent4Backrooms" 1>>
+
+		<<addinlineevent "sydneyCustomerDildoFlirt" 1>>
+			<<generateAdultShopCustomer 1>><<person1>>
+			<<run statusCheck("Sydney")>>
+			<<npc "Sydney" 2>>
+			<<set _toy to randomSexToy("dildos and whips")>><<set $shoptoy to _toy>>
+
+			<<person1>><<person>>【이가】 가게에 들어와 몇 분 동안 신중하게 물건을 살핀 후 하나를 고른다. 계산대로 향하던 중 <<he>>【은는】 멈춰 서서 당신에게 시선을 고정한다.
+			<br><br>
+			"저기, 이걸 살까 생각 중인데 잘 모르겠어서." <<He>>【은는】 계산대 위에 _toy【을를】 내려놓는다. "혼자 하면 좀 지루할 것 같거든. 네가 나랑 같이 써보면서, 이게 내 취향에 맞는지 확인해 주면 어때?"
+			<br><br>
+			<<person2>>
+			<<if _sydneyStatus.includes("pure")>>
+				"제품 시연은 허용되지 않지만, 궁금하신 점이 있다면 성심껏 도와드리겠습니다." 시드니가 나타나 _toy【을를】 집어 든다. "자 어디 한번 볼까요—"
+				포장을 읽던 시드니의 얼굴이 붉어진다. <<he>>【은는】 당신 쪽으로 몸을 기울여 속삭인다. "이거 진짜 이런 용도야?"
+				<<set $phase to 0>>
+			<<elseif _sydneyStatus.includes("corrupt")>>
+				"제품 시연은 허용되지 않지만, 저희가 추천해 드릴 수는 있습니다." 시드니가 나타나 _toy【을를】 집어 든다. "자 어디 한번 볼까요—"
+				<<He>>【은는】 미소를 지으며 _toy【을를】 유심히 살펴본다. <<he>>【은는】 당신 쪽으로 몸을 기울여 속삭인다. "이거 재밌어 보이지 않아?" <<He>>【은는】 당신을 쿡 찌르며 윙크하고는 다시 손님에게로 몸을 돌린다.
+				<<set $phase to 1>>
+			<<else>>
+				"제품 시연은 허용되지 않지만, 궁금하신 점이 있다면 성심껏 도와드릴 수 있습니다." 시드니가 나타나 _toy【을를】 집어 든다. "자 어디 한번 볼까요—"
+				<<He>>【은는】 집중하여 포장을 읽으며 미간을 찌푸린다. 당신 쪽으로 몸을 기울인 <<he>>【이가】 속삭인다. "이거 쾌감 극대화 버전 맞지?"
+				<<set $phase to 3>>
+			<</if>>
+
+			<br><br>
+			<<link [[다음|Adult Shop Clerk Sydney Customer Dildo Flirt]]>><</link>>
+
+		<</addinlineevent>>
+	<</if>>
+
+	<<if Time.weekDay is 7 or Time.weekDay is 6>>
+		<<if $pillory.tenant.special.name isnot "Leighton">>
+			<<addinlineevent "adultshopleighton" 0.5>>
+				레이튼이 가게로 걸어 들어온다.
+				<<npc "Leighton">><<person1>>
+				당신은 <<he>>【이가】 당신을 알아본 것 같다고 생각하지만, <<he>>【이가】 그저 <<print either("잡지","비디오","윤활제")>>【을를】 뒤적이는 데 바쁘게 굴 뿐이다. <<He>>【은는】 시리스가 카운터에 올 때까지 기다렸다가 구매를 한다.
+				<br><br>
+				남은 교대 시간은 별일 없이 지나간다. 당신은 <<moneyGain 15>>【을를】 번다.<<npcincr Sirris love 1>><<glove "Sirris">>
+				<br><br>
+				<<link [[돌아간다|Adult Shop]]>><</link>>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+
+	<<addinlineevent "dildolesson" 1>>
+		<<generateAdultShopCustomer 1>><<person1>>
+		<<person>>【이가】 한 움큼의 딜도를 들고 계산대로 다가온다. "어이 <<girl>>. 난 이런 거 써본 적이 없어서 말이야. 시범 좀 보여줘야겠어."
+		<br><br>
+		<<if hasSexStat("promiscuity", 3) and $awareness gte 200>>
+			<<link [[<<him>>에게 은밀하게 보여주겠다고 제안한다|Adult Shop Dildo Lesson Seduction]]>><<set $seductiondifficulty to 8000>><</link>><<seductiondifficulty>>
+			<br>
+		<</if>>
+		<<if displayDefiantOption(500)>>
+			<<link [[화낸다|Adult Shop Dildo Lesson Refuse]]>><<set $phase to 1>><<wolfDefiant 500>><<def 1>><<trauma -6>><<stress -6>><<npcincr Sirris love -5>><</link>><<defianttext 500>><<ltrauma>><<lstress>><<llove "Sirris">>
+			<br>
+		<</if>>
+		<<link [[말을 돌린다|Adult Shop Dildo Lesson Refuse]]>><<set $phase to 0>><</link>>
+		<br>
+
+	<</addinlineevent>>
+
+	<<addinlineevent "customerassistance" 1>>
+		<<generateAdultShopCustomer 1>><<person1>>
+		<<person>>【이가】 혼란스럽고 당황한 표정으로 계산대로 다가온다.
+		"어, 안녕하세요. 혹시 그... 찾는 걸 도와주실 수 있나요?" 말문이 막힌 <<he>>【은는】 손짓 발짓을 동원하기 시작한다.
+
+		<<if $awareness gte 300>>
+			<br><br>
+			<<if $speech_attitude is "bratty">>
+				<span class="lewd">당신은 <<personsimple>>에게 의미심장한 미소를 지어 보인다.</span> "아, 그런 취향이시군요. 전혀 몰랐어요."
+			<<else>>
+				<span class="lewd">당신은 <<personsimple>>【을를】 향해 미소 짓는다.</span> "찾으시는 물건 여기 있습니다."
+			<</if>>
+			당신이 근처 선반에 있는 물건을 가리킨다. <<personsimple>>【은는】 다급히 그쪽으로 달려간다.
+			<br><br>
+			"네! 바로 이거예요!" 거래를 마치는 동안 <<he>>【은는】 부끄러움에 얼굴이 붉어지며 당신과 눈을 마주치지 못한다.
+			<br><br>
+			<<set $tipmod to random(1,3)*random(1,3)*random(1,2)/10>>
+			<<tipset>>
+			<<set $tip += _wage*100>>
+			<<person1>><<He>>【이가】 팁을 남긴다. <<tipreceive "adultShop">><<npcincr Sirris love 1>><<glove "Sirris">>
+		<<else>>
+			<br><br>
+			<<if $wolfbuild gte 20 or $catbuild gte 20>>
+				<<he>>【이가】 그 물건을 어떻게든 묘사하려 애쓰는 동안 당신은 고개를 이리저리 갸웃거리지만 <span class="blue"><<he>>【이가】 대체 무엇을 원하는지 전혀 감을 잡지 못한다.</span>
+			<<else>>
+				<span class="blue">당신은 혼란스러워하며 머리를 긁적인다.</span>
+			<</if>>
+			"죄송합니다, <<maam>>. 무엇을 찾으시는지 전혀 모르겠어요."
+			<<personssimple>> 몸짓은 점점 더 거칠어지고, <<his>> 얼굴은 새빨갛게 달아오른다. 당신은 어깨를 으쓱할 뿐이다.
+			<br><br>
+			"아 진짜, 답답하게 굴지 마! 이런 거 아는 게 네 일 아니야!" <<he>>【이가】 소리친다. 당신은 말없이 서 있다. "매니저 어디 있어!"<<gstress>><<stress 3>><<gtrauma>><<trauma 3>>
+			<br><br>
+			"무슨 문제라도 있습니까?" 고함 소리를 듣고 나온 시리스가 묻는다.
+			<<person>>【은는】 문제의 물건을 묘사하면서 당신이 그것도 모를 만큼 멍청하다는 사실을 굳이 짚고 넘어간다. 시리스는 선반에서 물건을 집어 들고 손님의 계산을 마친 뒤, 깊은 한숨을 내쉬며 <<nnpc_his Sirris>> 고개를 젓는다. <<llove "Sirris">><<npcincr Sirris love -2>>
+			<br><br>
+			별로 유쾌한 일은 아니었지만, 그래도 무언가 배웠다는 것에 위안을 삼는다. 당신은 <<moneyGain _wage>>【을를】 번다.<<gawareness>><<awareness 2>>
+		<</if>>
+		<br><br>
+
+		<<link [[돌아간다|Adult Shop]]>><</link>>
+		<br>
+	<</addinlineevent>>
+
+	<<if $demon gte 6 or $angel gte 6 or $fallenangel gte 2>>
+		<<addinlineevent "divineconfrontation" 0.5>>
+			<<generateAdultShopCustomer 1>><<person1>>
+
+			<<person>>【이가】 가게에 들어온다. <<He>>【은는】 몇 분 동안 가게를 주의 깊게 둘러본 후 물건을 고른다. 하지만 <<personsimple>>【이가】 당신을 발견하자, <<he>>【은는】 <span class="purple">걸음을 멈추고 눈을 크게 뜬 채 당신을 빤히 바라본다.</span>
+			<br><br>
+			물건을 다시 선반에 내려놓은 <<he>>【은는】 가슴팍에 두 손을 모으고 서둘러 출구를 향해 걸음을 옮긴다.
+			<<if $angel gte 6>>
+				"절 용서하소서,"
+			<<elseif $fallenangel gte 2>>
+				"내겐 저런 일이 일어나지 않기를,"
+			<<elseif $demon gte 6>>
+				"내가 이런 꼴이 되었다니?"
+			<</if>>
+			<<he>>【이가】 소리치며, 가게를 나설 때 기도를 중얼거린다.
+			<br><br>
+			남은 교대 시간은 별일 없이 지나간다. 당신은 <<moneyGain _wage>>【을를】 번다.
+			<br><br>
+
+			<<link [[돌아간다|Adult Shop]]>><</link>>
+			<br>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if $angel gte 4 or $player.virginity.penile is true and $player.virginity.vaginal is true or $player.temple_virginity is true>>
+		<<addinlineevent "defilethepure" 0.5>>
+			<<set _sheila to ["<<girl>>","<<girl>>","<<lass>>"].pluck()>>
+			<<generateAdultShopCustomer 1>><<person1>>
+			<<set _toy to randomSexToy("dildos and whips")>>
+			<<giveNPCsextoy 0 _toy>>
+			<<person>>【이가】 가게 안으로 들어온다. <<He>>【은는】 당신 쪽을 슬쩍 보더니, 멈춰 서서 다시 한번 쳐다본다. 당신은 <<he>>【이가】 당신에게 추파를 던지며 군침을 흘리는 것을 생생하게 목격한다. <<gstress>><<stress 2>>
+			<br><br>
+			계산대로 다가오며 <<He>>【은는】 _toy【을를】 집어 든다.
+			"너 같은 순수한 _sheila【이가】 이런 곳에서 뭐 하는 거야?"
+			<<He>>【은는】 가게에 다른 사람이 있는지 짧게 훑어본다. "너 같은 놈을 마음껏 유린하고 더럽혀보고 싶은데..."
+			<br><br>
+			순식간에, <span class="red"><<he>>【이가】 손을 뻗어 당신을 계산대 너머로 끌어당긴다.</span>
+			<br><br>
+			<<link [[다음|Adult Shop Clerk Angel Molestation]]>><<set $molestationstart to 1>><</link>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<rngWraith 1>>
+	<<if _wraithEvent is true and $awareness gt 300 and $settings.swarmsEnabled>>
+		<<addinlineevent "wraithdildoswarm" 2>>
+			<<wearProp "dildo">>
+			선반에 딜도를 채워 넣고 있는데, 장난감들이 흔들리기 시작한다. 숨 가쁜 목소리가 당신의 귀에 속삭인다.
+			<br><br>
+			"<span class="wraith"><<print either(
+				"그리고 양들이 주위에 서 있네. 그들은 우리를 전혀 부끄러워하지 않아.","귀먹은 자에게 우리는 노래하지 않지. 숲이 모든 것을 대답할 테니까.","장미. 검은 날개 위에.","더욱 저주받은. 몸부림쳐라.","소용돌이, 비난의 폭풍.","심장 박동은 특권이야.","그들의 메아리를 들어봐. 바로 여기서 울려 퍼지고 있어.")>></span>"
+			<br><br>
+			빛이 희미해지면서 창백한 손이 당신을 붙잡아 어두운 심연으로 끌어당긴다. 당신은 선반에서 뿜어져 나오는 신비로운 빛만이 존재하는 칠흑 같은 방에 있는 자신을 발견한다. 딜도들이 길게 늘어지고 눈알이 돋아나며 꿈틀거린다. <span class="purple">그것들은 정욕에 찬 눈빛으로 당신을 노려본다.</span>
+			<br><br>
+			<<link [[다음|Adult Shop Dildo Swarm]]>><<handheldon>><<set $molestationstart to 1>><</link>>
+		<</addinlineevent>>
+	<</if>>
+
+	/* Event ideas: */
+	/* You help courier with packages, get gangraped */
+	/* High rape fame event */
+	/* Model fame event? */
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "passoutadultshop">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "adultShop">>
+	<<else>>
+		<<passout>>
+		<<link [[모든 것이 어둠에 잠긴다...|Adult Shop Passout Bondage]]>><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "adultShopWage">>
+	<<set _wage to 15>>
+<</widget>>
+
+<<widget "unlockAdultShop">>
+	<<set $adultshopunlocked to true>>
+	<<unset $adultshopgrandopening>>
+	<<unset $adultshopopeningevent>>
+	<<unset $adultshopopeningsydney>>
+	<<if $adultshopdegree is undefined>>
+		<<set $effectsmessage to 1>>
+		<<set $toy_message to 1>>
+		<<set $adultshopdegree to 1>>
+	<</if>>
+	<<if _disableUnlockAdultShopFeat>>
+		<<run $timeMessages.pushUnique("adultShopContribution")>>
+	<<elseif $adultshopcontribution>>
+		<<earnFeat "Opened Pandoras Box">>
+		<<if $adultshopcontribution gte 12>>
+			<<earnFeat "Opened Pandoras Cocks">>
+		<</if>>
+	<</if>>
+<</widget>>
+
+:: Adult Shop Lube Price [widget]
+<<widget lubePrice>>
+	<<if _args[0] lte 50>>
+		<<set _price to _args[0] * 2000 * .98>>
+	<<elseif _args lte 150>>
+		<<set _price to 50 * 2000 * .98 + (_args[0] - 50) * 2000 * .95>>
+	<<else>>
+		<<set _price to 50 * 2000 * .98 + 50 * 2000 * .95 + (_args[0] - 100) * 2000 * .92>>
+	<</if>>
+<</widget>>

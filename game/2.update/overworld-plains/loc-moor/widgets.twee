@@ -1,0 +1,1093 @@
+:: Moor Widgets [widget]
+<<widget "eventsmoorlow">>
+	<<if random(1, 8) is 8 or ($moormove is "quick_search" or $moormove is "normal_search" or $moormove is "careful_search" or $moormove is "fly_search") and random(1, 4) is 4>>
+		<<rng 3>>
+		<<if $rng is 3>>
+			<<wearProp "antique bullet">>
+			You see a bullet lying at the edge of a trail. It looks old. A collector might pay for it.
+			<br><br>
+			<<set $antiquemoney += 50>><<museumAntiqueStatus "antiquebullet" "found">>
+			<<link [[Next|Moor]]>><<handheldon>><<set $eventskip to 1>><</link>>
+			<br>
+		<<elseif $rng is 2>>
+			Tufts of small yellow flowers grow among the heather.
+			<br><br>
+
+			<<if currentSkillValue('tending') gte 400>>
+				Broccoli. They're fully grown, and inedible. Their gentle sway puts you at ease.<<lstress>><<stress -6>>
+				<br><br>
+				<<if !$plants_known.includes("broccoli")>>
+					<<foodstufficon "broccoli">><<link [[Harvest seeds (0:30)|Moor Broccoli]]>><<pass 30>><</link>><<tendingdifficulty 400 700>>
+					<br>
+				<</if>>
+			<<else>>
+				<span class="blue">You need a higher tending skill to identify them.</span>
+				<br><br>
+			<</if>>
+			<<mooricon>><<link [[Continue|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<else>>
+			Tufts of small white flowers grow among the heather.
+
+			<<if currentSkillValue('tending') gte 300>>
+				Wild carrots.
+				<br><br>
+
+				<<if pcAreArmsBound("both")>>
+					<span class="red">Both of your arms are bound</span>, so you are unable to pick wild carrots.
+				<<else>>
+					<<foodstufficon "wild_carrot">> <<link [[Pick wild carrots (0:30)|Moor Carrots]]>><<pass 30>><</link>><<tendingdifficulty 300 600>>
+				<</if>>
+				<br>
+			<<else>>
+				<span class="blue">You need a higher tending skill to identify them.</span>
+				<br><br>
+			<</if>>
+			<<mooricon>><<link [[Continue|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</if>>
+	<<elseif dangerEvent($forestmod, 9900 + ($moorLessDangerAll ?? 0))>>
+		<<rng 9>>
+		<<switch $rng>>
+		<<case 1>>
+			<<generate1>><<person1>>
+			A <<person>> appears over the ridge up ahead, walking stick in hand.
+			<<if $exposed gte 1>>
+				<<covered>> You duck behind the heather.
+				<br><br>
+
+				<<link [[Hide until <<he>> passes (0:10)|Moor Exposed Hide]]>><<pass 10>><</link>>
+				<br>
+
+				<<if $exposed gte 2>>
+					<<if hasSexStat("exhibitionism", 4)>>
+						<<link [[Keep walking|Moor Exposed Naked]]>><</link>><<exhibitionist4>>
+						<br>
+					<</if>>
+				<<else>>
+					<<if hasSexStat("exhibitionism", 2)>>
+						<<link [[Keep walking|Moor Exposed Undies]]>><</link>><<exhibitionist2>>
+						<br>
+					<</if>>
+				<</if>>
+			<<else>>
+				<<He>>
+				<<if random(1, 2) is 2>>
+					smiles
+				<<else>>
+					nods
+				<</if>>
+				as you pass.
+				<<if $anxiety gte 1 and $controlled is 0>>
+					<br><br>
+					You don't feel comfortable until <<hes>> far behind you.<<anxiety_disorder_text>><<gstress>><<stress 6>>
+					<br><br>
+				<<else>>
+					You smile back.<<ltrauma>><<trauma -6>>
+					<br><br>
+				<</if>>
+				<<link [[Next|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 2>>
+			<<if $settings.bestialityEnabled and $settings.lurkersEnabled>>
+				The heather parts as something rushes towards you. Before it arrives, you hear a rustling from behind. Something lands on your <<bottom>> before you can turn.
+				<br><br>
+
+				<<link [[Next|Moor Struggle Low]]>><<set $struggle_start to 1>><</link>>
+			<<else>>
+				The heather parts as something rushes towards you. You turn and flee, but it catches up, landing on your back and knocking you to the ground.
+				<br><br>
+
+				It's a struggle, but you manage to wrest it free and hurl it back into the heather.<<beastescape>>
+				<br><br>
+
+				<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 3>>
+			You hear the rumble of a vehicle approach from behind.<<if $anxiety gte 1>><<gstress>><<stress 6>><</if>>
+			<br><br>
+
+			<<link [[Keep walking|Moor Vehicle]]>><</link>>
+			<br>
+			<<link [[Hide (0:05)|Moor Vehicle Hide]]>><<trauma 6>><</link>><<gtrauma>>
+			<br>
+		<<case 4>>
+			Something leaps from the heather, colliding with your chest and knocking you to the dirt.<<gpain>><<gtrauma>><<gstress>><<pain 1>><<trauma 6>><<stress 6>>
+			<br><br>
+			<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 5>>
+			<<if random(1, 2) is 1>>
+				<<set $moorFlower to "flower">>
+			<<else>>
+				<<set $moorFlower to "phallus plant">>
+			<</if>>
+			You smell a sweet fragrance. <<if $moorFlower is "flower">>A pink flower<<else>>An odd plant<</if>> grows among the heather.
+			<<if $earSlime.corruption gte 80 and random(1, 4) gte 5 - numberOfEarSlime()>>
+				<span class="red">The ear slimes weaken your ability to resist its allure.</span>
+				<<if numberOfEarSlime() gte 2>>
+					<<set $moorFlowerMod to 400>>
+				<<else>>
+					<<set $moorFlowerMod to 200>>
+				<</if>>
+			<<else>>
+				<<set $moorFlowerMod to 0>>
+			<</if>>
+
+			<br><br>
+			<<if $moorFlower is "flower">>
+				<<link [[Investigate|Moor Flower]]>><<arousal 600>><<drugs 60>><</link>><<garousal>>
+			<<else>>
+				<<link [[Investigate|Moor Phallus Plant]]>><<arousal 600>><<drugs 60>><</link>><<garousal>>
+			<</if>>
+			<br>
+			<<link [[Ignore|Moor Flower Ignore]]>><</link>><<willpowerdifficulty `1 + $moorFlowerMod` `600 + $moorFlowerMod`>>
+			<br>
+		<<case 6>>
+			You come to a stream, running along a small valley. The water is fast, but clear and not very deep.
+			<br><br>
+
+			<<if !_topless or !_bottomless>>
+				<<link [[Strip and wash (0:10)|Moor Low Clothes Wash]]>><<strip>><<pass 10>><</link>><<exhibitionist1>>
+				<br>
+				<<link [[Take the time to hide your clothes, then wash (0:30)|Moor Low Wash]]>><<undress "moor wash">><<pass 30>><<set $phase to 1>><</link>><<exhibitionist1>>
+				<br>
+			<<else>>
+				<<link [[Wash (0:10)|Moor Low Wash]]>><<pass 10>><</link>>
+				<br>
+			<</if>>
+			<<link [[Continue your journey|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 7>>
+			<<generatey1>><<generatey2>><<generatey3>><<generate4>><<person1>>
+			You hear laughter and shouting up ahead. A group of youths appear over a ridge.
+			<<if $exposed gte 1>>
+				<<covered>> They're some distance away, and may not have noticed your state of dress.
+				<br><br>
+				<<set $skulduggerydifficulty to 600>>
+				<<link [[Hide until they pass|Moor Youths Hide]]>><</link>><<skulduggerydifficulty>>
+				<br>
+				<<if $exposed gte 2 and hasSexStat("exhibitionism", 5)>>
+					<<link [[Walk past them|Moor Youths Exhibitionism]]>><</link>><<exhibitionist5>>
+					<br>
+				<<elseif hasSexStat("exhibitionism", 3)>>
+					<<link [[Walk past them|Moor Youths Exhibitionism]]>><</link>><<exhibitionist3>>
+					<br>
+				<</if>>
+			<<else>>
+				One of them, a <<person1>><<person>>, carries a water cooler in <<his>> hand. The other two, a <<person2>><<person>> and <<person3>><<person>>, carry bottles of cider.
+				<br><br>
+
+				"What you doing out here?" the <<person1>><<person>> shouts once within clear earshot.
+				<br><br>
+				"Hey," says the <<person2>><<person>>, less audible at this distance. "Offer <<phim>> a drink. <<pShes>> cute."
+				<br><br>
+				They wait until they're closer, then stop to regard you. "Fancy a drink?"
+				<br><br>
+				<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+					<<foodicon "beerbottle">><span class="blue">You can't bring yourself to drink while you know you're with child.</span>
+				<<else>>
+					<<foodicon "beerbottle">><<link [[Drink (0:10)|Moor Youths Drink]]>><<pass 10>><<drunk 60>><<stress -6>><<wearProp "beer bottle">><</link>><<lstress>><<gdrunk>>
+				<</if>>
+				<br>
+				<<refuseicon>><<link [[Decline|Moor Youths Decline]]>><</link>>
+				<br>
+			<</if>>
+		<<case 8>>
+			<<moor_fox>>
+		<<case 9>>
+			<<beastNEWinit 1 horse>>
+			You spot a <<beasttype>> relaxing on the plains of the moor. <<bHe>> seems like <<bhe>> hasn't spotted you yet.
+			<br><br>
+
+			<<link [[Attempt to mount|Moor Horse]]>><<set $phase to 0>><</link>><<skill_difficulty `currentSkillValue("thighskill")` "Thigh Skill" 1 1200>>
+			<br>
+			<<link [[Approach carefully and mount|Moor Horse]]>><<set $phase to 1>><</link>><<tendingdifficulty 1 1200>>
+			<br>
+			<<if hasSexStat("deviancy", 5) and ($settings.bestialityEnabled or $monster is 1) and $settings.horsesEnabled>>
+				<<link [[Let <<bhim>> mount you|Moor Horse]]>><<set $phase to 2>><</link>><<deviant5>>
+				<br>
+			<</if>>
+			<<link [[Ignore|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+			<br>
+		<</switch>>
+	<<else>>
+		<<rng 6>>
+		<<switch $rng>>
+		<<case 1>>
+			<<if Weather.precipitation is "rain">>
+				The heather bows as a breeze rushes towards you, stinging your skin with raindrops.
+			<<else>>
+				The heather bows as a breeze rushes towards you, caressing your skin.<<lstress>><<stress -6>>
+			<</if>>
+			<br><br>
+
+			<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 2>>
+			You see a dark shape move in the corner of your vision. It's gone before you can turn.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 3>>
+			<<beastNEWinit 1 fox>>
+			<<if $NPCList[0].traits.includesAny("territorial", "clever")>>
+				A hare darts out of a nearby shrub. A <<beasttype>> pounces after it, narrowly missing you.
+				<<if $monster is 1>>
+					<<bHe>> cocks <<bhis>> head at you. "You made me lose my catch," <<bhe>> snickers. "Next time, you'll be my catch instead." <<bHe>> steps away. "Run along, <<foxnickname>>."
+				<<else>>
+					<<bHe>> stares at you a moment before stepping away and growling.
+				<</if>>
+				<br><br>
+
+				<<getouticon>><<link [[Leave|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				A <<beasttype>> appears from the shrubs, stopping right in your path. <<bHe>> stares at you a moment, ears twitching, before darting into a bush.
+				<br><br>
+
+				<<link [[Next|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 4>>
+			You find a tyre-marked trail that makes the going a little easier.<<lstress>><<stress -6>>
+			<br><br>
+
+			<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 5>>
+			You walk past a ruined cottage. The remains of the nearby stone walls suggest this was once a farm.
+			<br><br>
+
+			<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 6>>
+			<<eventAmbient>>
+			<<link [[Next|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</switch>>
+	<</if>>
+<</widget>>
+
+<<widget "eventsmoormid">>
+	<<if random(1, 8) is 8 or ($moormove is "quick_search" or $moormove is "normal_search" or $moormove is "careful_search" or $moormove is "fly_search") and random(1, 4) is 4>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			당신은 진흙 속에 반쯤 파묻힌 검은 형태를 발견한다. 포탄이다. 아주 오래돼 보인다.
+
+			<<if currentSkillValue('history') gte 500>>
+				<<wearProp "antique artillery">>
+				<span class="green">이제는 안 터질 거야.</span> 수집가들에겐 좀 돈이 될 수도 있다.
+				<<set $antiquemoney += 100>><<museumAntiqueStatus "antiqueshell" "found">>
+				<br><br>
+			<<else>>
+				<span class="red">당신은 멀리 떨어져 있는다.</span>
+				<br><br>
+
+			<</if>>
+
+			<<link [[다음|Moor]]>><<handheldon>><<set $eventskip to 1>><</link>>
+			<br>
+		<<else>>
+			푸른 싹들이 땅에서 다발로 돋아나고 있다.
+			<br><br>
+
+			<<if currentSkillValue('tending') gte 400>>
+				<<if pcAreArmsBound("both")>>
+					<span class="red">두 팔이 묶여 있어</span>, 양파를 수확할 수 없다.
+				<<else>>
+					<<foodstufficon "onion">> <<link [[양파를 수확한다 (0:30)|Moor Onions]]>><<pass 30>><</link>><<tendingdifficulty 400 700>>
+				<</if>>
+				<br>
+			<<else>>
+
+				<span class="blue">이것들을 식별하려면 더 높은 관리 스킬이 필요하다.</span>
+				<br><br>
+			<</if>>
+			<<mooricon>><<link [[계속한다|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</if>>
+	<<elseif dangerEvent($forestmod, 9900 + ($moorLessDangerAll ?? 0))>>
+		<<rng 11>>
+		<<switch $rng>>
+		<<case 1>>
+			<<beastNEWinit 1 cat>>
+			당신의 목 뒤로 소름이 돋는다. 돌아보니 <<print either("헤이즐넛 색", "노란색", "초록색", "파란색")>> 눈을 번뜩이며 커다란 <<beasttype>>【이가】 당신을 향해 전력 질주해오고 있다.
+			<br><br>
+
+			<<if $settings.bestialityEnabled>>
+				<<link [[다음|Moor Cat]]>><<set $molestationstart to 1>><</link>>
+				<br>
+			<<else>>
+				당신은 도망치는 데 성공했지만, 상처를 입었다.<<beastescape>>
+				<br><br>
+				<<link [[다음|Moor]]>><<endevent>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 2>>
+			당신 옆에 있는 높은 바위에서 자갈이 굴러 떨어진다. 당신은 위를 올려다본다. 정상에서 뭔가 반짝인다. 다리를 길게 펴며 그것이 당신을 향해 뛰어내린다.
+			<br><br>
+
+			<<if $settings.bestialityEnabled and $settings.lurkersEnabled>>
+				<<dancedifficulty 1 1000 true>>
+				<<if $danceSuccess>>
+					<span class="green">당신은 옆으로 피하고,</span> 괴물은 당신 옆 바닥에 착지한다.
+					<br><br>
+
+					<<link [[다음|Moor Struggle Mid]]>><<set $phase to 0>><<set $struggle_start to 1>><</link>>
+					<br>
+				<<else>>
+					<span class="red">반응하기도 전에 괴물이 얼굴 위에 착지한다.</span> 그 부속 기관이 당신의 입술을 찌른다.
+					<br><br>
+
+					<<link [[다음|Moor Struggle Mid]]>><<set $phase to 1>><<set $struggle_start to 1>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				그것이 가슴 위에 떨어지며 당신을 바닥에 쓰러뜨린다. 사투 끝에 당신은 그것을 떼어내어 다시 바위 위로 던져버렸다.<<beastescape>>
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 3>>
+			얼마 떨어진 바위에서 누군가 지켜보고 있는 것 같다. 눈을 깜빡이자, 그들은 사라졌다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 4>>
+			더 높은 바위의 꼭대기 부근 동굴에서 <<print either("헤이즐넛 색", "노란색", "초록색", "파란색")>> 눈 한 쌍이 당신을 노려본다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 5>>
+			당신은 절벽 꼭대기를 걷고 있는데, <span class="red">갑자기 땅이 진동한다.</span> 발을 헛디딘 당신은 벼랑 쪽으로 굴러간다.
+			<br><br>
+
+			<<if $harpy gte 6 or $angel gte 6 or $demon gte 6 or $fallenangel gte 2>>
+				가장자리 너머로 떨어질 때 날개가 펼쳐진다. 바람을 탄 당신은 안전하게 착륙한다.
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				질긴 덤불을 가까스로 붙잡았지만, 당신은 여전히 가장자리에 매달려 있다.
+				<br><br>
+
+				아래를 힐끗 본다. 그리 높은 곳은 아니다.
+				<br><br>
+
+				<<link [[스스로를 끌어올린다|Moor Cliff Pull]]>><</link>><<athleticsdifficulty 1 1000>>
+				<br>
+				<<link [[손을 놓는다|Moor Cliff Drop]]>><<pain 8>><<stress 6>><</link>><<ggpain>><<gstress>>
+				<br>
+			<</if>>
+		<<case 6>>
+			머리카락이 쭈뼛 선다. <span class="blue">누군가 지켜보고 있는 것 같다.</span> 주위를 둘러본다. 주위 바위들에 있는 수많은 갈라진 틈과 동굴 속에 무엇이든 숨어 있을 수 있다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[우회한다 (0:30)|Moor Cats Detour]]>><<pass 30>><<trauma 6>><</link>><<gtrauma>>
+			<br>
+			<<link [[계속 간다|Moor Cats Continue]]>><</link>>
+			<br>
+		<<case 7>>
+			무성한 수풀이 바스락거리는 것을 본다. 다리가 여러 개인 괴물이 수풀 속에서 재빠르게 튀어나오고, 이어서 수풀 뒤에서도 한 마리가 더 나타난다. 첫 번째 괴물이 당신에게 뛰어오른다.
+			<br><br>
+
+			<<if $settings.plantsEnabled and $settings.tentaclesEnabled and ($hallucinations gte 2 or $backgroundTraits.includes("plantlover"))>>
+				<<generatePlant1>><<person1>>
+				당신은 <<if $submissive gte 850>>팔을 휘둘러 쳐내려 하고<<else>>팔을 앞으로 내밀어 방어하려 하지만<</if>>, <span class="green">괴물이 당신에게 닿지 못한다.</span> 덩굴이 공중에서 그것을 휘감아 제자리에 묶어둔다. 두 번째 괴물 역시 같은 방식으로 구속당한다.
+				<br><br>
+
+				"야호!" <<person "normal">>【이가】 수풀 뒤에서 나타나 당신에게 손을 흔든다. 머리카락에는 <<Plant_details>>【이가】 엮여 있고, <<he>>【은는】 완전 나체이다. <<He>>【이가】 손짓을 하자 덩굴들이 더 단단히 조여든다.
+				<br><br>
+
+				"이 근처에 있어서 다행이네." <<person>>【이가】 말한다. "네가 이 조그만 것들의 희생양이 되는 건 원치 않거든. 그러니..." <<He>>【은는】 <<his>> 입술을 핥으며 몸을 기울인다. "너를 구해줬으니 나도 상을 받아야 하지 않을까?"
+				<br><br>
+
+				<<if hasSexStat("deviancy", 3) or $backgroundTraits.includes("plantlover")>>
+					<<link [[보상한다|Moor Plant Sex]]>><<set $sexstart to 1>><<set $phase to 1>><</link>><<deviant3>>
+				<<else>>
+					<<insufficientStat "deviancy" "'보상'을 주기에는">>
+				<</if>>
+				<br>
+				<<link [[거절한다|Moor Plant Refuse]]>><</link>>
+			<<else>>
+				당신은 <<if $submissive gte 850>>팔을 휘둘러 쳐내려 하고<<else>>팔을 앞으로 내밀어 방어하려 하지만<</if>>, 괴물이 당신에게 닿지 못한다. 갑자기 위에서 바위가 굴러떨어져 공중에서 그것을 내리친다. 첫 번째 녀석과 두 번째 녀석 모두 부리나케 달아난다.
+				<<stress 6>><<gstress>>
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<</if>>
+		<<case 8>>
+			바위투성이의 땅에서 크고 깊은 균열을 찾아 그 아래로 거센 흐름의 계곡이 있는 것을 발견한다. 물살이 거세어 얼마나 깊은지 가늠하기 어렵다.
+			<br><br>
+
+			<<if !_topless or !_bottomless>>
+				<<link [[옷을 벗고 씻는다 (0:10)|Moor Mid Wash]]>><<set $phase to 1>><<pass 10>><<strip>><</link>><<exhibitionist1>>
+				<br>
+			<<else>>
+				<<link [[씻는다 (0:10)|Moor Mid Wash]]>><<set $phase to 0>><<pass 10>><</link>>
+				<br>
+			<</if>>
+			<<link [[무시한다|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 9 10>>
+			<<if $bird and $bird.injured gt 1>>
+				<<moor_fox>>
+			<<else>>
+				<<moor_hunt_start>>
+			<</if>>
+		<<case 11>>
+			<<moor_fox>>
+		<</switch>>
+	<<else>>
+		<<outfitChecks>>
+		<<rng 7>>
+		<<switch $rng>>
+		<<case 1>>
+			<<if random(1, 2) is 2>>
+				<<if _top>>
+					당신의 _top.name【이가】 가시덤불에 걸린다.
+					<br><br>
+
+					<<link [[그냥 찢고 빠져나온다|Moor Tear]]>><<set $phase to 1>><</link>>
+					<br>
+					<<link [[조심스럽게 빠져나온다 (0:05)|Moor Careful]]>><<set $phase to 1>><<pain 4>><<pass 5>><</link>><<gpain>>
+					<br>
+				<<else>>
+					바람이 불어 가시덤불이 당신의 드러난 피부를 할퀴고 지나간다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+					<br><br>
+
+					<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				<<if _bottom>>
+					당신의 _bottom.name【이가】 가시덤불에 걸린다.
+					<br><br>
+
+					<<link [[그냥 찢고 빠져나온다|Moor Tear]]>><<set $phase to 3>><</link>>
+					<br>
+					<<link [[조심스럽게 빠져나온다 (0:05)|Moor Careful]]>><<set $phase to 3>><<pain 4>><<pass 5>><</link>><<gpain>>
+					<br>
+				<<else>>
+					바람이 가시덤불을 불어와 드러난 피부를 스치게 하고, 당신에게 긁힌 상처를 낸다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+					<br><br>
+
+					<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+					<br>
+				<</if>>
+			<</if>>
+		<<case 2>>
+			<<if $worn.feet.type.includes("naked") or $worn.feet.type.includes("shackle")>>
+				땅에는 날카로운 바위가 널려 있다. 제대로 된 신발이 없어서 걷기가 힘들다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+				<br><br>
+			<<else>>
+				땅에는 날카로운 바위가 널려 있다. 당신은 당신의 $worn.feet.name【이가】 있는 것에 감사한다.
+				<br><br>
+			<</if>>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 3>>
+			바람이 거세어진다.
+			<<if $hallucinations gte 2>>
+				속삭임이 들린다.
+				<<rng 5>>
+				<<switch $rng>>
+				<<case 1>>
+					<i>하지만 넌 이해하지 못해.</i>
+				<<case 2>>
+					<i>"내 안에 깊이 묻혀있어."</i>
+				<<case 3>>
+					<i>"그게 다가오고 있어."</i>
+				<<case 4>>
+					<i>"거울을 통해."</i>
+				<<case 5>>
+					<i>"돌아가."</i>
+				<</switch>>
+				<<gtrauma>><<trauma 6>>
+				<br><br>
+			<<else>>
+				바람이 불어오자 당신은 몸을 부르르 떤다.
+				<br><br>
+			<</if>>
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 4>>
+			절벽 아래 기슭에 바위들이 어지럽게 널려 있는 것을 발견한다.
+
+			<<if $moor_hunt gte 1>>
+				기슭에 어두운 구멍들이 흩어져 있다. 좁겠지만 숨고 싶다면 한 곳으로 비집고 들어갈 수 있다.
+				<br><br>
+
+				<<link [[숨는다 (0:30)|Moor Bird Hide]]>><<pass 30>><</link>>
+				<br>
+				<<link [[무시한다|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				당신은 거리를 유지한다.
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 5>>
+			당신은 다른 사람들의 흔적을 발견한다. 평평한 땅 조각이 발자국으로 뒤덮여 있다. 중앙에는 불이 아직도 연기를 피우고 있다. 흙 속에 사슬들이 묻혀 있다.
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 6>>
+			당신은 벼랑 끝을 걷는다. 가장자리가 위험해 보이므로, 충분히 멀리 떨어져서 걷는다.
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 7>>
+			<<eventAmbient>>
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</switch>>
+	<</if>>
+<</widget>>
+
+<<widget "eventsmoorhigh">>
+	<<if random(1, 8) is 8 or ($moormove is "quick_search" or $moormove is "normal_search" or $moormove is "careful_search" or $moormove is "fly_search") and random(1, 4) is 4>>
+		<<rng 2>>
+		<<if $rng is 2>>
+			땅속으로 이어지는 통로를 발견한다.
+			<br><br>
+
+			<<link [[들어간다 (0:20)|Moor Crack Passage]]>><<set $outside to 0>><<pass 20>><</link>>
+			<br>
+			<<link [[무시한다|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<else>>
+			둑에서 푸른 싹들이 돋아나고 있다.
+			<br><br>
+
+			<<if currentSkillValue('tending') gte 500>>
+				<<if pcAreArmsBound("both")>>
+					<span class="red">두 팔이 모두 묶여 있어</span>, 마늘을 캘 수 없다.
+				<<else>>
+					<<foodstufficon "garlic_bulb">> <<link [[마늘을 캔다 (0:30)|Moor Garlic]]>><<pass 30>><</link>><<tendingdifficulty 500 800>>
+				<</if>>
+				<br>
+			<<else>>
+
+				<span class="blue">이것들을 식별하려면 더 높은 관리 스킬이 필요하다.</span>
+				<br><br>
+			<</if>>
+			<<mooricon>><<link [[계속한다|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</if>>
+	<<elseif dangerEvent($forestmod, 9900 + ($moorLessDangerAll ?? 0))>>
+		<<rng 10>>
+		<<switch $rng>>
+		<<case 1>>
+			땅이 비틀거리며, 당신의 발청거리게 한다. 그 아래로 균열이 벌어지며 무서운 속도로 넓어진다.
+			<br><br>
+			<<dancedifficulty 500 1100 true>>
+			<<if $danceSuccess>>
+				다리가 벌어졌지만, <span class="green">당신은 균형을 잡고</span> 옆으로 뛰어오른다. 대지의 진동이 멈춘다.
+				<br><br>
+
+               당신은 틈을 피해 발걸음을 옮기며, 여정을 계속할 준비를 한다. 지하로 이어지는 통로가 보인다.
+				<br><br>
+
+               <<link [[들어가기 (0:20)|Moor Crack Passage]]>><<set $outside to 0>><<pass 20>><</link>>
+               <br>
+               <<link [[무시하기|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				옆으로 뛰어오르려 했지만, <span class="red">땅이 너무 많이 흔들린다.</span> 당신은 갈라진 틈 속으로 떨어진다.
+				<br><br>
+
+               <<link [[다음|Moor Crack]]>><<set $phase to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 2>>
+			당신은 두 연못 사이의 오솔길을 따라간다.
+			<<if !Weather.isOvercast>>
+				<<if Time.dayState is "night">>
+					연못들은 달빛을 반사하지 않는다.
+				<<else>>
+					연못들은 햇빛을 반사하지 않는다.
+				<</if>>
+			<<else>>
+				당신은 발을 헛디디지 않게 조심한다.
+			<</if>>
+			<br><br>
+			<<if $settings.bestialityEnabled and $settings.lurkersEnabled>>
+				수면 위로 기포가 터지는 소리가 들린다. 갑자기 깊은 곳에서 여러 생물체들이 튀어나온다. 그 중 하나가 얼굴에 날아와 착지하면서 당신은 비틀거린다. 또 다른 하나는 당신의 <<bottom>>에 내려앉는다.
+				<br><br>
+
+				<<link [[다음|Moor Struggle High]]>><<set $struggle_start to 1>><</link>>
+				<br>
+			<<else>>
+				수면 위로 기포가 터지는 소리가 들린다. 갑자기 깊은 곳에서 여러 생물체들이 튀어나온다. 당신은 그것들을 쳐내고 달린다. 오솔길 반대편 끝에 도달할 때까지 더 많은 생물들이 나타나 당신의 도망을 괴롭힌다.<<beastescape>>
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<<case 3>>
+			어두운 형체가 꽤 멀리 떨어진 수면에서 솟아오른다. 그것은 긴 목 위에 달린 머리처럼 보인다. 당신을 향해 고개를 돌린 뒤, 수면 아래로 사라진다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 4>>
+			몇 마리의 새들이 연못 수면에 앉아 있는 것을 본다. 새들은 당신을 경계하며 헤엄쳐 도망간다.
+			<br><br>
+
+			뒤쪽에서 물 튀기는 소리가 나더니, 새 중 한 마리가 수면 아래로 사라진다. 나머지 새들은 공포에 질려 꽥꽥거리며 날갯짓을 해서 당신 방향으로 날아간다. 새들은 강가에서 옹기종기 모여 몸을 웅크린다.<<gstress>><<stress 6>>
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 5>>
+			땅이 흔들리고, 당신은 미끄러지며 당신의 <<bottom>>【으로로】 착지한다.<<gpain>><<gstress>><<pain 1>><<stress 6>>
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 6>>
+			<<if $worn.feet.type.includes("shackle")>>
+				늪지대 같은 땅은 발이 제한되어 있어 통과하기 힘들다.<<gtiredness>><<tiredness 1>>
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<elseif $worn.feet.type.includes("rugged")>>
+				땅은 늪지대 같지만, 당신의 <span class="green">튼튼한</span> $worn.feet.name【이가】 역경을 극복해 낸다.
+				<br><br>
+
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				<<if $worn.feet.type.includes("naked")>>
+					당신의 발이 진흙 속에 빠지고, <span class="pink">철컥하는 소리가 들린다.</span> 금속 구속구가 당신의 발목 주변에 채워지면서 양 발목을 함께 결박한다. 한쪽 면에는 열쇠 구멍이 있다.
+				<<else>>
+					당신의 발이 진흙 속에 빠지더니 꿈쩍도 하지 않는다. <span class="pink">철컥하는 소리가 들린다.</span> 당신은 다리를 빼내 비틀거리며 앞으로 나아갔지만, 당신의 $worn.feet.name【은는】 뒤에 남겨졌다. 대신 금속 구속구가 발목 주위를 조이며 두 발을 하나로 묶어놓았다. 한쪽에는 열쇠구멍이 있다.
+					<<feetruined>>
+				<</if>>
+				<br><br>
+				<<shackle_feet>>
+				<<link [[부순다 (0:03)|Moor Shackle Break]]>><<pass 3>><</link>><<physiquedifficulty 1 15000>>
+				<br>
+				<<set $skulduggerydifficulty to 600>>
+				<<link [[자물쇠를 딴다 (0:05)|Moor Shackle Pick]]>><<pass 5>><</link>><<skulduggerydifficulty>>
+				<br>
+				<<link [[개의치 않고 계속 간다|Moor Shackle Continue]]>><<stress 6>><</link>><<gstress>>
+				<br>
+			<</if>>
+		<<case 7>>
+			<<set $plantMoney to 10*random(20,100)>>
+			<<if !Weather.isOvercast>>
+				번쩍이는 빛이
+			<<else>>
+				뭔가 반짝이는 것이
+			<</if>>
+			당신의 눈길을 끈다. 당신은 수풀 속에 놓여진 동전 <<printmoney $plantMoney>>【을를】 발견한다.
+			<br><br>
+
+			<<if $settings.plantsEnabled and $settings.tentaclesEnabled and ($hallucinations gte 2 or $backgroundTraits.includes("plantlover"))>>
+				<<if currentSkillValue('skulduggery') gte 700>>
+					당신은 동전을 더 가까이 들여다본다. 그건 흙 속에 놓여 있지만 흙 밑에 파묻힌 채 느슨하게 돈을 쥐고 있는 손을 간신히 알아볼 수 있다. 더 멀리 있는 흙에서는 덩굴과 <<plant_details>>【이가】 튀어나와 있다.
+					<br><br>
+				<</if>>
+				<<link [[돈을 집는다|Moor Plant Money]]>><<set $phase to 1>><</link>>
+				<br>
+				<<link [[떠난다|Moor Plant Money]]>><<set $phase to 0>><</link>>
+			<<else>>
+				당신은 길을 벗어나 돈을 주머니에 넣는다. 다시 일어서자 땅이 흔들리고, 방금 전 당신이 서 있던 자리에 갈라진 틈이 열린다.
+				<<ggstress>><<stress 12>>
+				<br><br>
+
+				<<money $plantMoney "moor">><<unset $plantMoney>>
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<</if>>
+		<<case 8 9>>
+			<<if $bird and $bird.injured gt 1>>
+				<<moor_fox>>
+			<<else>>
+				<<moor_hunt_start>>
+			<</if>>
+		<<case 10>>
+			<<if random(1,5) is 1 and $wrenSeen?.length and !$daily.moorhighWren>>
+				<<npc Wren>><<person1>>
+				<<set $daily.moorhighWren to true>>
+
+				앞으로 내딛으려던 찰나, 누군가가 뒤에서 당신의 손목을 움켜쥔다. 당신은 거칠게 뒤로 끌려간다. 당신은 비틀거리다 엉덩방아를 찧는다.<<pain 4>><<gpain>>
+				<br><br>
+				<<if $wrenSeen.includes("moorhigh")>>
+					"여긴 위험하다고 말했던 것 같은데." 목소리가 들린다. <span class="gold">렌이다.</span> <<He>>【은는】 어이없어하는 것 같다. "놀랄 일은 아니지만. 난 종종 너를 이런 곳에서 발견하는 것 같네. 내가 널 다시 이끌어줄까?"
+					<br><br>
+
+					<<link [[수락한다 (0:45)|Moor Wren Meeting End]]>><<set $phase to 0>><<pass 45>><</link>>
+					<br>
+					<<link [[거절한다|Moor Wren Meeting End]]>><<set $phase to 1>><</link>>
+					<br>
+				<<else>>
+					"조심해, <<girl>>." 목소리가 경고한다. "여긴 위험해."
+					<br><br>
+					<span class="gold">렌이다.</span>
+					<br><br>
+					<<if $settings.lurkersEnabled>>
+						<<his>> 말이 맞다는 것을 증명하듯, 바로 앞 수풀에서 그림자가 뛰쳐나온다. 당신이 제대로 보기도 전에 그것은 서둘러 멀어진다.
+					<<else>>
+						<<He>>【은는】 돌을 주워 당신이 발을 디디려 했던 곳에 던진다. 당신은 땅이 파문 하나 없이 그것을 삼키는 것을 지켜본다.
+					<</if>>
+					<br><br>
+					<<if $speech_attitude is "meek">>
+						"구-구해줘서 고마워." 당신은 말한다.
+					<<elseif $speech_attitude is "bratty">>
+						"나도 내 몸은 스스로 챙길 수 있거든." 당신은 말한다.
+					<<else>>
+						"고마워." 당신은 말한다. "하지만 내가 알아서 할 수 있었어."
+					<</if>>
+					<br><br>
+					"천만에." <<he>>【이가】 말한다. "너 여기서 대체 뭐 하는 거야?"
+					<br><br>
+
+					<<link [[솔직하게 말한다|Moor Wren Meeting]]>><<set $phase to 0>><</link>>
+					<br>
+					<<link [[거짓말을 한다|Moor Wren Meeting]]>><<set $phase to 1>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				<<moor_fox>>
+			<</if>>
+		<</switch>>
+	<<else>>
+		<<rng 6>>
+		<<switch $rng>>
+		<<case 1>>
+			당신은 주변 연못들보다 높이 솟아있는 맑은 샘을 발견한다. 물이 맑아 보인다.
+			<br><br>
+
+			<<skinicon "wash">><<link [[씻는다 (0:20)|Moor Wash]]>><<pass 20>><<strip>><<stress -2>><<if $moor_hunt gte 1>><<set $moor_hunt += 1.5>><</if>><</link>><<lstress>>
+			<br>
+			<<getouticon>><<link [[떠난다|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 2>>
+			여러 마리의 새들이 연못 수면에 앉아 있다. 그들은 헤엄쳐 멀어지면서도 경계 어린 시선으로 당신을 지켜본다.
+			<br><br>
+			<<if $moor_hunt gte 1>>
+				물은 깊고 어둡다. 아래에 무엇이 숨어 있을지 알 수 없다.
+				<br><br>
+
+				<<link [[숨는다 (0:01)|Moor Bird Pool]]>><<pass 1>><</link>><<swimmingdifficulty 1 300>>
+				<br>
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+
+		<<case 3>>
+			작은 언덕 위에 글이 새겨진 돌기둥이 세워져 있다.
+			<<if currentSkillValue('history') gte 1000>>
+				<span class="green">당신은 이런 것에 대해 읽어본 적이 있다.</span> 고대의 제단이다. 여행자들은 이 곳에서 행운을 빌었다고 한다.
+				<br><br>
+
+				<<link [[행운을 빈다 (0:05)|Moor Luck]]>><<stress -6>><<pass 5>><</link>><<lstress>>
+				<br>
+				<<link [[무시한다|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<<else>>
+				당신은 누가 이 기둥을 조각했는지 궁금해한다.
+				<br><br>
+				<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+
+
+		<<case 4>>
+			<<set $quicksand_depth to 4>>
+			당신의 발이 땅을 가르고, <span class="red">마치 물 속에 들어가는 것처럼,</span> 허리까지 땅속으로 가라앉는다. 빠져나오려 애쓰지만 단단히 끼어 있다.
+			<<if $quicksand is undefined>>
+				<<set $quicksand to 0>>
+			<</if>>
+			<<if $quicksand lt 5>>
+				당신은 천천히 가라앉는다.<<ggstress>><<stress 12>>
+			<<else>>
+				당신은 예전에 여기 와본 적이 있다. 당신은 가라앉지 않으리라는 것을 알고 침착함을 유지한다.
+			<</if>>
+			<br><br>
+
+			<<if $hallucinations gte 2 and $controlled is 0>>
+				<span class="pink">무언가가 발목을 잡는다. 그리고 잡아당긴다.</span><<ggstress>><<stress 12>>
+				<br><br>
+			<</if>>
+
+
+			<<quicksand_actions>>
+
+		<<case 5>>
+			이 곳은 땅이 좀 더 단단하다.<<lstress>><<stress -6>>
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+
+		<<case 6>>
+			<<eventAmbient>>
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<<case 7>>
+			모서리 한쪽이 진흙 밖으로 튀어나온 빛바랜 빨간색 화물 컨테이너가 보인다. 꺼내려면 중장비가 필요할 것이다. 어쩌다 그곳에 놓였고 안에 무엇이 있는지는 미스테리로 남을 것이다.
+			<br><br>
+
+			<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</switch>>
+	<</if>>
+<</widget>>
+
+<<widget "quicksand_actions">>
+	<<if $quicksand lt 5 and $quicksand_learn is undefined>>
+		<<link [[마음을 가라앉힌다 (0:05)|Moor Quicksand]]>><<set $quicksand_learn to true>><<set $phase to 0>><<pass 5>><</link>><<willpowerdifficulty 1 400>>
+		<br>
+	<<elseif $quicksand gte 5>>
+		<<link [[체중을 분산한다 (0:05)|Moor Quicksand]]>><<set $phase to 1>><<pass 5>><</link>><<note "상식: 모래늪" "Green">>
+		<br>
+	<</if>>
+	<<link [[도움을 요청한다 (0:05)|Moor Quicksand]]>><<set $phase to 2>><<pass 5>><</link>><<if Time.dayState is "night">><<difficulty 10>><<else>><<difficulty 30>><</if>>
+	<br>
+	<<link [[발버둥친다 (0:05)|Moor Quicksand]]>><<set $phase to 3>><<pass 5>><</link>><<physiquedifficulty 1 20000>>
+	<br>
+<</widget>>
+
+<<widget "quicksand_end">>
+	<<unset $quicksand_depth>>
+	<<unset $quicksand_learn>>
+	<<unset $quicksandWraith>>
+	<<unset $quicksand_escape>>
+<</widget>>
+
+<<widget "quicksand_pull">>
+	<<switch $quicksand_depth>>
+		<<case 1>>
+			<<set $quicksand_depth += 1>>
+			발목이 다시 잡아당겨져 더 깊이 끌려 들어가고, 모래가 <span class="purple">무릎까지 차오른다.</span> <<gstress>><<stress 6>>
+			<br><br>
+
+			<<quicksand_actions>>
+		<<case 2>>
+			<<set $quicksand_depth += 1>>
+			발목이 다시 잡아당겨져 더 깊이 끌려 들어가고, 모래가 <span class="purple">허벅지까지 차오른다.</span> <<gstress>><<stress 6>>
+			<br><br>
+
+			<<quicksand_actions>>
+		<<case 3>>
+			<<set $quicksand_depth += 1>>
+			발목이 다시 잡아당겨져 더 깊이 끌려 들어가고, 모래가 <span class="pink">허리까지 차오른다.</span> <<gstress>><<stress 6>>
+			<br><br>
+
+			<<quicksand_actions>>
+		<<case 4>>
+			<<set $quicksand_depth += 1>>
+			발목이 다시 잡아당겨져 더 깊이 끌려 들어가고, 모래가 <span class="pink">가슴까지 차오른다.</span> <<ggstress>><<stress 12>>
+			<br><br>
+
+			<<quicksand_actions>>
+		<<case 5>>
+			<<set $quicksand_depth += 1>>
+			발목이 다시 잡아당겨져 더 깊이 끌려 들어가고, 모래가 <span class="red">목까지 차오른다.</span> 곧 완전히 잠길 것이다. <<ggstress>><<stress 12>>
+			<br><br>
+
+			<<quicksand_actions>>
+		<<default>>
+			마지막으로 한 번 더 잡아당겨지자, <span class="red">대지가 당신을 삼켜 버린다.</span><<ggtrauma>><<ggstress>><<trauma 12>><<stress 12>>
+			<br><br>
+			<<passout_moor>>
+			<<if $quicksandWraith>>
+				<<ind>><<ind>><<ind>><<ind>><<ind>><<ind>><<ind>><<ind>><span class="wraith-flicker">_drown</span>
+				<br><br><<ind>><<ind>><span class="wraith-flicker">_drown</span>
+				<br><<ind>><<ind>><<ind>><<ind>><<ind>><span class="wraith-flicker">_drown</span>
+			<</if>>
+	<</switch>>
+	<<if $quicksandWraith>>
+		<br><br><<ind>><<ind>><<ind>><<ind>><<ind>><<ind>><span class="wraith-flicker">_drown</span>
+		<br><br><br><<ind>><span class="wraith-flicker">_drown</span>
+	<</if>>
+<</widget>>
+
+<<widget "passout_moor">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "moor">>
+	<<else>>
+		<<passout>>
+
+		<<if dangerEvent()>>
+			<<switch random(1, 2)>>
+				<<case 1>>
+					<<link [[다음|Moor Abduction Wake]]>><<if $moor lte 15>><<set $moor to 20>><</if>><</link>>
+				<<case 2>>
+					<<link [[다음|Moor Bird Wake]]>><</link>>
+			<</switch>>
+			<br>
+		<<else>>
+			<<ambulance>>
+		<</if>>
+	<</if>>
+	<<if $bird.hunts>>
+		<<flight_hunt_end>>
+	<</if>>
+<</widget>>
+
+<<widget "end_moor_captive">>
+	<<unset $moor_binding>>
+<</widget>>
+
+<<widget "moor_captive_init">>
+	<<set $moor_binding to 12>>
+<</widget>>
+
+<<widget "moor_binding_text">>
+	<<if $moor_binding gte 12>>
+		<span class="red">결박이 꽉 조여와 불편하다.</span>
+	<<elseif $moor_binding gte 8>>
+		<span class="pink">결박이 아까보다는 느슨해졌지만, 아직 단단하다.</span>
+	<<elseif $moor_binding gte 4>>
+		<span class="purple">결박이 느슨해지고 있다.</span>
+	<<elseif $moor_binding gte 1>>
+		<span class="blue">결박이 느슨해지고 있다.</span> 손목을 조금 비틀 수 있다.
+	<<else>>
+		<span class="lblue">결박이 느슨해졌다.</span> 마음만 먹으면 끊을 수 있다.
+	<</if>>
+<</widget>>
+
+<<widget "moor_captive_actions">>
+	<<if $moor_binding gte 1>>
+		<<set $skulduggerydifficulty to 500>>
+		<<link [[결박을 늦춘다|Moor Abduction Walk Loosen]]>><</link>><<skulduggerydifficulty>>
+		<br>
+		<<link [[얌전히 있는다|Moor Abduction Walk]]>><<sub 1>><</link>>
+		<br>
+
+	<<else>>
+		<<if $moor gte 51>>
+			당신은 숨겨진 웅덩이와 싱크홀에 둘러싸여 있다. 탈출하기는 어려울 것이다.
+			<br><br>
+			<<link [[결박을 풀고 도망친다|Moor Abduction Mire Run]]>><<unbind>><</link>><<athleticsdifficulty 900 1900>>
+			<br>
+		<<elseif $moor gte 21>>
+			어둠 속에서 이렇게 울퉁불퉁한 땅을 달리는 것은 위험할 수 있다.
+			<br><br>
+
+			<<link [[결박을 풀고 도망친다|Moor Abduction Rock Run]]>><<unbind>><</link>><<athleticsdifficulty 800 1500>>
+			<br>
+		<<else>>
+			도망칠 수는 있지만, 그들이 뒤쫓을 것이다.
+			<br><br>
+
+			<<link [[결박을 풀고 도망친다|Moor Abduction Plain Run]]>><<unbind>><</link>><<athleticsdifficulty 500 1500>>
+			<br>
+		<</if>>
+		<<link [[때를 기다린다|Moor Abduction Walk]]>><</link>>
+		<br>
+		<<if displayDefiantOption(500)>>
+			<<link [[복수를 상상한다|Moor Abduction Fantasise]]>><<wolfDefiant 500>><<def 1>><<stress -6>><</link>><<defianttext 500>>
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "moor_hunt_start">>
+	<<if !Weather.isOvercast>>
+		그림자가 당신 위를 지나간다.
+	<<else>>
+		<<hawkScreechDesc>>【이가】 들린다.
+	<</if>>
+	<<if $syndromebird is 1>>
+		<<npc "Great Hawk">>
+		<<your_bird_text "cap">>【이가】 머리 위를 맴돈다.
+		<br><br>
+		<<endevent>>
+
+		<<if $harpy gte 6>>
+			<<tficon "bird">><<link [[마주 소리친다|Moor Bird Screech]]>><</link>><<harpy>>
+			<br>
+		<</if>>
+		<<mooricon>><<link [[계속한다|Moor]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<if $birdescaped gte 1>>
+			<<npc "Great Hawk">>
+			익숙한 <<beasttype>>【이가】 머리 위를 맴돈다.
+			<<endevent>>
+		<<else>>
+			공포가 머리 위를 맴돈다.
+		<</if>>
+		<<if $moor_hunt is undefined>>
+			<span class="red">당신은 사냥당하고 있다.</span><<ggstress>><<stress 12>>
+			<<set $moor_hunt to 1>>
+		<<else>>
+			<span class="red">추적자가 빠르게 다가온다.</span><<gstress>><<stress 6>>
+			<<set $moor_hunt += 3>>
+		<</if>>
+		<br><br>
+
+		<<link [[다음|Moor]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "moor_hunt">>
+	<<npc "Great Hawk">>
+	<span class="red">또 다른 비명 소리가 들린다.</span> 이번엔 바로 등 뒤다. 가깝다. 뒤를 돌아보니
+	<<if $birdescaped gte 1>>
+		<<beasttype>>【이가】 
+	<<elseif $monster is 1>>
+		<<bhis>> 몸집을 훌쩍 넘는 날개와 발 대신 발톱이 달린 깃털 달린 <<nnpc_gendery "Great Hawk">>【이가】 
+	<<else>>
+		거대한 <<beasttype>>【이가】 
+	<</if>>
+	발톱을 세운 채 공중에서 당신을 향해 쏜살같이 날아든다.
+	<<if $birdescaped gte 1>>
+		<<bhers>> 눈이 마주치자 공포로 온몸이 굳어버린다.
+		<<if $monster is 1 or understandsBirdBehaviour()>>
+			그 강렬한 눈빛 속에서도 걱정스러움이 서려 있는 것이 보인다.
+		<</if>>
+	<<else>>
+		<<bHis>> 시선에 공포로 발이 얼어붙는다.
+	<</if>>
+	<br><br>
+
+	<<link [[가만히 있는다|Moor Bird Still]]>><<sub 1>><<unset $phase>><</link>>
+	<br>
+	<<link [[저항한다|Moor Bird Resist]]>><</link>><<willpowerdifficulty 1 300>>
+	<br>
+<</widget>>
+
+<<widget "moor_fox">>
+	<<beastNEWinit 1 fox>>
+	등 뒤 어딘가에서 부스럭거리는 소리가 들린다. 점점 가까워지는 것 같다.
+	<br><br>
+
+	<<link [[피한다|Moor Fox Dodge]]>><</link>><<dancedifficulty 1 $NPCList[0].skills.athletics>>
+	<br>
+	<<link [[물러서지 않는다|Moor Fox Stand]]>><</link>><<physiquedifficulty $NPCList[0].skills.athletics $physiquemax>>
+	<br>
+	<<link [[소리친다|Moor Fox Call]]>><</link>>
+	<br>
+<</widget>>
+<<widget "destinationMoor" container>>
+	<<set _linkText to _args[0] ?? "Next">>
+	<<if $bus is "fishingMoor">>
+		<<link [[_linkText|Fishing Moor Wait]]>><<= _contents>><</link>>
+	<<else>>
+		<<link [[_linkText|Moor]]>><<= _contents>><</link>>
+	<</if>>
+<</widget>>

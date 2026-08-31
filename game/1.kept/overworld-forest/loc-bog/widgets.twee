@@ -1,0 +1,214 @@
+:: Widgets Bog [widget]
+<<widget "passoutbog">>
+	<<if isPregnancyEnding()>>
+		<<set $bogdepth to 0>><<set $bogwater to 0>>
+		<<pregnancyPassout "bog">>
+	<<else>>
+		무리한 탓에 몸이 버티지 못한다.
+		<<if $bogwater gte 1>>
+			가까스로 나무에 기대어 쓰러진 덕분에, 늪에 가라앉는 것만은 면한다.
+		<</if>>
+		<br><br>
+
+		<<passout>>
+		<<if dangerEvent()>>
+			<<if $rng gte 71 and $settings.plantsEnabled and $settings.tentaclesEnabled and ($hallucinations gte 2 or $backgroundTraits.includes("plantlover"))>>
+				<<link [[모든 것이 어둠 속으로 희미해진다...|Bog Plant Tentacle Passout]]>><</link>>
+			<<else>>
+				<<link [[모든 것이 어둠 속으로 희미해진다...|Bog Passout]]>><</link>>
+			<</if>>
+		<<else>>
+			<<ambulance>>
+		<</if>>
+	<</if>>
+	<<pass 1 hour>>
+	<<trauma 6>><<set $stress -= 2000>>
+<</widget>>
+
+<<widget "eventbog">>
+	<<cleareventpool>>
+	<<if $bogwater gte 1>>
+		<<addinlineevent "bog_water_lizard">>
+			물이 부글부글 끓는다. 바로 앞에서 커다란 무언가가 튀어나오며 물보라가 튄다!
+			<<beastNEWinit 1 lizard>>
+			<<if $monster is 1 or $settings.bestialityEnabled>>
+				<<beasttype>>의 비늘 덮인 얼굴이 굶주린 듯 당신을 쳐다본다. <<bHe>>【이가】 당신에게 뛰어들어, 수면 아래로 끌어당긴다.
+				<br><br>
+
+				<<link [[다음|Bog Lizard Rape]]>><<set $molestationstart to 1>><</link>>
+				<br>
+			<<else>>
+				커다란 도마뱀이 아가리로 당신을 문다. 가까스로 빠져나오지만, 상처를 피하진 못한다. <<beastescape>>
+				<br><br>
+
+				다시 나무 통로 위로 기어오른다.
+				<br><br>
+
+				<<link [[다음|Bog]]>><<set $bogwater to 0>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<</addinlineevent>>
+		<<addinlineevent "bog_water_tentacles">>
+			<<if $settings.tentaclesEnabled and ($hallucinations gte 2 or $backgroundTraits.includes("plantlover"))>>
+				물속에서 무언가가 당신의 발목을 잡는다. 나무들에서 덩굴이 스르르 내려와 수면 위를 가로지른다.
+				<br><br>
+
+				<<link [[발버둥친다|Bog Tentacles]]>><<set $molestationstart to 1>><</link>>
+				<br>
+				<<if hasSexStat("deviancy", 5)>>
+					<<link [[더 가까이 끌어당긴다|Bog Tentacles]]>><<set $molestationstart to 2>><</link>><<deviant5>>
+				<</if>>
+			<<else>>
+				물속에서 무언가가 당신의 발목을 잡는다. 밀쳐내려 하지만, 곧바로 아래로 끌려들어간다.
+				<br><br>
+
+				계속 발버둥친 끝에, 마침내 그 정체 모를 것에게서 벗어난다. 도망치기 위해 물을 헤치고 나아간다. <<stress 12>><<ggstress>><<trauma 6>><<ggtrauma>>
+				<br><br>
+
+				<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<</addinlineevent>>
+		<<addinlineevent "bog_water_noise">>
+			물을 헤치고 나아가는 동안, 멀리서 가벼운 물보라 소리가 들린다. 돌아보려 하지만 아무것도 없다. 주의가 흐트러진 사이 늘어진 덩굴 더미 속으로 걸어 들어가고, 잠깐 공포에 질린다. <<stress 12>><<ggstress>>
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<addinlineevent "bog_water_tangle">>
+			물을 헤치고 나아가는 동안, 발에 무언가가 걸린다. 잡아당겨도 빠지지 않는다. 풀려나려 애쓰는 동안 다른 쪽 발까지 얽히고 만다. <<stress 6>><<gstress>>
+			<br><br>
+
+			시간이 좀 걸렸지만, 마침내 스스로 풀려나는 데 성공한다. <<pass 10>>
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<if $settings.parasitesEnabled and ($parasite.tummy.name is undefined or $parasite.bottom.name is undefined)>>
+			<<addinlineevent "bog_water_parasite" 0.33>>
+				<<if $parasite.tummy.name is undefined>>
+					<<parasite tummy urchin>>
+					배에 무언가 달라붙는 느낌이 든다.
+				<<else>>
+					<<parasite bottom urchin>>
+					엉덩이에 무언가 달라붙는 느낌이 든다.
+				<</if>>
+				<span class="lewd">그것은 따뜻해지기 시작한다.</span> 떼어내려 하지만, 꿈쩍도 하지 않는다.
+				<br><br>
+
+				<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+				<br>
+			<</addinlineevent>>
+		<</if>>
+	<<else>>
+		<<addinlineevent "bog_lizard">>
+			물이 부글부글 끓는다. 커다란 무언가가 통로 위로 뛰어오르며 요란한 물보라를 일으키는 소리가 들린다.
+			<<beastNEWinit 1 lizard>>
+			<<if $monster is 1 or $settings.bestialityEnabled>>
+				<<beasttype>>【이가】 굶주린 듯 당신을 쳐다본다.
+				<br><br>
+
+				<<link [[몸집을 크게 보이게 한다|Bog Lizard Stand]]>><</link>><<physiquedifficulty 6000 15000>>
+				<br>
+				<<link [[도망친다|Bog Lizard Run]]>><</link>><<athleticsdifficulty 0 700>>
+				<br>
+			<<else>>
+				도망치지만, 상처를 피하진 못한다. <<beastescape>>
+				<br><br>
+
+				<<link [[다음|Bog]]>><<endevent>><<set $eventskip to 1>><</link>>
+				<br>
+			<</if>>
+		<</addinlineevent>>
+		<<addinlineevent "bog_noise">>
+			걷던 중, 등 뒤 멀리서 가벼운 물보라 소리가 들린다. 돌아보려 하지만 아무것도 없다. 주의가 흐트러진 사이 늘어진 덩굴 더미 속으로 걸어 들어가고, 잠깐 공포에 질린다. <<stress 12>><<ggstress>>
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<addinlineevent "bog_gap">>
+			나무 통로가 끊긴 곳에 이른다. 뛰어넘기에는 너무 멀지만, 틈 위로 두꺼운 덩굴이 늘어져 있다.
+			<br><br>
+
+			<<link [[매달려 건너간다|Bog Swing]]>><</link>><<athleticsdifficulty 100 600>>
+			<br>
+			<<link [[헤엄친다|Bog]]>><<set $bogwater to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<if $hallucinations gte 1>>
+			<<addinlineevent "bog_lost">>
+
+				앞길이 어딘가 이상하다. 가까이 다가가자 나무 통로가 갑자기 끊겨 있는 것을 알아차린다. 부서진 것 같지는 않다. 마치 원래부터 여기서 끝나는 길인 것처럼, 그 너머로는 물뿐이다.
+				<br><br>
+
+				뒤를 돌아본다. <span class="red">통로가 여러 방향으로 갈라져 있다.</span> 어느 길로 왔는지조차 구별할 수 없다.
+				<br><br>
+
+				<<if $boglost gte 10>>
+					<<link [[방향을 유지한다 (0:05)|Bog Lost Stay]]>><<pass 5>><</link>>
+					<br>
+				<</if>>
+				<<link [[첫 번째 길을 따라간다 (0:10)|Bog Lost]]>><<set $boglost to 0>><<pass 10>><<set $phase to 1>><</link>>
+				<br>
+				<<link [[두 번째 길을 따라간다 (0:10)|Bog Lost]]>><<set $boglost to 0>><<pass 10>><<set $phase to 2>><</link>>
+				<br>
+				<<link [[세 번째 길을 따라간다 (0:10)|Bog Lost]]>><<set $boglost to 0>><<pass 10>><<set $phase to 3>><</link>>
+				<br>
+				<<link [[네 번째 길을 따라간다 (0:10)|Bog Lost]]>><<set $boglost to 0>><<pass 10>><<set $phase to 4>><</link>>
+				<br>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+	<<runeventpool>>
+<</widget>>
+
+<<widget "eventbogsafe">>
+	<<cleareventpool>>
+	<<addinlineevent "event_ambient">>
+		<<eventAmbient>>
+		<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<</addinlineevent>>
+	<<if $bogwater gte 1>>
+		<<addinlineevent "safebog_water_1">>
+			수면 아래서 무언가가 다리를 스치고는 순식간에 달아난다. <<stress 6>><<gstress>>
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<addinlineevent "safebog_water_2">>
+			개구리가 앞쪽 수련잎 위에 앉아 있다. 호기심 어린 눈으로 당신을 올려보더니 개굴거린다.
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+	<<else>>
+		<<addinlineevent "safebog_spores">>
+			기이한 균사 주머니들이 앞쪽 나무를 뒤덮고 있다. 지나가던 중 그중 하나에서 옅은 분홍빛 연기가 뿜어져 나온다. 기분이 이상해진다. <<hallucinogen 60>><<ghallucinogens>>
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<addinlineevent "safebog_splash">>
+			왼쪽에서 요란한 첨벙거림이 들린다. 쳐다보지만 물 위에 일렁이는 파문뿐이다. <<stress 6>><<gstress>>
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+		<<addinlineevent "safebog_walk">>
+			나무 길 덕분에 이동이 수월하다.
+			<br><br>
+
+			<<link [[다음|Bog]]>><<set $eventskip to 1>><</link>>
+			<br>
+		<</addinlineevent>>
+	<</if>>
+	<<runeventpool>>
+<</widget>>

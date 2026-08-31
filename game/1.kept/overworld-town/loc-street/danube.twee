@@ -1,0 +1,293 @@
+:: Danube Street
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "danube">><<getTarget true>>
+당신은 다뉴브 가에 있다. 이곳의 집들은 널찍하고 위풍당당하다.
+<<if Weather.dayState is "day">>
+	<<if Weather.precipitation is "rain">>
+		비 때문에 사람들이 실내로 들어갔다.
+	<<elseif Weather.precipitation is "snow">>
+		눈 때문에 대부분의 사람들이 실내에 머물러 있다.
+	<<else>>
+		담장 너머 정원에서 인기척이 들린다.
+	<</if>>
+<<elseif Weather.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		사람들이 빗속을 뚫고 큰 저택에서 나와 값비싼 차에 올라타며 서두른다.
+	<<elseif Weather.precipitation is "snow">>
+		이른 아침 눈 속의 넓은 정원은 그림처럼 보인다.
+	<<else>>
+		창문 너머로 움직임이 보인다.
+	<</if>>
+<<elseif Weather.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		머리 위의 비구름이 이른 어둠을 드리운다.
+	<<elseif Weather.precipitation is "snow">>
+		밤새 눈이 쌓인다.
+	<<else>>
+		어둑해지는 빛 속에서 저택들이 섬뜩한 그림자를 드리운다.
+	<</if>>
+<<elseif Weather.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		길에서 멀리 떨어진 창문에서 새어 나오는 얼룩덜룩한 빛을 알아볼 수 있다.
+	<<elseif Weather.precipitation is "snow">>
+		화려한 창문을 통해 눈 위로 빛이 비친다.
+	<<else>>
+		창문에서 새어 나오는 빛은 어둠을 걷어내는 데 거의 도움이 되지 않는다.
+	<</if>>
+<</if>>
+<<if $halloween is 1>>
+몇몇 집들은 사치스러운 할로윈 장식을 해놓았다.
+<</if>>
+<<streeteffects>>
+<br><br>
+<<if $exposed gte 1>>
+	<<exhibitionism "street">>
+<</if>>
+<<if $arousal gte $arousalmax>>
+	<<orgasmstreet>>
+<</if>>
+<<if $stress gte $stressmax and !$possessed>>
+	<<passoutstreet>>
+<<else>>
+
+	<<if C.npc.Gwylan.state is "active" and !isGwylanAbsent() and !$daily.gwylan.cafe and !$daily.gwylan.cafeOfferDeclined and !$daily.gwylan.cafeSkip and !$daily.gwylan.SchoolDropOff and !["reunion", "badEndReady"].includes(statusCheck("Gwylan")) and C.npc.Avery.state is "active" and $avery_mansion and !(between($chef_state, 7, 8) and $chef_rework lte 30) and Time.schoolDay and Time.hour is 7 and $exposed lte 0 and ($gwylan.sea + ($gwylanTalked.count("fox_mask") * 20) + ($gwylanTalked.count("dark_pendant") * 20) gte 40)>>
+			<<run statusCheck("Gwylan")>><<npc Gwylan>><<person1>>
+			<<set $daily.gwylan.SchoolDropOff to true>>
+			<<if ["Mansion Lounge", "Mansion Kitchen", "Mansion Dining", "Mansion Display", "Mansion Bedroom", "Mansion Study", "Mansion Pool", "Mansion Garage", "Mansion Garden"].includes($passagePrev)>>
+				에이버리의 저택 밖으로 나와 다뉴브 가를 걸어갈 때,
+			<<else>>
+				다뉴브 가를 지나갈 때,
+			<</if>>
+			<<if !$gwylanSeen.includes("cafe_walk")>>
+				길 건너편에서 익숙한 목소리가 당신을 부르는 것이 들린다. 그윌란이다.
+				<br><br>
+
+				<<He>>【이가】 다가온다. "좋은 아침, <<pcpetname "Gwylan">>. 아침 먹으러 가던 길이었는데, 혹시 같이 갈래? 괜찮으면 나중에 학교까지 데려다줄 수도 있고."
+
+				<<if !$gwylanSeen.includes("cafe")>>
+					<<set $gwylanSeen.pushUnique("cafe")>>
+					<br><br>
+					당신이 약간 혼란스러워하는 표정을 짓자 그윌란이 알아챈다. "아, 맞다! 말한 적이 없었나. 나 매일 아침 카페에서 아침을 먹어. 습관 같은 거지. 그래도 매일 똑같으면 지루한데, 너랑 같이 있으면 정말 좋아."
+				<</if>>
+				<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1 or $gwylanSeen.includes("petplay") and $worn.neck.type.includes("leash")>>
+					<<set _magicLeash to true>>
+					당신은 목줄이 당겨지는 것을 느낀다. <<if $worn.neck.name is "familiar collar">>그윌란의 손에 빛나는 목줄이 나타난다<<else>>아래를 내려다보니 그윌란이 당신의 목줄을 잡고 있다<</if>>. "어때, <<pcpetname "Gwylan" "my">>. 산책하고 싶지?" <<he>>【이가】 부드럽게 말한다.
+				<<else>>
+					<<He>>【은는】 미소 짓는다. "어때?"
+				<</if>>
+			<<else>>
+				그윌란이 당신을 기다리고 있는 것을 발견한다. <<He>>【이가】 손을 흔들어 당신을 부른다. "<<print either("좋은 아침", "화창한 아침이네", "만나서 반가워", "안녕", "거기 있었구나")>>, <<pcpetname "Gwylan">>. 잘 잤어?"
+				<br><br>
+
+				<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1 or $gwylanSeen.includes("petplay") and $worn.neck.type.includes("leash")>>
+					<<set _magicLeash to true>>
+					당신은 목줄이 당겨지는 것을 느낀다. <<if $worn.neck.name is "familiar collar">>그윌란의 손에 빛나는 목줄이 나타난다<<else>>아래를 내려다보니 그윌란이 당신의 목줄을 잡고 있다<</if>>. "내가 가장 좋아하는 <<pcpetname "Gwylan" "simple">>【은는】 아침 산책 하고 싶어? 난 카페 가는 길인데, 네가 같이 와주면 정말 기쁠 거야." <<He>>【이가】 미소 지으며 당신의 귀 뒤를 긁어준다.
+				<<else>>
+					<<He>>【은는】 미소 짓는다. "아침 먹으러 가는 길이야. 같이 갈래?"
+				<</if>>
+			<</if>>
+			<br><br>
+
+			<<cafeicon>><<link [[그윌란과 함께 걷는다 (0:05)|Gwylan Walk Cafe Solo]]>><<pass 5>><<set $phase to 0>><<set $daily.gwylan.cafe to true>><</link>>
+			<br>
+			<<refuseicon>><<link [[제안을 거절한다|Gwylan Walk Cafe Solo]]>><<set $phase to 1>><<set $daily.gwylan.cafeOfferDeclined to true>><</link>>
+			<br>
+	<<elseif (dangerEvent() or $eventforced) and $eventskip is 0>>
+		<<eventsstreet>>
+	<<else>>
+		<<if $options.mapTop is true>>
+			<<map "danube">>
+			<br>
+		<</if>>
+
+		<<if $wrenHeist is true and (Time.hour gte 19 and Time.hour lte 20) and $wrenHeistDance.attended isnot true>>
+			저 멀리 렌을 만나기로 한 저택이 보인다. <<nnpc_He "Wren">>【이가】 그곳에서 당신을 기다리고 있을 것이다.
+			<br>
+			<<if $exposed lte 0>>
+				<<dooricon "danube">><<link [[저택으로 향한다 (1:20)|Wren Heist Arrival]]>><<set $wrenHeistDance.attended to true>><</link>>
+			<<else>>
+				<span class="red">현재 노출 상태로는 들어갈 수 없습니다.</span>
+			<</if>>
+			<br><br>
+		<</if>>
+
+		흥미로운 장소
+		<br>
+		<<if $exposed lte 0 and Time.openingHours(2)>>
+			<<spaicon>><<link [[스파 (0:02)|Spa]]>><<pass 2>><</link>>
+			<br>
+		<<elseif Time.hour is $closinghour>>
+			<<spaicon>><span class="blue">사람들이 스파를 떠나고 있습니다.</span> 문 닫을 시간인 것 같다.
+			<br>
+		<<elseif !Time.openingHours(2)>>
+			<<spaicon>><<link [[스파 (0:02)|Spa Lock]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if $avery_mansion>>
+			<<if $avery_fate is "fallen" or $avery_fate is "kicked">>
+				<<if $avery_mansion_fire_time gte 1>>
+					<<icon "front-gate.png">><<link [[에이버리의 저택 (0:05)|Mansion Fire]]>><<pass 5>><</link>>
+					<br>
+				<<else>>
+					<<icon "front-gate.png">><<link [[에이버리의 저택 (0:05)|Mansion Ruin]]>><<pass 5>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				<<icon "front-gate.png">><<link [[에이버리의 저택 (0:05)|Mansion Enter]]>><<pass 5>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if $exhibitionismrun is "danube" and $exposed lte 1>>
+			<<oakicon>><<link [[스파 뒤 떡갈나무 (0:02)|Danube Challenge]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if $syndromekylar gte 1>>
+			<<kylarmanoricon>><<link [[카일라의 저택 (0:02)|Manor Garden]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if Time.dayState is "night">>
+			<<dooricon "danube">><<link [[집 중 한 곳에 접근한다 (0:02)|Danube House Lock]]>><<pass 2>><</link>>
+			<br>
+		<<elseif $exposed lte 0>>
+			<<dooricon "danube">><<link [[집 중 한 곳의 문을 두드린다 (0:02)|Danube House Knock]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<foresticon>><<link [[숲 (0:10)|Forest]]>><<pass 10>><<set $forest to 0>><<set $eventskip to 1>><</link>>
+		<br><br>
+		<<if $exposed gte 1 and Time.dayState isnot "night">>
+		<<else>>
+			<<add_link "이동<br>">><<hideDisplay>>
+			<<domus>>
+			<<wolf>>
+			<<connudatus>>
+			<<if $exposed lte 0>>
+				<<buswait>>
+			<</if>>
+			<<loiter>>
+		<</if>>
+		<<add_link "<br>우회로<br>">><<hideDisplay>>
+		<<residential>>
+		<<stormdrain>>
+		<<displayLinks>>
+		<<if $options.mapTop isnot true>>
+			<br>
+			<<map "danube">>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Danube Challenge
+<<set $outside to 1>><<set $location to "oak">><<effects>>
+
+<<if $exhibitionismrunon is 0>>
+
+	당신은 스파 뒤편으로 걸어가 쪽지에 언급된 떡갈나무를 찾는다. 나무는 숲 가장자리에 서 있다. 이곳이 쪽지에서 옷을 벗으라고 지시한 장소다. 주위에는 아무도 없다.
+	<br><br>
+	<<if hasSexStat("exhibitionism", 3)>>
+		<<link [[옷을 벗는다|Danube Challenge Strip]]>><<set $phase to 0>><</link>><<exhibitionist3>>
+		<br>
+	<<else>>
+		<<insufficientStat "exhibitionism" "이 행동을 하기에는">>
+		<br>
+	<</if>>
+	<<link [[떠난다|Danube Street]]>><</link>>
+	<br>
+
+<<else>>
+
+	당신은 스파 뒤편의 떡갈나무로 돌아간다. 주위에는 아무도 없고, 큰길에서는 보이지 않는다. 당신은 나뭇가지를 올려다본다. 카메라는 보이지 않지만, 거기에 있다는 것을 안다.
+	<br><br>
+
+	<<if hasSexStat("exhibitionism", 3)>>
+		<<link [[옷을 벗는다|Danube Challenge 2]]>><</link>><<exhibitionist3>>
+		<br>
+	<<else>>
+		<<insufficientStat "exhibitionism" "이 행동을 하기에는">>
+		<br>
+	<</if>>
+	<<link [[떠난다|Danube Street]]>><</link>>
+
+<</if>>
+
+:: Danube Challenge Strip
+<<set $challengetimer to 10>>
+<<set $outside to 1>><<set $location to "oak">><<effects>>
+<<strip>>
+<<if $phase is 0>>
+	당신은 쪽지에 적힌 대로 <<nervously>> 옷을 벗는다. 이윽고 마을 외곽에 알몸으로 서게 된다.
+<<else>>
+	당신은 심호흡을 하고 주위를 둘러본다. 이건 정말 큰돈이다. 당신은 쪽지에 적힌 대로 <<nervously>> 옷을 벗는다. 이윽고 마을 외곽에 알몸으로 서게 된다.
+<</if>>
+<<exhibitionism3>>
+떡갈나무 가지에서 무언가 번쩍인다. 카메라다. <<covered>> 얼굴이 화끈 달아오르는 것을 느끼지만, 머리 위에서 다른 무언가를 발견한다. 작은 낙하산이 작은 상자를 매달고 내려온다. 당신은 그것을 잡는다. 안에는 쪽지가 들어 있다.
+<br><br>
+<i>함께 일해서 즐거웠습니다.</i>
+<br><br>
+종이 뒤에는 <<moneyGain 100>>【이가】 있다. 당신은 떨리는 손으로 최대한 빨리 옷을 입는다. 아무도 당신을 보지 못한 것 같다. 카메라만 빼고.
+<br><br>
+<<set $exhibitionismrun to undefined>><<set $exhibitionismrunon to 1>>
+<<link [[떠난다|Danube Street]]>><<clotheson>><</link>>
+<br>
+
+:: Danube Challenge 2
+<<effects>><<strip>>
+
+당신은 재빨리 모든 옷을 벗는다. 마지막으로 주위를 한 번 둘러보며 아무도 당신의 나체를 보지 못하게 확인한다. 지난번처럼 나뭇가지에서 불빛이 번쩍인다. 하지만 아직 끝나지 않았다.
+<br><br>
+
+<<if hasSexStat("exhibitionism", 5)>>
+	<<skinicon "masturbate">><<link [[자위한다|Danube Challenge Masturbate]]>><<set $masturbationstart to 1>><</link>><<exhibitionist5>>
+<<else>>
+	<<skinicon "masturbate">><<link [[자위한다|Danube Challenge Masturbate]]>><<set $masturbationstart to 1>><<trauma 6>><<stress 12>><</link>><<ggtrauma>><<ggstress>>
+<</if>>
+<br>
+<<getouticon>><<link [[떠난다|Danube Street]]>><<clotheson>><</link>>
+<br>
+
+:: Danube Challenge Masturbate
+<<strip>><<effects>>
+
+<<if $masturbationstart is 1>>
+	<<set $masturbationstart to 0>>
+	<<set $masturbationstat += 1>>
+	몸을 떨며, 당신은 스스로를 즐겁게 하기 시작한다.
+	<<exhibitionism5>>
+	<<masturbationstart>>
+<</if>>
+
+<<masturbationeffects>>
+<<masturbationactions>>
+<<masturbationControls "orgasmcurrent">>
+
+:: Danube Challenge Masturbate Finish
+<<effects>><<set $challengetimer to 10>><<wearProp "cash four">>
+
+<<if $orgasmcurrent gte 1>>
+	<<fameexhibitionism 1>><<generate1>><<person1>>
+	당신은 행위를 마치고 숨을 고른다. 피부는 얇은 땀으로 덮여 있다. 얼마 지나지 않아 지난번과 똑같이 상자를 매단 또 다른 낙하산이 당신을 향해 내려온다. 상자를 열자 <<moneyGain 300>>【와과】 또 다른 쪽지가 나온다.
+	<br><br>
+
+	<i>이번에도 잘해줬습니다. 여기 현금입니다. 다시 연락드리겠습니다.</i>
+	<br><br>
+
+	당신은 돈을 챙긴다. 힐끗 보니 무언가 움직이는 것이 보인다. 당신은 돌아선다. 사우나 뒷문 바로 옆에 <<person1>><<person>>【이가】 서 있다. <<He>>【은는】 충격받은 표정으로 당신을 쳐다보고, 입에는 담배가 힘없이 매달려 있다. 당신은 <<him>> 앞에서 완전히 벌거벗은 채 서 있고, <<he>>【은는】 모든 것을 볼 수 있다. <<if hasSexStat("exhibitionism", 5)>><<ggarousal>><<arousal 1200>><<else>><<gtrauma>><<gstress>><<trauma 6>><<stress 6>><</if>>
+	<br><br>
+
+	<<if $speech_attitude is "bratty">>
+		당신은 옷을 집어 몸을 가린 다음, <<person1>><<person>>에게 소리친다. "이봐, 꺼져!" 그 말에 <<he>>【은는】 정신을 차리고 서둘러 자리를 뜬다.
+	<<else>>
+		당신은 비명을 지른다. 당신은 옷을 챙겨 도망쳐서, 조용한 곳을 찾아 옷을 다시 입는다.
+	<</if>>
+
+	<<endmasturbation>>
+	<<endcombat>>
+	<<set $exhibitionismrun to undefined>><<set $exhibitionismrunon to 2>><<clotheson>>
+	<<link [[떠난다|Danube Street]]>><<endevent>><</link>>
+
+<<else>>
+	당신은 하던 것을 멈춘다. 또 다른 풍선이나 카메라 불빛을 기다렸지만 아무 일도 일어나지 않는다. 몇 분 후, 당신은 옷을 입고 자리를 뜬다. 쪽지에는 절정에 이르라고 쓰여 있었지만, 당신은 가기 전에 멈췄다.
+	<br><br>
+	<<endmasturbation>>
+	<<endcombat>>
+	<<link [[다음|Danube Street]]>><<clotheson>><</link>>
+<</if>>

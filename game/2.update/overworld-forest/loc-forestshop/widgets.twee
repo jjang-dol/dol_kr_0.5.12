@@ -1,0 +1,2357 @@
+:: Gwylan Widgets [widget]
+
+<<widget "gwylanGreeting">><<silently>>
+	<<set $_gwylanSpeech to "">>
+	<<if !$daily.gwylan.greeting>>
+		<<set $daily.gwylan.greeting to true>>
+		<<set $_gwylanSpeech to "<br><br>">>
+		<<if $location is "cafe" and $daily.robin_in_cafe is 1>>
+			<<set $_gwylanSpeech += "그윌란은 ">>
+		<<else>>
+			<<set $_gwylanSpeech += "<<nnpc_He 'Gwylan'>>【은는】 ">>
+		<</if>>
+		<<if $gwylan.wary gte 5>>
+			<<set $_gwylanSpeech += "당신을 뚫어져라 바라본다.">>
+		<<elseif _gwylanLastSeenDays gte 21>>
+			<<set $_gwylanSpeech += "당신을 보고 놀라면서도 기뻐 보인다.">>
+		<<elseif $gwylan.hunting is 3>>
+			<<set $_gwylanSpeech += "당신을 보고 기뻐하면서도 짜증 난 듯하다.">>
+		<<elseif $daily.gwylan.ritual>>
+			<<set $_gwylanSpeech += "새빨개진 뺨 위로 따뜻한 미소를 지어 보인다.">>
+		<<elseif _gwylanLovePercent gte 25>>
+			<<set $_gwylanSpeech += "당신을 보자 기운이 나는 듯하다.">>
+		<<else>>
+			<<if $location is "cafe">>
+				<<set $_gwylanSpeech += "부드럽게 미소 짓지만, 계속 바다를 바라본다.">>
+			<<else>>
+				<<set $_gwylanSpeech += "당신에게 오라고 손짓한다.">>
+			<</if>>
+		<</if>>
+
+		<<set $_linePool to []>>
+		<<if $moorLuck gt 0>>
+			<<set $_linePool.push(`"오늘은 네 주변에 행운의 기운이 감도네.`)>>
+		<</if>>
+		<<if $gwylanSeen.includes("romance")>>
+			<<set $_linePool.push(`"안녕, 내 사랑.`)>>
+		<<else>>
+			<<set $_linePool.push(`"안녕, 얘야.`)>>
+		<</if>>
+		<<if $gwylanSeen.includes("ritual_beast")>>
+			<<set $_linePool.push(`"안녕, <<pcpetname 'Gwylan' 'name'>>.`)>>
+		<</if>>
+		<<if $location is "forest_shop" and $gwylanTalked.length gte 10 and (!$gwylan.wary or $gwylan.wary lte 1)>>
+			<<set $_linePool.push(`"내가 제일 좋아하는 손님이네!`)>>
+		<</if>>
+		<<if $exposed gte 2 and $location is "forest_shop">>
+			<<set $_linePool.push(`<<He>>【은는】 시선을 아래로 향하는 것을 피한다. "여기가 꽤 쌀쌀한 모양이네.`)>>
+		<</if>>
+		<<if $worn.head.name is "rose" and $worn.head.colour.includes("pink")>>
+			<<set $_linePool.push(`<<He>>【은는】 당신의 머리에 꽂힌 분홍 장미를 보며 미간을 찌푸린다. "안녕.`)>>
+		<<elseif $worn.head.name is "sage witch hat">>
+			<<set $_linePool.push(`"멋진 모자네.`)>>
+		<</if>>
+		<<if $worn.upper.name === "chain tunic" && $worn.lower.name === "chain tunic skirt" ||
+			$worn.upper.name.includes("vintage") && $worn.lower.name.includes("vintage")>>
+			<<set $_linePool.push(`"그거 정말 잘 어울린다.`)>>
+		<<elseif $worn.upper.type.includes("costume") && $worn.lower.type.includes("costume") ||
+			(V.worn.upper.type.includes("naked") && V.worn.under_upper.type.includes("costume") &&
+			V.worn.lower.type.includes("naked") && V.worn.under_lower.type.includes("costume"))>>
+			<<set $_linePool.push(`"옷차림 괜찮네.`)>>
+		<</if>>
+		<<if $location is "forest_shop" and $worn.feet.name is "reindeer slippers">>
+			<<set $_linePool.push(`<<He>>【은는】 당신의 슬리퍼를 눈치챈다. "안녕, 사슴아.`)>>
+		<</if>>
+
+		<<if $_linePool.length>>
+			<<set $_gwylanSpeech += " " + $_linePool.pluck()>>
+			<<if _gwylanLastSeenDays gte 21>>
+				<<set $_gwylanSpeech += `" <<He>>【은는】 뒷머리를 긁적인다. "다시 만나서 반가워. 날 잊어버린 줄 알기 시작하던 참이었어.`>>
+			<</if>>
+			<<if $location is "cafe" and getRobinLocation() is "cafe">>
+				<<set $_gwylanSpeech += ` 이리 와, 같이 있자." 로빈이 미소 지으며 당신에게 손을 흔든다.`>>
+			<<else>>
+				<<set $_gwylanSpeech += `"`>>
+			<</if>>
+		<</if>>
+	<</if>>
+<</silently>><<print $_gwylanSpeech>><</widget>>
+
+<<widget "gwylanOptions">>
+	<<if $gwylanPassTime>>
+		<<pass $gwylanPassTime>>
+		<<unset $gwylanPassTime>>
+	<</if>>
+	<<set _gwylanLocation to gwylanSchedule()>>
+	<<set $gwylan.timer.lastSeen to Time.date.timeStamp>>
+
+	<<if _gwylanLocation is "nowhere">>
+		/* Nothing */
+		<<gwylanOptionsLeave>>
+		<<exit>>
+	<</if>>
+
+	/* Story progress */
+	<<if !$gwylanSeen.includes("struggles") and $gwylan.progress gte 15 and _gwylanLovePercent gte 65 and $gwylanSeen.includes("ritual_beast") and $dateCount.GwylanBeast gte 2 and $gwylan.request.event isnot "meetAtCafe" and !gwylanRequestMet() and C.npc.Gwylan.dom gte 10 and C.npc.Gwylan.lust gte 25>>
+		<<set $_noLeave to true>>
+		<<if $location is "forest_shop">>
+			<<He>> looks unsure of <<himself>> for a moment. "I need to ask you something," <<he>> blurts out.
+			<br><br>
+
+			<<link [[Next|Gwylan Talk Struggles Intro]]>><</link>>
+			<br>
+		<<else>>
+			Gwylan's eyes have closed. <span class="blue">You try getting <<his>> attention, but <<he>> won't respond.</span>
+			<br><br>
+
+			<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+				<<getouticon>><<link [[Say goodbye and go back inside (0:01)|Gwylan Talk Struggles Intro]]>><<pass 1>><</link>>
+			<<elseif $location is "cafe">>
+				<<getouticon>><<link [[Say goodbye (0:01)|Gwylan Talk Struggles Intro]]>><<pass 1>><</link>>
+			<<else>>
+				<<getouticon>><<link [[Back to the shop|Gwylan Talk Struggles Intro]]>><</link>>
+			<</if>>
+			<br>
+		<</if>>
+		<<exit>>
+	<</if>>
+	<<if $location is "forest_shop" and _gwylanLovePercent gte 80 and C.npc.Gwylan.dom gte 75 and $dateCount.GwylanSex gte 5 and $gwylan.sea gte 5 and !$gwylanSeen.includes("partners") and _gwylanStatus.includes("lust") and !$weekly.gwylanLIChance and $exposed is 0 and !Time.isBloodMoon()>>
+		<<set $weekly.gwylanLIChance to true>>
+		You feel Gwylan's hand on yours.
+		<br><br>
+
+		"Would you like to join me for a walk?" <<he>> asks. "I'd like to talk about something." <<He>> pauses. "I won't get angry at you again. Promise."
+		<br><br>
+
+		<<link [[Yes (1:00)|Gwylan Promenade Walk]]>><<endevent>><<pass 20>><<trauma -1>><</link>><<ltrauma>><<gyearning true>>
+		<br>
+		<<link [[Not right now|Gwylan Promenade Walk No]]>><<npcincr Gwylan dom -5>><</link>><<llyearning>>
+		<br>
+		<<exit>>
+	<</if>>
+
+	/* Leaving the cafe for elsewhere */
+	<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30) and $gwylan.robin gte 10 and $daily.robin_in_cafe and getRobinLocation() isnot "cafe" and false>> /* WARNING! Re-enable later for Gwybin cafe */
+		Gwylan stands up with <<his>> plate. <<He>> empties the crumbs into the air, just as a flock of seagulls pass by. They don't let a single crumb land on the beach.
+		<br><br>
+
+		<<He>> smiles at you. "We better get going. You don't want to be late for school." Robin nods and grabs <<person2>><<his>> backpack. <span class="red">TODO: Walking to school with Gwylan and Robin.</span>
+		<br><br>
+		<<schoolicon "building">><<link [[Walk to school (0:05)|Gwylan Walk School Robin]]>><<set $daily.gwylan.cafeSkip to true>><<pass 5>><<unset $cafe_study>><<storeon "cafe_balcony">><<set $phase to 1>><</link>>
+		<br>
+		<<getouticon>><<link [[Excuse yourself and go back inside (0:01)|Ocean Breeze]]>><<pass 1>><<unset $cafe_study>><<storeon "cafe_balcony">><<endevent>><</link>>
+		<br>
+		<<exit>>
+	<</if>>
+	<<if $location is "cafe" and !$gwylan_school_walk_refused and Time.schoolDay and (Time.hour is 8 and Time.minute gte 40 or Time.hour is 9) and !$daily.gwylan_skip_school and ($gwylanSeen.includes("cafe_walk") or ($gwylan.sea + ($gwylanTalked.count("fox_mask") * 20) + ($gwylanTalked.count("dark_pendant") * 20) gte 40))>>
+		<<if _gwylanTF?.known>>
+			Gwylan's ears twitch, and <<he>> seems to realise something.
+		<</if>>
+
+		<<He>> smiles at you.
+		<<if !$gwylanSeen.includes("cafe_walk")>>
+			<<set $gwylanSeen.pushUnique("cafe_walk")>>
+			<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1 or $gwylanSeen.includes("petplay") and $worn.neck.type.includes("leash")>>
+				<<set _magicLeash to true>>
+				"School starts for you soon, doesn't it?" <<He>> grabs your leash and pulls you closer, trailing two fingers up your chest. "Want me to walk you there?"
+			<<else>>
+				"School starts for you soon, doesn't it? Want me to walk you there?"
+			<</if>>
+		<<else>>
+			<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1 or $gwylanSeen.includes("petplay") and $worn.neck.type.includes("leash")>>
+				<<set _magicLeash to true>>
+				"We better get going, <<pcpetname "Gwylan" "my">>." <<He>> grabs your leash and pulls you closer, trailing two fingers up your chest. "You don't want to be late for school."
+			<<else>>
+				"We better get going, <<pcpetname "Gwylan" "simple">>. You don't want to be late for school."
+			<</if>>
+		<</if>>
+		<br><br>
+
+		<<schoolicon "building">><<link [[Walk to school (0:10)|Gwylan Walk School Solo]]>><<set $daily.gwylan.cafeSkip to true>><<pass 10>><<unset $cafe_study>><<storeon "cafe_balcony">><</link>>
+		<br>
+		<<refuseicon>><<link [[Decline the offer (0:01)|Gwylan Walk School Solo Decline]]>><<pass 1>><<set $daily.gwylan.cafeSkip to false>><<set $daily.gwylan_skip_school to 1>><</link>>
+		<br>
+		<<exit>>
+	<</if>>
+	<<if $location is "cafe" and !["cafe", "cliff", "walking_to_cafe"].includes(_gwylanLocation)>>
+		<<if !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+			Gwylan stands up with <<his>> plate. <<He>> empties the crumbs into the air, just as a flock of seagulls pass by. They don't let a single crumb land on the beach.
+			<br><br>
+		<</if>>
+
+		"I'm heading back to the shop," <<he>> says.
+		<<if $gwylan.request is "meetAtShop" and !$daily.gwylan.preventProgress>>
+			"Remember to meet me there later, please."
+		<<elseif $daily.gwylan.ritualRequestBlocked and $gwylanSeen.includes("ritual_beast")>>
+			"If you still wish to enact the ritual today, you know where to find me." <<He>> winks, and leaves the balcony.
+		<<else>>
+			"Thank you for the company." <<He>> bows, and leaves the balcony.
+		<</if>>
+		<br><br>
+
+		<<gwylanOptionsLeave>>
+		<<exit>>
+	<</if>>
+
+	/* Leaving the forest shop for elsewhere */
+	<<if $location is "forest_shop" and ["walking_to_cafe", "cafe", "cliff"].includes(_gwylanLocation) and !$daily.gwylan.cafeOfferDeclined>>
+		Gwylan's eyes are glued to a nearby cuckoo clock. <<He>> suddenly walks by you, grabbing <<his>> hat and an umbrella from a stand.
+		<<if ["walking_to_cafe", "cafe"].includes(_gwylanLocation)>>
+			<<if $gwylanSeen.includesAny("cafe_walk", "struggles") or $gwylan.sea gte 10>>
+				"Breakfast time," <<he>> says.
+				<<if Time.schoolDay and $gwylanSeen.includes("cafe_walk")>>
+					"Would you like to accompany me? I could walk you to school afterwards."
+				<<else>>
+					"Would you like to accompany me?"
+				<</if>>
+				<br><br>
+
+				<<cafeicon>><<link [[Walk with Gwylan (0:15)|Gwylan Walk Cafe Solo]]>><<pass 15>><<set $phase to 0>><</link>>
+				<br>
+				<<refuseicon>><<link [[Decline the offer (0:01)|Gwylan Walk Cafe Solo]]>><<pass 1>><<set $phase to 1>><<set $daily.gwylan.cafeOfferDeclined to true>><</link>>
+			<<else>>
+				"Breakfast time," <<he>> says. "Sorry. The <<if Time.season is "winter">>gingerbread waits<<else>>crepes wait<</if>> for nobody.<<if $gwylanSeen.includes("cafe")>> Meet me at the cafe later?<</if>>"
+				<br><br>
+
+				<<gwylanOptionsLeave>>
+			<</if>>
+		<<else>>
+			"I'm going to..." <<He>> looks unsure for a moment. "Apologies, with my routine disrupted by the renovation I don't really know what to do with myself. I'll be on Cliff street."
+			<br><br>
+
+			<<gwylanOptionsLeave>>
+		<</if>>
+		<<exit>>
+	<</if>>
+
+	/* Normal options */
+	<<if $location is "forest_shop" and _gwylanLocation is "sleep">>
+		<<He>> lets out an exaggerated yawn. "You sure know how to make the time run away from me. I'm off to sleep."
+		<br><br>
+	<<else>>
+		<<if $location is "forest_shop">>
+			<<set $daily.gwylan.clothesTalk ||= 0>>
+			<<if $daily.gwylan.clothesTalk gte 3 and !$daily.gwylan.enoughTalk>>
+				<<set $daily.gwylan.enoughTalk to true>>
+				<<if $daily.gwylan.traumaTalk>>
+					<<He>> dons a sad smile. "Thank you for confiding in me. Forgive me, but this is a lot to process. Can we continue another day?"
+					<br><br>
+					<span class="blue">Gwylan needs time to process what you've told <<him>>.</span>
+					<br><br>
+				<<else>>
+					<<He>> stretches. "Thank you for sharing your stories. I think that's all I can process for one day. Same time tomorrow?"
+					<br><br>
+					<span class="blue">Gwylan wants to hear more stories another day.</span>
+					<br><br>
+				<</if>>
+			<<elseif $daily.gwylan.enoughTalk>>
+				<span class="blue">Gwylan wants to hear more stories another day.</span>
+				<br><br>
+			<</if>>
+			<<gwylanOptionsSpecial>>
+			<<if $gwylanSeen.includes("cafe_walk") and $exposed is 0 and (Time.hour === 6 && Time.minute >= 45 || Time.hour is 7)>>
+				<<cafeicon>><<link [[Ask to walk to the cafe (0:15)|Gwylan Walk Cafe Ask]]>><<pass 15>><</link>>
+				<br>
+			<</if>>
+			<<gwylanOptionsRequest>>
+			<<gwylanOptionsService>>
+			<<gwylanOptionsClothing>>
+		<</if>>
+
+		<<if $forest_shop_intro and !$gwylanSeen.includes("clothes_intro")>>
+			<<set $_askbr to true>>
+			<<socialiseicon "ask">><<link [[Ask Gwylan about the shop (0:10)|Gwylan Talk Clothes Intro]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+
+		<<if $location is "cafe">>
+			<<gwylanOptionsCafe>>
+		<</if>>
+
+		<<if $gwylanSeen.includes("yearning")>>
+			<<gwylanOptionsGift>>
+		<</if>>
+	<</if>>
+	<<gwylanOptionsLeave>>
+<</widget>>
+
+<<widget "gwylanOptionsSpecial">>
+	<<if !_hideRitualOptions>>
+		<<if $gwylanSeen.includes("ritual_beast")>>
+			<<if $gwylan.timer.ritual and Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual)) > 0>>
+				<<set _ritualDays to Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual))>>
+				<<if _ritualDays gt 7>>
+					<<set $gwylan.timer.ritual to Time.date.timeStamp + (7 * 86400)>>
+					<<set _ritualDays to 7>>
+				<</if>>
+				<<set $_askbr to true>>
+				<<icon "clothes/witch-hat-sage.png">><span class="pink">그윌란은 <<number _ritualDays>>일 뒤에 다음 의식을 준비할 것입니다.</span>
+			<<elseif $gwylanSeen.includes("ritual_sex_intro")>>
+				<<set $_askbr to true>>
+				<<icon "clothes/witch-hat-sage.png">><<link [[`<<his>> 의식에서 그윌란을 돕는다 (?:??)`|Gwylan Ritual Select]]>><</link>>
+			<<else>>
+				<<set $_askbr to true>>
+				<<icon "clothes/witch-hat-sage.png">><<link [[`<<his>> 의식에서 그윌란을 돕는다 (?:??)`|Gwylan Forest Journey Prep]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+			<<if (!$gwylan.timer.sample or $gwylan.timer.sample lte Time.date.timeStamp) and !["meetAtCafe", "sample"].includes($gwylan.request.event)>>
+				<<set $_askbr to true>>
+				<<if $gwylanSeen.includes("sample")>>
+					<<ind>><<link [[그윌란이 측정 부적을 교체하는 것을 돕는다|Gwylan Request Sample]]>><</link>>
+				<<else>>
+					<<ind>><<link [[그윌란에게 세상의 독에 대해 묻는다|Gwylan Request Sample]]>><</link>>
+				<</if>>
+				<br>
+			<</if>>
+		<<elseif !$gwylanSeen.includes("ritual_beast") and $gwylan.request.event is "meetAtShop" and !$daily.gwylan.preventProgress>>
+			<<set $_askbr to true>>
+			<<socialiseicon "ask">><<link [[그윌란을 돕는다 (?:??)|Gwylan Forest Journey Prep]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+
+	/* ToDo: Gwylan ToDo: Magic Tattoos */
+	<<if $gwylanSeen.includes("ritual_beast") and !$gwylanSeen.includes("tattoos_intro")>>
+		<<set $_askbr to true>>
+		<<ind>><<link [[`<<his>> 문신에 대해 그윌란에게 묻는다`|Gwylan Talk Tattoos Intro]]>><</link>>
+		<br>
+	<</if>>
+	<<if $gwylanSeen.includes("gwylan_ears") and !$gwylanSeen.includesAny("gwylan_ears_talk", "gwylan_tf_revealed") and $gwylanSeen.includes("hat_found")>>
+		<<set $_askbr to true>>
+		<<icon "clothes/witch-hat-sage.png">><<link [[`<<his>> 모자에 달린 귀에 대해 그윌란에게 묻는다 (0:05)`|Gwylan Talk TF Ears]]>><<pass 5>><</link>>
+		<br>
+	<</if>>
+	<<if $gwylanSeen.includes("gwylan_tail") and !$gwylanSeen.includesAny("gwylan_tail_talk", "gwylan_tf_revealed")>>
+		<<set $_askbr to true>>
+		<<ind>><<link [[`<<his>> 가짜 꼬리에 대해 그윌란에게 묻는다 (0:05)`|Gwylan Talk TF Tail]]>><<pass 5>><</link>>
+		<br>
+	<</if>>
+	<<if $gwylanSeen.includes("gwylan_fangs") and !$gwylanSeen.includesAny("gwylan_fangs_talk", "gwylan_tf_revealed")>>
+		<<set $_askbr to true>>
+		<<ind>><<link [[`<<his>> 날카로운 이에 대해 그윌란에게 묻는다 (0:05)`|Gwylan Talk TF Fangs]]>><<pass 5>><</link>>
+		<br>
+	<</if>>
+	<<if $gwylanSeen.includesAll("gwylan_ears_talk", "gwylan_tail_talk", "gwylan_fangs_talk") and $settings.transformAnimalEnabled and ($gwylanTalked.includes("transformation") or $gwylanSeen.includes("player_tf")) and !$gwylanSeen.includes("gwylan_tf_revealed")>>
+		<<set $_askbr to true>>
+		<<icon "transformation.png">><<link [[`<<his>> 여우 같은 모습에 대해 그윌란을 추궁한다 (0:05)`|Gwylan Talk TF Revealed Confront]]>><<pass 5>><</link>>
+		<br>
+	<</if>>
+	<<if $avery_mansion>>
+		<<if $avery_mansion.fox.known and $avery_mansion.fox.end and !$brownFoxRevealed and $gwylanTalked.includes("fox_mask") and ($brownFoxWoundedHint or $gwylanSeen.includes("yearning"))>>
+			<<set $_askbr to true>>
+			<<icon "clothes/fox-mask.png">><<link [[`여우 가면을 써 보라고 <<him>>에게 부탁한다 (0:05)`|Gwylan Talk Brown Fox]]>><<pass 5>><</link>>
+			<br>
+		<<elseif $brownFoxRevealed and !$brownFoxMaskTalk and $gwylanTalked.includes("fox_mask") and $avery_fate>>
+			<<set $_askbr to true>>
+			<<icon "clothes/fox-mask.png">><<link [[갈색 여우 가면에 대해 묻는다 (0:05)|Gwylan Talk Brown Fox Mask]]>><<pass 5>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $_askbr>><br><</if>>
+<</widget>>
+
+<<widget "gwylanOptionsRequest">>
+	<<if !$gwylan.request.event and $gwylanSeen.includes("hat_found")>>
+		<<set $_reqbr to true>>
+		<<socialiseicon "ask">><<link [[`도움이 필요한 일이 있는지 <<him>>에게 묻는다`|Gwylan Request]]>><</link>>
+		<br>
+	<</if>>
+	<<if $harpy gte 6 and $birdFly gte 1 and $gwylan.request.event isnot "preen" and !$plucked and $gwylanSeen.includesAny("preen", "request_preen")>>
+		<<set $_reqbr to true>>
+		<<tficon "bird">><<link [[`당신의 깃털을 다듬어 달라고 <<him>>에게 부탁한다 (0:40)`|Gwylan Request Preen]]>><</link>><<lstress>><<garousal>>
+		<br>
+	<</if>>
+	<<if $gwylan.request.event and $location is "forest_shop">>
+		<<switch $gwylan.request.event>>
+			<<case "clothing">>
+				<<if gwylanRequestMet()>>
+					<<set $_reqbr to true>>
+					<<set $_iconItem to $gwylan.request.items.find(item => item.root)>><<set $_iconWorn to V.worn[$_iconItem.slot]>>
+					<<clothingicon $_iconWorn $_iconItem.slot>>
+					<<if $gwylan.request.special and $gwylan.request.special isnot "none">>
+						<<set $_specialTextKR to {
+							"gas mask": "가스 마스크",
+							"maid": "메이드",
+							"waiter": "웨이터",
+							"waitress": "웨이트리스",
+							"nurse": "간호사",
+							"plastic nurse": "비닐 간호사",
+							"gothic": "고딕",
+							"karate": "가라테",
+							"sailor": "세일러",
+							"short sailor": "짧은 세일러",
+							"football": "미식축구",
+							"cheerleader": "치어리더",
+							"cowboy": "카우보이",
+							"bunny": "버니",
+							"kitty": "고양이"
+						}[$gwylan.request.special] ?? $gwylan.request.special>>
+            <<if $gwylan.request.special is "gold accessories">>
+                <<link [[`금 장신구를 <<him>>에게 보여준다`|Gwylan Request Clothes Complete]]>><</link>>
+            <<elseif $gwylan.request.details.outfit>>
+                <<link [[`$_specialTextKR 복장을 <<him>>에게 보여준다`|Gwylan Request Clothes Complete]]>><</link>>
+            <<else>>
+                <<link [[`$_specialTextKR【을를】 <<him>>에게 보여준다`|Gwylan Request Clothes Complete]]>><</link>>
+            <</if>>
+        <<elseif $_iconWorn.name>>
+						<<link [[`$_iconWorn.name【을를】 <<him>>에게 보여준다`|Gwylan Request Clothes Complete]]>><</link>>
+					<<else>>
+						<<link [[`<<he>>【이가】 부탁한 옷을 <<him>>에게 보여준다`|Gwylan Request Clothes Complete]]>><</link>>
+					<</if>>
+					<br>
+				<<elseif $earSlime.forcedDressing and $gwylan.request.items.some(item => ![V.earSlime.forcedDressing, "n"].includes(item.gender)) ||
+					$earSlime.forcedCommando gte 0 && $gwylan.request.items.some(item => item.slot === "under_lower") ||
+					$gwylan.request.items.some(item => item.reveal lt earSlimeCorruptionClothes() && setup.clothingLayer.torso.includes(item.slot))>>
+					<<set $_reqbr to true>>
+					<<set _earSlimeText to numberOfEarSlime() gt 1 ? "귀 슬라임들" : "귀 슬라임">>
+					<<socialiseicon "angry">><<link [[`_earSlimeText 때문에 <<his>> 부탁을 들어줄 수 없다고 <<him>>에게 말한다`|Gwylan Talk Ear Slime Clothes]]>><</link>>
+					<br>
+				<</if>>
+			<<case "ingredients">>
+				<<if $gwylan.request.special is "tutorial" and $gwylanTutorialShrooms + $foodstuff.wolfshroom.amount gte 3>>
+					<<set $_reqbr to true>>
+					<<foodstufficon "wolfshroom">><<link [[`늑대버섯을 <<him>>에게 준다`|Gwylan Request Tutorial Complete]]>><</link>>
+					<br>
+				<<elseif gwylanRequestMet()>>
+					<<set $_reqbr to true>>
+					<<set $_iconItem to $gwylan.request.items.find(item => item.root)>>
+					<<foodstufficon $_iconItem.name>><<link [[`<<he>>【이가】 부탁한 재료를 <<him>>에게 준다`|Gwylan Request Ingredients Complete]]>><</link>>
+					<br>
+				<</if>>
+			<<case "sample">>
+				<<if gwylanRequestMet()>>
+					<<set $_reqbr to true>>
+					<<scienceicon>><<link [[`샘플을 <<him>>에게 준다`|Gwylan Request Sample Complete]]>><</link>>
+					<br>
+				<</if>>
+			<<case "samplePlayer">>
+				/* ToDo: Gwylan */
+			<<case "cream">>
+				<<set $_reqbr to true>>
+				<<foodstufficon "cream">><<link [[`<<his>> 음란한 제안을 받아들인다`|Gwylan Request Cream]]>><</link>>
+				<br>
+			<<case "preen">>
+				<<if $harpy gte 6 and $gwylan.request.special is "harpy">>
+					<<set $_reqbr to true>>
+					<<tficon "bird">><<link [[`당신의 날개를 다듬도록 <<him>>에게 맡긴다 (0:40)`|Gwylan Request Preen]]>><</link>><<lstress>><<garousal>>
+					<br>
+					<<if $bird?.materials?.feathers gte 10>>
+						<<birdicon "feathers">><<link [[`대신 깃털 10개를 <<him>>에게 준다`|Gwylan Request Feathers]]>><<set $phase to 1>><</link>>
+						<br>
+					<</if>>
+				<<elseif $bird?.materials?.feathers gte $gwylan.request.items.find(feather => feather.name === "feathers").need or $harpy gte 6>>
+					<<set $_reqbr to true>>
+					<<if $bird?.materials?.feathers gte $gwylan.request.items.find(feather => feather.name === "feathers").need>>
+						<<birdicon "feathers">><<link [[`요청받은 깃털을 <<him>>에게 준다`|Gwylan Request Feathers]]>><<set $phase to 2>><</link>>
+						<br>
+					<</if>>
+					<<if $harpy gte 6>>
+						<<tficon "bird">><<link [[`대신 당신의 날개를 다듬도록 <<him>>에게 맡긴다 (0:40)`|Gwylan Request Preen]]>><</link>><<lstress>><<garousal>>
+						<br>
+					<</if>>
+				<</if>>
+			<<case "chastity">>
+				<<if !playerChastity()>>
+					<<lockicon "unlock">><<link [[`정조대가 제거됐다고 <<him>>에게 말한다`|Gwylan Chastity Removed]]>><</link>>
+					<br>
+				<<elseif playerChastity() and gwylanRequestMet()>>
+					<<lockicon "unlock">><<link [[`<<he>>【이가】 부탁한 물건을 <<him>>에게 준다 (1:00)`|Gwylan Chastity Removal Gold]]>><<pass 20>><</link>>
+					<br>
+				<</if>>
+			<<default>>
+				/* Request not applicable to interaction here */
+		<</switch>>
+		/* Necessary to avoid an uncompletable request if the golden chastity belt is removed before the request is turned in */
+		<<if $gwylan.request.event is "recipe" and $gwylan.request.special is "chastity" and !playerChastity()>>
+			<<lockicon "unlock">><<link [[`정조대가 제거됐다고 <<him>>에게 말한다`|Gwylan Chastity Removed]]>><</link>>
+			<br>
+		<</if>>
+		<<if !gwylanRequestMet() and !$gwylan.request.command and $debug is 1>>
+			/* ToDo: Gwylan - rerolling requests */
+			<span class="red">개발자 메모: 의뢰 재추첨은 아직 구현되지 않았습니다. 현재 의뢰를 초기화합니다. 부주의하게 사용하면 스토리 진행이 완전히 망가질 수 있습니다.</span>
+			<br>
+			<<set $_reqbr to true>>
+			<<icon "cross.png">><<link [[그윌란에게 다른 것을 해도 되냐고 묻는다|Forest Shop Entrance]]>><<gwylanRequestEnd "skip">><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $_reqbr>><br><</if>>
+<</widget>>
+
+<<widget "gwylanOptionsService">>
+	<<if playerChastity() and $gwylan.request.hold isnot "chastity" and ($gwylanSeen.includesAny("chastity", "partners") or $gwylanJordanChastity or $gwylan.request.event is "chastity" and !$gwylan.request.items?.length)>>
+		<<if $gwylan.requestLast?.hold is "chastity" and (!$gwylan.request.event or $gwylan.request.event is "chastity")>>
+			<<lockicon>><<link [[정조대를 제거하는 걸 도와달라고 부탁한다|Gwylan Chastity Removal]]>><<set $phase to "skip">><</link>>
+		<<else>>
+			<<lockicon>><<link [[정조대를 제거하는 걸 도와달라고 부탁한다|Gwylan Chastity Removal]]>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if !$gwylan.taken and $worn.neck.name is "familiar collar" and $gwylanSeen.includes("familiar_collar") and $daily.gwylan.collar_lock isnot 2>>
+		<<if $worn.neck.cursed is 1>>
+			<<icon "clothes/familiar-collar.png">><<link [[사역마 목걸이를 풀어 달라고 그윌란에게 부탁한다|Gwylan Familiar Collar Unlock]]>><</link>>
+		<<else>>
+			<<icon "clothes/familiar-collar.png">><<link [[사역마 목걸이를 채워 달라고 그윌란에게 부탁한다|Gwylan Familiar Collar Lock]]>><</link>><<gwylanHypnoNote>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if $gwylanSeen.includesAll("partners", "familiar_collar") and (!$gwylan.timer.petBed or $gwylan.timer.petBed and Time.date.dayDifference(new DateTime(V.gwylan.timer.petBed)) <= 1) and $gwylan.request.hold isnot "petBed" and ($tiredness gte 1000 or $gwylanSeen.includes("doggy_bed"))>>
+		<<if $gwylan.timer.petBed and Time.date.dayDifference(new DateTime(V.gwylan.timer.petBed)) <= 1>>
+			<<bedicon "gwylanpet">><<link [[펫 침대를 한 주 더 꺼내 둬 달라고 그윌란에게 부탁한다|Gwylan Dog Bed Request]]>><</link>>
+		<<elseif $gwylanSeen.includes("doggy_bed")>>
+			<<bedicon "gwylanpet">><<link [[펫 침대를 다시 끌어내 달라고 그윌란에게 부탁한다|Gwylan Dog Bed Request]]>><</link>>
+		<<else>>
+			<<bedicon "default">><<link [[여기서 자도 되는지 그윌란에게 묻는다|Gwylan Dog Bed Request]]>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if !_hideHypnosisOptions>>
+		<<if $gwylanSeen.includes("player_tf")>>
+			<<if $angel gte 4 or $fallenangel gte 2 or $demon gte 4 or $wolfgirl gte 4 or $cat gte 4 or $cow gte 4 or $harpy gte 4 or $fox gte 4>>
+				<<set $_hypnobr to true>>
+				<<icon "transformation.png">><<link [[내면의 자신을 받아들이도록 도와달라고 부탁한다|Gwylan Hypnosis Start]]>><<set $phase to "peace">><</link>><<gwylanHypnoNote>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if numberOfEarSlime(true)>>
+			<<if ($gwylanJordanSlime or $gwylanSeen.includes("ear_slime_intro")) and !$gwylanSeen.includes("ear_slime")>>
+				<<set $_hypnobr to true>>
+				<<socialiseicon "ask">><<link [[귀 슬라임에 대해 묻는다|Gwylan Talk Ear Slime]]>><</link>>
+				<br>
+			<<elseif $gwylanSeen.includes("ear_slime")>>
+				<<set $_hypnobr to true>>
+				<<hypnosisicon>><<link [[귀 슬라임을 잠재우는 걸 도와달라고 부탁한다|Gwylan Hypnosis Start]]>><<set $phase to "silence">><</link>><<gwylanHypnoNote>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if $gwylanSeen.includes("request_intro") and $sleeptrouble gte 1>>
+			<<set $_hypnobr to true>>
+			<<bedicon "zzz">><<link [[잠들기 어렵다고 그윌란에게 말한다|Gwylan Hypnosis Start]]>><<set $phase to "slumber">><</link>><<gwylanHypnoNote>>
+			<br>
+		<</if>>
+		/* ToDo: Gwylan - make proper unlock condition */
+		<<if $gwylanSeen.includes("ritual_beast") and $hallucinations gte 2>>
+			<<set $_hypnobr to true>>
+			<<symbol "awareness">><<link [[환각에 대해 도와달라고 그윌란에게 부탁한다|Gwylan Hypnosis Start]]>><<set $phase to "insight">><</link>><<gwylanHypnoNote>>
+			<br>
+		<</if>>
+		<<if $gwylanSeen.includes("request_intro") and Object.keys(V.hypnosis_traits).filter(trait => ["suggestion", "scream", "cover", "deviancy"].includes(trait) && V.hypnosis_traits[trait] >= 1).length>>
+			<<set $_hypnobr to true>>
+			<<hypnosisicon>><<link [[최면을 잊는 걸 도와달라고 부탁한다|Gwylan Hypnosis Start]]>><<set $phase to "removal">><</link>><<gwylanHypnoNote>>
+			<br>
+		<</if>>
+		<<if $_hypnobr>><br><</if>>
+	<</if>>
+
+	/* ToDo: Gwylan - Sneaking into the garden */
+
+	/* ToDo: Gwylan - Punishments for disobedience, including familiar collar */
+
+	/* ToDo: Gwylan - break down to Gwylan about your troubles? Leads to existing fruit trauma scene. */
+
+	/* ToDo: Gwylan - Telling Gwylan about misc troubles. Pool of possible scenes based on trauma, traits, etc. Could unlock hypnosis services.
+	'tell Gwylan you've been having trouble sleeping' etc.
+	V.gwylan.request.missed is 1 or V.gwylan.timer.lastSeen too high, say player feels bad about not seeing Gwylan
+	*/
+
+	/* ToDo: Gwylan - basic service unrelated to hypno that can be done without cooldown? */
+
+<</widget>>
+
+<<widget "gwylanOptionsClothing">>
+	<<if $gwylanSeen.includes("clothes_intro")>>
+		<<if $daily.gwylan.enoughTalk>>
+			/* Nothing */
+		<<else>>
+			/* Get sets that the player can talk about */
+			<<set $_setsAtForestShop to getSpecialSets(sets => sets.shop.includes("forest"))>>
+			/* Get unlocked sets */
+			<<set $_setsUnlocked to getUnlockedSpecialSets().filter(set => $_setsAtForestShop.includes(set) && !$gwylanTalked.includes(set))>>
+			<<if !$gwylanSeen.includesAny("clothes_talk_cheated", "clothes_talk_bypassed")>>
+				/* Count cheat sets for one-time event */
+				<<set $_setsCheated to getUnlockedSpecialSets(V.specialClothes.filter(c => c.unlocked === 1).map(c => c.name)).filter(set => $_setsAtForestShop.includes(set) && !$gwylanTalked.includes(set))>>
+				<<set $_setsUnlocked to $_setsUnlocked.concat($_setsCheated)>>
+			<</if>>
+			<<if !$gwylanSeen.includes("clothes_talk_bypassed")>>
+				/* Count feat sets for one-time event */
+				<<set $_setsBypassed to getUnlockedSpecialSets(V.specialClothes.filter(c => c.unlocked === 2).map(c => c.name)).filter(set => $_setsAtForestShop.includes(set) && !$gwylanTalked.includes(set))>>
+				<<set $_setsUnlocked to $_setsUnlocked.concat($_setsBypassed)>>
+			<</if>>
+			<div class="no-numberify">
+				/* Talk to Gwylan about further heists after catsuit conversation */
+				<<if $gwylanTalked.includes("catsuit") and
+				(($bird?.hunts?.estate is "complete" and !$gwylanTalked.includes("heist_silver")) or
+				($lakestealgold is 1 and !$gwylanTalked.includes("heist_gold")) or
+				($compound?.symbol.includes("docks") and !$gwylanTalked.includes("symbol")) or
+				(($wrenHeist or $wrenSeen?.includes("heist")) and !$gwylanTalked.includes("heist_wren")))>>
+					<<set $_catsuit to clone(setup.clothes.upper[75])>>
+					<<set $_catsuit.colour to "black">>
+					<<clothingicon $_catsuit "upper">><<link [[`당신의 범죄 행각에 대해 <<him>>에게 말한다`|Gwylan Talk Heists]]>><<set $phase to "silver">><</link>>
+					<br>
+				<</if>>
+				<<if !$gwylanSeen.includes("clothes_talk_savescum") and _saveLoaded>>
+					<<if localStorage.getItem("gwylanTalk") is "seen">>
+						<<set $gwylanSeen.pushUnique("clothes_talk_savescum")>>
+					<<elseif localStorage.getItem("gwylanTalk") is "nobody">>
+						<!-- Do nothing. Don't trigger savescum message if nobody happens -->
+					<<elseif !localStorage.getItem("gwylanTalk")>>
+						<<run localStorage.setItem("gwylanTalk", 0)>>
+					<<else>>
+						<<run localStorage.setItem("gwylanTalk", Number(localStorage.getItem("gwylanTalk")) + 1)>>
+					<</if>>
+				<</if>>
+				<<for $_label, _value range $_setsUnlocked>>
+					<<set $_subsetVals to Object.keys(setup.specialClothesSets).filter(set => setup.specialClothesSets[set].subsetOf?.includes(_value))>>
+					<<if $gwylanTalked.includesAll($_subsetVals)>>
+						<<set $_clothesbr to true>>
+						/* If value is a set that includes other sets, such as 'halloween', do not show the talk link unless all of its subsets have been talked about already. */
+						/* Empty arrays are valid to bypass this check, which is intended. */
+						/* Get icon provided by setup */
+						<<set _timeToPass to $_subsetVals.length ? 20 : 15>>
+						<<set $_clothingObject to clone(setup.specialClothesSets[_value])>>
+						<<if $_clothingObject.icon is "clothes">>
+							<<set $_cIcon to clone(setup.clothes[$_clothingObject.iconSlot][$_clothingObject.iconIndex])>>
+							<<set $_cIcon.colour to $_clothingObject.iconColor>><<set $_cIcon.accessory_colour to $_clothingObject.iconAccColor>>
+							<<clothingicon $_cIcon $_clothingObject.iconSlot>>
+						<<else>>
+							<<set $_cIcon to $_clothingObject.icon>>
+							<<icon $_cIcon>>
+						<</if>>
+						/* Passage names are "Gwylan Talk Clothes " + the set name from setup in title case with underscores removed */
+						<<set _incomingPassageText to toTitleCase(_value.replace(/_/g," "))>>
+						<<capture _value, _incomingPassageText, _timeToPass>>
+							<<if Number(localStorage.getItem("gwylanTalk")) gte 1>>
+								<<link [[`$_clothingObject.text【을를】 <<him>>에게 보여준다`|Gwylan Talk Clothes Savescum]]>><<set $clothesBeingTalkedAbout to _value>><</link>>
+								<br>
+							<<elseif !$_setsAtForestShop.includes(_value) or !setup.specialClothesSets[_value]>>
+								<<link [[`$_clothingObject.text【을를】 <<him>>에게 보여준다`|Gwylan Talk Clothes Error]]>><<set $clothesBeingTalkedAbout to _value>><</link>>
+								<br>
+							<<elseif $_setsCheated?.includes(_value)>>
+								<<link [[`$_clothingObject.text【을를】 <<him>>에게 보여준다`|Gwylan Talk Clothes Cheated]]>><<set $clothesBeingTalkedAbout to _value>><</link>>
+								<br>
+							<<elseif $_setsBypassed?.includes(_value)>>
+								<<link [[`$_clothingObject.text【을를】 <<him>>에게 보여준다`|Gwylan Talk Clothes Bypassed]]>><<set $clothesBeingTalkedAbout to _value>><</link>>
+								<br>
+							<<else>>
+								<<if $_subsetVals.length>>
+									<<link [[`$_clothingObject.text에 대해 <<him>>에게 묻는다 (0:_timeToPass)`|`Gwylan Talk Clothes `+ _incomingPassageText]]>><<set $gwylanPassTime to _timeToPass>><</link>><<glove>>
+								<<else>>
+									<<link [[`$_clothingObject.text【을를】 <<him>>에게 보여준다 (0:_timeToPass)`|`Gwylan Talk Clothes `+ _incomingPassageText]]>><<set $gwylanPassTime to _timeToPass>><</link>><<glove>>
+								<</if>>
+								<br>
+							<</if>>
+						<</capture>>
+					<</if>>
+				<</for>>
+			</div>
+		<</if>>
+		<<if $_clothesbr>><br><</if>>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanOptionsGift">>
+	<<if $location is "forest_shop" and checkSextoysGift("Gwylan") and C.npc.Gwylan.penis is "none" and checkIfNPCHasCategorySextoy("Gwylan","strap-on").length <= 5>>
+		<<set $_giftbr to true>>
+		<<for _key range Object.keys(V.NPCName[7].sextoys).filter(t => V.NPCName[7].sextoys[t][0].gift_state === "held")>>
+			<<set _toy to V.NPCName[7].sextoys[_key][0]>>
+			<<set _icon to `sex-toys/${_toy.name.replace(/ /g, "-")}.png`>>
+			<span @class="`clothes-${_toy.colour}`"><<icon _icon>></span>
+			<<capture _toy>>
+				<<link [[`_toy.colour _toy.name【을를】 그윌란에게 선물한다`|Gwylan Gift Strap-on]]>>
+					<<endevent>>
+					<<set $phase to _toy.name>>
+					<<set _toy.gift_state to "received">>
+					<<generateNewStrapon _toy.size _toy.colour _toy.shape>>
+					<<giveNNPCnewstrapon "Gwylan">>
+				<</link>>
+			<</capture>>
+			<br>
+		<</for>>
+		<br>
+	<</if>>
+	<<if canGiftFood("Gwylan") and $location isnot "cliff">>
+		<<set $_giftbr to true>>
+		<<skinicon "give">><<link [[그윌란에게 음식을 준다|Gwylan Gifts List]]>><</link>>
+		<br>
+	<</if>>
+	<<if $_giftbr>><br><</if>>
+<</widget>>
+
+<<widget "gwylanOptionsCafe">>
+	<<set $_schoolWalkAvailable to ($gwylanSeen.includes("cafe_walk") or ($gwylan.sea + ($gwylanTalked.count("fox_mask") * 20) + ($gwylanTalked.count("dark_pendant") * 20) gte 40)) or ($gwylan.robin gte 10 and $daily.robin_in_cafe and false)>> /* WARNING! Re-enable later for Gwybin cafe */
+	<<if $_schoolWalkAvailable and Time.schoolDay and ((Time.hour is 7 and Time.minute gte 45) or (Time.hour is 8 and Time.minute lte 35)) and !$daily.gwylan_skip_school>>
+		<<set _passTime to "<<passTimeUntil 8 45>><<set $daily.gwylan.cafeSkip to true>>">><<set _passTimeDisplay to "0:" + ("0" + ((45 - Time.minute + 60) % 60)).slice(-2)>>
+		<<if _passTimeDisplay is "0:00">><<set _passTimeDisplay to "1:00">><</if>>
+	<<elseif $_schoolWalkAvailable and Time.schoolDay and Time.hour is 8 and Time.minute gt 35 and !$daily.gwylan_skip_school>>
+		<<set _passTime to "<<pass 10>><<set $daily.gwylan.cafeSkip to true>>">><<set _passTimeDisplay to "0:10">>
+	<<elseif Time.hour lte 7 or (Time.hour is 8 and Time.minute lt 10)>>
+		<<set _passTime to "<<pass 1 hour>>">><<set _passTimeDisplay to "1:00">>
+	<<elseif Time.hour is 8 and Time.minute lte 20>>
+		<<set _passTime to "<<passTimeUntil 9 20>><<set $daily.gwylan.cafeSkip to true>>">><<set _passTimeDisplay to "1:" + ("0" + (20 - Time.minute)).slice(-2)>> /* Because why stop socialising only minutes before you're going to leave anyway? */
+	<<elseif Time.hour is 9 and Time.minute gte 10>>
+		<<set _passTime to "<<pass 10>><<set $daily.gwylan.cafeSkip to true>>">><<set _passTimeDisplay to "0:10">> /* So that Gwylan stays a little while longer if the player just arrived. */
+	<<else>>
+		<<set _passTime to "<<passTimeUntil 9 20>><<set $daily.gwylan.cafeSkip to true>>">><<set _passTimeDisplay to "0:" + ("0" + ((20 - Time.minute + 60) % 60)).slice(-2)>>
+	<</if>>
+	<<beachicon>><<link [[Watch the sea with <<him>> (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>>_passTime<<stress -6>><<trauma -3>><<willpower 1>><</link>><<lstress>><<ltrauma>><<gwillpower>>
+	<br>
+	<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30) and $daily.cafeEaten isnot 1>>
+		<<if $money gte 200>>
+			<<foodicon "coffee">><<link [[Buy coffee (_passTimeDisplay £2)|Gwylan Ocean Breeze Watch]]>>
+				<<set $phase to "coffee">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -200 "cafe">>
+				<<stress -9>><<trauma -3>><<tiredness -4>><<willpower 1>>_passTime
+			<</link>><<lstress>><<ltrauma>><<ltiredness>><<gwillpower>>
+			<br>
+		<</if>>
+		<<if $money gte 700>>
+			<<if Time.season is "winter">>
+				<<foodicon "winterale">>
+				<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+					<span class="blue">You can't bring yourself to drink winter ale while you know you're with child.</span>
+				<<else>>
+					<<link [[Buy winter ale (_passTimeDisplay £7)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "winter ale">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -700 "cafe">>
+						<<stress -12>><<drunk 100>><<willpower 1>>_passTime
+					<</link>><<llstress>><<ggdrunk>><<gwillpower>>
+				<</if>>
+				<br>
+			<<elseif Time.season is "spring">>
+				<<foodicon "fruityale">>
+				<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+					<span class="blue">You can't bring yourself to drink fruity ale while you know you're with child.</span>
+				<<else>>
+					<<link [[Buy fruity ale (_passTimeDisplay £7)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "fruity ale">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -700 "cafe">>
+						<<stress -12>><<drunk 60>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gdrunk>><<gwillpower>>
+				<</if>>
+				<br>
+			<<elseif Time.season is "summer">>
+				<<foodicon "shandy">>
+				<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+					<span class="blue">You can't bring yourself to drink shandy while you know you're with child.</span>
+				<<else>>
+					<<link [[Buy shandy (_passTimeDisplay £7)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "shandy">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -700 "cafe">>
+						<<stress -12>><<drunk 40>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gdrunk>><<gwillpower>>
+				<</if>>
+				<br>
+			<<else>>
+				<<foodicon "autumnale">>
+				<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+					<span class="blue">You can't bring yourself to drink autumn ale while you know you're with child.</span>
+				<<else>>
+					<<link [[Buy autumn ale (_passTimeDisplay £7)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "autumn ale">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -700 "cafe">>
+						<<stress -12>><<drunk 80>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gdrunk>><<gwillpower>>
+				<</if>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if $money gte 300>>
+			/* ToDo: Gwylan - bringing a milkshake to Gwylan at the forest shop */
+			<<if getRobinLocation() is "cafe">>
+				<<if $gwylanSeen.includes("yearning")>>
+					<<foodicon "milkshake">><<link [[Buy milkshake and share with Gwylan (_passTimeDisplay £3)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "milkshake">><<set $phase2 to 2>><<set $daily.cafeEaten to 1>><<money -300 "cafe">>
+						<<stress -12>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gwillpower>>
+					<br>
+				<</if>>
+				<<if $robinromance is 1>>
+					<<foodicon "milkshake">><<link [[Buy milkshake and share with Robin (_passTimeDisplay £3)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "milkshake">><<set $phase2 to 3>><<set $daily.cafeEaten to 1>><<money -300 "cafe">>
+						<<stress -12>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gwillpower>>
+					<br>
+				<</if>>
+				<<if $gwylanSeen.includes("yearning") and $robinromance is 1>>
+					<<foodicon "milkshake">><<link [[Buy milkshake and share with them both (_passTimeDisplay £3)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "milkshake">><<set $phase2 to 4>><<set $daily.cafeEaten to 1>><<money -300 "cafe">>
+						<<stress -12>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gwillpower>>
+					<br>
+				<</if>>
+			<<else>>
+				<<if $gwylanSeen.includes("yearning")>>
+					<<foodicon "milkshake">><<link [[Buy milkshake and share (_passTimeDisplay £3)|Gwylan Ocean Breeze Watch]]>>
+						<<set $phase to "milkshake">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -300 "cafe">>
+						<<stress -12>><<willpower 1>>_passTime
+					<</link>><<llstress>><<gwillpower>>
+					<br>
+				<</if>>
+			<</if>>
+		<</if>>
+		<<if $money gte 500>>
+			<<foodicon "fruitsalad">>
+			<<link [[Buy fruit salad (_passTimeDisplay £5)|Gwylan Ocean Breeze Watch]]>>
+				<<set $phase to "fruit salad">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -500 "cafe">>
+				<<stress -12>><<trauma -3>><<willpower 1>>_passTime
+			<</link>><<lstress>><<ltrauma>><<gwillpower>>
+			<br>
+		<</if>>
+		<<if $money gte 600 and Time.season is "winter">>
+			<<foodicon "gingerbread">>
+			<<link [[Buy gingerbread (_passTimeDisplay £6)|Gwylan Ocean Breeze Watch]]>>
+				<<set $phase to "gingerbread">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -600 "cafe">>
+				<<stress -14>><<willpower 1>>_passTime
+			<</link>><<llstress>><<gwillpower>>
+			<br>
+		<</if>>
+		<<if $money gte 1000>>
+			<<foodicon "pancakes">>
+			<<link [[Buy pancakes (_passTimeDisplay £10)|Gwylan Ocean Breeze Watch]]>>
+				<<set $phase to "pancakes">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -1000 "cafe">>
+				<<stress -6>><<trauma -3>><<tiredness -6>><<willpower 1>>_passTime
+			<</link>><<lstress>><<ltrauma>><<ltiredness>><<gwillpower>>
+			<br>
+			<<foodicon "crepes">>
+			<<link [[Buy crepes (_passTimeDisplay £10)|Gwylan Ocean Breeze Watch]]>>
+				<<set $phase to "crepes">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -1000 "cafe">>
+				<<stress -3>><<trauma -6>><<tiredness -6>><<willpower 1>>_passTime
+			<</link>><<lstress>><<ltrauma>><<ltiredness>><<gwillpower>>
+			<br>
+		<</if>>
+		<<if $money gte 5000>>
+			<<foodicon "creambun">>
+			<<link [[Buy Deluxe Cream Bun (_passTimeDisplay £50)|Gwylan Ocean Breeze Watch]]>>
+				<<set $phase to "deluxe cream bun">><<set $phase2 to 1>><<set $daily.cafeEaten to 1>><<money -5000 "cafe">>
+				<<transform cat 1>><<stress -24>><<trauma -3>><<willpower 1>>_passTime
+			<</link>><<lllstress>><<ltrauma>><<gwillpower>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if !(between($chef_state, 7, 8) and $chef_rework lte 30) and $cafe_study and ($studyBooks.rented isnot "none" or $studyBooks.stolen isnot "none") and Time.schoolDay>>
+		<br>
+		<<switch $studyBooks.rented>>
+			<<case "science">><<scienceicon>><<link [[Study science (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "science">><<set $phase2 to 2>><<scienceskill>><<willpower 1>>_passTime<</link>><<gscience>><<gwillpower>><br>
+			<<case "maths">><<mathicon>><<link [[Study maths (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "maths">><<set $phase2 to 2>><<mathsskill>><<willpower 1>>_passTime<</link>><<gmaths>><<gwillpower>><br>
+			<<case "English">><<englishicon>><<link [[Study English (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "English">><<set $phase2 to 2>><<englishskill>><<willpower 1>>_passTime<</link>><<genglish>><<gwillpower>><br>
+			<<case "history">><<historyicon>><<link [[Study history (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "history">><<set $phase2 to 2>><<historyskill>><<willpower 1>>_passTime<</link>><<ghistory>><<gwillpower>><br>
+		<</switch>>
+		<<switch $studyBooks.stolen>>
+			<<case "science">><<scienceicon>><<link [[Study science (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "science">><<set $phase2 to 2>><<scienceskill>><<willpower 1>>_passTime<</link>><<gscience>><<gwillpower>><br>
+			<<case "maths">><<mathicon>><<link [[Study maths (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "maths">><<set $phase2 to 2>><<mathsskill>><<willpower 1>>_passTime<</link>><<gmaths>><<gwillpower>><br>
+			<<case "English">><<englishicon>><<link [[Study English (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "English">><<set $phase2 to 2>><<englishskill>><<willpower 1>>_passTime<</link>><<genglish>><<gwillpower>><br>
+			<<case "history">><<historyicon>><<link [[Study history (_passTimeDisplay)|Gwylan Ocean Breeze Watch]]>><<set $phase to "history">><<set $phase2 to 2>><<historyskill>><<willpower 1>>_passTime<</link>><<ghistory>><<gwillpower>><br>
+		<</switch>>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "gwylanOptionsLeave">>
+	<<set $_schoolWalkAvailable to ($gwylanSeen.includes("cafe_walk") or ($gwylan.sea + ($gwylanTalked.count("fox_mask") * 20) + ($gwylanTalked.count("dark_pendant") * 20) gte 40)) or ($gwylan.robin gte 10 and $daily.robin_in_cafe and false)>> /* WARNING! Re-enable later for Gwybin cafe */
+	<<if $gwylan.request.event is "meetAtShop" and $location is "forest_shop" and gwylanCanForceRitual("beast") and !_ritualFailSafe and !$daily.gwylan.preventProgress>>
+		<<getouticon>><<link [[상점으로 돌아간다|Gwylan Forest Journey Cancel]]>><</link>><<if $daily.gwylan.eventCancelled>><<gwylanWillpowerDifficulty>><</if>>
+		/* ToDo: Gwylan - forcing player into ritual if it's been too long */
+	<<elseif $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+		<<if $_schoolWalkAvailable and Time.schoolDay and !$daily.gwylan_skip_school>>
+			<<if $daily.robin_in_cafe>>
+				<<schoolicon "building">><<link [[일찍 학교로 걸어간다 (0:10)|Gwylan Walk School Robin]]>><<pass 10>><<set $daily.gwylan.cafeSkip to true>><<unset $cafe_study>><<storeon "cafe_balcony">><</link>>
+			<<else>>
+				<<schoolicon "building">><<link [[일찍 학교로 걸어간다 (0:10)|Gwylan Walk School Solo]]>><<pass 10>><<set $daily.gwylan.cafeSkip to true>><<unset $cafe_study>><<storeon "cafe_balcony">><</link>>
+			<</if>>
+			<br>
+		<</if>>
+		<<getouticon>><<link [[작별 인사를 하고 안으로 돌아간다 (0:01)|Ocean Breeze]]>><<pass 1>><<unset $cafe_study>><<storeon "cafe_balcony">><<endevent>><</link>>
+	<<elseif $location is "cafe">>
+		<<getouticon>><<link [[작별 인사를 한다 (0:01)|Cliff Street]]>><<pass 1>><<endevent>><<set $eventskip to 1>><</link>>
+	<<else>>
+		<<getouticon>><<link [[상점으로 돌아간다|Forest Shop Entrance]]>><<endevent>><</link>>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "seagullFood">><<silently>>
+	<<if npcIsPregnant("Gwylan")>>
+		<<set _seagullFood to "자두 크레페">>
+	<<elseif Time.season is "winter">>
+		<<set _seagullFood to "진저브레드">>
+	<<elseif _gwylanStatus?.includes("lust")>>
+		<<set _seagullFood to "체리 크레페">>
+	<<else>>
+		<<set _seagullFood to "딸기 크레페">>
+	<</if>>
+<</silently>><<print _seagullFood>><</widget>>
+
+<<widget "gwylanHypnoName">><<silently>>
+	<<if $hypnosis_traits.devotion gte 4>>
+		<<if _args[0] is "cap">>
+			<<set $_text_output to `<span class="witch">당신의 <<nnpc_master "Gwylan">></span>`>>
+		<<else>>
+			<<set $_text_output to `<span class="witch">당신의 <<nnpc_master "Gwylan">></span>`>>
+		<</if>>
+	<<else>>
+		<<set $_text_output to "그윌란">>
+	<</if>>
+<</silently>><<print $_text_output>><</widget>>
+
+<<widget "gwylanNoChoice">>
+	<<if _args[0] is "speech">>
+		<<hypnosisText "말을 꺼내기도 전에 입에서 단어들이 빼앗긴다.">>
+	<<else>>
+		<<hypnosisText "당신의 몸은 더 이상 당신의 것이 아니다.">>
+	<</if>>
+	<br><br>
+	그윌란이 낄낄 웃는다.
+	<<print either(
+		`"<<pcPetname 'Gwylan' 'simple'>>...?"`,
+		`"혼란스러워 보이네... 쉿, 괜찮아."`,
+		`"나한테 '아니'라고 말하진 않겠지, 내 사랑?"`,
+		)>>
+	<br>
+<</widget>>
+
+<<widget "gwylanChaseOptions">>
+	<<link [[달린다 (0:05)|Gwylan Forest Run]]>><<pass 5>><<tiredness 2>><<set $phase to "run">><</link>><<gtiredness>><<athleticsdifficulty $beastRitual.difficultyMin $beastRitual.difficultyMax true>>
+	<br>
+	<<if !$beastRitual.foxChase>>
+		<<link [[걷는다 (0:10)|Gwylan Forest Run]]>><<stress -1>><<pass 10>><<set $beastRitual.time++>><<set $phase to "walk">><</link>><<lstress>>
+		<br>
+	<</if>>
+	<<if $fox gte 4 and $beastRitual.distance lt 0 and !$beastRitual.foxChase>>
+		<<link [[그윌란을 추적해 쫓는다 (0:05)|Gwylan Forest Run Fox Chase]]>><<transform fox 1>><<tiredness 6>><<trauma -8>><</link>><<ggtiredness>><<lltrauma>><<fox>>
+		<br>
+	<</if>>
+	<<if $beastRitual.lewdOption and $beastRitual.distance gte 2 and !$beastRitual.ambush>>
+		<<link [[기다렸다가 그윌란을 덮친다|Gwylan Forest Run Ambush]]>><<def 1>><<transform fox 1>><<set $phase to "ambush">><</link>><<skill_difficulty `currentSkillValue("skulduggery")` "Skulduggery" 400 1000>>
+		<br>
+	<</if>>
+	<<if $beastRitual.stalked is "wolf" and ($wolfgirl gte 6 or $wolfpackleader gte 1)>>
+		<<if $wolfgirl gte 6>>
+			<<link [[울부짖는다|Gwylan Forest Run Howl]]>><</link>><<wolfgirl>>
+		<<elseif $wolfpackleader gte 1>>
+			<<link [[울부짖는다|Gwylan Forest Run Howl]]>><</link>><<note "무리 우두머리" "red">>
+		<</if>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanPurgeEffect">><<silently>>
+	<<if $gwylanSeen.includes("ritual_beast") and $beastRitual or $gwylanSeen.includes("ritual_sex") and $sexRitual>>
+		<<set $_plus to _args[0]>>
+		<<switch $_plus>>
+			<<case 3>><<set $_text_output to " | <span class='teal'>+ + + 정화 효율</span>">>
+			<<case 2>><<set $_text_output to " | <span class='teal'>+ + 정화 효율</span>">>
+			<<case 1>><<set $_text_output to " | <span class='teal'>+ 정화 효율</span>">>
+			<<case -1>><<set $_text_output to " | <span class='purple'>- 정화 효율</span>">>
+			<<case -2>><<set $_text_output to " | <span class='purple'>- - 정화 효율</span>">>
+			<<case -3>><<set $_text_output to " | <span class='purple'>- - - 정화 효율</span>">>
+			<<default>><<set $_text_output to " | <span class='teal'>+ 정화력</span>">>
+		<</switch>>
+	<</if>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+<<widget "gwylanWorshipEffects">>
+	<<set $_fluid to $worship.fluid>>
+	<<switch $worship.action>>
+		<<case "start">>
+			<<he>>【이가】 기대하는 표정으로 당신을 바라본다.
+		<<case "none">>
+			<<set $worship.arousal -= 5>>
+			<<if $worship.actionLast is "none">>
+				당신은 계속해서 위를 올려다보며 그윌란을 쳐다본다. <<his>> 손이 당신의 뺨을 쓰다듬고는, 머리 쪽으로 움직인다.
+				<span class="lewd"><<he>>【이가】 당신의 머리를 아래로 밀어내 <<his>> <<npcGenitals 0>> 쪽에 대게 한다.</span>
+				<<set $worship.control to "Gwylan">>
+			<<else>>
+				당신은 그저 위를 올려다보며 그윌란을 쳐다볼 뿐이다. <<he>>【이가】 당신을 향해 미소 짓는다.
+			<</if>>
+		<<case "body">>
+			<<set $worship.body-->><<set $worship.arousal += 3>><<arousal 100>>
+			<<if $worship.actionLast is "none">>
+				당신은 그윌란의 피부를 핥기 시작하며, <<his>> 몸을 따라 흐르는 $_fluid의 자국을 더듬는다. <<he>>【이가】 천천히 숨을 내쉰다.
+			<<elseif $worship.actionLast is "body">>
+				당신은 달콤한 $_fluid의 맛을 음미하며, 그윌란의 몸을 계속 핥는다.
+			<<else>>
+				당신은 그윌란의 피부를 핥기 위해 움직이며, <<his>> 몸에 묻은 달콤한 $_fluid의 맛을 음미한다.
+			<</if>>
+			<<if $worship.body lte 0>>
+				마침내, <<his>> 피부에 $_fluid【이가】 하나도 남지 않게 되었다.
+				<<if $worship.breasts gte 3 and C.npc.Gwylan.breastsize gte 6>>
+					<<he>>【이가】 $_fluid 범벅이 된 자신의 가슴을 손으로 감싸 쥐며, 당신의 다음 목표가 무엇인지 분명히 알린다.
+				<<elseif $worship.genitals gte 2>>
+					<<he>>【이가】 미소 지으며 다리를 벌리고, 당신의 다음 목표가 무엇인지 분명히 알린다.
+				<</if>>
+			<<else>>
+				<<if $_fluid is "nectar">><<nectarfed 3>><<elseif $_fluid is "cream">><<stress -1>><</if>>
+			<</if>>
+		<<case "tummy">>
+			<<set $worship.tummy-->><<set $worship.arousal += 5>><<arousal 100>>
+			<<if $worship.actionLast is "none">>
+				당신은 그윌란의 <<bellyDescription "Gwylan">>【을를】 핥기 시작한다. 당신이 $_fluid【을를】 맛볼 때마다 <<he>>【이가】 몸을 떤다.
+			<<elseif $worship.actionLast is "body">>
+				당신은 계속해서 그윌란의 <<bellyDescription "Gwylan">>【을를】 핥는다. <<his>> 피부 역시 달콤한 맛이 난다.
+			<<else>>
+				당신은 몸을 움직여 대신 그윌란의 <<bellyDescription "Gwylan">>【을를】 핥는다. 당신이 $_fluid【을를】 맛볼 때마다 <<he>>【이가】 몸을 떤다.
+			<</if>>
+			<<if $worship.body lte 0>>
+				마침내, <<his>> 배에 $_fluid【이가】 하나도 남지 않게 되었다. <<he>>【이가】 낄낄 웃는다.
+			<<else>>
+				<<if $_fluid is "nectar">><<nectarfed 3>><<elseif $_fluid is "cream">><<stress -1>><</if>>
+			<</if>>
+		<<case "breasts">>
+			<<set $worship.breasts-->><<set $worship.arousal += 2 + Math.floor(C.npc.Gwylan.breastsize / 2)>><<arousal 500>>
+			<<if $worship.actionLast is "breasts">>
+				당신은 이따금씩 혀로 <<his>> 젖꼭지를 튕겨가며, 계속해서 그윌란의 <<= window.KR.getBreastSizeKr(C.npc.Gwylan.breastsdesc)>>【으로로】부터 <<if $worship.breasts gt 0>>$_fluid【을를】<</if>> 핥아낸다. <<set $worship.arousal += 5>>
+			<<else>>
+				당신은 그윌란의 <<= window.KR.getBreastSizeKr(C.npc.Gwylan.breastsdesc)>>【을를】 핥는다. <<he>>【이가】 당신의 뒤통수에 손을 얹는다.
+			<</if>>
+			<<if $worship.breasts lte 0 and !$worship.breastsClean>>
+				<<set $worship.breastsClean to true>>
+				당신이 핥아내자 다음 부위의 주근깨가 드러난다:
+				<<if C.npc.Gwylan.breastsize lte 2>>
+					<<his>> 가슴팍.
+				<<else>>
+					<<his>> 유방 윗부분.
+				<</if>>
+			<<elseif C.npc.Gwylan.breastsize gte 6 and $worship.breasts gte 1>>
+				<<his>> 가슴의 곡선 때문에 $_fluid【을를】 전부 핥아내기 위해 조금 더 노력을 들여야 한다.
+			<</if>>
+			<<if $worship.breasts gt 0>>
+				<<if $_fluid is "nectar">><<nectarfed 3>><<elseif $_fluid is "cream">><<stress -1>><</if>>
+			<</if>>
+			<<if $worship.breasts lte -5>>
+				<<set $worship.noBreasts to true>>
+				"좋아, 그 정도면 됐어." <<he>>【이가】 당신의 머리를 밀어내며 속삭인다.
+			<</if>>
+			<<if !$worship.promBreasts>><<set $worship.promBreasts to true>><<set _noBR to true>><<promiscuity1>><</if>>
+		<<case "nipples">>
+			<<set $worship.breasts-->><<set $worship.arousal += 4 + Math.floor(currentSkillValue("oralskill") / 40)>><<arousal 500>>
+			<<if $worship.actionLast is "nipples">>
+				당신은 계속해서 그윌란의 유두를 빤다.
+			<<elseif $worship.actionLast is "nipplesBite">>
+				당신은 잘근거리던 것을 멈추고 다시 유두를 빨기 시작한다. <<he>>【이가】 당신의 머리 뒤쪽을 쓰다듬으며 낄낄거린다. <<ltrauma>><<trauma -1>><br>
+			<<else>>
+				당신은 그윌란의 유두를 빤다. <<if $worship.lactation>>모유<<else>>$_fluid의<</if>> 맛이 여전히 남아있다. <<he>>【이가】 당신의 머리 뒤쪽을 쓰다듬는다. <<ltrauma>><<trauma -1>><br>
+			<</if>>
+			<<if $NPCList[0].lactation is 1>>
+				<<set $worship.arousal += 20>>
+				<<if !$worship.lactation>>
+					<<set $worship.lactation to true>>
+					잠시 후, <span class="lewd">신선한 우유 맛이 느껴진다.</span> 순간 당신의 눈이 크게 뜨인다.
+					<<if npcIsPregnant("Gwylan")>>
+						그윌란조차도 약간 놀란 눈치지만, <<he>>【이가】 웃으며 당신의 머리를 천천히 감싸 안는다.
+					<<else>>
+						그윌란조차도 잠시 놀란 표정을 짓지만, 이내 무언가 깨달은 듯한 얼굴이 된다. "내가 다루는 약초 중에... 젖을 나오게 하는 것들이 있거든. 묻지 않게 조심해야 했는데, 깜빡했나 봐."
+						<<he>>【이가】 킥킥 웃으며 당신의 머리를 천천히 감싸 안는다. "그래도 다행이지, 해결 방법이 이렇게 쉽다니."
+					<</if>>
+				<<else>>
+					<<if $_fluid is "cream">>
+						당신은 그윌란의 모유를 한 모금 두 모금 연달아 삼키며, 이전과는 또 다른 종류의 달콤함을 마신다. <<he>>【이가】 당신을 향해 부드럽게 콧노래를 흥얼거린다. <<stress -3>><<lstress>><br>
+					<<else>>
+						당신은 그윌란의 모유를 더 마시며, 꿀꺽꿀꺽 삼킨다. <<he>>【이가】 당신을 향해 부드럽게 콧노래를 흥얼거린다. <<stress -3>><<lstress>><br>
+					<</if>>
+				<</if>>
+				<<breastfed>>
+			<</if>>
+			<<if $worship.breasts lte -5>>
+				<<set $worship.noBreasts to true>>
+				"좋아, 그 정도면 됐어." <<he>>【이가】 <span class="blue">당신의 머리를 밀어내며</span> 속삭인다.
+				<<if $worship.lactation and npcIsPregnant("Gwylan")>>
+					"아기 먹을 것도 남겨 둬야지."
+				<</if>>
+			<</if>>
+		<<case "nipplesBite">>
+			<<set $worship.breasts-->><<set $worship.arousal += 5 + Math.floor(currentSkillValue("oralskill") / 35)>><<arousal 500>>
+			당신은 그윌란의 유두를 가볍게 잘근거린다. <<he>>【이가】 몸을 부르르 떤다.
+			<<if $worship.breasts lte -5>>
+				<<set $worship.noBreasts to true>>
+				"좋아, 그 정도면 됐어." <<he>>【이가】 당신의 머리를 밀어내며 속삭인다.
+			<</if>>
+		<<case "genitals">>
+			<<set $worship.genitals-->><<set $worship.arousal += 5 + Math.floor(currentSkillValue("oralskill") / 25)>><<arousal 800 "mouth">>
+			<<if $worship.actionLast isnot "genitals">>
+				당신은 머리를 그윌란의 <<npcGenitals 0>>【으로로】 옮긴다,
+				<<if $worship.genitals gte 1>>
+					$_fluid【을를】 핥아먹기 시작한다.
+				<<else>>
+					<<if C.npc.Gwylan.penis isnot "none">>
+						<<his>> 기둥을 위아래로 핥아 올린다. 여전히 $_fluid 맛이 난다.
+					<<else>>
+						당신의 혀를 <<his>> 보지 안으로 천천히 밀어 넣는다.
+					<</if>>
+				<</if>>
+			<<else>>
+				<<if $worship.genitals gte 1>>
+					당신은 계속해서 <<his>> <<npcGenitals 0>> 주변의 $_fluid【을를】 핥아먹는다.
+				<<else>>
+					<<if C.npc.Gwylan.penis isnot "none">>
+						당신은 그윌란의 기둥을 계속해서 핥으며, 중간중간 멈추어 귀두를 쪽쪽 빨거나 그 주위로 혀를 굴려댄다.
+					<<else>>
+						당신은 그윌란의 보지에 계속 혀를 박아 넣으며, 잠깐씩 멈추고 <<his>> 클리토리스를 핥아 올린다.
+					<</if>>
+				<</if>>
+			<</if>>
+			<<if $worship.control is "Gwylan">>
+				<<he>>【이가】 부드러운 신음을 내며, 당신의 뒤통수를 움켜잡고는 제 쪽으로 잡아당긴다.
+			<<else>>
+				<<he>>【이가】 부드럽게 신음한다.
+			<</if>>
+			<<if !$worship.promGenitals and $worship.control is "player">><<set $worship.promGenitals to true>><<set _noBR to true>><<promiscuity2>><</if>>
+			<<if $worship.genitals gt 0>>
+				<<if $_fluid is "nectar">><<nectarfed 3>><<elseif $_fluid is "cream">><<stress -1>><</if>>
+			<</if>>
+		<<case "oral">>
+			<<set $worship.arousal += 5 + Math.floor(currentSkillValue("oralskill") / 15)>><<arousal 1000 "mouth">>
+			<<if $worship.actionLast is "oral">>
+			<<else>>
+				당신은 그윌란의 <<npcPenis>>【을를】 천천히 입안으로 받아들인다. <<takeVirginity "Gwylan" "oral">>
+				<<if $worship.genitals gte 1>>
+					당신은 그것을 끝까지 삼키면서 남은 $_fluid【을를】 말끔히 핥아낸다. <<if $_fluid is "nectar">><<nectarfed 3>><<elseif $_fluid is "cream">><<stress -1>><</if>>
+				<<else>>
+					당신은 고개를 위아래로 흔들며 혀끝에 감도는 $_fluid의 맛을 입안 가득 음미한다.
+				<</if>>
+				<<his>> 손이 누비 담요를 꽉 움켜쥔다.
+			<</if>>
+			<<set $worship.genitals to 0>>
+		<<case "residue">>
+			<<set $worship.residue to 0>>
+			당신은 앞으로 기어간다. 당신의 얼굴이 <<hers>> 가까이 다가오자, 그윌란은 놀란 듯 살짝 뒤로 물러선다.
+			하지만 당신은 <<him>>에게 키스하지 않는다. 대신 당신은 <<his>> 입가를 혀로 쓸어올린다. 소량의 보라색 액체는 달콤한 맛이 난다.
+			<br><br>
+
+			<<he>>【이가】 웃는다. "조심해, 꽤 독한 거니까. 난 익숙하지만, 네겐 훅 갈지도 몰라." 당신은 몸이 무척 뜨거워지는 것을 느낀다. <<arousal 2000>><<drugs 120>><<ggarousal>><<ggdrugged>>
+		<<case "splurt">>
+			<<set $worship.arousal += 10>>
+			당신은 입을 떼고, 타이밍에 맞춰 자지를 그윌란의 몸 쪽으로 향하게 한다. <<he>>【이가】 고개를 기울인다. 따로 힘을 뺄 필요조차 없었다. 당신이 방금 핥아낸 그것이 무엇이든 당신을 절정으로 치닫게 만들고 있다.
+			<<orgasm>>
+
+			<<if $femaleclimax>>
+				그윌란은 정액이 나오지 않은 것에 잠시 실망한 듯 당신을 깜박이며 바라본다.
+			<<else>>
+				<<set $worship.semen to true>>
+				<<if _gwylanStatus.includes("dom")>>
+					그윌란이 미소를 짓는다. "깨끗하게 치우렴, 이 바보 같은 <<pcpetname "Gwylan" "simple">>."
+				<<else>>
+					그윌란이 당신을 깜박이며 바라본다. 당신의 정액은 이제 남은 $_fluid【와과】 약간 섞여 있다. "저것도... 치울 거니?"
+				<</if>>
+			<</if>>
+		<<case "splurtLick">>
+			<<set $worship.arousal += 20>>
+			당신은 당신의 정액을 <<him>>【으로로】부터 핥아낸다. <<He>>【은는】 웃으며 당신의 머리를 쓰다듬는다. "<<pcPetname "Gwylan" "good">>, <<pherself>>【이가】 싼 건 스스로 깨끗이 치우는구나." <<stress -2>><<lstress>>
+	<</switch>>
+	<<set $worship.actionLast to $worship.action>>
+	<<set $worship.timer-->>
+	<<if !_noBR>><br><br><</if>>
+
+	<<if $worship.residue is 0 and $arousal gte $arousalmax>>
+		<<set _orgasmAlt to true>>
+		당신 안의 열기가 끓는 점에 도달했다. <span class="kill-br"><<orgasm>></span>
+		<<if $worship.actionLast is "genitals">>
+			<<set $worship.arousal += 30>>
+			당신은 혀를 그윌란의 <<npcGenitals 0>>【으로로】 더 강하게 밀어붙인다. 비록 서툴긴 하지만, <<he>>【이가】 당신의 절정에 더욱 흥분한 듯 보인다.
+		<<elseif $worship.actionLast is "oral">>
+			<<set $worship.arousal += 60>>
+			당신의 입이 <<his>> <<npcPenis>> 주위로 꽉 조인다. <<he>>【이가】 당신과 함께 오르가즘에 빠져 몸을 떤다.
+		<<elseif ["breasts", "nipples", "nipplesBite"].includes($worship.actionLast)>>
+			쾌감의 물결이 온몸을 휘감고 지나가는 동안 당신은 그윌란의 가슴에 얼굴을 묻는다. <<he>>【이가】 오르가즘에서 서서히 헤어 나오는 당신의 머리를 어루만지며 부드럽게 콧노래를 부른다.
+		<<else>>
+			쾌감의 물결이 온몸을 휘감고 지나가는 동안 당신은 그윌란에게 꼭 달라붙는다. <<he>>【이가】 오르가즘에서 서서히 헤어 나오는 당신을 위로하듯 한쪽 팔로 꼭 끌어안는다.
+		<</if>>
+		<br><br>
+	<</if>>
+
+	<<if $worship.arousal gte 200 and ["oral", "genitals", "breasts", "nipples", "nipplesBite", "tummy", "body"].includes($worship.actionLast)>>
+		<<if _orgasmAlt>>
+			<span class="lewd">당신이 오르가즘을 맞이한 여파가 <<him>> 역시 한계 너머로 몰아붙인다.</span>
+		<</if>>
+		<<if $worship.actionLast is "genitals">>
+			<<if $worship.control is "Gwylan">>
+				<<he>>【이가】 당신의 머리를 더 거칠게 끌어당겨,
+			<<else>>
+				<<he>>【이가】 당신의 뒤통수를 끌어당겨,
+			<</if>>
+			<<if C.npc.Gwylan.penis isnot "none">>
+				자신의 자지를 당신에게 바짝 갖다 댄다. <span class="lewd">따뜻한 정액 한 줄기가 당신의 얼굴을 가로질러 뿜어진다.</span> 당신은 두 번째, 세 번째 정액을 입으로 받아먹기 위해 몸을 비튼다.
+				<<bodyliquid "face" "semen">><<bodyliquid "mouth" "semen">><<cumswallow "human" 40>><<set $worship.end to "genitals">>
+				<br><br>
+
+				하지만 그걸로 끝이 아니다. <<his>> 허리가 활처럼 휘며, <<he>>【이가】 계속해서 싸지른다.
+				<<if $ejactrait gte 1 or $demon gte 6>>
+					<<if $_fluid is "cream">>
+						당신은 흥분한 채 입을 <<his>> 귀두에 바짝 대고 <<his>> 기둥을 놀려주며, <<his>> 그 귀중한 크림을 최대한 많이 짜내려 안달을 낸다.
+					<<else>>
+						당신은 흥분한 채 입을 <<his>> 귀두에 바짝 대고 <<his>> 기둥을 놀려주며, $_fluid【와과】 <<his>> 정액을 섞어 맛보고 싶어 안달을 낸다.
+					<</if>>
+				<<else>>
+					<<if $_fluid is "cream">>
+						당신은 귀두에 입을 댄 채 다른 종류의 크림이 입 안 가득 채워지는 것을 느끼며 기둥을 단단히 붙잡고 고정한다.
+					<<else>>
+						당신은 귀두에 입을 댄 채 <<his>> 정액이 입 안 가득 채워지는 것을 느끼며 기둥을 단단히 붙잡고 고정한다.
+					<</if>>
+				<</if>>
+			<<else>>
+				<<bodyliquid "face" "goo">><<bodyliquid "mouth" "goo">><<set $worship.end to "genitals">>
+				당신이 더 깊고 격렬하게 핥도록 짓누른다. 사정할 때마다 <<his>> 허리가 활처럼 휘어진다. <<his>> 체액이 당신의 혀에 들러붙어 $_fluid의 맛과 뒤섞인다.
+			<</if>>
+		<<elseif $worship.actionLast is "oral">>
+			<<bodyliquid "mouth" "semen" 3>><<cumswallow "human" 80>><<set $worship.end to "oral">>
+			<<if $worship.control is "Gwylan">>
+				<<he>>【이가】 당신의 머리를 한층 더 거칠게 억눌러,
+			<<else>>
+				<<he>>【이가】 당신의 머리를 아래로 억눌러,
+			<</if>>
+			<span class="lewd"><<he>>【이가】 사정하는 동안 당신이 자신의 기둥을 더 깊숙이 받아들이도록 강요한다</span>. 첫 번째 뿜어져 나온 뜨거운 정액이 당신의 목구멍 안쪽을 간지럽힌다. <<his>> 등이 활처럼 휘며, <<he>>【이가】 멈추지 않고 계속 싸지른다.
+			<br><br>
+
+			<<if $ejactrait gte 1 or $demon gte 6>>
+				당신은 긴장한 채 흥분하여 귀두 주변을 혀로 맴돌면서도 기둥을 계속 쓸어 올린다. 당신은 <<his>> 물건을 끝까지 다 삼키고 싶진 않다; 그저 그 맛을 하나도 놓치고 싶지 않을 뿐이다.
+				당신은 두 눈을 질끈 감고, 끝없이 쏟아지는 <<his>> 그 귀중한 <<if $_fluid is "cream">>크림이<<else>>정액이<</if>> 당신의 입안을 가득 채우는 걸 고스란히 받아낸다.
+			<<else>>
+				<<if $_fluid is "cream">>
+					당신은 두 눈을 지그시 감고 혀끝으로 부드럽게 <<his>> 기둥을 어루만진다. 꿀럭거리며 쏟아지는 또 다른 질감의 달콤한 크림이 입안 가득 넘쳐흐른다.
+				<<else>>
+					당신은 귀두에 입을 댄 채 <<his>> 정액이 입 안 가득 채워지는 것을 느끼며 기둥을 단단히 붙잡고 고정한다.
+				<</if>>
+			<</if>>
+		<<elseif ["breasts", "nipples", "nipplesBite"].includes($worship.actionLast)>>
+			<<his>> 콧노래가 서서히 잦아들더니, <<he>>【이가】 당신을 꽉 끌어안는다.
+			<<if _orgasmAlt>>
+				당신은 숨 막힐 듯한 질식감을 느낀다.
+			<</if>>
+			<<if $worship.lactation>>
+				<<set $worship.end to "milk">>
+				<span class="lewd"><<he>>【이가】 오르가즘으로 몸을 부르르 떠는 가운데 <<his>> 젖꼭지에서 또다시 모유가 흘러나와 당신의 입을 가득 채운다.</span>
+			<<else>>
+				<<set $worship.end to "breasts">>
+				<span class="lewd"><<he>>【이가】 오르가즘으로 몸을 부르르 떠는 와중에도 당신은 계속해서 <<his>> 가슴을 희롱한다.</span>
+			<</if>>
+		<<else>>
+			<<set $worship.end to "default">>
+			<<if _orgasmAlt>>
+				<span class="lewd"><<he>>【이가】 그에 화답하듯 당신을 꽉 끌어안는다. 당신들 두 사람은 오르가즘의 황홀경 속에서 하나 되어 부르르 떤다.</span>
+			<<else>>
+				<span class="lewd"><<he>>【이가】 오르가즘으로 몸을 부르르 떨며 당신을 꼭 안아준다.</span>
+			<</if>>
+		<</if>>
+		<br><br>
+
+		마침내 <<his>> 떨림이 가라앉고, <<he>>【이가】 거친 숨을 내쉰다. <<npcincr Gwylan lust -20>><<lllust>>
+		<br><br>
+	<<else>>
+		<<if $worship.arousal gte 200>>
+			<span class="pink"><<he>>【이가】 날카롭게 몸을 긴장시킨다.</span>
+		<<elseif $worship.arousal gte 180>>
+			<span class="pink">당신은 <<he>>【이가】 오르가즘에 가까워지고 있다고 생각한다.</span>
+		<<elseif $worship.arousal gte 150>>
+			<span class="purple"><<he>>【이가】 욕정에 찬 표정이다.</span>
+		<<elseif $worship.arousal gte 100>>
+			<span class="blue"><<he>>【이가】 꼴린 표정이다.</span>
+		<<elseif $worship.arousal gte 50>>
+			<span class="lblue"><<he>>【이가】 발정 난 것 같다.</span>
+		<<else>>
+			<span class="teal"><<he>>【이가】 흥분한 표정이다.</span>
+		<</if>>
+		<br>
+		<<switch $worship.body>>
+			<<case 8 7 6 5 4 3>><<his>> 피부는 <span class="pink">$_fluid의 자국으로 범벅이 되어 있으며</span>, <<if $worship.semen>> 그 위로 <span class="pink">당신의 정액 약간이</span> 더해져 있다<</if>>.
+			<<case 2>><<his>> 피부에는 <span class="blue">$_fluid【이가】 여기저기 흩뿌려져 있으며</span>, <<if $worship.semen>> 그 사이로 <span class="pink">당신의 정액 약간이</span> 더해져 있다<</if>>.
+			<<case 1>><<his>> 피부에는 <span class="teal">$_fluid【이가】 여기저기 묻어 있으며</span>, <<if $worship.semen>> 그 사이로 <span class="pink">당신의 정액 약간이</span> 더해져 있다<</if>>.
+			<<default>><<his>> 피부는 <span class="green">깨끗하지만</span>, <<if $worship.semen>> <span class="pink">당신의 정액 일부가</span> 조금 남아 있다<</if>>.
+		<</switch>>
+		<br>
+		<<switch $worship.tummy>>
+			<<case 8 7 6 5 4 3>><<his>> <<bellyDescription "Gwylan">>【은는】 <span class="pink">$_fluid【으로로】 덮여 있다</span>.
+			<<case 2>><<his>> <<bellyDescription "Gwylan">>【은는】 <span class="blue">$_fluid【으로로】 흩뿌려져 있다</span>. 당신은 그 사이로 슬쩍 보이는 <<his>> 문신 조각들을 확인할 수 있다.
+			<<case 1>><<his>> <<bellyDescription "Gwylan">>【은는】 <span class="teal">$_fluid【으로로】 문질러져 있다</span>. 당신은 그 사이로 슬쩍 보이는 <<his>> 문신 조각들을 확인할 수 있다.
+			<<default>><<his>> <<bellyDescription "Gwylan">>【은는】 <span class="green">깨끗하다</span>. <<if $worship.arousal gte 150>>당신은 <<his>> 문신이 부드럽게 빛나는 것을 볼 수 있다.<</if>>
+		<</switch>>
+		<br>
+		<<switch $worship.breasts>>
+			<<case 8 7 6 5 4>><<his>> <<= window.KR.getBreastSizeKr(C.npc.Gwylan.breastsdesc)>>【은는】 <span class="pink">$_fluid【으로로】 덮여 있다</span>.
+			<<case 3 2>><<his>> <<= window.KR.getBreastSizeKr(C.npc.Gwylan.breastsdesc)>>【은는】 <span class="blue">$_fluid【으로로】 흩뿌려져 있다</span>.
+			<<case 1>><<his>> <<= window.KR.getBreastSizeKr(C.npc.Gwylan.breastsdesc)>>【은는】 <span class="teal">$_fluid【으로로】 문질러져 있다</span>.
+			<<default>><<his>> <<= window.KR.getBreastSizeKr(C.npc.Gwylan.breastsdesc)>>【은는】 <span class="green">깨끗하다</span>.
+		<</switch>>
+		<br>
+		<<switch $worship.genitals>>
+			<<case 4 3 2>><<his>> <<npcGenitals 0>>【은는】 <span class="pink">겨우 $_fluid【으로로】 감춰져 있다</span>.
+			<<case 1>><<his>> <<npcGenitals 0>>【은는】 <span class="teal">$_fluid【으로로】 문질러져 있다</span>.
+			<<default>><<his>> <<npcGenitals 0>>【은는】 <span class="green">깨끗하다</span>.
+		<</switch>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanWorshipActions">>
+	<<set $_fluid to $worship.fluid>>
+	<<if $worship.body gte 1 and $worship.control is "player">>
+		<<set $_action to true>>
+		<<if $worship.actionLast is "body">>
+			<<link [[`그윌란의 몸에서 $_fluid【을를】 계속 핥아낸다`|$passage]]>><<set $worship.action to "body">><</link>>
+		<<else>>
+			<<link [[`그윌란의 몸에서 $_fluid【을를】 핥아낸다`|$passage]]>><<set $worship.action to "body">><</link>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if $worship.tummy gte 1 and $worship.control is "player">>
+		<<set $_action to true>>
+		<<if $worship.actionLast is "tummy">>
+			<<link [[`그윌란의 <<bellyDescription "Gwylan">>에서 $_fluid【을를】 계속 핥아낸다`|$passage]]>><<set $worship.action to "tummy">><</link>>
+		<<else>>
+			<<link [[`그윌란의 <<bellyDescription "Gwylan">>에서 $_fluid【을를】 핥아낸다`|$passage]]>><<set $worship.action to "tummy">><</link>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if !$worship.noBreasts and $worship.control is "player">>
+		<<set $_action to true>>
+		<<if $worship.actionLast is "breasts">>
+			<<link [[`그윌란의 <<npcChest 0>>【을를】 계속 핥는다`|$passage]]>><<set $worship.action to "breasts">><</link>>
+			<br>
+			<<link [[그윌란의 유두를 빤다|$passage]]>><<set $worship.action to "nipples">><</link>>
+			<br>
+		<<elseif ["nipples", "nipplesBite"].includes($worship.actionLast)>>
+			<<link [[그윌란의 유두를 계속 빤다|$passage]]>><<set $worship.action to "nipples">><</link>>
+			<br>
+			<<link [[그윌란의 유두를 잘근거린다|$passage]]>><<set $worship.action to "nipplesBite">><</link>>
+			<br>
+		<<else>>
+			<<if $worship.breasts gte 1>>
+				<<link [[`그윌란의 <<npcChest 0>>에서 $_fluid【을를】 핥아낸다`|$passage]]>><<set $worship.action to "breasts">><</link>><<if !$worship.promBreasts>><<promiscuous1>><</if>>
+				<br>
+			<<else>>
+				<<link [[`그윌란의 <<npcChest 0>>【을를】 핥는다`|$passage]]>><<set $worship.action to "breasts">><</link>><<if !$worship.promBreasts>><<promiscuous1>><</if>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+	<<if $worship.actionLast is "genitals">>
+		<<set $_action to true>>
+		<<if $worship.genitals gte 1>>
+			<<link [[`그윌란의 <<npcGenitals 0>>에서 $_fluid【을를】 계속 핥아낸다`|$passage]]>><<set $worship.action to "genitals">><</link>>
+			<br>
+		<<else>>
+			<<link [[`그윌란의 <<npcGenitals 0>>【을를】 계속 애무한다`|$passage]]>><<set $worship.action to "genitals">><</link>>
+			<br>
+		<</if>>
+		<<if C.npc.Gwylan.penis isnot "none">>
+			<<if hasSexStat("promiscuity", 3)>>
+				<<link [[그윌란의 자지를 입에 넣는다|$passage]]>><<set $worship.action to "oral">><</link>><<oralvirginitywarning>>
+			<<else>>
+				<<insufficientStat "promiscuity" "그윌란의 자지를 입에 넣기엔">>
+			<</if>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if $worship.genitals gte 1>>
+			<<if hasSexStat("promiscuity", 2) or $worship.control is "Gwylan">>
+				<<set $_action to true>>
+				<<link [[`그윌란의 <<npcGenitals 0>>에서 $_fluid【을를】 핥아낸다`|$passage]]>><<set $worship.action to "genitals">><</link>><<if !$worship.promGenitals and $worship.control is "player">><<promiscuous2>><</if>>
+			<<else>>
+				<<set $_fluid_string to "그윌란의 <<npcGenitals 0>>에서 직접 " + $_fluid + "【을를】 핥아 먹기">>
+				<<insufficientStat "promiscuity" $_fluid_string>>
+			<</if>>
+			<br>
+		<<else>>
+			<<if hasSexStat("promiscuity", 2) or $worship.control is "Gwylan">>
+				<<set $_action to true>>
+				<<link [[`그윌란의 <<npcGenitals 0>>【을를】 핥는다`|$passage]]>><<set $worship.action to "genitals">><</link>><<if !$worship.promGenitals and $worship.control is "player">><<promiscuous2>><</if>>
+			<<else>>
+				<<insufficientStat "promiscuity" "그윌란의 <<npcGenitals 0>>【을를】 애무하기엔">>
+			<</if>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $worship.actionLast is "oral">>
+		<<set $_action to true>>
+		<<link [[`그윌란의 <<npcGenitals 0>>【을를】 계속 애무한다`|$passage]]>><<set $worship.action to "oral">><</link>>
+		<br>
+	<</if>>
+	<<if $worship.residue gte 1 and $worship.control is "player">>
+		<<set $_action to true>>
+		<<link [[그윌란의 입가에 묻은 보라색 잔여물을 핥는다|$passage]]>><<set $worship.action to "residue">><</link>>
+		<br>
+	<</if>>
+	<<if ($worship.residue is 0 or $drugged) and $arousal gte 9000 and $player.penisExist is true and $worship.control is "player">>
+		<<set $_action to true>>
+		<<link [[`<<him>>에게 사정한다`|$passage]]>><<set $worship.action to "splurt">><</link>>
+		<br>
+	<<elseif $worship.semen and $worship.control is "player">>
+		<<set $_action to true>>
+		<<link [[`<<him>>에게 묻은 당신의 정액을 핥아낸다`|$passage]]>><<set $worship.action to "splurtLick">><</link>>
+		<br>
+	<</if>>
+	<<if $hypnosis_traits.devotion isnot 5 and $worship.control is "player">>
+		<<set $_action to true>>
+		<<link [[아무것도 하지 않는다|$passage]]>><<sub 1>><<set $worship.action to "none">><</link>>
+		<br>
+	<</if>>
+	<<if !$_action>>
+		<<link [[다음|Gwylan Cream Lick End]]>><<set $worship.end to "clean">><<set $phase to "clean">><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanStalkInit">>
+	<<set $_skillAdded to C.npc.Gwylan.lust + C.npc.Gwylan.dom>>
+	<<if $location is "forest">>
+		<<set $_skillAdded += 200>>
+	<</if>>
+	<<set $NPCList[0].skills.security to 600 + $_skillAdded + random(10, 100)>>
+	<<set $NPCList[0].skills.athletics to 600 + $_skillAdded + random(10, 100)>>
+	<<run statusCheck("Gwylan")>>
+	<<if _gwylanStatus.includes("wounded")>>
+		<<set $NPCList[0].skills.athletics -= 500>>
+	<</if>>
+	<<if _gwylanStatus.includesAny("reunion", "heat", "badEndReady") or $gwylan?.hunting gte 2>>
+		<<set $NPCList[0].bold to 10000>>
+		<<set $combatgoal to "confront">>
+	<<elseif $gwylan?.hunting is 1 and ($settings.hypnosisEnabled or $hypnosis_devotion)>>
+		<<set $NPCList[0].bold to 10000>>
+		<<set $combatgoal to "confront">>
+	<<else>>
+		<<set $NPCList[0].bold to (($allure / 20) + (C.npc.Gwylan.lust * 2) + (C.npc.Gwylan.dom * 2) + (C.npc.Gwylan.love * 2))>>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanHuntStart">>
+	<<set $huntGame to {
+		otherHealth: 3,
+		hunter: "other",
+		hunterKnown: false,
+		adversary: "Gwylan",
+		adversaryText: "Gwylan",
+		adversaryKnown: true,
+		otherTracked: false,
+		otherAction: "",
+		playerHealth: 3,
+		playerTracked: false,
+		playerTrackedKnown: false,
+		playerAction: "",
+		consensual: 1,
+		event: "",
+		turn: 0,
+		distance: 5,
+	}>>
+	<<set $_difficultyAdded to C.npc.Gwylan.lust + C.npc.Gwylan.dom>>
+	<<set $huntGame.skills to {
+		danceMin: 400 + $_difficultyAdded,
+		danceMax: 700 + $_difficultyAdded,
+		athleticsMin: 400 + $_difficultyAdded,
+		athleticsMax: 700 + $_difficultyAdded,
+		skulduggeryMin: 400 + $_difficultyAdded,
+		skulduggeryMax: 800 + $_difficultyAdded,
+	}>>
+	<<set $_skillAdded to C.npc.Gwylan.lust + C.npc.Gwylan.dom>>
+	<<if $location is "forest">>
+		<<set $_skillAdded += 200>>
+	<</if>>
+	<<set $NPCList[0].skills.security to 600 + $_skillAdded + random(10, 100)>>
+	<<set $NPCList[0].skills.athletics to 600 + $_skillAdded + random(10, 100)>>
+	<<run statusCheck("Gwylan")>>
+	<<if _gwylanStatus.includes("wounded")>>
+		<<set $NPCList[0].skills.athletics -= 500>>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanHuntState">>
+	<<if hasSharpSenses("instincts")>>
+		<span class="teal">당신의 야수적 본능이 사냥을 위해 깨어난다.</span>
+		<br>
+		<<set $huntGame.hunterKnown to true>>
+		<<if $huntGame.hunter is "other">>
+			<span class="red"><<= $huntGame.adversaryText.toUpperFirst()>>【이가】 사냥꾼이다.</span>
+			<<if (playerHeatMinArousal() gte 1 or playerRutMinArousal() gte 1)>>
+				<<if $huntGame.adversary is "Gwylan" and _gwylanTF?.known or ["fox","wolf","Black Wolf"].includes($huntGame.adversary)>>
+					<br>
+					<<if playerHeatMinArousal() gte 1 and playerRutMinArousal() gte 1>>
+						<span class="lewd"><<He>>【은는】 당신이 발정기와 러트 상태라는 것을 냄새로 확실히 알아챌 수 있을 것이며, 아마 이미 당신의 체취를 맡았을 것이다.</span>
+					<<elseif playerRutMinArousal()>>
+						<span class="lewd"><<He>>【은는】 당신이 러트 상태라는 것을 냄새로 확실히 알아챌 수 있을 것이며, 아마 이미 당신의 체취를 맡았을 것이다.</span>
+					<<else>>
+						<span class="lewd"><<He>>【은는】 당신이 발정기 상태라는 것을 냄새로 확실히 알아챌 수 있을 것이며, 아마 이미 당신의 체취를 맡았을 것이다.</span>
+					<</if>>
+				<</if>>
+				<<set $huntGame.playerTracked to "scent">><<set $huntGame.playerTrackedKnown to true>>
+			<<elseif $huntGame.playerTrackedKnown>>
+				<br>
+				<span class="pink">당신은 <<he>>【이가】 당신을 추적했다는 것을 알고 있다.</span>
+			<</if>>
+		<<else>>
+			<span class="green">당신이 사냥꾼이다.</span>
+			<<if $huntGame.playerTrackedKnown>>
+				<br>
+				<span class="pink">당신은 <<he>>【이가】 당신을 추적했다는 것을 알고 있다.</span>
+			<</if>>
+		<</if>>
+		<<if $huntGame.adversary is "Gwylan" and _gwylanTF?.known and _gwylanStatus?.includes("heat")>>
+			<br>
+			<span class="pink">당신은 <<he>>【이가】 <<if C.npc.Gwylan.vagina isnot "none">>발정기<<else>>러트<</if>> 상태라는 것을 냄새로 알 수 있다.</span>
+			<<set $huntGame.otherTracked to "scent">>
+		<</if>>
+	<<else>>
+		<<if $huntGame.hunterKnown>>
+			<<if $huntGame.hunter is "other">>
+				<span class="red"><<= $huntGame.adversaryText.toUpperFirst()>>【이가】 당신을 사냥하고 있다.</span>
+			<<else>>
+				<span class="green">당신은 <<= $huntGame.adversaryText>>【을를】 사냥하고 있다.</span>
+			<</if>>
+			<<if $huntGame.playerTrackedKnown>>
+				<br>
+				<span class="pink">당신은 <<he>>【이가】 당신을 추적했다는 것을 알고 있다.</span>
+			<</if>>
+		<<else>>
+			<span class="blue">당신이 <<= $huntGame.adversaryText>>【을를】 사냥하고 있는지, 아니면 <<= $huntGame.adversaryText>>【이가】 당신을 사냥하고 있는지 확실하지 않다.</span>
+		<</if>>
+	<</if>>
+	<<if $huntGame.otherTracked>>
+		<br>
+		<<if $huntGame.otherTracked is "scent">>
+			당신은 <<= $huntGame.adversaryText>>의 냄새를 통해 그가
+		<<else>>
+			당신은 <<= $huntGame.adversaryText>>【이가】
+		<</if>>
+		<<if $huntGame.distance gte 5>>
+			<span class="teal">멀리 있다</span>는 것을 알 수 있다.
+		<<elseif $huntGame.distance gte 4>>
+			<span class="blue">이 지역 내에 있다</span>는 것을 알 수 있다.
+		<<elseif $huntGame.distance gte 3>>
+			<span class="purple">꽤 가까이에 있다</span>는 것을 알 수 있다.
+		<<elseif $huntGame.distance gte 2>>
+			<span class="pink">매우 가까이에 있다</span>는 것을 알 수 있다.
+		<<else>>
+			<span class="red">바로 여기에 있다</span>는 것을 알 수 있다!
+		<</if>>
+	<</if>>
+	<br><br>
+<</widget>>
+
+<<widget "gwylanHuntEffects">>
+	<<if $huntGame.timer gte 20>>
+		<<set _forceConfrontation to true>>
+		<<set $huntGame.distance to 0>>
+	<</if>>
+
+	/* Player actions */
+	<<switch $huntGame.playerAction>>
+		<<case "hunt">>
+			<<if $huntGame.hunterKnown and $huntGame.hunter is "other">>
+				당신은 <<his>> <<if $huntGame.otherTracked is "scent">>냄새<<else>>발자취<</if>>【을를】 쫓으며 <<= $huntGame.adversaryText>>의 뒤로 돌아가려 시도한다.
+			<<else>>
+				당신은 <<= $huntGame.adversaryText>>의 <<if $huntGame.otherTracked is "scent">>냄새<<else>>발자취<</if>>【을를】 쫓는다.
+			<</if>>
+			<<if $huntGame.otherAction is "run">>
+				<br>
+				<<if $athleticsSuccess>>
+					<<set $_actionPassed to true>>
+					<<set $huntGame.distance -= 1>>
+					<<if $huntGame.hunter is "player">>
+						<<set $huntGame.distance -= 1>>
+						<span class="green">당신이 <<him>>에게 가까워지고 있다는 것을 알 수 있다.</span>
+					<<else>>
+						<span class="purple">이대로라면 얼마 지나지 않아 맞닥뜨리게 될 것이다.</span>
+					<</if>>
+				<<else>>
+					<<if $huntGame.hunter is "player">>
+						<<set $huntGame.distance -= 1>>
+						<span class="purple">당신은 <<him>>【와과】 일정한 거리를 유지하고 있다.</span>
+					<<else>>
+						<span class="purple">이대로라면 얼마 지나지 않아 맞닥뜨리게 될 것이다.</span>
+					<</if>>
+				<</if>>
+			<<else>>
+				<<set $huntGame.distance -= 2>>
+			<</if>>
+		<<case "track">>
+			<<if hasSharpSenses("instincts")>>
+				당신은 공기의 냄새를 맡으며 <<= $huntGame.adversaryText>>의 체취를 찾으려 애쓴다.
+			<<else>>
+				당신은 몸을 낮추고 <<= $huntGame.adversaryText>>【이가】 지나간 흔적이 있는지 확인한다.
+			<</if>>
+			<<if ["hide", "stealth"].includes($huntGame.otherAction)>><<set $skulduggerydifficulty += 100>><</if>>
+			<<skulduggerycheck "silent">>
+			<<if $skulduggerysuccess is 1>>
+				<<set $_actionPassed to true>>
+				<<if hasSharpSenses("instincts") and random(0, 1)>>
+					<<set $huntGame.otherTracked to "scent">>
+					<span class="green">그러자, 바람결에 묻어오는 희미한 체취가 맡아진다. 당신은 <<him>>【을를】 찾아냈다.</span>
+				<<else>>
+					<<set $huntGame.otherTracked to "trail">>
+					<span class="green">당신은 어떻게든 <<print either("어지럽혀진 나뭇잎들", "부러진 나뭇가지", "희미한 발자국 몇 개")>>【을를】 발견해낸다. 당신은 <<his>> 발자취를 잡아냈다.</span>
+				<</if>>
+				<br><br>
+
+				<span class="purple">사냥이 격렬해진다...</span> <<note "+ 속임수 난이도" "purple">>
+				<<set $huntGame.skills.skulduggeryMin += 20>><<set $huntGame.skills.skulduggeryMax += 20>>
+			<<else>>
+				<span class="red">당신은 아무것도 찾아내지 못했다.</span>
+			<</if>>
+		<<case "stealth">>
+			당신은 흔적을 최대한 남기지 않으려 애쓰며, 덤불 속을 살금살금 나아간다.
+			<<skulduggerycheck "silent">>
+			<<if $skulduggerysuccess is 1>>
+				<<if $huntGame.hunterKnown and $huntGame.hunter is "other" and $huntGame.otherTracked and $huntGame.playerTracked and $huntGame.playerTrackedKnown>>
+					<span class="gold">당신은 <<he>>【이가】 당신의 흔적을 놓치게 만들었다고 확신한다.</span>
+					<<set $huntGame.playerTracked to false>><<set $huntGame.playerTrackedKnown to false>>
+					<br><br>
+
+					<span class="purple">사냥이 격렬해진다...</span> <<note "+ 속임수 난이도" "purple">>
+					<<set $huntGame.skills.skulduggeryMin += 20>><<set $huntGame.skills.skulduggeryMax += 20>>
+				<<else>>
+					<span class="green">당신은 흔적 없이 지나가서, <<he>>【이가】 당신을 추적하기 더 어렵게 만든다.</span>
+				<</if>>
+				<<set $_actionPassed to true>>
+				<<if $huntGame.hunter is "player">>
+					<<set $huntGame.distance-->>
+				<<else>>
+					<<set $huntGame.distance++>>
+				<</if>>
+			<<else>>
+				<span class="red">적당한 성공만 거둔다.</span>
+			<</if>>
+		<<case "hide">>
+			<<if $huntGame.playerActionLast is "hide">>
+				당신은 숨은 자리에 계속 웅크리고 있다. <<he>>【이가】 당신의 정확한 위치를 아는지 전혀 알 길이 없다.
+			<<else>>
+				당신은 은신처를 찾아 웅크린다.
+			<</if>>
+			<<skulduggerycheck "silent">>
+			<<if $skulduggerysuccess is 1>>
+				<<if $huntGame.hunterKnown and $huntGame.hunter is "other" and $huntGame.otherTracked and $huntGame.playerTracked and $huntGame.playerTrackedKnown>>
+					<br>
+					당신은 호흡을 가다듬고 집중한다. 숲이 당신을 정적으로 감싼다. <span class="gold">당신은 <<he>>【이가】 당신의 흔적을 놓치게 만들었다고 확신한다.</span>
+					<<set $huntGame.playerTracked to false>><<set $huntGame.playerTrackedKnown to false>>
+					<br><br>
+
+					<span class="purple">사냥이 격렬해진다...</span> <<note "+ 속임수 난이도" "purple">>
+					<<set $huntGame.skills.skulduggeryMin += 20>><<set $huntGame.skills.skulduggeryMax += 20>>
+				<</if>>
+				<<set $_actionPassed to true>>
+			<</if>>
+		/* Actions that lead into a proper chase or confrontation */
+		<<case "ambush">>
+			<<if $physiqueSuccess>>
+				<span class="green"><<He>>【은는】 당신이 다가오는 것을 눈치채지 못한다.</span>
+				<<if $huntGame.consensual and $huntGame.hunter is "other">>
+					<br>
+					<span class="gold">이제 당신이 사냥꾼이다.</span>
+					<<set $huntGame.hunter to "player">>
+				<</if>>
+				<<set $huntGame.end to "ambushSuccess">>
+			<<else>>
+				<span class="red"><<He>>【은는】 당신을 맞이할 준비가 되어 있다.</span>
+				<<set $huntGame.end to "ambushFailed">>
+			<</if>>
+			<<exit>>
+		<<case "hideKeep">>
+			<<if _forceConfrontation>>
+				<span class="red"><<He>>【은는】 갑자기 당신을 향해 돌아서더니, 당신에게 달려온다!</span>
+				<<set $huntGame.end to "caught">><<set $phase to "noDodge">>
+				<<exit>>
+			<<elseif $skulduggerysuccess>>
+				잠시 탐색한 후, <span class="green"><<he>>【이가】 계속 이동한다. 당신은 은밀하게 그 뒤를 밟는다.</span>
+				<<if $huntGame.consensual and $huntGame.hunter is "other">>
+					<br>
+					<span class="gold">이제 당신이 사냥꾼이다.</span>
+					<<set $huntGame.hunter to "player">>
+				<</if>>
+				<br><br>
+
+				<span class="purple">사냥이 격렬해진다...</span> <<note "+ 속임수 난이도" "purple">>
+				<<set $huntGame.skills.skulduggeryMin += 20>><<set $huntGame.skills.skulduggeryMax += 20>>
+				<<set $huntGame.otherTracked to "trail">><<set $huntGame.distance to 2>>
+			<<else>>
+				<span class="red"><<He>>【은는】 갑자기 당신을 향해 돌아서더니, 당신에게 달려온다!</span>
+				<<set $huntGame.end to "caught">><<set $phase to "noDodge">>
+				<<exit>>
+			<</if>>
+	<</switch>>
+	<br><br>
+
+	/* Adversary actions */
+	<<if !$huntGame.playerTracked and ($huntGame.hunter is "other" or $huntGame.distance gte 3)>>
+		<<set $huntGame.otherAction to "track">>
+		<<set $_otherTrackingDiff to currentSkillValue("skulduggery")>>
+		<<if ["stealth", "hide"].includes($huntGame.playerAction) and $_actionPassed>>
+			/* Failed to track */
+		<<elseif $NPCList[0].skills.security gte random(1, $_otherTrackingDiff)>>
+			<<set $huntGame.playerTracked to true>>
+		<</if>>
+
+		<<if ["hide"].includes($huntGame.playerAction) or $huntGame.playerAction is "stealth" and !$_actionPassed>>
+			<<set $huntGame.distance-->>
+		<</if>>
+	<<elseif $huntGame.hunter is "player">>
+		<<if ["hide", "ambush"].includes($huntGame.otherAction) and !$huntGame.noMoreHiding>>
+			<<set $huntGame.otherHideTimer-->>
+			<<if random(0, 2)>>
+				<<set $huntGame.otherAction to "ambush">>
+			<</if>>
+			<<if $huntGame.otherHideTimer lte 0>>
+				<<set $huntGame.noMoreHiding to true>>
+			<</if>>
+		<<elseif $huntGame.distance gte 3 and random(0, 1) and !$huntGame.noMoreHiding>>
+			<<set $huntGame.otherAction to "hide">>
+			<<set $huntGame.otherHideTimer ||= 3>>
+		<<elseif $huntGame.distance gte 2>>
+			<<set $huntGame.otherAction to "stealth">>
+			<<if $huntGame.playerTracked and !($huntGame.playerAction is "hunt" and $huntGame.otherTracked and $_actionPassed)>>
+				<<set $huntGame.distance++>>
+			<<elseif !$huntGame.playerTracked>>
+				<<set $huntGame.distance += random(-1, 1)>>
+			<</if>>
+		<<else>>
+			<<set $huntGame.otherAction to "run">>
+			<<if $huntGame.playerTracked and !($huntGame.playerAction is "hunt" and $huntGame.otherTracked and $_actionPassed)>>
+				<<set $huntGame.distance += 2>>
+			<<elseif $huntGame.playerTracked>>
+				<<set $huntGame.distance += 1>>
+			<<else>>
+				<<set $huntGame.distance += random(-1, 2)>>
+			<</if>>
+		<</if>>
+	<<elseif $huntGame.playerTracked>>
+		<<set $huntGame.otherAction to "hunt">>
+		<<set $huntGame.distance-->>
+	<<else>>
+		<<set $huntGame.otherAction to "stealth">>
+	<</if>>
+
+	/* Give player information if tracked */
+	<<if $huntGame.otherTracked>>
+		<<if $huntGame.playerAction is "tracked" and $_actionPassed>>
+			당신은 한동안 그것을 쫓아가다가 이내 깨닫는다,
+			<<if $huntGame.otherAction is "track">>
+				<<if $huntGame.playerTracked>>
+					<<set $huntGame.hunterKnown to true>><<set $huntGame.playerTrackedKnown to true>>
+					<<he>>【이가】 당신을 추적하고 있다는 것을. <span class="pink">서로가 서로를 맴돌고 있다.</span> 이제 고양이와 쥐의 싸움이다.
+				<<else>>
+					<<set $huntGame.hunterKnown to true>>
+					<<he>>【이가】 당신을 추적하려 하고 있다는 것을. <span class="green"><<He>>【은는】 아직 당신이 어디 있는지 모르는 것 같다!</span>
+					<<if $huntGame.consensual and $huntGame.hunter is "other">>
+						<br>
+						<span class="gold">이제 당신이 사냥꾼이다.</span>
+						<<set $huntGame.hunter to "player">>
+					<</if>>
+				<</if>>
+			<<elseif $huntGame.otherAction is "stealth">>
+				<<he>>【이가】 느리고 은밀하게 움직이고 있다는 것을. 아직 충분히 은밀하지는 않다.
+			<<elseif $huntGame.otherAction is "run">>
+				<<he>>【이가】 달리고 있다.
+				<<if $huntGame.playerTracked>>
+					<<He>>【은는】 당신이 <<his>> 흔적을 잡았다는 것을 알고 있을 것이다.
+				<<else>>
+					막연하게나마. <<He>>【은는】 당신이 정확히 어디 있는지 알지 못한다.
+				<</if>>
+			<<elseif $huntGame.otherAction is "hunt">>
+				<<set $huntGame.hunterKnown to true>><<set $huntGame.playerTrackedKnown to true>>
+				<<he>>【이가】 당신을 사냥하고 있다는 것을. <span class="pink">서로가 서로를 맴돌고 있다.</span> 이제 고양이와 쥐의 싸움이다.
+			<<else>>
+				<<he>>【이가】 전방 어딘가에 숨어 있을 가능성이 높다는 것을.
+			<</if>>
+		<<else>>
+			<<if ["hide"].includes($huntGame.playerAction) and $huntGame.otherTracked>>
+				<<set $huntGame.otherTracked to false>>
+				<span class="red">당신은 <<his>> 발자취를 놓친다.</span>
+			<<else>>
+				<<switch $huntGame.otherAction>>
+					<<case "track">>
+						<<he>>【이가】 당신을 추적하려고 한다는 것을 알 수 있다.
+						<<if $huntGame.playerTracked>>
+							<<set $huntGame.hunterKnown to true>><<set $huntGame.playerTrackedKnown to true>>
+							<span class="pink">서로가 서로를 맴돌고 있다.</span>
+						<<else>>
+							<<set $huntGame.hunterKnown to true>>
+							<span class="green"><<He>>【은는】 아직 당신이 어디 있는지 모르는 것 같다!</span>
+							<<if $huntGame.consensual and $huntGame.hunter is "other">>
+								<br>
+								<span class="gold">이제 당신이 사냥꾼이다.</span>
+								<<set $huntGame.hunter to "player">>
+							<</if>>
+						<</if>>
+					<<case "stealth">>
+						당신은 <<he>>【이가】 느리고 체계적으로 움직이고 있다는 것을 알 수 있다.
+						<<if !($huntGame.playerAction is "track" and $_actionPassed)>>
+							<<set $skulduggerydifficulty to random($huntGame.skills.skulduggeryMin, $huntGame.skills.skulduggeryMax)>>
+							<<skulduggerycheck "silent">>
+						<</if>>
+						<<if $skulduggerysuccess>>
+							<span class="green">일단 아직은 <<his>> 흔적을 잡고 있다.</span>
+							<<set $huntGame.skills.skulduggeryMin += 20>><<set $huntGame.skills.skulduggeryMax += 20>>
+						<<else>>
+							<span class="red"><<He>>【은는】 꽤 능숙하다. 당신은 <<his>> 발자취를 놓친다.</span>
+							<<set $huntGame.otherTracked to false>>
+						<</if>>
+					<<case "run">>
+						당신은 <<he>>【이가】 달아나고 있다는 것을 알 수 있다.
+						<<if $huntGame.playerTracked>>
+							<<He>>【은는】 당신이 <<his>> 흔적을 잡았다는 것을 알고 있을 것이다.
+						<<else>>
+							막연하게나마. <<He>>【은는】 당신이 정확히 어디 있는지 알지 못한다.
+						<</if>>
+					<<case "hunt">>
+						<<set $huntGame.hunterKnown to true>><<set $huntGame.playerTrackedKnown to true>>
+						<<His>> 움직임이 공격적이다. <<He>>【은는】 당신을 사냥하고 있다.
+						<<if $huntGame.hunter is "player">>
+							<br>
+							<span class="red">당신은 더 이상 사냥꾼이 아니다.</span>
+							<<set $huntGame.hunter to "other">>
+						<</if>>
+					<<default>>
+						<<he>>【이가】 어딘가에 숨어 있다는 것을 알 수 있다.
+						<<if !($huntGame.playerAction is "track" and $_actionPassed)>>
+							<<set $skulduggerydifficulty to random($huntGame.skills.skulduggeryMin, $huntGame.skills.skulduggeryMax)>>
+							<<skulduggerycheck "silent">>
+						<</if>>
+						<<if $skulduggerysuccess>>
+							<span class="green">일단 아직은 <<his>> 흔적을 잡고 있다.</span>
+							<<set $huntGame.skills.skulduggeryMin += 20>><<set $huntGame.skills.skulduggeryMax += 20>>
+						<<else>>
+							<span class="red"><<He>>【은는】 꽤 능숙하다. 당신은 <<his>> 발자취를 놓친다.</span>
+							<<set $huntGame.otherTracked to false>>
+						<</if>>
+				<</switch>>
+			<</if>>
+		<</if>>
+		<br><br>
+	<</if>>
+
+	/* Confrontation */
+	<<if $huntGame.distance lte 1 and $huntGame.playerAction isnot "hide" or _forceConfrontation>>
+		<<if ["hide","ambush"].includes($huntGame.otherAction) and $huntGame.hunter is "player" and $huntGame.playerAction is "stealth" and $_actionPassed and !_forceConfrontation>>
+			<<set $huntGame.end to "chase">><<set $huntGame.chaseDistance to 1>>
+			전방의 덤불 속에 숨어있는 <<= $huntGame.adversaryText>>【을를】 발견했다! <span class="green">은밀한 움직임 덕분에, 당신이 <<him>>【을를】 먼저 발견했다.</span>
+			<br><br>
+
+			당신은 기습에 성공한다. <<He>>【은는】 달아나기 시작하지만, 당신은 이미 <<him>>의 바로 뒤에 붙어 있다.
+		<<elseif $huntGame.otherAction is "ambush" or _forceConfrontation>>
+			<<set $huntGame.end to "caught">>
+			수풀에서 부스럭거리는 소리가 들린다. <<He>>【은는】 매복한 채 당신을 기다리고 있었다!
+			<<if $huntGame.hunterKnown>>
+				<br>
+				<span class="red">당신은 더 이상 사냥꾼이 아니다.</span>
+			<</if>>
+			<<set $huntGame.hunter to "other">>
+			<<set $huntGame.playerTracked to true>>
+		<<elseif $huntGame.hunter is "player">>
+			<<set $huntGame.end to "chase">>
+			당신은 전방의 덤불 속을 살금살금 헤쳐가는 <<him>>【을를】 발견한다. <<He>>【은는】 역시 당신을 본다. <<He>>【은는】 달리기 시작한다!
+		<<else>>
+			<<set $huntGame.end to "caught">>
+			가까이서 달리는 소리가 들린다. <<He>>【은는】 당신을 찾아냈다!
+		<</if>>
+		<<exit>>
+	<</if>>
+
+	<<set $huntGame.turn++>>
+	<<if $huntGame.hunter is "player">>
+		<<set $huntGame.playerHuntTimer ||= 7>>
+		<<set $huntGame.playerHuntTimer-->>
+		<<if !$huntGame.playerHuntTimer or _forceConfrontation>>
+			<<if $huntGame.hunterKnown>>
+				바람의 흐름이 변한다. 당신은 갑자기 몸이 무방비하게 노출된 것처럼 느낀다.
+				<br>
+				<span class="red">당신은 더 이상 사냥꾼이 아니다.</span>
+				<br><br>
+			<</if>>
+			<<set $huntGame.hunter to "other">>
+			<<set $huntGame.playerTracked to true>>
+		<</if>>
+	<</if>>
+	<<set $huntGame.distance to Math.clamp($huntGame.distance, 0, 7)>>
+	<<set $huntGame.playerActionLast to $huntGame.playerAction>>
+	<<pass 2>>
+<</widget>>
+
+<<widget "gwylanHuntOptions">>
+	<<set $skulduggerydifficulty to random($huntGame.skills.skulduggeryMin, $huntGame.skills.skulduggeryMax)>>
+	<<if $huntGame.distance lte 1 and $huntGame.playerAction is "hide">>
+		당신은 은신처에서 고개를 내밀어 <<he>>【이가】 당신을 찾고 있는 것을 지켜본다. <span class="green"><<He>>【은는】 아직 당신을 보지 못했다.</span>
+		<br><br>
+
+		<<link [[기습한다|$huntGame.event]]>><<set $huntGame.playerAction to "ambush">><<transform fox 1>><</link>><<physiquedifficulty 4000 17000>>
+		<br>
+		<<if $huntGame.consensual>>
+			<<link [[계속 숨어 있다가, <<he>>【이가】 떠나면 <<him>>【을를】 추적한다|$huntGame.event]]>><<set $huntGame.playerAction to "hideKeep">><</link>><<skulduggerydifficulty>>
+		<<else>>
+			<<link [[계속 숨어 있다가, <<he>>【이가】 떠나면 도망친다|$huntGame.event]]>><<set $huntGame.playerAction to "hideKeepEscape">><</link>><<skulduggerydifficulty>>
+		<</if>>
+		<br>
+	<<else>>
+		<<if $huntGame.otherTracked>>
+			<<if $huntGame.hunterKnown and $huntGame.hunter is "other">>
+				<<link [[정면으로 맞닥뜨린다|$huntGame.event]]>><<set $huntGame.playerAction to "hunt">><</link>><<note "- - 거리" "teal">>
+			<<else>>
+				<<link [[<<= $huntGame.adversaryText>>【을를】 사냥한다|$huntGame.event]]>><<set $huntGame.playerAction to "hunt">><</link>><<note "- 거리" "teal">>
+				<<if $huntGame.otherTracked and $huntGame.otherAction is "run">><<athleticsdifficulty $huntGame.skills.athleticsMin $huntGame.skills.athleticsMax>><</if>>
+			<</if>>
+		<<else>>
+			<<link [[<<= $huntGame.adversaryText>>【을를】 추적한다|$huntGame.event]]>><<set $huntGame.playerAction to "track">><</link>><<skulduggerydifficulty>>
+		<</if>>
+		<br>
+		<<if $huntGame.hunterKnown and $huntGame.hunter is "other" and $huntGame.otherTracked and $huntGame.playerTracked and $huntGame.playerTrackedKnown>>
+			<<link [[은밀하게 움직이며, <<= $huntGame.adversaryText>>【이가】 당신의 흔적을 놓치도록 유도한다|$huntGame.event]]>><<set $huntGame.playerAction to "stealth">><</link>><<skulduggerydifficulty>>
+			<br>
+		<<elseif $huntGame.hunterKnown and $huntGame.hunter is "other" and $huntGame.otherTracked>>
+			<<link [[<<= $huntGame.adversaryText>>에게서 은밀하게 멀어진다|$huntGame.event]]>><<set $huntGame.playerAction to "stealth">><</link>><<skulduggerydifficulty>>
+			<br>
+		<<else>>
+			<<link [[은밀하게 움직인다|$huntGame.event]]>><<set $huntGame.playerAction to "stealth">><</link>><<skulduggerydifficulty>>
+			<br>
+		<</if>>
+		<<link [[숨는다|$huntGame.event]]>><<set $huntGame.playerAction to "hide">><</link>><<skulduggerydifficulty>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanCombatInit">>
+	<<run statusCheck("Gwylan")>>
+	<<set $enemyarousalmax to 1200>>
+	<<set $enemyarousal += C.npc.Gwylan.lust>>
+	<<if _gwylanStatus.includes("heat")>>
+		<<set $enemyarousal += 100>>
+	<</if>>
+	<<set $combat_player_orgasm_target to Math.clamp(Math.ceil((C.npc.Gwylan.lust + C.npc.Gwylan.dom) / 100) + _gwylanStatus.count("heat"), 1, 10)>>
+	<<if $arousal gte ($arousalmax / 5) * 4 and $combat_player_orgasm_target lte 1>>
+		<<set $combat_player_orgasm_target++>>
+	<</if>>
+	<<if !_gwylanStatus.includes("wantsPregnancy")>>
+		<<set $disableNormalImpregnation to true>>
+		<<set $disableImpregnation to true>>
+	<</if>>
+
+	/* ToDo: Gwylan - delete when pregnancy is to be enabled */
+	<<set $disableNormalImpregnation to true>>
+	<<set $disableImpregnation to true>>
+
+	/* ToDo: Gwylan - Start combat effects from hypnosis traits or bad end triggers? */
+	<<set $_hypnoMessages to []>>
+	<<if $gwylan.silence>>
+		<<set $combat_silenced to true>>
+		<<set $_hypnoMessages.push("<span class='red'>그윌란이 당신의 목소리를 앗아간다</span>")>>
+	<</if>>
+	<<if $gwylan.trance>>
+		<<set $trance to 1>><<set $timer to $hypnosis_traits.devotion>>
+		<<set $_hypnoMessages.push("<span class='lewd'>당신은 매혹당했다</span>")>>
+	<</if>>
+	<<if $_hypnoMessages.length>>
+		<<hypnosisText "<<= formatList($_hypnoMessages, '', true, '. ')>>.">>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanNobody">>
+	<<set $_banishedDays to _args[0] || 9>>
+	<<if $gwylan.timer and ["active", "scorned"].includes(C.npc.Gwylan.state) and typeof $_banishedDays is "number">>
+		<<set $gwylan.timer.nobody to new DateTime(Time.date).addDays($_banishedDays).timeStamp>>
+		<<if $worn.neck.name is "familiar collar">>
+			<<set $worn.neck.type.delete("leash")>>
+			<<set $worn.neck.cursed to 0>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanDesc">><<silently>>
+	<<if $forest_shop_intro or $gwylan_rescue or $gwylan_cafe_intro>>
+		<<set _text_output to "그윌란">>
+	<<elseif _args.includes("the")>>
+		<<set _text_output to "소심한 <<nnpc_gendery 'Gwylan'>>">>
+	<<else>>
+		<<set _text_output to "소심한 <<nnpc_gendery 'Gwylan'>>">>
+	<</if>>
+	<<if _args.includes("cap")>><<set _text_output to _text_output.toUpperFirst()>><</if>>
+<</silently>><<print _text_output>><</widget>>
+
+<<widget "shopkeeperDesc">><<silently>>
+	<<if $forest_shop_intro or $gwylan_rescue or $gwylan_cafe_intro>>
+		<<set _text_output to "상점 주인">>
+	<<else>>
+		<<set _text_output to "<<nnpc_gendery 'Gwylan'>>">>
+	<</if>>
+	<<if _args.includes("cap")>><<capitalise>><</if>>
+<</silently>><<print _text_output>><</widget>>
+
+<<widget "gwylanRescueStats">>
+	<<if !$gwylanRescue>>
+		<<set $gwylanRescue to {
+			seen: [],
+			failed: "",
+			count: 0,
+			eden: 0,
+		}>>
+	<</if>>
+
+	<<if !$gwylanRescue.seen.includes(_args[1])>>
+		<<set _gwylanFirstRescue to _args[1]>>
+	<</if>>
+
+	<<if _args[0] is true>>
+		<<set $rescued++>>
+		<<set $gwylanRescue.count++>>
+		<<if _args[2] is "Eden" and !$edenCagedEscape>>
+			<<set $gwylanRescue.eden++>>
+		<</if>>
+		<<set $gwylanRescue.seen.pushUnique(_args[1])>>
+	<<else>>
+		<<set $gwylanRescue.failed to _args[1]>>
+		<<set $gwylanRescue.seen.pushUnique(_args[1] + "Failed")>>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanReunion">>
+	당신은 <<him>>에게 <<badEndProse $badEndStats.last()?.source "at">> 보냈던 시간에 대해 말해준다. <<He>>【은는】 당신의 머리를 쓰다듬으며 아무 말 없이 듣기만 한다. 이야기가 끝나자, <<he>>【이가】 당신의 이마에 입을 맞춘다.
+	<<switch $badEndStats.last()?.source>>
+		<<case "Underground Farm">>
+			<<if $brownFoxRevealed>>
+				"하이 엘크에서 도망치다니 운이 좋았네. <<nnpc_Hes "Remy">> 강력한 <<nnpc_gender "Remy">>니까. 특히 <<nnpc_his "Remy">> 식인 여우와 함께라면 더더욱 그렇지."
+			<<else>>
+				"레미에게서 도망치다니 운이 좋았네. <<nnpc_Hes "Remy">> 강력한 <<nnpc_gender "Remy">>. "
+			<</if>>
+			<<He>>【은는】 양손으로 당신의 뺨을 감싸며 눈을 들여다본다.
+			<<if $dissociation gte 1>>
+				"그들이 네 두 눈에서 빛을 앗아가 버렸구나." <<He>>【은는】 더욱 강하게 당신을 껴안는다.
+			<<else>>
+				"네가 여전히 인간이라는 걸 명심해. 놈들이 무슨 짓을 해도 그 사실은 변하지 않아." <<He>>【은는】 더욱 강하게 당신을 껴안는다.
+			<</if>>
+			<<if !$gwylanTalked.includes("underground_farm")>>
+				<<set _badEndFollowup to true>>
+			<</if>>
+		<<case "Wolf Cave">>
+			"늑대들은 평소엔 참 얌전한데, 그 검은 놈은 점점 대담해지고 있네," <<he>>【이가】 말한다. "<<if ($settings.monsterChance gte random(1, 100) and ($hallucinations gte 1 or !$settings.monsterHallucinationsOnly)) or $blackwolfmonster is 2>><<nnpc_he "Black Wolf">>【이가】 <<else>>그 녀석이<</if>> 널 그렇게 만들다니 정말 유감이야."
+			<<if !$gwylanTalked.includes("loincloth")>>
+				<<set _badEndFollowup to true>>
+			<</if>>
+		<<case "Eden">>
+			"숲은 다 알고 있지," <<he>>【이가】 말한다. "<<nnpc_he "Eden">>【은는】 그저 빼앗고 파괴할 뿐이야." <<His>> 눈빛이 어두워진다.
+			<<if !$gwylanTalked.includes("loincloth")>>
+				<<set _badEndFollowup to true>>
+			<</if>>
+		<<case "Underground Dungeon">>
+			"그건 끔찍할 정도네. 사람을 쓰다 버릴 물건처럼 밀매하다니, 너처럼 탈출할 행운조차 얻지 못한 이들이 얼마나 많을지 상상하는 것만으로도 끔찍해." <<He>>【은는】 당신을 더 꽉 끌어안는다. "네가 탈출해서 정말 천만다행이야."
+			<<if !$gwylanTalked.includes("underground_brothel")>>
+				<<set _badEndFollowup to true>>
+			<</if>>
+		<<case "Mines">>
+			"우리 발밑에서 그런 사악한 일이 벌어지고 있다니 믿을 수가 없네," <<he>>【이가】 말한다. "살아 돌아오다니, 넌 정말 강해."
+		<<case "Asylum">>
+			"그런 취급을 받으면 누구라도 미쳐버릴 텐데," <<he>>【이가】 말한다. "<<if $gwylanSeen.includes("hypnosis_removal")>>기억해, 만약<<else>>만약<</if>> 그 <<nnpc_gender "Harper">>【이가】 네가 평소라면 절대 생각지도 못할 것들을 생각하게 만들었다면, <span class="blue">부디 상점으로 날 찾아와 줘</span>. 내가 도와줄 수 있으니까."
+			<<if !$gwylanTalked.includes("asylum")>>
+				<<set _badEndFollowup to true>>
+			<</if>>
+		<<case "Prison">>
+			"우린 모두 뿌린 대로 거두는 법이야," <<he>>【이가】 말한다. "하지만 때로는 죗값에 비해 형벌이 너무 과혹할 때가 있지.
+			<<if $badEndStats.find(stat => stat.source === "Prison").reasonEnd is "prisonServed">>
+				네가 시들어버리지 않고 그 기나긴 형기를 무사히 버텨내서 기뻐."
+			<<else>>
+				기지를 발휘해 탈출해서 다행이야."
+			<</if>>
+			<<if !$gwylanTalked.includes("prison")>>
+				<<set _badEndFollowup to true>>
+			<</if>>
+		<<case "Pound">>
+			<<if isLoveInterest("Gwylan")>>"<span class="lewd">널 그렇게 대할 수 있는 건 오직 나뿐인데.</span>"<<else>>"사람을 짐승으로 만들다니 잔인함을 넘어서는 짓이네. 네가 누군지 잊지 않기를 바라."<</if>>
+		<<case "Kylar Abduction">>
+			"네 친구라고?" <<He>>【은는】 별로 놀란 눈치가 아니다. "<<nnpc_him "Kylar">>【을를】 그런 극단적인 수단으로 내몬 게 무엇이든 간에, 너희 둘 다 버텨내기 힘들었겠네."
+			<br><br>
+
+			<<if $syndromekylar is 1>>
+				<<if !$gwylanTalked.includes("vampire")>>
+					<<set _badEndFollowup to true>>
+				<</if>>
+				"힘들었지만, 이해해요," 당신이 말한다. "<<nnpc_Hes "Kylar">> 단지 오해했을 뿐이고, 친구가 필요한 거니까요.
+			<<else>>
+				"네," 당신이 말한다. "전 도저히 <<nnpc_him "Kylar">>【을를】 이해할 수가 없어요.
+			<</if>>
+			이제 끝나서 다행일 뿐이에요."
+			<br><br>
+
+			"나도 그래," <<he>>【이가】 말한다. <<if isLoveInterest("Gwylan")>>"보고 싶었어."<</if>>
+		<<case "Pirate Ship">>
+			"그건... 꽤 낯익은 이야기네," <<he>>【이가】 말한다. "엄청난 모험을 한 것 같아. 바다 한가운데의 마음이라니... 네가 그 깊은 속에서 길을 잃진 않았기를 바라."
+		<<default>>
+			그윌란이 <<his>> 귀에 새끼손가락을 집어넣는다. "방금 뭐라고? 미안, <span class="red">아무래도 여기 버그가 난 것 같네</span>. 내가 아니라 <span class="gold">PurityGuy</span>에게 네가 뭘 하고 다녔는지 가서 말해봐."
+	<</switch>>
+<</widget>>
+
+<<widget "schoolWalkChat">>
+	<<set _gwylan to statusCheck("Gwylan")>><<set _robin to statusCheck("Robin")>>
+	<<set _gwylanPresent to _args.includes("gwylan")>><<set _robinPresent to _args.includes("robin")>>
+	<<cleareventpool>>
+
+	<<if _gwylanPresent>>
+		<<if !$weekly.gwylan_school_talk_classes>>
+			<<addinlineevent "school_gwylan_classes" 1>>
+				<<set $weekly.gwylan_school_talk_classes to 1>>
+				<<if _robinPresent>>
+					"수업은 잘 돼가?" 그윌란이 묻는다.
+				<<else>>
+					"수업은 잘 돼가?" <<nnpc_he "Gwylan">>【이가】 묻는다.
+				<</if>>
+				<<if $sciencetrait + $mathstrait + $englishtrait + $historytrait gte 16>>
+					당신은 <<nnpc_him "Gwylan">>에게 모든 과목에서 A를 받았다고 자랑스럽게 말한다. <<nnpc_He "Gwylan">>【은는】 당신이 배운 흥미로운 사실들에 대해 길게 이야기하는 것을 듣는다.
+					<br><br>
+
+					"정말 좋은 소식이네, <<pcpetname "Gwylan" "simple">>." <<nnpc_He "Gwylan">>【이가】 미소 짓는다. "지식은 뇌의 양식이야. 배우려는 노력을 절대 멈추지 않길 바라."
+				<<elseif $sciencetrait + $mathstrait + $englishtrait + $historytrait gte 8 and ($sciencetrait lte 1 or $mathstrait lte 1 or $englishtrait lte 1 or $historytrait lte 1)>>
+					<<set _badClass to $sciencetrait lte 1 ? "과학" : $mathstrait lte 1 ? "수학" : $englishtrait lte 1 ? "영어" : "역사">>
+					당신은 <<nnpc_him "Gwylan">>에게 대체로 잘되고 있지만, _badClass 수업은 뒤처지고 있다고 말한다.
+					<br><br>
+
+					<<nnpc_He "Gwylan">>【은는】 당신의 머리를 쓰다듬는다. "누구에게나 부족한 점은 있어. 자연스러운 일이니까, 너무 자책하지 마. 그냥 최선을 다하면 돼, 알겠지?"
+				<<elseif $sciencetrait + $mathstrait + $englishtrait + $historytrait gte 8>>
+					당신은 <<nnpc_him "Gwylan">>에게 순조롭게 진행되고 있다고 말한다.
+					<<if $stress gte ($stressmax / 5) * 3>>
+						하지만 모든 학교 과제 때문에 스트레스를 받고 있다고.
+						<br><br>
+
+						그윌란이 몸을 기울여 당신을 안아준다<<if $gwylanSeen.includes("partners")>>, 그리고 당신의 뺨에 입을 맞춘다. <<stress -10>><<llstress>><<else>>. <<stress -5>><<lstress>><</if>>
+						<br><br>
+
+						"안타깝네. 학교 시스템은 학생들의 정신 건강에 대해 매우 무정할 수 있어. 그들이 널 갉아먹게 두지 마, 넌 쉴 자격이 있어."
+					<<else>>
+						그리고 계속해서 나아지고 있다고.
+						<br><br>
+
+						<<nnpc_He "Gwylan">>【은는】 미소 짓는다. "잘했어, <<pcpetname "Gwylan" "simple">>. 우리가 사는 이 세상에 대해 더 알아간다는 건 언제나 놀라운 일이야."
+					<</if>>
+				<<elseif $sciencetrait + $mathstrait + $englishtrait + $historytrait gte 4>>
+					당신은 <<nnpc_him "Gwylan">>에게 그럭저럭 괜찮다고, 특별한 건 없다고 말한다.
+					<br><br>
+
+					그윌란이 어깨를 으쓱한다. "그렇게 말하진 않겠어. 넌 매일 새로운 걸 배우고 있잖아, 아무리 작은 것이라도. 그건 좋은 거야."
+				<<elseif $sciencetrait + $mathstrait + $englishtrait + $historytrait is 0>>
+					당신은 이를 악문다. 모든 성적이 엉망이라는 것을 안다. 당신은 <<nnpc_him "Gwylan">>에게 자신의 실패에 대해 이야기하며 <<nnpc_him "Gwylan">>【을를】 쳐다보지 않으려고 애쓴다.
+					<br><br>
+
+					그윌란이 인상을 찌푸린다. "넌 자신에게 너무 가혹해. 노력하고 있는 한, 넌 잘하고 있는 거야, <<pcpetname "Gwylan">>."
+				<<else>>
+					<<set _goodClass to []>>
+					<<if $sciencetrait gte 1>><<set _goodClass.push("과학")>><</if>>
+					<<if $mathstrait gte 1>><<set _goodClass.push("수학")>><</if>>
+					<<if $englishtrait gte 1>><<set _goodClass.push("영어")>><</if>>
+					<<if $historytrait gte 1>><<set _goodClass.push("역사")>><</if>>
+					당신은 <<nnpc_him "Gwylan">>에게 _goodClass.pluck()에서 이룬 발전에 대해 이야기한다.
+					<br><br>
+
+					"잘했어. 그건 이해하기 어려운 과목인데, 도전을 받아들인 네가 자랑스러워!"
+				<</if>>
+				<br><br>
+			<</addinlineevent>>
+		<</if>>
+
+		<<if Weather.precipitation is "rain">>
+			<<addinlineevent "school_gwylan_rain" 1>>
+				깊은 웅덩이를 지나갈 때, 갑자기 큰 물보라를 맞는다. <<lowerwet 100>><<underlowerwet 50>><<effectswater "water">><<exposure>> 뒤를 돌아보니 그윌란이 그 한가운데 서서 아무렇지 않게 위아래로 뛰고 있다.
+				<br><br>
+
+				<<nnpc_He "Gwylan">>【은는】 멈춰 서서, 당신을 올려다본다
+				<<if $exposed gte 1>>
+					허리 아래가 흠뻑 젖었고, <<nnpc_his "Gwylan">> 입을 가린다. "이런," <<nnpc_he "Gwylan">>【이가】 말하지만, <<nnpc_his "Gwylan">> 목소리 톤은 놀란 척하려는 어떤 시도도 무색하게 만든다.
+				<<else>>
+					그리고 미소 짓는다. "미안, 참을 수가 없었어. 저 웅덩이 엄청 컸어! 파도가 치는 거 봤어?" 당신도 동의하지 않을 수 없다.
+				<</if>>
+				<br><br>
+
+				<<if hasSexStat("exhibitionism", 4) and $exposed is 1 and $uncomfortable.underwear is false or hasSexStat("exhibitionism", 5) and $exposed is 2 and $uncomfortable.nude is false>>
+					<<if $worn.feet.type.includes("rugged")>>
+						당신은 히죽 웃는다. 그윌란이 이대로 빠져나가게 둘 수는 없다. 당신은 달려들 기세로 도움닫기를 하더니, 곧장 <<nnpc_him "Gwylan">>에게 몸을 날린다. <<nnpc_he "Gwylan">>【이가】 당신이 뭘 하려는지 깨달은 순간, <<nnpc_his "Gwylan">> 눈에 스치는 짧은 공포를 당신은 놓치지 않는다.
+						<br><br>
+
+						당신의 발이 물웅덩이에 거칠게 내리꽂히며 <<nnpc_him "Gwylan">>까지 흠뻑 적시자, <<nnpc_He "Gwylan">>【은는】 깜짝 놀라 비명을 지른다. 당신은 우쭐하게 웃는다. "어라."
+						<br><br>
+
+						<<nnpc_He "Gwylan">>【은는】 <<nnpc_his "Gwylan">> <<npcClothesText _gwylan "lower">>에서 물기를 털어내며 뚱한 표정을 짓지만, 당신은 <<nnpc_hes "Gwylan">> 역시 즐거워하고 있음을 똑똑히 볼 수 있다. "역시 그렇게 나올 줄 알았어. 이제 우리 둘 다 젖었네." <<nnpc_He "Gwylan">>【은는】 주위를 둘러보더니 "이리 와, 몸을 좀 말려야겠어"라고 말하며, 당신의 손을 잡고 비를 피해 근처 골목으로 달려간다. <<takeHandholdingVirginity "Gwylan" `(V.gwylanSeen.includes("partners") ? "romantic" : "consensual")`>>
+						<br><br>
+
+						당신 둘은 몇 분간 몸을 말린 후 계속 나아간다. 골목을 나설 때 <<nnpc_He "Gwylan">>【이가】 장난스럽게 윙크한다.
+					<<else>>
+						당신은 기회를 틈타, 보고 있을 누군가를 향해 야한 자세를 몇 번 취한다. 그윌란이 키득거린다.
+						<br><br>
+
+						"착하지, 장난꾸러기 씨. 어서 몸 말리러 가자." <<nnpc_He "Gwylan">>【은는】 당신의 손을 잡고 비를 피해 골목으로 당신을 이끈다. <<takeHandholdingVirginity "Gwylan" `(V.gwylanSeen.includes("partners") ? "romantic" : "consensual")`>>
+						<br><br>
+
+						당신은 몇 분간 몸을 말린 후 계속 나아간다.
+					<</if>>
+					<<fame 1 "exhibitionism">>
+				<<elseif $exposed gte 1>>
+					당신은 본능적으로 <<if ["naked", "bellyShow"].includes($worn.upper.type)>>당신의 $worn.upper.name【을를】 아래로 끌어내려 <</if>>당신의 <<exposedlower>>【을를】 숨기려 한다.
+					<br><br>
+
+					"아구, 미안해, 착하지. 이리 와, 몸 말리러 가자. 날 따라와." <<nnpc_He "Gwylan">>【은는】 당신의 손을 잡고, 비를 피해 골목으로 당신을 이끌며 <<nnpc_his "Gwylan">> 몸으로 당신을 가려준다. <<takeHandholdingVirginity "Gwylan" `(V.gwylanSeen.includes("partners") ? "romantic" : "consensual")`>>
+					<br><br>
+
+					당신은 몇 분간 몸을 말린 후 계속 나아간다.
+				<</if>>
+				<br><br>
+				<<dry_full>>
+			<</addinlineevent>>
+		<</if>>
+
+		<<if $gwylanSeen.includes("yearning")>>
+			<<addinlineevent "school_gwylan_handholding" 1>>
+				잠시 말없이 걸어가고 있을 때, 그윌란의 손이 당신의 손에 스치는 것이 느껴진다. <<nnpc_He "Gwylan">>【은는】 자신이 무엇을 하고 있는지 깨닫기도 전에 멍하니 당신의 손을 잡는다. <<takeHandholdingVirginity "Gwylan" `(V.gwylanSeen.includes("partners") ? "romantic" : "consensual")`>>
+				<br><br>
+
+				<<if $gwylanSeen.includes("partners")>>
+					<<nnpc_He "Gwylan">>【은는】 갑자기 당신의 손을 더 꽉 쥐고, <span class="lewd">당신의 뺨에 키스한다</span>. <<arousal 400>><<garousal>>
+				<<else>>
+					<<nnpc_He "Gwylan">>【은는】 얼굴을 붉히며, <span class="blue">손을 놓는다</span>.
+				<</if>>
+				<br><br>
+			<</addinlineevent>>
+		<</if>>
+
+
+		<<addinlineevent "school_gwylan_object" 1>>
+			그윌란이 당신의 주의를 끌고는 <<print either(
+				"예쁜 돌을",
+				"벽에 그려진 낙서를",
+				"담배를 삼키는 갈매기를",
+				"이상하게 생긴 집을",
+				"이상한 모양의 구름을",
+				"여우 비니를 쓴 아이를",
+				"풍선을 든 아이를",
+				"거리 공연가를",
+				"오타가 있는 표지판을",
+				"재미있는 거리 이름을",
+				"피곤해 보이는 십 대를",
+				"소풍 온 가족을",
+				"재미있는 번호판을",
+				"말을 탄 경찰관을",
+				"지나가는 경찰차를",
+				"지나가는 소방차를",
+				"지나가는 구급차를",
+				"비눗방울을 쫓는 아이들 무리를",
+				"몇몇 학생들이 시끄럽게 떠드는 모습을",
+				"몇몇 아이들이 미끄럼틀을 타며 노는 모습을",
+				"몇몇 사람들이 연을 날리는 모습을",
+				"누군가 아주 화려하게 차려입은 모습을",
+				"누군가 물풍선에 맞는 모습을",
+				"누군가 전화기에 대고 화를 내며 소리치는 모습을",
+				"누군가 거의 옷을 입지 않은 채 자전거를 타고 돌아다니는 모습을",
+				"눈썹이 아주 짙은 사람을",
+				"엄청난... 자산을 가진 사람을",
+				"누군가 캣콜러의 뺨을 때리는 모습을",
+				"서두르던 누군가가 서류 더미를 떨어뜨리는 모습을",
+				"누군가 아주 두꺼운 샌드위치를 먹으려 애쓰는 모습을",
+				"두 명의 상점 주인이 말다툼하는 모습을",
+				"두 사람이 외국어로 말다툼하는 모습을",
+				"두 사람이 함께 술집에서 비틀거리며 나오는 모습을",
+				"두 마리의 새가 벌레 한 마리를 두고 싸우는 모습을",
+				"두 사람이 큰 피자를 나눠 먹는 모습을",
+				"두 사람이 막대기를 들고 장난스럽게 싸우는 모습을",
+				"세 명의 아이들이 술래잡기하는 모습을",
+				"세 마리의 개가 함께 뛰어다니며 노는 모습을"
+			)>> 가리킨다.
+			<br><br>
+
+			그에 관한 얘기를 나눈다.
+			<<if $rng gte 96>>
+				당신은 이야기에 푹 빠져, 거창하지만 우스꽝스러운 이야기를 지어낸다. 그윌란이 웃음을 터뜨린다. <<stress -8>><<trauma -2>><<npcincr Gwylan dom 1>><<llstress>><<ltrauma>><<gyearning>>
+			<<else>>
+				<<stress -4>><<lstress>>
+			<</if>>
+			<br><br>
+		<</addinlineevent>>
+	<</if>>
+
+	<<addinlineevent "school_talk_nothing" 1>>
+		/* Nothing */
+	<</addinlineevent>>
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "witch">>
+	<<if C.npc.Gwylan.pronoun is "m">>
+		<<set _text_output to "마녀">>
+	<<else>>
+		<<set _text_output to "마녀">>
+	<</if>>
+
+	<<exit _text_output>>
+<</widget>>
+
+<<widget "gwylanRobin">>
+	<<set $_incr to _args[0] or 1>>
+	<<set $_cap to _args[1] or 0>>
+	/* Note: $_cap could be used to add automatic breakpoints based on `$gwylanSeen` properties. For now, they're done manually with argument */
+
+	<<if !$_cap or $gwylan.robin + $_incr lte $_cap>>
+		<<set $gwylan.robin += $_incr>>
+	<<elseif $gwylan.robin lt $_cap and $gwylan.robin + $_incr gte $_cap>>
+		<<set $gwylan.robin to $_cap>>
+	<</if>>
+<</widget>>
+
+<<widget "measuringcharmsimage">>
+	<<set _softCorruption to Math.clamp(Math.ceil($world_corruption_soft / 10), 0, 10)>>
+	<<set _hardCorruption to Math.clamp($world_corruption_hard, 0, 10)>>
+	<<if $options.images is 1>>
+		<div id="divcharms">
+			<<if $world_corruption_soft gt 0 and $world_corruption_soft lt 10>>
+				<img id="map" src="img/misc/prop/charm-big-0b.png">
+			<<else>>
+				<img id="map" @src="'img/misc/prop/charm-big-' + Math.clamp(Math.ceil($world_corruption_soft / 10), 0, 10) + '.png'">
+			<</if>>
+			<img id="maparrow" @src="'img/misc/prop/charm-small-' + Math.clamp($world_corruption_hard, 0, 10) + '.png'">
+		</div>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "gwylanClothesValentinesContents">>
+
+<<if $gwylanSeen.includes("romance")>>
+	"고백하자면, 발렌타인데이는 내가 일 년 중 가장 안 좋아하는 때였어. 내가 너한테 로맨틱하게 구는 걸 얼마나 망설였는지 알잖아. 한 번 시작되면 봇물 터지듯 다 쏟아져 나오니까."
+	<br><br>
+
+	<<He>>【은는】 걸음을 멈추고, 장미 한 송이를 집어 든다. 분홍색 장미다. "그냥 가까이 지내는 걸로는 부족해. 사랑하는 사람과 함께하고 싶어 하는, 모든 걸 집어삼킬 듯한 그 괴로운 갈망이야. 그 사람을 잃을지도 모른다는 두려움이고.
+	현재의 기쁨으로 다스려지는, 미래에 대한 두려움이야. 사랑이 아플 때조차, 진정한 사랑이 정말로 아플 때조차 장미의 향기를 맡기 위해 걸음을 멈추는 거지."
+	<<He>>【은는】 당신의 목덜미에 <<his>> 머리를 파묻는다.
+	<br><br>
+
+	<<if isLoveInterest("Gwylan")>>
+		"나한텐 너무 벅찼어. 널 밀어내서 미안하지만, 지금 네가 나와 함께 있어서 행복해."
+	<<else>>
+		"네 약속을 기억하는 게 좋을 거야, 내 사랑."
+	<</if>>
+	<<He>>【은는】 계속해서 장미 꽃잎을 엄지로 문지르며 떼어낸다.
+<<elseif $gwylanSeen.includes("yearning") or $gwylanSeen.includesAll("ritual_sex", "pink_rose")>>
+	"솔직히 말하면, 밸런타인데이는 일 년 중 제일 싫어하는 때야. 난 그렇게 낭만적인 사람은 아니거든." <<He>>【은는】 잠시 말을 멈춘다. "적어도 그러지 않으려고 노력은 해. 감정이 너무 복잡해지니까." '복잡하다'는 말에 <<his>> 눈빛이 널 향해 날카로워지는 듯하다.
+	"다 나쁜 것만은 아니지만, 결국엔 아프게 될 거야. 홀린 감정은 결국 비극으로 끝나게 되어 있어. 사랑은 아픈 거고, 진짜 사랑은 정말로 아프거든."
+	<br><br>
+
+	<<He>>【은는】 걸음을 멈추고, 장미 한 송이를 집어 든다. 분홍색 장미다. "특히 이런 마을에선 말이지. 가시가 있는데도, 겉보기엔 아주 예뻐. 하지만 부주의하게 쥐면 똑같이 손이 피투성이가 될 뿐이야."
+	<<His>> 손에 힘이 들어간다. 당장이라도 장미꽃을 짓이겨버릴 것처럼 보이지만, <<He>>【은는】 이내 멈칫한다.
+	<br><br>
+
+	"누군가는 항상 상처를 입게 되고, 그 고통을 평생 안고 살아가야 해." <<He>>【은는】 눈을 감고 장미를 다시 내려놓는다. "그 기쁨이 그만한 고통을 감수할 가치가 있을까? 그 기억들을 평생 견뎌낼 수 있을까?"
+<<else>>
+	"고백하자면, 발렌타인데이는 내가 일 년 중 가장 안 좋아하는 때야. 난 별로 로맨틱한 편이 아니거든."
+	<<He>>【은는】 걸음을 멈추고, 장미 한 송이를 집어 든다. 분홍색 장미다.
+	<br><br>
+
+	"겉보기엔 참 예뻐. 맹목적인 사랑의 꽃잎은 위안을 주는 것처럼 보이지. 너를... 따뜻하게 해줄 누군가와 함께, 그 꽃잎을 두르고 피난처로 삼을 수 있을 것처럼."
+	<<His>> 표정은 공허하고, 시선은 초점이 없다. <<he>>【은는】 두 손가락으로 장미꽃의 머리를 깔끔하게 꺾어버린다.
+	<br><br>
+
+	"이런 마을에서는 결국 비극으로 끝날 운명이야. 그런 감정들, 그런 사람은 결국 사라지고 흉측한 것만 남기지. 사랑은 아프고, 진정한 사랑은 정말로 아파."
+	<<He>>【은는】 <<his>> 손 안에서 장미꽃을 짓뭉개고, 망가진 꽃잎들을 불어 날린다. 꽃잎들은 환상의 미풍에 휩쓸린다. 잠시 허공에서 춤을 추던 꽃잎들은 묘할 정도로 정확하게 근처 창문을 통해 빠져나간다.
+<</if>>
+<br><br>
+
+<<link [[아무 말도 하지 않는다|Gwylan Talk Clothes Valentines Silent]]>><</link>>
+<br>
+<<if !$gwylanSeen.includes("romance")>>
+	<<if !_hasLI>>
+		<<link [[<<him>>의 말에 동의한다|Gwylan Talk Clothes Valentines Agree]]>><</link>>
+		<br>
+	<</if>>
+	<<if $gwylanSeen.includesAny("yearning", "pink_rose") and _hasLI>>
+		<<link [[<<he>>【은는】 틀렸다고 말한다|Gwylan Talk Clothes Valentines Wrong]]>><<npcincr Gwylan dom 5>><</link>><<ggyearning>>
+	<<else>>
+		<<link [[왜 그런 생각을 하게 되었는지 묻는다|Gwylan Talk Clothes Valentines Ask]]>><</link>>
+	<</if>>
+	<br>
+<</if>>
+<<link [[<<him>>【을를】 껴안는다|Gwylan Talk Clothes Valentines Hug]]>><<npcincr Gwylan dom 2>><</link>><<gyearning>>
+<br>
+<<if $gwylanSeen.includes("partners")>>
+	<<link [[<<him>>【을를】 사랑한다고 말한다|Gwylan Talk Clothes Valentines Love]]>><<npcincr Gwylan dom 5>><</link>><<ggyearning>>
+	<br>
+<</if>>
+
+<</widget>>

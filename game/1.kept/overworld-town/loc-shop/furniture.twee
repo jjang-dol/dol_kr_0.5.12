@@ -1,0 +1,530 @@
+:: Furniture Shop Lock
+
+<<set $outside to 0>><<effects>><<set $lock to 0>>
+
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔이 묶여 있지만 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+
+		<<lockicon "pick">><<link [[자물쇠를 딴다 (0:10)|Furniture Shop]]>><<pass 10>><<crimeUp 5 "trespassing">><</link>><<crime "trespassing">>
+	<</if>>
+	<br>
+<<else>>
+	<span class="red">이 자물쇠는 당신의 능력 밖인 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+<<getouticon>><<link [[떠난다|Shopping Centre]]>><</link>>
+
+:: Furniture Shop
+<<set $outside to 0>><<set $location to "shopping_centre">><<effects>>
+
+/* TODO: Turn this shop into an actual megastore where you can get lost and encounter tentacles. Tentakea?*/
+
+당신은 가구점에 있다. 대부분의 재고는 당신의 방에 비해 너무 크다.
+<br><br>
+
+<<if Time.dayState is "night" and Time.hour isnot $closinghour>>
+	어둠 속에 당신 혼자 있다.
+	<br><br>
+<<elseif $exposed gte 1>>
+	당신은 존엄성을 지키기 위해 찬장 안에 숨는다.
+	<br><br>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	<<passoutshop "shop">>
+<<else>>
+	<<if Time.hour is 21>>
+		폐점 시간이다. 경비원이 모든 사람을 밖으로 몰아내고 있다.
+		<<if $exposed gte 1>>
+			경비원이 이 옷차림을 본다면 얼마나 노출되어 있을지 깨닫고 공황 상태에 빠진다.
+		<</if>>
+		<br><br>
+		<<if $exposed lte 0>>
+			<<highicon>><<link [[밖으로 나간다|High Street]]>><</link>>
+			<br>
+		<<else>>
+			<<ind>><<link [["끝날 때까지 숨는다 (1:00)"|Furniture Shop]]>><<pass 1 hour>><</link>>
+		<</if>>
+	<<else>>
+		<<if Time.dayState is "night" and Time.hour isnot 21 and !$weekly.theft.furnitureShop>>
+			<<shopicon "register">><<link [[금전 등록기를 살펴본다|Furniture Shop Register]]>><</link>>
+			<br><br>
+		<<elseif $exposed lte 0 and Time.dayState isnot "night" and Time.hour isnot 21>>
+			카탈로그에 몇 가지 어울리는 물건이 있다.
+			<br>
+			<<furnitureicon "catalogue">><<link [[카탈로그|Furniture Shop Catalogue]]>><</link>>
+			<br><br>
+		<</if>>
+		<<if ($exposed lte 0 and Time.dayState isnot "night" and Time.hour isnot 21) or (Time.hour gte 21 and !$weekly.theft.furnitureShop)>>
+			벽지와 포스터가 구석에 쌓여 있다.
+			<br>
+			<<furnitureicon "wallpaper">><<link [[벽지|Furniture Shop Papers]]>><</link>>
+			<br><br>
+		<</if>>
+		<<getouticon>><<link [[나간다|Shopping Centre]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Furniture Shop Papers
+<<effects>>
+
+<<set $chosenFurnitureCategory to $chosenFurnitureCategory || "poster">>
+<<dynamic "furnitureUpdate" "paper-update-container">>
+<<getouticon>><<link [[뒤로|Furniture Shop]]>><<run delete $chosenFurnitureCategory>><</link>>
+<br>
+<<paperCatalogue>>
+<br>
+
+:: Furniture Shop Catalogue [exitCheckBypass]
+<<effects>>
+
+<<set $chosenFurnitureCategory to $chosenFurnitureCategory || "bed">>
+<<dynamic "furnitureUpdate" "furniture-update-container">>
+<br>
+<<getouticon>><<link [[뒤로|Furniture Shop]]>>
+	<<run delete $chosenFurnitureCategory>>
+	<<unset $furnitureDowngrade>>
+
+<</link>>
+<br>
+<<furnitureCatalogue>>
+<br>
+
+:: Widgets Furniture [widget]
+
+<<widget "furnitureUpdate">>
+	<<if $boughtfurniturename isnot undefined>>
+		<<if $chosenFurnitureCategory is "poster">>
+			<<wearProp "rolled poster">>
+		<<else>>
+			<<set _furniture to $boughtfurniturehandheld || "catalogue">>
+			<<wearProp _furniture>>
+		<</if>>
+		
+		<<if $chosenFurnitureCategory is "poster" or $chosenFurnitureCategory is "wallpaper">>
+			<<set _itemType to $chosenFurnitureCategory is "poster" ? "포스터" : "벽지">>
+			<<set _itemName to $boughtfurniturename is "custom" ? "커스텀" : window.KR.hangingLabelsKr[$boughtfurniturename] || $boughtfurniturename.replace("_","")>>
+			당신은 <<= _itemName>> <<= _itemType>>【을를】 구매한다. 집에 도착할 때쯤 배송될 것이다.
+		<<else>>
+			당신은 <<= $boughtfurniturename.replace("_","")>>【을를】 구매한다. 집에 도착할 때쯤 배송될 것이다.
+		<</if>>
+		
+		<<run delete $boughtfurniturename>>
+		<<run delete $boughtfurniturehandheld>>
+	<<elseif ["poster", "wallpaper"].includes($chosenFurnitureCategory)>>
+		<<run Furniture.in('bedroom')>>
+		벽지 코너로 다가간다. 기성품 포스터와 벽지 샘플들이 전시되어 있다. 추가 비용을 지불하면 원하는 디자인으로 맞춤 인쇄할 수도 있다.
+	<<else>>
+		당신은 가구 카탈로그를 훑어본다. 상단에는 "환불 불가!"라고 인쇄되어 있다.
+		<<wearProp "catalogue">>
+	<</if>>
+	<br><br>
+
+	<<switch $chosenFurnitureCategory>>
+		<<case "bed">>
+			당신은 침대들을 둘러본다. 몇몇은 더블 침대라는 이름으로 팔리고 있지만, 중년 성인에겐 싱글 침대라고 하기도 비좁아 보인다.
+			<br>
+		<<case "table">>
+			당신은 탁자들을 둘러본다. 대부분 거대하지만, 몇몇 코너용 탁자라면 당신의 방에도 들어갈지 모른다.
+			<br>
+		<<case "chair">>
+			당신은 의자들을 둘러본다. 책상 의자를 바꾸고 방에 여분의 의자 하나를 작은 탁자와 함께 욱여넣을 수 있을 것 같다.
+			<br>
+		<<case "wardrobe">>
+			당신은 옷장들을 둘러본다. 일부는 당신의 낡은 옷장과 크기가 거의 비슷하다.
+			<br>
+		<<case "decoration">>
+			당신은 장식품들을 둘러본다. 당신의 방에 어울릴 만한 물건을 찾기가 영 힘들다.
+			<br>
+		<<case "windowsill">>
+			당신은 잡화들을 둘러본다. 쓰임새가 미심쩍은 잡동사니들이 페이지를 채우고 있다.
+			<br>
+		<<case "desk">>
+			당신은 책상들을 둘러본다. 몇 개는 낡은 책상을 대체할 만큼 작아 보인다.
+			<br>
+		<<default>>
+			/* Do nothing */
+	<</switch>>
+<</widget>>
+
+<<widget "furnitureCatalogue">>
+	<hr>
+	<div class="settingsHeader">가구</div>
+	<div id="furnitureContainer">
+		<<dynamic "furnitureLinks" "furnitureContainerHeader">>
+		<<dynamic "furnitureList" "furniture-menu-container">>
+	</div>
+<</widget>>
+
+<<widget "paperCatalogue">>
+	<hr>
+	<div class="settingsHeader">벽지</div>
+	<div id="paperContainer">
+
+		<<dynamic "paperLinks" "paperContainerHeader">>
+		<<dynamic "paperList" "paper-menu-container">>
+	</div>
+<</widget>>
+
+<<widget "furnitureLinks">>
+	<<set _furnitureLinks to [
+		{ id: 'bed', label: '침대' },
+		{ id: 'table', label: '탁자' },
+		{ id: 'chair', label: '의자' },
+		{ id: 'desk', label: '책상'},
+		{ id: 'wardrobe', label: '옷장' },
+		{ id: 'decoration', label: '장식품' },
+		{ id: 'windowsill', label: '잡화' }
+	]>>
+	<<for _i = 0; _i < _furnitureLinks.length; _i++>>
+		<<set _furniLink = _furnitureLinks[_i]>>
+		<div @class="$chosenFurnitureCategory is _furniLink.id ? 'shopTabSelected' : 'shopTab'">
+			<button
+				@class="($chosenFurnitureCategory is _furniLink.id ? 'selected' : '')"
+				@id="Dynamic.eventBinder(_furniLink.id)"
+				onclick="(id) => $chosenFurnitureCategory = id"
+			>_furniLink.label
+			</button>
+		</div>
+	<</for>>
+<</widget>>
+
+<<widget "paperLinks">>
+	<<set _furnitureLinks to [
+		{ id: 'poster', label: '포스터' },
+		{ id: 'wallpaper', label: '벽지' },
+	]>>
+	<<for _i = 0; _i < _furnitureLinks.length; _i++>>
+		<<set _furniLink = _furnitureLinks[_i]>>
+		<div @class="$chosenFurnitureCategory is _furniLink.id ? 'shopTabSelected' : 'shopTab'">
+			<button
+				@class="($chosenFurnitureCategory is _furniLink.id ? 'selected' : '')"
+				@id="Dynamic.eventBinder(_furniLink.id)"
+				onclick="(id) => $chosenFurnitureCategory = id"
+			>_furniLink.label
+			</button>
+		</div>
+	<</for>>
+<</widget>>
+
+<<widget "furnitureList">>
+	<<set $currentFurnishing to Furniture.get($chosenFurnitureCategory)>>
+	<<if $chosenFurnitureCategory is "desk" and $currentFurnishing is null>>
+		<<set $currentFurnishing to Furniture.set('desk','desk')>>
+	<</if>>
+	현재 침실에 설치된 가구:
+	<<if $currentFurnishing>>
+		<<furnitureicon $currentFurnishing.iconFile>>
+		$currentFurnishing.nameCap
+		<br>
+		<span class="description">$currentFurnishing.description
+			<<if $currentFurnishing.type && $currentFurnishing.type.includesAny('comfy','double','starter','spacious','organiser')>>
+				<<if $chosenFurnitureCategory is "wardrobe">>
+					<<set _amount to $currentFurnishing.type.includes('organiser') ? 40 : $currentFurnishing.type.includes('spacious') ? 30 : 20>>
+					각 아이템 유형별로 <span class="gold"><<= _amount>></span>개를 보관할 수 있습니다.
+				<</if>>
+				<<if $currentFurnishing.type.includes('comfy')>>
+					<<= $chosenFurnitureCategory is 'bed' ? "수면의 질을 높입니다." : "책상에서 프로젝트를 진행할 때 효율이 높아집니다.">>
+				<</if>>
+				<<if $currentFurnishing.type.includes('double')>>외박 온 손님이 편하게 잘 수 있는 충분한 공간이 있습니다.<</if>>
+			<</if>>
+		</span>
+	<<else>>
+		없음.
+	<</if>>
+	<hr>
+	<<if !$furnitureDowngrade>>
+		<div id="furnitureContainer">
+			<<generateFurnitureShopStock>>
+		</div>
+	<<else>>
+		<div id="furnitureDowngrade">
+			<<furnitureDowngrade>>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "paperList">>
+	<<set _hangingLabels to {
+		"vines": "덩굴",
+		"tentacles": "촉수",
+		"plain-white": "플레인 화이트",
+		"wavy-white": "물결무늬 화이트",
+		"cowgirls": "카우걸들",
+		"cow-girls": "카우걸들",
+		"hearts": "하트",
+		"trees": "나무",
+		"crosses": "십자가",
+		"starry": "별이 빛나는 은하수",
+		"deep sea": "깊은 바다",
+		"beach": "해변",
+		"crabs": "게",
+		"flames": "화염",
+		"stained glass": "스테인드글라스",
+		"audience": "관중",
+		"bears": "곰돌이",
+		"cowgirl": "카우걸",
+		"cow-girl": "카우걸",
+		"cat": "고양이",
+		"puppy": "강아지",
+	}>>
+
+	<<set $currentFurnishing to Furniture.get($chosenFurnitureCategory)>>
+	현재 침실에 설치된 것:
+	<<if $currentFurnishing>>
+		<<set _premade to $chosenFurnitureCategory is "wallpaper" ? ["vines", "tentacles", "plain-white", "wavy-white", "cowgirls", "cow-girls", "hearts", "trees", "crosses", "starry", "deep sea", "beach", "crabs", "flames", "stained glass", "audience", "bears"].includes($currentFurnishing.name) : ["cowgirl", "cow-girl", "cat", "puppy"].includes($currentFurnishing.name)>>
+		<<set _icon to _premade ? $currentFurnishing.id + "-" + $currentFurnishing.name.replace(/ /g, '-') : ['dol', 'degrees of lewdity'].some(e => $currentFurnishing.name.toLowerCase().includes(e)) ? $chosenFurnitureCategory + "-dol" : $chosenFurnitureCategory is "poster" ? "poster" : "wallpaper-custom">>
+		<<furnitureicon _icon>>
+		<<set $_label to window.KR.hangingLabelsKr[$currentFurnishing.name] || $currentFurnishing.nameCap.replace("_","").toUpperFirst()>>
+		<<= $_label>>
+		<br>
+		<span class="description">
+			<<if $chosenFurnitureCategory is "wallpaper">>
+				<<switch $currentFurnishing.name>>
+					<<case "vines">>
+						음란한 초록색 덩굴들이 벽에서 꿈틀거린다.
+					<<case "tentacles">>
+						보라색 촉수들이 벽에서 미끄러지듯 움직인다.
+					<<case "plain-white">>
+						평범한 흰색 벽지가 벽을 덮고 있다.
+					<<case "wavy-white">>
+						물결무늬와 함께 흰색 벽지가 검은색으로 그라데이션 되어 있다.
+					<<case "hearts">>
+						분홍색 하트가 벽을 덮고 있다.
+					<<case "cowgirls" "cow-girls">>
+						카우걸들이 벽에서 춤을 추고 있다.
+					<<case "trees">>
+						초록빛 나무들이 숲속에 있는 듯한 느낌을 준다.
+					<<case "crosses">>
+						황금 십자가가 벽을 덮고 있다.
+					<<case "starry">>
+						별이 빛나는 은하수가 벽을 덮고 있다.
+					<<case "deep sea">>
+						깊고 푸른 바다가 당신을 둘러싸고 있다.
+					<<case "beach">>
+						목가적인 해변 풍경이 벽을 덮고 있다.
+					<<case "crabs">>
+						귀여운 게 무늬가 벽을 덮고 있다.
+					<<case "flames">>
+						화염이 당신을 에워싼다. 이 정도면 괜찮다.
+					<<case "stained glass">>
+						스테인드글라스 무늬가 벽을 덮고 있다.
+					<<case "audience">>
+						실루엣이 당신을 둘러싸고 있다. 군중이 지켜보는 듯한 기분이 든다.
+					<<case "bears">>
+						무척 귀여운(beary cute) 곰돌이 무늬가 벽을 덮고 있다. (beary는 '매우'를 뜻하는 very와 '곰'을 뜻하는 bear의 발음 유사성을 이용한 말장난)
+					<<default>> /* Custom */
+						$currentFurnishing.name의 이미지들이 벽을 덮고 있다.
+						<<if _icon.includes("dol")>>
+							어쩐지 낯익어 보인다.
+						<<elseif $currentFurnishing.name.startsWith('&lt;&lt')>>
+							<span class="black">바람피우다 들킨 기분이다.</span>
+						<</if>>
+				<</switch>>
+			<<else>>
+				<<switch $currentFurnishing.name>>
+					<<case "cowgirl" "cow-girl">>
+						카우걸 포스터가 벽에 걸려 있다.
+					<<case "cat">>
+						고양이 포스터가 벽에 걸려 있다. 그 아래에는 "조금만 견뎌!"라고 적혀 있다.
+					<<case "puppy">>
+						강아지 포스터가 벽에 걸려 있다.
+					<<default>> /* Custom */
+						$currentFurnishing.name의 포스터가 벽에 걸려 있다.
+						<<if _icon.includes("dol")>>
+							기묘한 기시감이 느껴진다.
+						<<elseif $currentFurnishing.name.startsWith('&lt;&lt;')>>
+							<span class="black">바람피우다 들킨 기분이다.</span>
+						<</if>>
+				<</switch>>
+			<</if>>
+		</span>
+	<<else>>
+		아무것도 없다.
+	<</if>>
+	<hr>
+	<div id="paperContainer">
+		<<generatePaperShopStock>>
+	</div>
+<</widget>>
+
+<<widget "generatePaperShopStock">>
+	<br>
+	<<set _availableHangings to $chosenFurnitureCategory is "wallpaper" ? ["vines", "tentacles", "plain-white", "wavy-white", "cowgirls", "cow-girls", "hearts", "trees", "crosses", "starry", "deep sea", "beach", "crabs", "flames", "stained glass", "audience", "bears"] : ["cowgirl", "cow-girl", "cat", "puppy"]>>
+
+	<<if Time.dayState is "night" and Time.hour isnot 21 and $weekly.theft.furnitureShop>>
+		<span class="purple">당신은 이미 상점에서 물건을 훔쳤습니다.</span> 다른 것을 가져가기 전에 기다려야 합니다.
+		<br>
+	<<else>>
+		<<for $_key range _availableHangings>>
+			<<set $_icon to $chosenFurnitureCategory + "-" + $_key.replace(/ /g, '_')>>
+			<<set $_label to window.KR.hangingLabelsKr[$_key] || toTitleCase($_key.replace("_","-"))>>
+			<<set $_cost to Furniture.setPrice(Furniture.get($chosenFurnitureCategory, true).cost)>>
+			<<set $_isCurrent to !(!$currentFurnishing or $_key isnot $currentFurnishing.name)>>
+
+			<<if !$_isCurrent>>
+				<div class="shopBlock no-numberify">
+					<<furnitureicon $_icon>> $_label |
+					<<if Time.dayState is "night" and Time.hour isnot 21 and !$weekly.theft.furnitureShop>>
+						<<capture $_key>>
+							<<link [[훔친다|Furniture Shop Papers]]>>
+								<<run Furniture.set($chosenFurnitureCategory, $chosenFurnitureCategory, {
+									name	: $_key,
+									nameCap	: $_key.toUpperFirst()
+								})>>
+								<<crimeUp 5 "petty">>
+								<<set $weekly.theft.furnitureShop to true>>
+							<</link>><<gcrime "petty">>
+						<</capture>>
+					<<elseif $money gte $_cost>>
+						<<capture $_key $_cost>>
+							<<link [["£" + $_cost/100|Furniture Shop Papers]]>>
+								<<money `-$_cost` "furniture">>
+								<<run Furniture.set($chosenFurnitureCategory, $chosenFurnitureCategory, {
+									name	: $_key,
+									nameCap	: $_key.toUpperFirst()
+								})>>
+								<<set $boughtfurniturename to $_key>>
+								<<run Furniture.wardrobeUpdate()>>
+							<</link>>
+						<</capture>>
+					<<else>>
+						<span class="red"><<print "£"+$_cost/100>></span>
+					<</if>>
+				</div>
+			<</if>>
+		<</for>>
+		<br><br>
+		<<set $_customCost to Furniture.setPrice(Furniture.get($chosenFurnitureCategory, true).cost) * 2>>
+		<<if Time.dayState isnot "night">>
+			<<capture $_customCost>>
+				<div class="shopBlock no-numberify">
+					<<if $money gte $_customCost>>
+						맞춤 제작: <<textbox "_customHanging" "">> |
+						<<link [['£' + $_customCost / 100|Furniture Shop Papers]]>>
+							<<money `-$_customCost` "furniture">>
+							<<if _customHanging is "" or _customHanging is undefined>><<set _customHanging to "a custom design">><</if>>
+							<<set _normalisedName to Util.escape(_customHanging).replace(/\[/g, "&#91;").replace(/\]/g, "&#93;")>>
+							<<run Furniture.set($chosenFurnitureCategory, $chosenFurnitureCategory, {
+								name	: _normalisedName,
+								nameCap	: _normalisedName.toUpperFirst()
+							})>>
+							<<set $boughtfurniturename to "custom">>
+							<<run Furniture.wardrobeUpdate()>>
+						<</link>>
+						<br>
+					<<else>>
+						맞춤 제작 | <span class="red"><<print "£"+$_customCost/100>></span>
+					<</if>>
+				</div>
+			<</capture>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "generateFurnitureShopStock">>
+	<!-- TODO: Cache items belonging to a particular category. -->
+	<<for $_key, $_furnishing range setup.furniture>>
+		<<set $_isInCategory to $_furnishing.category.includes($chosenFurnitureCategory)>>
+		<<set $_isDefault to $_furnishing.type.includes('starter')>>
+		<<set $_isCurrent to !(!$currentFurnishing or $_key isnot $currentFurnishing.id)>>
+		<<set $_isShowing to $_furnishing.showCheck ? Furniture.showFn($_furnishing) : true>>
+		<<if $_isInCategory and !$_isDefault and !$_isCurrent and $_isShowing>>
+			<div class="shopBlock no-numberify">
+				<<furnitureicon $_furnishing.iconFile>> $_furnishing.nameCap |
+				<<if $_furnishing.type>>
+					<<if $_furnishing.type.includes('comfy')>> 편안함 | <</if>>
+					<<if $_furnishing.type.includes('single')>> 싱글 | <</if>>
+					<<if $_furnishing.type.includes('double')>> 더블 | <</if>>
+					<<if $_furnishing.type.includes('spacious')>> 넓음 | <</if>>
+					<<if $_furnishing.type.includes('organiser')>> 수납형 | <</if>>
+				<</if>>
+				<<set $_cost to Furniture.setPrice($_furnishing.cost)>>
+				<<set $_name to $_furnishing.name>>
+				<<if $_furnishing.description>>
+					<<capture $_name>>
+						<mouse class="tooltip linkBlue">(?)<span>
+							$_furnishing.description
+							<<if $_furnishing.type && $_furnishing.type.includesAny('comfy','double','starter','spacious','organiser')>>
+								<br>
+								<<if $_furnishing.type.includes('starter')>><br>각 아이템 유형별로 20개를 보관할 수 있습니다.<</if>>
+								<<if $_furnishing.type.includes('spacious')>><br>각 아이템 유형별로 30개를 보관할 수 있습니다.<</if>>
+								<<if $_furnishing.type.includes('organiser')>><br>각 아이템 유형별로 40개를 보관할 수 있습니다.<</if>>
+								<<if $_furnishing.type.includes('comfy')>>
+									<<if $chosenFurnitureCategory is 'bed'>>
+										<br>수면의 질을 향상시킵니다.
+									<<else>>
+										<br>책상에서의 공부 효율이 올라갑니다.
+									<</if>>
+								<</if>>
+								<<if $_furnishing.type.includes('double')>><br>외박 온 손님이 편하게 잘 수 있는 충분한 공간이 있습니다.<</if>>
+							<</if>>
+						</span></mouse> |
+					<</capture>>
+				<</if>>
+				<<if $money gte $_cost>>
+					<<capture $_key $_furnishing $_cost>>
+						<<link [["£" + $_cost/100|Furniture Shop Catalogue]]>>
+							<<if ($_furnishing.tier or 0) lt (nullable($currentFurnishing).tier or 0)>>
+								<<set $furnitureDowngrade to {
+									key: $_key,
+									cost: $_cost,
+									name: $_furnishing.name,
+									nameCap: $_furnishing.nameCap,
+									iconFile: $_furnishing.iconFile,
+									type: $_furnishing.type,
+								}>>
+							<<else>>
+								<<money `-$_cost` "furniture">>
+								<<run Furniture.set($_key, $chosenFurnitureCategory)>>
+								<<set $boughtfurniturename to $_furnishing.name>>
+								<<set $boughtfurniturehandheld to $_furnishing.handheld>>
+								<<run Furniture.wardrobeUpdate()>>
+							<</if>>
+						<</link>>
+					<</capture>>
+				<<else>>
+					<span class="red"><<print "£"+$_cost/100>></span>
+				<</if>>
+			</div>
+		<</if>>
+	<</for>>
+	<<set _wardrobe to Furniture.get("wardrobe")>>
+	<<if $chosenFurnitureCategory is "wardrobe" and _wardrobe.tier is 2>>
+		당신은 가장 좋은 옷장을 구입했다.
+	<</if>>
+<</widget>>
+
+<<widget "furnitureDowngrade">>
+	<<furnitureicon $furnitureDowngrade.iconFile>>
+	<<print $furnitureDowngrade.nameCap>>
+	<<if $furnitureDowngrade.type && $furnitureDowngrade.type.includesAny('comfy','double','starter','spacious','organiser')>>
+		<<if $furnitureDowngrade.type.includes('starter')>><br>각 아이템 유형별로 20개를 보관할 수 있습니다.<</if>>
+		<<if $furnitureDowngrade.type.includes('spacious')>><br>각 아이템 유형별로 30개를 보관할 수 있습니다.<</if>>
+		<<if $furnitureDowngrade.type.includes('organiser')>><br>각 아이템 유형별로 40개를 보관할 수 있습니다.<</if>>
+		<<if $furnitureDowngrade.type.includes('comfy')>><br>수면의 질을 향상시킵니다.<</if>>
+		<<if $furnitureDowngrade.type.includes('double')>><br>외박 온 손님이 편하게 잘 수 있는 충분한 공간이 있습니다.<</if>>
+	<</if>>
+	| <span class="blue">구매하려는 상품은 현재 소유한 가구보다 품질이 낮을 수 있습니다.</span>
+	<br>
+	그래도 구매하시겠습니까?
+	<br>
+	<<button [[아니오|Furniture Shop Catalogue]]>>
+		<<unset $furnitureDowngrade>>
+	<</button>>
+	<<button [[예|Furniture Shop Catalogue]]>>
+		<<money `-$furnitureDowngrade.cost` "furniture">>
+		<<run Furniture.set($furnitureDowngrade.key, $chosenFurnitureCategory)>>
+		<<set $boughtfurniturename to $furnitureDowngrade.name>>
+		<<run Furniture.wardrobeUpdate()>>
+		<<unset $furnitureDowngrade>>
+	<</button>>
+<</widget>>

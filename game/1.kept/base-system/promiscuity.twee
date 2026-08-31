@@ -1,0 +1,189 @@
+:: Widgets Promiscuity [widget]
+<<widget "promiscuity1">>
+	<<promiscuityN 1>>
+<</widget>>
+
+<<widget "promiscuity2">>
+	<<promiscuityN 2>>
+<</widget>>
+
+<<widget "promiscuity3">>
+	<<promiscuityN 3>>
+<</widget>>
+
+<<widget "promiscuity4">>
+	<<promiscuityN 4>>
+<</widget>>
+
+<<widget "promiscuity5">>
+	<<promiscuityN 5>>
+<</widget>>
+
+<<widget "promiscuity6">>
+	<<promiscuityN 6>>
+<</widget>>
+
+<<widget "promiscuityN">>
+	<<set $_n to _args[0]>>
+	<<set $_scaledPromiscuityMax to 20 * $_n>>
+	<<if $desperateaction is 1>>
+		역겨운 기분이 들지만, 베일리가 하려는 짓보다는 낫다.
+	<<elseif $desperateaction is 2>>
+		역겨운 기분이 들지만, 다른 선택지보다는 낫다.
+	<<elseif typeof $desperateaction is "string">>
+		역겹지만, <<print $desperateaction>>.
+	<<else>>
+		<<if $control lt $controlmax>>
+			<<if $_n is 6>>
+				광기 어린 타락 행위로 <span class="green">통제력을 완전히 회복하지만</span>, <span class="red">정신 상태에는 타격을 입는다</span>.
+			<<elseif $promiscuity lt $_scaledPromiscuityMax>>
+				이런 음란한 행위는 흥분을 불러일으키고, <span class="green">당분간 통제력과 자존감을 회복시켜 준다</span>.
+			<<else>>
+				이런 음란한 행위는 흥분을 불러일으키지만, 당신을 짓누르는 먹구름을 걷어내지는 못한다. <span class="pink">뭔가 더 극단적인 행동이 필요하다.</span>
+			<</if>>
+		<<else>>
+			<<if $_n is 6>>
+				이미 통제력을 유지하고 있어, <span class="red">광기 어린 타락 행위가 그저 헛수고처럼 느껴져 공허함만 남는다</span>.
+			<<elseif $promiscuity lt $_scaledPromiscuityMax>>
+				이미 통제력을 되찾은 상태지만, 이런 음란한 행동이 <span class="green">마음을 달래고</span> 흥분을 불러일으킨다.
+			<<else>>
+				이미 통제력을 유지하고 있고, 이 행위는 <span class="pink">마음을 달래기에는 너무 온건하지만</span> 흥분은 불러일으킨다.
+			<</if>>
+		<</if>>
+		<<if !hasSexStat("promiscuity", $_n, false) and $drunk gte 1>>
+			<<if $_n is 6>>
+				<span @class="'red ' + basicDrunkCss()">머릿속이 안개 낀 것처럼 멍하고 가볍다. 나중에 이 일을 기억하지 않기만을 바랄 뿐이다.</span>
+			<<else>>
+				<span @class="'blue ' + basicDrunkCss()">알코올이 자제심을 무디게 만들자 몸이 붕 뜬 것처럼 가벼워진다.</span>
+			<</if>>
+		<</if>>
+		<<if !hasSexStat("promiscuity", $_n, false) and (playerHeatMinArousal() + playerRutMinArousal()) gte 1>>
+			<<if $_n is 6>>
+				<span @class="'red ' + basicJitterCss()">이걸 바라면 안 된다는 걸 알지만, 더는 신경 쓰기 어려워진다.</span>
+			<<else>>
+				<span @class="'pink ' + basicJitterCss()">선을 넘으라고 부추기는 원초적 충동이 밀려든다.</span>
+			<</if>>
+		<</if>>
+	<</if>>
+
+	<!-- separating the code from the written text -->
+	<<if $desperateaction is 1 or $desperateaction is 2 or typeof $desperateaction is "string">>
+		<<control `$_n * -10`>>
+		<<switch $_n>>
+			<<case 1>><<lcontrol>>
+			<<case 2>><<llcontrol>>
+			<<case 3>><<llcontrol>>
+			<<case 4>><<llcontrol>>
+			<<case 5>><<lllcontrol>>
+		<</switch>>
+		<<gtrauma>><<trauma $_n>>
+	<<else>>
+		<<if $_n is 6>>
+			<<set $promiscuity += ($control lt $controlmax ? 2 : 1)>>
+			<<if $control lt $controlmax>>
+				<<control $controlmax>>
+				<<gggcontrol>>
+			<</if>>
+			<<trauma 40>>
+			<<ggtrauma>>
+		<<elseif $promiscuity lt $_scaledPromiscuityMax>>
+			<<set $promiscuity += ($control lt $controlmax ? 2 : 1)>>
+			<<if $control lt $controlmax>>
+				<<ggcontrol>>
+			<</if>>
+			<<control 25>><<stress $_n -300>><<combattrauma `$_n * -30`>><<ltrauma>><<lstress>>
+		<<else>>
+			<<if V.daily["promiscuityStress" + $_n] isnot 1 and $statFreeze isnot true>>
+				<<set V.daily["promiscuityStress" + $_n] to 1>><<lstress>><<stress $_n -100>>
+			<</if>>
+		<</if>>
+		<<arousal `$_n * 100`>><<garousal>>
+	<</if>>
+	<<set $promiscuity to Math.clamp($promiscuity, 0, 100)>>
+	<<earSlimeSeenActions "promiscuity" $_n>>
+	<br><br>
+	<<unset $desperateaction>>
+<</widget>>
+
+<<widget "combatpromiscuity1">>
+	<<combatpromiscuityN 1>>
+<</widget>>
+
+<<widget "combatpromiscuity2">>
+	<<combatpromiscuityN 2>>
+<</widget>>
+
+<<widget "combatpromiscuity3">>
+	<<combatpromiscuityN 3>>
+<</widget>>
+
+<<widget "combatpromiscuity4">>
+	<<combatpromiscuityN 4>>
+<</widget>>
+
+<<widget "combatpromiscuity5">>
+	<<combatpromiscuityN 5>>
+<</widget>>
+
+<<widget "combatpromiscuity6">>
+	<<combatpromiscuityN 6>>
+<</widget>>
+
+<<widget "combatpromiscuityN">>
+	<<if !$promiscuityIgnore>>
+		<<set $_n to _args[0]>>
+		<<if $enemytype isnot "man">>
+			<<combatdeviancyN $_n>>
+		<<elseif $consensual is 1 or $_n is 6>>
+			<<set $_scaledPromiscuityMax to 20 * $_n>>
+			<<if $promiscuity lt $_scaledPromiscuityMax>>
+				<<set $promiscuity += ($control lt $controlmax ? 2 : 1)>>
+				<<if $control lt $controlmax>>
+					<<set _combat_promiscuity_success to (_combat_promiscuity_success gte $_n ? _combat_promiscuity_success : $_n)>>
+					<<if $_n is 6>>
+						<<control $controlmax>>
+					<<else>>
+						<<control 25>>
+					<</if>>
+				<<else>>
+					<<set _combat_promiscuity_max_control to $_n>>
+				<</if>>
+				<<if $_n is 6>>
+					<<combattrauma 40>>
+				<<else>>
+					<<stress $_n -300>>
+					<<combattrauma `$_n * -30`>>
+				<</if>>
+			<<else>>
+				<<set _combat_promiscuity_failure to $_n>>
+				<<if V.daily["promiscuityStress" + $_n] isnot 1 and $statFreeze isnot true>>
+					<<set V.daily["promiscuityStress" + $_n] to 1>><<stress $_n -100>>
+				<</if>>
+			<</if>>
+			<<arousal `$_n * 100`>>
+		<</if>>
+	<</if>>
+	<<set $promiscuity to Math.clamp($promiscuity, 0, 100)>>
+	<<earSlimeSeenActions "promiscuity" $_n 5>>
+<</widget>>
+
+<<widget "combat_promiscuity_text">>
+	<<if _combat_promiscuity_success>>
+		<br>
+		<<if _combat_promiscuity_success is 6>>
+			광기 어린 음란 행위는 <span class="green">통제력을 완전히 회복시켜 주지만</span>, <span class="red">정신 상태에는 타격을 입힌다</span>.<<gggcontrol>><<ggtrauma>><<ggarousal>>
+		<<else>>
+			음란한 행동이 <span class="green">통제력을 회복시켜 준다.</span><<ggcontrol>><<ltrauma>><<lstress>><<garousal>>
+		<</if>>
+	<<elseif _combat_promiscuity_max_control>>
+		<br>
+		<<if _combat_promiscuity_max_control is 6>>
+			이미 통제력을 유지하고 있어, <span class="red">이런 광기 어린 타락 행위가 헛수고처럼 느껴져 충족감을 얻지 못한다</span>.<<ggtrauma>><<ggarousal>>
+		<<else>>
+			음란한 행동이 <span class="green">마음을 달래고 흥분을 불러일으킨다.</span><<ltrauma>><<lstress>><<garousal>>
+		<</if>>
+	<<elseif _combat_promiscuity_failure>>
+		<br>
+		행동은 음란하긴 하지만, <span class="pink">마음을 달래기에는 너무 온건하다.</span><<lstress>><<garousal>>
+	<</if>>
+<</widget>>

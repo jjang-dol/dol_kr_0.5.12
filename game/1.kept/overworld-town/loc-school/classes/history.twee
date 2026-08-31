@@ -1,0 +1,601 @@
+:: History Classroom
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<set _robin to statusCheck("Robin")>>
+<<if _robin_location is "school">>
+	<<set $robinhistory to "active">>
+<<else>>
+	<<set $robinhistory to "missing">>
+<</if>>
+<<if $schoolstate is "fourth">>
+	<<lockerClothesAutoEquip>>
+	<<classRoomEarSlime "history">>
+	<<if $worn.upper.type.includes("naked") and $worn.lower.type.includes("naked")>>
+		<<outfitChecks>>
+		/*Check for when the pc is only wearing an overcoat*/
+		<<if $worn.under_upper.name isnot "naked" and $worn.under_lower.name isnot "naked">>
+			<<set _naked to ($worn.under_upper.type.includes("swim") or $worn.under_lower.type.includes("swim")) ? "only wearing swimwear" : "only wearing underwear">>
+		<<else>>
+			<<set _naked to "not wearing anything">>
+		<</if>>
+		<<if $worn.over_upper.name isnot "naked" and $worn.over_lower.name isnot "naked">>
+			<<print _middleOutfit ? $worn.over_upper.name : $worn.over_upper.name + "와 " + $worn.over_lower.name>>【을를】 걸려다가, 안에 아무것도 입지 않았다는 사실을 떠올린다.
+		<</if>>
+		<br><br>
+		<<npc Winter>><<person1>>
+		당신이 잠시 망설이는 동안 윈터가 말한다. "내가 눈치채지 못할 거라고 생각하진 않았겠지. 교장 선생님께 가봐라."
+		<br><br>
+		<!--<<link [[코트 걸기|]]>><<endevent>><</link>>
+		<br><br> good starting point for when you can go to class naked-->
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<br><br>
+	<<elseif wearingSchoolOutfit() and !pcAreArmsBound("right")>>
+		<<if $daily.school.attended.history>>
+			역사 수업에 다시 참여한다.
+			<<if $worn.over_upper.name isnot "naked" or $worn.over_lower.name isnot "naked" or $worn.over_head.name isnot "naked">>
+				교실 뒤편에 코트를 걸어두고
+				<<undressOverClothes "historyClassroom">>
+			<</if>>
+			자리에 앉는다.
+			<br><br>
+			<<link [[다음|History Lesson]]>><<endevent>><</link>>
+			<br>
+		<<elseif Time.minute lt 5>>
+			역사 교실에 들어간다.
+			<<npc Winter>><<person1>>
+			학생들이 자리를 채우는 동안 윈터는 교실 앞에서 준비하고 있다.
+			<<if $worn.over_upper.name isnot "naked" or $worn.over_lower.name isnot "naked" or $worn.over_head.name isnot "naked">>
+				<<undressOverClothes "historyClassroom">>
+				교실 뒤편에 코트를 건다.
+			<</if>>
+			<<if _robin_location is "school">>
+				<<if $withRobin>>
+					<<unset $withRobin>>
+					로빈이 <<nnpc_him Robin>> 옆의 빈자리를 가리키며 서둘러 앉는다.
+				<<else>>
+					로빈이 당신에게 손짓하며 <<nnpc_him Robin>> 옆의 빈자리를 가리킨다.
+				<</if>>
+				<br><br>
+				<<if random(1, 2) is 2>>
+					<<endevent>>
+					<<npc Robin>><<generatey2>><<person2>>
+					당신이 다가가지만, 도착하기 전에 한 <<person>>【이가】 그 자리에 앉는다.
+					<br><br>
+					<<if C.npc.Robin.dom gte 20>>
+						"실례합니다," 로빈이 말한다. "제 <<friend>>【이가】 거기 앉으려고 했어요."
+						<br><br>
+						<<if random(1, 2) is 2>>
+							"내가 먼저 왔어." <<person2>><<person>>【이가】 꼼짝도 않고 대답한다.
+							<br><br>
+
+							<<link [[학생에게 비켜달라고 한다|History Robin Move]]>><</link>>
+							<br>
+							<<link [[다른 자리를 찾는다|History Robin New]]>><</link>>
+							<br>
+						<<else>>
+							"알았어." <<person2>><<person>>【이가】 대답한다. <<He>>【은는】 <<his>> 가방을 들고 일어선다. 당신은 로빈 옆에 앉는다.
+							<br><br>
+							<<link [[다음|History Lesson]]>><<endevent>><<set $robinhistory to "seat">><</link>>
+							<br>
+						<</if>>
+					<<else>>
+						<<person1>>
+						로빈이 <<his>> 고개를 숙인다.
+						<br><br>
+
+						<<link [[학생에게 비켜달라고 한다|History Robin Move]]>><</link>>
+						<br>
+						<<link [[다른 자리를 찾는다|History Robin New]]>><</link>>
+						<br>
+					<</if>>
+				<<else>>
+					<<link [[다음|History Lesson]]>><<endevent>><<set $robinhistory to "seat">><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				<br><br>
+
+				<<link [[다음|History Lesson]]>><<endevent>><</link>>
+				<br>
+			<</if>>
+		<<else>>
+			<<print $withRobin ? "당신과 로빈" : "당신">> 역사 교실에 들어간다.
+			<<npc Winter>><<person1>>
+			윈터가 말하다 말고 당신을 쳐다본다.
+			<<if $daily.school.historyExcused>>
+				<<run delete $daily.school.historyExcused>>
+				"사유 있는 지각이군." <<he>>【이가】 당신의 자리를 가리키며 간단히 말한다.
+			<<else>>
+				<<He>>【은는】 <<his>> 시계를 톡톡 치고 당신의 자리를 가리킨다.
+				<<gdelinquency>>
+				<<detention 1>>
+			<</if>>
+			<br><br>
+			<<if $withRobin>>
+				<<unset $withRobin>>
+				로빈은 당황한 표정으로 재빨리 자리에 앉는다.
+			<</if>>
+
+			당신은
+			<<if $worn.over_upper.name isnot "naked" or $worn.over_lower.name isnot "naked" or $worn.over_head.name isnot "naked">>
+				교실 뒤편에 코트를 걸어두고
+				<<undressOverClothes "historyClassroom">>
+			<</if>>
+			윈터가 수업을 계속하는 동안 자리에 앉는다.
+			<br><br>
+
+			<<link [[다음|History Lesson]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+
+	<<elseif pcAreArmsBound("any") or $feetuse is "bound">>
+		윈터가 당신의 결박을 본다. "그게 뭐든 간에 내 수업에 들어오기 전에 해결해야 한다. <<print $withRobin ? "자네, 친구 좀 도와줘라" : "교장 선생님께 가봐라">>."
+		<<if $withRobin>>
+			로빈이 서둘러 당신의 결박을 풀어준다.<<unbind>><<unset $withRobin>>
+			<br><br>
+			<<link [[다음|History Lesson]]>><<endevent>><</link>>
+		<<else>>
+			<br><br>
+			<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<</if>>
+		<br><br>
+	<<else>>
+		<<npc Winter>><<person1>>
+		윈터가 당신의 옷을 본다. "내가 눈치채지 못할 거라고 생각하진 않았겠지. 교장 선생님께 가봐라."
+		<<if $withRobin>><<unset $withRobin>>당신이 떠나자 로빈이 슬픈 표정으로 쳐다본다.<</if>>
+		<br><br>
+
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<br><br>
+	<</if>>
+<<elseif $schoolstate is "lunch">>
+	<<lockerClothesAutoEquip>>
+	<<classRoomEarSlime "history">>
+	<<print $withRobin ? "당신과 로빈" : "당신">> 역사 교실에 들어간다.
+	<<if $withRobin is "hurt">>
+		<<npc Robin>><<person1>>
+		당신은 <<his>> 책상에 앉아 <<his>> 손에 머리를 파묻고 있는 로빈을 발견한다. <<He>>【은는】 당신을 보려고 <<his>> 고개를 든다. 울었던 것 같다. "말하고 싶지 않아." <<he>>【이가】 속삭인다. "네가 누구랑 키스하든 상관없어. 난 그냥... 난 우리가..." <<He>>【은는】 <<his>> 고개를 젓는다. "신경 쓰지 마. 난 그냥 공부할 거야. 너도 그래야 해."
+		<br><br>
+		<<He>>【은는】 <<his>> 역사 교과서를 펴고 더 이상 대화하려 하지 않는다. 당신은 <<him>>에게 말을 거는 것을 포기한다.
+		<br><br>
+		<<unset $withRobin>><<endevent>>
+	<<elseif $withRobin is "yes">>
+		<<npc Robin>><<person1>>
+		<<if !wearingSchoolOutfit()>>
+			로빈이 당신의 옷을 힐끗 본다. "윈터 선생님이 그런 차림으로 수업에 들여보내 주실 것 같지 않은데... 수영장 사물함에 여벌 교복 있어? 없다면, <<nnpc_title "Leighton">> 선생님이 하나 가지고 계실지도 몰라!" 로빈은 <<his>> 책상에 앉아 <<his>> 책가방에서 <<his>> 교과서를 꺼낸다.
+		<<elseif !$worn.handheld.type.includes("bookbag")>>
+			로빈은 <<his>> 책상에 앉아 <<his>> 책가방에서 <<his>> 교과서를 꺼낸다. <<He>>【은는】 당신을 힐끗 쳐다본다. "어, 사물함에 책가방을 두고 왔어? 가서 가져와야 해! 책을 넣고 다닐 게 없다면 학교 도서관에서도 책가방을 팔 거야."
+		<<else>>
+			"오늘 수업에선 뭘 배울까?" 로빈이 생각에 잠긴다. <<He>>【은는】 <<his>> 책상에 앉아 <<his>> 책가방에서 <<his>> 교과서를 꺼낸다. "지금부터 예습해야겠어."
+		<</if>>
+		<<unset $withRobin>><<set $robinhistory to "seat">><<endevent>>
+	<<elseif _robin_location is "school" and $daily.school.lunchEaten is 1>>
+		로빈은 이미 와 있다.
+		<<if $robin.timer.hurt gte 1>>
+			<<nnpc_He Robin>>【은는】 당신을 쳐다보지 않으려 한다.
+		<<elseif C.npc.Robin.trauma gte 20>>
+			<<nnpc_He Robin>>【은는】 창밖을 쳐다본다.
+		<<elseif $robinromance is 1>>
+			<<nnpc_He Robin>>【은는】 미소 지으며 이리 오라고 손짓한다.
+		<<else>>
+			<<nnpc_He Robin>>【은는】 미소 지으며 손을 흔든다.
+		<</if>>
+		<<set $robinhistory to "seat">>
+	<<else>>
+		아직 아무도 도착하지 않았다.
+	<</if>>
+	<br><br>
+	남는 시간을 공부하는 데 쓸 수 있다.
+	<<classgrades>>
+
+	<<schoolperiodtext>>
+	<<outfitChecks>>
+	<<if _overNaked and _middleNaked>>
+		<!-- Should be changed once naked classes are a thing -->
+		제대로 옷을 입지 않은 채로 공부해서는 안 될 것 같다.
+		<br>
+	<<elseif !$worn.handheld.type.includes("bookbag")>>
+		<span class="blue">책가방 없이는 공부할 수 없다.</span>
+		<br>
+		<<historyicon>><<link [[수업 전에 휴식한다|History Classroom Study]]>><<set $phase to 0>><</link>><<lstress>>
+	<<else>>
+		<<historyicon>><<link [[역사 공부하기|History Classroom Study]]>><<set $phase to 1>><</link>><<gstress>><<ghistory>>
+	<</if>>
+	<br>
+	<<getouticon>><<link [[나가기|Hallways]]>><</link>>
+	<br>
+<<elseif $schoollesson is 1>>
+	<<lockerClothesAutoEquip>>
+	<<if $daily.school.historyInterrupted is 1>>
+		<<npc Winter>><<person1>>역사 교실에 들어간다. 윈터가 갑자기 말을 멈추고 당신 쪽을 본다. "네가 방해할 때마다 다른 학생들의 기회를 망치는 거다. 방과 후 청소 명단에 올려두겠다." <<He>>【은는】 당신을 문으로 안내한다.
+		<<gdelinquency>>
+		<br><br>
+		<<detention 1>>
+
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<<else>>
+		<<npc Winter>><<person1>>역사 교실에 들어간다. 윈터가 갑자기 말을 멈추고 당신 쪽을 본다. "무슨 일이지?" 수업을 방해한 것 같다.
+		<br><br>
+		<<set $daily.school.historyInterrupted to 1>>
+
+		<<link [[사과한다|History Classroom Apology]]>><<trauma 1>><<stress 1>><</link>><<gstress>><<gtrauma>>
+		<br>
+		<<if $trauma gte 1>>
+			<<link [[조롱한다|History Classroom Mock]]>><<status 1>><<stress -12>><</link>><<lstress>><<gcool>><<gdelinquency>>
+			<br>
+		<</if>>
+	<</if>>
+<<else>>
+	역사 교실 안이다. 답답한 분위기다.
+	<br><br>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "emptyClassroom">>
+	<</if>>
+	<<storeon "historyClassroom" "check">>
+	<<if _store_check is 1>>
+		<<storeon "historyClassroom">>
+		교실 뒤편에서 코트를 챙긴다.
+		<br><br>
+	<</if>>
+	<<exhibitionclassroom>>
+
+	<<emptyClassroomMasturbationIntro>>
+	<<getouticon>><<link [[교실을 나간다 (0:01)|Hallways]]>><<pass 1>><</link>>
+	<br>
+<</if>>
+
+:: History Lesson
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<set $daily.school.attended.history to true>>
+
+<<if Time.weekDay is 6 and Time.minute gte 37>>
+	<<npc Winter>><<person1>>
+	"수업에 집중했는지 증명할 시간이다." 윈터가 <<his>> 책상 위에 책자 더미를 올려놓으며 말한다. "차례로 줄을 서도록. 내가 시작 신호를 주기 전에 시작하는 학생은 징계를 받을 것이다."<<gstress>><<stress 6>>
+	<br><br>
+	<<if $arousal gte $arousalmax>>
+		<<set _teacher to "Winter">>
+		<<orgasmLocation "classroom">>
+	<</if>>
+
+	<<exam history>>
+	<br><br>
+	당신은 자리로 돌아가 윈터의 신호를 기다린다. "시작."
+	<br><br>
+
+	<<endevent>>
+	<<exam_cheat history>>
+	<<if !$daily.earSlimeCheatExam and numberOfEarSlime() and earSlimeMakingMundaneRequests() and random(0,200) gte 150 - $earSlime.corruption>>
+		<<set $daily.earSlimeCheatExam to true>>
+		<span @class="$earSlime.startedThreats ? 'lewd' : 'lblue'">머릿속의 슬라임이 시험에서 부정행위를 하라고 명령하는 것이 느껴진다.</span> 따르면 보상을 약속하고<<if $earSlime.startedThreats>> 따르지 않으면 대가가 있을 것이라고 위협한다<</if>>.
+		<br><br>
+		<<link [[복종한다|History Exam]]>><<set $phase to 3>><<corruption 1>><<pain -4>><<stress -6>><<trauma -12>><<sub 2>><</link>><<gcorruption>><<lpain>><<lltrauma>><<lstress>>
+		<br>
+		<<if $earSlime.startedThreats>>
+			<<link [[거부한다|History Exam]]>><<set $phase to 5>><<corruption -1>><<pain 8>><<stress 6>><<trauma 6>><<def 1>><</link>><<lcorruption>><<ggpain>><<ggtrauma>><<ggstress>>
+		<<else>>
+			<<link [[무시한다|History Exam]]>><<set $phase to 4>><</link>>
+		<</if>>
+		<br>
+	<<else>>
+		<<link [[집중한다|History Exam]]>><<stress 6>><<set $phase to 0>><<set $exam_chance += 5>><</link>><<gstress>><<passPercent 5>>
+		<br>
+		<<link [[긴장을 푼다|History Exam]]>><<set $phase to 1>><</link>>
+		<br>
+		<<link [[부정행위를 한다|History Exam]]>><<set $phase to 2>><</link>><<skulduggerydifficulty>>
+	<</if>>
+	<br>
+<<else>>
+	<<if Time.minute lt 5>>
+		역사 수업이 시작된다. 어떻게 행동하시겠습니까?
+		<br><br>
+		<<classgrades>>
+	<<else>>
+		역사 수업이 계속된다. 어떻게 행동하시겠습니까?
+		<br><br>
+	<</if>>
+	<<if $arousal gte $arousalmax>>
+		<<set _teacher to "Winter">>
+		<<orgasmLocation "classroom">>
+	<</if>>
+
+	<<historyicon>><<link [[수업에 집중한다|History Lesson Focus]]>><</link>><<gstress>><<ghistory>>
+	<br>
+	<<socialiseicon>><<link [[반 친구들과 어울린다|History Lesson Socialise]]>><</link>><<gcool>><<ltrauma>><<lstress>><<gharass>>
+	<br>
+	<<daydreamicon>><<link [[공상에 잠긴다|History Lesson Daydream]]>><</link>><<lstress>><<lharass>>
+	<br>
+	<<if $tiredness gte (C.tiredness.max / 5) * 3>>
+		<<bedicon "zzz">><<link [[책상에서 잔다|History Lesson Sleep]]>><</link>><<ltiredness>>
+		<br>
+	<</if>>
+	<<if $robinhistory is "seat" and hasSexStat("exhibitionism", 5)>>
+		<<if C.npc.Robin.dom gte 60>>
+			<<skinicon "masturbate">><<link [[자위한다|History Lesson Masturbate Robin]]>><</link>><<exhibitionist5>>
+			<br>
+		<<else>>
+			<<skinicon "masturbate">><<link [[자위한다|History Lesson Masturbate]]>><<set $masturbationstart to 1>><</link>><<exhibitionist5>>
+			<br>
+		<</if>>
+	<<elseif hasSexStat("exhibitionism", 4)>>
+		<<skinicon "masturbate">><<link [[자위한다|History Lesson Masturbate]]>><<set $masturbationstart to 1>><</link>><<exhibitionist4>>
+		<br>
+	<</if>>
+<</if>>
+
+:: History Classroom Apology
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당황하며, 당신은 사과하고 떠난다.
+<br><br>
+
+<<link [[다음|Hallways]]>><<endevent>><</link>>
+
+:: History Classroom Mock
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 선생님을 조롱한다. "방해해서 죄송합니다, <<sir>>. 과학실에 있는 해골이랑 헷갈렸네요." 앉아 있던 학생들 사이에서 웃음이 터져 나온다.
+<br><br>
+
+윈터가 한숨을 쉰다. "요즘 유머 수준이 고작 이건가?" <<He>>【은는】 당신을 출구로 이끌고는 등 뒤에서 문을 닫는다.
+<<gdelinquency>>
+<br><br>
+<<detention 1>><<npcincr Winter love -1>>
+<<link [[다음|Hallways]]>><<endevent>><</link>>
+
+:: History Lesson Focus
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 선생님의 말을 듣고 자료를 공부하는 데 집중한다.
+<<if $robinhistory is "seat">>
+	로빈은 기꺼이 도와준다.
+<</if>>
+힘들긴 하지만, 진전이 있는 것 같다.
+<br><br>
+
+<<towelup>>
+
+<<advancelesson>>
+<<historyskill _lesson_progress>>
+<<stress _lesson_progress>>
+
+<<if $phase is 1>>
+	<<lessonEnd "historyClassroom">>
+<<else>>
+	<<lessonEvents "history">>
+<</if>>
+
+:: History Lesson Socialise
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<towelup>>
+
+<<if $robinhistory is "seat" and $daily.robin.historyChat isnot 1>>
+	<<set $daily.robin.historyChat to 1>>
+	<<npc Robin>><<person1>>
+	<<if C.npc.Robin.trauma gte 20>>
+		대화를 걸어보려 하지만, <<he>>【은는】 수업에 집중하려 애쓰느라 바쁘다.
+	<<elseif $robin.stayup is 2>>
+		로빈에게 대화를 걸어보려 하지만, <<he>>【은는】 잠들지 않으려고 최선을 다하고 있다.
+	<<elseif $robinromance is 1>>
+		로빈에게 대화를 걸어본다. <<He>>【은는】 수업에 집중하면서도 책상 밑으로 당신의 손을 툭 친다. 당신이 <<hers>> 손가락을 감싸자, <<he>>【이가】 꽉 쥔다.
+	<<elseif C.npc.Robin.love gte 50>>
+		로빈에게 대화를 걸어본다. <<He>>【은는】 고개를 끄덕이고 가끔 당신을 보며 미소 짓지만, <<he>>【은는】 수업에 더 집중하고 있다.
+	<<else>>
+		로빈에게 대화를 걸어본다. <<He>>【은는】 당신이 말할 때 고개를 끄덕이지만, <<he>>【은는】 수업에 더 집중하고 있다.
+	<</if>>
+	<<endevent>>
+<<else>>
+	<<if $cool gte ($coolmax / 5 * 2)>>
+		당신은 최소한의 공부만 하고, 대신 반 친구들의 환심을 사려고 노력한다. 당신은 곧 주목의 중심이 된다.
+	<<elseif $cool gte ($coolmax / 5)>>
+		당신은 최소한의 공부만 하고, 대신 반 친구들의 환심을 사려고 노력한다.
+	<<else>>
+		당신은 최소한의 공부만 하고, 대신 반 친구들의 환심을 사려고 노력한다. 대부분은 당신과 엮이는 것을 피한다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<status 1>>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+<<set _trauma to _lesson_progress * -0.5>>
+<<trauma _trauma>>
+
+<<if $phase is 1>>
+	<<lessonEnd "historyClassroom">>
+<<else>>
+	<<lessonEvents "history" 2>>
+<</if>>
+
+:: History Lesson Daydream
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<towelup>>
+
+<<if $trauma gte (($traumamax / 10) * 7)>>
+	당신은 한 번의 잘못된 행동이 반 전체가 당신을 성추행하는 결과로 이어질까 두려워 조용히 있는다.
+<<elseif $trauma gte (($traumamax / 10) * 2)>>
+	당신은 스멀스멀 피어오르는 불안감을 억누르려 애쓰며 자신의 생각에 집중한다.
+<<else>>
+	당신은 수업에 별로 집중하지 않고, 대신 창밖을 멍하니 바라보며 방과 후에 무엇을 할지 생각한다.
+<</if>>
+<br><br>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+
+<<if $phase is 1>>
+	<<lessonEnd "historyClassroom">>
+<<else>>
+	<<lessonEvents "history" 0.5>>
+<</if>>
+
+:: History Lesson Sleep
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+윈터가 <<print either("1912년의 중요성에 대해 자세히 설명하고", "무언가에 대해 지루하게 늘어놓고", "마을의 역사에 대해 이야기하고", "시대별 복장에 대해 자세히 설명하고", "교실 앞에서 강의하고")>> 있는 동안, 당신은 책상에 머리를 기댄다. 눈이 곧 감겼다가, 잠시 후 다시 뜬다. 깨어 있으려고 애쓰지만, 책상이 너무 편안하다.
+<br><br>
+<<towelup>>
+<<tiredness -12>>
+<<advancelesson>>
+
+<<if $phase is 1>>
+	<<lessonEnd "historyClassroom" "sleep">>
+<<else>>
+	<<eventshistorysleep>>
+<</if>>
+
+:: History Classroom Study
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<run statusCheck("Robin")>>
+<<if $phase is 1>>
+	<<wearProp "open history">>
+<</if>>
+<<set _robin_active to C.npc.Robin.init>>
+<<npc Robin>><<person1>>
+<<if $robinhistory is "seat">>
+	<<if !_robin_active>>
+		<<set $robindebt to 0>><<set $robindebtlimit to 5>>
+		책상 중 하나에서 낯익은 얼굴이 보인다. 로빈이다. <<Hes>> 고아원에 함께 사는 아이다.
+		<<Hes>> 비슷한 나이임에도 불구하고 항상 당신을 동경해 왔다.
+		<<He>>【은는】 당신을 올려다보며 미소 짓는다. "안녕!" <<he>>【이가】 말한다.
+		"오늘 아침엔 못 봤네. 기억해, 원할 땐 언제든 <span class="gold">집에 있는 내 방으로 놀러 와도 돼</span>.
+		너한테 보여주려고 기다리고 있었어. 정말 기대돼!"
+		<br><br>
+		당신은 <<him>> 옆에 앉아 <<if $phase is 1>>역사 교과서를 읽는다<<else>><<he>>【이가】 역사 교과서를 읽는 동안 기다린다<</if>>.
+	<<else>>
+		당신은 로빈 옆에 앉아 <<if $phase is 1>>역사 교과서를 읽는다<<else>><<he>>【이가】 역사 교과서를 읽는 동안 기다린다<</if>>.
+	<</if>>
+<<else>>
+	당신은 자리에 앉아 <<if $phase is 1>>역사 교과서를 읽는다<<else>>수업이 시작되기를 기다린다<</if>>.
+	<<if _robin_location is "school" and $daily.school.lunchEaten isnot 1>>
+		<<if !_robin_active>>
+			<<set $robindebt to 0>><<set $robindebtlimit to 5>>
+			뒤에서 외치는 목소리가 들린다. "안녕!" 로빈이다. <<Hes>> 고아원에 함께 사는 아이다.
+			<<Hes>> 비슷한 나이임에도 불구하고 항상 당신을 동경해 왔다. <<He>>【은는】 당신을 향해 달려온다.
+			"오늘 아침엔 못 봤네. 기억해, 원할 땐 언제든 <span class="gold">집에 있는 내 방으로 놀러 와도 돼</span>.
+			너한테 보여주려고 기다리고 있었어. 정말 기대돼!"
+			<br><br>
+			<<He>>【은는】 재빨리 당신 옆자리에 앉는다.
+			<<set $robinhistory to "seat">>
+		<<else>>
+			다음으로 로빈이 도착해 당신 옆자리에 앉는다.
+			<<set $robinhistory to "seat">>
+		<</if>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<npc Winter 2>>교실은 곧 학생들로 가득 차고 윈터가 도착해 수업을 시작한다.
+<br><br>
+
+<<if pcAreArmsBound("any") or $feetuse is "bound">>
+	윈터가 당신의 묶인 팔다리를 본다. "내 수업에 들어오기 전에 그거나 해결하고 오너라. 교장 선생님께 가봐."
+	<br><br>
+
+	<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<br><br>
+<<elseif wearingSchoolOutfit()>>
+	<<link [[다음|History Lesson]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	윈터가 당신의 옷을 본다. "내가 눈치채지 못할 거라고 생각하진 않았겠지. 교장 선생님께 가봐."
+	<br><br>
+
+	<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<br><br>
+<</if>>
+
+<!-- option to study only appears at lunchtime and lasts until the next hour -->
+<<set _time_to_pass to 60 - Time.minute>>
+<<pass _time_to_pass>>
+<<schooleffects>>
+<!-- add stress every 5 minutes -->
+<<set _stress to Math.trunc(_time_to_pass / 5)>>
+<<if $phase is 1>>
+	<<stress _stress>>
+	<!-- gain history skill with same efficiency as studying in the library -->
+	<<set _history to _time_to_pass / 20>>
+	<<historyskill _history>>
+<<else>>
+	<<set _stress to _stress * -1>>
+	<<stress _stress>>
+<</if>>
+
+:: History Robin Move
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 저기요." 당신이 말한다. "제가 거기 앉으려고 했는데요. ㅂ, 비켜줄 수 있나요?"
+<<elseif $speech_attitude is "bratty">>
+	"내 자리야." 당신이 말한다.
+<<else>>
+	"내가 거기 앉으려고 했는데." 당신이 말한다. "좀 비켜줄래?"
+<</if>>
+<br><br>
+
+<<if random(1, $coolmax) gt $cool>>
+	"싫은데." <<person2>><<person>>【이가】 비웃는다. "어쩔 건데?"
+	<<if $submissive lte 500>>
+		당신은 주먹을 꽉 쥔다.
+	<</if>>
+	다른 학생들이 구경하려고 고개를 돌린다.
+	<br><br>
+
+	<<link [[다른 자리 찾기|History Robin New]]>><</link>>
+	<br>
+	<<if $submissive gte 1500>>
+		<<link [[애원한다|History Robin Beg]]>><<sub 1>><</link>><<submissivetext>>
+		<br>
+	<</if>>
+	<<if displayDefiantOption(500)>>
+		<<link [[몸으로 해결한다|History Robin Fight]]>><<wolfDefiant 500>><<def 1>><</link>><<defianttext 500>>
+		<br>
+	<</if>>
+<<else>>
+	<<person2>><<person>>【이가】 고개를 끄덕인다. "그래." <<He>>【은는】 <<his>> 가방을 들고 다른 자리를 찾는다.
+	<br><br>
+	<<link [[다음|History Lesson]]>><<set $robinhistory to "seat">><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: History Robin New
+<<effects>>
+
+당신은 다른 자리를 찾는다. 자리에 앉자 로빈이 교실 반대편에서 슬픈 표정으로 손을 흔든다.
+<br><br>
+
+<<link [[다음|History Lesson]]>><<endevent>><</link>>
+<br>
+
+:: History Robin Beg
+<<effects>>
+
+당신은 <<person2>><<persons>> 셔츠를 붙잡고 거의 무릎을 꿇을 뻔한다. "ㅈ, 제발." 당신은 말과 자세에 모든 것을 쏟아부으며 말한다. "로빈 옆에 앉아야 해요."
+<br><br>
+
+<<person>>【이가】 불편한 듯 몸을 뒤척인다. "알았어." <<he>>【이가】 말한다. "나한테서 떨어져." <<He>>【은는】 <<his>> 가방을 들고 다른 자리를 찾는다.
+<br><br>
+
+당신이 앉자 로빈이 걱정스러운 표정을 짓는다.
+<br><br>
+
+<<link [[다음|History Lesson]]>><<set $robinhistory to "seat">><<endevent>><</link>>
+<br>
+
+:: History Robin Fight
+<<effects>>
+
+당신은 <<persons>> 옷깃을 잡고 <<him>> 가까이 끌어당긴다. <<He>>【은는】 <<his>> 책상에 기대 몸을 가누려 하지만, 손을 놓치고 만다.
+<br><br>
+"내 자리에서 비켜." 당신이 말한다. 당신이 <<him>>【을를】 놓아주자, <<he>>【은는】 카펫 위로 거의 쓰러질 뻔한다.
+<br><br>
+"ㅇ, 알았어." <<he>>【은는】 <<his>> 가방을 챙기며 말한다. "미쳤네."
+<br><br>
+<<person1>>당신이 <<him>> 옆에 앉자 로빈이 걱정스러운 표정으로 당신을 본다.
+<br><br>
+
+<<link [[다음|History Lesson]]>><<set $robinhistory to "seat">><<endevent>><</link>>
+<br>

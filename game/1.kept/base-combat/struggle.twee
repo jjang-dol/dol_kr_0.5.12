@@ -1,0 +1,2373 @@
+:: Widgets Struggle [widget]
+<<widget "struggle_init">>
+	<<set $enemytype to "struggle">>
+	<<set $struggle to {
+		timer: 0,
+		creature: "lurker",
+		number: 1,
+		warded: 0,
+		done: 0,
+		enemy: {}
+	}>>
+	<<set $feetaction to "evade">>
+	<<set $leftaction to "guard">>
+	<<set $rightaction to "guard">>
+	<<if $worn.face.type.includes("gag")>>
+		<<set $mouthuse to "gagged">>
+	<</if>>
+	<<if $worn.feet.type.includes("shackle")>>
+		<<set $leftleg to "bound">>
+		<<set $rightleg to "bound">>
+		<<set $feetuse to "bound">>
+	<</if>>
+	/*<<if playerHasStrapon() and $worn.under_lower.size isnot undefined>>
+		<<set $playerPenisSizeBackup to $player.penissize>>
+		<<set $player.penissize to $worn.under_lower.size>>
+	<</if>>*/
+<</widget>>
+
+<<widget "struggle_creatures">>
+	<<set $struggle.number to _args[0]>>
+	<<set $struggle.descriptions to ["뒤틀린", "미끈한", "딸깍거리는", "미끄러운", "날쌘", "매혹적인", "커다란", "작은", "알록달록한", "칙칙한", "경련하는", "떨리는", "맥동하는", "넓적한", "가느다란", "굵은", "윙윙거리는", "번들거리는"]>>
+	<<for _i to 0; _i lt $struggle.number; _i++>>
+		<<generate_struggle_creature _i _args[1]>>
+	<</for>>
+	<<for _part range ["mouth", "vagina", "penis", "anus", "chest"]>>
+		<<struggle_part_init _part>>
+	<</for>>
+<</widget>>
+
+<<widget "struggle_add">>
+	<<set _i to $struggle.number>>
+	<<set $struggle.number += _args[0]>>
+	<<for _i to _i; _i lt $struggle.number; _i++>>
+		<<generate_struggle_creature _i _args[1]>>
+	<</for>>
+<</widget>>
+
+<<widget "generate_struggle_creature">>
+	<<set _slot = _args[0];
+			_health = _args[1];
+			_type = _args[2] ? _args[2] : $struggle.creature
+	>>
+	<<set $struggle.enemy[_slot] to {
+		location: "lurking",
+		health: _health,
+		satisfied: 0,
+		name: _type,
+		description: $struggle.descriptions.pluck(),
+		motion: {wasp: "flying", bee: "flying", squid: "swimming"}[_type] || "jumping",
+		legs: {wasp: "legs", bee: "legs", squid: "tentacles"}[_type] || "none"
+	}>>
+<</widget>>
+
+<<widget "struggle_part_init">>
+	<<if ["mouth", "vagina", "penis", "anus", "chest"].includes(_args[0])>>
+		<<set $_part to _args[0]>>
+	<<else>>
+		<span class="error">struggle_part_init 오류: 잘못된 인수: _args</span>
+	<</if>>
+	<!-- reset bodypart states -->
+	<<set $struggle[$_part] to {
+		grip: 0,
+		creature: 0,
+		progress: 0,
+		success: 0,
+		action: 0,
+		action_default: 0,
+		damage: 0
+	}>>
+	<<if !$struggle_start>>
+		<!-- clean all creatures stuck to bodypart -->
+		<<for _i to 0; _i lt $struggle.number; _i++>>
+			<<if $struggle.enemy[_i].location is $_part>>
+				<<set $struggle.enemy[_i].location to "fleeing">>
+
+				<<if _args[1] is "cum">>
+					<<set $struggle.enemy[_i].satisfied += 1>>
+				<<else>>
+					<<set $struggle.enemy[_i].health -= 1>>
+				<</if>>
+			<</if>>
+		<</for>>
+
+		<!-- clean hand states -->
+		<<set $_actions to [$_part + '_strengthen', $_part + '_pull', $_part + '_spray', $_part + '_grasp', $_part + '_stroke']>>
+		<<if $_actions.includes($leftactiondefault)>>
+			<<if $carryblock>>
+				<<set $leftactioncarry to "rest">>
+			<<else>>
+				<<set $leftactiondefault to "rest">>
+			<</if>>
+			<<set $leftarmstate to 0>>
+			<<set $leftarm to 0>>
+		<</if>>
+		<<if $_actions.includes($rightactiondefault)>>
+			<<if $carryblock>>
+				<<set $rightactioncarry to "rest">>
+			<<else>>
+				<<set $rightactiondefault to "rest">>
+			<</if>>
+			<<set $rightarmstate to 0>>
+			<<set $rightarm to 0>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_name">><<silently>>
+	<!-- prints full description of an enemy in specified slot or location -->
+	<<set $_loc to _args[0]>>
+	<<if $_loc lt $struggle.number>>
+	<!-- when _args[0] is a slot number -->
+		<<set _fulldesc to $struggle.enemy[$_loc].description + ' ' + window.KR.getCreatureTypeKr($struggle.enemy[$_loc].name)>>
+	<<elseif ["mouth", "vagina", "penis", "anus", "chest"].includes($_loc)>>
+	<!-- when _args[0] is a location -->
+		<<if $struggle[$_loc].description>>
+		<!-- description doesn't exist in older versions -->
+			<<set _fulldesc to $struggle[$_loc].description + ' ' + window.KR.getCreatureTypeKr($struggle[$_loc].creature)>>
+		<<elseif $struggle[$_loc].creature>>
+			<<for _i to 0; _i lt $struggle.number; _i++>>
+				<<if $struggle.enemy[_i].location is $_loc>>
+					<<set _fulldesc to $struggle.enemy[_i].description + ' ' + window.KR.getCreatureTypeKr($struggle.enemy[_i].name)>>
+					<<set $struggle[$_loc].description to $struggle.enemy[_i].description>>
+				<</if>>
+			<</for>>
+		<</if>>
+	<</if>>
+	<</silently>><<print _fulldesc>>
+<</widget>>
+
+<<widget "struggle_creature_name">><<silently>>
+	<<set _struggleCreatureName to _struggleCreatureMap[_args[0]] || _args[0]>>
+<</silently>><<print _struggleCreatureName>>
+<</widget>>
+
+<<widget "struggle">>
+	<<struggle_effects>>
+	<<struggle_enemy>>
+	<<struggle_state>>
+	<<struggle_actions>>
+<</widget>>
+
+<<widget "struggle_state">>
+	<<for $_part range ["mouth", "vagina", "penis", "anus", "chest"]>>
+		<<if $struggle[$_part].creature>>
+			현재 당신이 구속에서 벗어나려는 힘은
+			<<switch $struggle[$_part].grip>>
+				<<case 0>><span class="red"> 전혀 통하지 않는 </span>
+				<<case 1>><span class="pink"> 몹시 미약한 </span>
+				<<case 2>><span class="purple"> 약한 </span>
+				<<case 3>><span class="blue"> 소극적인 </span>
+				<<case 4>><span class="lblue"> 적극적인 </span>
+				<<case 5>><span class="teal"> 강한 </span>
+				<<default>><span class="green"> 강철 같은 </span>
+			<</switch>>
+			수준이며, 지금 당신을 붙잡고 있는 <<print window.KR.getCreatureTypeKr($struggle[$_part].creature)>>【은는】 당신의
+			<<switch $_part>>
+				<<case "mouth">> 입이다.
+				<<case "vagina">> 골반이다.
+				<<case "penis">> 배다.
+				<<case "anus">> 엉덩이다.
+				<<case "chest">> 가슴이다.
+			<</switch>>
+			<br>
+		<</if>>
+	<</for>>
+	<br>
+
+	<<if $arousal gte $arousalmax and $orgasmdown lte 0>>
+		<<orgasm>>
+	<</if>>
+	<<set $struggle.timer += 1>>
+	<<sexcheck>>
+<</widget>>
+
+<<widget "struggle_end">>
+	/*<<if playerHasStrapon()>>
+			<<set $player.penissize to $playerPenisSizeBackup>>
+	<</if>>*/
+	<<unset $struggle>>
+	<<unset $softlock_prevent>>
+<</widget>>
+
+<<widget "generateActionsStruggle">>
+	<<set $combat to 1>>
+	<<if _targetlist is undefined>>
+		<<getTargetList>>
+	<</if>>
+	<<for _i to 0; _i lt $struggle.number; _i++>>
+		<<if $struggle.enemy[_i].location is "fleeing" or $struggle.enemy[_i].location is "lurking">>
+			<<struggle_name _i>>【은는】 거리를 유지한다.
+			<br>
+			<<if $farm_stage gte 10 and $lurkers_held lt 1>>
+				<<set _lurker_net_possible to true>>
+			<</if>>
+		<</if>>
+	<</for>>
+	<hr>
+
+	<div id="listContainer" style="margin-bottom:0px">
+		<div id="leftaction" @class="$options.combatControls + 'Control'">
+			<<leftActionInitStruggle>>
+		</div>
+
+		<div id="rightaction" @class="$options.combatControls + 'Control'">
+			<<rightActionInitStruggle>>
+		</div>
+		<<if $dissociation lte 1 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined)>>
+			<div id="feetaction" @class="$options.combatControls + 'Control'">
+				<<feetActionInitStruggle>>
+			</div>
+		<</if>>
+	</div>
+
+	<<if ($mouthuse is "struggle" and $struggle.mouth.creature) or ($mouthuse is 0 and !($dissociation lte 1 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined)))>>
+		<hr>
+		<div id="listContainer" style="margin-bottom:0px">
+			<div id="mouthaction" @class="$options.combatControls + 'Control'">
+				<<mouthActionInitStruggle>>
+			</div>
+		</div>
+	<</if>>
+
+	<<if $dissociation lte 1 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined)>>
+		<<if $vaginastate isnot 0 and $player.vaginaExist>>
+			<hr>
+			<div id="listContainer" style="margin-bottom:0px">
+				<div id="vaginaaction" @class="$options.combatControls + 'Control'">
+					<<vaginaActionInitStruggle>>
+				</div>
+			</div>
+		<</if>>
+
+		<<if $penisstate isnot 0 and (playerHasStrapon() or $player.penisExist)>>
+			<hr>
+			<div id="listContainer" style="margin-bottom:0px">
+				<div id="penisaction" @class="$options.combatControls + 'Control'">
+					<<penisActionInitStruggle>>
+				</div>
+			</div>
+		<</if>>
+
+		<<if $anusstate isnot 0>>
+			<hr>
+			<div id="listContainer" style="margin-bottom:0px">
+				<div id="anusaction" @class="$options.combatControls + 'Control'">
+					<<anusActionInitStruggle>>
+				</div>
+			</div>
+		<</if>>
+
+		<<if $chestuse isnot 0 and $chestuse isnot "squeezed">>
+			<hr>
+			<div id="listContainer" style="margin-bottom:0px">
+				<div id="chestaction" @class="$options.combatControls + 'Control'">
+					<<chestActionInitStruggle>>
+				</div>
+			</div>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "leftActionInitStruggle">>
+	<<set $lefttarget to "struggle">>
+	<<switch $leftarm>>
+		<<case 0>>
+			<<if $orgasmdown gte 1>>
+				<<set _leftOptions to "orgasm">>
+				<span class="lewd">왼팔은 자유롭지만, 경련을 멈출 수 없다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _leftOptions to "pain">>
+				<span class="red">왼팔은 자유롭지만, 움직이면 아프다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _leftOptions to "unreal">>
+				<span class="pink">왼팔은 자유롭지만, 현실감각이 없다.</span>
+			<<else>>
+				<<if _targetYourself is true and _targetnumber gt 1>>
+					<<set _targetlistarms["자신"] to "self">>
+				<</if>>
+				<<if not $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "left" _targetlistarms>>
+				<</if>>
+				<<set _leftOptions to "free">>
+				<span @class="($lastOptions.left isnot _leftOptions ? 'gold' : '')">왼팔은 자유롭다.</span>
+				<<if $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "left" _targetlistarms>>
+					<br>
+				<</if>>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "struggle">>
+			<<if $orgasmdown gte 1>>
+				<<set _leftOptions to "orgasm">>
+				<span class="lewd">왼팔로 <<print window.KR.getCreatureTypeKr($struggle.creature)>>【을를】 안고 있지만, 경련을 멈출 수 없다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _leftOptions to "bound">>
+				<span class="red">왼팔로 <<print window.KR.getCreatureTypeKr($struggle.creature)>>【을를】 안고 있지만, 움직이면 아프다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _leftOptions to "bound">>
+				<span class="pink">왼팔로 <<print window.KR.getCreatureTypeKr($struggle.creature)>>【을를】 안고 있지만, 현실감각이 없다.</span>
+			<<else>>
+				<<set _leftOptions to "struggle">>
+				<<switch $leftarmstate>>
+					<<case "mouth_struggle">>
+						<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔로 당신의 입 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "penis_struggle">>
+						<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔로 당신의 <<penis>> 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "vagina_struggle">>
+						<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔로 당신의 <<pussy>> 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "anus_struggle">>
+						<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔로 당신의 <<bottom>> 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "chest_struggle">>
+						<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔로 당신의 가슴 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【을를】 꽉 쥐고 있다.</span>
+				<</switch>>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "bound">>
+			<<set _leftOptions to "bound">>
+			<<if $orgasmdown gte 1>>
+				<span class="lewd">왼팔이 결박에서 벗어나려 꿈틀거린다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<span class="red">왼팔이 고통스럽게 결박되어 있다.</span>
+			<<elseif $dissociation gte 2>>
+				<span class="pink">왼팔이 결박된 채 축 늘어져 있다.</span>
+			<<else>>
+				<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔이 결박되어 있다.</span>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "trapped">>
+			<<set $_changetype to true>><<leftActionInitVore>>
+		<<case "grappled" "penis" "othervagina" "vagina" "coverpenis" "anus" "behind">>
+			<<set $_changetype to true>><<leftActionInit>>
+		<<case "swarmgrappled">>
+			<<set $_changetype to true>><<leftActionInitSwarm>>
+		<<case "mechgrappled">>
+			<<set $_changetype to true>><<leftActionInitMachine>>
+		<<default>>
+			<<set $_changetype to true>><<leftActionInitTentacle>>
+	<</switch>>
+	<<if $_changetype isnot true>>
+		<<leftActionsStruggle>>
+		<<if Object.keys(_leftaction).length gt 0>>
+			<<if Object.values(_leftaction).includes($leftactiondefault)>>
+				<<set $leftaction to $leftactiondefault>>
+			<</if>>
+			<<generateCombatAction _leftaction "leftaction" "버둥거린다">>
+			<<if $options.combatControls.includes("ists")>>
+				<div id="leftactionDifficulty">
+					<<leftactionDifficulty>>
+				</div>
+			<</if>>
+		<</if>>
+		<<set $lastOptions.left to clone(_leftOptions)>>
+	<</if>>
+<</widget>>
+
+<<widget "leftactionDifficultyStruggle">>/* Don't mind the blank widget. */
+	<!-- Does nothing -->
+<</widget>>
+
+<<widget "leftActionsStruggle">>
+	<<set _leftaction to {}>>
+	<<switch _leftOptions>>
+		<<case "free" "struggle">>
+			<<set _leftaction["왼팔을 가만히 둔다"] to "rest">>
+			<<if _lurker_net_possible is true>>
+				<<set _leftaction["그물을 던진다"] to "capture">>
+			<</if>>
+			<<set _leftaction["방어한다"] to "guard">>
+			<<leftclothesnew>>
+
+			<<if not $options.combatControls.includes("adio")>>
+				<<for $_part range ["mouth", "vagina", "penis", "anus", "chest"]>>
+					<<if V[$_part + 'use'] is "struggle" and $struggle[$_part].creature>>
+						<<set $_desc to ($leftactiondefault.includes($_part) ? '' : ' (' + {mouth:'입', vagina:'보지', penis:'자지', anus:'항문', chest:'가슴'}[$_part] + ')')>>
+						<<if $leftactiondefault.includes($_part) and $struggle[$_part].grip gte 1>>
+							<!-- require hand on the creature before pulling or strengthening -->
+							<<if $struggle[$_part].success lt 100>>
+								<<set _leftaction["붙잡는 힘을 강화한다"] to $_part + '_strengthen'>>
+							<</if>>
+							<<set _leftaction["당긴다"] to $_part + '_pull'>>
+						<<elseif $struggle[$_part].success lt 100>>
+							<<set _leftaction['꽉 쥔다' + $_desc] to $_part + '_grasp'>>
+						<</if>>
+						<<if $spray gte 1 and $consensual isnot 1>>
+							<<set _leftaction['스프레이를 뿌린다' + $_desc] to $_part + '_spray'>>
+						<</if>>
+						<<set _leftaction['문지른다' + $_desc] to $_part + '_stroke'>>
+					<</if>>
+				<</for>>
+			<</if>>
+		<<case "bound">>
+		<<case "orgasm">>
+			<<set _leftaction["접는다"] to "leftfold">>
+			<<set _leftaction["움켜쥔다"] to "leftgrip">>
+		<<case "pain">>
+			<<set _leftaction["버둥거린다"] to "leftstruggleweak">>
+			<<set _leftaction["보호한다"] to "leftprotect">>
+		<<case "unreal">>
+			<<set _leftaction["자신을 찌른다"] to "leftpoke">>
+			<<set _leftaction["팔을 치워둔다"] to "leftcurl">>
+	<</switch>>
+<</widget>>
+
+<<widget "rightActionInitStruggle">>
+	<<set $righttarget to "struggle">>
+	<<switch $rightarm>>
+		<<case 0>>
+			<<if $orgasmdown gte 1>>
+				<<set _rightOptions to "orgasm">>
+				<span class="lewd">오른팔은 자유롭지만, 경련을 멈출 수 없다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _rightOptions to "pain">>
+				<span class="red">오른팔은 자유롭지만, 움직이면 아프다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _rightOptions to "unreal">>
+				<span class="pink">오른팔은 자유롭지만, 현실감각이 없다.</span>
+			<<else>>
+				<<if _targetYourself is true and _targetnumber gt 1>>
+					<<set _targetlistarms["자신"] to "self">>
+				<</if>>
+				<<if not $options.combatControls.includes("adio") and _targetnumber gt 1>>
+				<</if>>
+				<<set _rightOptions to "free">>
+				<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔은 자유롭다.</span>
+				<<if $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "right" _targetlistarms>>
+					<<if $options.combatControls is "radio">><br><</if>>
+				<</if>>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "struggle">>
+			<<if $orgasmdown gte 1>>
+				<<set _rightOptions to "orgasm">>
+				<span class="lewd">오른팔로 <<print window.KR.getCreatureTypeKr($struggle.creature)>>【을를】 붙잡고 있지만, 경련을 멈출 수 없다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _rightOptions to "bound">>
+				<span class="red">오른팔로 <<print window.KR.getCreatureTypeKr($struggle.creature)>>【을를】 붙잡고 있지만, 움직이면 아프다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _rightOptions to "bound">>
+				<span class="pink">오른팔로 <<print window.KR.getCreatureTypeKr($struggle.creature)>>【을를】 붙잡고 있지만, 현실감각이 없다.</span>
+			<<else>>
+				<<set _rightOptions to "struggle">>
+				<<switch $rightarmstate>>
+					<<case "mouth_struggle">>
+						<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔로 당신의 입 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "penis_struggle">>
+						<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔로 당신의 <<penis>> 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "vagina_struggle">>
+						<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔로 당신의 <<pussy>> 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "anus_struggle">>
+						<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔로 당신의 <<bottom>> 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>【을를】 꽉 쥐고 있다.</span>
+					<<case "chest_struggle">>
+						<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔로 당신의 가슴 위에 있는 <<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【을를】 꽉 쥐고 있다.</span>
+				<</switch>>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "bound">>
+			<<set _rightOptions to "bound">>
+			<<if $orgasmdown gte 1>>
+				<span class="lewd">오른팔이 결박에서 벗어나려 꿈틀거린다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<span class="red">오른팔이 고통스럽게 결박되어 있다.</span>
+			<<elseif $dissociation gte 2>>
+				<span class="pink">오른팔이 결박된 채 축 늘어져 있다.</span>
+			<<else>>
+				<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔이 결박되어 있다.</span>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "trapped">>
+			<<set $_changetype to true>><<rightActionInitVore>>
+		<<case "grappled" "penis" "othervagina" "vagina" "coverpenis" "anus" "behind">>
+			<<set $_changetype to true>><<rightActionInit>>
+		<<case "swarmgrappled">>
+			<<set $_changetype to true>><<rightActionInitSwarm>>
+		<<case "mechgrappled">>
+			<<set $_changetype to true>><<rightActionInitMachine>>
+		<<default>>
+			<<set $_changetype to true>><<rightActionInitTentacle>>
+	<</switch>>
+	<<if $_changetype isnot true>>
+		<<rightActionsStruggle>>
+		<<if Object.keys(_rightaction).length gt 0>>
+			<<if Object.values(_rightaction).includes($rightactiondefault)>>
+				<<set $rightaction to $rightactiondefault>>
+			<</if>>
+			<<generateCombatAction _rightaction "rightaction" "버둥거린다">>
+			<<if $options.combatControls.includes("ists")>>
+				<div id="rightactionDifficulty">
+					<<rightactionDifficulty>>
+				</div>
+			<</if>>
+		<</if>>
+		<<set $lastOptions.right to clone(_rightOptions)>>
+	<</if>>
+<</widget>>
+
+<<widget "rightactionDifficultyStruggle">>/* It's a necessary evil. */
+	<!-- Does nothing. todo: investigate why combatButtonAdjustments() needs this -->
+<</widget>>
+
+<<widget "rightActionsStruggle">>
+	<<set _rightaction to {}>>
+	<<switch _rightOptions>>
+		<<case "free" "struggle">>
+			<<set _rightaction["오른팔을 가만히 둔다"] to "rest">>
+			<<if _lurker_net_possible is true>>
+				<<set _rightaction["그물을 던진다"] to "capture">>
+			<</if>>
+			<<set _rightaction["방어한다"] to "guard">>
+			<<rightclothesnew>>
+
+			<<if not $options.combatControls.includes("adio")>>
+				<<for $_part range ["mouth", "vagina", "penis", "anus", "chest"]>>
+					<<if V[$_part + 'use'] is "struggle" and $struggle[$_part].creature>>
+						<<set $_desc to ($rightactiondefault.includes($_part) ? '' : ' (' + {mouth:'입', vagina:'보지', penis:'자지', anus:'항문', chest:'가슴'}[$_part] + ')')>>
+						<<if $rightactiondefault.includes($_part) and $struggle[$_part].grip gt 0>>
+							<!-- require hand on the creature before pulling or strengthening -->
+							<<if $struggle[$_part].success lt 100>>
+								<<set _rightaction["붙잡는 힘을 강화한다"] to $_part + '_strengthen'>>
+							<</if>>
+							<<set _rightaction["당긴다"] to $_part + '_pull'>>
+						<<elseif $struggle[$_part].success lt 100>>
+							<<set _rightaction['꽉 쥔다' + $_desc] to $_part + '_grasp'>>
+						<</if>>
+						<<if $spray gte 1 and $consensual isnot 1>>
+							<<set _rightaction['스프레이를 뿌린다' + $_desc] to $_part + '_spray'>>
+						<</if>>
+						<<set _rightaction['문지른다' + $_desc] to $_part + '_stroke'>>
+					<</if>>
+				<</for>>
+			<</if>>
+		<<case "bound">>
+		<<case "orgasm">>
+			<<set _rightaction["접는다"] to "rightfold">>
+			<<set _rightaction["움켜쥔다"] to "rightgrip">>
+		<<case "pain">>
+			<<set _rightaction["버둥거린다"] to "rightstruggleweak">>
+			<<set _rightaction["보호한다"] to "rightprotect">>
+		<<case "unreal">>
+			<<set _rightaction["자신을 찌른다"] to "rightpoke">>
+			<<set _rightaction["팔을 치워둔다"] to "rightcurl">>
+	<</switch>>
+<</widget>>
+
+<<widget "feetActionInitStruggle">>
+	<<set $feettarget to "struggle">>
+	<<switch $feetuse>>
+		<<case 0>>
+			<<if _targetYourself is true and _targetnumber gt 1>>
+				<<set _targetlistall["자신"] to "self">>
+			<</if>>
+			<<if not $options.combatControls.includes("adio") and _targetnumber gt 1>>
+				<<if ($leftleg is "grappled" and $rightleg is "grappled") or ($leftleg is "bound" and $rightleg is "bound")>>
+				<<else>>
+					<<targetListBox "feet" _targetlistall>>
+				<</if>>
+			<</if>>
+			<<if $leftleg is 0 and $rightleg is 0>>
+				<<set _feetOptions to "free">>
+				<span @class="($lastOptions.feet isnot _feetOptions ?'gold':'')">발이 자유롭다.</span>
+			<<elseif $leftleg is 0>>
+				<<set _feetOptions to "leftfree">>
+				<span @class="($lastOptions.feet isnot _feetOptions ?'gold':'')">왼쪽 다리가 자유롭다.</span>
+			<<elseif $rightleg is 0>>
+				<<set _feetOptions to "rightfree">>
+				<span @class="($lastOptions.feet isnot _feetOptions ?'gold':'')">오른쪽 다리가 자유롭다.</span>
+			<<elseif $leftleg is "grappled" and $rightleg is "grappled">>
+				<<set $_changetype to true>><<feetActionInitTentacle>>
+			<<elseif $leftleg is "bound" and $rightleg is "bound">>
+				<<set $_changetype to true>><<feetActionInitTentacle>>
+			<<else>>
+				<<set _feetOptions to "free">>
+				<span @class="($lastOptions.feet isnot _feetOptions or _feetGold is true ?'gold':'')">발이 자유롭다.</span>
+			<</if>>
+			<<if $options.combatControls.includes("adio") and _targetnumber gt 1 and _feetOptions.toLowerCase().includes("free")>>
+				<<targetListBox "feet" _targetlistall>>
+			<</if>>
+			<<if _targetnumber is 1>>
+				<<set $feettarget to _firsttarget>>
+			<</if>>
+			<<if $options.combatControls is "radio">><br><</if>>
+		<<case "penis" "othervagina" "bound" "walk" "run" "strut" "none">>
+			<<set $_changetype to true>><<feetActionInit>>
+		<<case "mechgrappled">>
+			<<set $_changetype to true>><<feetActionInitMachine>>
+		<<default>>
+			<<set $_changetype to true>><<feetActionInitTentacle>>
+	<</switch>>
+	<<if $_changetype isnot true>>
+		<<feetActionsStruggle>>
+		<<if Object.keys(_feetaction).length gt 0>>
+			<<if !(Object.values(_feetaction).includes($feetactiondefault))>>
+				<<set $feetactiondefault to "rest">>
+			<</if>>
+			<<set $feetaction to $feetactiondefault>>
+			<<generateCombatAction _feetaction "feetaction" "버둥거린다">>
+			<<if $options.combatControls.includes("ists")>>
+				<div id="feetactionDifficulty">
+					<<feetactionDifficulty>>
+				</div>
+			<</if>>
+		<</if>>
+		<<set $lastOptions.feet to clone(_feetOptions)>>
+	<</if>>
+<</widget>>
+
+<<widget "feetactionDifficultyStruggle">>/* "How so", you ask? */
+	<!-- Does nothing -->
+<</widget>>
+
+<<widget "feetActionsStruggle">>
+	<<set _feetaction to {}>>
+	<<set _feetaction["가만히 있는다"] to "rest">>
+	<<set _feetaction["피한다"] to "evade">>
+	<<set _feetaction["버틴다"] to "plant">>
+<</widget>>
+
+<<widget "mouthActionInitStruggle">>
+	<<if $orgasmdown gte 1>>
+		<<mouthActionInit>>
+	<<elseif $pain gte 100 and $willpowerpain is 0>>
+		<<mouthActionInit>>
+	<<elseif $dissociation gte 2>>
+		<<mouthActionInit>>
+	<<else>>
+		<<set $mouthtarget to "struggle">>
+		<<switch $mouthuse>>
+			<<case "struggle">>
+				<span @class="($lastOptions.mouth isnot _mouthOptions or _mouthGold is true ?'gold':'')"><<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【이가】 당신의 얼굴에 달라붙어 있다.</span>
+				<<if $leftarmstate is "mouth_struggle" and $rightarmstate is "mouth_struggle">>
+					당신은 두 손으로 그것을 꽉 잡고 있다.
+				<<elseif $leftarmstate is "mouth_struggle">>
+					당신은 왼손으로 그것을 꽉 잡고 있다.
+				<<elseif $rightarmstate is "mouth_struggle">>
+					당신은 오른손으로 그것을 꽉 잡고 있다.
+				<</if>>
+				<<if $options.combatControls is "radio">><br><</if>>
+			<<case "tentacle">>
+				<<set $_changetype to true>><<mouthActionInitTentacle>>
+			<<default>>
+				<<set $_changetype to true>><<mouthActionInit>>
+		<</switch>>
+		<<if $_changetype isnot true>>
+			<<set _mouthaction to {}>>
+			<<if $mouthstate is "struggle" and !$worn.face.type.includes("face_covering") and !$worn.face.type.includes("gag")>>
+				<<set _mouthaction["다물고 있는다"] to "rest">>
+				<<set _mouthaction["벌린다"] to "open">>
+			<<elseif $worn.face.type.includes("face_covering") or $worn.face.type.includes("gag")>>
+				<<set _mouthaction["쉰다"] to "rest">>
+			<<elseif $mouthstate is "struggle_pen">>
+				<<set _mouthaction["쉰다"] to "rest">>
+				<<set _mouthaction["빤다"] to "suck">>
+				<<if $consensual isnot 1>>
+					<<set _mouthaction["깨문다"] to "bite">>
+				<</if>>
+			<</if>>
+			<<if Object.keys(_mouthaction).length gt 0>>
+				<<if !(Object.values(_mouthaction).includes($mouthactiondefault))>>
+					<<if !["open", "suck", "bite"].includes($mouthactiondefault)>>
+						<<set $mouthactiondefault to "rest">>
+					<</if>>
+				<</if>>
+				<<set $mouthaction to $mouthactiondefault>>
+				<<if $options.combatControls.includes("adio")>>
+				<span>입:
+					<<generateCombatAction _mouthaction "mouthaction" "버둥거린다">>
+				</span>
+				<<else>>
+					<<generateCombatAction _mouthaction "mouthaction" "버둥거린다">>
+				<</if>>
+
+				<<if $options.combatControls.includes("ists")>>
+					<div id="mouthactionDifficulty">
+						<<mouthactionDifficulty>>
+					</div>
+				<</if>>
+			<</if>>
+			<<if $options.combatControls is "radio">>
+				<<handsActionsStruggleRadio "mouth">>
+			<</if>>
+			<<if $options.combatControls is "columnRadio">>
+				<<handsActionsStruggleColumnRadio "mouth">>
+			<</if>>
+			<<set $lastOptions.mouth to clone(_mouthOptions)>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "mouthactionDifficultyStruggle">>/* Simply put, there's a JavaScript macro that needs it. */
+	<!-- Does nothing -->
+<</widget>>
+
+<<widget "penisActionInitStruggle">>
+	<<set $penistarget to "struggle">>
+	<<if $dissociation lte 1 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined)>>
+		<<switch $penisstate>>
+			<<case "struggle" "struggle_pen">>
+				<span @class="(_gold_penis ? 'gold' : '')"><<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 배에 달라붙어, 당신의 <<penisSimple>>【을를】 위협한다.</span>
+				<<if $leftarmstate is "penis_struggle" and $rightarmstate is "penis_struggle">>
+					당신은 그것을 양손으로 움켜쥔다.
+				<<elseif $leftarmstate is "penis_struggle">>
+					당신은 그것을 왼손으로 움켜쥔다.
+				<<elseif $rightarmstate is "penis_struggle">>
+					당신은 그것을 오른손으로 움켜쥔다.
+				<</if>>
+			<<case "tentacleentrance" "tentacleimminent" "tentacle" "tentacledeep" "tentaclerub">>
+				<<set $_changetype to true>><<penisActionInitTentacle>>
+			<<default>>
+				<<set $_changetype to true>><<penisActionInit>>
+		<</switch>>
+		<<if $_changetype isnot true and $options.combatControls is "radio">>
+			<<handsActionsStruggleRadio penis>>
+		<</if>>
+		<<if $_changetype isnot true and $options.combatControls is "columnRadio">>
+			<<handsActionsStruggleColumnRadio penis>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "vaginaActionInitStruggle">>
+	<<set $vaginatarget to "struggle">>
+	<<switch $vaginastate>>
+		<<case "struggle" "struggle_pen">>
+			<span @class="(_gold_vagina ? 'gold' : '')"><<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【이가】 당신의 골반에 매달려, 당신의 보지를 위협한다.</span>
+			<<if $leftarmstate is "vagina_struggle" and $rightarmstate is "vagina_struggle">>
+				당신은 두 손으로 그것을 움켜쥔다.
+			<<elseif $leftarmstate is "vagina_struggle">>
+				당신은 왼손으로 그것을 움켜쥔다.
+			<<elseif $rightarmstate is "vagina_struggle">>
+				당신은 오른손으로 그것을 움켜쥔다.
+			<</if>>
+		<<case "tentacleentrance" "tentacleimminent" "tentacle" "tentacledeep" "tentaclerub">>
+			<<set $_changetype to true>><<vaginaActionInitTentacle>>
+		<<default>>
+			<<set $_changetype to true>><<vaginaActionInit>>
+	<</switch>>
+	<<if $_changetype isnot true and $options.combatControls is"radio">>
+		<<handsActionsStruggleRadio "vagina">>
+	<</if>>
+	<<if $_changetype isnot true and $options.combatControls is "columnRadio">>
+		<<handsActionsStruggleColumnRadio "vagina">>
+	<</if>>
+<</widget>>
+
+<<widget "anusActionInitStruggle">>
+	<<set $anustarget to "struggle">>
+	<<if $bottomuse is "mouth" or $bottomuse is "penis">>
+		<<set $_changetype to true>><<anusActionInit>>
+	<<else>>
+		<<switch $anusstate>>
+			<<case "struggle" "struggle_pen">>
+				<span @class="(_gold_anus ? 'gold' : '')"><<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>【이가】 당신의 엉덩이에 매달려 있다.</span>
+				<<if $leftarmstate is "anus_struggle" and $rightarmstate is "anus_struggle">>
+					당신은 양손으로 그것을 움켜쥔다.
+				<<elseif $leftarmstate is "anus_struggle">>
+					당신은 왼손으로 그것을 움켜쥔다.
+				<<elseif $rightarmstate is "anus_struggle">>
+					당신은 오른손으로 그것을 움켜쥔다.
+				<</if>>
+			<<case "tentacleentrance" "tentacleimminent" "tentacle" "tentacledeep" "tentaclerub">>
+				<<set $_changetype to true>><<anusActionInitTentacle>>
+			<<default>>
+				<<set $_changetype to true>><<anusActionInit>>
+		<</switch>>
+	<</if>>
+	<<if $_changetype isnot true and $options.combatControls is "radio">>
+		<<handsActionsStruggleRadio "anus">>
+	<</if>>
+	<<if $_changetype isnot true and $options.combatControls is "columnRadio">>
+		<<handsActionsStruggleColumnRadio "anus">>
+	<</if>>
+<</widget>>
+
+<<widget "chestActionInitStruggle">>
+	<<switch $chestuse>>
+		<<case "struggle">>
+			<span @class="(_gold_chest ? 'gold' : '')"><<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【이가】 당신의 가슴에 매달려 있다.</span>
+			<<if $leftarmstate is "chest_struggle" and $rightarmstate is "chest_struggle">>
+				당신은 두 손으로 그것을 움켜쥔다.
+			<<elseif $leftarmstate is "chest_struggle">>
+				당신은 왼손으로 그것을 움켜쥔다.
+			<<elseif $rightarmstate is "chest_struggle">>
+				당신은 오른손으로 그것을 움켜쥔다.
+			<</if>>
+		<<case "tentaclerub">>
+			<<set $_changetype to true>><<chestActionInitTentacle>>
+		<<case "penis">>
+			<<set $_changetype to true>><<chestActionInit>>
+	<</switch>>
+	<<if $_changetype isnot true and $options.combatControls is "radio">>
+		<<handsActionsStruggleRadio "chest">>
+	<</if>>
+	<<if $_changetype isnot true and $options.combatControls is "columnRadio">>
+		<<handsActionsStruggleColumnRadio "chest">>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_actions">>
+	<<if !($struggle.mouth.progress gte 6 and $struggle.mouth.progress lte 14) and !$underwater>>
+		<<oxygen 50>>
+	<</if>>
+
+	<<willpowerpain>>
+	<<willpowerorgasm>>
+	<<actioncarry>>
+	<<actioncarrydrop>>
+
+	<<combatstate>>
+	<<carryblock>>
+
+	<<if $trance lte 0 and $panicparalysis is 0 and $panicviolence is 0 and $options.combatControls isnot "radio_old">>
+		<<struggle_difficulty_set>>
+		<<if $options.combatControls.includes("adio")>>
+			<<set $leftaction to $leftactiondefault>>
+			<<set $rightaction to $rightactiondefault>>
+		<</if>>
+		<<generateActionsStruggle>>
+	<</if>>
+
+	<<if $trance lte 0 and $dissociation lte 1 and $panicparalysis is 0 and $panicviolence is 0
+	and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined) and $options.combatControls is "radio_old">>
+		<<struggle_difficulty_set>>
+		<!-- arms bound set -->
+		<<if $leftarm is "bound" and $rightarm is "bound">>
+			<span class="pink">당신의 팔이 무력하게 묶여, 무방비 상태가 된다.</span>
+		<<elseif $leftarm is "grappled" and $rightarm is "grappled">>
+			<span class="pink">당신의 팔이 붙잡혀, 무방비 상태가 된다.</span>
+		<<elseif $leftarm is "grappled" or $leftarm is "bound">>
+			<span class="purple">당신의 왼팔이 붙잡혔다.</span>
+		<<elseif $rightarm is "grappled" or $rightarm is "bound">>
+			<span class="purple">당신의 오른팔이 붙잡혔다.</span>
+		<<else>>
+			당신의 팔은 자유롭다.
+		<</if>>
+		<!-- arms line -->
+		<<set $leftaction to $leftactiondefault>>
+		<<if $leftarm isnot "grappled" and $leftarm isnot "bound">>
+			<label><span class="meek">왼팔을 가만히 둔다</span> <<radiobutton "$leftaction" "rest" autocheck>></label>
+			<<set _pipe to 1>>
+		<</if>>
+		<<set $rightaction to $rightactiondefault>>
+		<<if $rightarm isnot "grappled" and $rightarm isnot "bound">>
+			<<if _pipe>>| <</if>><label><span class="meek">오른팔을 가만히 둔다</span> <<radiobutton "$rightaction" "rest" autocheck>></label>
+		<</if>>
+		<<set _pipe to 0>>
+		<br>
+		<!-- feet line -->
+		<<set $feetaction to $feetactiondefault>>
+		<<if $feetuse is 0>>
+			당신의 발은 자유롭다.
+			<<set $feetaction to $feetactiondefault>>
+			<label><span class="meek">가만히 있는다</span> <<radiobutton "$feetaction" "rest" autocheck>></label>
+			| <label><span class="meek">피한다</span> <<radiobutton "$feetaction" "evade" autocheck>></label>
+			| <label><span class="meek">버틴다</span> <<radiobutton "$feetaction" "plant" autocheck>></label>
+		<</if>>
+		<br>
+		<hr>
+		<!-- attached lurkers -->
+		<!-- mouth -->
+		<<if $mouthuse is "struggle" and $struggle.mouth.creature>>
+			<<struggle_name "mouth">>【이가】 당신의 얼굴에 매달려 있다.
+			<br>
+			<span>
+			입:
+			<<if $mouthstate is "struggle">>
+				<<set $mouthaction to ($mouthactiondefault is "open" ? "open" : "rest")>>
+				<label>다물고 있는다 <<radiobutton "$mouthaction" "rest" autocheck>></label>
+				| <label><span class="sub">벌린다</span> <<radiobutton "$mouthaction" "open" autocheck>></label>
+			<<elseif $mouthstate is "struggle_pen">>
+				<<if $mouthactiondefault is "suck" or ($consensual isnot 1 and $mouthactiondefault is "bite")>>
+					<!-- all is good -->
+				<<else>>
+					<<set $mouthactiondefault to "rest">>
+				<</if>>
+				<<set $mouthaction to $mouthactiondefault>>
+				<label>쉰다 <<radiobutton "$mouthaction" "rest" autocheck>></label>
+				| <label><span class="sub">빤다</span> <<radiobutton "$mouthaction" "suck" autocheck>></label>
+				<<if $consensual isnot 1>>
+					| <label><span class="def">깨문다</span> <<radiobutton "$mouthaction" "bite" autocheck>></label>
+				<</if>>
+			<</if>>
+			</span>
+		<<if $options.combatControls is "radio">>
+			<br>
+			<hr>
+			<<handsActionsStruggleRadio "mouth">>
+		<<elseif $options.combatControls is "columnRadio">>
+			<<handsActionsStruggleColumnRadio "mouth">>
+		<</if>>
+		<</if>>
+		<!-- the rest of it -->
+		<<for _part range ["vagina", "penis", "anus", "chest"]>>
+			<<if V[_part + 'use'] is "struggle">>
+				<<struggle_name _part>>【이가】 당신의 <<struggle_region _part>>에 매달려 있다<<if ["vagina", "penis"].includes(_part)>>. 그곳에서 당신의 <<struggle_bodypart _part>>【을를】 위협한다<</if>>.
+				<br>
+				<<if $options.combatControls is "radio">>
+				<<handsActionsStruggleRadio _part>>
+				<hr>
+					<<elseif $options.combatControls is "columnRadio">>
+				<<handsActionsStruggleColumnRadio _part>>
+				<</if>>
+
+			<</if>>
+		<</for>>
+
+		<!-- distant lurkers -->
+		<<set _dlurkers to []>>
+		<<for _i to 0; _i lt $struggle.number; _i++>>
+			<<if $struggle.enemy[_i].location is "fleeing" or $struggle.enemy[_i].location is "lurking">>
+				<<set _dlurkers.push(_i)>>
+			<</if>>
+		<</for>>
+		<<if _dlurkers.length gt 0>>
+			<<for _i to _dlurkers.length - 1; _i gte 0; _i-->>
+				<<struggle_name _dlurkers[_i]>><<if _i gte 2>>, <<elseif _i is 1>> 그리고 <</if>>
+			<</for>>
+			거리를 유지하고 있다.
+			<<if $farm_stage gte 10 and $lurkers_held lt 1>>
+				<<if $leftarm isnot "grappled" and $leftarm isnot "bound">>
+					<br>
+					왼팔: <label><span class="def">그물을 던진다</span> <<radiobutton "$leftaction" "capture" autocheck>></label>
+				<</if>>
+				<<if $rightarm isnot "grappled" and $rightarm isnot "bound">>
+					<br>
+					오른팔: <label><span class="def">그물을 던진다</span> <<radiobutton "$rightaction" "capture" autocheck>></label>
+				<</if>>
+			<</if>>
+			<br>
+			<hr>
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<setupMidOrgasm>>
+<</widget>>
+
+<<widget "handsActionsStruggleRadio">>
+	<<set _hpart to _args[0]>>
+	<<set V[_hpart + 'target'] to "struggle">>
+	<<if V[_hpart + 'use'] is "struggle">>
+		<br>
+		<<for _hhand range ["left", "right"]>>
+			<<if ["free", "struggle"].includes(_leftOptions)>>
+				<<print (_hhand is "left" ? "왼쪽" : "오른쪽")>> 팔:
+				<<if V[_hhand + 'actiondefault'].includes(_hpart) and $struggle[_hpart].grip gte 1>>
+					<!-- require hand on the creature before pulling or strengthening -->
+					<<if $struggle[_hpart].success lt 100>>
+						<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_strengthen'` autocheck>> <span class="brat">붙잡는 힘을 강화한다</span></label> |
+					<</if>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_pull'` autocheck>> <span class="def">당긴다</span></label> |
+				<<elseif $struggle[_hpart].success lt 100>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_grasp'` autocheck>> <span class="brat">꽉 쥔다</span></label> |
+				<</if>>
+				<<if $spray gte 1 and !$consensual>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_spray'` autocheck>> <span class="def">스프레이를 뿌린다</span></label> |
+				<</if>>
+				<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_stroke'` autocheck>> <span class="sub">문지른다</span></label> |
+			<</if>>
+			<br>
+		<</for>>
+	<</if>>
+<</widget>>
+
+<<widget "handsActionsStruggleColumnRadio">>
+	<<set _hpart to _args[0]>>
+	<<set V[_hpart + 'target'] to "struggle">>
+	<<if V[_hpart + 'use'] is "struggle">>
+		<span>
+		<<for _hhand range ["left", "right"]>>
+			<<if ["free", "struggle"].includes(_leftOptions)>>
+				<span><<print (_hhand is "left" ? "왼쪽" : "오른쪽")>> 팔: </span>
+				<<if V[_hhand + 'actiondefault'].includes(_hpart) and $struggle[_hpart].grip gte 1>>
+					<!-- require hand on the creature before pulling or strengthening -->
+					<<if $struggle[_hpart].success lt 100>>
+						<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_strengthen'` autocheck>> <span class="brat">붙잡는 힘을 강화한다</span></label> |
+					<</if>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_pull'` autocheck>> <span class="def">당긴다</span></label> |
+				<<elseif $struggle[_hpart].success lt 100>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_grasp'` autocheck>> <span class="brat">꽉 쥔다</span></label> |
+				<</if>>
+				<<if $spray gte 1 and !$consensual>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_spray'` autocheck>> <span class="def">스프레이를 뿌린다</span></label> |
+				<</if>>
+				<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_stroke'` autocheck>> <span class="sub">문지른다</span></label>
+			<</if>>
+			<br>
+		<</for>>
+		</span>
+	<</if>>
+<</widget>>
+
+<<widget "handsActionsStruggleRadiobkp">>
+	<<set _hpart to _args[0]>>
+	<<set V[_hpart + 'target'] to "struggle">>
+	<<if V[_hpart + 'use'] is "struggle">>
+		<br>
+		<<for _hhand range ["left", "right"]>>
+			<<if V[_hhand + 'arm'] isnot "bound" and !(V[_hhand + 'arm'] and V[_hhand + 'arm'].includes("grappled"))>>
+				<<print (_hhand is "left" ? "왼쪽" : "오른쪽")>> 팔:
+				<<if $struggle[_hpart].success lt 100>>
+					<<if !V[_hhand + 'armstate'].includes(_hpart)>>
+						<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_grasp'` autocheck>> <span class="brat">꽉 쥔다</span></label> |
+					<<else>>
+						<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_strengthen'` autocheck>> <span class="brat">붙잡는 힘을 강화한다</span></label> |
+					<</if>>
+				<</if>>
+				<<if $struggle[_hpart].grip gte 1>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_pull'` autocheck>> <span class="def">당긴다</span></label> |
+				<</if>>
+				<<if $spray gte 1 and !$consensual>>
+					<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_spray'` autocheck>> <span class="def">스프레이를 뿌린다</span></label> |
+				<</if>>
+				<label><<radiobutton `'$' + _hhand + 'action'` `_hpart + '_stroke'` autocheck>> <span class="sub">문지른다</span></label> |
+			<</if>>
+			<br>
+		<</for>>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_effects">>
+	<<pain -0.25>>
+
+	<<if $trance gte 1 or $dissociation gte 2>>
+		<<if $position is "stalk">>
+			당신은 멍한 상태로 헤매며, 주위 상황을 인지하지 못한다.
+		<<else>>
+			당신은 앞만 멍하니 바라보고, 몸은 저항할 의지 없이 그저 순종한다.
+		<</if>>
+	<</if>>
+
+	<<if $underwater is 1>>
+		<<set $underwatertime += 1>>
+		<<if $underwatertime lte 5>>
+			당신은 물속에 있어서 말을 할 수 없다.
+		<<elseif $underwatertime lte 10>>
+			<span class="blue">당신은 물속에 있어서 숨을 쉴 수 없다.</span>
+			<<gstress>><<stress 1>>
+		<<elseif $underwatertime lte 15>>
+			<span class="purple">당신은 물속에 있어서 숨을 쉴 수 없다.</span>
+			<<gstress>><<stress 2>>
+		<<elseif $underwatertime lte 20>>
+			<span class="pink">당신은 물속에 있고 숨이 점점 차오른다.</span>
+			<<gtrauma>><<gstress>><<stress 4>><<trauma 2>>
+		<<else>>
+			<span class="red">당신은 물속에서 질식하고 있다.</span>
+			<<pain 20 1>><<gtrauma>><<gstress>><<gpain>><<stress 6>><<trauma 4>>
+			<br><br>
+		<</if>>
+	<</if>>
+
+	<<effectspain>>
+	<<effectsorgasm>>
+	<<effectsdissociation>>
+
+	<!-- MOUTH -->
+	<<if $mouthaction is "rest">>
+		<!-- nothing to do. add some flavour text maybe? -->
+	<<elseif $mouthaction is "open" and $mouthstate is "struggle">>
+		<<set $mouthactiondefault to "suck">>
+		당신은 그것이 들어올 수 있도록 입을 크게 벌린다.
+		<<set _mouthOpen to true>>
+		<<if $struggle.mouth.progress gte 1 and $struggle.mouth.progress lte 3>>
+			<<set $struggle.mouth.progress to 4>><<submission 1>>
+		<</if>>
+	<<elseif $mouthaction is "suck" and $mouthstate is "struggle_pen">>
+		당신은 <<struggle_name mouth>>의 <<struggle_appendage mouth>>【을를】 빨아들인다<<if $struggle.mouth.progress gte 8>>, 더 많은 달콤한 체액이 목구멍으로 넘어가게 만들면서<</if>>.
+		<<neutral 5 "mouth">><<struggle_fluid mouth>><<purity -1>><<internalejac>><<bodyliquid "mouth" "goo">><<submission 2>>
+		<<if $struggle.mouth.progress gt 7 and $struggle.mouth.progress lt 13>>
+			<<set $struggle.mouth.progress += 1>>
+		<</if>>
+	<<elseif $mouthaction is "bite" and $mouthstate is "struggle_pen">>
+		<<if $transformationParts.traits.fangs isnot "disabled">>
+			<<set _rng to random(1, 5)>>
+			<<switch _rng>>
+				<<case 1>>
+					당신은 송곳니로 <<struggle_name mouth>>의 <<struggle_appendage mouth>>【을를】 깨문다.
+				<<case 2>>
+					당신의 송곳니가 <<struggle_name mouth>>의 <<struggle_skin mouth>> 깊숙이 박힌다.
+				<<case 3>>
+					당신의 송곳니가 <<struggle_name mouth>>의 <<struggle_skin mouth>>【을를】 갈가리 찢어발긴다.
+				<<case 4>>
+					당신의 송곳니가 <<struggle_name mouth>>의 <<struggle_skin mouth>>【을를】 꿰뚫는다.
+				<<default>>
+					당신의 송곳니가 <<struggle_name mouth>>의 <<struggle_skin mouth>>【을를】 꿰뚫어 버린다.
+			<</switch>>
+			<span class="green">그것이 당신의 얼굴에서 떨어져 나간다.</span>
+			<<set $mouthuse to 0>>
+			<<set $mouthstate to 0>>
+			<<struggle_part_init "mouth">>
+			<<set $struggle.warded += 1>>
+			<<defiance 2>> <<control 5>>
+			<<struggleClearActions "mouth_">>
+			<br>
+		<<else>>
+			<<set _rng to random(1, 5)>>
+			<<switch _rng>>
+				<<case 1>>
+					아무리 세게 그것의 <<struggle_appendage mouth>>【을를】 깨물려 해도, <span class="red">그것은 반응하지 않는다.</span>
+				<<case 2>>
+					당신이 깨물어 보지만, <<struggle_name mouth>>의 <<struggle_skin mouth>>【을를】 뚫기엔 <span class="red">당신의 이빨이 역부족이다.</span>
+				<<case 3>>
+					당신이 깨물어 보지만, <<struggle_name mouth>>의 질긴 <<struggle_skin mouth>>【을를】 뚫기엔 <span class="red">당신의 이빨이 역부족이다.</span>
+				<<case 4>>
+					<<struggle_name mouth>>의 질긴 <<struggle_skin mouth>>【을를】 깨물어 보지만, <span class="red">반응을 끌어내기엔 충분치 않다.</span>
+				<<default>>
+					당신은 강하게 깨물어 보지만, <<struggle_name mouth>>의 <<struggle_skin mouth>>에 <span class="red">당신의 이빨이 제대로 박히지 않는다.</span>
+			<</switch>>
+			<<defiance 1>>
+		<</if>>
+	<</if>>
+	<<if !$carryblock>>
+		<<set $mouthactiondefault to ($mouthaction is "bite" ? "rest" : $mouthaction)>>
+		<<set $mouthaction to 0>>
+	<</if>>
+
+	<!-- FEET -->
+	<<set _grip_strength to currentSkillValue('physique') / 20 + currentSkillValue("handskill")>>
+	<<if $feetaction is "rest">>
+		<<unset $dodging>>
+		당신은 다리를 가만히 둔다.
+	<<elseif $feetaction is "evade">>
+		<<set $dodging to 1>>
+		<<if $underwater is 1 or ["sea","lake"].includes($location)>>
+			당신은 다리의 긴장을 풀고 몸을 띄우며, 다가오는 공격을 피할 준비를 한다.
+		<<else>>
+			당신은 발놀림을 가볍게 유지하며, 다가오는 공격을 피할 준비를 한다.
+		<</if>>
+	<<elseif $feetaction is "plant">>
+		<<unset $dodging>>
+		<<set _grip_strength += currentSkillValue("feetskill")>>
+		<<if $underwater is 1 or ["sea","lake"].includes($location)>>
+			당신은 물장구를 치며, 안정적으로 중심을 잡는다.
+		<<else>>
+			당신은 두 발을 단단히 딛고 버틴다.
+		<</if>>
+		<<feetskilluse>>
+	<</if>>
+	<<if !$carryblock>>
+		<<set $feetactiondefault to ($feetaction ? $feetaction : "rest")>>
+		<<set $feetaction to 0>>
+	<</if>>
+
+	<!-- HANDS -->
+	<<set _actionPriority = ["rest", "stroke", "grasp", "strengthen", "pull", "spray"]>>
+	<<set _hands = [{id: "left", handaction: $leftaction},{id: "right", handaction: $rightaction}]
+		.map(h => {
+			let [,part, action] = /(?:([^_]+)_)?(.*)/.exec(h.handaction);
+			return Object.assign(h, {part, action});
+		}).sort((a,b) => _actionPriority.indexOf(a.action) - _actionPriority.indexOf(b.action))
+	>>
+	<<for _i, _handObj range _hands>>
+	<!-- iterate once per hand, unless $leftaction is $rightaction, in which case do stuff for the other hand immediately and <<break>> -->
+		/* <<set {id: _hand, part: _actionpart, action: _action} = _Hand>> */
+		<<set _hand = _handObj.id, _actionpart = _handObj.part, _action = _handObj.action>>
+		<<set _otherHand to _hands[1-_i].id>>
+		<<if !_action or V[_hand + "action"] is 0>><<continue>><</if>>
+		<<if _action.includes("upper") or _action.includes("lower") or _action.includes("mask")>><<set _action to "clothes">><</if>>
+		<<set _gripped to _grip_strength gte random(2000)>>
+		<!-- _grip_strength is set above in the FEET section -->
+		<<switch _action>>
+			<<case "rest">>
+				/* nothing to do */
+			<<case "stroke">>
+				<<if _actionpart is "mouth">>
+					당신은 안심시키려는 듯이, <<struggle_name _actionpart>>【을를】 쓰다듬는다.
+				<<else>>
+					당신은 흥분시키려는 듯이, <<struggle_name _actionpart>>의 <<struggle_appendage _actionpart>>【을를】 쓰다듬는다.
+					<<if $struggle[_actionpart].progress gt 7 and $struggle[_actionpart].progress lt (_actionpart is "chest" ? 12 : 13)>>
+						<<set $struggle[_actionpart].progress++>>
+						<<bodyliquid _actionpart "goo">>
+						<<if ["vagina", "anus"].includes(_actionpart)>>
+							<<struggle_fluid _actionpart>>
+							<<purity -1>>
+							<<internalejac>>
+						<</if>>
+					<</if>>
+				<</if>>
+				<br>
+				<<neutral 5>><<submission 2>>
+
+				<<set V[_hand + 'arm'] to "struggle">>
+				<<set V[_hand + 'armstate'] to _actionpart + '_struggle'>>
+				<<if $leftaction is $rightaction>>
+					<<set V[_otherHand + "armstate"] to _actionpart + '_struggle'>>
+					<<set V[_otherHand + "arm"] to "struggle">>
+					<<submission 2>>
+					<<break>>
+				<</if>>
+			<<case "grasp">>
+				당신은 <<struggle_region _actionpart>>에 매달려 있는 <<print window.KR.getCreatureTypeKr($struggle[_actionpart].creature)>>에 <<if $leftaction is $rightaction>>양손을<<else>><<print _hand is "left" ? "왼손" : "오른손">><</if>> 뻗어 보지만, 움켜쥘 곳을 찾기 어렵다.
+				<<set V[_hand + 'arm'] to "struggle">>
+				<<set V[_hand + 'armstate'] to _actionpart + '_struggle'>>
+				<<set $struggle[_actionpart].grip += 1 + _gripped>>
+				<<set V[_hand + 'action'] to _actionpart + '_strengthen'>>
+			<<case "strengthen">>
+				당신은 <<struggle_region _actionpart>>에 매달려 있는 <<print window.KR.getCreatureTypeKr($struggle[_actionpart].creature)>>【을를】 <<if $leftaction is $rightaction>> 양손으로<</if>> 더 세게 움켜쥔다.
+				<<set V[_hand + 'arm'] to "struggle">>
+				<<set V[_hand + 'armstate'] to _actionpart + '_struggle'>>
+				<<if _gripped>>
+					당신의 장악력이 <span class="teal">훨씬 더 나아진다.</span>
+					<<set $struggle[_actionpart].grip += 2>>
+				<<else>>
+					당신의 장악력이 <span class="blue">조금 나아진다.</span>
+					<<set $struggle[_actionpart].grip += 1>>
+				<</if>>
+				<br>
+				<<handskilluse>>
+
+				<<if $leftaction is $rightaction and _i == 0>>
+					<<set $struggle[_actionpart].grip += 1 + _gripped>>
+					<<set V[_otherHand + "arm"] to "struggle">>
+					<<set V[_otherHand + "armstate"] to _actionpart + '_struggle'>>
+					<<break>>
+				<</if>>
+			<<case "pull">>
+				<br>
+				당신은 손톱을 박아넣고 <<struggle_region _actionpart>>에서 <<print window.KR.getCreatureTypeKr($struggle[_actionpart].creature)>>【을를】 비틀어 떼어내려 애쓴다.
+				<<struggle_difficulty_set>>
+				<<if $struggle[_actionpart].success gte random(1, 100) || ($leftaction is $rightaction and $struggle[_actionpart].success gte random(1, 100))>>
+					<span class="green">당신은 그것을 멀리 내던진다.</span>
+					<<set V[_actionpart + 'use'] to 0>>
+					<<set V[_actionpart + 'state'] to 0>>
+					<<struggle_part_init _actionpart>>
+					<<set $struggle.warded++>>
+					<<struggleClearActions `_actionpart + '_'`>>
+				<<else>>
+					<!-- TODO: maybe add some skill and random checks, with possibilities (and corresponding flavour text) to retain the grip -->
+					당신은 손아귀의 힘을 유지하지 못했고, <span class="red">결국 생물을 떼어내지 못한 채 손가락이 미끄러져 떨어지고 만다.</span>
+					<<set $struggle[_actionpart].grip to 0>>
+					<<set V[_hand + 'action'] to _actionpart + '_grasp'>>
+				<</if>>
+
+				<<if $leftaction is $rightaction>>
+					<<break>>
+				<</if>>
+
+			<<case "spray">>
+				<<if $spray gte 1>>
+					당신은 <<print window.KR.getCreatureTypeKr($struggle[_actionpart].creature)>>에 스프레이를 뿌린다. <span class="green">그것이 당신의 <<struggle_region _actionpart>>에서 떨어져 나간다.</span>
+					<<set $spraystat++>><<spray -1>>
+					<<set V[_actionpart + 'use'] to 0>>
+					<<set V[_actionpart + 'state'] to 0>>
+					<<struggle_part_init _actionpart>>
+					<<set $struggle.warded++>>
+					<<struggleClearActions _actionpart>>
+					<<effectssprayFree>>
+				<<else>>
+					당신은 <<struggle_region _actionpart>>에 매달린 <<print window.KR.getCreatureTypeKr($struggle[_actionpart].creature)>>에 스프레이를 뿌리려 하지만, <span class="purple">스프레이가 비어있다!</span>
+				<</if>>
+				<br>
+				<<if $leftaction is $rightaction>>
+					<<break>>
+				<</if>>
+
+			<<case "clothes">>
+				<<effectshandsclothes>>
+				<br>
+				<<if _hand is "left" and ($rightaction.toString().includes("upper") or $rightaction.toString().includes("lower"))>>
+					<<break>>
+				<</if>>
+		<</switch>>
+	<</for>>
+
+
+	/* lose grasp on the lurkers that you have no contact with */
+	<<if !$carryblock>>
+		<<for _part range ["mouth", "vagina", "penis", "anus", "chest"]>>
+			<<if $struggle[_part].grip gt 0 and (!$leftaction or !$leftaction.includes(_part)) and (!$rightaction or !$rightaction.includes(_part))>>
+				그것으로부터 신경을 꺼버리자, <span class="red">당신의 <<struggle_region _part>>【을를】 쥐고 있던 <<print window.KR.getCreatureTypeKr($struggle[_part].creature)>>에 대한 모든 장악력을 잃고 만다.</span>
+				<<set $struggle[_part].grip to 0>>
+				<!-- reset arm state -->
+				<<if $leftarmstate.toString().includes(_part)>>
+					<<set $leftarmstate to 0>>
+					<<set $leftarm to 0>>
+				<</if>>
+				<<if $rightarmstate.toString().includes(_part)>>
+					<<set $rightarmstate to 0>>
+					<<set $rightarm to 0>>
+				<</if>>
+				<!-- prevent attempts to strenghten what hasn't been grasped after orgasm, disassociation, etc -->
+				<!-- pretty useless unless !$carryblock check above goes away some day -->
+				<<if $rightactioncarry is (_part + '_strengthen')>>
+					<<set $rightactioncarry to (_part + '_grasp')>>
+				<</if>>
+				<<if $leftactioncarry is (_part + '_strengthen')>>
+					<<set $leftactioncarry to (_part + '_grasp')>>
+				<</if>>
+			<</if>>
+		<</for>>
+	<</if>>
+
+	/* capture calculations should go independently */
+	<<if $leftaction is "capture" or $rightaction is "capture">>
+		<<set _capture_chance to (!!($leftaction is "capture") + !!($rightaction is "capture")) * 30>>
+		<!-- select the best target -->
+		<<for _i to 0; _i lt $struggle.number; _i++>>
+			<<if $struggle.enemy[_i].location is "fleeing">>
+				<<set _capture_chance *= 2>>
+				<<set _capture_creature to _i>>
+				<<break>>
+			<<elseif $struggle.enemy[_i].location is "lurking">>
+				<<set _capture_creature to _i>>
+			<</if>>
+		<</for>>
+		<<if _capture_creature isnot undefined>>
+		<!-- do a strict check for undefined and not something else! otherwise the check will fail on 0 -->
+			당신은 <<if $leftaction is $rightaction>>양손으로 <</if>><<if $struggle.enemy[_capture_creature] is "fleeing">><span class="green">움츠러든 </span><</if>><<print window.KR.getCreatureTypeKr($struggle.enemy[_capture_creature].name)>>에 그물을 던진다.
+			<<if $prof.net / 20 + _capture_chance gte random(100)>>
+				<<set _succ to true>>
+			<</if>>
+		<<else>>
+			당신은 <<print window.KR.getCreatureTypeKr($struggle.creature)>>에 그물을 던질 준비를 하지만, <span class="pink">그들이 너무 가깝다.</span> 먼저 하나를 밀쳐내야 한다.
+		<</if>>
+		<<if _succ>>
+			<span class="green">그물이 정확하게 명중한다.</span> 당신은 생물을 잡아당겨 수중에 넣는다.
+			<<if $struggle.enemy[_capture_creature].name is "lurker">>
+				<<set $lurkers_held += 1>>
+				<<set $stat_lurkers_captured += 1>>
+			<</if>>
+			<<set $struggle.done += 1>>
+			<<set $struggle.enemy[_capture_creature].location to "fled">>
+			<<if $leftaction is "capture">>
+				<<set $leftaction to "rest">>
+				<<set $leftarmstate to "rest">>
+			<</if>>
+			<<if $rightaction is "capture">>
+				<<set $rightaction to "rest">>
+				<<set $rightarmstate to "rest">>
+			<</if>>
+		<<else>>
+			<span class="red">생물이 몸을 비틀어 피한다.</span><<gnet>><<prof net 1>>
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "guard" and $rightaction is "guard">>
+		당신은 양팔을 들어, 어떤 공격이든 쳐낼 준비를 한다.
+		<<set $left_guard to 1>>
+		<<set $right_guard to 1>>
+	<<elseif $leftaction is "guard">>
+		당신은 왼팔을 들어, 어떤 공격이든 쳐낼 준비를 한다.
+		<<set $left_guard to 1>>
+	<<elseif $rightaction is "guard">>
+		당신은 오른팔을 들어, 어떤 공격이든 쳐낼 준비를 한다.
+		<<set $right_guard to 1>>
+	<</if>>
+
+	<<if !$carryblock>>
+		<<set $leftactiondefault to ($leftaction ? $leftaction : "rest"); $leftaction to 0>>
+		<<set $rightactiondefault to ($rightaction ? $rightaction : "rest"); $rightaction to 0>>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "struggle_enemy">>
+	<<if $struggle.mouth.creature>>
+		<<switch $struggle.mouth.progress>>
+			<<case 0>>
+				<<if $struggle.mouth.legs is "tentacles">>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【이가】 촉수로 당신의 목을 감싼다.<<neutral 2>>
+				<<elseif $worn.face.type.includes("face_covering") or $worn.face.type.includes("gag")>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>의 <<struggle_appendage mouth>>【이가】 당신의 $worn.face.name에 문질러진다.<<neutral 1>>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>의 <<struggle_appendage mouth>>【이가】 당신의 얼굴에 문질러진다.<<neutral 1>>
+				<</if>>
+			<<case 1>>
+				<<if $worn.face.type.includes("face_covering") or $worn.face.type.includes("gag")>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 당신의 $worn.face.name【을를】 가지고 놀며, <span class="blue">들어갈 길을 찾는다.</span><<neutral 2 "mouth">>
+					/*<<struggle_clothes mouth>>*/
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 당신의 입술을 가지고 놀며, <span class="blue">들어갈 길을 찾는다.</span><<neutral 2 "mouth">>
+				<</if>>
+			<<case 2>>
+				<<struggle_clothes mouth>>
+				/*The <<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>'s <<struggle_appendage mouth>> <span class="purple">pushes against your lips.</span><<neutral 4 "mouth">>*/
+			<<case 3>>
+				<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>의 <<struggle_appendage mouth>> 끝부분이 당신의 입술을 벌리기 시작한다. <span class="pink">곧 완전히 관통할 것 같다.</span><<neutral 5 "mouth">>
+			<<case 4>>
+				<<if $player.virginity.oral isnot true>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 <span class="pink"><<print (_mouthOpen ?'미끄러지듯':'억지로')>> 그 <<struggle_appendage mouth>>【을를】 당신의 입 안으로 밀어넣는다</span>. 들어갈수록 더 굵어진다.
+					<<submission 10>>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 <span class="pink"><<print (_mouthOpen ?'미끄러지듯':'억지로')>> 그 <<struggle_appendage mouth>>【을를】 당신의 입 안으로 밀어넣는다</span>. <span class="red">이상한 맛이 난다.</span>
+					<<submission 30>><<takeVirginity $struggle.mouth.creature "oral">>
+				<</if>>
+				<<if $consensual isnot 1>><<bruise face>><<violence 1>><<raped>><</if>>
+				<<oralstat>><<neutral 5 "mouth">><<set $mouthstate to "struggle_pen">><<set $mouthaction to 0>>
+			<<case 5>>
+				<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 당신의 입 안으로 더 깊이 파고든다.<<neutral 5 "mouth">>
+			<<case 6>>
+				<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>의 <<struggle_appendage mouth>>【이가】 당신의 목구멍 안으로 밀고 들어온다. <<if $underwater isnot 1>><span class="purple">숨을 쉴 수가 없다!</span><</if>><<neutral 5 "mouth">>
+			<<case 7>>
+				<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 <span class="pink">달콤한 액체를 당신의 목구멍으로 펌프질하기 시작하며 몸을 떤다.</span><<neutral 5 "mouth">><<struggle_fluid mouth>><<purity -1>><<internalejac>><<bodyliquid "mouth" "goo">><<oralejacstat>><<ejacstat>>
+			<<case 13>>
+				<<if $struggle.creature is "lurker">>
+					<<impregnateParasite "Lurker" 400>><<fertiliseParasites>>
+					<<if _impreg is true>>
+						<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>의 <<struggle_appendage mouth>>【이가】 <span class="red">다시 부풀어 오른다.</span> 그러나 그 추가적인 압박감은 금세 사라진다. 무언가를 남겨두고 떠난 것 같은 느낌이 든다. <<neutral 5 "mouth">><<struggle_fluid mouth>><<purity -1>><<internalejac>><<bodyliquid "mouth" "goo">>
+					<<else>>
+						<<set _failedImpreg to true>>
+					<</if>>
+					<<set _impreg to false>>
+				<<else>>
+					<<set _failedImpreg to true>>
+				<</if>>
+				<<if _failedImpreg>>
+					<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 달콤한 액체를 당신의 목구멍으로 펌프질한다.<<neutral 5 "mouth">><<struggle_fluid mouth>><<purity -1>><<internalejac>><<bodyliquid "mouth" "goo">>
+				<</if>>
+			<<case 14>>
+				<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 부르르 떨며 <span class="blue">당신의 목구멍에서 <<struggle_appendage mouth>>【을를】 빼낸다.</span> 그리고는 당신의 얼굴에서 떨어져 나간다.<<neutral 5 "mouth">><<struggle_fluid mouth>>
+				<<set $mouthuse to 0>>
+				<<set $mouthstate to 0>>
+				<<struggle_part_init "mouth" "cum">>
+				<<struggleClearActions "mouth_">>
+			<<default>>
+				<<print window.KR.getCreatureTypeKr($struggle.mouth.creature)>>【은는】 달콤한 액체를 당신의 목구멍으로 펌프질한다.<<neutral 5 "mouth">><<struggle_fluid mouth>><<purity -1>><<internalejac>><<bodyliquid "mouth" "goo">>
+		<</switch>>
+		<<if $struggle.mouth.progress gte 6 and $struggle.mouth.progress lte 14>>
+			<<if $underwater isnot 1>>
+				<<oxygen -150>>
+			<</if>>
+			<<if $oxygen gte 900>>
+				<!-- TODO: maybe add something here? -->
+			<<elseif $oxygen gte 600>>
+			<<elseif $oxygen gte 300>>
+			<<elseif $oxygen gte 1>>
+			<<else>>
+				<<violence 15>>
+			<</if>>
+		<</if>>
+		<<set $struggle.mouth.progress += 1>>
+		<br>
+	<</if>>
+
+	<<if $struggle.vagina.creature>>
+		<<switch $struggle.vagina.progress>>
+			<<case 0>>
+				<<if $struggle.vagina.legs is "tentacles">>
+					<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【이가】 촉수로 당신의 골반을 더듬으며 매달린다.<<neutral 2 "genitals">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>의 <<struggle_appendage vagina>>【이가】 무언가를 찾는 것처럼 당신의 골반을 쿡쿡 찌른다.<<neutral 1 "genitals">>
+				<</if>>
+			<<case 1>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 당신의 음순 위를 미끄러지며, <span class="blue">들어갈 곳을 찾는다.</span><<neutral 2 "genitals">>
+			<<case 2>>
+				<<struggle_clothes vagina>>
+			<<case 3>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>의 <<struggle_appendage vagina>> 끝이 당신의 <<pussy>>【을를】 밀어붙인다. <span class="pink">곧 완전히 관통할 것 같다.</span><<neutral 5 "genitals">>
+			<<case 4>>
+				<<set _pain to $vaginalPain>>
+				<<if $player.virginity.vaginal isnot true>>
+					<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 <span class="pink">억지로 그 <<struggle_appendage vagina>>【을를】 당신의 <<pussy>> 안으로 밀어넣는다.</span> 들어갈수록 더 굵어진다.
+					<<sex 30 "genitals">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 <span class="pink">억지로 그 <<struggle_appendage vagina>>【을를】 당신의 <<pussy>> 안으로 밀어넣는다,</span>
+					<<if $sexStats.vagina.pregnancy.totalBirthEvents gt 0>>
+						<span class="red">처녀막이 없음에도, 처녀와 순결을 빼앗기며 몸 안에서 무언가 변하는 것을 느낀다.</span>
+					<<else>>
+						<span class="red">처녀막을 찢고 영원히 당신의 순결을 빼앗아 버린다.</span>
+					<</if>>
+					<<sex 100 "genitals">><<takeVirginity $struggle.vagina.creature "vaginal">>
+				<</if>>
+				<<if $consensual isnot 1>><<bruise vagina>><<violence 2>><<pain _pain>><</if>>
+				<<raped>><<vaginaraped>>
+				<<vaginalstat>><<set $vaginastate to "struggle_pen">><<neutral 5 "genitals">>
+			<<case 5>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 당신의 <<pussy>> 안으로 더 깊이 파고든다.<<neutral 5 "genitals">>
+			<<case 6>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>의 <<struggle_appendage vagina>>【이가】 당신의 <<pussy>> 안에서 쑤셔대기 시작한다.<<neutral 5 "genitals">>
+			<<case 7>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 <span class="pink">몸을 떨며 따뜻한 액체를 당신의 <<pussy>> 안으로 펌프질한다.</span><<neutral 5 "genitals">><<struggle_fluid vagina>><<purity -1>><<internalejac>><<bodyliquid "vagina" "goo">><<vaginalejacstat>><<ejacstat>>
+			<<case 13>>
+				<<impregnateParasite $struggle.vagina.creature 50 "vagina">>
+				<<if _impreg is true>>
+					<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>의 <<struggle_appendage vagina>>【이가】 <span class="red">다시 팽창한다.</span> 하지만 추가적인 압력은 금세 사라진다. 무언가를 남기고 간 것 같다.<<neutral 5 "genitals">><<bodyliquid "vagina" "goo">><<struggle_fluid vagina>><<purity -1>><<internalejac>><<bodyliquid "vagina" "goo">>
+					<<set _impreg to false>>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>의 <<struggle_appendage vagina>>【이가】 당신의 <<pussy>> 안을 쑤신다.<<neutral 5 "genitals">><<bodyliquid "vagina" "goo">><<struggle_fluid vagina>><<purity -1>><<internalejac>><<bodyliquid "vagina" "goo">>
+				<</if>>
+			<<case 14>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 부르르 떨며 <span class="blue">당신의 <<pussy>>에서 <<struggle_appendage vagina>>【을를】 빼낸다.</span> 그리고는 당신의 골반에서 떨어져 나간다.<<neutral 5 "genitals">><<struggle_fluid vagina>>
+				<<set $vaginause to 0>>
+				<<set $vaginastate to 0>>
+				<<struggle_part_init "vagina" "cum">>
+				<<struggleClearActions "vagina_">>
+			<<default>>
+				<<print window.KR.getCreatureTypeKr($struggle.vagina.creature)>>【은는】 따뜻한 액체를 당신의 <<pussy>> 안으로 펌프질한다.<<neutral 5 "genitals">><<struggle_fluid vagina>><<purity -1>><<internalejac>><<bodyliquid "vagina" "goo">>
+			<</switch>>
+		<<set $struggle.vagina.progress += 1>>
+		<br>
+	<</if>>
+
+	<<if $struggle.penis.creature>>
+		<<switch $struggle.penis.progress>>
+			<<case 0>>
+				<<if $struggle.penis.legs is "tentacles">>
+					<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 <<penis>>【을를】 향해 내려오고 촉수들이 미끄러지며 더듬는다.<<neutral 2 "genitals">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 <<penis>>【을를】 향해 몸을 낮춘다.<<neutral 1 "genitals">>
+				<</if>>
+			<<case 1>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 <<penis>>에 밀착하며, <span class="blue">감싸려고 시도한다.</span><<neutral 2 "genitals">>
+			<<case 2>>
+				<<struggle_clothes penis>>
+			<<case 3>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 <<penis>>에 몸을 밀어붙인다. <span class="pink">곧 당신을 완전히 집어삼킬 것 같다.</span><<neutral 5 "genitals">>
+			<<case 4>>
+				<<set _pain to $penisPain>>
+				<<if playerHasStrapon() or $player.virginity.penile isnot true>>
+					<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【은는】 <span class="pink">당신의 <<penis>>【을를】 자기 몸통 안으로 억지로 집어넣는다.</span> 들어갈수록 더 조여든다.
+					<<sex 30 "genitals">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【은는】 <span class="pink">당신의 <<penis>>【을를】 자기 몸통 안으로 억지로 집어넣어,</span> <span class="red">귀두에서 포피를 떼어내고 영원히 당신의 순결을 빼앗는다.</span>
+					<<sex 100 "genitals">><<takeVirginity $struggle.penis.creature "penile">><<penisraped>><<raped>><<penilestat>>
+				<</if>>
+				<<if playerHasStrapon()>><<violence 2 1 1 0>>
+				<<elseif $consensual isnot 1>><<bruise penis>><<violence 2>><<pain _pain>><</if>>
+				<<neutral 5 "genitals">><<set $penisstate to "struggle_pen">>
+			<<case 5>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【은는】 당신의 <<penis>>【을를】 더 깊이 삼킨다.<<neutral 5 "genitals">>
+			<<case 6>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 <<penis>>에 대고 쑤셔대기 시작한다.<<neutral 5 "genitals">>
+			<<case 7>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【은는】 <span class="pink">당신의 <<penis>>【이가】 그것의 코어를 찌르자 부르르 떤다.</span><<neutral 5 "genitals">><<bodyliquid "penis" "goo">>
+			<<case 14>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【은는】 몸을 떨며 <span class="blue">당신의 <<penis>>【을를】 놓아준다.</span> 그리고 당신의 배 위에서 떨어진다.<<neutral 5 "genitals">>
+				<<set $penisuse to 0>>
+				<<set $penisstate to 0>>
+				<<struggle_part_init "penis" "cum">>
+				<<struggleClearActions "penis_">>
+			<<default>>
+				<<print window.KR.getCreatureTypeKr($struggle.penis.creature)>>【이가】 당신의 <<penis>>에 대고 쑤셔댄다.<<neutral 5 "genitals">><<bodyliquid "penis" "goo">>
+		<</switch>>
+		<<set $struggle.penis.progress += 1>>
+		<br>
+	<</if>>
+
+	<<if $struggle.anus.creature>>
+		<<switch $struggle.anus.progress>>
+			<<case 0>>
+				<<if $struggle.anus.legs is "tentacles">>
+					<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>【이가】 촉수로 당신의 <<bottom>> 위를 미끄러지며 더듬는다.<<neutral 2 "anus">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>> 위를 미끄러지듯 움직인다.<<neutral 1 "anus">>
+				<</if>>
+			<<case 1>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>>【을를】 더듬으며, <span class="blue">들어갈 곳을 찾으려 한다.</span><<neutral 2 "anus">>
+			<<case 2>>
+				<<struggle_clothes anus>>
+			<<case 3>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>>【을를】 밀어붙이며, <span class="pink">곧 완전히 뚫고 들어올 기세다.</span><<neutral 5 "anus">>
+			<<case 4>>
+				<<set _pain to $analPain>>
+				<<if $player.virginity.anal isnot true>>
+					<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 <span class="pink">당신의 <<bottom>> 안으로 밀고 들어온다.</span> 깊이 들어갈수록 더욱 굵어지는 느낌이다.
+					<<sex 30 "anus">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 <span class="pink">당신의 <<bottom>> 안으로 밀고 들어오며,</span> <span class="red">상상조차 못한 방식으로 당신을 범한다.</span>
+					<<sex 100 "anus">><<takeVirginity $struggle.anus.creature "anal">>
+				<</if>>
+				<<if $consensual isnot 1>><<bruise anus>><<violence 2>><</if>>
+				<<raped>><<anusraped>>
+				<<analstat>><<neutral 5 "anus">><<pain _pain>><<set $anusstate to "struggle_pen">>
+			<<case 5>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>> 안으로 더 깊이 파고든다.<<neutral 5 "anus">>
+			<<case 6>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>> 안을 쑤시기 시작한다.<<neutral 5 "anus">>
+			<<case 7>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>【은는】 <span class="pink">따뜻한 액체를 당신의 <<bottom>> 안으로 뿜어내며 부르르 떤다.</span><<neutral 5 "anus">><<struggle_fluid anus>><<purity -1>><<internalejac>><<bodyliquid "anus" "goo">><<analejacstat>><<ejacstat>>
+			<<case 13>>
+				<<impregnateParasite $struggle.anus.creature 50>>
+				<<if _impreg is true>>
+					<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 <span class="red">다시 부풀어 오른다.</span> 그러나 그 압박감은 금세 사라진다. 무언가를 남겨둔 듯한 기분이다.<<neutral 5 "anus">><<bodyliquid "anus" "goo">><<struggle_fluid anus>><<purity -1>><<internalejac>><<bodyliquid "anus" "goo">>
+					<<set _impreg to false>>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>> 안을 들락날락한다.<<neutral 5 "anus">><<bodyliquid "anus" "goo">><<struggle_fluid anus>><<purity -1>><<internalejac>><<bodyliquid "anus" "goo">>
+				<</if>>
+			<<case 14>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>【은는】 부르르 떨며 <span class="blue">그 <<struggle_appendage anus>>【을를】 빼내고,</span> 당신의 <<bottom>>에서 떨어져 나간다.<<neutral 5 "anus">><<struggle_fluid anus>>
+				<<set $anususe to 0>>
+				<<set $anusstate to 0>>
+				<<struggle_part_init "anus" "cum">>
+				<<struggleClearActions "anus_">>
+			<<default>>
+				<<print window.KR.getCreatureTypeKr($struggle.anus.creature)>>의 <<struggle_appendage anus>>【이가】 당신의 <<bottom>> 안을 쑤신다.<<neutral 5 "anus">><<bodyliquid "anus" "goo">><<struggle_fluid anus>><<purity -1>><<internalejac>><<bodyliquid "anus" "goo">>
+		<</switch>>
+		<<set $struggle.anus.progress += 1>>
+		<br>
+	<</if>>
+
+	<<if $struggle.chest.creature>>
+		<<switch $struggle.chest.progress>>
+			<<case 0>>
+				<<neutral 2 "breasts">>
+				<<if $struggle.chest.legs is "tentacles">>
+					<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【이가】 촉수로 당신의 <<breasts>>【을를】 더듬고,
+					<<if $player.breastsize gte 3>>
+						그것들을 함께 쥐어짜며 <span class="blue">남근 형태의 <<struggle_appendage chest>>【을를】 문지른다.</span>
+					<<else>>
+						그것들을 애무하며 <span class="blue">남근 형태의 <<struggle_appendage chest>>【을를】 그 사이로 문지른다.</span>
+					<</if>>
+				<<elseif $struggle.chest.legs is "legs">>
+					<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 다리가 당신의
+					<<if $player.breastsize gte 3>>
+						<<breasts>>【을를】 더듬는다. <span class="blue">그 생물체에서 남근 같은 <<struggle_appendage chest>>【이가】 튀어나와,</span> 그것들에 문지른다.
+					<<else>>
+						<<breasts>>【을를】 더듬으며, <span class="blue">그 생물체에서 남근 같은 <<struggle_appendage chest>>【이가】 튀어나와</span> 그 행렬에 합류한다.
+					<</if>>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 몸이 당신의 <<breasts>> 위를 미끄러지듯 움직인다.
+					<<if $player.breastsize gte 3>>
+						<span class="blue">그 생물체에서 남근 같은 <<struggle_appendage chest>>【이가】 튀어나와</span> 가슴에 비벼댄다.
+					<<else>>
+						그것은 당신을 희롱하며 <span class="blue">생물체에서 튀어나온 남근 모양의 <<struggle_appendage chest>>【을를】 꺼낸다.</span>
+					<</if>>
+				<</if>>
+			<<case 1>>
+				<<struggle_clothes chest>>
+			<<case 2>>
+				<<if $player.breastsize gte 3>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 촉수가 <span class="pink">당신의 가슴을 감싼다.</span><<neutral 5 "breasts">>
+					<<else>>
+						<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 당신의 <<breasts>>【을를】 모아 쥐고 <span class="pink">그 사이로 <<struggle_appendage chest>>【을를】 밀어넣는다.</span><<neutral 3 "breasts">>
+					<</if>>
+				<<else>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【이가】 촉수로 당신의 <<breasts>>【을를】 더듬고 튕긴다.<<neutral 5 "breasts">>
+					<<else>>
+						<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 당신의 <<breasts>>【을를】 주무르고 애무한다.<<neutral 3 "breasts">>
+					<</if>>
+				<</if>>
+				<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+					<span class="pink">유두에서 모유가 새어 나오는 것을 느낀다.</span>
+					<<breastfeed>>
+					<<milkvolume 1>>
+				<<else>>
+					<<milkvolume 1>>
+				<</if>>
+			<<case 3>>
+				<<if $player.breastsize gte 3>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 촉수들이 <span class="pink">당신의 <<breasts>>에서 모유를 짜낸다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 촉수들이 당신의 <<breasts>>【을를】 쥐어짜는 동안, 다른 촉수들은 젖꼭지를 튕긴다.
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">>
+					<<else>>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 <span class="pink">당신의 <<breasts>> 사이로 <<struggle_appendage chest>>【을를】 쑤셔대고</span> 그동안 <span class="pink">당신의 유두에서는 젖이 흘러나온다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 <span class="pink">당신의 <<breasts>> 사이로 <<struggle_appendage chest>>【을를】 쑤셔댄다.</span>
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">>
+					<</if>>
+				<<else>>
+					<<struggle_flat_chest>>
+				<</if>>
+			<<case 4>>
+				<<if $player.breastsize gte 3>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속물이 <span class="pink">당신의 <<breasts>>【을를】 압박하고</span> 그동안 <span class="pink">촉수들은 계속해서 젖꼭지에서 젖을 짜낸다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속물이 <span class="pink">당신의 <<breasts>>【을를】 누르는 동안</span> <span class="pink">촉수들은 계속해서 주물럭거린다.</span>
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">>
+					<<else>>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【이가】 당신의 <<breasts>>【을를】 범하는 동안 <span class="pink">유두에서 모유가 샌다.</span> 그 생물체가 부르르 떨자 <span class="purple">따뜻한 액체가 그 <<struggle_appendage chest>>에서 뿜어져 나온다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>>【을를】 범한다. 그 괴물이 몸을 떨더니 <span class="purple">그 <<struggle_appendage chest>>에서 따뜻한 액체가 뿜어져 나온다.</span>
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">><<bodyliquid "chest" "goo">>
+					<</if>>
+				<<else>>
+					<<struggle_flat_chest>>
+				<</if>>
+			<<case 5>>
+				<<if $player.breastsize gte 3>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속물이 <span class="pink">당신의 <<breasts>> 사이를 쑤시는 동안</span> <span class="pink">촉수들은 계속해서 당신의 유두에서 모유를 짜낸다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 돌기가 <span class="pink">당신의 <<breasts>> 사이를 쑤시는 동안</span> <span class="pink">촉수들은 계속해서 주무른다.</span>
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">>
+					<<else>>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>>【을를】 범하며, 찌를 때마다 따뜻한 액체를 뿜어내고 <span class="pink">당신의 젖꼭지에서는 젖이 흘러나온다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>> 사이를 계속 쑤시며 따뜻한 액체를 내뿜는다.
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">><<bodyliquid "chest" "goo">>
+					<</if>>
+				<<else>>
+					<<struggle_flat_chest>>
+				<</if>>
+			<<case 6>>
+				<<if $player.breastsize gte 3>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속기관이 당신의 <<breasts>>【을를】 쑤시고, 그동안 <span class="pink">촉수들은 계속해서 당신의 유두에서 젖을 짜낸다.</span> 생물체가 부르르 떨더니 그 <<struggle_appendage chest>>에서 따뜻한 액체가 분출된다.
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속기관이 당신의 <<breasts>>【을를】 범하고, <span class="pink">촉수들은 계속해서 가슴을 주무른다.</span> 괴물이 부르르 떨더니 <<struggle_appendage chest>>에서 따뜻한 액체가 뿜어져 나온다.
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">><<bodyliquid "chest" "goo">>
+					<<else>>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>>【을를】 범하며 찌를 때마다 따뜻한 액체를 내뿜고 <span class="pink">당신의 젖꼭지에서는 젖이 흘러내린다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>> 사이를 계속 쑤시며, 따뜻한 액체를 내뿜는다.
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">><<bodyliquid "chest" "goo">>
+					<</if>>
+				<<else>>
+					<<struggle_flat_chest>>
+				<</if>>
+			<<case 12>>
+				<<if $player.breastsize gte 3>>
+					<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 부르르 떨며 <span class="blue">그 <<struggle_appendage chest>>【을를】 거두고,</span> 당신의 <<breasts>>에서 떨어진다.<<bodyliquid "chest" "goo">>
+				<<else>>
+					<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【이가】 <span class="blue">당신의 <<breasts>>에서 떨어져 나간다.</span>
+				<</if>>
+				<<set $chestuse to 0>>
+				<<set $cheststate to 0>>
+				<<struggle_part_init "chest" "cum">>
+				<<struggleClearActions "chest_">>
+			<<default>>
+				<<if $player.breastsize gte 3>>
+					<<if $struggle.chest.legs is "tentacles">>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속기관이 당신의 <<breasts>> 사이를 계속 쑤시며 따뜻한 액체를 뿜어내고, 촉수들은 <span class="pink">계속해서 젖꼭지에서 젖을 짜낸다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 부속기관이 당신의 <<breasts>> 사이를 계속 쑤시며, 따뜻한 액체를 내뿜는다.
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">><<bodyliquid "chest" "goo">>
+					<<else>>
+						<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>>【을를】 범하며 쑤실 때마다 따뜻한 액체를 뿜어내고, 그동안 <span class="pink">당신의 유두에서는 모유가 흘러나온다.</span>
+							<<breastfeed>>
+						<<else>>
+							<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 <<struggle_appendage chest>>【이가】 당신의 <<breasts>> 사이를 계속 쑤시며 따뜻한 액체를 뿜어낸다.
+							<<milkvolume 1>>
+						<</if>>
+						<<sex 5 "breasts">><<bodyliquid "chest" "goo">>
+					<</if>>
+				<<else>>
+					<<struggle_flat_chest>>
+				<</if>>
+		<</switch>>
+		<<set $struggle.chest.progress += 1>>
+		<br>
+	<</if>>
+
+	<!-- populate an array of unoccupied bodyparts to target -->
+	<<set _targets to []>>
+	<<if $mouthuse is 0>><<set _targets.push("mouth")>><</if>>
+	<<if $vaginause is 0 and $player.vaginaExist>><<set _targets.push("vagina")>><</if>>
+	<<if $penisuse is 0 and (playerHasStrapon() or $player.penisExist)>><<set _targets.push("penis")>><</if>>
+	<<if $anususe is 0 and $settings.analEnabled>><<set _targets.push("anus")>><</if>>
+	<<if $chestuse is 0>><<set _targets.push("chest")>><</if>>
+
+	<<for _i to 0; _i lt $struggle.number; _i++>>
+		<<if $struggle.enemy[_i].location is "fleeing">>
+			<<struggle_name _i>>【이가】 
+			<<if $struggle.enemy[_i].health gte 1 and $struggle.enemy[_i].satisfied lt 1>>
+				<<if $underwater is 1 or $struggle.enemy[_i].motion is "swimming">>
+					당신 주위를 헤엄치며
+				<<elseif $struggle.enemy[_i].motion is "flying">>
+					당신 주위를 맴돌며
+				<<else>>
+					근처에 착지하며
+				<</if>>
+				<span class="blue">공격을 준비한다.</span>
+				<<set $struggle.enemy[_i].location to "lurking">>
+			<<else>>
+				<<if $underwater is 1 or $struggle.enemy[_i].motion is "swimming">>
+					탁한 물 속으로 헤엄쳐 간다.
+				<<elseif $struggle.enemy[_i].motion is "flying">>
+					날아간다.
+				<<else>>
+					뛰어서 멀어진다.
+				<</if>>
+				<span class="green">돌아오지 않을 것이다.</span>
+				<<set $struggle.done += 1>>
+				<<set $struggle.enemy[_i].location to "fled">>
+			<</if>>
+			<br>
+		<<elseif $struggle.enemy[_i].location is "lurking" and _targets.length gt 0>>
+			<!-- lurkers attacc -->
+			<<rng>>
+			<<if $dodging gte 1>>
+				<<set _doge_chance to ((currentSkillValue("feetskill") / 3) + (currentSkillValue('danceskill') / 3) - $drunk - (!!$worn.feet.type.includes("heels") * 200))>>
+				<<feetskilluse>>
+			<</if>>
+			<<if $left_guard is 1>>
+				<<set _left_guard_chance to (currentSkillValue("handskill") / 3)>>
+				<<handskilluse>>
+			<</if>>
+			<<if $right_guard is 1>>
+				<<set _right_guard_chance to (currentSkillValue("handskill") / 3)>>
+				<<handskilluse>>
+			<</if>>
+			<<set _hit_chance to random(1, 1000)>>
+			<<if _doge_chance gte _hit_chance>>
+				<<struggle_bide_the>> <<struggle_name _i>>【이가】 
+				<<if $underwater is 1 or $struggle.enemy[_i].motion is "swimming">>
+					당신을 향해 헤엄쳐 오지만
+				<<elseif $struggle.enemy[_i].motion is "flying">>
+					당신을 향해 날아오지만
+				<<else>>
+					당신을 향해 뛰어오르지만
+				<</if>>
+				<<set $dodging -= 1>>
+				<<if $drunk gte 60>>
+					당신은 술에 취해 비틀거리며 길을 피한다<<if !random(100)>>. 마치 취권의 달인처럼<</if>>.
+				<<elseif currentSkillValue("feetskill") gte 800 or currentSkillValue('danceskill') gte 400>>
+					당신은 춤추듯 옆으로 피한다.
+				<<elseif currentSkillValue("feetskill") gte 200>>
+					당신은 옆으로 비켜선다.
+				<<else>>
+					당신은 비틀거리며 피한다.
+				<</if>>
+				<<if _doge_chance - _hit_chance gte 200>>
+					<span class="green">그것을 피해낸다.</span>
+				<<else>>
+					<span class="teal">가까스로 피해낸다.</span>
+					<<for $_slot range setup.clothingLayer.torso>>
+						<<if $worn[$_slot].name isnot "naked">>
+							<<set $worn[$_slot].integrity -= random(10, 15)>>
+							<<set _clothesdamaged to true>>
+							그것이 스쳐 지나가며 당신의 $worn[$_slot].name【을를】 찢는다.
+							<<break>>
+						<</if>>
+					<</for>>
+					<<if !_clothesdamaged>>
+						그것이 지나가며 당신을 채찍질한다. <<pain 2>>
+					<</if>>
+					<<neutral 2>>
+				<</if>>
+			<<elseif _left_guard_chance gte _hit_chance or _right_guard_chance gte _hit_chance>>
+				<<struggle_bide_the>> <<struggle_name _i>>【이가】 
+				<<if $underwater is 1 or $struggle.enemy[_i].motion is "swimming">>
+					당신을 향해 헤엄쳐 오지만
+				<<elseif $struggle.enemy[_i].motion is "flying">>
+					당신을 향해 날아오지만
+				<<else>>
+					당신을 향해 뛰어오르지만
+				<</if>>
+				<<if currentSkillValue("handskill") gte 800>>
+					당신은 타이밍을 맞춰 타격을 가해 그 기세를 꺾고
+				<<elseif currentSkillValue("handskill") gte 200>>
+					당신은 그것을 옆으로 쳐내고
+				<<else>>
+					당신의 발버둥에 그것이 옆으로 나가떨어지며
+				<</if>>
+				<<if _left_guard_chance - _hit_chance gte 200 or _right_guard_chance - _hit_chance gte 200>>
+					<span class="green">바닥에 메다꽂는다.</span>
+					<<set $struggle.enemy[_i].health -= 1>>
+				<<else>>
+					<span class="teal">간신히 피한다.</span>
+					<<for $_slot range ["over_upper", "over_lower", "upper", "lower", "under_upper", "under_lower"]>>
+						<<if $worn[$_slot].name isnot "naked">>
+							<<set $worn[$_slot].integrity -= random(10, 15)>>
+							<<set _clothesdamaged to true>>
+							그것이 지나가면서 당신의 $worn[$_slot].name【을를】 찢어발긴다.
+							<<break>>
+						<</if>>
+					<</for>>
+					<<if !_clothesdamaged>>
+						그것이 지나가며 당신을 후려친다. <<pain 2>>
+					<</if>>
+					<<neutral 2>>
+				<</if>>
+				<<if _left_guard_chance gte _hit_chance>>
+					<<unset $left_guard>>
+				<<elseif _right_guard_chance gte _hit_chance>>
+					<<unset $right_guard>>
+				<</if>>
+			<<elseif $rng lte 66 and _targets.length gt 0>>
+				<<set _target to _targets.pluck()>>
+				<<struggle_bide_the>> <<struggle_name _i>>【이가】 
+				<<if $underwater is 1 or $struggle.enemy[_i].motion is "swimming">>
+					당신을 향해 헤엄쳐 온다.
+				<<elseif $struggle.enemy[_i].motion is "flying">>
+					당신을 향해 날아온다.
+				<<else>>
+					당신을 향해 뛰어오른다.
+				<</if>>
+				<span class="blue">당신의 <<struggle_region _target>>에 착지한다.</span>
+				<<struggle_attach _target>>
+				<<set V[_target + 'use'] to "struggle">>
+				<<set V[_target + 'state'] to "struggle">>
+				<<set V[_target + 'target'] to "struggle">>
+			<<elseif random(1, 2) is 2>>
+				<<struggle_name _i>>의 몸에서 돌기가 튀어나오더니 <span class="blue">당신에게 끈적이는 액체를 한 줄기 내뿜는다.</span>
+				<<random_goo>>
+			<<else>>
+				<<struggle_name _i>>【은는】 빈틈을 노리고 있다.
+				<<set $struggle.enemy[_i].bide to true>>
+			<</if>>
+			<br>
+		<</if>>
+	<</for>>
+	<<unset $left_guard>>
+	<<unset $right_guard>>
+	<<if $oxygen lt $oxygenmax and $underwater isnot 1 and _strangle is 1>>
+		<<unset _strangle>>
+		<br>공기: <<oxygencaption>>
+	<</if>>
+	<br>
+	<<turnend>>
+<</widget>>
+
+
+<<widget "struggle_difficulty">>/*Unused for now*/
+	<!-- can be slapped at the end of _pull actions to show difficulty -->
+	<<set $_chance to $struggle[_args[0]].success>>
+	<<struggle_difficulty_set>>
+
+	| 성공 확률 :
+	<<if $_chance gte 100>>
+		<span class="green"><<print $_chance>>%</span>
+	<<elseif $_chance gte 80>>
+		<span class="teal"><<print $_chance>>%</span>
+	<<elseif $_chance gte 60>>
+		<span class="lblue"><<print $_chance>>%</span>
+	<<elseif $_chance gte 40>>
+		<span class="blue"><<print $_chance>>%</span>
+	<<elseif $_chance gte 20>>
+		<span class="purple"><<print $_chance>>%</span>
+	<<elseif $_chance gte 1>>
+		<span class="pink"><<print $_chance>>%</span>
+	<<else>>
+		<span class="red"><<print $_chance>>%</span>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_difficulty_set">>
+	<<for $_part range ["mouth", "vagina", "penis", "anus", "chest"]>>
+		<<set $struggle[$_part].success to Math.trunc(($struggle[$_part].grip * 17) + (currentSkillValue('physique') / 600))>>
+		<<if $struggle[$_part].success gte 100>>
+			<!-- can't strengthen anymore, default to pull -->
+			<<if $leftactiondefault is $_part + '_strengthen'>>
+				<<set $leftactiondefault to $_part + '_pull'>>
+			<</if>>
+			<<if $rightactiondefault is $_part + '_strengthen'>>
+				<<set $rightactiondefault to $_part + '_pull'>>
+			<</if>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "struggle_bide_the">>
+	<<if $struggle.enemy[_i].bide is true>>
+		<<set $struggle.enemy[_i].bide to false>>
+		빈틈을 발견한
+	<</if>>
+<</widget>>
+
+<<widget "struggle_fluid">>
+	<<if ["mouth", "vagina", "anus"].includes(_args[0])>>
+		<<if $struggle[_args[0]].creature is "lurker" or $struggle.mouth.creature is "slime">>
+			<<drugs 25>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<<drugs 50>>
+			<<hallucinogen 40>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_clothes">>
+	<<if _args[0] is "vagina" or _args[0] is "penis">>
+		<<if $worn.over_lower.vagina_exposed is 0 or (setup.clothes.over_lower[clothesIndex('over_lower', $worn.over_lower)].skirt is 1 and $worn.over_lower.skirt_down is 1)>>
+			<<set _struggle_exposed to "over">>
+		<<elseif $worn.lower.vagina_exposed is 0 or (setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1 and $worn.lower.skirt_down is 1)>>
+			<<set _struggle_exposed to "main">>
+		<<elseif $worn.under_lower.vagina_exposed is 0 or (setup.clothes.under_lower[clothesIndex('under_lower', $worn.under_lower)].skirt is 1 and $worn.under_lower.skirt_down is 1)>>
+			<<set _struggle_exposed to "under">>
+		<<elseif (playerChastity("penis") and _args[0] is "penis") or (playerChastity("vagina") and _args[0] is "vagina")>>
+			<<set _struggle_exposed to "genitals">>
+		<<else>>
+			<<set _struggle_exposed to "naked">>
+		<</if>>
+	<<elseif _args[0] is "anus">>
+		<<if (setup.clothes.over_lower[clothesIndex('over_lower', $worn.over_lower)].skirt is 1 and $worn.over_lower.skirt_down is 1) or $worn.over_lower.anus_exposed is 0>>
+			<<set _struggle_exposed to "over">>
+		<<elseif $worn.lower.anus_exposed is 0 or (setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1 and $worn.lower.skirt_down is 1)>>
+			<<set _struggle_exposed to "main">>
+		<<elseif $worn.under_lower.anus_exposed is 0 or (setup.clothes.under_lower[clothesIndex('under_lower', $worn.under_lower)].skirt is 1 and $worn.under_lower.skirt_down is 1)>>
+			<<set _struggle_exposed to "under">>
+		<<elseif playerChastity("anus")>>
+			<<set _struggle_exposed to "genitals">>
+		<<else>>
+			<<set _struggle_exposed to "naked">>
+		<</if>>
+	<<elseif _args[0] is "chest">>
+		<<if !$worn.over_upper.type.includes("naked") and $worn.over_upper.exposed lt 2>>
+			<<set _struggle_exposed to "over_top">>
+		<<elseif !$worn.upper.type.includes("naked") and $worn.upper.exposed lt 2>>
+			<<set _struggle_exposed to "main_top">>
+		<<elseif !$worn.under_upper.type.includes("naked") and $worn.under_upper.exposed is 0>>
+			<<set _struggle_exposed to "under_top">>
+		<<else>>
+			<<set _struggle_exposed to "naked">>
+		<</if>>
+	<<elseif _args[0] is "mouth">>
+		<<if $worn.face.type.includes("face_covering") or $worn.face.type.includes("gag")>>
+			<<set _struggle_exposed to "mask">>
+		<<else>>
+			<<set _struggle_exposed to "naked">>
+		<</if>>
+	<</if>>
+
+	<<if _struggle_exposed is "over_top">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 들어갈 길을 찾으며 당신의 $worn.over_upper.name【을를】 찢어댄다.<<neutral 2>><<set $worn.over_upper.integrity -= 10>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 부속지가 당신의 $worn.over_upper.name 너머로 <<struggle_bodypart _args[0]>>【을를】 쿡쿡 찌른다.<<neutral 1>>
+		<</if>>
+		<<set $worn.over_upper.integrity -= 10>><<struggle_softlock_prevent>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.over_upper.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.over_upper.integrity -= 50>>
+		<</if>>
+		<<if $worn.over_upper.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				촉수들이 옷감을 휘감고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<top>>【을를】 드러낸다.</span>
+			<<else>>
+				촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<top>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "main_top">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 들어갈 길을 찾으며 당신의 $worn.upper.name【을를】 찢어댄다.<<neutral 2>><<set $worn.upper.integrity -= 10>><<struggle_softlock_prevent>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 부속지가 당신의 $worn.upper.name 너머로 <<struggle_bodypart _args[0]>>【을를】 쿡쿡 찌른다.<<neutral 1>>
+		<</if>>
+		<<set $worn.upper.integrity -= 10>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.upper.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.upper.integrity -= 50>>
+		<</if>>
+		<<if $worn.upper.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				촉수들이 옷감을 휘감고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<undertop>>【을를】 드러낸다.</span>
+			<<else>>
+				촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<undertop>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "under_top">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 들어갈 길을 찾으며 당신의 $worn.under_upper.name【을를】 찢어댄다.<<neutral 3>><<set $worn.under_upper.integrity -= 10>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 부속지가 당신의 $worn.under_upper.name【을를】 쿡쿡 찌른다.
+		<</if>>
+		<<set $worn.under_upper.integrity -= 10>><<struggle_softlock_prevent>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.under_upper.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.under_upper.integrity -= 50>>
+		<</if>>
+		<<if $worn.under_upper.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				촉수들이 옷감을 휘감고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<breasts>>【을를】 드러낸다.</span>
+			<<else>>
+				촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<breasts>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "over">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.over_lower.name【을를】 찢어댄다.<<neutral 2>><<set $worn.over_lower.integrity -= 10>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.over_lower.name【을를】 찢어댄다.<<neutral 1>>
+		<</if>>
+		<<set $worn.over_lower.integrity -= 10>><<struggle_softlock_prevent>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.over_lower.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.over_lower.integrity -= 50>>
+		<</if>>
+		<<if $worn.over_lower.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				그 촉수들이 옷감을 휘감고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<crotch>>【을를】 드러낸다.</span>
+			<<else>>
+				그 촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<crotch>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "main">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.lower.name【을를】 찢어댄다.<<neutral 2>><<set $worn.lower.integrity -= 10>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.lower.name【을를】 찢어댄다.<<neutral 1>>
+		<</if>>
+		<<set $worn.lower.integrity -= 10>><<struggle_softlock_prevent>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.lower.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.lower.integrity -= 50>>
+		<</if>>
+		<<if $worn.lower.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				그 촉수들이 옷감을 휘감고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<undies>>【을를】 드러낸다.</span>
+			<<else>>
+				그 촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<undies>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "under">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.under_lower.name 안으로 파고든다.<<neutral 2>><<set $worn.under_lower.integrity -= 10>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.under_lower.name【을를】 찢어댄다.<<neutral 1>>
+		<</if>>
+		<<set $worn.under_lower.integrity -= 10>><<struggle_softlock_prevent>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.under_lower.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.under_lower.integrity -= 50>>
+		<</if>>
+		<<if $worn.under_lower.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				그 촉수들이 옷감 속으로 파고들어 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<genitals>>【을를】 드러낸다.</span>
+			<<else>>
+				그 촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 당신의 몸에서 찢어발기며, 당신의 <<genitals>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "genitals">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<if $worn.genitals.name is "chastity parasite">>
+				<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 당신의 $worn.genitals.name【을를】 휘감고 꿈틀대며 문지르고 쥐어짠다. <span class="lewd">당신의 확연히 흥분한 반응이 그것을 더욱 부추긴다.</span>
+				<<arousal 200 "genitals">><<neutral 2 "genitals">><<set $worn.genitals.integrity -= 5>><<struggle_softlock_prevent>>
+			<<else>>
+				<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 들어갈 길을 찾으며 당신의 $worn.genitals.name 뒤로 파고들어, 당신의 <<struggle_bodypart _args[0]>>【을를】 스친다.<<neutral 2 "genitals">><<set $worn.genitals.integrity -= 10>><<struggle_softlock_prevent>>
+			<</if>>
+		<<else>>
+			<<if $worn.genitals.name is "chastity parasite">>
+				<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 당신의 $worn.genitals.name【을를】 찢어발기려 하지만, 그저 꽉 쥐어짜 <span>당신을 더욱 흥분시킬</span> 뿐이다.
+				<<neutral 1 "genitals">><<arousal 100 "genitals">><<set $worn.genitals.integrity -= 5>><<struggle_softlock_prevent>>
+			<<else>>
+				<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.genitals.name【을를】 찢어댄다.<<neutral 1 "genitals">><<set $worn.genitals.integrity -= 10>>
+			<</if>>
+		<</if>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">재질이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<set $worn.genitals.integrity -= 30>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">재질이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<set $worn.genitals.integrity -= 50>>
+		<</if>>
+		<<if $worn.genitals.integrity lte 0>>
+			<<integritycheck no_text>><<exposure>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				그 촉수들이 재질을 휘감고 잡아당긴다. 재질은
+				<<if $worn.genitals.name is "chastity parasite">>
+					튕겨나가며
+				<<else>>
+					비명을 지르며
+				<</if>>
+				<span class="pink"><<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그것을 튕겨내 몸에서 찢어발기면서, 당신의 <<genitals>>【을를】 드러낸다.</span>
+			<<else>>
+				그 촉수가 재질을 꿰뚫고 잡아당긴다. 재질은
+				<<if $worn.genitals.name is "chastity parasite">>
+					튕겨나가며
+				<<else>>
+					비명을 지르며
+				<</if>>
+				<span class="pink"><<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그것을 튕겨내 몸에서 찢어발기면서, 당신의 <<genitals>>【을를】 드러낸다.</span>
+			<</if>>
+		<<else>>
+			<<if $struggle[_args[0]].damage gte 10>>
+				그것은 재질에 부딪혀 <<if $worn.genitals.name is "chastity parasite">>지쳐 버렸고<<else>>상처를 입었고<</if>>, <span class="green">멀리 떨어져 나간다.</span>
+				<<if _args[0] is "vagina">>
+					<<set $vaginause to 0>>
+					<<set $vaginastate to 0>>
+					<<struggle_part_init "vagina">>
+					<<set $struggle.warded += 1>>
+					<<struggleClearActions "vagina_">>
+				<<elseif _args[0] is "penis">>
+					<<set $penisuse to 0>>
+					<<set $penisstate to 0>>
+					<<struggle_part_init "penis">>
+					<<set $struggle.warded += 1>>
+					<<struggleClearActions "penis_">>
+				<<else>>
+					<<set $anususe to 0>>
+					<<set $anusstate to 0>>
+					<<struggle_part_init "anus">>
+					<<set $struggle.warded += 1>>
+					<<struggleClearActions "anus_">>
+				<</if>>
+			<<else>>
+				그것은 재질에 부딪혀 스스로 <<if $worn.genitals.name is "chastity parasite">>지쳐 버린다<<else>>상처를 입는다<</if>>.
+				<<set $struggle[_args[0]].damage += 1>>
+			<</if>>
+		<</if>>
+	<<elseif _struggle_exposed is "mask">>
+		<<set $struggle[_args[0]].progress -= 1>>
+		<<if $struggle[_args[0]].legs is "tentacles">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>의 촉수들이 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.face.name 안으로 파고든다.<<neutral 2>><<damageFaceCover 5 struggle>>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle[_args[0]].creature)>>【이가】 그 아래의 <<struggle_bodypart _args[0]>>에 닿으려 당신의 $worn.face.name【을를】 찢어댄다.<<neutral 1>>
+		<</if>>
+		<<damageFaceCover 5 struggle>>
+		<<if $struggle[_args[0]].creature is "slime">>
+			<span class="purple">옷감이 슬라임에 녹아들며 쉬익 소리를 낸다.</span><<damageFaceCover 20 struggle>>
+		<<elseif $struggle[_args[0]].creature is "pale slime">>
+			<span class="purple">옷감이 창백한 슬라임에 녹아들며 격렬하게 쉬익 소리를 낸다.</span><<damageFaceCover 30 struggle>>
+		<</if>>
+		<<if $worn.face.integrity lte 0>>
+			<<if $struggle[_args[0]].legs is "tentacles">>
+				그 촉수들이 옷감 속으로 파고들어 <span class="pink">가볍게 튕겨내 몸에서 찢어발기며, 당신의 입을 드러낸다.</span>
+			<<else>>
+				그 촉수가 옷감을 꿰뚫고 <span class="pink">가볍게 튕겨내 몸에서 찢어발기며, 당신의 입을 드러낸다.</span>
+			<</if>>
+			<<faceruined>><<set $worn.face.type.push("broken")>>
+		<</if>>
+	<<elseif _struggle_exposed is "naked">>
+		<<if _args[0] is "vagina">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args].creature)>>의 촉수가 <span class="purple">당신의 <<pussy>>【을를】 꾹 누른다.</span><<neutral 4 "genitals">>
+		<<elseif _args[0] is "penis">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args].creature)>>【이가】 <span class="purple">그 구멍을 당신의 <<penis>>에 밀착시킨다.</span><<neutral 4 "genitals">>
+		<<elseif _args[0] is "anus">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args].creature)>>의 촉수가 <span class="purple">당신의 <<bottom>>【을를】 꾹 누른다.</span><<neutral 4 "bottom">>
+		<<elseif _args[0] is "chest">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args].creature)>>의 촉수가 <span class="purple">당신의 <<breasts>>【을를】 꾹 누른다.</span><<neutral 4 "breasts">>
+		<<elseif _args[0] is "mouth">>
+			<<print window.KR.getCreatureTypeKr($struggle[_args].creature)>>의 촉수가 <span class="purple">당신의 입을 꾹 누른다.</span><<neutral 4 "mouth">>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_bodypart">><<silently>>
+	<<switch _args[0]>>
+		<<case "vagina">>
+			<<pussy>>
+		<<case "penis">>
+			<<penis>>
+		<<case "anus">>
+			<<bottom>>
+		<<case "chest">>
+			<<breasts>>
+		<<case "mouth">>
+			<<set _text_output to "입">>
+	<</switch>>
+<</silently>><<print _text_output>>
+<</widget>>
+
+<<widget "struggle_appendage">><<silently>>
+	<<switch $struggle[_args[0]].creature>>
+		<<case "wasp" "bee">>
+			<<set $_text_output to "침">>
+		<<case "squid">>
+			<<set $_text_output to "촉수">>
+		<<default>>
+			<<set $_text_output to "부속지">>
+	<</switch>>
+<</silently>><<print $_text_output>>
+<</widget>>
+
+<<widget "struggle_skin">><<silently>>
+	<<switch $struggle[_args[0]].creature>>
+		<<case "wasp" "bee">>
+			<<set $_text_output to "외골격">>
+		<<default>>
+			<<set $_text_output to "살점">>
+	<</switch>>
+<</silently>><<print $_text_output>>
+<</widget>>
+
+<<widget "struggle_flat_chest">>
+	<<if $struggle.chest.legs is "tentacles">>
+		<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+			<span class="pink">유두에서 모유가 흘러나오는</span> 동안 <<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 촉수가 당신의 <<breasts>>【을를】 튕겨댄다.
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>의 촉수가 당신의 <<breasts>>【을를】 튕기며 애태운다.
+		<</if>>
+		<<sex 5 "breasts">>
+	<<else>>
+		<<if $lactating is 1 and $settings.breastFeedingEnabled and $milk_amount gte 1>>
+			<span class="pink">유두에서 모유가 흘러나오는</span> 동안 <<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 당신의 <<breasts>>【을를】 빨아들인다.
+			<<breastfeed>><<sex 3 "breasts">>
+		<<else>>
+			<<print window.KR.getCreatureTypeKr($struggle.chest.creature)>>【은는】 당신의 <<breasts>>【을를】 빨아대고, 그와 동시에 <<struggle_appendage chest>>【이가】 당신의 배를 문지른다.
+			<<milkvolume 1>><<sex 5 "breasts">>
+		<</if>>
+		<<sex 3 "breasts">>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_attach">>
+	<<set $struggle[_args[0]].creature to $struggle.enemy[_i].name>>
+	<<set $struggle[_args[0]].description to $struggle.enemy[_i].description>>
+	<<set $struggle[_args[0]].legs to $struggle.enemy[_i].legs>>
+	<<set $struggle.enemy[_i].location to _args[0]>>
+	<!-- temp var to highlight newly attached lurkers -->
+	<<set T['gold_' + _args[0]] to true>>
+<</widget>>
+
+
+<<widget "struggleClearActions">>
+	<<if _args[0]>>
+		<<if ($mouthaction).toString().includes(_args[0])>>
+			<<set $mouthactiondefault to $mouthaction>><<set $mouthaction to 0>>
+		<</if>>
+		<<if ($leftaction).toString().includes(_args[0])>>
+			<<set $leftactiondefault to $leftaction>><<set $leftaction to 0>>
+		<</if>>
+		<<if ($rightaction).toString().includes(_args[0])>>
+			<<set $rightactiondefault to $rightaction>><<set $rightaction to 0>>
+		<</if>>
+		<<if ($leftarmstate).toString().includes(_args[0])>>
+			<<set $leftarm to 0>><<set $leftarmstate to 0>>
+		<</if>>
+		<<if ($rightarmstate).toString().includes(_args[0])>>
+			<<set $rightarm to 0>><<set $rightarmstate to 0>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "struggle_region">><<silently>>
+	<<if ["mouth","vagina","penis","anus","chest"].includes(_args[0])>>
+		<<switch _args[0]>>
+			<<case "mouth">><<set _text_output to "머리">>
+			<<case "vagina">><<set _text_output to "골반">>
+			<<case "penis">><<set _text_output to "배">>
+			<<case "anus">><<set _text_output to "엉덩이">>
+			<<case "chest">><<set _text_output to "가슴">>
+		<</switch>>
+	<</if>>
+	<</silently>><<print _text_output>>
+<</widget>>

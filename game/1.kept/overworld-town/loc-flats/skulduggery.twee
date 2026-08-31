@@ -1,0 +1,730 @@
+:: Flats Lock
+<<effects>><<set $lock to 200>>
+
+문은 단단히 잠겨 있습니다.
+<br><br>
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		자물쇠를 딸 수 있을 것 같지만, <span class="blue">팔이 묶여 있지 않다면 말이다.</span>
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+		<<lockicon "pick">><<link [[침입한다 (0:05)|Flats Sneak]]>><<pass 5>><<crimeUp 5 "trespassing">><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span><<skulduggeryrequired>>
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[나간다|Flats]]>><</link>>
+<br>
+
+:: Flats Sneak
+<<effects>>
+
+당신은 성공적으로 자물쇠를 따고 거처로 들어간다.
+<br><br>
+
+<<skulduggeryuse 300 "locks">>
+
+<<cleareventpool>>
+
+<<addinlineevent "flats_sneak_1" 1>>
+	내부는 부드러운 분홍색 조명으로 밝혀져 있습니다. 벽은 외설적인 사진들로 장식되어 있고, 소파는 이상한 곡선 형태를 띠고 있습니다. 값비싼 골동품처럼 보이지만, 들고 가기에는 너무 큽니다.
+	<br><br>
+	<<set _blackmoney to 0>>
+	<<set _rng to random(1, 5)>>
+	<<switch _rng>>
+		<<case 1>>
+			하지만 바닥에 빈티지 잡지가 한 권 있습니다. 암시장에서 어느 정도 가치가 있을지도 모릅니다.<<set _blackmoney += 10>>
+		<<case 2>>
+			<<wearProp "cash two">>
+			하지만 옆 테이블에 외국 지폐 £20가 놓여 있습니다. 암시장에서 어느 정도 가치가 있을지도 모릅니다.<<set _blackmoney += 20>>
+		<<case 3>>
+			<<wearProp "pearl necklace">>
+			하지만 옆 테이블에 진주 목걸이가 놓여 있습니다. 암시장에서 어느 정도 가치가 있을지도 모릅니다.<<set _blackmoney += 30>>
+		<<case 4>>
+			하지만 옆 테이블에 금 커프스 단추 한 쌍이 놓여 있습니다. 암시장에서 어느 정도 가치가 있을지도 모릅니다.<<set _blackmoney += 40>>
+		<<default>>
+			<<wearProp "honeycomb ring">>
+			하지만 옆 테이블에 빈티지 반지가 하나 있습니다. 이상한 벌집 모양이지만 진짜 금으로 만들어졌습니다. 암시장에서 어느 정도 가치가 있을지도 모릅니다.<<set _blackmoney += 80>>
+	<</switch>>
+	<br><br>
+
+	<<link [[가져간다|Flats]]>><<set $blackmoney += _blackmoney>><<crimeUp _blackmoney "thievery">><</link>><<crime "thievery">>
+	<br>
+	<<link [[나간다|Flats]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_2" 1>>
+	<<npcClothesType $NPCList[0] "worker">>
+	<<generate1>><<person1>><<npcClothesType $NPCList[0] "bathrobe">>
+	물 흐르는 소리가 들립니다. 누군가 샤워를 하고 있습니다. 아파트에 특별한 점은 없지만, 침실에 숨겨진 금고를 발견하기 전까지는 귀중품을 찾을 수 없습니다. 구식 잠금 장치가 있어 당신이 풀 수 있을 것 같지만, 시간이 좀 걸릴 수도 있습니다.
+	<br><br>
+	샤워하며 노래하는 <<personssimple>> 목소리가 들립니다.
+	<br><br>
+
+	<<set $skulduggerydifficulty to 400>>
+	<<link [[금고를 딴다|Flats Sneak Crack]]>><</link>><<skulduggerydifficulty>>
+	<br>
+	<<link [[나간다|Flats]]>><<endevent>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_3" 1>>
+	테라스로 통하는 열린 문에서 바람이 불어옵니다. 주위에는 아무도 없지만, 그 상태가 얼마나 오래갈지는 알 수 없습니다.
+	<br><br>
+
+	<<if $flats_vents_init is undefined>>
+		테라스를 조사합니다. 널어놓은 빨래 외에는 아무것도 없습니다. 이웃 테라스가 기어갈 수 있을 만큼 가깝습니다. 그쪽에는 문이 없어서, 그 아파트에 보통 어떻게 들어가는지 알 수 없습니다.
+		<br><br>
+		<<link [[틈을 건너 다른 테라스로 간다|Flats Sneak Terrace]]>><</link>><<willpowerdifficulty 1 400>>
+		<br>
+		<<link [[이 아파트를 조사한다|Flats Sneak Investigate]]>><</link>>
+		<br>
+	<<else>>
+		아파트에서 귀중품을 찾아보니, 매트리스 밑에서 <<printmoney 3000>>【을를】 발견합니다.
+		<br><br>
+
+		<<link [[가져간다|Flats]]>><<moneyGain 30>><<crimeUp 30 "petty">><</link>><<crime "petty">>
+		<br>
+		<<link [[그대로 둔다|Flats]]>><</link>>
+		<br>
+	<</if>>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_4" 1>>
+	<<generate1>><<person1>>
+	당신은 뒤에서 문을 닫습니다. 창문에는 두꺼운 커튼이 쳐져 있어 방이 어둡습니다. 당신은 더듬거리며 전등 스위치를 찾습니다. 불이 켜지자 방이 밝아지고, 의자에 앉아 있는 <<person>>【이가】 드러납니다. <<his>> 무릎 위에는 고양이가 있습니다. <<He>>【은는】 당신을 똑바로 쳐다보고 있습니다.
+	<br><br>
+
+	"손님을 기대하진 않았는데," <<he>>【이가】 말합니다. "하물며 침입자는 더더욱. 무슨 할 말이 있지?" 당신은 <<his>> 비싼 시계를 보지 않을 수 없습니다. 당신은 그것을 똑바로 쳐다보는 것을 피합니다.
+	<br><br>
+
+	<<if hasSexStat("promiscuity", 2)>>
+		<<link [[유혹한다|Flats Sneak Seduce]]>><</link>><<promiscuous2>>
+		<br>
+	<</if>>
+	<<link [[공격한다|Flats Sneak Attack]]>><</link>>
+	<br>
+	<<link [[도망친다|Flats Sneak Run]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<if crimeSumCurrent() gte 500>>
+	<<addinlineevent "flats_sneak_5" 0.2>>
+		공기 중에 매캐한 냄새가 남아있지만, 아파트는 달리 평범해 보입니다. 하지만 두 걸음 안으로 들어서자, 등 뒤의 문에 금속 셔터가 쾅 하고 내려옵니다. 경보가 울립니다.
+		<br><br>
+
+		"경찰에 통보되었습니다." 로봇 목소리가 알립니다. "예상 도착 시간: 5분. 대기하십시오."
+		<br><br>
+
+		창문에는 셔터가 없지만, 당신은 아주 높은 층에 있습니다. 밧줄을 만드는 데는 적어도 몇 분이 걸릴 것입니다.
+		<br><br>
+
+		<<set $flats_alarm_fabric to 0>>
+		<<set $flats_alarm_time to 5>>
+
+		<<flats_alarm_links>>
+
+	<</addinlineevent>>
+<</if>>
+
+<<addinlineevent "flats_sneak_6" 1>>
+	<<generate1>><<person1>>
+	소파에서 <<person>>【이가】 코를 골고 있습니다. 당신은 발끝으로 걸으며 전리품을 찾습니다. 침실에서 보석 상자를 발견합니다. 대단한 것은 아니지만, 암시장에서 어느 정도 가치가 있을지도 모릅니다.
+	<br><br>
+
+	<<link [[가져간다|Flats Sneak Snore]]>><<set $blackmoney += 30>><<crimeUp 30 "thievery">><</link>><<crime "thievery">>
+	<br>
+	<<link [[나간다|Flats]]>><<endevent>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_7" 1>>
+	<<generate1>><<person1>>
+	구운 채소 냄새가 당신을 맞이합니다. <<person>>【이가】 부엌에 서서, 창밖을 보며 전화 통화를 하고 있습니다.
+	<br><br>
+
+	<<His>> <<wallet>>【이가】 <<him>>에게서 멀지 않은 테이블 위에 놓여 있습니다. 안에는 <<printmoney 4000>>【이가】 들어 있습니다.
+	<br><br>
+
+	<<link [[가져간다|Flats Sneak Wallet]]>><<moneyGain 40>><<crimeUp 40 "petty">><</link>><<crime "petty">>
+	<br>
+	<<link [[나간다|Flats]]>><<endevent>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_8" 1>>
+	벽에 골동품 총이 있지만, 너무 단단히 고정되어 있어 가져갈 수 없습니다. 당신은 주위를 뒤져 서랍에서 <<printmoney 2000>>【을를】 발견합니다.
+	<br><br>
+
+	<<link [[가져간다|Flats]]>><<moneyGain 20>><<crimeUp 20 "petty">><</link>><<crime "petty">>
+	<br>
+	<<link [[나간다|Flats]]>><<endevent>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_9" 1>>
+	<<wearProp "shoebox">>
+	구석에서 용암 램프가 빛나며 구식 장식을 부드러운 빛으로 비춥니다. 하지만 신발 상자에 숨겨진 보석을 좀 찾긴 했지만, 들고 갈 만한 가치 있는 물건은 거의 없습니다.
+	<br><br>
+
+	<<link [[가져간다|Flats]]>><<set $blackmoney += 30>><<crimeUp 30 "thievery">><</link>><<crime "thievery">>
+	<br>
+	<<link [[나간다|Flats]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "flats_sneak_10" 1>>
+	비어 있습니다. 심지어 전등과 스위치도 없어서 케이블이 늘어져 있습니다. 다른 곳을 찾아봐야 합니다.
+	<br><br>
+	<<link [[나간다|Flats]]>><<endevent>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<runeventpool>>
+
+:: Flats Sneak Wallet
+<<effects>><<wearProp "wallet empty">>
+
+당신이 테이블에서 <<wallet>>【을를】 쓸어 담자 <<person>>【이가】 돌아본다. <<He>>【은는】 놀라서 뛰어오르며 하마터면 휴대폰을 떨어뜨릴 뻔하더니, 미친 듯이 번호를 누른다. 당신은 돌아서서 달린다.
+<br><br>
+"경찰!" <<person>>【이가】 등 뒤에서 말한다. "도둑이야!"
+<br><br>
+집주인이 <<his>> 휴대폰에 대고 소리치는 동안 당신은 아파트에서 탈출한다.
+<br><br>
+
+<<link [[다음|Flats]]>><<endevent>><</link>>
+<br>
+
+:: Flats Sneak Snore
+<<effects>>
+
+<<if random(1, 2) is 2>>
+	물건들을 챙겨서, 아무 문제 없이 아파트에서 살금살금 빠져나온다.
+	<br><br>
+
+	<<link [[다음|Flats]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	물건들을 챙겼지만, 살금살금 지나가려 할 때 <<person>>【이가】 잠에서 깬다.
+	<br><br>
+
+	"네가 무슨 짓을 하는지는 모르겠지만," <<he>>【은는】 당신의 허벅지를 붙잡으며 말한다. "이제 넌 곤경에 처했어."
+	<br><br>
+
+	<<link [[다음|Flats Sneak Rape 3]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Flats Sneak Rape 3
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $enemyanger to 40>><<set $enemytrust to -50>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Flats Sneak Rape 3 Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Flats Sneak Rape 3]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Flats Sneak Rape 3 Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<He>> 당신을 아파트 밖으로 밀쳐낸다.
+	<br><br>
+	<<tearful>> 당신은 몸을 일으켜 선다.
+	<br><br>
+<<else>>
+	<<person1>><<person>>【은는】 침실로 달려가 숨는다.
+	<br><br>
+	<<tearful>> 당신은 아파트에서 탈출한다.
+	<br><br>
+<</if>>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Flats]]>><</link>>
+<br>
+
+:: Flats Sneak Housekeeping
+<<effects>>
+
+당신은 아파트를 뒤져 시트, 옷, 수건 등 함께 묶을 수 있는 모든 것을 찾는다.
+<<if $housekeepingSuccess>>
+	<<set $flats_alarm_fabric += 1>>
+	당신은 그것을 힘껏 당겨본다.
+	<<if $flats_alarm_fabric gte 3>>
+		<<set _ropeLength to 2>>
+		<span class="green">튼튼하게 느껴진다.</span> 당신은 그것을 창밖으로 던지고, 아래 포장도로로 떨어지는 것을 지켜본다.
+		<br><br>
+
+		<<link [[탈출!|Flats Sneak Rope]]>><</link>>
+		<br>
+	<<else>>
+		<<set _ropeLength to 3>>
+		<span class="green">튼튼하게 느껴지지만,</span> 더 길어야 한다.
+		<br><br>
+		<<flats_alarm_time>>
+	<</if>>
+<<else>>
+	<<set _ropeLength to 4>>
+	울려 퍼지는 경보음 때문에 쉽지 않다. 천을 단단히 묶었다고 생각했지만, <span class="red">당신이 당기자 급조한 밧줄이 끊어져 버린다.</span>
+	<br><br>
+
+	<<flats_alarm_time>>
+<</if>>
+<<wearProp "fabric rope climb">>
+
+:: Flats Sneak Physique
+<<effects>>
+
+당신은 문에 몸을 던져, 온 힘을 다해 두드린다.
+
+<<if $physiqueSuccess>>
+	<span class="green">셔터가 약간 밀려나면서 약한 부분이 삐걱거리는 소리가 들린다.</span> 당신은 약한 부분이 부서지고 셔터가 카펫 위로 떨어질 때까지 계속해서 두드린다.
+	<br><br>
+
+	<<earnFeat "Panic Room">>
+	<<flats_alarm_end>>
+
+	당신은 밖의 복도로 뛰쳐나가 경보음으로부터 멀어진다. 밖에서 사이렌 소리가 들린다. 당신은 중앙 계단을 피한다.
+	<br><br>
+
+	<<link [[다음|Flats]]>><</link>>
+	<br>
+<<else>>
+	<span class="red">소용없다.</span> 당신의 망치질에도 금속은 튼튼하게 버틴다.
+	<br><br>
+
+	<<flats_alarm_time>>
+<</if>>
+
+:: Flats Sneak Assume
+<<effects>>
+
+당신은 네 발로 엎드려 <<bottom>>【을를】 공중으로 치켜들고 경찰의 도착을 기다린다.
+<br><br>
+
+<<generate1>><<generate2>>
+<span class="red">"경찰 현장 도착," 목소리가 알린다. "좋은 하루 보내십시오."</span> 셔터가 열리고, 두 명의 경찰관, <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 들어온다.
+<br><br>
+
+"얌전히 따라올 준비가 된 것 같군," <<person1>><<person>>【이가】 낄낄거린다. "가만히 있어." <<person2>><<person>>【이가】 수갑을 들고 다가온다.
+<br><br>
+
+<<link [[얌전히 따라간다|Hospital Arrest Journey]]>><<flats_alarm_end>><</link>>
+<br>
+<<link [[싸운다|Flats Sneak Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Flats Sneak Hide
+<<effects>>
+
+당신은 아파트에서 숨을 만한 좋은 장소를 찾는다. 가장 좋은 곳은 찬장이다.
+<br><br>
+
+아직 수색 중일 때 복도 밖에서 발소리가 쿵쿵 울리는 것을 느낀다. 시간이 없어서, 당신은 근처 테이블 아래로 뛰어든다.
+<br><br>
+
+<<generate1>><<generate2>>
+<span class="red">"경찰 현장 도착," 목소리가 알린다. "좋은 하루 보내십시오."</span> 셔터가 열리고, 두 명의 경찰관, <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 들어온다.
+<br><br>
+
+"내가 찬장을 확인하지," <<person1>><<person>>【이가】 말한다.
+<br>
+"그럴 필요 없어," <<person2>><<person>>【이가】 당신 쪽으로 고개를 끄덕이며 대답한다. "<<pShe>>【은는】 테이블 밑에 있군."
+<br>
+"얌전히 따라오는 게 좋을 거야," <<person1>><<person>>【이가】 <<his>> 파트너가 수갑을 들고 다가오자 웃으며 말한다.
+<br><br>
+
+<<link [[얌전히 따라간다|Hospital Arrest Journey]]>><<flats_alarm_end>><</link>>
+<br>
+<<link [[싸운다|Flats Sneak Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Flats Sneak Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Flats Sneak Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Flats Sneak Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Flats Sneak Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	두 사람은 벽에 기대어 숨을 고른다. <<tearful>> 당신은 기회를 잡는다. 복도를 따라 탈출하는 동안 <<person1>><<person>>【이가】 힘없이 지원을 요청하는 소리가 들린다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<earnFeat "Panic Room">>
+	<<flats_alarm_end>>
+
+	<<link [[다음|Flats]]>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	<<person2>><<person>>【이가】 쓰러지고, <<person1>><<person>>【은는】 <<his>> 라디오를 잡으려 뒤로 물러선다. <<tearful>> 당신은 기회를 잡는다. 복도를 따라 탈출하는 동안 <<he>>【이가】 지원을 요청하는 소리가 들린다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<earnFeat "Panic Room">>
+	<<flats_alarm_end>>
+
+	<<link [[다음|Flats]]>><</link>>
+	<br>
+<<else>>
+	<<tearful>> 당신은 땅에 쓰러진다. 너무 다쳐서 더 이상 싸울 수 없다.
+	<br><br>
+	<<saveNPC 0 "flats_arrest_1">>
+	<<saveNPC 1 "flats_arrest_2">>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<flats_alarm_end>>
+
+	<<link [[다음|Hospital Arrest Journey]]>><<loadNPC 0 "flats_arrest_1">><<loadNPC 1 "flats_arrest_2">><<clearNPC "flats_arrest_1">><<clearNPC "flats_arrest_2">><</link>>
+	<br>
+
+<</if>>
+
+:: Flats Sneak Rope
+<<effects>>
+
+당신은 건물 옆면을 타고 내려간다. 한 노부부가 창문에서 당신이 지나가는 것을 지켜보는데, 이상하게도 당신의 하강에 놀라지 않는다.
+<br><br>
+
+당신은 문제없이 바닥에 도착한다. 당신이 탈출한 창문에서 머리 하나가 삐져나온다. 너무 멀어서 당신의 얼굴을 식별할 수 없다.
+<br><br>
+
+<<link [[다음|Flats]]>><<endevent>><</link>>
+<br>
+
+:: Flats Sneak Smash
+<<effects>>
+
+<<earnFeat "Panic Room">>
+<<flats_alarm_end>>
+
+:: Flats Sneak Seduce
+<<effects>>
+
+<<set $seductiondifficulty to 6000>>
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<seductionskilluse>>
+
+<<if $speech_attitude is "meek">>
+	"ㅊ-침입해서 죄송합니다," 당신은 말한다. "누군가 저를 고용해서 동행해달라고 했어요. 주소를 잘못 찾았나 봐요."
+<<elseif $speech_attitude is "bratty">>
+	"방을 잘못 찾았나요?" 당신은 묻는다. "알려주셔서 다행이네요. 저는 에스코트거든요. 이미 돈도 받았고요."
+<<else>>
+	"방을 잘못 찾았나 봐요," 당신은 말한다. "저는 에스코트인데, 즐거움을 제공하라는 돈을 받았어요."
+<</if>>
+당신은 떠나기 위해 돌아선다.
+<<promiscuity2>>
+
+<<if $seductionrating gte $seductionrequired>>
+
+	<span class="green">"잠깐만,"</span> 그 사람이 즉시 말하며 고양이를 바닥으로 뛰어내리게 한다. "농담이었어요. 물론 제가 당신이 찾던 사람이지요."
+	<br><br>
+
+	당신은 시계를 쳐다보지 않고 <<him>>에게 걸어간다.
+	<br><br>
+
+	<<link [[다음|Flats Sneak Sex]]>><<set $sexstart to 1>><</link>>
+	<br>
+
+<<else>>
+
+	<span class="red">"좋은 시도였어,"</span> <<person>>【이가】 일어서며 고양이를 바닥으로 뛰어내리게 하며 말한다. "하지만 여기까지 왔으니, 내가 이 기회를 이용해볼까?"
+	<br><br>
+
+	<<link [[다음|Flats Sneak Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Flats Sneak Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend>>
+	<span id="next"><<link [[다음|Flats Sneak Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Flats Sneak Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Flats Sneak Sex Finish
+
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	당신은 경련하는 <<his>> 팔을 쓸어내리며 슬쩍 시계를 빼내 숨긴다. <<He>>【은는】 눈치채지 못한다.<<set $blackmoney += 20>><<crimeUp 20 "thievery">><<crime "thievery">>
+	<br><br>
+	<<tearful>> 당신은 의자에 쓰러져 있는 <<him>>【을를】 남겨두고 떠난다.
+	<br><br>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 밀쳐내고, <<he>>【이가】 넘어질 때 손목시계를 움켜쥔다. 반동으로 <<his>> 손목에서 시계가 뜯어져 나온다.<<set $blackmoney += 20>><<crimeUp 20 "thievery">><<crimeUp 20 "assault">><<crimes "assault" "thievery">>
+	<br><br>
+	<<tearful>> 당신은 아파트에서 탈출한다.
+	<br><br>
+<<else>>
+	"대단한 창녀 납셨네," <<person1>><<person>>【이가】 비웃는다. "꺼져."
+	<br><br>
+	<<tearful>> 당신은 아파트를 떠난다.
+	<br><br>
+<</if>>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Flats]]>><</link>>
+
+:: Flats Sneak Attack
+<<effects>>
+
+당신은 <<person1>><<person>>【이가】 먼저 움직이기를 기다리지 않는다. 당신은 <<him>>에게 달려들어, <<he>>【이가】 일어설 시간도 거의 주지 않는다. 고양이는 당신에게서 멀리 뛰어오른다.
+<br><br>
+
+<<link [[다음|Flats Sneak Rape 2]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Flats Sneak Run
+<<effects>>
+
+당신은 현관문을 열려고 하지만, <<person>>【이가】 벌떡 일어나 당신을 향해 돌진하며 고양이를 몇 피트나 던져버린다.
+<br><br>
+
+<<link [[다음|Flats Sneak Rape 2]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Flats Sneak Rape 2
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $enemyanger += 100>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Flats Sneak Rape 2 Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Flats Sneak Rape 2]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Flats Sneak Rape 2 Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<He>> 문을 열고 당신을 밖으로 밀쳐낸다.
+	<br><br>
+	<<tearful>> 당신은 몸을 일으켜 선다.
+	<br><br>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 밀쳐내고, <<he>>【이가】 넘어질 때 시계를 움켜쥔다. 그 힘에 <<his>> 손목에서 시계가 뜯겨 나간다.<<set $blackmoney += 80>><<crimeUp 80 "thievery">><<crimeUp 20 "assault">><<crimes "assault" "thievery">>
+	<br><br>
+	<<tearful>> 당신은 아파트에서 탈출한다.
+	<br><br>
+<</if>>
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Flats]]>><</link>>
+
+:: Flats Sneak Terrace
+<<effects>>
+
+<<if $willpowerSuccess>>
+	넓은 틈은 아니지만, 이렇게 높은 곳에서 건너는 것은 여전히 무섭다. 당신은 아래를 보지 않으려 애쓰며, <span class="green">건너편으로 건너간다.</span>
+	<br><br>
+	이 아파트의 테라스 문은 닫혀 있지만 잠겨 있지는 않다. 당신이 사용한 문 외에는 현관문이 없고, 방은 하나뿐이다. 하지만 천장의 환기구로 이어지는 사다리가 있다.
+	<br><br>
+	두 개의 컴퓨터 서버 스택이 의자를 제외한 유일한 가구다. 그것들은 유리 스크린 뒤에 앉아 파란 불빛을 깜박인다.
+	<br><br>
+	<<link [[다음|Flats Sneak Terrace 2]]>><</link>>
+	<br>
+<<else>>
+	당신은 저 아래 포장도로를 내려다본다. 틈이 원래 이렇게 넓었나? 당신은 난간에 한 발을 올리자, <span class="red">갑작스러운 공포가 당신을 덮친다.</span> 당신은 아파트에서 도망친다.<<gstress>><<stress 6>><<gwillpower>><<willpower 1>>
+	<br><br>
+
+	<<link [[다음|Flats]]>><</link>>
+	<br>
+<</if>>
+
+:: Flats Sneak Terrace 2
+<<effects>>
+
+당신은 사다리를 올라가 환기구 위아래를 살펴본다. 당신이 비집고 들어갈 만큼 넓다. 한쪽 방향은 막다른 길로 이어지지만, 다른 쪽은 아래로 기울어져 굽이진 곳으로 사라진다.
+<br><br>
+
+<<link [[탐험한다 (0:10)|Flats Sneak Terrace Explore]]>><<pass 10>><</link>>
+<br>
+<<link [[떠난다|Flats]]>><<endevent>><</link>>
+<br>
+
+:: Flats Sneak Terrace Explore
+<<effects>>
+<<set $flats_vents_init to 1>>
+당신은 환기구를 통해 기어간다. 환기구는 이리저리 꺾여 방들 위를 지나가며, 얇은 틈새로 안을 엿볼 수 있게 해준다. 일부는 사람이 있지만, 당신은 들키지 않고 지나간다.
+<br><br>
+
+하지만 다른 입구는 없었고, 마침내 세탁실 바닥에 도착한다. 당신은 환기구에서 기어 나와 밖을 엿본다. 평범한 복도다. 당신은 곧 방향을 잡는다.
+<br><br>
+
+<<link [[다음|Flats]]>><</link>>
+<br>
+
+:: Flats Sneak Investigate
+<<effects>>
+
+당신은 아파트에서 귀중품을 찾다가 매트리스 밑에서 <<printmoney 3000>>【을를】 발견한다.
+<br><br>
+
+<<link [[가져간다|Flats]]>><<moneyGain 30>><<crimeUp 30 "petty">><</link>><<crime "petty">>
+<br>
+<<link [[내버려 둔다|Flats]]>><</link>>
+<br>
+
+
+:: Flats Sneak Crack
+<<effects>>
+
+당신은 금고에 귀를 대고 다이얼을 돌리면서 딸깍거리는 소리를 듣는다.
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+
+	<span class="green">금고가 열리며,</span> 내용물을 드러낸다. 안에서 <<printmoney 12000>>【을를】 발견한다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[가져간다|Flats]]>><<moneyGain 120>><<crimeUp 120 "thievery">><<endevent>><</link>><<crime "thievery">>
+	<br>
+	<<link [[나간다|Flats]]>><<endevent>><</link>>
+	<br>
+
+<<else>>
+
+	<span class="red">흐르던 물이 멈추는 소리가 들린다.</span> 당신이 침실에서 탈출하기 전에, 목욕 가운만 걸친 채 아직 물이 뚝뚝 떨어지는 <<person>>【이가】 욕실에서 튀어나온다.
+	<br><br>
+
+	"내 물건을 훔치려고?" <<he>>【이가】 말한다. "수업 시간이다."
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Flats Sneak Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Flats Sneak Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Flats Sneak Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Flats Sneak Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Flats Sneak Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"필요했어," <<he>>【이가】 당신을 문 쪽으로 밀치며 말한다. "이제 꺼져."
+	<br><br>
+	<<tearful>> 당신은 등 뒤에서 문이 쾅 닫히는 소리를 듣는다.
+	<br><br>
+<<elseif $enemyhealth lte 0>>
+	<<person>>【은는】 <<his>> 가운에 걸려 넘어져 욕실 바닥으로 굴러떨어진다.
+	<br><br>
+	<<tearful>> 당신은 아파트에서 탈출한다.
+	<br><br>
+<</if>>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Flats]]>><<endevent>><</link>>
+<br>

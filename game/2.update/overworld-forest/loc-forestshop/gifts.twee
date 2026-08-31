@@ -1,0 +1,418 @@
+:: Gwylan Gifts List
+<<effects>>
+
+그윌란에게 어떤 선물을 주시겠습니까?
+<br><br>
+
+<<food_gift_list>>
+
+<<if _food_gift_found is true>>
+	<<skinicon "give">><<link [[선물 주기 (0:05)|Gwylan Gifts]]>><<pass 5>><<give_gift Gwylan>><</link>>
+	<br>
+<</if>>
+<<refuseicon>><<link [[다시 생각한다|Gwylan Gifts List Reconsider]]>><</link>>
+<br>
+
+:: Gwylan Gifts List Reconsider
+<<effects>><<run statusCheck("Gwylan")>>
+
+<<if $location is "forest_shop">>
+	그윌란은 당신이 마음을 바꾼 것을 전혀 눈치채지 못하고, 계속 무언가를 뒤적거린다.
+<<else>>
+	그윌란은 당신이 마음을 바꾼 것을 전혀 눈치채지 못하고, 계속 바다를 멍하니 바라본다.
+<</if>>
+<br><br>
+
+<<gwylanOptions>>
+
+:: Gwylan Gifts
+<<effects>><<run statusCheck("Gwylan")>>
+<<set _gift to setup.foodstuff[$gift].name + (setup.foodstuff[$gift].food.handheld_gift ? " gift" : "")>>
+<<wearProp _gift>>
+
+<<if $phase is 1>>
+	"I've brought you something," you say.
+<<elseif $phase is 2>>
+	"I made something," you say. "Just for you."
+<<else>>
+	"I've made you a gift," you say. "I hope you like it."
+<</if>>
+<br><br>
+
+<<if $gift is "plum_pudding">>
+	You hold out the plum pudding.
+	<<if _gwylanTF.known and $location is "forest_shop">>
+		Gwylan's eyes light up, and <<his>> fox ears stand up straight.
+	<<else>>
+		Gwylan's eyes light up.
+	<</if>>
+	"Oh my. You certainly know the fastest way to a <<personssimple>> heart." <<npcincr Gwylan dom 1>><<gyearning>>
+	<br><br>
+
+	<<He>> takes a large bite of it. "Made with real plums, too! Perfection." <<He>> closes <<his>> eyes and places a hand on <<his>> cheek as <<he>> chews. "I adore plums. The perfect texture and balance of sweetness and tartness. You could even taste it without a tongue."
+	<br><br>
+	<<saveFavoriteFood "Gwylan" $gift>>
+	<<earnFeat "Coven Comforts">>
+
+	<<He>> opens <<his>> eyes and blushes, realising <<hes>> already eaten half of it. "Oh dear, how rude of me. This would taste much better shared."
+	<<if $location is "forest_shop">>
+		<<He>> nods to a small table tucked away in the corner of the shop.
+	<</if>>
+	<br><br>
+
+	<<link [[Let Gwylan have all of it|Gwylan Gifts Plum]]>><</link>>
+	<br>
+	<<link [[Share it|Gwylan Gifts Plum Share]]>><<npcincr Gwylan lust 1>><</link>><<glust>>
+	<br>
+<<elseif $gift is "valentines_chocolate" and $valentines>>
+	<<earnFeat "Be My Valentine">>
+	You hold out the heart-shaped box of Valentines chocolates. Gwylan leans forward and sniffs it.
+	<<if $gwylanSeen.includes("romance")>>
+		"Chocolates?" <<he>> asks. "For Valentine's Day! Why, I will be your Valentine, dear!" <<He>> flips open the box, and bites one of the chocolates in half.<<ggyearning>><<npcincr Gwylan dom 3>>
+		<br><br>
+
+		<<He>> licks <<his>> upper lip. "It tastes excellent. But then, anything made by you tastes good." <<He>> catches <<himself>> before biting another. "I hope I'm not breaking a convention by scoffing them straight away." <<He>> thinks a moment, then shrugs, and devours another. "As if I could resist your chocolate."
+		<br><br>
+		<<He>> scoffs yet another, then puts the box away for later.
+		<br><br>
+	<<else>>
+		"Chocolates?" <<he>> asks. "For little old me?"<<ggyearning>><<npcincr Gwylan dom 3>>
+		<br><br>
+
+		<<He>> opens the box, and appears to enjoy savouring the sight of them. "Are there any conventions? Can I eat them now?" Without waiting for an answer, <<he>> takes a chocolate, and bites it in half. "I'd say your talents are wasted on me, but that's for you to decide."
+		<br><br>
+		<<He>> scoffs another, then puts the box away for later.
+		<br><br>
+	<</if>>
+
+	<<gwylanOptions>>
+<<elseif setup.foodstuff[$gift].food.tags.includes("spicy")>>
+	You hold out the <<recipe_name $gift>>. Gwylan tilts <<his>> head.
+	<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+		"How did you sneak that past Sammy? Never mind, I'm sure I can squeeze that in alongside breakfast."
+	<</if>>
+
+	<<He>> smells it. "A spicy dish? I have trouble tasting those. I'm willing to try, though."
+	<br><br>
+
+	<<He>> takes a bite, and chews. <<His>> expression remains neutral. "Sorry, dear. I'm afraid I can't taste it at all." <<He>> smiles. "I won't let it go to waste, though. It might taste better shared."
+	<<if $location is "forest_shop">>
+		<<He>> nods to a small table tucked away in the corner of the shop.
+	<</if>>
+	<br><br>
+
+	<<link [[Let Gwylan have all of it|Gwylan Gifts Spicy]]>><</link>>
+	<br>
+	<<link [[Share it|Gwylan Gifts Spicy Share]]>><<npcincr Gwylan lust 1>><</link>><<glust>>
+	<br>
+
+<<elseif setup.foodstuff[$gift].food.tags.includes("drink")>>
+	You hold out the <<recipe_name $gift>>. <<He>> tilts <<his>> head. "A brew of your own? I'm intrigued." <<He>> gently takes it in both hands and smells it. "Interesting." <<He>> swirls it, before taking a small sip. The small sip quickly turns into <<him>> chugging it.
+	<br><br>
+
+	<<link [[Next|Gwylan Gifts Drink End]]>><</link>>
+<<else>>
+	You hold out the <<recipe_name $gift>>.
+	<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+		"How did you sneak that past Sammy? Never mind, I'm sure I can squeeze that in alongside breakfast."
+	<</if>>
+
+	<<He>> inspects it for a moment, before taking it in <<his>> hands. "It smells wonderful," <<he>> says. "I'm sure it tastes just as good. It would taste better shared, though."
+	<<if $location is "forest_shop">>
+		<<He>> nods to a small table tucked away in the corner of the shop.
+	<</if>>
+	<br><br>
+
+	<<link [[Let Gwylan have all of it|Gwylan Gifts Food]]>><</link>>
+	<br>
+	<<link [[Share it|Gwylan Gifts Food Share]]>><<npcincr Gwylan lust 1>><</link>><<glust>>
+	<br>
+<</if>>
+
+:: Gwylan Gifts Plum
+<<effects>><<run statusCheck("Gwylan")>>
+고개를 저으며 <<him>>에게 전부 먹으라고 고집한다.
+<br><br>
+
+<<if $location is "forest_shop">>
+	<<he>>【이가】 음식을 다 먹자 가게 전체가 잠시 밝아지는 것 같다.
+<<else>>
+	<<He>>【은는】 음식을 다 먹으면서 계속 바다를 바라본다. <<He>>【은는】 거의 빛이 날 지경이다.
+<</if>>
+<br><br>
+
+<<if C.npc.Gwylan.dom gte 50>>
+	"너도 상을 받아야지, <<pcpetname "Gwylan">>."
+	<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+		<<He>>【은는】 테이블 너머로 몸을 기울여 당신의 뺨에 가볍게 입을 맞춘다.
+	<<else>>
+		<<He>>【은는】 카운터 너머로 몸을 기울여 당신의 뺨에 가볍게 입을 맞춘다.
+	<</if>>
+	<<if !$gwylanSeen.includes("partners")>>
+		"너무 깊게 생각하지 마." <<he>>【이가】 얼굴을 붉히며 말한다.
+	<</if>>
+<<else>>
+	"정말 사려 깊었어, 얘야. 고마워."
+<</if>>
+<br><br>
+
+<<gwylanOptions>>
+
+:: Gwylan Gifts Plum Share
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $location is "forest_shop">>
+	<<He>>【은는】 당신을 작은 테이블로 이끌고는, 어두운 문으로 사라진다.
+	<<if $gwylanSeen.includes("dog_bowl")>>
+		<<if _gwylanStatus.includesAny("dom", "lust") or $gwylanSeen.includes("dog_bowl_name")>>
+			<<if !$gwylanSeen.includes("dog_bowl_name")>>
+				<<set $gwylanSeen.pushUnique("dog_bowl_name")>>
+				<<He>>【은는】 <span class="pink">깨끗한 개밥그릇</span>을 들고 돌아와 당신 앞에 놓는다.
+				지난번과는 다르다. 주변에는 작은 보석들이 박혀 있고, <span class="pink">옆면에는 당신의 이름이 새겨져 있다</span>.
+				<br><br>
+
+				그윌란이 얼굴을 붉히며 몸을 앞뒤로 흔든다. "넌 나에게 정말 <<pcpetname "Gwylan" "good">>【이었였】어. 그래서 나도 내가 얼마나 너를 아끼는지 보여주려고 이걸 만들었어. 마음에 들었으면 좋겠다." <<npcincr Gwylan dom 5>><<ggyearning>>
+				<br><br>
+			<<else>>
+				<<He>>【은는】 <span class="pink">당신의 개밥그릇</span>을 들고 돌아온다.
+			<</if>>
+		<<else>>
+			<<He>>【은는】 <span class="pink">깨끗한 개밥그릇</span>을 들고 돌아와 당신 앞에 놓는다.
+		<</if>>
+		<<He>>【은는】 남은 푸딩을 그 안에 담는다.
+	<<else>>
+		<<set $gwylanSeen.pushUnique("dog_bowl")>>
+		"아, 이런. 깨끗한 접시가 다 떨어졌네. 혹시..." 그릇들이 덜그럭거리는 소리가 들린다.
+		<br><br>
+
+		<<He>>【은는】 다시 나타나, <span class="pink">깨끗한 개밥그릇</span>을 당신 앞에 놓는다. <<He>>【은는】 얼굴을 붉히며 남은 푸딩을 그 안에 담는다. "이런 걸 줘서 미안해, 자기. 깨끗하니까 걱정 마."
+		<<if $worn.neck.collared is 1>>
+			<<He>>【은는】 당신의 개목걸이를 본다. "상관없어 하는 것 같네."
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<link [[평범하게 먹는다|Gwylan Gifts Food Pet Normal]]>><<set $phase to "plum">><<stress -2>><</link>><<lstress>>
+	<br>
+	<<if hasSexStat("deviancy", 2)>>
+		<<link [[애완동물처럼 먹는다|Gwylan Gifts Food Petplay]]>><<set $phase to "plum">><<npcincr Gwylan lust 4>><</link>><<deviant2>><<gglust>>
+	<<else>>
+		<<insufficientStat "deviancy" "애완동물처럼 먹기엔">>
+	<</if>>
+	<br>
+<<else>>
+	<<He>>【은는】 남은 푸딩의 절반을 당신의 접시에 담아준다. 잘했다. 꽤 맛있다.
+	<br><br>
+
+	<<if C.npc.Gwylan.dom gte 50>>
+		"너도 상을 받아야지, <<pcpetname "Gwylan">>."
+		<<if $location is "cafe" and !(between($chef_state, 7, 8) and $chef_rework lte 30)>>
+			<<He>>【은는】 테이블 너머로 몸을 기울여 당신의 뺨에 가볍게 입을 맞춘다.
+		<<else>>
+			<<He>>【은는】 카운터 너머로 몸을 기울여 당신의 뺨에 가볍게 입을 맞춘다.
+		<</if>>
+		<<if !$gwylanSeen.includes("partners")>>
+			"너무 깊게 생각하지 마." <<he>>【이가】 얼굴을 붉히며 말한다.
+		<</if>>
+	<<else>>
+		"정말 사려 깊구나, 자기. 고마워."
+	<</if>>
+	<br><br>
+
+	<<gwylanOptions>>
+<</if>>
+
+:: Gwylan Gifts Spicy
+<<effects>><<run statusCheck("Gwylan")>>
+그윌란은 조용히 먹는다. <<he>>【은는】 전혀 맛을 느끼지 못하는 것 같다. "분명 맛있을 거야." <<he>>【이가】 말한다. "생각해줘서 고마워."
+<br><br>
+
+<<gwylanOptions>>
+
+:: Gwylan Gifts Spicy Share
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $location is "forest_shop">>
+	<<He>>【은는】 당신을 작은 테이블로 이끌고는, 어두운 문으로 사라진다.
+	<<if $gwylanSeen.includes("dog_bowl")>>
+		<<if _gwylanStatus.includesAny("dom", "lust") or $gwylanSeen.includes("dog_bowl_name")>>
+			<<if !$gwylanSeen.includes("dog_bowl_name")>>
+				<<set $gwylanSeen.pushUnique("dog_bowl_name")>>
+				<<He>>【은는】 <span class="pink">깨끗한 개밥그릇</span>을 들고 돌아와 당신 앞에 놓는다.
+				지난번과는 다르다. 주변에는 작은 보석들이 박혀 있고, <span class="pink">옆면에는 당신의 이름이 새겨져 있다</span>.
+				<br><br>
+
+				그윌란이 얼굴을 붉히며 몸을 앞뒤로 흔든다. "넌 나에게 정말 <<pcpetname "Gwylan" "good">>【이었였】어. 그래서 나도 내가 얼마나 너를 아끼는지 보여주려고 이걸 만들었어. 마음에 들었으면 좋겠다." <<npcincr Gwylan dom 5>><<ggyearning>>
+				<br><br>
+			<<else>>
+				<<He>>【은는】 <span class="pink">당신의 개밥그릇</span>을 들고 돌아온다.
+			<</if>>
+		<<else>>
+			<<He>>【은는】 <span class="pink">깨끗한 개밥그릇</span>을 들고 돌아와 당신 앞에 놓는다.
+		<</if>>
+		<<He>>【은는】 그 안에 식사의 절반을 담는다.
+	<<else>>
+		<<set $gwylanSeen.pushUnique("dog_bowl")>>
+		"아, 이런. 깨끗한 접시가 다 떨어졌네. 혹시..." 그릇들이 덜그럭거리는 소리가 들린다.
+		<br><br>
+
+		<<He>>【은는】 다시 나타나, <span class="pink">깨끗한 개밥그릇</span>을 당신 앞에 놓는다. <<He>>【은는】 그 안에 식사의 절반을 담으며 얼굴을 붉힌다. "이런 걸 줘서 미안해, 자기. 깨끗하니까 안심해도 돼."
+		<<if $worn.neck.collared is 1>>
+			<<He>>【은는】 당신의 개목걸이를 본다. "상관없어 하는 것 같네."
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<link [[평범하게 먹는다|Gwylan Gifts Food Pet Normal]]>><<set $phase to "spicy">><<stress -2>><</link>><<lstress>>
+	<br>
+	<<if hasSexStat("deviancy", 2)>>
+		<<link [[애완동물처럼 먹는다|Gwylan Gifts Food Petplay]]>><<set $phase to "spicy">><<npcincr Gwylan lust 4>><</link>><<deviant2>><<gglust>>
+	<<else>>
+		<<insufficientStat "deviancy" "애완동물처럼 먹기엔">>
+	<</if>>
+	<br>
+<<else>>
+	<<He>>【은는】 당신의 접시에 음식의 절반을 덜어준다. 꽤 맛있다. <<he>>【이가】 말한다. "내가 맛을 못 느껴도, 너와 함께 먹는 건 즐길 수 있어. 아주 약간의 달콤함이 더해지는 기분이야."
+	<br><br>
+
+	<<gwylanOptions>>
+<</if>>
+
+:: Gwylan Gifts Food
+<<effects>><<run statusCheck("Gwylan")>>
+고개를 저으며 <<him>>에게 전부 먹으라고 고집한다.
+<br><br>
+
+<<if $location is "forest_shop">>
+	<<He>>【은는】 꽤 빨리 먹어치운다.
+<<else>>
+	<<He>>【은는】 계속 바다를 바라보며 천천히 음식을 즐긴다.
+<</if>>
+"식사 고마워, 자기."
+<br><br>
+
+<<gwylanOptions>>
+
+:: Gwylan Gifts Food Share
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $location is "forest_shop">>
+	<<He>>【은는】 당신을 작은 테이블로 이끌고는, 어두운 문으로 사라진다.
+	<<if $gwylanSeen.includes("dog_bowl")>>
+		<<if _gwylanStatus.includesAny("dom", "lust") or $gwylanSeen.includes("dog_bowl_name")>>
+			<<if !$gwylanSeen.includes("dog_bowl_name")>>
+				<<set $gwylanSeen.pushUnique("dog_bowl_name")>>
+				<<He>>【은는】 <span class="pink">깨끗한 개밥그릇</span>을 들고 돌아와 당신 앞에 놓는다.
+				지난번과는 다르다. 주변에는 작은 보석들이 박혀 있고, <span class="pink">옆면에는 당신의 이름이 새겨져 있다</span>.
+				<br><br>
+
+				그윌란이 얼굴을 붉히며 몸을 앞뒤로 흔든다. "넌 나에게 정말 <<pcpetname "Gwylan" "good">>【이었였】어. 그래서 나도 내가 얼마나 너를 아끼는지 보여주려고 이걸 만들었어. 마음에 들었으면 좋겠다." <<npcincr Gwylan dom 5>><<ggyearning>>
+				<br><br>
+			<<else>>
+				<<He>>【은는】 <span class="pink">당신의 개밥그릇</span>을 들고 돌아온다.
+			<</if>>
+		<<else>>
+			<<He>>【은는】 <span class="pink">깨끗한 개밥그릇</span>을 들고 돌아와 당신 앞에 놓는다.
+		<</if>>
+		<<He>>【은는】 그 안에 음식의 절반을 담는다.
+	<<else>>
+		<<set $gwylanSeen.pushUnique("dog_bowl")>>
+		"아, 이런. 깨끗한 접시가 다 떨어졌네. 혹시..." 그릇들이 덜그럭거리는 소리가 들린다.
+		<br><br>
+
+		<<He>>【은는】 다시 나타나, <span class="pink">깨끗한 개밥그릇</span>을 당신 앞에 놓는다. <<He>>【은는】 그 안에 음식의 절반을 담으며 얼굴을 붉힌다. "이런 걸 줘서 미안해, 자기. 깨끗하니까 안심해도 돼."
+		<<if $worn.neck.collared is 1>>
+			<<He>>【은는】 당신의 개목걸이를 본다. "상관없어 하는 것 같네."
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<link [[평범하게 먹는다|Gwylan Gifts Food Pet Normal]]>><<stress -2>><</link>><<lstress>>
+	<br>
+	<<if hasSexStat("deviancy", 2)>>
+		<<link [[애완동물처럼 먹는다|Gwylan Gifts Food Petplay]]>><<npcincr Gwylan lust 4>><</link>><<deviant2>><<gglust>>
+	<<else>>
+		<<insufficientStat "deviancy" "애완동물처럼 먹기엔">>
+	<</if>>
+	<br>
+<<else>>
+	<<He>>【은는】 당신의 접시에 그것의 절반을 덜어준다. 꽤 맛있다.
+	<br><br>
+
+	"식사 고마워, 자기."
+	<br><br>
+
+	<<gwylanOptions>>
+<</if>>
+
+:: Gwylan Gifts Food Pet Normal
+<<effects>><<run statusCheck("Gwylan")>>
+식기를 사용해 평범한 사람처럼 그릇에 담긴 음식을 먹는다.
+<br><br>
+
+<<if $gwylanSeen.includes("romance") or _gwylanStatus.includes("lust")>>
+	그윌란은 마치 당신이 세상에서 가장 흥미로운 존재인 것처럼, 테이블에 팔꿈치를 올리고 <<his>> 손으로 머리를 받친 채 당신을 빤히 쳐다본다.
+	<<if _gwylanTF.known>>
+		<<His>> 꼬리가 뒤에서 이리저리 흔들린다.
+	<</if>>
+	<br><br>
+
+	당신이 식사를 마치자, <<he>>【은는】 테이블을 돌아와 당신의 머리를 쓰다듬는다.
+	<<if $phase is "plum">>
+		"넌 정말 사려 깊어, <<pcpetname "Gwylan">>."
+		<<if $gwylanSeen.includes("partners") or _gwylanStatus.includes("lust")>>
+			<<He>>【은는】 <<his>> 팔로 당신을 감싸고 뺨에 키스한다.
+		<</if>>
+	<<else>>
+		"<<pcPetname "Gwylan" "good">>."
+	<</if>>
+<<else>>
+	그윌란은 계속 당신을 올려다본다.
+	<<if $phase is "plum">>
+		"정말 사려 깊구나, 자기. 고마워."
+	<<elseif $phase is "spicy">>
+		<<he>>【이가】 말한다. "내가 맛을 못 느껴도, 너와 함께 먹는 건 즐길 수 있어. 아주 약간의 달콤함이 더해지는 기분이야."
+	<<else>>
+		"식사 고마워, 자기."
+	<</if>>
+<</if>>
+<br><br>
+
+그윌란이 설거지를 하고 카운터로 돌아온다.
+<br><br>
+
+<<set $phase to 0>>
+<<gwylanOptions>>
+
+:: Gwylan Gifts Food Petplay
+<<effects>><<run statusCheck("Gwylan")>>
+<<set $gwylanSeen.pushUnique("petplay")>>
+당신은 고개를 숙이고
+<<if $hypnosis_traits.devotion gte 3>>
+	착한 작은 애완동물처럼 음식을 먹고 핥는다. <<hypnosisText "당신은 <<gwylanHypnoName>>에게 참 착한 애완동물이다. 그 생각만으로 기쁨과 황홀감이 차오른다. <<trauma -2>><<ltrauma>>">>
+<<else>>
+	그윌란의 애완동물이라도 된 것처럼 음식을 먹고 핥는다.
+<</if>>
+<<deviancy2>>
+
+<<He>>【은는】 킥킥 웃으며 테이블을 돌아온다. <<He>>【은는】 당신의 뒤통수를 쓰다듬자, 당신은 그 손길에 몸을 기댄다.
+<<if $phase is "plum">>
+	"넌 정말 사려 깊어, <<pcpetname "Gwylan">>."
+	<<if $gwylanSeen.includes("partners") or _gwylanStatus.includes("lust")>>
+		<<He>>【은는】 <<his>> 팔로 당신을 감싸고 뺨에 키스한다.
+	<</if>>
+<<else>>
+	"<<pcPetname "Gwylan" "good">>."
+<</if>>
+<br><br>
+
+당신은 그릇을 깨끗이 핥는다. 그윌란이 설거지를 하고 카운터로 돌아온다.
+<br><br>
+
+<<set $phase to 0>>
+<<gwylanOptions>>
+
+:: Gwylan Gifts Drink End
+<<effects>>
+
+<<He>>【은는】 상쾌한 한숨을 내쉰다. "맛있었어. 고마워, 자기. 이 용기 가져도 될까? 작은 조개껍데기 같은 걸로 채워둘 수 있을 것 같아." 당신이 고개를 끄덕이자 <<he>>【이가】 미소 짓는다.
+<br><br>
+
+<<gwylanOptions>>

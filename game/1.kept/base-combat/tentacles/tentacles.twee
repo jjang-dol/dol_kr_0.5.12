@@ -1,0 +1,375 @@
+:: Widgets Tentacles [widget]
+<<widget "tentaclestart">>
+	<<if $abomination isnot 1>>
+		<<set $enemyarousalmax to 10000>>
+	<</if>>
+
+	<<set $tentacles to {
+		"max": _args[0],
+		"active": _args[0],
+	}>>
+
+	<<if _args[0]>>
+
+		<<if _args[2]>>
+			<<set _tentacleType to _args[2]>>
+		<<else>>
+			<<set _tentacleType to "tentacle">>
+		<</if>>
+		<<if ["root","shoot"].includes(_tentacleType)>>
+			<<set _babyType to "vine">>
+		<<elseif _tentacleType is "tendril">>
+			<<set _babyType to "tentacle">>
+		<<else>>
+			<<set _babyType to _tentacleType>>
+		<</if>>
+		<<if _args[3] isnot "tainted" and ["root","shoot","vine","metal"].includes(_tentacleType) or _args[3] is "metal">>
+			<<set $banishDisable to true>>
+		<</if>>
+
+		/* Deciding if tentacle templates should be defined somewhere else still */
+		/* Argument 0 is the number of tentacles.
+		* Argument 1 is health.
+		* Argument 2 is tentacle type, which can be replaced with "vines", "machines" etc later on. Optional, unless also using Argument 3.
+		* Argument 3 is variant and will give different offspring as well as allowing different batches of descriptions.
+		* Argument 4 is whether or not the variant impacts the full description and offspring. If Argument 4 is used, Argument 3 will only impact which description batches are part of _tentacledescs. If Argument 4 is "desc", Argument 3 will impact description batches and variant, but not offspring.*/
+		<<set _tentacledescs to [
+			{"desc":"slimy","name":"끈적이는","baby":0,"size":2,"traits":[]},
+			{"desc":"sticky","name":"달라붙는","baby":0,"size":2,"traits":[]},
+			{"desc":"thick","name":"두꺼운","baby":_babyType,"size":3,"traits":[]},
+			{"desc":"throbbing","name":"박동하는","baby":0,"size":2,"traits":[]},
+			{"desc":"slick","name":"매끄러운","baby":0,"size":2,"traits":[]},
+			{"desc":"moist","name":"축축한","baby":0,"size":2,"traits":[]},
+			{"desc":"quivering","name":"떨리는","baby":0,"size":2,"traits":[]},
+			{"desc":"sodden","name":"흠뻑 젖은","baby":0,"size":2,"traits":[]},
+			{"desc":"shivering","name":"전율하는","baby":0,"size":2,"traits":[]},
+			{"desc":"shuddering","name":"몸서리치는","baby":0,"size":2,"traits":[]},
+			{"desc":"convulsing","name":"경련하는","baby":0,"size":2,"traits":["hypno"]},
+			{"desc":"undulating","name":"꿈틀거리는","baby":0,"size":2,"traits":[]},
+			{"desc":"damp","name":"축축한","baby":0,"size":2,"traits":[]},
+			{"desc":"bulbous","name":"불룩한","baby":0,"size":3,"traits":[]},
+			{"desc":"gyrating","name":"회전하는","baby":0,"size":2,"traits":["hypno"]},
+			{"desc":"large","name":"커다란","baby":_babyType,"size":3,"traits":[]},
+			{"desc":"bumpy","name":"울퉁불퉁한","baby":0,"size":2,"traits":[]},
+			{"desc":"thin","name":"가느다란","baby":0,"size":1,"traits":[]},
+			{"desc":"narrow","name":"좁은","baby":0,"size":1,"traits":[]},
+			{"desc":"squishy","name":"말랑한","baby":0,"size":2,"traits":[]},
+			{"desc":"rough","name":"거친","baby":0,"size":2,"traits":["pain"]},
+		]>>
+
+		<<if _args[3]>>
+			<<if _args[3] is "pale">>
+				<<set _tentacledescs.push(
+					{"desc":"ghostly","name":"유령 같은","baby":_babyType,"size":2,"traits":[]},
+					{"desc":"translucent","name":"반투명한","baby":0,"size":1,"traits":["hypno"]},
+					{"desc":"twitching","name":"씰룩거리는","baby":0,"size":2,"traits":[]},
+					{"desc":"manic","name":"광기 어린","baby":0,"size":3,"traits":[]},
+					{"desc":"cloudy","name":"흐릿한","baby":_babyType,"size":3,"traits":[]},
+					{"desc":"ethereal","name":"천상의","baby":0,"size":1,"traits":[]},
+					{"desc":"incandescent","name":"타오르는","baby":0,"size":3,"traits":["hypno"]},
+					{"desc":"iridescent","name":"무지갯빛","baby":_babyType,"size":2,"traits":["hypno"]},
+					{"desc":"searing","name":"화끈거리는","baby":0,"size":3,"traits":["pain"]},
+				)>>
+			<<elseif _args[3] is "vine">>
+				<<set _tentacledescs.push(
+					{"desc":"flowering","name":"꽃이 핀","baby":_babyType,"size":3,"traits":[]},
+					{"desc":"blossoming","name":"만개한","baby":0,"size":3,"traits":[]},
+					{"desc":"wooden","name":"나무 재질의","baby":0,"size":2,"traits":[]},
+					{"desc":"blooming","name":"꽃망울 터진","baby":_babyType,"size":2,"traits":["hypno"]},
+					{"desc":"climbing","name":"휘감기는","baby":0,"size":2,"traits":[]},
+					{"desc":"mossy","name":"이끼 낀","baby":0,"size":2,"traits":[]},
+					{"desc":"grassy","name":"풀 같은","baby":0,"size":2,"traits":[]},
+					{"desc":"thorny","name":"가시 돋친","baby":0,"size":2,"traits":["pain"]},
+					{"desc":"pistil","name":"암술 모양의","baby":_babyType,"size":1,"traits":[]},
+					{"desc":"leafy","name":"잎이 무성한","baby":0,"size":1,"traits":[]},
+					{"desc":"sprouting","name":"싹트는","baby":0,"size":1,"traits":[]},
+					{"desc":"sapling","name":"어린 나무 같은","baby":0,"size":1,"traits":[]},
+				)>>
+			<<elseif _args[3] is "metal">>
+				<<set _tentacledescs.push(
+					{"desc":"jerking","name":"삐걱거리는","baby":0,"size":3,"traits":[]},
+					{"desc":"plated","name":"도금된","baby":0,"size":3,"traits":[]},
+					{"desc":"sparking","name":"불꽃 튀는","baby":0,"size":2,"traits":["pain"]},
+					{"desc":"shiny","name":"반짝이는","baby":0,"size":2,"traits":[]},
+					{"desc":"labelled","name":"각인된","baby":_babyType,"size":2,"traits":[]},
+					{"desc":"jolting","name":"충격적인","baby":0,"size":2,"traits":["pain"]},
+					{"desc":"rusted","name":"녹슨","baby":0,"size":2,"traits":[]},
+					{"desc":"wired","name":"배선이 드러난","baby":0,"size":1,"traits":["hypno"]},
+					{"desc":"stainless","name":"스테인리스","baby":0,"size":1,"traits":[]},
+				)>>
+			<<elseif _args[3] is "tainted">>
+				<<set _tentacledescs.push(
+					{"desc":"strange-flowering","name":"기괴하게 꽃 핀","baby":_babyType,"size":3,"traits":["hypno"]},
+					{"desc":"jagged","name":"들쭉날쭉한","baby":0,"size":3,"traits":["pain"]},
+					{"desc":"blossoming","name":"만개한","baby":0,"size":3,"traits":[]},
+					{"desc":"burnt","name":"타버린","baby":0,"size":2,"traits":["pain"]},
+					{"desc":"witchblooming","name":"마녀의 꽃이 핀","baby":_babyType,"size":2,"traits":["pain", "hypno"]},
+					{"desc":"crumbling","name":"부서져 가는","baby":_babyType,"size":2,"traits":["pain"]},
+					{"desc":"glowing","name":"발광하는","baby":0,"size":2,"traits":["hypno"]},
+					{"desc":"spined","name":"가시 박힌","baby":0,"size":2,"traits":["pain"]},
+					{"desc":"thorny","name":"가시 돋친","baby":0,"size":2,"traits":["pain"]},
+					{"desc":"leaking","name":"액체가 흐르는","baby":_babyType,"size":1,"traits":[]},
+					{"desc":"desiccated","name":"메마른","baby":0,"size":1,"traits":["pain"]},
+					{"desc":"wilting","name":"시들어가는","baby":0,"size":1,"traits":[]},
+					{"desc":"stunted","name":"발육 부진인","baby":0,"size":1,"traits":[]},
+				)>>
+			<</if>>
+		<</if>>
+
+		<<set _tentacledescs to shuffle(_tentacledescs)>>
+
+		<<for _i to 0; _i lt _args[0]; _i++>>
+			<<if _i gte _tentacledescs.length - 1>>
+				<<error {
+					message	: `Passage ${$passage} attempted to generate ${_args[0]} tentacles, when max possible tentacles is ${_tentacledescs.length - 1}`,
+					source	: Utils.GetStack()
+				}>>
+				<<break>>
+			<</if>>
+			<<set _tentacledata to _tentacledescs[_i]>>
+			<<set _variantKr to { "pale": "창백한", "vine": "덩굴", "metal": "금속", "tainted": "오염된" }[_args[3]] || "">>
+			<<set _typeKr to window.KR.getCreatureTypeKr(_tentacleType)>>
+			<<set _tentacle to {
+				"desc": (_args[3] and (!_args[4] or _args[4] is "desc") ? _args[3] + " " : "" ) + _tentacledata.desc,
+				"fullDesc": (_variantKr and _variantKr isnot _typeKr ? _variantKr + " " : "") + (_tentacledata.name || _tentacledata.desc) + " " + _typeKr,
+				"type": _tentacleType,
+				"tentaclehealth": _args[1],
+				"tentaclehealthstart": _args[1],
+				"shaft": 0,
+				"head": 0,
+				"id": "tentacle"+_i,
+				"baby": (_args[3] and (!_args[4] or _args[4] is "baby") and _tentacledata.baby isnot 0 ? _args[3] + " " + _tentacledata.baby : _tentacledata.baby ),
+				"babychance": 400,
+				"size": _tentacledata.size,
+				"traits": _tentacledata.traits
+			}>>
+
+			<<set $tentacles[_i] to clone(_tentacle)>>
+		<</for>>
+
+	<</if>>
+	<<set $combat to 1>>
+
+	<<if $rng gte 51>>
+	<<set $position to "missionary">>
+	<<else>>
+	<<set $position to "doggy">>
+	<</if>>
+	<<wetnessCalculate>>
+	<<resetLastOptions>>
+	<<getCombatDefaultsType>>
+
+	<<if !$tentacleColour>>
+		<<if $tentacles[0].desc.includes("pale")>>
+			<<set $tentacleColour to "tentacles-wraith">>
+		<<elseif $tentacles[0].desc.includes("metal")>>
+			<<set $tentacleColour to "tentacles-red">>
+		<<elseif $tentacles[0].type>>
+			<<switch $tentacles[0].type>>
+				<<case "vine" "shoot">>
+					<<set $tentacleColour to "tentacles-vines">>
+				<<case "root">>
+					<<set $tentacleColour to "tentacles-roots">>
+				<<default>>
+					<<set $tentacleColour to "tentacles-purple">>
+			<</switch>>
+		<<else>>
+			<<set $tentacleColour to "tentacles-purple">>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "tentacles">>
+	<div @class="($debugLines ? 'debugLines-tentacles' : '')">
+	<<for _i to 0; _i lt $tentacles.max; _i++>>
+		<<set _tentacle to $tentacles[_i]>>
+		<<if _tentacle isnot undefined>>
+			<<tentacleadv _tentacle>>
+			<<set _tentacle.tentaclehealth -= 0.2>>
+		<</if>>
+	<</for>>
+
+	<<if $panicattacks gte 1 and $panicviolence is 0 and $panicparalysis is 0 and $controlled is 0 and _panicchecked isnot true>>
+		<<rng>>
+		<<if $rng is 100>>
+			<<set $panicparalysis to 5>>
+		<</if>>
+		<<set _panicchecked to true>>
+	<</if>>
+	<<if $panicattacks gte 2 and $panicviolence is 0 and $panicparalysis is 0 and $controlled is 0 and _paniccheckedviolence isnot true>>
+		<<rng>>
+		<<if $rng is 100>>
+			<<set $panicviolence to 3>>
+		<</if>>
+		<<set _paniccheckedviolence to true>>
+	<</if>>
+	<<if $arousal gte $arousalmax and $orgasmdown lte 0>>
+		<<orgasm>>
+	<</if>>
+	<br>
+	</div>
+<</widget>>
+
+<<widget "effectstentacles">>
+	<<effectspain>>
+	<<effectsorgasm>>
+	<<effectsdissociation>>
+
+	<div @class="($debugLines ? 'debugLines-effectstentacleadv' : '')">
+		<<for _i to 0; _i lt $tentacles.max; _i++>>
+			<<if $tentacles[_i] isnot undefined>>
+				<<set _tentacle to $tentacles[_i]>>
+				<<effectstentacleadv _tentacle>>
+			<</if>>
+		<</for>>
+	</div>
+
+	<br>
+<</widget>>
+
+<<widget "actionstentacles">>
+	<div @class="($debugLines ? 'debugLines-actionstentacles' : '')">
+		<<set $enemyarousal to $arousal>>
+		<<if $vorecreature is 0 and _swarmcreature is undefined>>
+			<<animateCombat>>
+		<</if>>
+		<<willpowerpain>>
+		<<willpowerorgasm>>
+		<<actioncarry>>
+		<<actioncarrydrop>>
+
+		<<combatstate>>
+		<<carryblock>>
+
+		<<if $trance lte 0 and $panicparalysis is 0 and $panicviolence is 0>>
+			<<generateActionsTentacle>>
+		<</if>>
+
+	</div>
+	<br><br>
+<</widget>>
+
+<<widget "actionstentaclespenis">> /* unused */
+	<<for _i to 0; _i lt $tentacles.max; _i++>>
+		<<if $tentacles[_i] isnot undefined>>
+			<<set _tentacle to $tentacles[_i]>>
+			<<actionstentacleadvpenis _tentacle>>
+		<</if>>
+	<</for>>
+	<br>
+<</widget>>
+
+<<widget "actionstentacleslegs">> /* unused */
+	<<for _i to 0; _i lt $tentacles.max; _i++>>
+		<<if $tentacles[_i] isnot undefined>>
+			<<set _tentacle to $tentacles[_i]>>
+			<<actionstentacleadvlegs _tentacle>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "actionstentaclesrighthand">> /* unused */
+	<<for _i to 0; _i lt $tentacles.max; _i++>>
+		<<if $tentacles[_i] isnot undefined>>
+			<<set _tentacle to $tentacles[_i]>>
+			<<actionstentacleadvrighthand _tentacle>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "actionstentacleslefthand">> /* unused */
+	<<for _i to 0; _i lt $tentacles.max; _i++>>
+		<<if $tentacles[_i] isnot undefined>>
+			<<set _tentacle to $tentacles[_i]>>
+			<<actionstentacleadvlefthand _tentacle>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "upperslither">>
+	<<if $worn.over_upper.name isnot "naked">>
+		그러고는 당신의 $worn.over_upper.name<<if $worn.upper.name isnot "naked">>【와과】 $worn.upper.name<</if>> 아래로 <<slithers>>
+	<<elseif $worn.upper.name isnot "naked">>
+		그러고는 당신의 $worn.upper.name 아래로 <<slithers>>
+	<<else>>
+		그러고는 당신의 맨살 위를 <<slithers>>
+	<</if>>
+<</widget>>
+
+<<widget "lowerslither">>
+	<<if $worn.over_lower.name isnot "naked">>
+		그런 다음 $worn.over_lower.name<<if $worn.lower.name isnot "naked">>【와과】 $worn.lower.name<</if>> 밑으로 <<slithers>>
+	<<elseif $worn.lower.name isnot "naked">>
+		그런 다음 $worn.lower.name 밑으로 <<slithers>>
+	<<else>>
+		그런 다음 맨살을 가로질러 <<slithers>>
+	<</if>>
+<</widget>>
+
+<<widget "underslither">>
+	<<if $worn.lower.name isnot "naked">>
+		<<if !$worn.under_lower.type.includes("naked")>>
+			그러고는 당신의 $worn.lower.name【와과】 $worn.under_lower.name 아래로 <<slithers>>
+		<<elseif playerChastity()>>
+			그러고는 당신의 $worn.lower.name 아래 당신의 <<print $worn.genitals.name>>【을를】 향해 <<slithers>>
+		<<else>>
+		<</if>>
+	<<else>>
+		<<if !$worn.under_lower.type.includes("naked")>>
+			그러고는 당신의 $worn.under_lower.name 아래로 <<slithers>>
+			<<if playerChastity("hidden")>>
+				당신의 <<print $worn.genitals.name>>【을를】 향해
+			<</if>>
+		<<elseif $worn.under_lower.type.includes("naked") and playerChastity("hidden")>>
+			그러고는 당신의 <<print $worn.genitals.name>>【을를】 향해 <<slithers>>
+		<<else>>
+			그러고는 당신의 맨살 위를 가로질러 <<slithers>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "statetentacles">>
+	<<for _j to 0; _j lt $tentacles.max; _j++>>
+		<<if $tentacles[_j] isnot undefined>>
+			<<if $tentacles[_j].shaft is "finished" and $tentacles[_j].name isnot "finished">>
+				<<set $tentacles.active -= 1>>
+				<<set $tentacles[_j].name to "finished">>
+			<</if>>
+		<</if>>
+	<</for>>
+<<sexcheck>>
+<<if $ejaculating isnot 1>>
+	현재 당신을 에워싸고 있는 <<switch $tentacles[0].type>><<case "root">>뿌리<<case "shoot">>새순<<case "vine">>덩굴<<case "metal">>금속 촉수<<default>>촉수<</switch>>【은는】 총 <span class="blue"><<number $tentacles.active>></span>개다.
+	<br><br>
+<</if>>
+<</widget>>
+
+<<widget "leftarmtentacledisable">>
+	<<for _j to 0; _j lt $tentacles.max; _j++>>
+		<<if $tentacles[_j] isnot undefined>>
+			<<if $tentacles[_j].id is $leftarm>>
+				<<set $tentacles[_j].head to 0>>
+			<</if>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "rightarmtentacledisable">>
+	<<for _j to 0; _j lt $tentacles.max; _j++>>
+		<<if $tentacles[_j] isnot undefined>>
+			<<if $tentacles[_j].id is $rightarm>>
+				<<set $tentacles[_j].head to 0>>
+			<</if>>
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget "feettentacledisable">>
+	<<for _j to 0; _j lt $tentacles.max; _j++>>
+		<<if $tentacles[_j] isnot undefined>>
+			<<if $tentacles[_j].id is $feetuse>>
+				<<set $tentacles[_j].head to 0>>
+			<</if>>
+		<</if>>
+	<</for>>
+<</widget>>

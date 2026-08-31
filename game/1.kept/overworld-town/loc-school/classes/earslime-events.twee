@@ -1,0 +1,218 @@
+:: School Lesson Slime
+<<effects>>
+
+<<if $phase is 2>>
+	<<if $earSlime.corruption gte (currentSkillValue('willpower') / 10)>>
+		<<set $earSlime.defyCooldown += 2>>
+		슬라임이 통제권을 주장하려 한다. <span class="red">그것이 당신의 의지를 압도하여,</span> 당신은 강제로 몸을 돌려 <<if $daily.earSlimeSkipLesson is "swimming">>수영장<<else>>교실<</if>>【을를】 떠난다.
+		<<ggwillpower>><<willpower 1>>
+		<br><br>
+		<<if $daily.earSlimeSkipLesson is "swimming">>
+			<<link [[다음|$lastChangingRoom]]>><<endevent>><</link>>
+		<<else>>
+			<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<</if>>
+	<<else>>
+		당신은 슬라임의 명령을 무시하고 계속 나아가려 한다. 그것은 당신을 <<if $daily.earSlimeSkipLesson is "swimming">>수영장<<else>>교실<</if>> 밖으로 쫓아내려 <span class="green">시도하지만 실패한다</span>.
+		<br><br>
+		<<link [[다음|$lessonPassage]]>><<unset $lessonPassage>><<endevent>><</link>>
+		<<set $daily.earSlimeSkipLesson to "failed">>
+	<</if>>
+<<elseif $phase is 1>>
+	당신은 슬라임의 명령을 무시하고 계속 나아간다.
+	<br><br>
+	<<link [[다음|$lessonPassage]]>><<unset $lessonPassage>><<endevent>><</link>>
+	<<set $daily.earSlimeSkipLesson to "ignored">>
+<<else>>
+	당신은 귀 슬라임의 명령에 따라 <<if $daily.earSlimeSkipLesson is "swimming">>수영장<<else>>교실<</if>>【을를】 떠난다.
+	<br><br>
+	<<if $daily.earSlimeSkipLesson is "swimming">>
+		<<link [[다음|$lastChangingRoom]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<</if>>
+<</if>>
+
+:: School Lesson 2 Slime
+<<effects>>
+
+<<if $phase is 1>>
+	<<if $earSlime.defyCooldown>>
+		<<if $earSlime.growth gte 100>>
+			<<set $earSlime.defyCooldown += 2>>
+			당신은 슬라임의 명령을 무시하고 수업에 계속 참여한다. 하지만, <span class="red">그것은 다른 방식으로 당신을 벌할 수 있다는 것을 알기에 당신을 멈추지 않는다.</span>
+		<<else>>
+			당신은 슬라임의 요구에 저항하고 수업에 계속 참여하려 한다. 하지만, <span class="teal">그것은 이전에 당신을 제압하느라 아직 지쳐있다.</span> 그것은 당신의 발걸음을 반대 방향으로 돌리려 <span class="green">시도하지만 실패한다</span>.
+		<</if>>
+		<br><br>
+		<<link [[다음|$lessonPassage]]>><<unset $lessonPassage>><<endevent>><</link>>
+		<<set $daily.earSlimeSkipLesson to "failed">>
+	<<elseif $earSlime.corruption gte (currentSkillValue('willpower') / 10)>>
+		<<set $earSlime.defyCooldown += 4>>
+		슬라임이 통제권을 주장하려 한다. <span class="red">그것이 당신의 의지를 압도하여,</span> 당신은 강제로 몸을 돌린다. 당신은 <<if $daily.earSlimeSkipLesson is "swimming">>수영장<<else>>교실<</if>>【을를】 떠나 자위를 시작한다.
+		<<ggwillpower>><<willpower 1>>
+		<br><br>
+		<<link [[다음|School Lesson 2 Slime Masturbation]]>><<set $masturbationstart to 1>><</link>>
+	<<else>>
+		당신은 슬라임의 명령을 무시하고 수업에 계속 참여하려 한다. 그것은 당신을 <<if $daily.earSlimeSkipLesson is "swimming">>수영장<<else>>교실<</if>> 밖으로 쫓아내 자위를 시키려 <span class="green">시도하지만 실패한다</span>.
+		<br><br>
+		<<link [[다음|$lessonPassage]]>><<unset $lessonPassage>><<endevent>><</link>>
+		<<set $daily.earSlimeSkipLesson to "failed">>
+	<</if>>
+<<else>>
+	당신은 귀 슬라임의 명령을 따른다. 당신은 <<if $daily.earSlimeSkipLesson is "swimming">>수영장<<else>>교실<</if>>【을를】 떠나 자위를 시작한다.
+	<br><br>
+	<<link [[다음|School Lesson 2 Slime Masturbation]]>><<set $masturbationstart to 1>><</link>>
+<</if>>
+
+:: School Lesson 2 Slime Masturbation
+<<effects>>
+
+<<if $masturbationstart is 1>>
+	<<set $masturbationstart to 0>>
+	<<set $masturbationstat += 1>>
+	<<silently>><<masturbationstart>><</silently>>
+	<<set $corruptionMasturbation to true>>
+	<<if $earSlime.growth gte 200 and $earSlime.promiscuity gte 4>>
+		<<set $corruptionMasturbationCount to random(8, 16)>>
+	<<elseif $earSlime.growth gte 100>>
+		<<set $corruptionMasturbationCount to random(4, 8)>>
+	<<elseif $earSlime.growth gte 50>>
+		<<set $corruptionMasturbationCount to random(2, 4)>>
+	<<else>>
+		<<set $corruptionMasturbationCount to random(1, 2)>>
+	<</if>>
+	<<set $masturbationAudienceMutualAllowed to true>>
+<</if>>
+<<if $masturbationAudience gte 10 and $corruptionMasturbationCount gt 1>>
+	<<set $corruptionMasturbationCount to 1>>
+<</if>>
+<<if masturbationAudienceCalc()>>
+	<<masturbationAudienceIncrement "student">>
+<</if>>
+<<masturbationeffects>>
+<<masturbationactions>>
+<<masturbationControls "studentAudience|corruptionMasturbation">>
+
+:: School Lesson 2 Slime Masturbation Finish
+<<effects>>
+<<set _masturbationAudience to $masturbationAudience>>
+<<if !_masturbationAudience>>
+	<<endmasturbation>>
+	<<clotheson>>
+	<<endcombat>>
+	귀 슬라임의 영향력이 약해지는 것을 느끼는 순간,
+	<<if $exposed gte 1>>
+		당신은 최대한 몸을 숨기고<<if $daily.earSlimeSkipLesson is "swimming">> 재빨리 탈의실로 돌아간다<</if>>.
+	<<else>>
+		당신은 최대한 빨리 옷을 입고<<if $daily.earSlimeSkipLesson is "swimming">>, 탈의실로 돌아간다<</if>>.
+	<</if>>
+
+	<br><br>
+	<<if $daily.earSlimeSkipLesson is "swimming">>
+		<<link [[다음|$lastChangingRoom]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<</if>>
+<<elseif $earSlime.growth gte 200 and $earSlime.promiscuity gte 4>>
+	<<endmasturbation>>
+
+	당신은 귀 슬라임의 영향력이 변하는 것을 느낀다. 슬라임의 명령을 기억하며, 당신은
+	<<if _masturbationAudience gte 10>>
+		많은 학생 무리를 향해 돌아본다.
+		<<set $slimeAudience to true>>
+	<<elseif _masturbationAudience gte 7>>
+		학생 무리를 향해 돌아본다.
+		<<set $slimeAudience to true>>
+	<<elseif _masturbationAudience gte 4>>
+		학생 그룹을 향해 돌아본다.
+	<<elseif _masturbationAudience gte 2>>
+		두 명의 학생을 향해 돌아본다.
+	<<else>>
+		학생을 향해 돌아본다.
+	<</if>>
+	<br><br>
+	당신은 옷을 벗고 <<pluralise _masturbationAudience "학생" "학생">>【을를】 바라본다. "강간해 줘!" 당신은 소리친다.
+	<<clothesstrip>>
+	<br><br>
+	잠깐의 침묵 후, 누군가 당신에게 다가온다.
+	<br><br>
+	<<link [[다음|School Lesson 2 Slime Rape]]>><<set $molestationstart to 1>><</link>>
+<<else>>
+	<<endmasturbation>>
+
+	귀 슬라임의 영향력이 약해지는 것을 느끼는 순간, 당신은 달린다. 숨을 곳을 찾아 몸을 정돈한다.
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<if $daily.earSlimeSkipLesson is "swimming">>
+		<<link [[다음|$lastChangingRoom]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<</if>>
+	<br>
+<</if>>
+
+:: School Lesson 2 Slime Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<npc_attempt_sex>>
+	<<set $audienceforceteen to 1>>
+	<<set $enemytrust -= 150>>
+	<<set $enemyanger += 150>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<if $slimeAudience>>
+	<<audience>>
+<</if>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|School Lesson 2 Slime Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|School Lesson 2 Slime Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: School Lesson 2 Slime Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<set _pass15 to true>>
+	<<ejaculation>>
+	당신은 땅바닥에 누워 헐떡인다. 벌거벗은 채로 둘러싸여 있다. 군중은 아직 끝나지 않았다. 당신이 누워있는 동안 그들은 더 많은 사진을 찍고, 이상한 안개가 당신의 마음을 흐리게 한다.
+	<br><br>
+
+	그들은 서서히 흥미를 잃는다. <<tearful>> 당신은 힘겹게 일어선다.
+
+	<<if $rapeavoid is 0 and $stress gte 1000>>
+		<span class="green">머릿속의 슬라임이 영향력이 사라지기 전에 당신을 진정시키는 것을 느낀다.</span><<if $stress gte 5000>><<lllstress>><<else>><<llstress>><</if>><<stress `$stress / -200`>>
+	<<else>>
+		당신은 슬라임의 영향력이 사라지는 것을 느낀다.
+	<</if>>
+	<br><br>
+<<else>>
+	당신은 어리둥절한 군중을 뚫고 달린다. 몇몇이 당신을 쫓아오지만, 그들이 잡기 전에 숨을 수 있었다.
+	<br><br>
+
+	<<tearful>> 당신은 움찔한다. 슬라임이 당신의 반항을 벌한다.
+	<<corruption -3>><<pain 8>><<stress 6>><<trauma 6>><<def 1>><<llcorruption>><<ggpain>><<ggtrauma>><<ggstress>>
+	<br><br>
+<</if>>
+<<clotheson>>
+<<endcombat>>
+<<unset $slimeAudience>>
+
+<<if $daily.earSlimeSkipLesson is "swimming">>
+	<<link [[다음|$lastChangingRoom]]>><<endevent>><<if _pass15>><<pass 15>><</if>><</link>>
+<<else>>
+	<<link [[다음|Hallways]]>><<endevent>><<if _pass15>><<pass 15>><</if>><</link>>
+<</if>>

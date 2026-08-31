@@ -1,0 +1,681 @@
+:: Hairdressers Lock
+
+<<set $outside to 0>><<effects>><<set $lock to 0>>
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔이 묶여 있지만 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+		<<lockicon "pick">><<link [[자물쇠를 딴다 (0:10)|Hairdressers]]>><<pass 10>><<crimeUp 5 "trespassing">><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">이 자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+<<getouticon>><<link [[떠난다|Shopping Centre]]>><</link>>
+
+:: Hairdressers
+
+<<set $outside to 0>><<set $location to "shopping_centre">><<effects>>
+<<calchairlengthstage>>
+
+당신은 미용실에 있다. 다양한 헤어 제품을 판매 중이다. 머리를 자르거나 염색할 수도 있다.
+<<if Time.dayState is "night" and Time.hour isnot $closinghour>>
+	당신은 어둠 속에 혼자 있다.
+<<elseif $exposed gte 1>>
+	당신은 존엄성을 지키기 위해 찬장에 숨는다.
+<<elseif Time.dayState isnot "night">>
+	빈자리가 있다.
+<</if>>
+<<if $hairgelBottles is undefined>>
+	<<set $hairgelBottles to 0>>
+<</if>>
+<br><br>
+<<if $stress gte $stressmax>>
+	<<passoutshop "shop">>
+<<else>>
+	<<if Time.hour is 21>>
+		폐점 시간이다. 경비원이 모든 사람을 밖으로 몰아내고 있다.
+		<<if $exposed gte 1>>
+			경비원이 이 옷차림을 본다면 얼마나 노출되어 있을지 깨닫고 공황 상태에 빠진다.
+		<</if>>
+		<br><br>
+		<<if $exposed lte 0>>
+			<<highicon>><<link [[밖으로 나간다|High Street]]>><</link>>
+			<br>
+		<<else>>
+			<<ind>><<link [["끝날 때까지 숨는다 (1:00)"|Hairdressers]]>><<pass 1 hour>><</link>>
+		<</if>>
+	<<else>>
+		<<if Time.dayState is "night" and Time.hour isnot $closinghour>>
+			<<hairdressericon "gel">><<link [[헤어 젤 한 병을 훔친다|$passage]]>><<crimeUp 8 "petty">><<set $hairgelBottles += 1>><</link>><<crime "petty">> | 보유 중: <span class="gold"><<= $hairgelBottles || 0>></span>
+			<br>
+			<<hairdressericon "hairspray">><<link [[모발 성장제 한 병 훔치기|$passage]]>><<crimeUp 50 "petty">><<set $sexStats.pills.pills["Hair Growth Formula"].owned++>><<set $sexStats.pills.boughtOnce to true>><</link>><<crime "petty">> | 보유: <span class="gold"><<= $sexStats.pills.pills["Hair Growth Formula"].owned>></span>
+			<br>
+			<<if !$weekly.theft.hairDressers>>
+				<<shopicon "register">><<link [[금전 등록기를 살펴본다|Hairdressers Register]]>><</link>>
+				<br><br>
+			<</if>>
+		<</if>>
+		<<if $exposed lte 1 and Time.dayState isnot "night" and Time.hour isnot 21>>
+			<<hairdressericon "chair">><<link [[자리에 앉는다|Hairdressers Seat]]>><</link>>
+			<br>
+			<<if $money gte 800>>
+				<<hairdressericon "gel">> <<link [[헤어젤 구매 (£8)|Hairdressers Gel]]>><<money -800 "hairdressers">><<set $hairgelBottles += 1>><</link>> | 보유: <span class="gold"><<= $hairgelBottles || 0>></span>
+			<<else>>
+				<<hairdressericon "gel">> <span class="blue">헤어 젤이나 모발 성장제를 살 돈이 없다.</span>
+			<</if>>
+			<br>
+			<<if $money gte 5000>>
+				<<hairdressericon "hairspray">> <<link [[모발 성장제 구매 (£50)|Hairdressers Gel]]>><<money -5000 "hairdressers">><<set $sexStats.pills.pills["Hair Growth Formula"].owned += 3>><<set $sexStats.pills.boughtOnce to true>><<set $phase to 1>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["Hair Growth Formula"].owned>></span>
+			<<elseif $money gte 800>>
+				<<hairdressericon "hairspray">> <span class="blue">모발 성장제를 살 돈이 없습니다.</span>
+			<</if>>
+			<br><br>
+		<</if>>
+		<<getouticon>><<link [[나간다|Shopping Centre]]>><</link>>
+	<</if>>
+<</if>>
+
+:: Hairdressers Gel
+
+<<generate1>><<person1>>당신은 판매 중인 헤어 제품들을 둘러본다. "번거로움 없이 깔끔하게!"라는 라벨이 붙은 작은 <<if $phase is 1>>통<<else>>병<</if>>【을를】 고른다.
+<br><br>
+미용사가 물건을 계산하며 잡담을 건넨다. "그거 아주 좋아요." <<he>>【이가】 말한다.
+
+<<if $phase is 1>>
+	"통이 작아서 <span class="teal">몇 번 못 쓰겠지만</span>, 매일 뿌려야 하는 건 아닐 거야. 머리가 짧게 유지될지 걱정할 필요 없어. 적어도 다른 스타일로 바꾸기로 결정하기 전까진 말이야."
+<<else>>
+	"병이 작아서 <span class="teal">한 번밖에</span> 못 쓰겠지만, 고정력은 돌처럼 단단할 거야. 머리가 헝클어질까 걱정 안 해도 될걸. 적어도 헤어스타일을 바꾸기로 결정할 때까지는."
+<</if>>
+<br><br>
+<<He>>【은는】 미소 지으며 당신에게 가방을 건넨다. "<<print either("구매해 주셔서 감사합니다!","좋은 하루 보내세요.","안녕히 가세요.","거래해서 즐거웠어요.","또 오세요!")>>"
+<br><br>
+<<if $phase is 1>>
+	모발 성장제가 <span class="gold"><<print $sexStats.pills.pills["Hair Growth Formula"].owned>></span>회분 남았습니다.
+<<else>>
+	헤어 젤 <span class="gold">$hairgelBottles</span>병을 가지고 있습니다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hairdressers]]>><<endevent>><</link>>
+
+:: Hairdressers Seat
+
+<<calchairlengthstage>>
+<<generate1>><<person1>>자리에 앉자, 곧 미용사가 당신 뒤에 나타난다. "어떻게 해줄까, 자기?" <<hairdressersPricelist>>
+<<set $hairOption to $hairlength>>
+<<set $fringeOption to $fringelength>>
+<<set $dyeOption to "noChange">>
+<<set $browsDyeOption to "noChange">>
+<<set $twoToneDyeOption1 to "noChange">>
+<<set $twoToneDyeOption2 to "noChange">>
+<<set $twoToneHairDye to false>>
+<<set $transformationShow to false>>
+<<set $twoToneStyle to $hairColourGradient.style>>
+<div id="hairDressers">
+	<<hairDressersOptions>>
+</div>
+<<hairdressersReset>>
+
+:: Hairdressers Session
+<<hairdressersSession>>
+<<getouticon>><<link [[떠난다|Hairdressers]]>><<endevent>><</link>>
+
+:: Hairdressers Widgets [widget]
+/*args[0]: dye name in colours.js */
+<<widget "dyeSwatch">>
+	<div @class="'hair-'+_args[0]">
+		<div style="height: 25px; width: 100px; margin-top:5px; background-color: #fd6064; border:1px solid #ccc;" class="colour-hair"></div>
+	</div>
+<</widget>>
+
+<<widget "hairdressersPricelist">>
+	거울 옆의 팻말에 적혀 있다:
+	<br>
+	커트: £30
+	<br>
+	앞머리 다듬기: £30
+	<br>
+	전체 염색: £60
+	<br>
+	앞머리 또는 옆머리 염색: £50
+	<br>
+	투톤 염색: £250
+	<br>
+	눈썹 염색: £20
+	<br>
+<</widget>>
+
+<<widget "hairDressersOptions">>
+	<<set _currentCost to 0>>
+	<<if not $transformationShow>>
+		<<set $transformationShow to false>>
+	<</if>>
+	<<if not $dyedHairPart>>
+		<<set $dyedHairPart to "hair">>
+	<</if>>
+	<<if not $twoToneHairDye>>
+		<<set $twoToneHairDye to false>>
+	<</if>>
+	<<if not $twoToneDyeOption1>>
+		<<set $twoToneDyeOption1 to "red">>
+	<</if>>
+	<<if not $twoToneDyeOption2>>
+		<<set $twoToneDyeOption2 to "black">>
+	<</if>>
+
+	<<if not $twoToneStyle>>
+		<<set $twoToneStyle to $hairColourGradient.style>>
+	<</if>>
+	<<set _hiddenMannequin = $options.images is 1 ? "" : "hidden">>
+	<div id="hairDresserDiv">
+		<div id="mannequin" @class="'mannequin ' + _hiddenMannequin" style="height:unset">
+			<<mannequinHairdresser>>
+			<<if ($settings.transformAnimalEnabled or $settings.transformDivineEnabled) and getTransformParts().length>>
+				<label><<checkbox "$transformationShow" false true autocheck>> Show transformations</label>
+			<</if>>
+			<div id="currentCost" class="gold">To pay: £0</div>
+		</div>
+		<div>
+			<<if ($money gte _currentCost + 3000 or $hairOption isnot $hairlength)>>
+				<<if $hairOption isnot $hairlength>>
+					<<set _currentCost += 3000>>
+				<</if>>
+				Have your sides cut to your:
+				<br>
+				<<set _hairNames to ["Ears", "Chin", "Shoulders", "Upper chest", "Middle chest", "Upper stomach", "Navel", "Thighs", "Knees", "Ankles"]>>
+				<<set _hairOptions to {"Don't cut":$hairlength}>>
+				<<for _i to 9; _i gte 0; _i-->>
+					<<set $_length to (_i * 100) + 100>>
+					<<if $_length + 50 lt $hairlength>> /* + 50 to ensure it's not cut too early */
+						<<set _hairOptions[_hairNames[_i]] to $_length>>
+					<</if>>
+				<</for>>
+				<<listbox "$hairOption" autoselect>>
+					<<optionsfrom _hairOptions>>
+				<</listbox>>
+				<br><br>
+			<<elseif $hairlength gt 100>>
+				You don't have enough money to cut your hair.
+				<br><br>
+			<</if>>
+
+			<<if ($money gte _currentCost + 3000 or $fringeOption isnot $fringelength)>>
+				<<if $fringeOption isnot $fringelength>>
+					<<set _currentCost += 3000>>
+				<</if>>
+				Have your fringe cut until it's:
+				<br>
+				<<set _fringeNames to ["Very short", "Short", "Standard", "Long"]>>
+				<<set _fringeOptions to {"Don't cut":$fringelength}>>
+				<<for _i to 3; _i gte 0; _i-->>
+					<<set $_length to (_i * 200) + 100>>
+					<<if $_length + 50 lt $fringelength>> /* + 50 to ensure it's not cut too early */
+						<<set _fringeOptions[_fringeNames[_i]] to $_length>>
+					<</if>>
+				<</for>>
+				<<listbox "$fringeOption" autoselect>>
+					<<optionsfrom _fringeOptions>>
+				<</listbox>>
+				<br><br>
+			<<elseif $fringelength gte 100>>
+				You don't have enough money to cut your fringe.
+				<br><br>
+			<</if>>
+
+			<<set _dyeNames to ["Red", "Ebony","Jet black", "Black", "Blond", "Soft Blond", "Platinum blond", "Golden", "Ashy blond", "Strawberry blond", "Dark Brown", "Brown", "Copper Brown", "Soft brown", "Light brown", "Burnt Orange", "Ginger", "Blood Orange", "Blue", "Deep Blue", "Neon Blue", "Frost Blue", "Green", "Dark Lime", "Toxic Green", "Teal", "Aquamarine", "Pink", "Bright Pink", "Hot pink", "Soft pink", "Rosegold", "Crimson", "Wine", "Purple", "Medium Purple", "Bright Purple", "Grey", "White", "Snow white"]>>
+			<<set $hairdressersHairColour to ["red", "ebony", "jetblack", "black", "blond", "softblond", "platinumblond", "golden", "ashyblond", "strawberryblond", "darkbrown", "brown", "copperbrown", "softbrown", "lightbrown", "burntorange", "ginger", "bloodorange", "blue", "deepblue", "neonblue", "frostblue", "green", "darklime", "toxicgreen", "teal", "aquamarine", "pink", "brightpink", "hotpink", "softpink", "rosegold", "crimson", "wine", "purple", "mediumpurple", "brightpurple", "grey", "white", "snowwhite"]>>
+
+			<<if $money gte _currentCost + 3000 or $dyeOption isnot "noChange" or $twoToneHairDye>>
+				<<if $dyeOption is "removeDye">>
+					<<set _currentCost += 3000>>
+				<<elseif not $twoToneHairDye and $dyeOption isnot "noChange">>
+					<<if $dyedHairPart is "hair">>
+						<<set _currentCost += 6000>>
+					<<else>>
+						<<set _currentCost += 5000>>
+					<</if>>
+				<<elseif $twoToneHairDye>>
+					<<set _currentCost += 25000>>
+				<</if>>
+				Have your hair dyed<<if $haircolour isnot $naturalhaircolour or $hairfringecolour isnot $naturalhaircolour>> or cleared of hair dye<</if>>:
+				<br>
+				<label><<radiobutton "$dyedHairPart" "hair" autocheck>> Full head</label> |
+				<label><<radiobutton "$dyedHairPart" "fringe" autocheck>> Fringe</label> |
+				<label><<radiobutton "$dyedHairPart" "sides" autocheck>> Sides</label> |
+				<br>
+				<label><<checkbox "$twoToneHairDye" false true autocheck>> Request a two-tone colouring</label>
+				<br>
+
+				<<set _dyeOptions to {"Don't dye":"noChange"}>>
+				<<set _twotoneDyeOptions to {}>>
+				<<if $haircolour isnot $naturalhaircolour>>
+					<<set _dyeOptions["Remove dye"] to "removeDye">>
+				<</if>>
+				<<if $money gte _currentCost + 6000 or ($dyeOption isnot "noChange" and $dyeOption isnot "removeDye")>>
+					<<for _i to 0; _i lt _dyeNames.length; _i++>>
+						<<if ($haircolour is $hairdressersHairColour[_i] and $hairColourStyle is "simple") or $naturalhaircolour is $hairdressersHairColour[_i]>>
+							<<continue>>
+						<</if>>
+						<<set _dyeOptions[_dyeNames[_i]] to $hairdressersHairColour[_i]>>
+					<</for>>
+				<</if>>
+				<<for _i to 0; _i lt _dyeNames.length; _i++>>
+					<<set _twotoneDyeOptions[_dyeNames[_i]] to $hairdressersHairColour[_i]>>
+				<</for>>
+				<<if not $twoToneHairDye>>
+					<<listbox "$dyeOption" autoselect>>
+						<<optionsfrom _dyeOptions>>
+					<</listbox>>
+					<<if $dyeOption isnot "noChange"and $dyeOption isnot "removeDye">>
+						<<dyeSwatch $dyeOption>>
+						<br>
+					<<else>>
+						<br><br>
+					<</if>>
+				<<else>>
+					Style: <<listbox "$twoToneStyle" autoselect>>
+						<<option "Low Ombré" "low-ombre">>
+						<<option "High Ombré" "high-ombre">>
+						<<option "Split" "split">>
+						<<option "Face-framing highlights" "face-frame">>
+					<</listbox>>
+					<br>
+					First colour: <<listbox "$twoToneDyeOption1" autoselect>>
+						<<optionsfrom _twotoneDyeOptions>>
+					<</listbox>>
+					<<dyeSwatch $twoToneDyeOption1>>
+					<br>
+					Second colour: <<listbox "$twoToneDyeOption2" autoselect>>
+						<<optionsfrom _twotoneDyeOptions>>
+					<</listbox>>
+					<<dyeSwatch $twoToneDyeOption2>>
+					<br>
+					<br>
+				<</if>>
+			<<else>>
+				You don't have enough money to dye your <<print $dyedHairPart>>.
+				<br><br>
+			<</if>>
+
+			<<if $money gte _currentCost + 1000 or $browsDyeOption isnot "noChange">>
+				<<if $browsDyeOption is "removeDye">>
+					<<set _currentCost += 1000>>
+				<<elseif $browsDyeOption isnot "noChange">>
+					<<set _currentCost += 2000>>
+				<</if>>
+				Have your eyebrows dyed<<if $makeup.browscolour isnot $naturalhaircolour>> or cleared of hair dye<</if>>:
+				<br>
+
+				<<set _browsDyeOptions to {"Don't dye":"noChange"}>>
+				<<if $makeup.browscolour isnot $naturalhaircolour>>
+					<<set _browsDyeOptions["Remove dye"] to "removeDye">>
+				<</if>>
+				<<if $money gte _currentCost + 2000 or ($browsDyeOption isnot "noChange" and $browsDyeOption isnot "removeDye")>>
+					<<for _i to 0; _i lt _dyeNames.length; _i++>>
+						<<if $makeup.browscolour is $hairdressersHairColour[_i] or $naturalhaircolour is $hairdressersHairColour[_i]>>
+							<<continue>>
+						<</if>>
+						<<set _browsDyeOptions[_dyeNames[_i]] to $hairdressersHairColour[_i]>>
+					<</for>>
+				<</if>>
+				<<listbox "$browsDyeOption" autoselect>>
+					<<optionsfrom _browsDyeOptions>>
+				<</listbox>>
+				<<if $browsDyeOption isnot "noChange"and $browsDyeOption isnot "removeDye">>
+					<<dyeSwatch $browsDyeOption>>
+					<br>
+				<<else>>
+					<br><br>
+				<</if>>
+			<<else>>
+				You don't have enough money to dye your brow.
+				<br><br>
+			<</if>>
+		</div>
+	</div>
+
+	<<set _pass to 0>>
+	<<set _pass += $hairOption isnot $hairlength ? 15 : 0>>
+	<<set _pass += $fringeOption isnot $fringelength ? 15 : 0>>
+	<<set _pass += $browsDyeOption isnot "noChange" ? 10 : 0>>
+	<<set _pass += $twoToneHairDye ? 30 : $dyeOption is "removeDye" ? 15 : $dyeOption isnot "noChange" ? 30 : 0>>
+	<<if _sydneyPresent>>
+		<<if (!_cancel or _currentCost gt 0) and $money gte _currentCost>>
+			<<hairdressericon "chair">><<link [[Continue|Sydney Hairdressers Session]]>>
+				<<money `-_currentCost` "hairdressers">>
+			<</link>>
+		<<elseif $money lt _currentCost>>
+			<span class="blue">You don't have enough money to pay the hairdresser.</span>
+			<br><br>
+			<<hairdressericon "chair">><<link [[Continue|Sydney Hairdressers Session]]>><</link>>
+			<br>
+		<</if>>
+		<<if _cancel>>
+			<br><br>
+			<<getouticon>><<link [[Leave|Sydney Hairdressers Cancel]]>><<endevent>><</link>>
+		<</if>>
+	<<else>>
+
+		<<if $money lt _currentCost>>
+			<<hairdressericon "chair">><span class="blue">You don't have enough money to pay the hairdresser.</span>
+			<br>
+		<<elseif $twoToneHairDye and ($twoToneDyeOption1 eq $twoToneDyeOption2)>>
+			<<hairdressericon "chair">><span class="blue">You need to select two different colours for two-tone hair colouring.</span>
+			<br>
+		<<elseif _currentCost gt 0>>
+			<<hairdressericon "chair">><<link [[Pay hairdresser (<<printmoney _currentCost>> <<= getTimeString(_pass)>>)|Hairdressers Session]]>>
+				<<money `-_currentCost` "hairdressers">>
+			<</link>>
+			<br>
+		<</if>>
+		<<getouticon>><<link [[Leave|Hairdressers]]>><<endevent>><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "hairdressersSession">>
+	당신은 돈을 건네고 <<he>>【은는】 작업을 시작한다.
+	<br><br>
+	<<set _pass to 0>>
+	<<if $hairOption isnot $hairlength>>
+		미용사가 가위질을 시작하고 당신 주위로 머리카락이 떨어져 내린다. 잠시 후, <<he>>【은는】 당신이 <<his>> 솜씨를 확인할 수 있도록 거울을 내민 채 뒤로 물러선다.
+		<br><br>
+		<<set $hairlength to clone($hairOption)>>
+		<<set _pass += 15>>
+		<<unset $hairOption>>
+	<</if>>
+
+	<<if $fringeOption isnot $fringelength>>
+		<<if _pass gt 0>>
+			<<He>>【은는】 가위질을 계속하고 당신 주위로 머리카락이 계속 떨어져 내린다. 잠시 후, <<he>>【은는】 당신이 <<his>> 솜씨를 더 확인할 수 있도록 다시 거울을 내민 채 뒤로 물러선다.
+		<<else>>
+			미용사가 가위질을 시작하고 당신 주위로 머리카락이 떨어져 내린다. 잠시 후, <<he>>【은는】 당신이 <<his>> 솜씨를 확인할 수 있도록 거울을 내민 채 뒤로 물러선다.
+		<</if>>
+		<br><br>
+		<<set $fringelength to clone($fringeOption)>>
+		<<set _pass += 15>>
+		<<unset $fringeOption>>
+	<</if>>
+
+	<<if $browsDyeOption is "removeDye">>
+		<<if _pass gt 0>>
+			그러고 나서 <<he>>【은는】 당신에게 고개를 뒤로 젖히라고 한다. <<He>>【은는】 당신의 눈썹에 인공적인 화학 약품 냄새가 나는 액체를 바른다. 미용사는 비눗물이 묻은 티슈로 눈썹을 닦아내고 당신의 얼굴을 씻어내는 것으로 과정을 마무리한다.
+			<<He>>【은는】 당신이 본래의 $naturalhaircolour 색으로 돌아온 눈썹을 볼 수 있도록 거울을 가져온다.
+		<<else>>
+			<<He>>【은는】 당신의 눈썹에 인공적인 화학 약품 냄새가 나는 액체를 바른다. 미용사는 비눗물이 묻은 티슈로 눈썹을 닦아내고 당신의 얼굴을 씻어내는 것으로 과정을 마무리한다.
+			<<He>>【은는】 당신이 본래의 $naturalhaircolour 색으로 돌아온 눈썹을 볼 수 있도록 거울을 가져온다.
+		<</if>>
+		<br><br>
+		<<set $makeup.browscolour to clone($naturalhaircolour)>>
+		<<set _pass += 10>>
+		<<unset $browsDyeOption>>
+	<<elseif $browsDyeOption isnot "noChange">>
+		<<set $makeup.browscolour to clone($browsDyeOption)>>
+		<<if _pass gt 0>>
+			그러고 나서 <<he>>【은는】 당신에게 고개를 뒤로 젖히라고 한다. <<He>>【은는】 작은 브러시에 선택한 눈썹 틴트를 묻힌 다음 몇 분 동안 당신의 눈썹을 빗어준다.
+			이내 <<he>>【은는】 당신이 새로 <<hairmapcolourtext $makeup.browscolour>> 색이 된 눈썹을 볼 수 있도록 거울을 가져온다.
+		<<else>>
+			미용사가 작은 브러시에 선택한 눈썹 틴트를 묻히고 몇 분 동안 당신의 눈썹을 빗어주기 시작한다.
+			이내 <<he>>【은는】 당신이 새로 <<hairmapcolourtext $makeup.browscolour>> 색이 된 눈썹을 볼 수 있도록 거울을 가져온다.
+		<</if>>
+		<br><br>
+		<<set _pass += 10>>
+		<<unset $browsDyeOption>>
+	<</if>>
+
+	<<if $dyeOption is "removeDye">>
+		<<if _pass gt 0>>
+			<<He>>【은는】 당신에게 고개를 뒤로 젖히라고 한 뒤 요청을 마무리한다. <<He>>【은는】 당신의 <<print $dyedHairPart>> 부분에 인공적인 화학 약품 냄새가 나는 액체를 바른 다음, 작은 대야에서 헹궈내기 시작한다.
+			<<He>>【은는】 이내 드라이기로 머리를 말려주고 당신이 본래의 $naturalhaircolour 색으로 돌아온 <<print $dyedHairPart>> 부분을 볼 수 있도록 거울을 내민다.
+		<<else>>
+			미용사가 당신에게 고개를 뒤로 젖히라고 한다. <<He>>【은는】 당신의 <<print $dyedHairPart>> 부분에 인공적인 화학 약품 냄새가 나는 액체를 바른 다음, 작은 대야에서 헹궈내기 시작한다.
+			<<He>>【은는】 이내 드라이기로 머리를 말려주고 당신이 본래의 $naturalhaircolour 색으로 돌아온 <<print $dyedHairPart>> 부분을 볼 수 있도록 거울을 내민다.
+		<</if>>
+		<br><br>
+
+		<<if $dyedHairPart is "sides" or $dyedHairPart is "hair">>
+			<<set $hairColourStyle to "simple">>
+			<<set $haircolour to clone($naturalhaircolour)>>
+		<</if>>
+		<<if $dyedHairPart is "fringe" or $dyedHairPart is "hair">>
+			<<set $hairFringeColourStyle to "simple">>
+			<<set $hairfringecolour to clone($naturalhaircolour)>>
+		<</if>>
+		<<set _pass += 15>>
+		<<unset $dyeOption>>
+		<<unset $dyedHairPart>>
+	<<elseif $dyeOption isnot "noChange" and not $twoToneHairDye>>
+		<<if $dyedHairPart is "sides" or $dyedHairPart is "hair">>
+			<<set $hairColourStyle to "simple">>
+			<<set $haircolour to clone($dyeOption)>>
+		<</if>>
+		<<if $dyedHairPart is "fringe" or $dyedHairPart is "hair">>
+			<<set $hairFringeColourStyle to "simple">>
+			<<set $hairfringecolour to clone($dyeOption)>>
+		<</if>>
+		<<if _pass gt 0>>
+			<<He>>【은는】 당신이 선택한 색상을 꼼꼼히 바르며 요청을 마무리한다. 얼마 지나지 않아 <<he>>【은는】 당신이 사방에서 새롭게 <<if $dyedHairPart is "fringe">><<hairfringecolourtext>><<else>><<haircolourtext>><</if>> 색이 된 <<print $dyedHairPart>> 부분을 볼 수 있도록 거울을 내민다.
+		<<else>>
+			미용사가 당신이 선택한 색상을 꼼꼼히 바르기 시작한다. 얼마 지나지 않아 <<he>>【은는】 당신이 사방에서 새롭게 <<if $dyedHairPart is "fringe">><<hairfringecolourtext>><<else>><<haircolourtext>><</if>> 색이 된 <<print $dyedHairPart>> 부분을 볼 수 있도록 거울을 내민다.
+		<</if>>
+		<br><br>
+		<<set _pass += 30>>
+		<<unset $dyeOption>>
+		<<unset $dyedHairPart>>
+	<<elseif $twoToneHairDye>>
+		<<set _gradient to {
+			style: $twoToneStyle,
+			colours: [$twoToneDyeOption1, $twoToneDyeOption2]
+		}>>
+		<<if $dyedHairPart is "sides" or $dyedHairPart is "hair">>
+			<<set $hairColourStyle to "gradient">>
+			<<set $haircolour to clone($twoToneDyeOption1)>> /* This is set as a 'fallback' colour for combat renderer */
+			<<set $hairColourGradient to clone(_gradient)>>
+		<</if>>
+		<<if $dyedHairPart is "fringe" or $dyedHairPart is "hair">>
+			<<set $hairFringeColourStyle to "gradient">>
+			<<set $hairfringecolour to clone($twoToneDyeOption2)>> /* This is set as a 'fallback' colour for combat renderer */
+			<<set $hairFringeColourGradient to clone(_gradient)>>
+		<</if>>
+
+		<<if _pass gt 0>>
+			Finally, the
+		<<else>>
+			The
+		<</if>>
+		미용사는 거품이 일 때까지 두 개의 그릇에 각각 염색약을 섞는다. <<Hes>>【은는】 끈적끈적해 보이는 액체가 담긴 그릇들을 남긴다.
+		<br>
+		<<He>>【은는】 여러 개의 집게로 당신의 머리를 여러 구역으로 나눈다. 그런 다음, 더 밝은 색부터 시작하여 각 구역마다 꼼꼼하게 그 액체를 바른다.
+		<br><br>
+		염색약이 스며들기를 기다리는 동안 당신은 잡담을 나눈다. 얼마 지나지 않아 미용사가 거울을 내밀고, 당신은 사방에서 새롭게 <<haircolourtext>> 색이 된 <<print $dyedHairPart>> 부분을 확인한다.
+		<br><br>
+		<<set _pass += 30>>
+		<<unset $dyeOption>>
+		<<unset $dyedHairPart>>
+	<</if>>
+
+	<<calchairlengthstage>>
+
+	<<pass _pass>>
+<</widget>>
+
+<<widget "hairDressersOptionsSydney">>
+	<<set $_sydney to C.npc.Sydney>>
+	<<set _currentCost to 0>>
+	<<set _currentCost += ($sydneyHairOption isnot $sydney.hair ? 3000 : 0)>>
+	<<set _currentCost += ($dyeOption is "removeDye" ? 3000 : ($dyeOption isnot "noChange" ? 6000 : 0))>>
+
+	<<if ($money gte _currentCost + 3000 or $sydneyHairOption isnot $sydney.hair)>>
+		시드니의 헤어스타일을 바꾼다.
+		<br>
+		<<set _hairOptions to {"그대로":$sydney.hair}>>
+		<<if $sydney.hair is "ponytail">>
+			<<set _hairOptions["풀어 헤침"] to "loose">>
+		<<else>>
+			<<set _hairOptions["포니테일"] to "ponytail">>
+		<</if>>
+		<<cycle "$sydneyHairOption" autoselect>>
+			<<optionsfrom _hairOptions>>
+		<</cycle>>
+		<span class="grey">(클릭하여 변경)
+		<br>
+		현재 스타일: <<if $sydney.hair is "ponytail">>포니테일<<else>>풀어 헤침<</if>></span>
+	<<else>>
+		시드니의 머리 스타일을 바꿀 돈이 부족하다.
+	<</if>>
+	<br><br>
+
+	<<if $money gte _currentCost + ($_sydney.hairColour isnot "strawberryblond" ? 3000 : 6000) or $dyeOption isnot "noChange">>
+		시드니에게 염색을 하도록<<if $_sydney.hairColour isnot "strawberryblond">> 또는 염색을 제거 하도록<</if>> 한다.
+		<br>
+		<<set _dyeOptions to {"염색하지 않는다":"noChange"}>>
+		<<if $_sydney.hairColour isnot "strawberryblond">>
+			<<set _dyeOptions["염색 제거"] to "removeDye">>
+		<<else>>
+			<<set _dyeOptions["검정"] to "black">>
+		<</if>>
+		<<cycle "$dyeOption" autoselect>>
+			<<optionsfrom _dyeOptions>>
+		<</cycle>>
+		<span class="grey">(클릭하여 변경)
+		<br>
+		현재 색상: <<npcHairColour "Sydney">><<if _text_output is "스트로베리 블론드">> (본래 색상)<</if>></span>
+	<<else>>
+		시드니의 머리를 염색할 돈이 부족하다.
+	<</if>>
+	<br><br>
+<</widget>>
+
+<<widget "mannequinHairdresser">>
+	<<if $options.images is 1>>
+		<div class="mannequin-inner">
+			<<selectmodel "lighting" "hairdresser">>
+			<<set _modeloptions.lights.gradient.enabled = false>>
+			<<set _modeloptions.lights.flat.enabled = false>>
+			<<rendermodel "lighting">>
+			<<selectmodel "main" "hairdresser">>
+				<<selectmodel "main">>
+				<<hidelayer "base">>
+				<<set _modeloptions.arm_left to "none">>
+				<<set _modeloptions.arm_right to "none">>
+				<<set _modeloptions.tanningEnabled to false>>
+				<<set _modeloptions.skin_type = Skin.color.natural>>
+				<<set _modeloptions.skin_tone = Skin.color.tan>>
+				<<set _modeloptions.scars to false>>
+				<<set _modeloptions.freckles = $player.freckles == true and $makeup.concealer != 1>>
+				<<set _modeloptions.mouth to 'neutral'>>
+				<<set _modeloptions.facevariant = $facevariant>>
+				<<set _modeloptions.left_eye = $makeup.eyelenses.left != 0 ? $makeup.eyelenses.left : $leftEyeColour>>
+				<<set _modeloptions.right_eye = $makeup.eyelenses.right != 0 ? $makeup.eyelenses.right : $rightEyeColour>>
+				<<showlayer "brows">>
+				<<set _modeloptions.brows to "top">>
+				<<set _modeloptions.brows_colour to ($makeup.browscolour != 0 ? $makeup.browscolour : $naturalhaircolour)>>
+				<<if $browsDyeOption isnot "noChange" and $browsDyeOption isnot "removeDye">>
+					<<set _modeloptions.brows_colour to $browsDyeOption>>
+				<</if>>
+
+				<<set _modeloptions.hair_colour = $haircolour>>
+				<<set _modeloptions.hair_fringe_colour = $hairfringecolour>>
+				<<set _modeloptions.hair_fringe_colour_gradient = $hairFringeColourGradient>>
+				<<set _modeloptions.hair_fringe_colour_style = $hairFringeColourStyle>>
+				<<set _modeloptions.hair_colour_gradient = $hairColourGradient>>
+				<<set _modeloptions.hair_colour_style = $hairColourStyle>>
+				<<if $twoToneHairDye>>
+					<<if !setup.colours.hair_map[$twoToneDyeOption1] or !setup.colours.hair_map[$twoToneDyeOption2]>>
+						<<set $twoToneDyeOption1 = $haircolour>>
+						<<set $twoToneDyeOption2 = $hairfringecolour>>
+					<</if>>
+					<<set _gradient = {
+						style: $twoToneStyle,
+						colours: [$twoToneDyeOption1, $twoToneDyeOption2]
+					}>>
+					<<if $dyedHairPart isnot "fringe">>
+						<<set _modeloptions.hair_colour = $twoToneDyeOption1>>
+						<<set _modeloptions.hair_colour_gradient = clone(_gradient)>>
+						<<set _modeloptions.hair_colour_style to "gradient">>
+					<</if>>
+					<<if $dyedHairPart isnot "sides">>
+						<<set _modeloptions.hair_fringe_colour = $twoToneDyeOption2>>
+						<<set _modeloptions.hair_fringe_colour_gradient = clone(_gradient)>>
+						<<set _modeloptions.hair_fringe_colour_style to "gradient">>
+					<</if>>
+				<<else>>
+					<<set _newColour = $dyeOption == "removeDye" ? $naturalhaircolour : $dyeOption>>
+					<<if _newColour isnot "noChange">>
+						<<if $dyedHairPart isnot "fringe">>
+							<<set _modeloptions.hair_colour = _newColour>>
+							<<set _modeloptions.hair_colour_style to "simple">>
+						<</if>>
+						<<if $dyedHairPart isnot "sides">>
+							<<set _modeloptions.hair_fringe_colour = _newColour>>
+							<<set _modeloptions.hair_fringe_colour_style to "simple">>
+						<</if>>
+					<</if>>
+				<</if>>
+				<<set _modeloptions.hair_sides_length to $hairOption != $hairlength ? convertHairLengthToStage("sides", $hairOption) : $hairlengthstage>>
+				<<set _modeloptions.hair_fringe_length to $fringeOption != $fringelength ? convertHairLengthToStage("fringe", $fringeOption) : $fringelengthstage>>
+				<<set _modeloptions.hair_fringe_type to $fringetype>>
+				<<set _modeloptions.hair_sides_type to $hairtype>>
+
+				/* Automate this later so it doesn't need to be manually updated with every new TF part that gets added */
+				<<set _modeloptions.angel_wings_type to
+					!["hidden", "disabled"].includes($transformationParts.bird.wings) and !["hidden", "disabled"].includes($transformationParts.angel.wings) and $chimera.angelharpy.wings is true ? "harpy-default" :
+					$transformationParts.angel.wings>>
+				<<set _modeloptions.bird_malar_type to $transformationParts.bird.malar>>
+				<<set _modeloptions.bird_tail_type to $transformationParts.bird.tail>>
+				<<set _modeloptions.bird_wings_type to
+					!["hidden", "disabled"].includes($transformationParts.angel.wings) and !["hidden", "disabled"].includes($transformationParts.bird.wings) and $chimera.angelharpy.wings is true ? "default-angel" :
+					!["hidden", "disabled"].includes($transformationParts.fallenAngel.wings) and !["hidden", "disabled"].includes($transformationParts.bird.wings) and $chimera.fallenharpy.wings is true ? "default-fallen" :
+					!["hidden", "disabled"].includes($transformationParts.demon.wings) and !["hidden", "disabled"].includes($transformationParts.bird.wings) and $chimera.demonharpy.wings is true ? "default-demon" :
+					$transformationParts.bird.wings>>
+				<<set _modeloptions.cat_ears_type to $transformationParts.cat.ears>>
+				<<set _modeloptions.cat_tail_type to $transformationParts.cat.tail>>
+				<<set _modeloptions.cow_ears_type to $transformationParts.cow.ears>>
+				<<set _modeloptions.cow_horns_type to
+					!["hidden", "disabled"].includes($transformationParts.demon.horns) and !["hidden", "disabled"].includes($transformationParts.cow.horns) and $transformationParts.demon.horns is "succubus" and $chimera.demoncow.horns is true ? "succubus-demon" :
+					!["hidden", "disabled"].includes($transformationParts.demon.horns) and !["hidden", "disabled"].includes($transformationParts.cow.horns) and $chimera.demoncow.horns is true ? "default-demon" :
+					$transformationParts.cow.horns>>
+				<<set _modeloptions.cow_tail_type to
+					!["hidden", "disabled"].includes($transformationParts.demon.tail) and !["hidden", "disabled"].includes($transformationParts.cow.tail) and $transformationParts.cow.tail is "black" and $chimera.demoncow.tail is true ? "black-demon" :
+					!["hidden", "disabled"].includes($transformationParts.demon.tail) and !["hidden", "disabled"].includes($transformationParts.cow.tail) and $chimera.demoncow.tail is true ? "default-demon" :
+					$transformationParts.cow.tail>>
+				<<set _modeloptions.demon_wings_type to $transformationParts.demon.wings>>
+				<<set _modeloptions.demon_tail_type to
+					!["hidden", "disabled"].includes($transformationParts.cat.tail) and !["hidden", "disabled"].includes($transformationParts.demon.tail) and $chimera.demoncat.tail is true ? "default-cat" :
+					!["hidden", "disabled"].includes($transformationParts.cow.tail) and !["hidden", "disabled"].includes($transformationParts.demon.tail) and $chimera.demoncow.tail is true ? "default-cow" :
+					!["hidden", "disabled"].includes($transformationParts.fox.tail) and !["hidden", "disabled"].includes($transformationParts.demon.tail) and $chimera.demonfox.tail is true ? "hidden" :
+					!["hidden", "disabled"].includes($transformationParts.wolf.tail) and !["hidden", "disabled"].includes($transformationParts.demon.tail) and $chimera.demonwolf.tail is true and $transformationParts.wolf.tail is "feral" ? "default-feral" :
+					!["hidden", "disabled"].includes($transformationParts.wolf.tail) and !["hidden", "disabled"].includes($transformationParts.demon.tail) and $chimera.demonwolf.tail is true ? "default-wolf" :
+					$transformationParts.demon.tail>>
+				<<set _modeloptions.demon_horns_type to
+					!["hidden", "disabled"].includes($transformationParts.cow.horns) and !["hidden", "disabled"].includes($transformationParts.demon.horns) and $transformationParts.demon.horns is "succubus" and $chimera.demoncow.horns is true ? "succubus" :
+					!["hidden", "disabled"].includes($transformationParts.cow.horns) and !["hidden", "disabled"].includes($transformationParts.demon.horns) and $chimera.demoncow.horns is true ? "default" :
+					$transformationParts.demon.horns>>
+				<<set _modeloptions.fallen_wings_type to
+					!["hidden", "disabled"].includes($transformationParts.bird.wings) and !["hidden", "disabled"].includes($transformationParts.fallenAngel.wings) and $chimera.fallenharpy.wings is true ? "harpy-default" :
+					$transformationParts.fallenAngel.wings>>
+				<<set _modeloptions.fox_cheeks_type to $transformationParts.fox.cheeks>>
+				<<set _modeloptions.fox_ears_type to
+					$demon gte 6 and $fox gte 6 and $chimera.demonfox.ears is true ? "default-demon" :
+					$transformationParts.fox.ears>>
+				<<set _modeloptions.fox_tail_type to
+					!["hidden", "disabled"].includes($transformationParts.demon.tail) and !["hidden", "disabled"].includes($transformationParts.fox.tail) and $chimera.demonfox.tail is true ? "default-demon" :
+					$transformationParts.fox.tail>>
+				<<set _modeloptions.wolf_ears_type to $transformationParts.wolf.ears>>
+				<<set _modeloptions.wolf_tail_type to
+					!["hidden", "disabled"].includes($transformationParts.demon.tail) and !["hidden", "disabled"].includes($transformationParts.wolf.tail) and $transformationParts.wolf.tail is "feral" and $chimera.demonwolf.tail is true ? "demon-feral" :
+					!["hidden", "disabled"].includes($transformationParts.demon.tail) and !["hidden", "disabled"].includes($transformationParts.wolf.tail) and $chimera.demonwolf.tail is true ? "demon-default" :
+					$transformationParts.wolf.tail>>
+				<<set _modeloptions.show_tf = $transformationShow>>
+
+				<<set _modeloptions.worn.over_upper.index to 3>>
+			<<rendermodel "canvas-mannequin">>
+		</div>
+	<</if>>
+<</widget>>

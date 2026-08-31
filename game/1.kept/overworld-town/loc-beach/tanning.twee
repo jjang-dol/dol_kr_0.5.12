@@ -1,0 +1,195 @@
+:: Tanning
+<<location "beach">>
+
+<<if Time.season is "summer">>
+	<<switch random(1, 3)>>
+	<<case 1>>
+		당신은 타오르는 태양 아래 해변에 눕는다. 햇살이 피부에 스며들자 마음이 몽롱해진다.
+	<<case 2>>
+		당신은 해변에 드러눕는다. 태양이 피부를 데우는 동안 파도 소리가 당신을 감싼다.
+	<<case 3>>
+		당신은 모래 위에 눕는다. 휴식을 취하는 동안 바다 소리, 아이들이 노는 소리, 해변 음악 소리가 들려온다.
+	<</switch>>
+	<br><br>
+	몸이 따뜻해진다.
+	<<stress -6>><<lstress>>
+<<elseif Time.season is "winter">>
+	<<switch random(1, 3)>>
+	<<case 1>>
+		당신은 태양 아래 해변에 눕는다. 차가운 산들바람이 당신을 어루만진다.
+	<<case 2>>
+		당신은 해변에 드러눕는다. 차가운 바람 때문에 태양을 거의 느낄 수 없다.
+	<<case 3>>
+		당신은 모래 위에 눕는다. 철썩이는 파도 소리가 당신을 감싼다. 쌀쌀하다.
+	<</switch>>
+	<br><br>
+	몸이 떨린다.
+	<<stress 6>><<gstress>>
+<<else>>
+	<<switch random(1, 3)>>
+	<<case 1>>
+		당신은 따뜻한 태양 아래 해변에 눕는다. 햇살이 피부를 어루만지자 마음이 몽롱해진다.
+	<<case 2>>
+		당신은 해변에 드러눕는다. 태양이 피부를 따뜻하게 하는 동안 파도 소리가 당신을 감싼다.
+	<<case 3>>
+		당신은 모래 위에 눕는다. 휴식을 취하는 동안 바다 소리, 아이들이 노는 소리, 해변 음악 소리가 들려온다.
+	<</switch>>
+	<br><br>
+	상쾌한 기분이 든다.
+	<<stress -6>><<lstress>>
+<</if>>
+<<set _tanningModifiers to Skin.getTanningFactor()>>
+<<tanningGainOutput _tanningModifiers.result 90>>
+<br>
+<<tanningPenaltiesOutput _tanningModifiers>>
+<br>
+<<set Skin.tanningBonus = 2>>
+
+당신의 피부는 <<skincolourtext>>【이】다.
+<br><br>
+
+<<rng>>
+<<if dangerEvent() and $rng gte 81>>
+	<<if $rng gte 91 and C.npc.Whitney.state is "active">>
+		<<endevent>>
+		<<link [[다음|Whitney Beach Sunbathing]]>><<pass 60>><<set $eventskip to 1>><</link>>
+	<<else>>
+		<<endevent>>
+		<<link [[다음|Sunbathing Sabotage]]>><<pass 60>><<set $eventskip to 1>><</link>>
+	<</if>>
+<<else>>
+	<<endevent>>
+	<<link [[다음|Beach]]>><<pass 60>><<set $eventskip to 1>><</link>>
+<</if>>
+
+:: Sunbathing Sabotage
+열기와 파도 소리가 너무나 편안해서, 당신은 깜빡 잠이 든다.
+<<rng 5 20>>
+<<pass $rng>>
+<br><br>
+당신은 <<print either ("푹 쉰 기분으로", "다소 정신이 멍한 채로", "시간이 얼마나 흘렀는지 모르는 채로")>> 잠에서 깬다. <<ltiredness>><<tiredness -6>>
+<br><br>
+일어서자, <span class="red">수영복이 몸에서 흘러내린다.</span> 당신이 자는 동안 누군가 가위로 잘라버린 게 틀림없다. <<if hasSexStat("exhibitionism", 5)>>이렇게 노출되니 흥분으로 몸이 떨린다.<<else>>당신은 재빨리 몸을 가리고 가장 가까운 탈의실을 찾는다.<</if>> <<gstress>><<stress 6>>
+<br><br>
+<<clothesruined>>
+<<endevent>>
+<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+
+:: Whitney Beach Sunbathing
+<<effects>>
+<<npc Whitney>><<person1>>
+<<print Time.season is "winter" ? "햇볕 아래서 몸을 데우려 애쓰는 동안," : "햇살의 온기를 만끽하는 동안,">> 그림자가 당신 위로 드리워진다. 눈을 몇 번 깜빡이자 휘트니가 친구 두어 명을 거느리고 당신 위에 서 있는 것이 보인다.
+<br><br>
+"일어나, <<bitch>>." 휘트니가 당신에게 모래를 걷어차며 명령한다. 당신이 일어서자, <<he>>【은는】 말을 잇는다. "혼자 해변에 누워 있는 게 좀 외로워 보여서, 우리가 널 위해 작은 친구를 하나 찾아왔지!"
+<br><br>
+휘트니는 손을 등 뒤로 감추고 있지만, 이 깜짝 "친구"가 유쾌할 것 같지는 않다.
+<br><br>
+
+<<link [[싸운다|Whitney Beach Fight]]>><<set $fightstart to 1>><<def 1>><<npcincr Whitney dom -1>><</link>><<ldom>>
+<br>
+<<link [[굴복한다|Whitney Beach Sunbathing Crab]]>><<npcincr Whitney dom 1>><<sub 1>><<endevent>><</link>><<gdom>>
+
+:: Whitney Beach Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+		당신은 휘트니에게 달려든다. <<He>>【은는】 당신과 함께 모래 위로 뒹굴기 전에, <<he>>【이가】 들고 있던 것을 친구 중 한 명의 손에 간신히 떠넘긴다.
+	<<npcidlegenitals>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<set $audienceforceteen to 1>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<audience>>
+<<stateman>>
+<<enable_rescue>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Whitney Beach Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Whitney Beach Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Whitney Beach Fight Finish
+<<if $enemyhealth lte 0>>
+	당신은 휘트니를 밀쳐내고 도망친다. 휘트니의 친구들은 물가를 향해 기어가는 무언가에 정신이 팔린 듯하다. 당신은 해변을 따라 달리느라 그것을 제대로 볼 틈이 없다. <<stress 2>><<gstress>>
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">>
+	휘트니가 얼굴을 붉히며 헐떡인다. <<his>> 친구 중 한 명이 <<him>>에게 어리둥절한 표정을 보낸다. <<he>>【은는】 코웃음을 치며 당신에게서 몸을 떼고 큰 소리로 말한다. "됐어, 이 걸레. 우리 어디까지 했지?"
+	<br><br>
+	휘트니는 기대에 찬 눈으로 <<his>> 친구들을 본다. 그들은 어깨를 으쓱하며 시선을 피한다. <<He>>【은는】 얼굴을 찌푸린다. "진심이야? 다들 잃어버렸다고? 이 멍청한 새끼들."
+	<br><br>
+	당신은 이어지는 말다툼을 틈타 슬쩍 빠져나온다. 휘트니가 당신을 위해 준비한 것이 무엇이었든, 보지 못한 것이 아마 최선일 것이다. <<stress 2>><<gstress>><<llust>><<npcincr Whitney lust -20>>
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+<<elseif $alarm is 1 and $rescue is 1>>
+	"이봐요! 거기서 무슨 일이죠? 다들 괜찮아요?" 근무 중인 인명 구조원 중 한 명이 소리치며, <<generate1>><<person1>><<he>>【은는】 당신 쪽으로 가볍게 뛰기 시작한다.
+	<br><br>
+	휘트니가 당신에게서 떨어진다. "괜찮아요, 우린 끝났어요." <<nnpc_he Whitney>>【이가】 말한다. "또 보자, 이 울보 <<bitch>>【아야】." 당신을 괴롭히던 무리가 떠나고, 인명 구조원은 <<his>> 자리로 돌아간다.
+	<br><br>
+	<<tearful>> 당신은 힘겹게 일어선다.
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+<<else>>
+	당신은 너무 얻어맞고 멍이 들어 더 이상 계속할 수 없는 채로 바닥에 누워 있다. "좋아, <<bitch>>." 휘트니가 일어나며 말한다. "이제 몸도 풀렸으니, 네 새 친구에게 돌아가 볼까!" <<gstress>><<stress 2>>
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Whitney Beach Sunbathing Crab]]>><</link>>
+<</if>>
+
+:: Whitney Beach Sunbathing Crab
+<<effects>>
+<<npc Whitney>><<person1>>
+다른 두 불량배가 당신의 팔을 붙잡아 고정시킨다. 휘트니가 <<his>> 깜짝 선물을 당신에게 보여준다. 살아있는 게 한 마리가 탈출하려는 듯 다리와 집게발을 허우적거리고 있다. 당신은 꿀꺽 침을 삼킨다.
+<br><br>
+<<if C.npc.Whitney.dom lte 10>>
+	<<if $worn.upper isnot "naked" or $worn.under_upper isnot "naked">>그들은 당신의 상의를 부분적으로 들춰, 지나가는 사람들에게 당신의 <<breasts>>【을를】 노출시킨다. <</if>>휘트니는 당신의 가슴 앞에 게를 들고, 집게발로 당신의 유두를 감싸게 한 뒤, 게의 머리를 세게 튕긴다. 본능적으로, 게는 세게 꼬집는다.
+	<br><br>
+	집게발이 유두를 꽉 조이자 당신은 고통에 울부짖는다. 휘트니와 <<his>> 친구들은 폭소를 터뜨리며 당신의 팔을 놓아주고, 당신은 탈출할 기회를 얻는다. 당신은 괴롭히는 자들에게서 도망쳐 게가 힘을 풀자마자 떼어낸다. 당신은 옷을 고쳐 입고 최대한 회복하려 애쓰지만, 유두는 여전히 욱신거린다. <<pain 4>><<stress 12>><<trauma 12>><<ggpain>><<ggstress>><<ggtrauma>>
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+<<elseif C.npc.Whitney.dom lte 15>>
+	그들은 당신의 옷 뒤쪽을 잡아당기고, 휘트니는 게를 당신의 <<bottom>>에 쑤셔 넣는다. 게는 당신의 $worn.under_lower.name_simple에서 벗어날 길을 필사적으로 찾으며 다리와 집게발을 허우적거린다. 뾰족한 다리들이 당신의 민감한 피부를 간지럽히고 찌른다.
+	<br><br>
+	<<link [[가만히 있는다|Whitney Beach Sunbathing Still]]>><<set $phase to 1>><</link>><<willpowerdifficulty 1 600>>
+<<else>>
+	그들은 당신의 옷 앞쪽을 잡아당기고, 휘트니는 게를 당신의 <<genitals>>에 쑤셔 넣는다. 게는 당신의 $worn.under_lower.name_simple에서 벗어날 길을 필사적으로 찾으며 다리와 집게발을 허우적거린다. 뾰족한 다리들이 당신의 민감한 피부를 간지럽히고 찌른다.
+	<br><br>
+	<<link [[가만히 있는다|Whitney Beach Sunbathing Still]]>><</link>><<willpowerdifficulty 1 800>>
+<</if>>
+
+:: Whitney Beach Sunbathing Still
+<<effects>>
+	<<if $willpowerSuccess>>
+		<span class="green">당신은 간신히 가만히 있는다.</span> 당신은 꿈틀거리고 싶은 충동을 억누르고, 게는 당신의 옷에서 빠져나와 바다를 향해 돌진한다. 명백히 좌절한 휘트니는 당신을 모래 위로 밀치고 걸어간다.
+		<br><br>
+		<<endevent>>
+		<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+	<<else>>
+		당신은 무의식적으로 움찔거리며 몸을 비틀고, 게는 공황 상태에 빠진다. 게는 본능적으로, <span class="red">당신의 <<print $phase is 1 ? "엉덩이" : $player.penisExist ? "자지" : "클리토리스">>【을를】 있는 힘껏 꼬집는다.</span> 당신이 고통에 울부짖자 휘트니와 <<his>> 친구들은 폭소를 터뜨리며 당신의 팔을 놓아주고, 당신은 탈출할 기회를 얻는다.
+		<br><br>
+		당신은 괴롭히는 자들에게서 도망쳐 게가 힘을 풀자마자 $worn.under_lower.name_simple에서 떼어낸다. 당신은 옷을 고쳐 입고 최대한 회복하려 애쓰지만, 당신의 <<print $phase is 1 ? "엉덩이" : $player.penisExist ? "자지" : "클리">>【은는】 여전히 욱신거린다.
+		<<if $phase is 1>>
+			<<pain 8>><<stress 18>><<trauma 18>><<gggpain>><<ggstress>><<gggtrauma>>
+		<<else>>
+			<<pain 12>><<stress 24>><<trauma 24>><<gggpain>><<gggstress>><<gggtrauma>>
+		<</if>>
+		<br><br>
+		<<endevent>>
+		<<link [[다음|Beach]]>><<set $eventskip to 1>><</link>>
+	<</if>>

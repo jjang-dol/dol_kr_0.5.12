@@ -1,0 +1,213 @@
+:: Widgets Police [widget]
+<<widget "police_computer_action">>
+	경찰 컴퓨터를 통해 범죄 기록에 접근할 수 있다. 당신의 기록을 보니,
+
+	<<if crimeSumCurrent() gte 6000>>
+		<span class="red">당신은 "1급 수배자" 명단에 올라와 있으며, 그들은 당신을 가혹하게 처벌할 계획이다.</span>
+	<<elseif crimeSumCurrent() gte 4500>>
+		<span class="red">당신의 체포는 최우선 사항이며 극형을 선고할 수 있을 만큼 당신에 대한 증거가 충분하다.</span>
+	<<elseif crimeSumCurrent() gte 4000>>
+		<span class="red">적극적으로 당신의 체포가 이루어지고 있으며</span>, <span class="red">무거운 처벌을</span> 선고할 수 있을 만큼 증거가 충분하다.
+	<<elseif crimeSumCurrent() gte 3000>>
+		<span class="red">당신에 대한 체포 영장이 발부되었으며</span>, <span class="red">심각한 처벌을</span> 선고할 수 있을 만큼 증거가 충분하다.
+	<<elseif crimeSumCurrent() gte 2000>>
+		<span class="red">당신에 대한 체포 영장이 발부되었으며</span>, 상당한 처벌을 선고할 수 있을 만큼 증거가 충분하다.
+	<<elseif crimeSumCurrent() gte 1000>>
+		당신에 대한 <span class="red">체포 영장</span>이 발부되었다. 그들은 처벌을 선고할 수 있을 만큼 충분한 증거를 가지고 있다.
+	<<elseif crimeSumCurrent() gte 500>>
+		<span class="gold">조만간 체포 영장을 발부할 수 있을 만큼 증거가 모일지도 모른다.</span>
+	<<else>>
+		<span class="teal">그들은 당신에 대한 중요한 정보를 가지고 있지 않다.</span>
+	<</if>>
+
+	<<if crimeSumCurrent() gte 6000>>
+		옵션:
+		<br>
+		<span class="teal">와이퍼 웜을 설치하면</span> 당신을 포함한 모든 사람의 경찰 기록이 다수 파괴될 것이다.
+		<br>
+		<span class="teal">누군가에게 누명을 씌우면</span> 당신에 대한 모든 증거가 다른 사람에게 첨부될 것이다. 이는 경찰을 오도할 것이다.
+		하지만, 시스템에 이미 기록이 있는 사람에게만 누명을 씌울 수 있다.
+		<br><br>
+		<<if $police_delete gte 5 and random(1,4) is 4>>
+			<<link [[와이퍼를 설치한다|Police Sneak Caught]]>><</link>>
+			<br>
+			<<if C.npc.Whitney.init is 1 and C.npc.Whitney.state isnot "dungeon" and $framed is 0>>
+				<<link [[휘트니에게 누명을 씌운다|Police Sneak Caught]]>><</link>>
+				<br>
+			<</if>>
+			<<if $headpolice is 1 and $framed is 0>>
+				<<link [[레이튼에게 누명을 씌운다|Police Sneak Caught]]>><</link>>
+				<br>
+			<</if>>
+			<<if $framed isnot 0>>
+				<span class="red">이미 <<print ($framed.toUpperFirst())>>에게 당신의 범죄를 뒤집어씌웠습니다. <<nnpc_he $framed.toUpperFirst()>>【이가】 당신의 범죄에 대한 대가를 치르기 전까지는 다시 할 수 없습니다.</span>
+			<</if>>
+		<<else>>
+			<<link [[와이퍼를 설치한다 (0:10)|Police Computer]]>><<pass 10>><<set $phase to 11>><<crimeDown 0.5 "all">><<set _randomCrime to ((random(5,35) + 20)/100)>><<crimeDown _randomCrime "all">><<set $police_delete += 1>><</link>>
+			<!-- Original crime calculation as follows:
+			<<set $crime /= 2>><<set $crime *= (random(5,35)/100)>> -->
+			<br>
+			<<if C.npc.Whitney.init is 1 and C.npc.Whitney.state isnot "dungeon" and $framed is 0>>
+				<<link [[휘트니에게 누명을 씌운다 (0:10)|Police Computer]]>><<pass 10>><<set $phase to 12>><<crimeClear "all">><<set $police_delete += 1>><</link>>
+				<br>
+			<</if>>
+			<<if $headpolice is 1 and $framed is 0>>
+				<<link [[레이튼에게 누명을 씌운다 (0:10)|Police Computer]]>><<pass 10>><<set $phase to 13>><<crimeClear "all">><<set $police_delete += 1>><</link>>
+				<br>
+			<</if>>
+			<<if $framed isnot 0>>
+				<span class="red">이미 <<print ($framed.toUpperFirst())>>에게 당신의 범죄를 뒤집어씌웠습니다. <<nnpc_he $framed.toUpperFirst()>>【이가】 당신의 범죄에 대한 대가를 치르기 전까지는 다시 할 수 없습니다.</span>
+			<</if>>
+		<</if>>
+	<<elseif crimeSumCurrent() gte 1000>>
+		옵션:
+		<br>
+		<span class="teal">전자 증거를 삭제하면</span> 당신에게 덮어씌울 수 있는 범죄 양을 줄여주며, 경찰에게 발각되지 않을 것이다.
+		<br>
+		<span class="teal">와이퍼 웜을 설치하면</span> 당신을 포함한 모든 사람의 경찰 기록이 다수 파괴될 것이다.
+		<br>
+		<<if $police_delete gte 5 and random(1,4) is 4>>
+			<<link [[증거를 삭제한다|Police Sneak Caught]]>><</link>>
+			<br>
+			<<link [[와이퍼를 설치한다|Police Sneak Caught]]>><</link>>
+			<br>
+		<<else>>
+			<<link [[증거를 삭제한다 (0:15)|Police Computer]]>><<pass 15>><<set $phase to 10>><<set _randomCrime to ((random(5,35) + 20)/100)>><<crimeDown _randomCrime "all">><<set $police_delete += 1>><</link>>
+			<!-- Original crime calculation as follows:
+			<<set $crime -= $crime * ((random(5,35) + 20)/100)>> -->
+			<br>
+			<<link [[와이퍼를 설치한다 (0:10)|Police Computer]]>><<pass 10>><<set $phase to 11>><<crimeDown 0.5 "all">><<set $police_delete += 1>><</link>>
+			<br>
+		<</if>>
+
+	<</if>>
+<</widget>>
+
+<<widget "seize_stolen_goods">>
+	<<outfitChecks>>
+	"가만히 있어." <<person>>【이가】 당신의 몸을 더듬어 검사한다.
+	<<if dangerEvent() or $exposed gt 0>>
+		<<His>> 손이 당신의 온몸을 거칠게 더듬고 찌르더니, 가장 먼저
+		<<if $breastsize gt 0>>
+			당신의 <<breasts>>【을를】 쥐어짜고
+		<<else>>
+			당신의 <<nipples>>【을를】 만지작거리고
+		<</if>>
+		결국 당신의 <<bottom>>에 머문다. <<He>>【이가】 그것을 몇 번 톡톡 치더니,
+		<<if _bottomless>>
+			엉덩이골을 양옆으로 벌린다.
+		<<else>>
+			그것을 들어 올렸다가 놓아버린다.
+			<<if $player.bottomsize gte 7>>
+				<<if $player.bottomsize gte 8 and $rng gte 100>>
+					엉덩이살이 떨어지며 천둥 같은 마찰음을 내자, <<person>>【이가】 깜짝 놀라 뒤로 넘어질 뻔하지만 이내 정신을 차린다.
+				<<else>>
+					그것은 무게 때문에 출렁거리며, 꽤 몇 초 동안 튕기다가 멈춘다.
+				<</if>>
+			<<elseif $player.bottomsize gte 2>>
+				잠시 흔들리다가 멈춘다.
+			<<else>>
+				전혀 흔들림 없이 단단하게 유지된다.
+			<</if>>
+		<</if>>
+		<<He>>【이가】 미심쩍은 듯 콧소리를 낸다.
+		<<arousal 1600>><<ggarousal>>
+	<<else>>
+		<<His>> 손이 마치 수백만 번은 해본 것처럼 당신의 몸을 훑어 내리며<<if !_fullyNaked>>, 몇몇 불룩한 부분에서 머문다<</if>>. <<He>>【이가】 미심쩍은 듯 콧소리를 낸다.
+	<</if>>
+	<<if $blackmoney gt 0>>
+		<br><br>
+		<<set $skulduggerydifficulty to Math.clamp($blackmoney / 5, 0, 10000)>>
+		<<skulduggerycheck>>
+		<<if $skulduggerysuccess>>
+			<<He>>【은는】 당신이 훔친 귀중품을 찾아내지 못했다. <<stress -1>><<lstress>>
+		<<else>>
+			<<His>> 움직임이 갑자기 멈춘다. "그럴 줄 알았어." <<He>>【이가】 장물 하나를 옆으로 툭 던진다.<<if _fullyNaked>> 당신은 얼굴을 붉히며 그게 어디서 났는지 모르는 척한다. <<arousal 400>><<garousal>><</if>><<stress 2>><<gstress>>
+			<<set _seizedAmount to 1000>>
+			<<if $blackmoney gt 1000>>
+				<br><br>
+				<<set $skulduggerydifficulty to Math.clamp(($blackmoney - 1000) / 5, 0, 10000)>>
+				<<skulduggerycheck>>
+				<<if $skulduggerysuccess>>
+					<<he>>【은는】 당신이 훔친 나머지 귀중품들을 찾지 못한 것 같다. <<stress -2>><<lstress>>
+				<<else>>
+					<<He>>【이가】 조금 더 뒤적거리자 무더기에 물건이 몇 개 더 추가된다. <<stress 6>><<gstress>>
+					<<set _seizedAmount to 2500>>
+					<<if $blackmoney gt 2500>>
+						<br><br>
+						<<set $skulduggerydifficulty to Math.clamp(($blackmoney - 2500) / 5, 0, 10000)>>
+						<<skulduggerycheck>>
+						<<if $skulduggerysuccess>>
+							<<he>>【은는】 당신이 훔친 나머지 귀중품들을 찾지 못한 것 같다. <<stress -4>><<lstress>>
+						<<else>>
+							더 깊이 파고들자, <<he>>【은는】 당신이 훔친 귀중품 무더기를 통째로 발견해 낸다. <<He>>【은는】 놀란 듯 보이며 조금 걱정스러워 보인다. <<stress 14>><<ggstress>>
+							<<set _seizedAmount to 5000>>
+							<<if $blackmoney gt 5000>>
+								<br><br>
+								<<set $skulduggerydifficulty to Math.clamp(($blackmoney - 5000) / 5, 0, 10000)>>
+								<<skulduggerycheck>>
+								<<if $skulduggerysuccess>>
+									<<he>>【은는】 당신이 훔친 나머지 귀중품들을 찾지 못한 것 같다. <<stress -6>><<lstress>>
+								<<else>>
+									검사가 계속되자, <<his>> 눈이 갑자기 휘둥그레진다. "세상에, <<girl>>, 너 지금 작은 나라 하나를 살 정도의 재산을 여기 숨겨둔 거냐?" <<He>>【은는】 땅에서 무릎 높이쯤 다다를 때까지 무더기에 물건을 더해간다. <<stress 24>><<gggstress>>
+									<<set _seizedAmount to 0>><<set $blackmoney to 0>>
+								<</if>>
+							<</if>>
+						<</if>>
+					<</if>>
+				<</if>>
+			<</if>>
+			<<set $blackmoney -= Math.clamp(_seizedAmount, 0, $blackmoney)>><<set _blackmoneySeized to true>>
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<he>>【이가】 검색에 만족할 때까지 몇 분이 더 지나간다.
+
+	<<if ($studyBooks and $studyBooks?.rented isnot "none" and (_args[0] is "all" or $bookOverdue gte 7)) or $studyBooks?.stolen isnot "none">>
+		<br><br>
+		<<if $studyBooks.rented isnot "none" and (_args[0] is "all" or $bookOverdue gte 7)>>
+			<<if $studyBooks.rented is "Pinch">>
+				<<if $per_npc.pinch isnot undefined>>
+					<<set _book to "《핀치 <<= $per_npc.pinch.pronoun is 'm' ? '씨' : '양'>>【은는】 어떻게 크리스마스를 더듬었나》 한 권">>
+				<<else>>
+					<<set _book to "올리브색 책">>
+				<</if>>
+			<<elseif $studyBooks.rented is "Raul and Janet">>
+				<<set _book to "《라울과 재닛》 한 권">>
+			<<else>>
+				<<set _book to $studyBooks.rented + " 교과서">>
+			<</if>>
+			<<if _blackmoneySeized>>"아, 그리고 이것도<<else>>"이것도<</if>>
+			동네 학교에서<<if $book_rent_timer gte 0>> 곧<</if>> 돌려받고 싶어 할 거야." <<he>>【이가】 <span class="purple">당신의 <<print _book>>【을를】 압수하며</span> 말한다. "그러니까 우리가 대신 반납해주지." <<He>>【은는】 씩 웃는다.
+			<<set $studyBooks.rented to "none">><<unset $bookOverdue>><<set $book_rent_timer to 0>><<set _bookSeized to true>>
+		<</if>>
+		<<if $studyBooks.stolen isnot "none">>
+			<<set $skulduggerydifficulty to _bookSeized ? 600 : 300>>
+			<<skulduggerycheck>>
+			<<if $skulduggerysuccess>>
+				보아하니 <<he>>【은는】 훔친 책을 찾지 못한 것 같다<<if _bookSeized>>, 최소한 말이다. <<stress -2>><<lstress>><<else>>. <<stress -5>><<lstress>><</if>>
+			<<else>>
+				<<if $studyBooks.stolen is "Pinch">>
+					<<if $per_npc.pinch isnot undefined>>
+						<<set _book to "《핀치 <<= $per_npc.pinch.pronoun is 'm' ? '씨' : '양'>>【은는】 어떻게 크리스마스를 더듬었나》 한 권">>
+					<<else>>
+						<<set _book to "올리브색 책">>
+					<</if>>
+				<<elseif $studyBooks.stolen is "Raul and Janet">>
+					<<set _book to "《라울과 재닛》 한 권">>
+				<<else>>
+					<<set _book to $studyBooks.stolen + " 교과서">>
+				<</if>>
+				<<if _bookSeized>>"그리고 이것도 도난 신고가 들어온 물건 같군." <<he>>【이가】 이어 말한다.<<else>>"이건 도난 신고가 들어온 물건 같군." <<he>>【이가】 말한다.<</if>>
+				<span class="purple"><<print _book>>【을를】 들어 보인다</span>. <<He>>【은는】 몸을 기울인다. "<<if $studyBooks.stolen is "Pinch" and $per_npc.pinch isnot undefined>>핀치<<= $per_npc.pinch.pronoun is 'm' ? ' 씨' : ' 양'>>, 응? 네가 그런 이야기를 좋아할 만도 하네. 범죄자 같으니<<else>>참 친절하게도 반납해 주셔서 고맙군<</if>>."
+				<<if _bookSeized>><<stress 10>><<ggstress>><<else>><<stress 5>><<gstress>><</if>>
+				<<set $studyBooks.stolen to "none">><<set $bookStolenPolice to true>><<set _bookSeized to true>>
+			<</if>>
+		<</if>>
+	<</if>>
+	<<if !_blackmoneySeized and !_bookSeized>>
+		<br><br>
+		"아무것도 없다고, 응. 그 말을 믿기 힘든데." <<he>>【이가】 콧방귀를 뀐다. "상관없어."
+	<</if>>
+<</widget>>

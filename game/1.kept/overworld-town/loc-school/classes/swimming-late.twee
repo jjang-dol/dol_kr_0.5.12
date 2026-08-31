@@ -1,0 +1,313 @@
+:: School Swimming Late
+<!-- no effects, this is included not called -->
+
+<<if $exposed gte 2 and $swimall is 1>>
+	<<set $cstate to "fine">>
+<<elseif $exposed gte 2 and $swimall isnot 1>>
+	<<if $swimnudecounter is 0>>
+		<<set $cstate to "naked">>
+	<<else>>
+		<<set $cstate to "fine">>
+	<</if>>
+<<elseif $swimall is 1>>
+	<<if $exposed gte 2>>
+		<<set $cstate to "fine">>
+	<<else>>
+		<<set $cstate to "clothed">>
+	<</if>>
+<<elseif ($worn.under_lower.type.includes("swim") or $worn.lower.type.includes("swim"))
+and ($worn.under_upper.type.includes("swim") or $worn.upper.type.includes("swim") or ($worn.under_upper.type.includes("naked") and $worn.upper.type.includes("naked") and ($player.gender_appearance is "m" or $daily.swimCrossdressPermission)))
+and (($worn.upper.type.includes("naked") or $worn.upper.type.includes("swim")) and ($worn.lower.type.includes("naked") or $worn.lower.type.includes("swim")))>>
+	<<set $cstate to "fine">>
+<<else>>
+	<<set $cstate to "wrong">>
+<</if>>
+
+<<if $cstate is "nakedfirst">>
+	<<npc Mason>><<person1>>
+	<<schoolpoolexposed>>
+	<!-- no asking to swin naked here, you're late -->
+	<!-- detention 6 already is in the widget -->
+<<else>>
+
+	<<npc Mason>><<person1>>수영장에 들어섰다.
+	<br><br>
+	<<if $rng gte 51>>
+		메이슨과 학생들은 물속에 있다.
+	<<elseif $rng gte 26>>
+		메이슨은 수영장 옆에 서서 반 학생들에게 무언가를 설명하고 있다.
+	<<elseif $rng gte 6 or $swimall is 1>>
+		메이슨은 수영장 가에서 수영 기술을 시범으로 보여주고 있다.
+	<<else>>
+		학생들은 수영장에 있지만 메이슨은 보이지 않는다. 잠시 후, <<he>>【이가】 손에 <<print either("수영복", "수영 반바지")>>【을를】 들고 옆문으로 들어온다. <<He>>【은는】 그것을 물속에 있는 <<generatey2>><<person2>><<person>><<person1>>에게 건넨 후
+		당신을 돌아본다.
+	<</if>>
+	<<rng>>
+
+	<<if $daily.school.swimmingExcused>>
+		<<run delete $daily.school.swimmingExcused>>
+		"이제야 왔냐." <<he>>【이가】 말한다. "결석 처리 안 되긴 했지만, 지금 참여하기엔 너무 늦었어."
+		<br><br>
+
+		<<He>>【은는】 구석에 있는 자리를 턱짓으로 가리킨다. "저기 가서 앉아 있지 그래?"
+		<br><br>
+
+		<<loitericon>><<link [[앉아서 기다린다|School Swimming Late Wait]]>><<endevent>><</link>>
+		<br>
+		<<if $exposed lte 0>>
+			<<maleicon>><<link [[남자 탈의실|School Boy Changing Room]]>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+			<br>
+			<<femaleicon>><<link [[여자 탈의실|School Girl Changing Room]]>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+		<<elseif $exposed gte 1>>
+			<<maleicon>><<link [[수건을 몇 장 챙겨 들고 남자 탈의실로 들어간다|School Boy Changing Room]]>><<towelupm>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+			<br>
+			<<femaleicon>><<link [[수건을 몇 장 챙겨 들고 여자 탈의실로 들어간다|School Girl Changing Room]]>><<towelup>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+		<</if>>
+	<<elseif (($delinquency gte 800 and $rng lte 90) or ($delinquency gte 500 and $rng lte 50) or $daily.school.swimmingLate) and $swimall isnot 1>>
+		<!-- Note Mason won't do this if they are naked. Or will they? -->
+		"또 너냐." <<he>>【이가】 말한다. "나도 이제 참을 만큼 참았어. 넌 레이튼 교장이 처리할 문제다. 수업 끝."<<detention 2>>
+		<<He>>【은는】 당신의 팔을 잡고 출구 쪽으로 이끈다<<if $exposed is 1>>. 당신이 부끄러워하든 말든 신경 쓰지 않는다<</if>>.
+		<<if $exposed gte 2 and pcAreArmsBound("any")>>
+			나가는 길에 <<he>>【이가】 선반에서 수건을 집어 당신의 허리에 두른다.
+			<!-- Note: Mason's stressed so they will miss towelling up breasts -->
+			"대체 어쩌다 그딴 식으로 묶였는지는 알고 싶지도 않다." <<he>>【이가】 소리친다. "그것도 레이튼 교장한테 직접 설명해."<<detention 1>>
+			<br><br>
+
+			<<link [[다음|School Swimming Late Detention]]>><<endevent>><<pass 2>><<towelupm>><</link>>
+		<<elseif $exposed gte 2>>
+			나가는 길에 <<he>>【이가】 선반에서 수건을 집어 든다. "이거 걸쳐." <<he>>【이가】 말한다.
+			<br><br>
+
+			<<link [[수건을 두른다 (0:02)|School Swimming Late Detention]]>><<endevent>><<pass 2>><<towelup>><</link>>
+			<!-- TODO: refuse -->
+		<<else>>
+			<br><br>
+
+			<<link [[다음|School Swimming Late Detention]]>><<endevent>><<pass 2>><</link>>
+		<</if>>
+	<<elseif $rng gte 26>>
+		"함께 할 수 있어서 참 다행이구나." <<he>>【이가】 빈정거린다. "하지만 유감스럽게도 수업에 참여하기엔 너무 늦었어.<<if $cstate isnot "fine">> 게다가 옷도 '제대로'
+		<<if $swimall is 1>><<detention 5>>안 입었잖아<!-- Mason may be a bit miffed having to teach naked because of you --><<else>><<detention 1>>안 입었잖아<</if>>.<</if>>"
+
+		<<He>>【은는】 구석에 있는 의자를 가리킨다. "저기 앉아서 조용히 있어."<<detention 1>><<gdelinquency>>
+		<br><br>
+
+		<<loitericon>><<link [[앉아서 기다린다|School Swimming Late Wait]]>><<endevent>><</link>>
+		<br>
+		<<if $exposed lte 0>>
+			<<maleicon>><<link [[남자 탈의실|School Boy Changing Room]]>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+			<br>
+			<<femaleicon>><<link [[여자 탈의실|School Girl Changing Room]]>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+		<<elseif $exposed gte 1>>
+			<<maleicon>><<link [[수건을 몇 장 챙겨 들고 남자 탈의실로 들어간다|School Boy Changing Room]]>><<towelupm>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+			<br>
+			<<femaleicon>><<link [[수건을 몇 장 챙겨 들고 여자 탈의실로 들어간다|School Girl Changing Room]]>><<towelup>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+		<</if>>
+	<<elseif $rng gte 11>>
+		"이제라도 수업에 들어와 줘서 고맙네." <<he>>【이가】 말한다. "<<nnpc_title "Leighton">> 교장이 너랑 할 얘기가 있을 거야."
+		<br><br>
+		<<He>>【은는】 출구를 가리킨다.<<detention 1>><<gdelinquency>>
+		<br><br>
+
+		<<link [[나간다 (0:02)|School Pool Entrance]]>><<pass 2>><<endevent>><</link>>
+		<br>
+		<<if $exposed gte 1>>
+			<<maleicon>><<link [[수건을 몇 장 챙겨 들고 남자 탈의실로 들어간다|School Boy Changing Room]]>><<towelupm>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+			<br>
+			<<femaleicon>><<link [[수건을 몇 장 챙겨 들고 여자 탈의실로 들어간다|School Girl Changing Room]]>><<towelup>><<detention 1>><<endevent>><</link>><<gdelinquency>>
+		<</if>>
+	<<else>>
+		<<He>>【은는】 <<print either("지친 듯이", "체념한 듯이")>> 고개를 젓는다. "이렇게 늦게까지 뭐 하러 꾸역꾸역 기어 왔는지 모르겠네." <<He>>【은는】 탈의실 쪽을 가리킨다.<<detention 1>>
+		<br><br>
+
+		<<if $exposed lte 0>>
+			<<maleicon>><<link [[남자 탈의실|School Boy Changing Room]]>><<endevent>><</link>>
+			<br>
+			<<femaleicon>><<link [[여자 탈의실|School Girl Changing Room]]>><<endevent>><</link>>
+		<<elseif $exposed gte 1>>
+			<<maleicon>><<link [[수건을 몇 장 챙겨 들고 남자 탈의실로 들어간다|School Boy Changing Room]]>><<towelupm>><<endevent>><</link>>
+			<br>
+			<<femaleicon>><<link [[수건을 몇 장 챙겨 들고 여자 탈의실로 들어간다|School Girl Changing Room]]>><<towelup>><<endevent>><</link>>
+		<</if>>
+    <</if>>
+<</if>>
+
+
+:: School Swimming Late Wait
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+당신은 의자에 앉는다.
+<<if $exposed gte 2>>
+	<<if $swimall isnot 1>>
+		<<if hasSexStat("exhibitionism", 5)>>
+			당신의 노출된 <<genitalsandbreasts is are>>【이가】 반 전체에 전시된다.<<arousal 600>>
+		<<else>>
+			당신은 노출된 <<genitalsandbreasts>>【을를】 손으로 가린다.<<arousal 300>><<stress 1>>
+		<</if>>
+	<<else>>
+		당신의 노출된 <<genitalsandbreasts is are>>【이가】 반 전체에 전시되지만, 여기 있는 다른 모두도 마찬가지다.<<arousal 100>>
+	<</if>>
+<</if>>
+반 친구들의 시선이 느껴진다.<<stress 1>><<status 1>><<gcool>><!-- rulebreaker bonus -->
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<link [[눈앞이 캄캄해진다...|School Passout]]>><</link>>
+<<else>>
+	<<loitericon>><<link [[기다린다|School Swimming Late Wait End]]>><<stress 1>><<advancetohour>><</link>><<gstress>>
+	<br>
+	<<if $exposed lte 0>>
+		<<maleicon>><<link [[남자 탈의실|School Boy Changing Room]]>><<detention 1>><</link>><<gdelinquency>>
+		<br>
+		<<femaleicon>><<link [[여자 탈의실|School Girl Changing Room]]>><<detention 1>><</link>><<gdelinquency>>
+	<<elseif $exposed gte 1>>
+		<<maleicon>><<link [[수건 몇 장을 챙겨 남자 탈의실로 들어간다|School Boy Changing Room]]>><<towelupm>><<detention 1>><</link>><<gdelinquency>>
+		<br>
+		<<femaleicon>><<link [[수건 몇 장을 챙겨 여자 탈의실로 들어간다|School Girl Changing Room]]>><<towelup>><<detention 1>><</link>><<gdelinquency>>
+	<</if>>
+<</if>>
+
+:: School Swimming Late Wait End
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+수업 종료를 알리는 종이 울린다.<<if $swimall is 1>> 메이슨이 지나가는 학생들에게 수건을 나눠주며, 눈을 마주치지 않으려 애쓴다.<</if>>
+<br><br>
+
+<<if $exposed lte 0>>
+	<<maleicon>><<link [[남자 탈의실|School Boy Changing Room]]>><</link>>
+	<br>
+	<<femaleicon>><<link [[여자 탈의실|School Girl Changing Room]]>><</link>>
+<<elseif $exposed gte 1>>
+	<<maleicon>><<link [[수건 몇 장을 챙겨 남자 탈의실로 들어간다|School Boy Changing Room]]>><<towelupm>><</link>>
+	<br>
+	<<femaleicon>><<link [[수건 몇 장을 챙겨 여자 탈의실로 들어간다|School Girl Changing Room]]>><<towelup>><</link>>
+<</if>>
+
+:: School Swimming Late Detention
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 학교 복도에 있다.<<pass 2>>
+
+<<if Time.hour gte 15>>
+	수업이 막 끝나서 복도는 밖으로 나가는 학생들로 가득하다.
+<<else>>
+	여러 교실 문 너머로 말소리가 들리지만, 몇몇 수업은 막 끝나서 학생들이 쏟아져 나오고 있다.
+<</if>>
+<br><br>
+메이슨이 당신을 꽉 붙잡고 레이튼의 사무실로 끌고 간다.
+<br><br>
+
+<<if $exposed gte 1>>
+	모퉁이를 돌자 <<peopley>>【으로로】 가득한 복도로 들어선다. <<covered>>
+	근처의 <<persony>> 한 명이 당신을 보고 <<if $exposed gte 2>>충격받아 숨을 헐떡인다<<else>>킥킥거린다<</if>>.<<stress 1>>
+	다른 사람들도 비슷한 반응을 보인다. 소란이 커지자 더 많은 사람이 돌아보고, 마침내 모두가 당신을 쳐다본다.
+	<br><br>
+<<else>>
+	대부분의 학생은 당신을 무시하지만, <<generatey1>><<person1>><<person>>【이가】 당신을 가리킨다. "누가 레이튼한테 가나 보네." <<he>>【은는】 친구들에게 들으라는 듯 속삭인다.<<stress 1>>
+	<br><br>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	<<link [[눈앞이 캄캄해진다...|School Passout]]>><<endevent>><</link>>
+<<else>>
+	<<link [[걷는다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 1>><</link>>
+	<br>
+	<<if $exposed gte 2 and hasSexStat("exhibitionism", 5)>>
+		<<link [[과시한다|School Swimming Late Detention Flaunt]]>><<endevent>><</link>><<exhibitionist5>>
+		<br>
+	<<elseif $exposed gte 1 and hasSexStat("exhibitionism", 4)>>
+		<<link [[과시한다|School Swimming Late Detention Flaunt]]>><<endevent>><</link>><<exhibitionist4>>
+		<br>
+	<</if>>
+	<<if hasSexStat("exhibitionism", 4) and !pcAreArmsBound("both") and $exposed lt 2>>
+		<<checkdroptowel>>
+		<<if _exlevel gte 2>>
+			<<link [[수건을 떨어뜨리고 과시한다|School Swimming Late Detention Flaunt]]>><<droptowel>><<endevent>><</link>><<exhibitionist5>>
+			<br>
+		<<elseif _exlevel>>
+			<<link [[수건을 떨어뜨리고 과시한다|School Swimming Late Detention Flaunt]]>><<droptowel>><<endevent>><</link>><<exhibitionist4>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $feetuse isnot "bound">>
+		<<link [[도망친다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 2>><</link>><<athleticsdifficulty 100 600>>
+	<</if>>
+<</if>>
+
+:: School Swimming Late Detention Flaunt
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<flaunting>> 당신은 마치 캣워크를 하듯 복도를 행진한다. 몇몇은 얼굴을 붉히며 시선을 피한다.
+하지만 대부분은 <<if $worn.lower.type.includes("naked") and $worn.under_lower.type.includes("naked")>>알몸으로<<else>>거의 알몸으로<</if>> 복도 중앙을 행진하는 <<girl>>의 모습을 열심히 구경한다.
+<br><br>
+
+"마음껏 봐." 당신이 선언한다. "부끄러워할 거 없어." <<status 5>><<arousal 50>>
+<br><br>
+
+<<if $exposed gte 2>>
+	<<exhibitionism5>>
+	<<fameexhibitionism 50>>
+	<<npc Mason>><<person1>>메이슨은 <<his>> 몸으로 당신의 몸을 가려주려고 최선을 다하고 있다.
+	<br><br>
+
+	<<link [[걷는다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 1>><</link>>
+	<br>
+	<<if $feetuse isnot "bound">>
+		<<link [[달려서 도망치려 한다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 2>><</link>><<athleticsdifficulty 1 400>>
+		<br>
+		<<link [[몸을 숙여 빠져나가려 한다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 2>><</link>><<dancedifficulty 100 600>>
+	<</if>>
+<<else>>
+	<<exhibitionism4>>
+	<<fameexhibitionism 25>>
+	<<npc Mason>><<person1>>메이슨은 당신을 더 꽉 붙잡고 밀치며, <<his>> 몸으로 당신의 몸을 가려주려고 최선을 다한다.
+	<br><br>
+
+	<<link [[걷는다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 1>><</link>>
+	<br>
+	<<if $feetuse isnot "bound">>
+		<<link [[달려서 도망치려 한다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 2>><</link>><<athleticsdifficulty 200 1000>>
+	<</if>>
+<</if>>
+
+:: School Swimming Late Detention 2
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 2 and $danceSuccess>>
+	재빠른 발놀림으로 메이슨의 손아귀에서 벗어나 다른 학생들 사이를 헤치고 나아간다. 메이슨이 뒤쫓아오지만, 당신은 근처의 관리용 벽장에 숨는 데 성공한다.
+	<br><br>
+
+	<<link [[다음 (0:10)|Hallways]]>><<pass 10>><</link>>
+<<elseif $phase is 2 and $athleticsSuccess>>
+	갑작스러운 움직임으로 메이슨의 손아귀에서 벗어나 다른 학생들 사이로 뛰어든다. 메이슨이 뒤쫓아오지만, 당신은 근처의 관리용 벽장에 숨는 데 성공한다.
+	<br><br>
+
+	<<link [[다음 (0:10)|Hallways]]>><<pass 10>><</link>>
+<<else>>
+	<<if $phase is 2>>
+		벗어나려 하지만, 메이슨이 너무 꽉 잡고 있다.<<gpain>><<pain 4>>
+		<br><br>
+	<</if>>
+
+	당신은 레이튼의 사무실 앞, 학교 복도에 있다.<<pass 2>>
+
+	<<if Time.hour gte 15>>
+		수업이 막 끝나서 복도는 학생들로 가득하다.
+	<<else>>
+		여러 교실 문 너머로 말소리가 들리지만, 몇몇 수업은 막 끝나서 학생들이 쏟아져 나오고 있다.
+	<</if>>
+	<<if $exposed gte 1>><<covered>><</if>>
+	<br><br>
+	<<if $carried.upper.name isnot "naked" or $carried.lower.name isnot "naked">> <!-- Detention scene doesn't account for you being naked, put the towel back on if you took it off -->
+		당신은 직전에 수건을 다시 두른다.
+		<<silently>><<clotheson>><</silently>>
+	<</if>>
+	메이슨이 교장실 문을 열고 당신을 안으로 밀어 넣는다.<!-- Mason would accompany you but "School Detention" assumes you're alone -->
+	<br><br>
+
+	<<link [[들어간다|School Detention]]>><</link>>
+	<br>
+	<<if $phase is 1 and $feetuse isnot "bound">>
+		<<link [[도망친다|School Swimming Late Detention 2]]>><<endevent>><<set $phase to 2>><</link>><<athleticsdifficulty 200 800>>
+	<</if>>
+<</if>>

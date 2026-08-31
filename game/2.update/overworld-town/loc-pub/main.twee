@@ -1,0 +1,2228 @@
+:: Widgets Pub [widget]
+
+<<widget "landryoptions">>
+	<<if $loft_gh is 1 and $landry_loft_known isnot 1>>
+		<<socialiseicon "ask">><<link [[인부 고용에 도움을 요청한다|Pub Window Loft Ask]]>><</link>>
+		<br>
+	<<elseif $landry_loft_known is 1 and $loft_gh is 1 and $money gte 500000>>
+		<<highicon>><<link [[론드리에게 인부를 고용할 돈을 건넨다|Pub Window Loft Purchase]]>><<money -500000 "orphanageUpgrades">><<endevent>><</link>>
+		<br>
+	<</if>>
+	<<if $blackmoney gte 1>>
+		<<highicon>><<link [[장물을 판다|Pub Sell]]>><</link>>
+		<br>
+	<</if>>
+	<<if $spray lt $spraymax and $money gte 250000>>
+		<<peppersprayicon>><<link [[후추 스프레이 충전을 산다 (£2500)|Pub Spray]]>><<spray 1>><<money -250000 "pubPepperSpray">><</link>>
+		<br>
+	<</if>>
+	<<if crimeSumCurrent() gte 500 and !$pubtask>>
+		<<socialiseicon "ask">><<link [[흔적을 덮는 데 도움을 요청한다|Pub Task]]>><</link>>
+		<br>
+	<</if>>
+	<<if $police_hack is 1>>
+		<<policeicon>><<link [[경찰 컴퓨터에 침입하는 데 도움을 요청한다|Pub Hack]]>><</link>>
+		<br>
+	<<elseif $police_hack is 4 and $money gte 30000>>
+		<<policeicon>><<link [[갱신된 경찰 비밀번호를 묻는다 (£300)|Pub Hack]]>><<money -30000 "pub">><</link>>
+		<br>
+	<<elseif $pub_hack_job is 3 and $hacker_tasks.length gte 2>>
+		<<if $mickeyPub gte 2>>
+			<<socialiseicon>><<link [[경찰 컴퓨터 비밀번호 건을 다시 확인한다|Pub Hack]]>><<set $pub_hack_job to 4>><</link>>
+		<<else>>
+			<<socialiseicon>><<link [["해커의 전언을 전한다"|Pub Hack]]>><<set $pub_hack_job to 4>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if $pubtask2 is 1>>
+		<<crimeicon "black box">><<link [[블랙 박스를 넘긴다|Pub Box]]>><<set $pub_task_stat++>><</link>>
+		<br>
+	<</if>>
+	<<if $estate_fence is "quest" and _estate_asked isnot true>>
+		<<mooricon "remy">><<link [[레미 저택에 침입하는 법을 묻는다|Pub Estate]]>><</link>>
+		<br>
+	<</if>>
+	<<if $pubfame>>
+		<<if $pubfame.status is "ready">>
+			<<socialiseicon "ask">><<link [[평판 문제로 도움을 요청한다|Pub Fame]]>><<set $phase to 0>><</link>>
+			<br>
+		<<elseif $pubfame.status is "hiding">>
+			<<socialiseicon "ask">><<link [[평판 문제로 도움을 요청한다|Pub Fame Hiding]]>><</link>>
+			<br>
+		<<elseif $pubfame.status is "accepted">>
+			<<socialiseicon>><<link [[부탁 건으로 미키와 이야기한다|Pub Fame]]>><<set $phase to 0>><</link>>
+			<br>
+		<<elseif $pubfame.status is "done">>
+			<<socialiseicon>><<link [[완료한 부탁을 미키에게 보고한다|Pub Fame]]>><<set $phase to 0>><</link>>
+			<br>
+		<<elseif $pubfame.intro and $hacker_tasks.length gte 2>>
+			<<socialiseicon "ask">><<link [[평판 문제로 도움을 요청한다|Pub Fame Return]]>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $farm_manors_usb gte 1>>
+		<<techicon "usb">><<link [[농장 저택에서 가져온 USB를 건넨다|Pub Farm USB]]>><<unset $farm_manors_usb>><</link>>
+		<br>
+	<</if>>
+
+	<<if $avery_mansion>>
+		<<if (!$avery_mansion.landry_told or $avery_mansion.landry_told is 1) and $avery_fate>>
+			<<if $avery_fate is "fallen" or $avery_fate is "kicked" or $avery_fate is "saved">>
+				<<socialiseicon>><<link [[고층 빌딩에서 있었던 일을 랜드리에게 말한다|Pub Avery Stones Tell 2]]>><<set $avery_mansion.landry_told to 2>><</link>>
+				<br>
+				<<socialiseicon "angry">><<link [[고층 빌딩에서 있었던 일로 랜드리에게 화낸다|Pub Avery Stones Angry]]>><<set $avery_mansion.landry_told to 2>><</link>>
+				<br>
+			<<elseif $fake_artefact is "pc" and $avery_fate is "ascended">>
+				<<socialiseicon>><<link [[고층 빌딩에서 있었던 일을 랜드리에게 말한다|Pub Avery Stones Ascend]]>><<set $avery_mansion.landry_told to 2>><</link>>
+				<br>
+			<</if>>
+		<<elseif !$avery_mansion.landry_told and $fake_artefact is "Avery">>
+			<<icon "bones.png">><<link [[돌을 교체했다고 랜드리에게 말한다|Pub Avery Stones Tell]]>><<set $avery_mansion.landry_told to 1>><</link>>
+			<br>
+		<</if>>
+		<<if $avery_mansion.fox.known and $avery_mansion.guest and !$avery_fate and !$daily.noBrownFox>>
+			<<icon "clothes/fox-mask.png">>
+			<<if isGwylanAbsent()>>
+				<<link [[갈색 여우를 요청한다|Pub Brown Fox Unavailable]]>><</link>>
+			<<elseif $daily.brownFox or gwylanSchedule() is "pub">>
+				<<link [[갈색 여우를 요청한다 (0:01)|Pub Brown Fox]]>><<pass 1>><</link>>
+			<<elseif $brownFoxWoundedTimer>>
+				<<link [[갈색 여우를 요청한다 (0:20)|Pub Brown Fox]]>><<pass 20>><</link>>
+			<<else>>
+				<<link [[갈색 여우를 요청한다 (0:10)|Pub Brown Fox]]>><<pass 10>><</link>>
+			<</if>>
+			<br>
+		<<elseif $avery_mansion.fox.known and $avery_mansion.fox.progress gte 3 and !$avery_mansion.fox.end_landry and $avery_fate>>
+			<<icon "clothes/fox-mask.png">><<link [[갈색 여우를 요청한다|Pub Avery Stones Fox End]]>><<set $avery_mansion.fox.end_landry to true>><</link>>
+			<br>
+		<</if>>
+		/*
+		<<if $avery_mansion.landry gte 2 and $avery_mansion.fake_stones is 1>>
+			<<link [[대체 소원석에 대해 묻는다|Pub Avery Fake Stones]]>><</link>>
+			<br>
+		<</if>>
+		 */
+	<</if>>
+	<<if (($fake_artefact is "pc" or $fake_artefact is "Avery") and $avery_fate isnot "fallen" and $avery_fate isnot "kicked") and C.npc.Avery.state is "dismissed" and !$avery_card_gift>>
+		<<socialiseicon>><<link [[에이버리의 호감을 되찾을 방법이 필요하다고 랜드리에게 말한다|Pub Avery Card]]>><</link>>
+		<br>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "brownFoxOptions">>
+	<<if $brownFoxRevealed>>
+		<<if ["pub", "sulking"].includes(gwylanSchedule())>>
+			<span class="purple"><<His>> 지금의 기분을 읽기 어렵다.</span>
+		<<elseif $avery_mansion.fox.progress gte 15>>
+			<<He>>【은는】 따뜻하게 미소 짓는다. <span class="gold"><<He>>【은는】 당신을 전적으로 신뢰한다.</span>
+		<<elseif $avery_mansion.fox.progress gte 12 or $avery_mansion.fox.friend>>
+			<<He>>【은는】 몸을 기댄다. <span class="green"><<He>>【은는】 당신을 위해 위험을 무릅쓸 용의가 있다.</span>
+		<<elseif $avery_mansion.fox.progress gte 9>>
+			<<He>>【은는】 무심코 뒤로 물러난다. <span class="teal"><<He>>【은는】 일을 완수할 거라 믿고 있다.</span>
+		<<elseif $avery_mansion.fox.progress gte 6>>
+			<<He>>【은는】 조용히 앉는다. <span class="blue"><<He>>【은는】 당신의 능력을 신뢰하기 시작했다.</span>
+		<<elseif $avery_mansion.fox.progress gte 3>>
+			<<He>>【은는】 당신을 아래위로 훑어본다. <span class="purple"><<He>>【은는】 여전히 당신의 조력 능력에 의구심을 가지고 있다.</span>
+		<<elseif $avery_mansion.fox.progress gte 0>>
+			<<He>>【은는】 예민하고 경계심이 많다. <span class="pink"><<He>>【은는】 아직 당신의 능력을 확신하지 못하는 것 같다.</span>
+		<<else>>
+			<<He>>【은는】 팔짱을 낀 채 당신을 바라본다. <span class="red"><<He>>【은는】 당신에게 자질이 있다고 생각하지 않는 것 같다.</span>
+		<</if>>
+	<<else>>
+		<<if $avery_mansion.fox.progress gte 15>>
+			<<He>>【은는】 따뜻하게 미소 짓는다. <span class="gold"><<He>>【은는】 당신을 전적으로 신뢰한다.</span>
+		<<elseif $avery_mansion.fox.progress gte 12 or $avery_mansion.fox.friend>>
+			<<He>>【은는】 앞으로 기울인다. <span class="green"><<He>>【은는】 당신을 위해 기꺼이 위험을 감수할 의향이 있다.</span>
+		<<elseif $avery_mansion.fox.progress gte 9>>
+			<<He>>【은는】 편하게 앉는다. <span class="teal"><<He>>【은는】 당신을 신뢰한다.</span>
+		<<elseif $avery_mansion.fox.progress gte 6>>
+			<<He>>【은는】 조용히 앉는다. <span class="blue"><<He>>【은는】 당신을 신뢰하기 시작했다.</span>
+		<<elseif $avery_mansion.fox.progress gte 3>>
+			<<He>>【은는】 당신을 유심히 쳐다본다. <span class="purple"><<He>>【은는】 여전히 당신의 능력을 입증하기를 기다리고 있다.</span>
+		<<elseif $avery_mansion.fox.progress gte 0>>
+			<<He>>【은는】 당신의 눈을 똑바로 응시한다. <span class="pink"><<He>>【은는】 당신의 충성심을 확신하지 못하는 것 같다.</span>
+		<<else>>
+			<<He>>【은는】 팔짱을 낀 채 당신을 응시한다. <span class="red"><<He>>【은는】 당신을 신뢰하지 않는다.</span>
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<if $avery_mansion.fox.task isnot "heist" and $avery_mansion.fox.progress gte 12 and $fake_artefact is "pc">>
+		<<if $brownFoxWoundedTimer or !$avery_mansion.fox.dungeon>>
+			<<if !$avery_mansion.fox.heist_intro>>
+				<<set $avery_mansion.fox.heist_intro to true>>
+				"제안할 게 있어." <<he>>【이가】 시작한다. "넌 많은 것을 해냈어. 더 이상 필요 이상의 위험에 처하는 걸 원치 않아."
+				<br><br>
+
+				<<He>>【은는】 두 손바닥을 비빈다.
+				<<if $brownFoxWoundedTimer and !$avery_mansion.fox.dungeon>>
+					"내 다리가 낫고 네가 금고를 찾게 되면, <span class="green">뼈를 훔치기 위해 함께 작업하자</span>."
+				<<elseif $brownFoxWoundedTimer>>
+					"내 다리가 낫는다면, <span class="green">뼈를 훔치기 위해 협력할 수 있을 거야</span>."
+				<<else>>
+					"금고를 찾으면 <span class="green">우리가 함께 뼈를 훔칠 수 있을 텐데</span>."
+				<</if>>
+				<br><br>
+			<</if>>
+		<<else>>
+			<<set $avery_mansion.fox.task to "heist">>
+			<<set $avery_mansion.fox.task_complete to false>>
+			"<span class="blue">이제 움직일 때가 온 것 같아.</span> 나는 다 나았고 필요한 정보도 있으니까. 에이버리가 다음에 자리를 비우면 잠입해서 뼈를 마침내 손에 넣는 거야."
+			<br><br>
+
+			<<He>>【은는】 두 손으로 입을 가리고 휘파람을 분다
+			<<if $seabird_lullaby gte 2>>
+				<span class="teal">바닷새의 자장가</span> 첫 여섯 음절을.
+			<<else>>
+				<<set $seabird_lullaby to 1>>
+				어딘가 <span class="teal">익숙한</span> 6개의 음표를.
+			<</if>>
+			"정원에서 길이 트였을 때 그 노래를 휘파람으로 불면 내가 들어갈게."
+			<br><br>
+		<</if>>
+	<<elseif $avery_mansion.fox.stones and !$avery_mansion.fox.friend and $avery_mansion.fox.progress gte 12>>
+		<<set $avery_mansion.fox.friend to true>>
+		"잘해 주었구나." <<He>>【은는】 생각에 잠기기 위해 멈춘다. "뼈가 쓰이는 날이 오면..."
+		<br><br>
+
+		<<He>>【은는】 시선을 돌렸다 다시 말한다. "에이버리가 저택을 떠난 뒤에 저택에 숨어들게. 축하주 한잔 하자. 약속할게." <<He>>【은는】 당신을 보고 미소 짓는다.
+		<br><br>
+	<</if>>
+
+	<<if !$avery_mansion.fox.task>>
+		<<icon "front-gate.png">><<link [["다음 주빈은 " + window.KR.gatPersonNameDictKR($avery_mansion.guest) + "라고 말한다"|Pub Brown Fox Task]]>><</link>>
+		<br>
+	<<elseif $avery_mansion.fox.task_complete is "success" and $avery_mansion.fox.task isnot "heist">>
+		<<socialiseicon>><<link [[<<his>> 일을 끝냈다고 말한다|Pub Brown Fox Task]]>><<set $phase to "success">><</link>>
+		<br>
+	<<elseif $avery_mansion.fox.task isnot $avery_mansion.guest and $avery_mansion.fox.task isnot "heist" or $avery_mansion.fox.task_complete is "fail">>
+		<<icon "cross.png">><<link [[<<his>> 일을 끝내지 못했다고 말한다|Pub Brown Fox Task]]>><<set $phase to "fail">><</link>>
+		<br>
+	<</if>>
+	<<if $avery_mansion.jobs.includes("dungeon") and !$avery_mansion.fox.dungeon and $fake_artefact isnot "Avery">>
+		<<icon "avery-dungeon.png">><<link [[지하 감옥에 대해 말한다|Pub Brown Fox Dungeon]]>><<set $avery_mansion.fox.dungeon to true>><<set $avery_mansion.fox.progress += 3>><</link>>
+		<br>
+	<</if>>
+	<<if $fake_artefact is "Avery" and !$avery_mansion.fox.stones>>
+		<<icon "bones.png">><<link [[돌을 직접 찾았다고 말한다|Pub Brown Fox Stones]]>><<set $avery_mansion.fox.stones to true>><<set $avery_mansion.fox.progress += 3>><</link>>
+		<br>
+	<</if>>
+	<<if !$brownFoxRevealed and ($brownFoxWoundedHint or $gwylanSeen?.includes("yearning"))>>
+		<<ind>><<link [[<<he>>【이가】 누군지 안다고 말한다|Pub Brown Fox Revealed]]>><<set $brownFoxRevealed to true>><</link>>
+		<br>
+	<</if>>
+	<<if $brownFoxRevealed and ["pub", "sulking"].includes(gwylanSchedule()) and !$gwylanSeen?.includes("pub_yearning") and !$avery_mansion.fox.yearning>>
+		<<ind>><<link [[사과한다|Pub Brown Fox Apologise]]>><<set $avery_mansion.fox.yearning to true>><</link>>
+		<br>
+	<</if>>
+	<<getouticon>><<link [[작별 인사한다|Pub]]>><<endevent>><</link>>
+	<br>
+<</widget>>
+
+:: Pub
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+
+<!-- If the PC maxes out their stress while they're wasted, they'll wake up at a random passout location. -->
+<<if $stress gte $stressmax and $drunk gte 500>>
+	The countertop is swirling. You try to get up, but you end up walking into the floor.
+	<br><br>
+
+	<!--
+		Generic Environment Weight: 3
+		Specific Location Weight: 2
+		Complex Location Weight: 1
+	 -->
+	<<cleareventpool>>
+		<!-- Waking up in an alley. -->
+		<<addinlineevent "alley" 3>>
+			<<passoutalley>>
+		<</addinlineevent>>
+
+		<!-- Waking up on the street. -->
+		<<addinlineevent "street" 3>>
+			<<passoutstreet>>
+		<</addinlineevent>>
+
+		<!-- Waking up at the park. -->
+		<<addinlineevent "park" 2>>
+			<<passoutpark>>
+		<</addinlineevent>>
+
+		<!-- Waking up on the beach. -->
+		<<addinlineevent "beach" 2>>
+			<<passoutbeach>>
+		<</addinlineevent>>
+
+		<!-- Waking up on bus. -->
+		<<addinlineevent "bus" 1>>
+			<<set $phase to 1>>
+			<<set $phase2 to 0>>
+			<<passoutbus>>
+		<</addinlineevent>>
+
+		<!-- Waking up in the arcade. -->
+		<<if Time.dayState is "day" or Time.dayState is "dusk">>
+			<<addinlineevent "arcade" 1>>
+				<<passoutarcade>>
+			<</addinlineevent>>
+		<</if>>
+
+		<!-- Waking up in the adult shop. -->
+		<<if $adultshopunlocked isnot undefined
+			and (Time.hour gte 21 or Time.weekDay is 1 or (Time.weekDay is 7 ? Time.hour lt 9 : Time.hour lt 16))
+			and not (Time.hour is $closinghour and Time.weekDay isnot 1)
+			and $adultshopstate is not "closed">>
+			<<addinlineevent "adult_shop" 1>>
+				<<passoutadultshop>>
+			<</addinlineevent>>
+		<</if>>
+	<<runeventpool>>
+<<elseif $exposed gte 1>>
+	You are hiding in a trolley to conceal your <<lewdness>>. Everyone's too busy or intoxicated to notice you.
+	<br><br>
+
+	<<link [[Look for something to cover with|Pub Exposed]]>><</link>>
+	<br>
+	<<link [[Sneak out the back|Industrial Alleyways]]>><</link>>
+	<br>
+<<else>>
+	<<if $pubbooze is "herbal">>
+		<<wearProp "beer mug">>
+		<<set $pubbooze to 0>>
+		The bartender pours a glass of a locally produced spirit. The pub seems more colourful after drinking it.
+	<<elseif $pubbooze is "booze">>
+		<<wearProp "beer mug">>
+		<<set $pubbooze to 0>>
+		The bartender pours a glass of a cheap and popular beverage.
+	<<else>>
+		You enter the pub. It's busy as always.
+	<</if>>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "pub">>
+		<<set _nobr to true>>
+	<</if>>
+	<<if !_nobr>>
+		<br><br>
+	<</if>>
+	<<if $averyPub is 1 and (Time.dayState is "day" or Time.dayState is "dusk")>>
+		<<npc Avery>><<person1>>
+		<<loadNPC 1 avery_sidepiece>><<person2>>
+		You try to remain inconspicuous, looking for Avery. You quickly spot the <<person>> and Avery at the bar, having an animated chat.
+		You now recognise that the <span class="red"><<person>> is from the orphanage.</span>
+		<br><br>
+		Avery leans in and places a hand on <<his>> thigh, causing <<him>> to tense up. The <<person>> stands up suddenly, and excuses <<himself>> to the restrooms.
+		<br><br>
+		<<link [[Go to the restrooms|Avery Dismissal Restroom]]>><</link>>
+		<br>
+		<<link [[Go to the bar|Avery Dismissal Bar]]>><</link>>
+		<br>
+	<<elseif ($fame.bestiality gte 400 or $fame.rape gte 400 or $fame.prostitution gte 400 or $fame.sex gte 400 or $fame.exhibitionism gte 400) and !$pubfame>>
+		<<set $pubfame to {seen: [], tasksDone: []}>><<set $fameDecay to {}>><<set $fameDecayTimer to {}>>
+		<<generate1>><<person1>>
+		A hand lands on your shoulder from behind. "You've been busy," a <<person>> says in your ear. You can smell the alcohol on <<his>> breath. "Don't think I don't recognise you. You're the talk of the town.
+		<<if $fame.bestiality gte 400>>
+			Bit surprising not seeing a buncha mutts fucking you raw, though."
+		<<elseif $fame.sex gte 400 or $fame.rape gte 400 or $fame.prostitution gte 400>>
+			Bit surprising not seeing you being fucked raw, though."
+		<<else>>
+			Bit surprising seeing you all covered up, though."
+		<</if>>
+		<<stress 3>><<gstress>>
+		<br><br>
+		<<His>> grip tightens. "I reckon it's time I got my slice of the pie. <<if $fame.prostitution gte 400>>Hope you don't mind that I'm not paying for it.<<elseif $fame.rape gte 400>>You like it rough, right? That's what I've heard.<</if>> Come 'ere, sweetheart."
+		<br><br>
+		<<link [[Next|Pub Fame Intro]]>><</link>>
+	<<elseif $pubwhore gte 10 and $pubattack isnot 1>>
+		<<set $pubattack to 1>>
+		<span class="red">A black sack is thrown over your head</span> and two pairs of arms grab you from behind. They drag you out of the pub and into a waiting van.
+		<br><br>
+		<<link [[Next|Brothel Punishment]]>><</link>>
+		<br>
+	<<elseif $pubwhore gte 20>>
+		<<set $pubwhore to 10>>
+		<<generate1>><<generate2>><<person1>> A <<person>> shoves you against the wall. A <<person2>><<person>> stands beside <<person1>><<him>>. The pub staff and clientele look away. <span class="red">"Boss sent us,"</span> the <<person1>><<person>> says. "Says you've been naughty. We're gonna bring you in." <<He>> glances at the bar. "And don't try nothing. No one's gonna help you."
+		<br><br>
+		<<if $money gte 50000>>
+			<<link [[Bribe (£500)|Pub Accost]]>><<set $phase to 0>><</link>>
+			<br>
+		<</if>>
+		<<link [[Fight|Pub Accost Fight]]>><<set $fightstart to 1>><</link>>
+		<br>
+		<<link [[Go with them|Pub Accost]]>><<set $phase to 1>><</link>>
+		<br>
+	<<else>>
+		<<socialiseicon "ask">><<link [[Ask for Landry|Pub Landry]]>><<endevent>><</link>>
+		<br>
+		<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+			<span class="blue">You can't bring yourself to drink while you know you're with child.</span>
+			<br>
+		<<else>>
+			<<if $money gte 1000>>
+				<<foodicon "beer">><<link [[Drink booze (£10 0:05)|Pub]]>><<endevent>><<money -1000 "pubAlcohol">><<set $pubbooze to "booze">><<drunk 120>><<pass 5>><</link>><<ggdrunk>>
+				<br>
+			<</if>>
+			<<if $money gte 2000>>
+				<<foodicon "beerbottle">><<link [[Drink herbal booze (£20 0:05)|Pub]]>><<endevent>><<money -2000 "pubAlcohol">><<set $pubbooze to "herbal">><<pass 5>><<drunk 60>><<hallucinogen 20>><</link>><<gdrunk>><<ghallucinogens>>
+				<br>
+			<</if>>
+		<</if>>
+		<<if $farm>>
+			<<if $farm.tower gte 1 and !$farm.tower_guard and !$farm.build_finished.includes("tower 1")>>
+				<<investigateicon>><<link [[Look for a guard for your farm (0:30)|Pub Guard]]>><<endevent>><<pass 30>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+		<br>
+		<<if !($weekly.theft.pub || $weekly.pubMusic)>>
+			<<if !$per_npc.pubMusic>>
+				<<generate2>><<person2>><<saveNPC 1 pubMusic>><<endevent>>
+			<</if>>
+			You see a <<loadNPC 1 pubMusic>><<person2>><<person>> playing music in the corner.<br>
+			<<birdicon "sing">><<link [[Approach|Pub Music]]>><<set $pubdrink to 0>><</link>>
+			<br><br>
+		<</if>>
+		<<generate1>><<person1>>You see a <<person>> sitting alone.
+		<br>
+		<<brothelicon>><<link [[Flirt (0:05)|Pub Flirt]]>><<if !($weekly.theft.pub || $weekly.pubMusic)>><<clearsinglenpc 1>><</if>><<pass 5>><<set $pubdrink to 0>><</link>><<promiscuous1>>
+		<br>
+		<<investigateicon>><<link [[Look for someone else (0:01)|Pub]]>><<endevent>><<pass 1>><</link>>
+		<br>
+
+		<<if C.npc.Gwylan.state is "scorned">>
+			<<if gwylanSchedule() is "pub">>
+				<br>
+				You see Gwylan sulking in a secluded corner. No one seems to be paying <<nnpc_him "Gwylan">> any mind.
+				<br>
+				<<socialiseicon>><<link [[Approach|Gwylan Pub Sulking]]>><<endevent>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+
+		<<if Time.weekDay is 1 and Time.hour gte 21 and C.npc.Whitney.state is "active">>
+			<br>
+			Some delinquents occupy a table, drowning the room in revelry.
+			<<if $weekly.whitneyPub>>
+				<span class="purple">You shouldn't provoke them further.</span>
+			<<else>>
+				You spot Whitney among them.
+				<<if C.npc.Whitney.love gte 10>>
+					<span class="teal"><<nnpc_He "Whitney">> eyes you from <<nnpc_his "Whitney">> seat.</span>
+				<<else>>
+					<span class="blue">If <<nnpc_he "Whitney">> notices you, <<nnpc_he "Whitney">> doesn't show it.</span>
+				<</if>>
+				<br>
+				<<ind>><<link [[Approach|Whitney Pub Approach]]>><<endevent>><<set $weekly.whitneyPub to 1>><<set $phase to 0>><</link>>
+			<</if>>
+			<br>
+		<</if>>
+
+		<br>
+		<<harvesticon>><<link [[Leave|Harvest Street]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Pub Intro
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+당신은 술집에 들어선다. 내부는 아늑하고 소박한 분위기다. 오래된 농기구들이 벽을 장식하고 있는데, 인근의 유서 깊은 농업을 암시하는 듯하다.
+<<if Time.dayState is "night">>
+	시간이 늦었음에도 불구하고, 이곳은 활기가 넘친다. 테이블을 잡기는 어려울 것 같다.
+<<else>>
+	이곳은 활기가 넘친다. 테이블을 잡기는 어려울 것 같다.
+<</if>>
+<br><br>
+<<npc Landry>><<person1>>
+<<if $pronoun is "m">>
+	"이 근처에선 못 보던 얼굴이네." 옆에서 남자의 목소리가 들린다. <<He>>【은는】 짧은 검은 머리에 회색 스웨터와 어두운 바지를 입고 있다. 이런 곳에서는 두 번 쳐다볼 일 없는 평범한 사람이다. "나랑 합석할래? 너한테 제안할 게 있거든."
+	<br><br>
+<<else>>
+	"이 근처에선 못 보던 얼굴이네." 옆에서 여자의 목소리가 들린다. <<He>>【은는】 어깨까지 오는 검은 머리에 회색 카디건과 어두운 바지를 입고 있다. 이런 곳에서는 두 번 쳐다볼 일 없는 평범한 사람이다. "나랑 합석할래? 너한테 제안할 게 있거든."
+	<br><br>
+<</if>>
+이렇게 사람이 많은 곳에서는 위험할 리 없다고 판단한 당신은 동의한다. <<He>>【은는】 당신을 중앙 홀 옆에 있는, 시야가 부분적으로 가려진 작은 공간으로 이끈다. 이상하게도 이곳의 테이블은 비어 있다. <<He>>【이가】 작은 테이블에 앉자, 당신도 따라 앉는다. 당신은 <<his>> 다소 평범하고 헐렁한 옷에 가려져 있던 <<he>>의 호리호리한 체격을 알아차린다.
+<br><br>
+"솔직하게 말할게." <<he>>【이가】 말한다. "네가 돈이 필요하다는 걸 알아. 어떻게 아는지는 묻지 마, 소문은 퍼지기 마련이니까. 내가 널 도울 수 있을 것 같아. 만약 네가 어떻게 처리해야 할지 모르는 보석이나 다른 물건들을 손에 넣게 되면, 내가 처리해 줄 수 있어. 돈은 두둑하게 쳐줄게."
+<br><br>
+<<He>>【은는】 당신의 어깨 너머를 살피며, 여전히 둘만 있는지 확인하는 듯하다. "어쨌든, 기대하는 만큼은 줄 수 있을 거야. 때때로 서로 도울 수도 있을 거고. 내가 할 말은 이게 다야." <<He>>【은는】 일어나서 <<his>> 손을 내민다. "적어도 날 기억해 둬. 나랑 얘기하고 싶으면 직원 중 한 명에게 물어봐, 그들이 내가 어디 있는지 알 거야. 내 이름은 랜드리야."
+<<set $pubintro to 1>>
+<br><br>
+<<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Landry
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+
+<<if $phase is 1>>
+	<<endevent>><<npc Landry>><<person1>>
+	당신은 랜드리의 테이블로 돌아간다. "이제 계획이 뭐야?" <<he>>【이가】 묻는다.
+	<br><br>
+	<<landryoptions>>
+	<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+	<br>
+<<elseif $fake_artefact is undefined and $skulduggery gte 600 and C.npc.Avery.init is 1 and !$avery_fate or ($avery_mansion and $avery_mansion.landry is 1 and !$avery_fate)>>
+	<<npc Landry 1>><<person1>>
+	바텐더에게 랜드리에 대해 묻자, 바텐더는 고개를 끄덕이며 늘 앉던 테이블로 당신을 안내한다. 늘 앉던 자리에 누군가 몸을 앞으로 숙인 채 조용히 이야기하고 있다. 그 사람은 후드가 달린 짙은 녹색 망토를 입고 있다.
+	<<if $transformationParts.fox.ears isnot "disabled" or $transformationParts.wolf.ears isnot "disabled" or $transformationParts.cat.ears isnot "disabled">>
+		날카로운 귀 덕분에, 당신은 그들이 무슨 말을 하는지 간신히 알아들을 수 있다.
+	<</if>>
+	<br><br>
+	"...수도원은 정조 검사에 비슷한 반응성 가루를 사용해. 아주 비슷하지. 사실상 아이들이 사용하는 것의 약화된 버전이야. 보통 인체에서 분비되는 천연 유분과 반응하지만, 더... 폭발적인 반응도 있어. 우리는 그 물질로 만든 마개 뒤에 작은 수은 저장고를 추가했지. 그들의 의식에 사용되는 화학 물질에 반응하여 녹으면, 수은이 흘러나올 거야. 회로를 완성하는 것과 같을 거고, 그러면—"
+	<br><br>
+	그들은 갑자기 말을 멈춘다.
+	<<if $avery_mansion?.fox?.known>>
+		<<set $daily.brownFox to true>>
+		그들의 고개가 당신 쪽으로 기울어진다. 갈색 여우다. "타이밍 좋네. 두 분이서 사업 얘기를 나누도록 자리를 비켜주지." 갈색 여우가 일어나 당신을 스쳐 지나가자 랜드리는 의아한 듯 고개를 갸웃거린다. 여우는 술집을 떠나기 전 잠시 당신의 어깨에 손을 얹는다.
+		<br><br>
+		랜드리가 헛기침을 한다. "이미 안면이 있는 사이라니 다행이군."
+	<<else>>
+		<span class="red">그들의 고개가 당신 쪽으로 기울어진다.</span> 랜드리가 즉시 <<his>> 손을 들어 올린다. "괜찮아. <<pShe>>【은는】 날 보러 온 거야."
+		<br><br>
+		의문의 인물은 고개를 끄덕이고 일어선다. 그가 돌아서자, 갈색 여우 가면으로 얼굴이 가려져 있는 것이 드러난다. <<if $auriga_artefact is "Avery">>레미의 파티에서 봤던 것과 거의 똑같다.<</if>> 그들은 한마디 말도 없이 당신을 지나쳐 술집을 나간다.
+	<</if>>
+	<br><br>
+	당신은 자리에 앉는다. "아주 쓸모 있는 녀석이지." 랜드리가 말한다. "아무도 그 작은 여우에게 신경 쓰지 않고, 어디에 있었는지도 기억하지 못하는 것 같더군. 늙은 개에게 새로운 재주가 필요 없는 경우도 있는 법이지."
+	<br><br>
+	<<link [[다음|Pub Avery Note]]>><</link>>
+	<br>
+<<elseif ($wren_intro isnot undefined or $wrenSeen?.includesAny("cards", "prison")) and ($prison?.wren_names is 2 or crimeSumCurrent() gte 5000 or $fame.social gte 600) and $wrenHeist is undefined and Time.hour lte 17>>
+	<<npc Landry>><<person1>>바텐더에게 랜드리를 찾자, 바텐더는 고개를 끄덕이며 늘 앉던 테이블로 당신을 안내한다. 당신이 자리에 앉자마자
+	<<set $wrenHeist to false>><<set $wrenHeistMonthly to 30>>
+
+	<<npc Wren 2>><<person2>>술집 앞에서 작은 소란이 일어난다. 랜드리는 한숨을 쉬며 무슨 일인지 보러 간다. 당신이 따라가려 할 때, 누군가 당신 맞은편에 앉는다. <span class="gold">렌이다.</span>
+	<br><br>
+	"이런 데서 마주치다니 신기하네." <<he>>【이가】 말한다.
+	<br><br>
+	<<if $speech_attitude is "meek">>
+		"여-여기서 뭐 하는 거예요?" 당신이 묻는다.
+	<<elseif $speech_attitude is "bratty">>
+		"어디 맞춰볼까." 당신이 씩 웃으며 말한다.
+	<</if>>
+
+	<<if $wrenSeenLast is "cards">>
+		<<if $speech_attitude is "meek">>
+			"미안하지만, 지-지금은 카드놀이를 할 수 없어요..."
+		<<elseif $speech_attitude is "bratty">>
+			"내 옷이라도 벗겨 먹으려고? 뭐, 지금은 네 장난에 어울려 줄 시간이 없네."
+		<<else>>
+			"한판 하려고?" 당신이 묻는다. "미안하지만 바빠."
+		<</if>>
+		<br><br>
+		"이번엔 아니야." <<he>>【이가】 가볍게 말한다.
+	<<else>>
+		<<if $speech_attitude is "meek">>
+			"저-저는 랜드리에게 아무 짓도 안 할 거예요, 약속해요..."
+		<<elseif $speech_attitude is "bratty">>
+			"날 끌어들여서 랜드리 물건을 훔치려고? 어림도 없지."
+		<<else>>
+			"공범이라도 찾는 거야?" 당신이 묻는다. "미안하지만 랜드리 물건은 안 훔쳐."
+		<</if>>
+		<br><br>
+		"진정해, <<girl>>. 그런 일로 온 게 아니니까." <<he>>【이가】 말한다.
+	<</if>>
+	<br><br>
+	"다른 걸 생각하고 있어. 우리 둘 다에게 이득이 될 만한 일. 일거리 말이야." <<He>>【이가】 당신을 보며 씨익 웃는다. "관심 있어?"
+	<br><br>
+
+	<<link [[렌의 말을 들어본다|Wren Heist Intro]]>><</link>>
+	<br>
+	<<link [[렌의 제안을 거절한다|Wren Heist Intro End]]>><<set $phase to 0>><<npcincr Wren love -1>><</link>><<llove "Wren">>
+	<<exit>>
+<<else>>
+	<<npc Landry>><<person1>>바텐더에게 랜드리를 찾자, 바텐더는 고개를 끄덕이며 늘 앉던 테이블로 당신을 안내한다. 당신이 자리에 앉자마자 랜드리가 도착해 맞은편에 앉는다.
+	<br><br>
+
+	"무슨 일로 왔어?" <<he>>【이가】 묻는다.
+	<<if $pubfame>>
+		<<if $pubfame.status is "finished">>
+			"우리 친구를 찾는 거라면, 지금 바빠. <span class="gold"><<if $pubfame.timer gt 1>><<number $pubfame.timer>>일 후에<<else>>내일<</if>></span> 만날 준비가 될 거야."
+		<<elseif $pubfame.status is "hidingKnown">>
+			"우리 친구를 찾는 거라면, 아직 잠수 중이야. <span class="gold"><<if $pubfame.timer gt 1>><<number $pubfame.timer>>일 후에<<else>>내일<</if>></span> 만날 준비가 될 거야."
+		<</if>>
+	<</if>>
+	<br><br>
+	<<landryoptions>>
+	<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Pub Spray
+<<wearProp "pepper spray">>
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+당신은 테이블 위에 돈을 올려놓는다. 랜드리가 돈을 받고 작은 용기를 건네준다.
+<<gspray>>
+<br><br>
+<<if $pubspray isnot 1>>
+	<<set $pubspray to 1>>
+	"비싸서 미안하군." <<he>>【이가】 말한다. "재료를 구하기가 어려워서."
+	<br><br>
+<</if>>
+<<landryoptions>>
+<<getouticon>><<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Sell
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+당신은 물건을 테이블 위에 올려놓는다. 랜드리는 자기 일에 익숙한 사람 특유의 느긋한 태도로 물건을 감정한다.
+<<if $blackmoney lt 100>>
+	"잘했어. 다른 거라도 손에 넣으면 날 찾아오라고."
+	<br><br>
+<<elseif $blackmoney lt 500>>
+	"꽤 괜찮은 물건이군. 다른 거라도 손에 넣으면 날 찾아오라고."
+	<br><br>
+<<else>>
+	"이건 정말 대단한 물건인데. 감당할 수 있는 것 이상을 문 건 아니길 바라. 뒤처리가 필요하면 날 찾아오라고."
+	<br><br>
+<</if>>
+당신은 <span class="gold">£<<print $blackmoney>></span>【을를】 법니다.
+<<money `$blackmoney * 100` "pubStolenGoods">><<set $blackmoney to 0>>
+<br><br>
+<<getouticon>><<link [[술집|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Task
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+
+<<if $pubstage is undefined>>
+	<<set $pubstage to 1>><<set $pubtask to "forest">>
+	"도와줄 수 있지." 랜드리가 몸을 뒤로 젖히며 말한다. "하지만 내 부탁을 하나 들어줘야겠어. 아니, 돈 얘기는 아니야. 도착했어야 할 소포가 아직 안 왔는데, 그걸 찾아다 줘야겠어. 다행히 GPS 추적기가 있어서 정확한 위치는 알고 있지. <span class="gold">마을 옆 숲 깊은 곳에 있어.</span>"
+	<br><br>
+	"그걸 가져다주면 네 과거 경범죄 기록이 들통나지 않게 해주지. 작은 검은 상자야. 돌멩이나 나뭇가지랑 헷갈릴 일은 없을 거야. 아, 그리고 조심해. 거기선 사람들이 늘 사라지거든."
+<<elseif $pubstage is 1>>
+	<<set $pubstage to 2>><<set $pubtask to "moor">>
+	"다시 도와줄 수 있지." 랜드리가 몸을 뒤로 젖히며 말한다. "하지만 다른 일이 있어. 또 다른 소포가 도착하지 않았거든. <span class="gold">이번엔 황야에서 분실됐어.</span> 마을에서 좀 떨어진 곳이야. 거길 가려면 하베스트 가로 나가야 할 거야."
+	<br><br>
+	"그걸 가져다주면 네 과거 경범죄 기록이 들통나지 않게 해주지. 또 다른 작은 검은 상자야. 아, 그리고 조심해. 괴물 이야기는 믿지 않지만, 어떤 미신 뒤에는 그럴듯한 이유가 있는 법이거든."
+<<elseif $pubstage is 2>>
+	<<unset $pubstage>><<set $pubtask to "sewers">>
+	"그래, 도와줄 수 있지." 랜드리가 몸을 뒤로 젖히며 말한다. "하지만 내 부탁을 하나 들어줘야겠어. 물론, 돈 얘기는 아니야. 도착했어야 할 또 다른 소포가 아직 안 왔어. 그걸 가져다 줘야겠어. 다행히도, GPS 추적기 덕분에 정확한 위치는 알고 있지. <span class="gold">마을 아래 오래된 하수구 깊은 곳에 있어.</span>"
+	<br><br>
+	"그걸 가져다주면 네 과거 경범죄 기록이 들통나지 않게 해주지. 짐작했겠지만, 작은 검은 상자야. 웅덩이나 오물이랑 헷갈릴 일은 없을 거야. 아, 그리고 조심해. 거기선 사람들이 늘 휩쓸려 가거든."
+<</if>>
+<br><br>
+
+<<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Box
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+"바로 그거야! 넌 내 생명의 은인이야." <<He>>【은는】 상자를 더 자세히 살핀다. "별일 없었길 바라. 걱정 마, 내 쪽 일은 확실히 처리할 테니. 넌 깨끗해질 거야." <<He>>【은는】 일어선다. "그럼 실례하지, 신세 진 사람들에게 연락 좀 해야겠어."
+<br><br>
+<<unset $pubtask>>
+<<unset $pubtask2>>
+<<unset $pubtasksetting>>
+<<crimeDown 10000>>
+<<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Hack
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">><<set $phase to 1>>
+<<if $police_hack is 1>>
+	<<if $pubfame and !$pubfame.intro>>
+		"경찰 컴퓨터를 해킹한다고?" 랜드리가 몸을 뒤로 젖히며 묻는다. "네 스타일 마음에 드는군.
+		<<if $pubfame.status is "hiding">>
+			<<set $pubfame.status to "hidingKnown">>
+			그건 내가 도와줄 수 없어. 그리고 안타깝게도 <span class="red">우리 친구는 지금 활동을 중단한 상태야</span>. 잠시 몸을 낮추고, 성가신 놈들이 추적하지 못하게 해야 하거든. 누군가 그 친구에 대한 중요한 정보를 흘렸어."
+			<<stress 12>><<ggstress>>
+			<br><br>
+
+			<<He>>【은는】 당신이 무언가 말하기 전에 고개를 젓는다. "사과하지 마. 예전에도 그보다 더한 비밀을 흘린 적 있어. 그들이 다시 움직일 수 있게 되면 널 도와줄 수 있을 거야. <span class="gold"><<if $pubfame.timer gt 1>><<number $pubfame.timer>>일 후에<<else>>내일<</if>></span>이면 괜찮아질 거야."
+			<br><br>
+
+			<<link [[떠난다|Pub]]>><<endevent>><</link>>
+		<<elseif $pubfame.status is "hidingKnown">>
+			그건 내가 도와줄 수 없어. 그리고 안타깝게도 우리 친구는 아직 잠적 중이야. 그래도 다시 활동을 시작하면 널 도와줄 수 있을 거야."
+			<br><br>
+
+			<<link [[떠난다|Pub]]>><<endevent>><</link>>
+		<<else>>
+			<<set $police_hack to 4>>
+			내가 도와줄 순 없지만, 누가 할 수 있는지는 알 것 같아." <<He>>【은는】 주변에 아무도 없는지 확인한 뒤, 테이블 뒤쪽 문을 엄지로 가리킨다. <span class="teal">"우리의 공통된 친구라면 널 도와줄 수 있을 거야."</span>
+			<br><br>
+
+			당신은 문을 두드린다. "나야."
+			<br><br>
+
+			'미키'가 문을 살짝 연다. "안녕. 너랑 랜드리가 하는 말 엿들었어. 경찰 비밀번호? 쉽지. 하지만 대가가 따를 거야. <<printmoney 30000>>." 당신의 표정을 보고 미키가 눈썹을 치켜올린다. "왜? 나도 돈이 필요하거든. 호의만으로 모든 걸 해결할 순 없잖아."
+			<br><br>
+
+			<<if $money gte 30000>>
+				<<link [[거래한다 (£300)|Pub Hack Deal Mickey]]>><<set $police_hack to 5>><<set $phase to 1>><<money -30000 "pub">><</link>>
+				<br>
+				<<link [[거래하지 않는다|Pub Hack Deal Mickey]]>><<set $police_hack to 4>><<set $phase to 2>><</link>>
+			<<else>>
+				돈이 부족하다.
+				<<link [[다음|Pub Hack Deal Mickey]]>><<set $police_hack to 4>><<set $phase to 2>><</link>>
+			<</if>>
+		<</if>>
+	<<else>>
+		"경찰 컴퓨터를 해킹한다고?" 랜드리가 몸을 뒤로 젖히며 묻는다. "네 스타일 마음에 드는군. 하지만 사이버 관련으로 내 도움을 바란다면, 운이 없네." <<He>>【은는】 생각에 잠겨 턱을 문지른다. "적임자가 한 명 있긴 하지.
+		<<if $pubfame and $pubfame.intro>>
+			미키 기억나? 네 명성 문제 때문에 내가 소개해줬던 해커 말이야. 그 친구라면 해결할 수 있을 거야."
+		<<else>>
+			<span class="teal">도무스 가에 있는 고아원의 그 고아 말이야.</span> 컴퓨터 천재야. 미키, 아니면 맥케이, 뭐 그런 이름이었지."
+			<br><br>
+
+			랜드리가 누구를 말하는지 알지만, 한 번도 이야기해 본 적은 없다. 그 아이는 혼자 지내는 편이다.
+			<br><br>
+
+			"최선의 방법은," 랜드리가 말을 잇는다. "이 고아를 찾는 거야. 그 아이를 설득해서 나와 함께 일하게 만들면, 너한테도 돈이 좀 들어갈 거야. 베일리의 심기만 건드리지 마." <<He>>【이가】 미소 짓는다. "하지만 그건 이미 알고 있겠지."
+		<</if>>
+		<br><br>
+
+		<<link [[거래한다|Pub Hack Deal]]>><<set $police_hack to 2>><<if $pub_hack_job lte 1>><<set $pub_hack_job to 1>><</if>><<set $phase to 1>><</link>>
+		<br>
+		<<link [[거래하지 않는다|Pub Hack Deal]]>><<set $phase to 2>><</link>>
+		<br>
+	<</if>>
+	<<exit>>
+<<elseif $police_hack is 4>>
+	"물론이지," 랜드리가 말한다. "10분만 줘."
+	<br><br>
+
+	당신은 잠시 다른 손님들을 구경한다. 랜드리가 곧 돌아온다.
+	<br>
+	"여기 있어," 랜드리가 말한다. "새 경찰 마스터 비밀번호 하나. 그리고 우리 친구가 안부 전해달래."
+<<elseif $mickeyPub gte 2>>
+	"경찰 컴퓨터 일 말이지," 랜드리가 고개를 끄덕이며 말한다. "그래. 네가 말했었지. 우리 친구가 처리해 뒀어."
+	<br><br>
+	<<He>>【이가】 봉투 하나를 밀어준다. 안에는 단어가 휘갈겨진 카드가 들어있다.
+	<br><br>
+	"이게 경찰 마스터 비밀번호야. 이것도 있어," <<he>>【이가】 USB 스틱을 내밀며 덧붙인다. "바이러스야. 컴퓨터 시스템을 깨끗하게 지워버리지. 이걸로 문제를 일으킬 수도 있고, 아니면 오래된 문제를 없앨 수도 있을 거야. 행운을 빌어."
+<<else>> /*Was elseif $pub_hack_job is 4*/
+	<<money 50000 "pub">><<set $mickeyPub to 2>>
+	"미키가 나타났어," 랜드리가 말한다. "이상한 녀석이야. 나한테 줄 SD 카드가 잔뜩 있다고 네가 그랬다던데?"
+	<br><br>
+	당신은 SD 메모리 카드를 건네준다. 그 대가로 랜드리는 봉투를 준다. 안에는 돈과 단어가 휘갈겨진 카드가 들어있다.
+	<br><br>
+	"고마워. 이건 경찰 마스터 비밀번호고, 이건 내게 인재를 데려와 준 것에 대한 <<printmoney 50000>>의 사례금이야. 앞으로 새로운 종류의 일이 생길지도 모르겠군."
+	<br><br>
+	"이것도 있어," <<he>>【이가】 USB 스틱을 내밀며 말한다. "바이러스야. 컴퓨터 시스템을 깨끗하게 지워버리지. 이걸로 문제를 일으킬 수도 있고, 아니면 오래된 문제를 없앨 수도 있을 거야. 행운을 빌어."
+<</if>>
+<br><br>
+<<set $police_hack to 5>>
+<<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Hack Deal
+<<set $outside to 0>><<set $location to "pub">><<effects>><<set $bus to "harvest">>
+
+<<if $phase is 1>>
+	"훌륭해. 사냥 잘하고 와."
+<<elseif $phase is 2>>
+	"그럼 내가 도와줄 수 있는 건 없군. 그 컴퓨터는 알아서 잘 해봐."
+<</if>>
+<br><br>
+<<link [[다음|Pub]]>><<endevent>><</link>>
+
+:: Pub Hack Deal Mickey
+<<effects>>
+<<if $phase is 1>>
+	"좋아." 미키가 갑자기 문을 닫았다가 다시 연다. "미안. 몇 분만 기다려줘. 그냥 돈만 받으려던 건 아니었어." 그리곤 다시 문을 닫는다.
+	<br><br>
+
+	잠시 다른 손님들을 구경한다. 곧 미키가 돌아온다.
+	<br>
+	"여기." 미키가 말한다. 단어가 휘갈겨 쓰인 카드가 든 봉투를 건넨다. USB 스틱도 함께 준다. "이건 바이러스야. 이걸로 시스템 전체를 날려버려. 필요할 때만 써. 이걸 쓰면 새 비밀번호가 필요할 거야."
+<<elseif $phase is 2>>
+	미키가 갑자기 문을 닫는다. "마음 바뀌면 랜드리한테 말해." 문 너머로 목소리가 들린다.
+<</if>>
+<br><br>
+<<link [[다음|Pub]]>><<endevent>><</link>>
+
+:: Pub Estate
+<<effects>>
+
+당신이 저택에 대해 언급하자 랜드리가 모퉁이 너머를 힐끗 쳐다본다. <<He>>【은는】 당신이 말을 마칠 때까지 기다리며, 차가운 표정으로 당신을 관찰한다. <span class="pink">"£2000."</span> <<he>>【이가】 말한다. "내가 쓸 건 아니고. 전문가를 위한 거지. 귀족을 건드리는 건 위험한 일이야. 하지만 <<nnpc_he Wren>>【이가】 널 들여보내 줄 거야."
+<br><br>
+<<set _estate_asked to true>>
+
+<<if $money gte 200000>>
+	<<highicon>><<link [[지불한다 (£2000)|Pub Estate Pay]]>><<money -200000 "pub">><</link>>
+	<br>
+<<else>>
+	비용을 감당할 수 없다.
+	<br>
+<</if>>
+<br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Estate Pay
+<<effects>>
+
+테이블 너머로 돈을 밀어준다.
+<<set $estate_fence to "landry">>
+<<if currentSkillValue('skulduggery') gte 200>>
+	돈이 랜드리의 소매 속으로 사라진다.
+<<else>>
+	순식간에 사라졌다.
+<</if>>
+"전화해 두지." <<he>>【이가】 말한다. "네가 도착할 때쯤이면 끝나 있을 거야."
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Guard
+<<effects>>
+
+<<generate1>><<set $NPCList[0].skills.security to random(1, 600)>><<npcClothesName $NPCList[0] "wildsFlannel">>
+<<generate2>><<person2>>
+주인에게 일손이 필요한 사람이 있는지 묻는다. <<He>>【은는】 <<person1>><<person>>【을를】 가리킨다.
+<<if $NPCList[0].traits.includes("relaxed")>>
+	혼자 창가에 기대앉아 있다. 당신이 다가가자 <<He>>【은는】 고개를 든다. "뭘 도와줄까?" <<he>>【은는】 맞은편 자리를 가리키며 묻는다.
+	<br><br>
+
+	<<if $speech_attitude is "meek">>
+		"저, 제 농장을 지켜줄 경비원이 필요해서요." 당신이 말한다. "밤에 일할 수 있는 사람이요."
+	<<elseif $speech_attitude is "bratty">>
+		"내 농장에서 일할 경비원을 고용하고 있어." 당신이 말한다. "야간 근무야. 관심 있어?"
+	<<else>>
+		"제 농장에서 일할 경비원을 찾고 있어요." 당신이 말한다. "야간에 일할 사람으로요."
+	<</if>>
+	<br><br>
+
+	<<person>>【은는】 술잔 너머로 당신을 바라본다. "흥미로운데." <<he>>【이가】 말한다. "비쌀 거야."
+	<br><br>
+<<elseif $NPCList[0].traits.includes("sociable")>>
+	친구들과 함께 앉아 수다를 떨고 있다. <<his>> 어깨를 두드려야 <<his>> 주의를 끌 수 있다.
+	<br><br>
+
+	<<He>>【은는】 다른 테이블에 당신과 함께 앉기로 동의한다. "그래서 무슨 일인데?" <<he>>【이가】 말한다.
+	<br><br>
+
+	<<if $speech_attitude is "meek">>
+		"저, 제 농장을 지켜줄 경비원이 필요해서요." 당신이 말한다. "밤에 일할 수 있는 사람이요."
+	<<elseif $speech_attitude is "bratty">>
+		"내 농장에서 일할 경비원을 고용하고 있어." 당신이 말한다. "야간 근무야. 관심 있어?"
+	<<else>>
+		"제 농장에서 일할 경비원을 찾고 있어요." 당신이 말한다. "야간에 일할 사람으로요."
+	<</if>>
+	<br><br>
+
+	"경비? 지루하겠지만, 일이니 어쩔 수 없지."
+	<br><br>
+
+<<elseif $NPCList[0].traits.includes("brooding")>>
+	어두운 구석에 혼자 앉아 있다. <<He>>【은는】 이미 당신을 지켜보고 있다.
+	<br><br>
+
+	당신은 <<him>> 맞은편 자리에 앉는다.
+	<<if $speech_attitude is "meek">>
+		"저, 저는 경비원이 필요해서—"
+	<<elseif $speech_attitude is "bratty">>
+		"저는—"
+	<<else>>
+		"저는 찾고 있어요—"
+	<</if>>
+	<br>
+	"내가 하지." <<person>>【이가】 말을 가로챈다. <<He>>【은는】 웃는다. "그렇게 쳐다보지 마. 너도 그다지 눈에 띄지 않는 건 아니니까. 내 조건에 대해 얘기해 보자고."
+	<br><br>
+
+<<else>>
+	바에서 <<print maleChance($pronoun) gte random(1, 100) ? "남자" : "여자">>에게 작업을 걸고 있다. <<His>> 목표물이 떠나버리고, <<him>> 카운터에 기댄 채 남겨진다. 당신은 이제 비어있는 자리에 앉는다.
+	<br><br>
+
+	"너도 꽤 괜찮은데." <<person>>【이가】 당신을 위아래로 훑어보며 말한다.
+	<br><br>
+
+	<<if $speech_attitude is "meek">>
+		"저, 제 농장을 지켜줄 경비원이 필요해서요." 당신이 말한다. "밤에 일할 수 있는 사람이요."
+	<<elseif $speech_attitude is "bratty">>
+		"내 농장에서 일할 경비원을 고용하고 있어." 당신이 말한다. "야간 근무야. 관심 있어?"
+	<<else>>
+		"제 농장에서 일할 경비원을 찾고 있어요." 당신이 말한다. "야간에 일할 사람으로요."
+	<</if>>
+	<br><br>
+
+	"농장?" <<he>>【이가】 묻더니 어깨를 으쓱한다. "진흙탕에만 안 들어가면 돼. 나 빈털터리거든."
+	<br><br>
+
+<</if>>
+
+<<guard_terms>>
+<br><br>
+
+<<link [[수락한다|Pub Guard Accept]]>><<famebusiness 2>><</link>>
+<br>
+<<link [[거절한다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Guard Accept
+<<effects>>
+
+<<if $NPCList[0].traits.includes("relaxed")>>
+	"오랜 비즈니스 관계를 위하여." <<person>>【이가】 <<his>> 술을 단숨에 들이키며 말한다. "내 이름은 <span class="gold"><<print window.KR.gatPersonNameDictKR($NPCList[0].name)>></span>【이】야. 어디로 가야 할지만 알려줘."
+	<br><br>
+
+	농장으로 가는 길을 알려준다. "알았어. 해 질 녘에 도착해서 동틀 때까지 자리를 지킬게. 쉽네."
+	<br><br>
+
+	<<He>>【은는】 술집을 나가는 길에 약간 비틀거린다.
+	<br><br>
+
+<<elseif $NPCList[0].traits.includes("sociable")>>
+	"좋아." <<person>>【이가】 말한다. "<span class="gold"><<print window.KR.gatPersonNameDictKR($NPCList[0].name)>></span>【이】라고 불러. 그래서 네 농장은 어디 있는데?"
+	<br><br>
+
+	길을 알려준다. "알았어. 늦은 오후에 갈게. 언제쯤 첫 여우를 쫓아낼 수 있을지 궁금하네."
+	<br><br>
+
+	<<He>>【은는】 일어나서 <<his>> 친구들에게 돌아간다.
+	<br><br>
+
+<<elseif $NPCList[0].traits.includes("brooding")>>
+	"알았어." <<person>>【이가】 말한다. "난 <span class="gold"><<print window.KR.gatPersonNameDictKR($NPCList[0].name)>></span>【이】야." <<He>>【은는】 일어선다. "길은 알아." <<He>>【은는】 술집을 나선다.
+	<br><br>
+
+<<else>>
+	<<person>>【은는】 망설이다가 고개를 끄덕인다. "재밌겠는데." <<he>>【이가】 말한다. "<span class="gold"><<print window.KR.gatPersonNameDictKR($NPCList[0].name)>></span>【이】라고 불러도 돼. 서로 알아갈 시간은 충분하겠지. 그 농장은 어디야?
+	<br><br>
+
+	당신은 <<him>>에게 길을 알려준다. "거기까지 가는 버스는 없네." <<he>>【이가】 불평한다. "그래도 야간 근무 시간 맞춰서 갈게."
+	<br><br>
+
+	<<He>>【은는】 거들먹거리며 술집을 나선다.
+	<br><br>
+
+<</if>>
+
+<<saveNPC 0 "farm_tower_guard">>
+<<set $farm.tower_guard to window.KR.gatPersonNameDictKR($NPCList[0].name)>>
+<<set $farm.tower_guard_unpaid to 1>>
+<<set $farm.tower_guard_skill to clone($NPCList[0].skills.security)>>
+<<earnFeat "To Watch the Fields">>
+
+<<link [[다음|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Exposed
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+<<generate1>><<person1>>
+
+방 안에서 몸을 가릴 만한 것을 찾아본다.
+<br><br>
+
+<<switch random(1, 3)>>
+	<<case 3>>
+		다가오는 <<person>> 때문에 당신의 노력은 중단된다. <<he>>【이가】 더러운 접시를 트롤리에 싣는 동안 당신은 고개를 다시 집어넣는다. 기적적으로, <<he>>【은는】 당신을 알아채지 못한다.
+		<br><br>
+
+		청소용 헝겊 뭉치가 당신의 무릎 위로 떨어진다. 위스키 냄새가 나지만, 아무것도 없는 것보다는 낫다. 몸에 헝겊을 두르고 안전한 곳으로 몰래 빠져나간다.
+		<<towelup>>
+		<br><br>
+
+		<<link [[다음|Pub]]>><<endevent>><</link>>
+		<br>
+	<<case 2>>
+		움직이기도 전에 트롤리가 덜컹거리며 움직이기 시작한다. 당신은 재빨리 안으로 다시 몸을 숨긴다.
+		<br><br>
+
+		바를 지나갈 때 조심스럽게 고개를 내민다. 바 의자에 스웨터 하나가 버려져 있다. 주인이 근처에 있는지 알 수 없다.
+		<br><br>
+
+		<<set $skulduggerydifficulty to 600>>
+		<<link [[훔친다|Pub Exposed Sweater]]>><</link>><<skulduggerydifficulty>>
+		<br>
+		<<link [[내버려 둔다|Pub Exposed Kitchen]]>><</link>>
+		<br>
+	<<case 1>>
+		바 옆에서 한 <<person>>【이가】 수건 더미를 접고 있다가, <<he>>【은는】 불려 나간다. 수건들은 아무도 지키지 않은 채 남겨져 있다.
+		<br><br>
+
+		<<link [[수건을 가지러 간다|Pub Exposed Bar]]>><<endevent>><</link>>
+		<br>
+		<<link [[계속 찾아본다|Pub Exposed No Towels]]>><</link>>
+		<br>
+<</switch>>
+
+:: Pub Exposed Kitchen
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+
+밀려가는 동안 술집의 소음이 잦아든다. 트롤리의 삐걱거리는 소리와 함께 발을 끄는 소리, 접시 부딪히는 소리가 들린다. 주방에 있는 게 틀림없다.
+<br><br>
+
+갑자기, <span class="pink">트롤리를 덮고 있던 천이 들춰진다.</span> <<person>>【와과】 마주친다. <<He>>【은는】 비명을 지른다.<<stress 12>><<ggstress>>
+<br><br>
+
+당황해서 뒷문으로 도망친다. <<person>>【은는】 뒤에서 욕설을 퍼붓지만, 쫓아오지는 않는다.
+<br><br>
+
+<<link [[다음|Industrial Alleyways]]>><<endevent>><</link>>
+<br>
+
+:: Pub Exposed Sweater
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+
+바로 코앞까지 다가갈 때까지 기다렸다가, 스웨터에 손을 뻗는다.
+<<silently>><<skulduggerycheck>><</silently>>
+<<if $skulduggerysuccess is 1>>
+	<span class="green">아무도 당신을 막지 않는다.</span> 당신은 그것을 트롤리 안으로 낚아채고, 옷을 입은 뒤, 아무도 눈치채기 전에 몰래 빠져나간다.
+	<<if $pronoun is "f">>
+		<<upperwear "girl's oversized sweater">>
+	<<else>>
+		<<upperwear "oversized sweater">>
+	<</if>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Pub]]>><<endevent>><</link>>
+<<else>>
+	손가락이 옷감에 닿는 순간, <span class="red">누군가 당신의 손목을 낚아챈다.</span> <<person>>에게 숨어 있던 곳에서 끌려 나온다. "이 좀도둑 같은 놈." <<he>>【이가】 으르렁거린다. "네가 지금 무슨 짓을—"
+	<br><br>
+
+	당신의 <<lewdness>>【을를】 보자 <<his>> 분노는 충격으로 바뀐다. <<His>> 손아귀 힘이 풀린 틈을 타 당신은 빠져나온다. 당신은 당황하며 술집에서 도망친다.<<trauma 6>><<stress 6>><<gtrauma>><<gstress>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Harvest Street]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Pub Exposed Bar
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+<<generate1>><<generate2>>
+
+몸을 낮추고 바로 향한다. 수건이 손에 닿을 무렵, 머리 위에서 머그잔이 쾅 내려쳐져 깜짝 놀란다.
+<br><br>
+
+"어이, <<girl>>." 목소리가 들린다. 바 너머를 엿보니 <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 있다. 그들은 빈 잔을 당신에게 밀어준다. "리필 좀 해줄래?"
+<br><br>
+
+바 뒤에서는 당신이 노출된 상태라는 걸 알 수 없지만, 거절하면 의심스러워 보일 것이다.
+<br><br>
+
+<<link [[술을 따라준다|Pub Exposed Bar Serve]]>><<trauma 6>><<stress 6>><</link>><<gtrauma>><<gstress>>
+<br>
+<<link [[거절한다|Pub Exposed Bar Refuse]]>><</link>><<difficulty 50>>
+<br>
+
+:: Pub Exposed Bar Serve
+<<set $outside to 0>><<set $location to "pub">><<effects>><<wearProp "drink tray">>
+
+<<if $player.gender_appearance is "f" and $worn.upper.exposed gte 2 and $worn.under_upper.exposed gte 1>>
+	음료 쟁반을 가득 채우고, 가슴에 안은 채 다가간다. 거품이 당신의 <<breasts>>【을를】 가려주길 바란다.
+<<else>>
+	음료 쟁반을 가득 채우고, <<genitals>> 바로 위, 낮은 위치에 들고 다가간다.
+<</if>>
+<br><br>
+
+그들은 당신이 도망칠 틈도 없이 잔 두 개를 집어 단숨에 비운다. 당신은 꼼짝없이 서서 그들이 잔을 비우는 것을 지켜봐야 한다. 한 번의 서투른 손길이 재앙을 부를 수도 있다.
+<<if $player.gender_appearance is "f" and $worn.upper.exposed gte 2 and $worn.under_upper.exposed gte 1>>
+	설상가상으로, 그들이 마시는 속도를 보니, 당신을 가려주던 것들이 빠르게 사라지고 있다.
+<</if>>
+<br><br>
+
+세 잔째 마시던 중, <<person>>【은는】 화장실에 간다며 자리를 뜬다. 그 틈을 타, 당신은 수건을 낚아채고 바에서 슬쩍 빠져나온다.
+<<towelup>>
+<br><br>
+
+<<link [[다음|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Exposed Bar Refuse
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+
+바 뒤에 몸을 낮게 웅크린다.
+<<if $speech_attitude is "meek">>
+	"죄-죄송해요." 당신이 말한다. "제가 좀 바빠서요."
+<<elseif $speech_attitude is "bratty">>
+	"나 쉬는 시간이야." 당신이 거짓말한다. "꺼져."
+<<else>>
+	"안 돼요." 당신이 말한다. "다른 사람한테 물어보세요."
+<</if>>
+<br><br>
+
+<<if random(1)>>
+	잠시 침묵이 흐른다. 그러다, <span class="green"><<person>>【이가】 한숨을 쉰다.</span> "<<pher>> 사장한테 얘기 좀 해야겠군." <<he>>【이가】 중얼거린다.
+	<br><br>
+
+	위에서 두 사람이 떠나며 의자가 삐걱거리는 소리가 들린다. 당신은 자유롭게 수건을 낚아채고 슬쩍 빠져나온다.
+	<<towelup>>
+	<br><br>
+
+	<<link [[다음|Pub]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	"뭐라고?" <<person>>【이가】 비웃는다. <span class="red">바 위에서 <<he>>【이가】 몸을 기울이자 바가 삐걱거린다.</span> "네가 뭔데 감히—"
+	<br><br>
+
+	숨 막히는 소리에 <<him>> 말이 끊긴다. "<<pShe>>【은는】—" <<he>>【이가】 더듬거린다. "<<pShe>>【은는】 벌거벗었어!" <<he>>【은는】 질겁했는지 흥분했는지 알 수 없다. 당신은 확인하려 머물지 않는다. 거리로 도망치는 당신 뒤로 환호성이 쫓아온다.<<trauma 6>><<stress 6>><<gtrauma>><<gstress>>
+	<br><br>
+
+	<<link [[다음|Harvest Street]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Pub Exposed No Towels
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+
+방 안을 계속 훑어본다. 적당한 것을 찾기도 전에, <span class="purple">트롤리가 덜컹거리며 움직이기 시작한다.</span> 당신은 재빨리 덮개 아래로 머리를 집어넣는다.
+<br><br>
+
+<<link [[다음|Pub Exposed Kitchen]]>><</link>>
+<br>
+
+:: Pub Music
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+<<person2>><<person>>【은는】 <<print either("오래된 나무 기타", "낡은 키보드","탬버린")>>【을를】 연주하고 있다. 당신은 <<him>> 연주를 들으며 무심코 박자에 맞춰 발을 까딱인다.
+<br><br>
+
+<<him>> 옆 테이블에는 반쯤 채워진 팁 통이 있다.
+<br><br>
+
+<<set $skulduggerydifficulty to 400>>
+<<if $harpy gte 6>>
+	<<birdicon "sing">><<link [[노래를 따라 부른다|Pub Music Sing]]>><</link>><<harpy>><br>
+<</if>>
+<<if $money gte 100>>
+	<<highicon>><<link [[적은 팁을 준다 (£1)|Pub Music Tip]]>><<set $phase to 1>><<money -100 "pub">><</link>><br>
+<</if>>
+<<if $money gte 500>>
+	<<highicon>><<link [[적당한 팁을 준다 (£5)|Pub Music Tip]]>><<set $phase to 2>><<money -500 "pub">><</link>><br>
+<</if>>
+<<if $money gte 3000>>
+	<<highicon>><<link [[후한 팁을 준다 (£30)|Pub Music Tip]]>><<set $phase to 3>><<money -3000 "pub">><</link>><br>
+<</if>>
+<<crimeicon "mark">><<link [[`<<he>>【이가】 안 볼 때 훔친다`|Pub Music Steal]]>><</link>><<skulduggerydifficulty>><br>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+
+:: Pub Music Sing
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+<<set $weekly.pubMusic to true>>
+
+당신이 <<person>>에게 다가가며 흥얼거리자, <<he>>【은는】 혼란스러워한다. <<He>>【은는】 멈추려는 듯 속도를 늦추지만, 당신은 노래를 시작한다. 당신의 완벽한 목소리에 <<His>> 눈이 살짝 커진다.
+<br><br>
+
+아무 말 없이, <<he>>【은는】 멈췄던 곳에서 다시 연주를 시작하며, <<his>> 리듬을 당신의 리듬에 맞춘다. 손님들의 시선이 당신에게 쏠려, 당신의 공연을 즐거워한다.
+<br><br>
+
+<<if $seabird_lullaby gte 2 and random(0,100) is 1>>
+	<span class="teal">바다새의 자장가</span>가 당신의 마음을 스친다. 기억을 따라, 당신은 노래의 첫 음을 흥얼거린다. 이상하게도 자연스럽게 느껴진다. <<person>>【은는】 어쩔 줄 몰라 하다가, <<his>> 악기를 내려놓고 당신의 노래를 듣는 데 만족한다.
+	<br><br>
+	당신의 목소리가 청중을 나른하게 만든다. 그들은 눈을 뜨려고 애쓴다. 당신이 노래를 마칠 때쯤, 대부분은 잠이 들었고, 남은 몇몇만이 조용한 박수를 보낸다. 당신은 자리를 뜬다.
+<<else>>
+	<<switch random(1,2)>>
+		<<case 1>>당신이 절정에 이르자, <<person>>【은는】 황홀경에 빠져 따라온다. 당신은 눈을 감고 거의 비명처럼 느껴지는 높은 음으로 노래를 마친다. 잠시 숨을 고른다. 눈을 뜨자, 청중은 어리둥절해하며 피부에 소름이 돋아 있다. 당연한 일이다. 결국, 그들은 사냥감이고, 당신은 사냥꾼이니까.
+		<<case 2>>당신의 곡조는 나른하면서도 매혹적이다. <<persons>> 속도가 당신과 일치한다. 눈을 감고 마지막 음을 길게 끌며 노래를 마친다. 깊은 한숨과 함께 눈을 뜨자, 청중은 멍하지만 갈망하는 표정으로 당신을 바라보고 있다. 당신의 발라드는 파트너를 갈망하고, 그들도 그것을 느꼈을 것이다.
+	<</switch>>
+	<br><br>
+	방 안은 잠시 숨을 죽였다가 박수갈채의 폭풍으로 터져 나온다. 당신은 자리를 뜬다.
+<</if>>
+<br><br>
+
+당신 뒤에서, <<person>>【은는】 팁 세례를 받는다. <<His>> 감사한 시선이 당신의 등을 따른다.
+<<clearNPC pubMusic>>
+<br><br>
+<<link [[다음|Pub]]>><<endevent>><</link>>
+
+:: Pub Music Tip
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+<<set $weekly.pubMusic to true>>
+
+<<switch $phase>>
+	<<case 1>>
+		잔돈을 꺼내 통에 넣는다. <<person>>【은는】 퉁명스럽게 고개를 끄덕인다.
+		<<stress -6>><<lstress>><<famegood 2>>
+	<<case 2>>
+		지폐 몇 장을 꺼내 통에 넣는다. <<person>>【은는】 살짝 미소를 짓는다.
+		<<stress -6>><<trauma -6>><<lstress>><<ltrauma>><<famegood 4>>
+	<<default>>
+		현금 뭉치를 꺼내 통에 넣는다. <<person>>【은는】 충격을 받은 듯 보이며 당신에게 거듭 감사한다. 따뜻한 자부심이 당신을 채운다.
+		<<stress -12>><<trauma -12>><<llstress>><<lltrauma>><<famegood 8>>
+<</switch>>
+<<clearNPC pubMusic>>
+<br><br>
+
+<<link [[나간다|Pub]]>><<endevent>><</link>>
+
+:: Pub Music Steal
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+<<set $weekly.theft.pub to true>>
+
+<<silently>><<skulduggerycheck>><</silently>>
+<<if $skulduggerysuccess is 1>>
+	적절한 순간을 기다렸다가, 통에 손을 집어넣는다. 재빨리 <<set _tip to random(5,100)>><<moneyGain _tip true true>>【을를】 꺼내 주머니에 쑤셔 넣는다. <span class="green"><<person>>【은는】 아무것도 눈치채지 못한다.</span><<crime "thievery">>
+	<br><br>
+	<<skulduggeryuse>>
+	<<link [[떠난다|Pub]]>><<endevent>><</link>>
+<<else>>
+	<span class="red">"어이!"</span> <<person>>【이가】 당신을 쏘아보자 음악이 갑자기 멈춘다. "지금 뭐 하는 짓이야? 도로 집어넣어!"
+	<br><br>
+	<<skulduggeryuse>>
+	<<link [[둘러대며 빠져나가려 한다|Pub Music Bluff]]>><</link>><<englishdifficulty 1 1000>>
+<</if>>
+
+:: Pub Music Bluff
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+
+손을 빼고 <<him>>에게 경멸적인 표정을 짓는다.
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"그냥 팁을 주려던 건데요?" 당신이 말한다. "저를 그렇게 대하지 말아 주세요." 당신은 <<him>>에게 원망스러운 눈빛을 보낸다.
+<<elseif $speech_attitude is "bratty">>
+	"팁 주는 사람마다 그렇게 대한다면, 돈을 많이 못 버는 것도 놀랍지 않네." 당신은 <<him>>에게 비웃는다. "내 돈은 내가 갖고 있을게."
+<<else>>
+	"그냥 팁을 주려던 건데요." 당신이 말한다. "왜 저를 이렇게 대하세요?"
+<</if>>
+<br><br>
+
+<<if $englishSuccess>>
+	<<person>>【은는】 당신을 보고 말을 더듬는다. <span class="green">"죄-죄송합니다."</span> <<He>>【은는】 다시 연주를 시작하지만, <<he>>【은는】 계속해서 통을 주시한다.
+	<<clearNPC pubMusic>>
+	<br><br>
+	<<link [[다음|Pub]]>><<endevent>><</link>>
+<<else>>
+	<span class="red"><<persons>> 찌푸린 얼굴이 더욱 굳어진다.</span> "거짓말하지 마, 이 더러운 도둑놈아." <<He>>【은는】 <<his>> 악기를 내려놓고, 당신의 팔을 잡아 <<his>> 무릎 위에 눕힌다. "누군가 널 제자리에 앉혀줘야겠군.
+	<<endevent>><<loadNPC 0 pubMusic>>
+	<br><br>
+	<<link [[다음|Pub Music Spank]]>><<set $molestationstart to 1>><</link>>
+<</if>>
+
+:: Pub Music Spank
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<npcspank>><<npcidlegenitals>>
+	<<set $enemyanger += 150>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or $enemyanger lte 0>>
+	<span id="next"><<link [[다음|Pub Music Spank Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Pub Music Spank]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Pub Music Spank Finish
+<<set $outside to 0>><<set $location to "pub">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<person>>【은는】 쾌감에 몸을 떨고, <<his>> 바지에 젖은 자국이 생긴다. 군중이 사진을 찍는 동안 당신은 <<his>> 손아귀에서 벗어난다. <<tearful>> 당신은 뒷문으로 도망친다.
+
+<<elseif $enemyhealth lte 0>>
+	<<person>>【은는】 고통에 소리치며 당신을 놓친다. 당신이 <<him>>에게서 통을 빼앗자 군중이 길을 비켜준다. <<tearful>> 당신은 뒷문으로 도망친다.
+	<br><br>
+
+	통에 든 팁을 센다. 당신은 <<set _tip to random(5,100)>><<moneyGain _tip true true>>【을를】 번다. <<crime "thievery">>
+
+<<else>>
+	<<person>>【은는】 당신의 따끔거리는 뺨에 마지막으로 한 대 더 때린다. "그리고 이게, <<if maleChance() is 100>>신사 여러분<<elseif maleChance() is 0>>숙녀 여러분<<else>>신사 숙녀 여러분<</if>>, 정직하게 생계를 꾸리려는 선량한 사람들에게서 훔치려는 버릇없는 놈들에게 일어나는 일입니다." 군중이 환호한다. 당신이 다시 일어서자 몇몇이 더러운 눈초리를 보낸다. <<tearful>> 당신은 비난의 시선을 피해 뒷문으로 슬그머니 빠져나간다. <<famegood -10>><<famesocial -5>>
+<</if>>
+<<silently>><<clotheson>><</silently>>
+<<endcombat>>
+<<clearNPC pubMusic>>
+<br><br>
+<<link [[다음|Industrial Alleyways]]>><<endevent>><</link>>
+
+:: Pub Farm USB
+<<effects>>
+
+농장 저택에서 가져온 USB를 테이블 너머로 밀어준다. 랜드리는 마치 살아있는 뱀인 것처럼 몸을 뒤로 뺀다. "이거 농장에서 가져온 거야?" <<he>>【이가】 묻는다. "네가 이걸 가지고 있다는 걸 그들이 알아?"
+<br><br>
+
+당신은 고개를 젓는다. 랜드리는 만족스럽게 고개를 끄덕이고 USB를 가져간다. "수고에 대한 보상이야." <<He>>【은는】 지폐 뭉치를 테이블 너머로 밀어준다. 당신은 <<moneyGain 500>>【을를】 벌었다.
+<br><br>
+
+"다른 건?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Note
+<<effects>>
+<<if $avery_mansion and $avery_mansion.landry is 1>>
+	<<set $avery_mansion.landry to 2>>
+	<<if $avery_mansion.fox.known>>
+		<<if $speech_attitude is "meek">>
+			"방금 이야기하던 그 사람, 에이버리의 파티에서 만났어요." 당신이 말한다. "그 사람이 저한테 여기서 친구를 찾으라고 말했어요. 그게 당신인가요?"
+		<<elseif $speech_attitude is "bratty">>
+			"방금 이야기하던 그 사람, 에이버리의 파티에서 만났어요." 당신이 말한다. "저보고 여기로 오라고 하더군요. 혹시 당신과 관련이 있는 건가요?"
+		<<else>>
+			"방금 이야기하던 그 사람, 에이버리의 파티에서 만났어요." 당신이 말한다. "누군가 그 사람을 보냈더군요. 혹시 당신인가요?"
+		<</if>>
+		<br><br>
+
+		랜드리가 미소 짓는다. "에이버리? 이제 <<nnpc_him "Avery">>【와과】 함께 산다고 들었어. 출세했네." <<He>>【은는】 앞으로 몸을 기울인다. "말이 나와서 말인데, <span class="gold">너에게 제안할 게 있어.</span>"
+	<<else>>
+		<<if $speech_attitude is "meek">>
+			"다뉴브 가 근처에서 누군가와 부딪혔어요." 당신이 말한다. "그 사람이 쪽지를 떨어뜨렸는데, 여기서 친구를 찾으라고 하더군요. 그게 당신인가요?"
+		<<elseif $speech_attitude is "bratty">>
+			"다뉴브 가 근처에서 누군가 쪽지를 줬어요." 당신이 말한다. "여기 오라고 하더군요. 혹시 당신과 관련이 있는 건가요?"
+		<<else>>
+			"다뉴브 가 근처에서 누군가와 부딪혔어요." 당신이 말한다. "누군가 그 사람을 보냈더군요. 혹시 당신인가요?"
+		<</if>>
+		<br><br>
+
+		랜드리가 미소 짓는다. "다뉴브 가? 이제 거기서 산다고 들었어. 에이버리와 엮이고. 출세했네." <<He>>【은는】 앞으로 몸을 기울인다. "말이 나와서 말인데, <span class="gold">너에게 제안할 게 있어.</span>"
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 더 가까이 몸을 기울인다. "그 저택 어딘가에 금고가 있어. 오직 한 가지만을 보호하지. 바로 이거야."
+	<br><br>
+<<else>>
+	"너에게 제안할 게 있어." <<He>>【은는】 미소 짓는다. "이 지역 사업가 중에, <span class="red">에이버리</span>라는 <<nnpc_gender "Avery">>【이가】 있는데, 내가 한동안 눈여겨보고 있었지. 그러니 <<nnpc_he Avery>>【이가】 너처럼 교활한 사람에게 관심을 가졌다는 소식을 들었을 때 내가 얼마나 놀랐겠어."
+	<br><br>
+	"<<nnpc_he Avery>>【이가】 다뉴브 가에 아주 멋진 저택을 가지고 있다는 건 알지. 그 저택 어딘가에 금고가 있어." <<He>>【은는】 더 가까이 몸을 기울인다. "오직 한 가지만을 보호하지. 바로 이거야."
+	<br><br>
+<</if>>
+
+랜드리가 하얀 꾸러미를 꺼내 펼친다. <span class="pink">창백할 정도로 하얀색이다.</span>
+<br><br>
+<<link [[다음|Pub Avery Stones]]>><<set $fake_artefact to "pc">><</link>>
+<br>
+
+:: Pub Avery Stones
+<<effects>>
+"소원의 돌이라고 부르지." 랜드리가 말한다. "아니면 움켜쥔 뼈라고도 하고. 진짜 뼈인지는 모르겠지만. 어쨌든, 에이버리에게 중요한 물건이야."
+<br><br>
+"더 중요한 건, 이건 가짜라는 거지. 내 제안은 이래. <span class="gold">네가 에이버리의 저택에 잠입해서, <<nnpc_his "Avery">> 금고를 열고, 진짜 돌을 이 위조품으로 바꿔치기했으면 해."</span> <<He>>【이가】 가짜 돌 위에 옷을 접어 올리고는 당신 쪽으로 밀어준다. "내가 알기로 에이버리와 가까워져서 <<nnpc_his "Avery">> 내실까지 들어간 사람은 딱 한 명뿐이야. <<pShe>> <<nnpc_him "Avery">>【와과】 함께 살면서 <<nnpc_his "Avery">> 장단에 맞춰주는 방식으로 해냈지."
+<br><br>
+<<person1>>
+<<if C.npc.Avery.state is "dismissed">>
+	"말처럼 쉽지는 않겠지." <<He>>【은는】 말을 잇는다. "네가 <<nnpc_him "Avery">>【을를】 떼어내는 데 성공했다고 들었어. 그건 상관없어. <span class="gold"><<nnpc_him "Avery">>에게 이걸 줘."</span> 랜드리가 <<his>> 주머니에 손을 넣어 보호 케이스에 든 얇은 카드를 꺼낸다. <<He>> 테이블 위로 그것을 밀어준다. 오래된 수집형 게임 카드다. "듣자 하니 <<nnpc_he "Avery">>【이가】 고아원 출신과 데이트하는 버릇이 있다더군. <span class="gold">토요일 <<ampm 20 00>>에 도무스 가에서</span> 상대를 물색한대. 그 카드라면 발을 들여놓을 수 있을 거야. 나머지는 네게 달렸고."
+	<<set $avery_card_gift to true>>
+	<br><br>
+<</if>>
+당신이 가짜 돌에 손을 뻗는다. 당신이 그것을 만지자 랜드리의 미소가 살짝 흐려진다. "조심해서 다뤄." <<he>>【이가】 말한다. "불법 부품을 썼거든. 어쩔 수 없었어. 손상되면 공기 중으로 유해 화학물질이 퍼질 수 있어. 다시 구하기도 어렵고 말이야."
+<br><br>
+
+<<link [[보상이 뭔지 묻는다|Pub Avery Stones Ask]]>><</link>>
+<br>
+<<link [[하겠다고 말한다|Pub Avery Stones Accept]]>><</link>>
+<br>
+<<link [[거절한다|Pub Avery Stones Refuse]]>><</link>>
+<br>
+
+:: Pub Avery Card
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"에이버리가 저한테 화가 났어요." 당신이 말한다. "혹시 도와주실 방법이 있을까요?"
+<<elseif $speech_attitude is "bratty">>
+	"에이버리의 환심을 다시 사야 해요." 당신이 말한다. "도와주실 방법이 있나요?"
+<<else>>
+	"에이버리와는 말도 안 하는 사이에요." 당신이 말한다. "혹시 도와주실 방법이 있을까요?"
+<</if>>
+<br><br>
+
+랜드리가 <<his>> 주머니에 손을 넣어 보호 케이스에 든 얇은 직사각형 물건을 꺼낸다. <<He>> 테이블 위로 그것을 밀어준다. 오래된 수집형 카드 게임의 카드다. "이거면 발을 들여놓을 수 있을 거야. 나머지는 네게 달렸고."
+<<set $avery_card_gift to true>>
+<br><br>
+
+"다른 건 없나요?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Ask
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"That sounds very dangerous," you say. "What do I get in return?"
+<<elseif $speech_attitude is "bratty">>
+	"What's in it for me?" you ask.
+<<else>>
+	"What do I get in return?" you ask.
+<</if>>
+<br><br>
+
+Landry pauses for a moment, thinking over <<his>> words. "<span class="blue">If you want to destroy Avery's ambitions,</span> then replace <<nnpc_his "Avery">> stones with mine. Avery's getting in with the wrong crowd. Dangerous people, though <<nnpc_he Avery>> doesn't realise it.
+They've trusted <<nnpc_him "Avery">> with this artefact, or soon will. When the stones are revealed to be fake, their plans will crumble. There's no reward. If our goals align, they align, and we can work together. <span class="blue">Replace the stones, and Avery will be saved from <<nnpc_himself "Avery">>.</span>"
+<br><br>
+
+"It would also make some friends of mine very happy," <<he>> continues. "They're a bit out of touch I'm afraid. But they're strong. The sort your Bailey has to tiptoe around, or risk being crushed by. They have things, and do things, money can't buy. Friends like that would be good to have, no?"
+<br><br>
+
+<<He>> leans back. "I'm sure someone as enterprising as you will be able to squeeze Avery in other ways as well. Must be a lot of nice loot in that place. Though I shouldn't have to tell you this will be dangerous, and there's no rush. Avery plays a long game, and so do we."
+<br><br>
+
+"Thanks for indulging me. Now, what can I do for you?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[Leave|Pub]]>><<endevent>><</link>>
+<br>
+
+
+:: Pub Avery Stones Accept
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"해볼게요." 당신이 말한다. "제가 할 만하다고 생각하신다면요."
+<<elseif $speech_attitude is "bratty">>
+	"좋아요." 당신이 말한다. "곧 에이버리를 내 손아귀에 넣을 테니까."
+<<else>>
+	"할게요." 당신이 말한다. "재밌겠네요."
+<</if>>
+<br><br>
+
+랜드리가 미소 짓는다. "훌륭해. 에이버리는 비밀스러운 집단에서 활동하고 있어. 그들은 <<nnpc_him "Avery">>에게 이 유물을 맡겼거나, 곧 맡길 거야. 돌이 가짜로 밝혀지면, <<nnpc_his "Avery">> 계획은 무너지겠지. <span class="blue">돌을 바꿔치기하면, 에이버리의 야망은 파괴될 거야. 그건 <<nnpc_him "Avery">>【을를】 <<nnpc_himself "Avery">> 자신으로부터 구하는 일이 될 거고.</span>"
+<br><br>
+
+<<He>> 등을 기댄다. "이 일이 위험할 거라는 건 굳이 말할 필요도 없겠지. 서두를 건 없어. 에이버리는 장기전을 펼치고, 우리도 마찬가지야."
+<br><br>
+"내 얘기에 어울려줘서 고마워. 자, 뭘 도와줄까?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Refuse
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"죄송해요." 당신이 말한다. "너무 위험하게 들리네요."
+<<elseif $speech_attitude is "bratty">>
+	"당신은 여기서 맥주나 마시면서 위험한 일은 전부 저한테 시키려는 것 같네요." 당신이 말한다.
+<<else>>
+	"저한테는 너무 위험한 일인 것 같네요."
+<</if>>
+<br><br>
+
+"네 말이 맞아." 랜드리가 말한다. "엄청나게 위험한 일이지. 가짜 돌은 일단 갖고 있어, 마음이 바뀔지도 모르니까. 에이버리에게 그렇게 가까이 다가갈 수 있는 사람은 너 말고는 없어. 일을 해낼 만한 기술을 가진 사람은 더더욱."
+<br><br>
+
+"내 동기를 숨기진 않겠어. <span class="blue">나는 <<nnpc_his "Avery">> 야망을 무너뜨려서 에이버리를 돕고 싶어.</span> 그 돌들을 바꿔치기하면 그 목적을 달성할 수 있지. <<nnpc_He "Avery">>【은는】 질 나쁜 무리와 어울리고 있어. 위험한 자들이지만, <<nnpc_he Avery>>【은는】 그걸 모르지. 그들은 <<nnpc_him "Avery">>에게 이 유물을 맡겼거나, 곧 맡길 거야. 돌이 가짜로 밝혀지면, 그들의 계획은 무너지겠지. <span class="blue">돌을 바꿔치기하면, 에이버리는... 구원받게 될 거야.</span>"
+<br><br>
+
+"내 친구 몇몇도 아주 기뻐할 거고." <<he>> 말을 잇는다. "그 친구들은 좀 세상 물정에 어둡긴 해. 하지만 강하지. 네 그 베일리 같은 놈도 발끝으로 살금살금 걷게 만들거나, 잘못하면 짓밟힐 수도 있는 그런 부류야. 돈으로 살 수 없는 것들을 가졌고, 그런 일들을 하지. 그런 친구들이 있으면 좋지 않겠어?"
+<br><br>
+
+<<He>> 등을 기댄다. "서두를 건 없어. 에이버리는 장기전을 펼치고, 우리도 마찬가지야. 내 얘기에 어울려줘서 고마워. 자, 뭘 도와줄까?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[나간다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Brown Fox
+<<effects>><<summon_brown_fox 2>><<person1>><<run statusCheck("Gwylan")>>
+랜드리가 폴더폰을 꺼내 수동으로 번호를 누르고, 세 번 울리게 둔 다음 끊는다. <<He>>【은는】 다른 테이블을 가리킨다.
+<<person2>>
+<<if $daily.brownFox>>
+	때마침, <<say_brown_fox>>【이가】 술집으로 어슬렁거리며 돌아와, 당신보다 먼저 다른 테이블에 도착한다.
+<<elseif gwylanSchedule() is "pub">>
+	<br><br>
+
+	술집 건너편에서, <span class="blue">당신은 그윌란이 일어나 기지개를 켜고, 갈색 여우 가면을 쓴 뒤 <<his>> 머리 위로 녹색 후드를 뒤집어쓰는 것을 본다.</span>
+	<br><br>
+
+	<<He>>【은는】 당신의 테이블로 어슬렁거리며 다가와 자리에 털썩 주저앉는다.
+	<<if !$brownFoxRevealed>>
+		<<set $brownFoxRevealed to true>>
+		<<He>> 방금 당신에게 <<his>> 정체를 드러낸 것에 대해 전혀 신경 쓰지 않는 것 같다.
+	<</if>>
+<<elseif $brownFoxWoundedTimer>>
+	"20분."
+	<br><br>
+
+	당신은 다른 테이블에서 20분 동안 빈둥거린다. <<him>>【이가】 들어오는 소리는 듣지 못했지만, <<say_brown_fox>>【이가】 당신의 테이블로 다가와
+	<<if $avery_mansion.fox.friend or $brownFoxRevealed and _gwylanLovePercent gte 75>>
+		당신 옆에 앉고,
+	<<else>>
+		당신 맞은편에 앉는다,
+	<</if>>
+	이미 변장한 채로.
+<<else>>
+	"10분."
+	<br><br>
+
+	당신은 다른 테이블에서 10분 동안 빈둥거린다. <<him>>【이가】 들어오는 소리는 듣지 못했지만, <<say_brown_fox>>【이가】 당신의 테이블로 다가와
+	<<if $avery_mansion.fox.friend or $brownFoxRevealed and _gwylanLovePercent gte 75>>
+		당신 옆에 앉고,
+	<<else>>
+		당신 맞은편에 앉는다,
+	<</if>>
+	이미 변장한 채로.
+<</if>>
+<<set $daily.brownFox to true>>
+<br><br>
+
+<<if !_gwylanStatus.includes("wounded") and $brownFoxWoundedTimer>>
+	<<unset $brownFoxWoundedTimer>>
+	<span class="green"><<His>> 걸음걸이가 더는 힘들어 보이지 않고 훨씬 부드러워졌다.</span> <<He>> 당신을 보며 미소 짓는다. "드디어 다시 험한 일에 뛰어들 준비가 됐어."
+<<elseif $brownFoxWoundedTimer and !$avery_mansion.fox.wounded_talk>>
+	<<set $avery_mansion.fox.wounded_talk to true>>
+	<<if $brownFoxCoverBlown>>
+		<<He>> 당신을 보고 별로 기뻐 보이지 않는다.
+	<<else>>
+		"늦어서 미안. 하이 엘크한테 당한 이후로 움직이기가 쉽지 않아서."
+	<</if>>
+<<else>>
+	"좋아, 덤벼."
+<</if>>
+<<if gwylanSchedule() is "pub">>
+	<<His>> 얼굴이 상기되어 있고, 꽤 화가 나 보인다.
+<</if>>
+<br><br>
+
+<<brownFoxOptions>>
+
+:: Pub Brown Fox Task
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $phase is "success">>
+	<<set $avery_mansion.fox.progress++>>
+	<<switch $avery_mansion.fox.task>>
+		<<case "Jordan">>
+			<<if $temple_confessor_intro>>
+				"주교의 손을 찾아서 당신의 메시지를 전달했습니다."라고 당신은 말한다.
+			<<else>>
+				"변장한 수련생 두 명을 찾아서 당신의 메시지를 전달했습니다."라고 당신은 말한다.
+			<</if>>
+			<br><br>
+
+			<<He>>【이가】 미소 짓는다. "그 두 사람이라면 다음에 닥칠 일도 잘 처리할 수 있을 거라고 믿네."
+		<<case "Quinn">>
+			<<if $speech_attitude is "meek">>
+				"랜드리의 내부자에게 신호를 보냈습니다."라고 당신은 말한다.
+			<<elseif $speech_attitude is "bratty">>
+				"내부자를 다시 규율에 따르게 만들었습니다."라고 당신은 말한다.
+			<<else>>
+				"신호를 보냈습니다."라고 당신은 말한다.
+			<</if>>
+			<br><br>
+
+			<<He>>【이가】 미소 짓는다. "고맙네. 랜드리에게는 그 문제를 해결하는 게 중요했거든."<<set $avery_mansion.fox.progress++>>
+		<<case "Remy">>
+			<<if $avery_mansion.fox.task_detail is "ascend">>
+				<<if $speech_attitude is "meek">>
+					"레미의 동행 두 명 모두 파티에 머물렀습니다."라고 당신은 말한다.
+				<<elseif $speech_attitude is "bratty">>
+					"레미의 개새끼들 둘 다 당신이 원했던 대로 저녁 내내 거기 있었습니다."라고 당신은 말한다.
+				<<else>>
+					"레미의 수행원 두 명 모두 저녁 식사 자리에 있었습니다. <<nnpc_He "Remy">>【은는】 아주 만족스러워 보였습니다."
+				<</if>>
+				<br><br>
+
+				<<He>>【이가】 미소 짓는다. "잘했네. 하이 엘크는 곧 지독한 기습을 당하게 될 걸세."
+			<<else>>
+				<<if $speech_attitude is "meek">>
+					"레미의 동행 두 명 모두 파티를 일찍 떠났습니다."라고 당신은 말한다.
+				<<elseif $speech_attitude is "bratty">>
+					"레미의 개새끼들 둘 다 꼬리를 말고 일찍 떠났습니다."라고 당신은 말한다.
+				<<else>>
+					"레미의 수행원 두 명 모두 파티를 일찍 떠났습니다. <<nnpc_He "Remy">>【은는】 그걸 마음에 들어 하지 않았습니다."
+				<</if>>
+				<br><br>
+
+				<<He>>【이가】 미소 짓는다. "잘했네. 하이 엘크가 수치심에 <<nnpc_his "Remy">> 뿔을 숙이는군."
+			<</if>>
+		<<case "Briar">>
+			<<if $avery_mansion.fox.task_detail is "ascend">>
+				<<if $speech_attitude is "meek">>
+					"브라이어는 본격적으로 착취하기 위해서라도 탑 건설을 지원할 준비가 됐습니다."라고 당신은 말한다.
+				<<elseif $speech_attitude is "bratty">>
+					"브라이어는 탑 꼭대기에 무게 좀 실을 준비가 됐습니다."라고 당신은 말한다.
+				<<else>>
+					"브라이어는 탑에 투자할 준비가 됐습니다."라고 당신은 말한다.
+				<</if>>
+				<br><br>
+
+				<<He>>【이가】 고개를 끄덕인다. "타고났군. <<nnpc_he "Briar">>【을를】 감당하기 너무 벅차진 않았나?"
+			<<else>>
+				<<if $speech_attitude is "meek">>
+					"브라이어는 마천루 주변에서 <<nnpc_his "Briar">> 활동을 조금 더 대담하게 할 겁니다."라고 당신은 말한다.
+				<<elseif $speech_attitude is "bratty">>
+					"브라이어는 독수리처럼 덮칠 준비가 됐습니다."라고 당신은 말한다.
+				<<else>>
+					"브라이어는 마천루 주변의 범죄를 두 배로 늘릴 준비가 됐습니다."라고 당신은 말한다.
+				<</if>>
+				<br><br>
+
+				<<He>>【이가】 고개를 끄덕인다. "브라이어에게서 이미 연락이 왔네. 타고났군. <<nnpc_he "Briar">>【을를】 감당하기 너무 벅차진 않았나?"
+			<</if>>
+		<<case "Harper">>
+			<<if $speech_attitude is "meek">>
+				"원하시는 대로 혼합물을 바꿔치기했습니다."라고 당신은 말한다. "무서웠지만, 희생자들은 탈출했습니다."
+			<<elseif $speech_attitude is "bratty">>
+				"저녁 식사가 제공되었습니다."라고 당신은 말한다. "음식이 손님들을 덮쳤고, 탈출했습니다."
+			<<else>>
+				"당신의 혼합물로 바꿔치기했습니다."라고 당신은 말한다. "결과는... 흥미로웠습니다. 세 명 모두 도망친 것 같습니다."
+			<</if>>
+			<br><br>
+
+			<<He>>【이가】 긴 숨을 내쉰다. "그들의 복수가 늑대술만큼이나 달콤했으면 좋겠군. 날 위해 이 일을 해줘서 고맙네. 우리의 최종 목표에는 도움이 안 되겠지만, 내가 밤에 잠드는 데는 도움이 될 거야." <<if $brownFoxRevealed>><<gyearning>><<else>><<note "+ ???" "forest-green">><</if>>
+			<<set $avery_mansion.fox.progress++>>
+			<<if $gwylanSeen>>
+				<<npcincr Gwylan dom 1>>
+				<<set $gwylanSeen.pushUnique("bf_harper")>>
+			<</if>>
+	<</switch>>
+	<br><br>
+	<<set $avery_mansion.fox.task to false>>
+	<<set $avery_mansion.fox.task_complete to false>>
+	<<set $avery_mansion.fox.task_detail to false>>
+	<<if $brownFoxRevealed and _gwylanStatus.includesAny("aroused", "lust", "dom")>>
+		<<He>>【이가】 손을 뻗어 당신의 머리를 쓰다듬는다. "<<pcPetname "Gwylan" "good">>." 따뜻한 기분이 든다. <<trauma -1>><<ltrauma>>
+		<br><br>
+	<</if>>
+<<elseif $phase is "fail">>
+	"부탁하신 일을 해내지 못했습니다, 죄송합니다."
+	<br><br>
+
+	<<He>>【이가】 얼굴을 찌푸린다. "그냥 넘어가고 다시 시도해야겠군. 슬퍼할 시간은 없네."
+	<<set $avery_mansion.fox.task to false>>
+	<<set $avery_mansion.fox.task_complete to false>>
+	<<set $avery_mansion.fox.task_detail to false>>
+	<br><br>
+<<else>>
+	<<switch $avery_mansion.guest>>
+		<<case "Jordan">>
+			"다음 주빈은 조던과 신전에서 온 행렬이 될 걸세."
+			<br><br>
+
+			<<He>>【이가】 <<his>> 턱에 손을 댄다.
+			<<if $fake_artefact is "Avery">>
+				"더 이상 그들이 현장을 방해하게 둘 순 없네. 저 탑은 조만간 완공되어야 해. 그들의 열의를 역이용할 수 있을지도 모르지.
+			<<else>>
+				"수도원이 계속 항의하게 하는 건 쉽겠지만, 우린 더 많은 걸 할 수 있네.
+			<</if>>
+			조던이 간다면, 주교의 손들도 분명 따라갈 걸세. 아마 변장하고 있겠지. 가능하다면 그들을 찾아서 이 메시지를 전해주게." <<He>>【이가】 <<his>> 목을 가다듬는다.
+			<br><br>
+
+			<<if $fake_artefact is "Avery">>
+				"<span class="gold">탑은 솟아오른 만큼 빠르게 무너질 것이다. 세상의 무게가 호화로운 자들을 끌어내릴 것이다.</span>"
+			<<else>>
+				"<span class="gold">믿음의 무게가 가장 빛나는 황금 족쇄로 탑을 땅에 묶지 않는 한, 탑은 천상의 왕좌를 빼앗을 것이다.</span>"
+			<</if>>
+
+			<<if $fake_artefact is "Avery">>
+				<br><br>
+
+				<<He>>【은는】 무언가 기억난 듯하다. "아! 조던에게 하는 말은 조심하게. <<nnpc_him "Jordan">>에게 너무 솔직하게 말하면, <span class="blue"><<nnpc_he "Jordan">>【은는】 에이버리와의 관계를 끊어버릴지도 모르네</span>. 수도원은 불 때문에 숲을 보지 못하는 버릇이 있거든."
+			<</if>>
+		<<case "Quinn">>
+			"다음 손님은 시장일 겁니다. 중요한 일인 것 같아요."
+			<br><br>
+
+			<<He>>【이가】 활기를 띤다. "완벽해. 랜드리가 내부에 심어둔 사람이 있지만, 퀸에 대한 개인적인 애착 때문에 변절했을 수도 있네."
+			<<He>>【이가】 몸을 떤다. "어떻게 저런 돼지 같은 놈에게 정이 들 수 있는지 이해할 수 없지만, 그건 중요하지 않아. 그 사람은 숨어 있을 걸세.
+			<span class="blue">먼저 그 사람의 주의를 끌 만한 일을 해야 할 걸세.</span> 이런 부탁을 하긴 싫지만, 시장에 대한 자네의 의도를 아주 노골적으로 드러내면 반응을 얻을 수 있을지도 모르네. 예리하게 행동해야 해. 다른 데 정신 팔리지 말고."
+			<br><br>
+
+			<<He>>【이가】 손을 든다. "그 사람을 보면, 이 수신호를 보내게."
+			<<if $fake_artefact is "Avery">>
+				<<He>>【은는】 <<his>> 손을 위로 구부렸다가, 호를 그리며 내린다.
+			<<else>>
+				<<He>>【은는】 <<his>> 손가락들 사이에 차례로 엄지를 넣었다가, 손을 펴서 돌린다.
+			<</if>>
+			"그저 자신이 누구인지, 그리고 진정으로 누구를 위해 일하는지 잠깐 상기시켜주면 되네."
+		<<case "Remy">>
+			"다음 손님은 저 멀리 동쪽에서 온 농부, 레미일 겁니다."
+			<br><br>
+
+			<<if !$brownFoxWounded and $fake_artefact isnot "Avery">>
+				<<He>>【은는】 <<his>> 두 손을 모으고, 한참 동안 생각에 잠긴다.
+				<br><br>
+
+				"하이 엘크 <<nnpc_himself "Remy">>라." 또다시 침묵이 흐른다. "<span class="blue">내가 거기 갈 걸세.</span> 그들이 저렇게 대놓고 대담하게 활동하는데 내가 여기서 빈둥거릴 수만은 없지."
+			<<else>>
+				<<He>> 잠시 부끄러워하는 듯하다. "지난번엔 내가 무모했어. 다시는 그런 실수를 하지 않을 걸세.
+				<<if $fake_artefact is "Avery">>
+					이제 엘크들이 자만하게 만들 때야. 하이 엘크는 아마 <<nnpc_him "Remy">>【와과】 함께 한 쌍의 수행원을 데리고 있을 걸세. <span class="blue">무슨 일이 있어도 그들이 파티를 떠나지 못하게 하게.</span>"
+				<<else>>
+					이제 엘크들을 겸손하게 만들 때야. 하이 엘크는 아마 <<nnpc_him "Remy">>【와과】 함께 한 쌍의 수행원을 데리고 있을 걸세. <span class="blue">그들이 파티를 일찍 떠나게 하게.</span> 저런 속물적인 놈들의 심기를 건드리기는 쉬울 걸세."
+				<</if>>
+			<</if>>
+		<<case "Briar">>
+			"다음 손님은 브라이어입니다. 에이버리는 별로 좋아하지 않는 눈치예요."
+			<br><br>
+
+			<<if $fake_artefact is "Avery">>
+				<<He>>【은는】 잠시 생각한다. "브라이어는 암흑가에 연줄이 많지. <<nnpc_him "Briar">>【이가】 훔친 물건 중 일부를 '기부'하도록 설득할 수 있을지도 모르겠군." <<He>>【이가】 미소 짓는다.
+				"<span class="blue">가장 영리한 포식자는 먹잇감이 먼저 배를 채우게 놔둔다는 사실을 브라이어에게 상기시켜주게.</span>"
+			<<else>>
+				<<He>> 잠시 생각한다. "브라이어가 지금처럼 계속하게 두는 게 우리에게 최선이겠지. 하지만... <<nnpc_him "Briar">>【을를】 더 밀어붙일 수도 있을 거야." <<He>>【이가】 미소 짓는다.
+				"<span class="blue">브라이어의 자존심을 좀 부추기게. 에이버리가 <<nnpc_him "Briar">>【을를】 어떻게 생각하는지 알려준 다음,</span> 다시 <<nnpc_him "Briar">>【을를】 치켜세워주게.
+				은밀한 언어를 사용하고, 범죄자처럼 말하도록 노력하게. 해낼 수 있겠나?"
+				<br><br>
+
+				<<He>>【은는】 <<his>> 어깨 너머로 랜드리를 쳐다보고, 랜드리는 엄지를 치켜세운다. "브라이어에게 <span class="gold"><<nnpc_his "Briar">> 꼬리 바로 밑에서</span> 나를 찾으라고 전하게. <<nnpc_He "Briar">>도 무슨 뜻인지 알 걸세."
+			<</if>>
+		<<case "Harper">>
+			<<wearProp "phial red">>
+			"다음 손님은 하퍼 의사입니다."
+			<br><br>
+
+			당신이 볼 수 있는 <<his>> 얼굴의 3분의 1에 순수한 경멸감이 스쳐 지나간다. "식인 여우로군.
+			<<if $fake_artefact is "Avery">>
+				<<nnpc_him "Harper">>【이가】 지원을 중단하도록 설득할 방법은 거의 없네."
+			<<else>>
+				<<nnpc_He "Harper">>【은는】 어쨌든 탑 건설을 분명히 지지할 걸세."
+			<</if>>
+			<<His>> 손톱이 테이블을 긁는다.
+			<br><br>
+
+			"거짓말은 하지 않겠네. 이 부탁은 개인적인 것이야. 자네를 크게 믿고 있네." <<He>>【은는】 <<his>> 망토 아래로 손을 뻗어 약병 두 개를 꺼낸다. 하나는 탁한 녹색 물질로, 다른 하나는 선명한 붉은색으로 채워져 있다.
+			"광견병 걸린 여우는, <<nnpc_he "Harper">>【이가】 늘 그렇듯이, <<nnpc_his "Harper">> 동족을 식사로 삼을 걸세. 우리는 그 식사에 독을 탈 거야. <<nnpc_he "Harper">>【이가】 자네에게 뭘 주든, 장단 맞춰주지 말게. 책임자가 반드시 이것들을 사용하게 하게."
+			<br><br>
+
+			<<He>>【이가】 녹색 약병을 들어 올린다. "이건 애피타이저용이야." <<He>>【은는】 차례로 붉은 약병을 들어 올린다. "이건 메인 코스용이지. 하나는 진정제와 화학 표식이고, 다른 하나는 농축된 늑대술이네.
+			<<nnpc_him "Harper">>【을를】 막을 방법은 없네. 하지만 적어도 희생자들에게 복수할 기회는 줄 수 있지. 불행하게도, 곧 이해하게 될 걸세."
+	<</switch>>
+	<br><br>
+	<<set $avery_mansion.fox.task to $avery_mansion.guest>>
+	<<set $avery_mansion.fox.task_detail to $fake_artefact is "Avery" ? "ascend" : "descend">>
+	<<if $avery_mansion.guest is "Remy" and !$brownFoxWounded and $fake_artefact isnot "Avery">>
+	<<else>>
+		<span class="gold">갈색 여우의 요청이 일지에 추가되었습니다.</span>
+		<br><br>
+	<</if>>
+<</if>>
+
+<<set $phase to 0>>
+
+<<brownFoxOptions>>
+
+:: Pub Brown Fox Dungeon
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $speech_attitude is "meek">>
+	"금고를 찾았어요. 그건... 지하 감옥에 있어요. 입구는 에이버리의 서재 어딘가에 숨겨져 있고요."
+<<elseif $speech_attitude is "bratty">>
+	"금고를 찾았어요. 에이버리의 강간용 지하 감옥에 있는데, 입구는 에이버리의 서재 어딘가에 숨겨져 있어요."
+<<else>>
+	"금고를 찾았어요. 지하 감옥에 있는데, 입구는 에이버리의 서재 어딘가에 숨겨져 있어요."
+<</if>>
+"네 자리 조합의 키패드로 잠겨 있어요."
+<br><br>
+
+<<His>> 가면 뒤로 녹색 눈이 커진다. "완벽해. 그만큼 가까워졌군."
+<<if $avery_mansion.fox.progress lt 12>>
+	<<if $brownFoxWoundedTimer>>
+		<<He>>【은는】 짜증스럽게 <<his>> 다리를 내려다본다.
+	<<else>>
+		<<He>>【은는】 잠시 생각에 잠긴다.
+	<</if>>
+	"그런 금고에 들어가는 건 쉽지 않을 거야. <span class="green">우리가 협력해서 침입할 수도 있겠지.</span> 하지만 그 전에 몇 가지 부탁을 더 들어줘야겠어. 우리에게 필요한 정보가 더 있거든."
+<</if>>
+<br><br>
+
+<<brownFoxOptions>>
+
+:: Pub Brown Fox Stones
+<<effects>><<run statusCheck("Gwylan")>>
+"이것 좀 봐." 당신은 소원의 돌을 내민다.
+<br><br>
+
+<<He>>【은는】 그것들을 빤히 쳐다본다. 잠시 후, <<he>>【은는】 활짝 미소를 짓는다. "아주 잘했어. 계획은 세워졌고, 그들의 의식은 역효과를 낳을 거야.
+적절한 속임수를 쓰면, <span class="green">탑 건설을 가속화할 수 있어.</span>, 이 모든 시련을 더 빨리 끝낼 수 있지."
+<br><br>
+
+<<He>>【이가】 고개를 숙인다. "이야기는 들었어. 에이버리와 함께 사는 게 쉽지 않았을 거라고 상상해. 곧 네 살점을 되찾게 될 거야." <<He>>【은는】 <<his>> 입을 가린다. "미안, 끔찍한 단어 선택이었네."
+<br><br>
+
+<<brownFoxOptions>>
+
+:: Pub Brown Fox Revealed
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $speech_attitude is "meek">>
+	"너구나, 그윌란?"
+<<elseif $speech_attitude is "bratty">>
+	"네가 그윌란인 거 알아."
+<<else>>
+	"네가 이런 식으로 행동할 줄은 몰랐는데, 그윌란."
+<</if>>
+<br><br>
+
+<<He>>【은는】 잠시 당신을 쳐다보더니, 킥킥 웃는다. "절대 눈치 못 챌 줄 알았는데. 뭐가 들통났지?"
+<br><br>
+
+<<if $gwylanSeen.includes("romance")>>
+	"그냥 느낄 수 있었어." 당신이 말한다. "네 냄새도 알아."
+	<br><br>
+
+	<<He>>【은는】 얼굴을 붉히며, 어쩔 줄 몰라 하는 표정을 억누르려 하지만 잘 되지 않는다. "어머, 귀엽기는."
+<<elseif $brownFoxWoundedHint>>
+	"네 다리에 있는 <<if _gwylanStatus.includes("wounded")>>붕대<<else>>흉터<</if>>【을를】 봤어." 당신은 말한다. "우연이라기엔 좀 그렇잖아."
+	<br><br>
+
+	<<He>>【은는】 고개를 끄덕인다. "네가 예리한 건 알았지. 영원히 숨길 수는 없었을 테니까."
+<<else>>
+	"난 널 알아." 당신은 간단히 말한다. "내가 잊을 거라고 생각했어?"
+	<br><br>
+
+	<<He>>【은는】 얼굴을 찡그린다. "대부분은 잊어버리던데." <<He>>【은는】 <<his>> 손을 <<his>> 머리에 얹는다. "그럼 최면 때문이었군. 성가시게 됐네."
+<</if>>
+<<He>>【이가】 <<his>> 의자에 기댄다. "어쨌든, 지금의 나는 그게 아니야. 나를 위해 비밀로 해줄래, <<pcpetname "Gwylan">>?"
+<br><br>
+
+<<if $brownFoxCoverBlown>>
+	당신이 입을 열어 말하려 하지만, <<he>>【이가】 말을 가로챈다.
+	<<if _gwylanStatus.includes("cautious")>>
+		"설마 또 내 정체를 까발리려는 건 아니겠지. 그랬다간 빚지는 게 될 거야, 얘야. 거대 매한테 찔린 다리가 아직도 쑤시거든."
+	<<else>>
+		"설마 또 내 정체를 까발리려는 건 아니겠지. 거대 매한테 찔린 다리가 아직도 쑤시거든." <<He>>【은는】 잠시 심각한 표정을 짓다가 다시 미소 짓기 시작한다. "괜찮아. 넌 이미 그걸 만회하고도 남았으니까."
+	<</if>>
+	<br><br>
+<</if>>
+
+<<brownFoxOptions>>
+
+:: Pub Brown Fox Apologise
+<<effects>><<run statusCheck("Gwylan")>>
+"저기, 미안해—"
+<br><br>
+
+<<He>>【이가】 당신에게 조용히 하라고 손짓한다.
+<br><br>
+
+"지금은 안 돼. 그런 건 사업에 끌어들이지 말자. 이건 우리 둘보다 더 큰 문제야." 긴 침묵이 흐른다. "만약... 만약 우리가 일을 끝낸 후에 이야기하고 싶다면, 저쪽에 있을게." <<He>>【은는】 <<his>> 원래 테이블을 가리킨다.
+<br><br>
+
+<<brownFoxOptions>>
+
+:: Pub Brown Fox Unavailable
+<<effects>>
+<<if isGwylanAbsent() is "nobody">>
+	당신은 아무도 찾지 않는다.
+	<br><br>
+
+	랜드리가 혼란스러운 표정으로 당신을 쳐다본다.
+<<else>>
+	당신은 갈색 여우를 찾는다.
+	<br><br>
+
+	랜드리가 <<his>> 고개를 젓는다. "<<nnpc_him Gwylan>>에게서 소식을 못 들었어. <<nnpc_He Gwylan>>【이가】 위험에 처했을지도 몰라. <<nnpc_him Gwylan>> 없이 계속 진행해야 할 수도 있겠군."
+<</if>>
+<br><br>
+
+<<set $daily.noBrownFox to true>>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+/*
+
+:: Pub Avery Nod Note
+<<effects>>
+재작업됨
+당신이 고개를 끄덕이자, 랜드리는 미소를 지으며 뒤로 기댄다. "다른 건?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Nod Point
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"정말 관대하시네요." 당신이 말한다. "하지만 에이버리도 관대해요. 그리고 부자죠. 제가 <<nnpc_him Avery>>【을를】 배신하길 원하시는 건가요?"
+<<elseif $speech_attitude is "bratty">>
+	"<<nnpc_he Avery>>【이가】 <<nnpc_his Avery>> 소파 밑에서나 찾을 법한 액수 때문에 에이버리를 배신하라고요?" 당신이 묻는다.
+<<else>>
+	"에이버리에게 그건 큰돈이 아니에요." 당신이 말한다.
+<</if>>
+<br><br>
+
+랜드리가 웃는다. "알아. 그 보상금, 내 결정이 아니었어, 믿어줘." <<He>>【은는】 술집 앞쪽을 힐끗 본다. "10,£000는 내 친구들한테서 나오는 거야. 그 친구들이 좀 현실 감각이 없어서 말이지. 하지만 강해. 네 베일리가 알아서 기어야 하는, 안 그러면 짓밟힐 위험이 있는 그런 부류지. 그들은 돈으로 살 수 없는 것들을 가지고 있고, 그런 일들을 해. 그런 친구들이 있으면 좋지 않겠어?"
+<br><br>
+
+"부담 갖지 마. 그냥 주시하고 있어." <<He>>【은는】 뒤로 기댄다. "다른 건?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Give
+<<effects>>
+
+당신은 소원의 돌에 손을 뻗는다. 그것들을 만지자 손가락을 통해 힘이 전해져 온다. 랜드리는 당신을 관찰하며 눈썹을 치켜 올린다.
+<br><br>
+"나한테 줄 거라도 있어?"
+<br><br>
+
+<<link [[랜드리에게 소원의 돌을 준다|Pub Avery Stones 2]]>><</link>>
+<br>
+<<link [[다시 생각한다|Pub Avery Stones Reconsider]]>><</link>>
+<br>
+
+:: Pub Avery Stones Reconsider
+<<effects>>
+
+당신은 고개를 젓는다. 랜드리는 당신을 관찰하며, <<his>> 얼굴은 아무것도 드러내지 않는다.
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones 2
+<<effects>>
+
+<<set $auriga_artefact to "Landry">>
+
+랜드리는 잠시 동안 경이로운 듯 넋을 잃고 소원의 돌을 바라본다. "솔직히 말해서," <<he>>【이가】 말한다. "네가 그걸 찾을 줄은 몰랐어." <<He>>【은는】 앞으로 손을 뻗다가, <<himself>> 멈칫한다. <<He>>【은는】 <<his>> 주머니에 손을 넣어 두툼한 봉투를 꺼낸다. <<He>>【은는】 그것을 테이블 너머로 밀어준다. "수고에 대한 보상이야. 네 칭찬도 해둘게." <<He>>【은는】 미소 짓는다. "아주 잘했어."
+<br><br>
+
+<<He>>【은는】 뼈에 손을 뻗지만, 망설인다. "이건 정말 뼈네." <<He>>【은는】 그것들을 자세히 들여다본다. "동물 뼈이길 바라야지, 응?" <<He>>【은는】 <<his>> 주머니에 손을 넣어 돋보기를 꺼낸다. <<His>> 미소가 넓어진다. "뼈에 코드가 새겨져 있군. 내 생각대로야. 좀 덜 끔찍한 곳에 숨겨뒀으면 좋았을 텐데."
+<br><br>
+
+<<moneyGain 10000>>【을를】 얻었습니다.
+<br><br>
+
+랜드리는 소원의 돌을 비닐봉지에 밀봉한다. "더 자세히 분석하려면 도움이 필요할 거야. 다른 건?"
+<br><br>
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Fake Stones
+<<effects>>
+
+<<set $avery_mansion.fake_stones to 2>>
+<<if $auriga_artefact is "Landry">>
+	<<if $speech_attitude is "meek">>
+		"귀찮게 해드리기 싫지만," 당신이 말한다. "소원의 돌을 어떻게 교체할 수 있는지 아시나요? 에이버리는 상대하기 힘든 사람이라, 가짜로 바꿔치기하면 더 쉬울 것 같아요."
+	<<elseif $speech_attitude is "bratty">>
+		"에이버리는 조만간 소원의 돌이 없어진 걸 알게 될 거예요." 당신이 말한다. "저한테 문제가 생길 수도 있어요. <<nnpc_him Avery>>【을를】 속일 방법 아세요?"
+	<<else>>
+		"소원의 돌 위조품이 유용할 거예요." 당신이 말한다. "대신 금고에 그걸 두고, 에이버리를 더 오래 속일 수 있을 테니까요."
+	<</if>>
+	<br><br>
+	랜드리가 미소 지으며 테이블 아래에서 손을 뻗어 소원의 돌을 꺼낸다.
+	<br><br>
+	"이건 가짜야." <<he>>【이가】 만족스러운 미소를 지으며 말한다. "훌륭하지, 안 그래?" 당신이 보기에는 똑같아 보인다. "완벽한 복제품은 아니라는 점에 유의해. 우린 그 사진들만 보고 만들었거든. 하지만 에이버리와 그 일당을 속이기엔 충분할 거야."
+	<br><br>
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"원하시던 소원의 돌을 찾았어요." 당신이 말한다. "하지만 에이버리가 없어진 걸 보면 곤란해질 거예요. 대신 놓아둘 만한 거 있으세요?"
+	<<elseif $speech_attitude is "bratty">>
+		"그 돌들이 어디 있는지 알아요." 당신이 말한다. "대신 놓을 걸 주면, 전부 당신 거예요."
+	<<else>>
+		"돌을 찾았어요." 당신이 말한다. "대신 놓을 게 필요해요."
+	<</if>>
+	<br><br>
+	랜드리가 미소 지으며 테이블 아래에서 손을 뻗어 소원의 돌 복제품을 꺼낸다. 당신이 보기에는 똑같아 보인다.
+	<br><br>
+
+	"준비해서 나쁠 건 없지." <<he>>【이가】 만족스러운 미소를 지으며 말한다. "완벽한 복제품은 아니라는 점에 유의해. 우린 그 사진들만 보고 만들었거든. 하지만 에이버리와 그 일당을 속이기엔 충분할 거야."
+	<br><br>
+<</if>>
+
+당신은 가짜 돌에 손을 뻗는다. 당신이 그것들을 만지자 랜드리의 미소가 흔들린다. "조심해서 다뤄." <<he>>【이가】 말한다. "불법 재료를 썼거든. 어쩔 수 없었어. 손상되면 공기 중에 유해 화학물질이 방출될 수 있어. 다시 구하기도 힘들고." <<He>>【은는】 뒤로 기댄다. "다른 건?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+ */
+
+:: Pub Avery Stones Tell
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"힘들었어요." 당신이 말한다. "하지만 에이버리의 돌을 교체하는 데 성공했어요."
+<<elseif $speech_attitude is "bratty">>
+	"에이버리의 돌을 교체했어요." 당신이 말한다. "어렵지 않았어요."
+<<else>>
+	"에이버리의 금고에 들어갔어요." 당신이 말한다. "그리고 <<nnpc_his Avery>> 돌을 당신 것과 바꿨어요."
+<</if>>
+<br><br>
+
+랜드리는 미소를 지으며 폴더폰을 꺼내 무언가를 누른다. "아주 훌륭한 솜씨야. 이제 에이버리가 엘크 가에 있는 <<nnpc_hers Avery>> 건물을 완공하기만 기다리면 돼. <<nnpc_He Avery>>【은는】 개장식에 그 돌들이 필요할 거야. <<nnpc_he Avery>>【이가】 그걸 내놓지 못하면, <<nnpc_his Avery>> 계획은 <<nnpc_his Avery>> 면전에서 터져버릴 테지."
+<br><br>
+
+<<He>>【은는】 잠시 당신을 훑어본다. "진짜를 좀 보여줄 수 있을까?" 당신은 주위를 둘러보고 랜드리에게 그것들을 내민다.
+<br><br>
+
+랜드리는 잠시 동안 경이로운 듯 넋을 잃고 소원의 돌을 바라본다. "솔직히 말해서," <<he>>【이가】 말한다. "네가 그걸 찾을 줄은 몰랐어. 네 칭찬도 해둘게." <<He>>【은는】 미소 짓는다. "아주 잘했어."
+<br><br>
+
+<<He>>【은는】 뼈에 손을 뻗지만, 망설인다. "이건 정말 뼈네." <<He>>【은는】 그것들을 자세히 들여다본다. "동물 뼈이길 바라야지, 응?" <<He>>【은는】 <<his>> 주머니에 손을 넣어 돋보기를 꺼낸다. <<His>> 미소가 넓어진다. "뼈에 코드가 새겨져 있군. 내 생각대로야. 좀 덜 끔찍한 곳에 숨겨뒀으면 좋았을 텐데."
+<br><br>
+
+랜드리가 당신에게 돌을 돌려준다. "갈색 여우가 네가 그것들을 찾으면 계속 가지고 있으라고 주장했어.<<if !$avery_mansion.fox.stones>> 말이 나와서 말인데, <<nnpc_him Gwylan>>에게 직접 말해주는 게 좋겠어. <<nnpc_his Gwylan>> 얼굴에 떠오를 표정을 보고 싶거든.<</if>>"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Tell 2
+<<effects>>
+
+<<if $avery_fate is "saved">>
+	<<if $speech_attitude is "meek">>
+		"에이버리의 면전에서 모든 게 터져버렸어요." 당신이 말한다. "당신이 원했던 것처럼요."
+	<<elseif $speech_attitude is "bratty">>
+		"당신 폭탄이 터졌어요." 당신이 말한다. "당신이 계획한 대로겠죠."
+	<<else>>
+		"당신 폭탄이 터졌어요." 당신이 말한다. "당신이 원했던 것처럼요."
+	<</if>>
+	<br><br>
+	"그렇게 들었어." 랜드리가 말한다. "에이버리와 <<nnpc_his Avery>> 친구들은 더 이상 문제를 일으키기 전에 두 번 생각하게 될 거야. 하지만 환상은 없어. 전쟁은 아직 끝나지 않았지만, 이건 우리가 가한 첫 번째 의미 있는 타격이야. 예상치 못한 문제에 대해서는 미안하게 생각해. 네가 폭탄이 터질 때 그렇게 가까이 있을 줄은 몰랐어."
+	<br><br>
+
+	<<He>>【은는】 미소 짓는다. "넌 착한 아이야. 에이버리 같은 사람을 위해 목숨을 걸 사람은 아무도 없을 거라고 생각해. 적어도 자발적으로는 말이지."
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"에이버리가 다시는 당신을 괴롭히지 않을 거예요." 당신이 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"잘했어요." 당신이 말한다. "에이버리는 사라졌고, 당신은 손에 피 한 방울 묻히지 않았네요."
+	<<else>>
+		"당신 계획이 성공했어요." 당신이 말한다. "에이버리는 사라졌어요."
+	<</if>>
+	<br><br>
+
+	"그렇게 들었어. 넌 좋은 일을 한 거야." 랜드리가 말한다. "몇 가지 세부 사항을 빼놓아서 미안해. 네가 덜 알수록 더 안전했으니까. <<nnpc_his Avery>> 친구들은 위축되겠지만, 환상은 없어. 이 전쟁은 아직 끝나지 않았지만, 이건 우리가 가한 첫 번째 의미 있는 타격이야."
+	<br><br>
+
+	<<He>>【은는】 잠시 멈췄다가 말을 잇는다. "예상치 못한 문제에 대해서는 미안하게 생각해. 네가 폭탄이 터질 때 그렇게 가까이 있을 줄은 몰랐어."
+<</if>>
+<br><br>
+
+<<link [["「우리」가 누구를 가리키는 건지 묻는다"|Pub Avery Stones Tell Ask]]>><</link>>
+<br>
+<<link [[침묵을 지킨다|Pub Avery Stones Silent]]>><</link>>
+<br>
+
+:: Pub Avery Stones Angry
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"당신 폭탄 때문에 다쳤어요." 당신이 말한다. "다른 사람들도 다쳤고요. 그들이 나쁜 사람들이란 건 알지만, 그렇다고 괜찮은 건 아니에요."
+<<elseif $speech_attitude is "bratty">>
+	"당신 폭탄에 죽을 뻔했어요." 당신이 말한다. "당신이 뭔데 그래요?"
+<<else>>
+	"당신 폭탄 때문에 다쳤어요." 당신이 말한다. "너무 심했어요."
+<</if>>
+<br><br>
+
+랜드리는 항복하는 시늉으로 <<his>> 손을 들어 올린다. "미안해." <<he>>【이가】 말한다. "내 결정이 아니었어. 그래도, 이 편이 더 안전했어. 가짜 돌이 폭탄이라는 걸 알았다면 어땠을지 상상해 봐. 네가 지금 공범이 되었을지도 모르는 일이야. 게다가, 네가 폭탄이 터질 때 그렇게 가까이 있을 줄은 몰랐어."
+<br><br>
+
+<<if $avery_state is "saved">>
+	"이게 에이버리를 구할 거라고 했잖아요. 폭탄은 사람을 구하지 않아요."
+	<br><br>
+
+	그 말에 <<him>>【은는】 얼굴을 찡그린다. "아니. 그렇지 않지."
+	<br><br>
+<</if>>
+
+<<link [[경찰에 알리겠다고 위협한다|Pub Avery Stones Threaten]]>><</link>>
+<br>
+<<link [[침묵을 지킨다|Pub Avery Stones Silent]]>><</link>>
+<br>
+
+:: Pub Avery Stones Threaten
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"경찰에 신고하는 게 더 안전할 것 같아요." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"네 엉덩이에 경찰을 붙여줄 수도 있어." 당신이 말한다.
+<<else>>
+	"당신에 대해 경찰에 말할 수도 있어요." 당신이 말한다.
+<</if>>
+<br><br>
+
+랜드리는 잠시 재미있다는 듯 미소 짓다가, 이내 <<his>> 표정을 다잡는다. "당신 처분에 맡기겠소."
+<br><br>
+잠시 시간이 흐른다. "당국에 신고하는 걸 고려하는 동안, 나한테 줄 다른 건 없어?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Tell Ask
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"'우리'가 누군데요?" 당신이 묻는다. "당신과 나요? 전 전쟁에 참여한 적 없어요."
+<<elseif $speech_attitude is "bratty">>
+	"'우리'요?" 당신이 묻는다. "당신 친구들 말하는 거예요?"
+<<else>>
+	"'우리'가 누굴 말하는 거죠?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+랜드리가 멋쩍은 미소를 짓는다. "내가 그렇게 말했나? 네 훌륭한 솜씨에 입이 방정이었군. 네가 몇몇 힘 있는 사람들을 기쁘게 해줬다고만 해두지. 자, 나한테 줄 다른 건 없어?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Silent
+<<effects>>
+
+당신은 침묵을 지킨다. 랜드리는 잠시 불안한 표정을 짓는다. "기운 내. 넌 몇몇 힘 있는 사람들을 기쁘게 해줬어. 유용할 수도 있을 거야. 자, 나한테 줄 다른 건 없어?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Ascend
+<<effects>>
+<<if $speech_attitude is "meek">>
+	"당신 돌을 교체하지 않았어요."
+<<elseif $speech_attitude is "bratty">>
+	"돌을 교체하지 않았어요."
+<<else>>
+	"돌을 교체하지 않았어요."
+<</if>>
+<br><br>
+
+<<He>>【은는】 얼굴을 찡그린다. "알아. 상황이 훨씬 더 어려워졌어. 이 전쟁은 아직 끝나지 않았지만, 이제 우리가 불리한 입장이 됐어. 에이버리는 그 어느 때보다 강력해졌고, 아주 나쁜 사람들과 <<nnpc_his "Avery">> 패거리를 짰어. 상황이 좋지 않아."
+<br><br>
+
+<<link [['우리'가 누군지 묻는다|Pub Avery Stones Ascend Ask]]>><</link>>
+<br>
+<<link [[침묵을 지킨다|Pub Avery Stones Ascend Silent]]>><</link>>
+<br>
+
+:: Pub Avery Stones Ascend Silent
+<<effects>>
+
+당신은 침묵을 지킨다. 랜드리는 잠시 불안한 표정을 짓는다. "기운 내. 아직 절망적인 상황은 아니니까."
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Ascend Ask
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"'우리'가 누군데요?" 당신이 묻는다. "당신과 나요? 당신들 전쟁에 날 끼어들게 하지 마세요."
+<<elseif $speech_attitude is "bratty">>
+	"'우리'요?" 당신이 묻는다. "당신 친구들 말하는 거예요? 전 전쟁 안 해요."
+<<else>>
+	"'우리'가 누굴 말하는 거죠?" 당신이 묻는다. "전쟁에 동의한 적 없어요."
+<</if>>
+<br><br>
+
+랜드리가 앞으로 몸을 기울인다. "넌 이미 연루됐고, 위험할 정도로 잘못된 편에 서 있어. 자, 나한테 줄 다른 건 없어?"
+<br><br>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Avery Stones Fox End
+<<effects>><<summon_brown_fox 2>><<person2>>
+<<if $avery_mansion.fox.saved and !$avery_mansion.fox.end and !$brownFoxRevealed>>
+	<<if $speech_attitude is "meek">>
+		"우리 친구, 여우 가면을 쓴 <<personsimple>>【은는】 어떻게 됐어요? <<him>>【이가】 불길에서 탈출하는 걸 못 봤어요."
+	<<elseif $speech_attitude is "bratty">>
+		"당신 가면 쓴 공범은 어디 있죠? <<him>>에게 할 말이 있었는데, <<him>>【이가】 탈출하는 걸 못 봤어요."
+	<<else>>
+		"당신 공범은 어디 있죠? 갈색 여우요. 적어도 작별 인사는 하고 싶었는데. <<he>>【은는】 불길에서 탈출했나요?"
+	<</if>>
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"당신 친구, 여우 가면을 쓴 <<personsimple>>【은는】 어떻게 됐어요?"
+	<<elseif $speech_attitude is "bratty">>
+		"당신 가면 쓴 공범은 어디 있죠?"
+	<<else>>
+		"당신 공범은 어디 있죠? 갈색 여우요."
+	<</if>>
+<</if>>
+<br><br>
+
+<<person1>>
+<<if $avery_fate is "ascended">>
+	랜드리의 미간이 찌푸려진다. <<He>>【은는】 잠시 깊은 생각에 잠긴 듯하다. <<His>> 입이 열리지만, <<he>>【은는】 <<himself>> 말을 멈춘다.
+	<br><br>
+
+	마침내, <<he>>【은는】 불확실한 표정으로 당신을 바라본다.
+	<br><br>
+
+	<span class="red">"누구?"</span>
+<<elseif $avery_fate is "saved">>
+	<<He>>【이가】 미소 짓는다. <<person2>>
+	<<if $avery_mansion.fox.saved and !$avery_mansion.fox.end>>
+		"<<He>>【은는】 괜찮아, 하지만 <<he>>【은는】 잠적했어.
+	<<else>>
+		"<<He>>【은는】 잠적했어.
+	<</if>>
+	네가 <<him>>에게 깊은 인상을 남겼어. 네가 아주 용감했다고 하더군. <span class="green">내 생각엔 너희 둘이 곧 훨씬 더 자주 보게 될 것 같아.</span>"
+<<else>>
+	<<He>>【이가】 미소 짓는다. <<person2>>
+	<<if $avery_mansion.fox.saved and !$avery_mansion.fox.end>>
+		"<<He>>【은는】 괜찮아, 하지만 <<he>>【은는】 잠적했어.
+	<<else>>
+		"<<He>>【은는】 잠적했어.
+	<</if>>
+	<<if $avery_mansion.fox.friend>>
+		네가 <<him>>에게 깊은 인상을 남겼어.
+		<<if !$avery_mansion.fox.end>>
+			<<if $avery_mansion_fire_time>>
+				작별 인사를 하고 싶다면, <span class="blue">에이버리 저택의 불이 꺼질 때까지 기다렸다가 밤에 그 주변을 둘러봐.</span> <<He>>【은는】 분명 무언가를 찾으러 폐허 주변을 어슬렁거릴 거야.
+			<<else>>
+				작별 인사를 하고 싶다면, <span class="blue">밤에 저택의 폐허 주변을 둘러봐.</span> <<He>>【은는】 분명 무언가를 찾으러 그곳을 어슬렁거릴 거야.
+			<</if>>
+			<span class="green">내 생각엔 너희 둘이 곧 훨씬 더 자주 보게 될 것 같아.</span>"
+		<<else>>
+			<<He>>【은는】 네가 다친 것에 대해 꽤 마음 아파했지만, <span class="green">내 생각엔 너희 둘이 곧 훨씬 더 자주 보게 될 것 같아.</span>"
+		<</if>>
+	<<else>>
+		말은 별로 없었지만, 일이 끝난 것에 대해 충분히 행복해 보였어. <span class="teal">아마 곧 다시 만나게 될 거야.</span>"
+	<</if>>
+<</if>>
+<br><br>
+
+<<endevent>><<npc Landry>><<person1>>
+
+<<landryoptions>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Window Loft Ask
+<<effects>><<set $landry_loft_known to 1>>
+당신은 랜드리에게 고아원 다락방에 대해 이야기하고, 그곳에 돌출창을 만들 계획을 말한다.
+<br><br>
+"비밀을 숨기기 좋은 곳이군." 랜드리가 생각에 잠기며 말한다. "좋아." <<He>>【은는】 고개를 끄덕이고는, 전화를 집어 든다.
+<br><br>
+"그래. 그래. 그—" <<he>>【이가】 말을 끊는다. "맞아." <<He>>【은는】 전화를 끊고, 손가락 다섯 개를 들어 올린다. "<<printmoney 500000>>. 돈을 지불하면 인부들이 도착할 거야."
+<br><br>
+
+<<if $money gte 500000>>
+	<<highicon>><<link [[돈을 건넨다|Pub Window Loft Purchase]]>><<money -500000 "orphanageUpgrades">><<endevent>><</link>>
+	<br>
+<<else>>
+	<span class="blue">지불할 돈이 부족합니다.</span>
+	<br>
+<</if>>
+<<getouticon>><<link [[떠난다|Pub]]>><<endevent>><</link>>
+<br>
+
+:: Pub Window Loft Purchase
+<<effects>><<pass 20>>
+<<generate1>><<generate2>><<generate3>><<generate4>>
+랜드리는 돈을 세고는 구석에 있는 테이블을 가리킨다. "20분."
+<br><br>
+당신은 테이블로 걸어가 기다린다. 곧 <<fullGroup>>【이가】 도착한다. 랜드리가 다가와 당신을 소개해 주고, 당신은 그들과 계획을 논의한다.
+<br><br>
+그들은 당신을 자신들의 밴으로 안내하고, 당신은 고아원으로 가는 길을 알려준다.
+<br><br>
+<<link [[다음 (0:10)|Bird Loft 1]]>><<set $loft_gh to 2>><<set $loft_upgrade += 1>><<pass 10>><</link>>

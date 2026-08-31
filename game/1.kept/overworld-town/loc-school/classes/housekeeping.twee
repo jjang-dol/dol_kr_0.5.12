@@ -1,0 +1,315 @@
+:: Housekeeping Classroom
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>><<set $bus to "housekeeping_classroom">>
+
+<<if $schoolstate is "second" and [3, 5].includes(Time.weekDay)>>
+	<!-- Note: until we separate the NPC introductions out of the <<npc>> widget, we must pay attention to where we use <<npc River>> in this passage. -->
+	<!-- It would save several lines to simply put it here, but we can't. -->
+	<<lockerClothesAutoEquip>>
+	<<classRoomEarSlime "housekeeping">>
+	<<if $worn.upper.type.includes("naked") and $worn.lower.type.includes("naked")>>
+		<<outfitChecks>>
+		/*Check for when the pc is only wearing an overcoat*/
+		<<if $worn.under_upper.name isnot "naked" and $worn.under_lower.name isnot "naked">>
+			<<set _naked to ($worn.under_upper.type.includes("swim") or $worn.under_lower.type.includes("swim")) ? "only wearing swimwear" : "only wearing underwear">>
+		<<else>>
+			<<set _naked to "not wearing anything">>
+		<</if>>
+		<<if $worn.over_upper.name isnot "naked" and $worn.over_lower.name isnot "naked">>
+			<<print _middleOutfit ? $worn.over_upper.name : $worn.over_upper.name + "와 " + $worn.over_lower.name>>【을를】 교실 뒤에 걸려고 하다가, 안에는 아무것도 입지 않았다는 걸 떠올린다.
+		<</if>>
+		<br><br>
+		<<npc River>><<person1>>
+		당신이 <<him>>【을를】 힐끗 보자 리버의 눈이 가늘어진다. "교복도 없이 내 수업에 들어오려고 하다니. 교장 선생님께 가봐."
+		<br><br>
+		<<pubfameComplete "river">>
+		<!--<<link [[코트를 건다|]]>><<endevent>><</link>>
+		<br><br> good starting point for when you can go to class naked-->
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<br><br>
+	<<elseif wearingSchoolOutfit() and !pcAreArmsBound("right")>>
+		<<if $daily.school.attended.housekeeping>>
+			당신은 가사 수업에 다시 참여한다,
+			<<if $worn.over_upper.name isnot "naked" or $worn.over_lower.name isnot "naked" or $worn.over_head.name isnot "naked">>
+				교실 뒤에 코트를 걸고
+				<<undressOverClothes "mathsClassroom">>
+			<</if>>
+			자리에 앉는다.
+		<<elseif Time.minute lt 5>>
+			당신은 가사 교실로 들어간다.
+			<<npc River>><<person1>>
+			리버는 자리가 차는 동안 교실 앞에서 준비하고 있다.
+			<<if $worn.over_upper.name isnot "naked" or $worn.over_lower.name isnot "naked" or $worn.over_head.name isnot "naked">>
+				<<undressOverClothes "mathsClassroom">>
+				당신은 교실 뒤에 코트를 걸고 자리에 앉는다.
+			<</if>>
+		<<else>>
+			당신은 가사 교실로 들어간다.
+			<<npc River>><<person1>>
+			리버는 당신을 보려고 하던 말을 멈춘다.
+			<<if $daily.school.mathsExcused>>
+				<<run delete $daily.school.mathsExcused>>
+				"앉아서 따라잡도록 해." <<He>>【은는】 당신의 지각에 대해 언급하지 않는다.
+			<<else>>
+				"늦었군. 방과 후 청소를 좀 하면 앞으로 지각하는 걸 막을 수 있을지도 모르지."
+				<<gdelinquency>>
+				<<detention 1>>
+			<</if>>
+			<br><br>
+			당신은
+			<<if $worn.over_upper.name isnot "naked" or $worn.over_lower.name isnot "naked" or $worn.over_head.name isnot "naked">>
+				교실 뒤에 코트를 걸고
+				<<undressOverClothes "mathsClassroom">>
+			<</if>>
+			리버가 계속 말하는 동안 자리에 앉는다.
+		<</if>>
+		<br><br>
+
+		<<pubfameComplete "river">>
+		<<link [[다음|Housekeeping Lesson]]>><<endevent>><</link>>
+		<br>
+	<<elseif pcAreArmsBound("any") or $feetuse is "bound">>
+		<<npc River>><<person1>>
+		리버는 <<he>>【이가】 당신의 묶인 <<boundBodyParts>>【을를】 보고 눈을 가늘게 뜬다.
+		"또 한 명이군. 이봐, 네가 무슨 바보 같은 장난을 치고 있는지는 모르겠지만 그만둬야 해. 그런 식으로 묶인 채로 여기 들어올 순 없어. 교장 선생님께 가봐."
+		<br><br>
+
+		<<pubfameComplete "river">>
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<br><br>
+	<<else>>
+		<<npc River>><<person1>>
+		당신이 들어가자 리버의 눈이 가늘어진다. "교복 없이는 내 수업에 들어올 수 없어. 교장 선생님께 가봐."
+		<br><br>
+
+		<<pubfameComplete "river">>
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+		<br><br>
+	<</if>>
+<<elseif $schoollesson is 1 and [3, 5].includes(Time.weekDay)>>
+	<<npc River>><<person1>>
+	<<if $daily.school.housekeepingInterrupted is 1>>
+		당신은 가사 교실로 들어간다. 리버는 갑자기 말을 멈추고 당신 쪽을 본다. "또 너야? 나가." <<He>>【은는】 당신 앞에서 문을 닫아버린다.
+		<<detention 1>><<gdelinquency>>
+		<br><br>
+
+		<<link [[다음|Hallways]]>><<endevent>><</link>>
+	<<else>>
+		<<set $daily.school.housekeepingInterrupted to 1>>
+		당신은 가사 교실로 들어간다. 리버는 갑자기 말을 멈추고 당신 쪽을 본다. "그래, 무슨 일이지?" 수업을 방해한 것 같다.
+		<br><br>
+		<<pubfameComplete "river">>
+
+		<<link [[사과한다|Housekeeping Classroom Apology]]>><<trauma 1>><<stress 1>><</link>><<gstress>><<gtrauma>>
+		<br>
+		<<if $trauma gte 1>>
+			<<link [[조롱한다|Housekeeping Classroom Mock]]>><<status 1>><<stress -12>><</link>><<lstress>><<gcool>><<gdelinquency>>
+			<br>
+		<</if>>
+	<</if>>
+<<else>>
+	당신은 가사 교실에 있다. 넓은 공간이 부엌으로 꾸며져 있다.
+	<br><br>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "emptyClassroom">>
+	<</if>>
+	<<storeon "housekeepingClassroom" "check">>
+	<<if _store_check is 1>>
+		<<storeon "housekeepingClassroom">>
+		당신은 교실 뒤에 걸어 둔 코트를 챙긴다.
+		<br><br>
+	<</if>>
+
+	<<exhibitionclassroom>>
+
+	/* Commented out because it looks really weird with the kitchen UI. Maybe something unique could be done here?
+	<<emptyClassroomMasturbationIntro>> */
+
+	리버는 수업 중이 아닐 때 학생들이 부엌을 쓰도록 허락하지만, 뒤처리를 하지 않는 자에게는 재앙이 닥칠 것이다.
+	<br><br>
+
+	<<ingredientsSupplied "salt" "vegetable_oil" "bottle_of_milk" "white_wine" "flour" "oats" "sugar">>
+	<br><br>
+
+	<<kitchenDisplay>>
+
+	<<getouticon>><<link [[방을 나간다 (0:01)|Hallways]]>><<kitchenExit>><<pass 1>><</link>>
+	<br>
+<</if>>
+
+:: Housekeeping Lesson
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<set $daily.school.attended.housekeeping to true>>
+
+<<if Time.weekDay is 5 and Time.minute gte 37>>
+	"모두 주방으로," 리버가 말한다. "시험 시간이다."<<gstress>><<stress 6>>
+	<br><br>
+
+	<<npc River>><<person1>>
+	<<housekeeping_exam_select>>
+	<<if $chosen_recipe isnot "none">>
+		<<exam "housekeeping">>
+	<</if>>
+	<br><br>
+
+	<<if $chosen_recipe is "none">>
+		리버가 당신에게 다가오라고 손짓한다. "넌 이미 다 알고 있잖아." <<he>>【이가】 말한다. "프로젝터나 설치해 줘. 아무 레시피나 골라. 어차피 반 전체가 다 알아야 하는 거니까."
+		<br><br>
+		당신은 프로젝터로 다가간다. 그 옆에는 여러 장의 슬라이드가 놓여 있다. 각 슬라이드에는 특정 요리에 대한 지침이 담겨 있다. 반 학생들은 어떤 종류의 레시피로 시험을 봐야 할까?
+		<br><br>
+
+		<<link [[달콤한 것|Housekeeping Exam Assistant Sweet]]>><</link>>
+		<br>
+		<<link [[짭짤한 것|Housekeeping Exam Assistant Savoury]]>><</link>>
+		<br>
+		<<link [[매콤한 것|Housekeeping Exam Assistant Spicy]]>><</link>>
+		<br>
+	<<else>>
+		리버가 프로젝터를 만지작거리는 동안 학생들은 주방에 자리를 잡는다. 칠판에 레시피가 표시된다.
+		<<recipe_exam_description $chosen_recipe>>
+		<<He>>【이가】 칠판을 두드린다. "20분 주겠다. 시작."
+		<br><br>
+
+		<<endevent>>
+		<<if $arousal gte $arousalmax>>
+			<<set _teacher to "River">>
+			<<orgasmLocation "classroom">>
+		<</if>>
+
+		<<link [[집중한다|Housekeeping Exam]]>><<stress 6>><<set $phase to 0>><<set $exam_chance += 5>><</link>><<gstress>><<passPercent 5>>
+		<br>
+		<<link [[긴장을 풀려고 노력한다|Housekeeping Exam]]>><<set $phase to 1>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<if Time.minute lt 5>>
+		가사 수업이 시작된다. 어떻게 행동하시겠습니까?
+		<br><br>
+	<<else>>
+		가사 수업이 계속된다. 어떻게 행동하시겠습니까?
+		<br><br>
+	<</if>>
+	<<if $arousal gte $arousalmax>>
+		<<set _teacher to "River">>
+		<<orgasmLocation "classroom">>
+	<</if>>
+
+	<<icon "housekeeping.png">><<link [[수업에 집중한다|Housekeeping Lesson Focus]]>><</link>><<gstress>><<ghousekeeping>>
+	<br>
+	<<socialiseicon>><<link [[반 친구들과 어울린다|Housekeeping Lesson Socialise]]>><</link>><<gcool>><<ltrauma>><<lstress>><<gharass>>
+	<br>
+	<<daydreamicon>><<link [[공상에 잠긴다|Housekeeping Lesson Daydream]]>><</link>><<lstress>><<lharass>>
+	<br>
+	<<if $tiredness gte (C.tiredness.max / 5) * 3>>
+		<<bedicon "zzz">><<link [[책상에 엎드려 잔다|Housekeeping Lesson Sleep]]>><</link>><<ltiredness>>
+		<br>
+	<</if>>
+	<<if hasSexStat("exhibitionism", 4)>>
+		<<skinicon "masturbate">><<link [[자위한다|Housekeeping Lesson Masturbate]]>><<set $masturbationstart to 1>><</link>><<exhibitionist4>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Housekeeping Classroom Apology
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당황하며, 당신은 사과하고 떠난다.
+<br><br>
+
+<<link [[다음|Hallways]]>><<endevent>><</link>>
+
+:: Housekeeping Classroom Mock
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 선생님을 조롱한다. "방해해서 죄송합니다, <<sir>>. 계속 학생들을 재우시죠." 앉아 있던 학생들 사이에서 웃음이 터져 나온다.
+<br><br>
+
+리버는 그다지 즐거워 보이지 않는다. "실수했군. 나가."
+<<gdelinquency>>
+<br><br>
+<<detention 1>><<npcincr River love -1>>
+<<link [[다음|Hallways]]>><<endevent>><</link>>
+
+:: Housekeeping Lesson Focus
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<towelup>>
+
+당신은 선생님의 말을 듣고 자료를 공부하는 데 집중한다. 쉽지는 않지만, 진전이 있는 것 같다.
+<br><br>
+
+<<advancelesson>>
+<<housekeeping _lesson_progress>>
+<<stress _lesson_progress>>
+
+<<if $phase is 1>>
+	<<lessonEnd "housekeepingClassroom">>
+<<else>>
+	<<lessonEvents "housekeeping">>
+<</if>>
+
+:: Housekeeping Lesson Socialise
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<towelup>>
+
+<<if $cool gte ($coolmax / 5 * 2)>>
+	당신은 최소한의 공부만 하고, 대신 반 친구들의 환심을 사려고 노력한다. 당신은 곧 주목의 중심이 된다.
+<<elseif $cool gte ($coolmax / 5)>>
+	당신은 최소한의 공부만 하고, 대신 반 친구들의 환심을 사려고 노력한다.
+<<else>>
+	당신은 최소한의 공부만 하고, 대신 반 친구들의 환심을 사려고 노력한다. 대부분은 당신과 어울리는 것을 피한다.
+<</if>>
+<br><br>
+
+<<status 1>>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+<<set _trauma to _lesson_progress * -0.5>>
+<<trauma _trauma>>
+
+<<if $phase is 1>>
+	<<lessonEnd "housekeepingClassroom">>
+<<else>>
+	<<lessonEvents "housekeeping" 2>>
+<</if>>
+
+:: Housekeeping Lesson Daydream
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<towelup>>
+
+<<if $trauma gte (($traumamax / 10) * 7)>>
+	당신은 한 번의 잘못된 행동이 반 전체가 당신을 성추행하는 결과로 이어질까 두려워 조용히 있는다.
+<<elseif $trauma gte (($traumamax / 10) * 2)>>
+	당신은 스멀스멀 피어오르는 불안감을 억누르려 애쓰며 자신의 생각에 집중한다.
+<<else>>
+	당신은 수업에 별로 집중하지 않고, 대신 창밖을 멍하니 바라보며 방과 후에 무엇을 할지 생각한다.
+<</if>>
+<br><br>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+
+<<if $phase is 1>>
+	<<lessonEnd "housekeepingClassroom">>
+<<else>>
+	<<lessonEvents "housekeeping" 0.5>>
+<</if>>
+
+:: Housekeeping Lesson Sleep
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+리버가 <<print either("바느질 기술을 시연하거나", "주방 위생의 중요성에 대해 열변을 토하거나", "특정 레시피의 세부 사항을 설명하거나", "가정 재정에 대해 강의하는")>> 동안 당신은 책상에 머리를 기댄다. 눈이 감겼다가, 잠시 후 다시 뜨인다. 깨어 있으려고 애쓰지만, 책상이 너무 편안하다.
+<br><br>
+<<towelup>>
+<<tiredness -12>>
+<<advancelesson>>
+
+<<if $phase is 1>>
+	<<lessonEnd "housekeepingClassroom" "sleep">>
+<<else>>
+	<<eventshousekeepingsleep>>
+<</if>>

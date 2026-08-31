@@ -1,0 +1,518 @@
+:: Avery Gifts List
+<<effects>>
+
+에이버리에게 무엇을 주고 싶으신가요?
+<br><br>
+<<food_gift_list>>
+
+<<if _food_gift_found is true>>
+	<<skinicon "give">><<link [[선물을 준다 (0:10)|Avery Gifts]]>><<give_gift Avery>><</link>>
+	<br>
+<</if>>
+<<refuseicon>><<link [[다시 생각한다|Avery Gifts Reconsider]]>><</link>>
+<br>
+
+:: Avery Gifts Reconsider
+<<effects>>
+
+에이버리는 당신의 망설임을 눈치챈 기색이 없다.
+<br><br>
+
+<<avery_date_options>>
+
+:: Avery Gifts Dinner List
+<<effects>>
+<<npc "Avery">><<person1>>
+에이버리는 <<his>> 표정을 인내심의 본보기처럼 유지한 채 기다린다.
+<br><br>
+
+<<him>>에게 무엇을 대접할까?
+<<if $avery_mansion?.food isnot "none">>
+	<<He>>【은는】 <<recipe_name $avery_mansion?.food "article">>【을를】 부탁했다.
+<</if>>
+<br><br>
+<<food_gift_list>>
+<<if _food_gift_found is true>>
+	<<skinicon "give">><<link [[대접한다 (0:10)|Avery Gifts 3]]>><<give_gift Avery>><</link>>
+	<br>
+<</if>>
+<<refuseicon>><<link [[다시 생각한다|Mansion Dining]]>><<endevent>><</link>>
+<br>
+
+:: Avery Gifts
+<<effects>>
+
+<<if $phase is 1>>
+	"당신을 위해 뭘 좀 만들었어요." 당신은 말한다.
+<<elseif $phase is 2>>
+	"뭘 좀 만들었어." 당신이 말한다. "너 주려고."
+<<else>>
+	"선물을 만들었어." 당신이 말한다. "마음에 들었으면 좋겠다."
+<</if>>
+<br><br>
+
+에이버리가 <<his>> 손을 든다. "아직 아닙니다," <<he>>【이가】 말한다. "먼저 당신을 어딘가로 데려가죠."
+<br><br>
+
+<<He>>【은는】 <<his>> 차의 시동을 걸고 거리를 달린다. <<He>>【은는】 좁은 골목으로 꺾어 들어가 작은 건물 앞에 멈춘다. 낡아 보이는 건물이다. 문과 창문은 더 커지는 것을 두려워하기라도 하듯 작다.
+<br><br>
+
+에이버리가 밖으로 나와, 따라오라고 손짓한다.
+<br><br>
+
+<<link [[다음|Avery Gifts 2]]>><</link>>
+<br>
+
+:: Avery Gifts 2
+<<effects>>
+
+<<generate2>><<person2>>
+안은 하나의 넓은 방이고, 안쪽 끝에는 카운터가 있다. 그 너머에는 <<personsimple>>【이가】 서 있다. 당신과 <<him>> 사이에는 의자들이 둘러싼 탁자 세 개가 놓여 있다. 식당처럼 보인다.
+<br><br>
+
+<<person>>【은는】 에이버리에게 고개를 끄덕이고 방을 나간다.
+<br><br>
+
+<<clearsinglenpc 1>><<person1>>
+에이버리는 자리에 앉아 <<him>> 앞의 테이블을 가리킨다.
+<br><br>
+
+<<link [[다음|Avery Gifts 3]]>><</link>>
+<br>
+
+:: Avery Gifts 3
+<<effects>>
+<<set _gift to $gift + (setup.foodstuff[$gift].food.handheld_gift ? " gift" : "")>>
+<<wearProp _gift>>
+
+당신은 <<recipe_name $gift>>【을를】 에이버리 앞에 놓는다.
+<<if $avery_mansion>>
+	<<set $avery_mansion.rage.dinner_done to 1>>
+	<<He>>【은는】 긴 홀 너머, <<him>> 맞은편 의자를 가리킨다. 당신은 자리에 앉는다.
+	<<avery_housework_change "dining" 1>>
+<</if>>
+<br><br>
+
+<<if $gift is "souffle">>
+	<<if $avery_mansion?.food_last is "souffle" and $avery_mansion?.food isnot "souffle">>
+		"수플레?" 에이버리가 몸을 앞으로 기울여 디저트를 살피며 묻는다. "또요? 이런 디저트를 거절하진 않겠지만, 가끔은 다른 것도 좋을 텐데요."<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<<elseif $avery_mansion?.food is "souffle">>
+		"수플레." 에이버리가 디저트를 살피려고 몸을 앞으로 기울이며 말한다. "딱 제가 원하던 거군요. 기대 이상입니다, 천사님." <<He>>【은는】 <<his>> 숟가락으로 손을 뻗다가 멈춘다. "은식기가 더 어울리겠군요."<<glove>><<larage>><<npcincr Avery love 1>><<npcincr Avery rage -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<<else>>
+		"수플레?" 에이버리가 몸을 앞으로 기울여 디저트를 살피며 묻는다. "원하던 건 아니지만, 어떻게 거절하겠습니까?" <<He>>【은는】 <<his>> 숟가락으로 손을 뻗다가 멈춘다. "은식기가 더 어울리겠군요."<<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<</if>>
+	<br><br>
+	<<his>> 식기류에 만족하자, <<he>>【은는】 한 입 베어 문다. <<He>>【은는】 씹는 동안 <<his>> 눈을 감고, <<he>>【이가】 눈을 뜨면서 접시를 두 번 두드린다. "너무 달아." <<he>>【이가】 말하지만, <<he>>【은는】 또 한 입 가득 먹는다.
+	<br><br>
+	<<He>>【은는】 접시가 빌 때까지 계속 먹는다. 숟가락이 안에서 달그락거린다. "다음에는 훨씬 더 잘할 거라 믿습니다."
+	<br><br>
+	<<saveFavoriteFood "Avery" $gift>>
+	<<earnFeat "Haute Cuisine">>
+	<<link [[귀엽게 군다|Avery Gifts Soufflé Cute]]>><<npcincr Avery love 1>><</link>><<glove>>
+	<br>
+	<<link [[능청스럽게 군다|Avery Gifts Soufflé Cheeky]]>><<set $endear += 20>><<npcincr Avery love -1>><</link>><<llove>><<ggendear>>
+	<br>
+	<<link [[침묵한다|Avery Gifts Soufflé Silent]]>><<if !$avery_mansion>><<set $endear += 10>><</if>><</link>><<if !$avery_mansion>><<gendear>><</if>>
+	<br>
+<<elseif $gift is "linguine">>
+	<<if $avery_mansion?.food_last is "linguine" and $avery_mansion?.food isnot "linguine">>
+		"링귀네?" 에이버리가 묻는다. "또요? 다양성이 있으면 좋을 텐데요." <<He>>【은는】 접시를 <<him>> 앞쪽으로 끌어당기고, 포크에 파스타 면을 감는다.<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<<elseif $avery_mansion?.food is "linguine">>
+		"아하," 에이버리가 말한다. "링귀네군요." <<He>>【은는】 접시를 <<him>> 앞쪽으로 끌어당기고, 포크에 파스타 면을 감는다.<<gglove>><<npcincr Avery love 3>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<<else>>
+		"아하," 에이버리가 말한다. "링귀네군요. 부탁한 건 아니지만, 제가 무슨 불평을 하겠습니까?" <<He>>【은는】 접시를 <<him>> 앞쪽으로 끌어당기고, 포크에 파스타 면을 감는다.<<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<</if>>
+
+	<br><br>
+	"여기 환상적인 레스토랑이 있었지." <<He>>【이가】 음식을 맛본다. "음. 내 말은, 마을에 말이야. 강가에. 주인이 잘못된 사람들에게 밉보였거든." 또 한 입. "이게 그들의 요리를 떠올리게 하는군."
+	<br><br>
+	<<He>>【은는】 식사를 마치고 냅킨으로 <<his>> 입술을 톡톡 닦는다. "그럭저럭 괜찮은 요리사군요."
+	<br><br>
+	<<saveFavoriteFood "Avery" $gift>>
+	<<earnFeat "Haute Cuisine">>
+	<<link [[고개를 끄덕인다|Avery Gifts Linguine Nod]]>><<npcincr Avery love 1>><</link>><<glove>>
+	<br>
+	<<link [[자랑한다|Avery Gifts Linguine Brag]]>><<if !$avery_mansion>><<set $endear += 10>><</if>><</link>><<if !$avery_mansion>><<gendear>><</if>>
+	<br>
+<<elseif $gift is "steak">>
+	<<if $avery_mansion?.food_last is "steak" and $avery_mansion?.food isnot "steak">>
+		"또 스테이크입니까?" 에이버리가 묻는다. <<He>>【은는】 그것을 썰기 시작한다. "다양성이 있으면 좋을 텐데요."<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<<elseif $avery_mansion?.food is "steak">>
+		에이버리는 <<him>> 앞에 놓인 고기를 살핀다. <<He>>【은는】 <<his>> 오른손에 나이프를, 왼손에 포크를 들고 고기를 썬다. 전체를 한입 크기로 자른 뒤, 나이프를 내려놓고 포크를 <<his>> 오른손으로 옮긴다.<<gglove>><<npcincr Avery love 3>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<<else>>
+		에이버리는 <<him>> 앞에 놓인 고기를 살핀다. <<He>>【은는】 <<his>> 오른손에 나이프를, 왼손에 포크를 들고 고기를 썬다. 전체를 한입 크기로 자른 뒤, 나이프를 내려놓고 포크를 <<his>> 오른손으로 옮긴다.<<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<</if>>
+	<br><br>
+	<<if $avery_mansion>>
+		<<He>>【은는】 고기를 <<his>> 눈앞으로 들어 올린 뒤 입술 사이에 넣는다. <<He>>【은는】 씹고 삼킨 다음, <<himself>>에게 레드 와인을 한 잔 따른다.
+	<<else>>
+		<<He>>【은는】 고기를 <<his>> 눈앞으로 들어 올린 뒤 입술 사이에 넣는다. <<He>>【은는】 손가락을 튕기고, 주인이 돌아와 에이버리의 잔에 레드 와인을 채운다.
+		<br><br>
+	<</if>>
+	<<He>>【은는】 한입 한입 음미하며, 이따금 <<his>> 와인을 홀짝이면서 식사를 이어간다.
+	<br><br>
+	<<saveFavoriteFood "Avery" $gift>>
+	<<earnFeat "Haute Cuisine">>
+	<<link [[의견을 묻는다|Avery Gifts Steak Ask]]>><<if !$avery_mansion>><<set $endear += 10>><</if>><</link>><<if !$avery_mansion>><<gendear>><</if>>
+	<br>
+	<<link [[침묵한다|Avery Gifts Steak Silent]]>><<npcincr Avery love 1>><</link>><<glove>>
+	<br>
+<<elseif setup.foodstuff[$gift].food.tags.includes("spicy")>>
+	<<if $avery_mansion?.food_last is $gift and $avery_mansion?.food isnot $gift>>
+		에이버리가 식사를 빤히 바라본다. "이것도 또요? 자, 당신은 더 잘할 수 있을 텐데요." <<He>>【은는】 <<recipe_name $gift>> 한입을 먹고, 향신료가 제 역할을 하자 얼굴을 찡그린다.<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<<elseif $avery_mansion?.food is $gift or !$avery_mansion>>
+		"완벽하군요," 에이버리가 말한다. <<He>>【은는】 <<recipe_name $gift>> 한입을 먹고, 향신료가 제 역할을 하자 얼굴을 찡그린다. "당신이 향신료를 약하게 쓸 줄 알았습니다," <<he>>【이가】 하나 더 집어 먹으며 말한다. "제가 더 잘 알아야 했는데." <<He>>【은는】 당신에게 미소 짓는다.<<glove>><<npcincr Avery love 1>><<if !$avery_mansion>><<gendear>><<set $endear += 10>><<else>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<<else>>
+		에이버리가 식사를 빤히 바라본다. "이건 제가 부탁한 게 아닙니다." <<He>>【은는】 <<recipe_name $gift>> 한입을 먹고, 향신료가 제 역할을 하자 얼굴을 찡그린다.<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Avery Gifts End]]>><</link>>
+	<br>
+<<elseif setup.foodstuff[$gift].food.tags.includes("drink")>>
+	<<if $avery_mansion?.food_last is $gift and $avery_mansion?.food isnot $gift>>
+		에이버리는 술잔을 빛에 비춰 들고 잔을 돌린다. "또 이겁니까? 이러지 마세요, 더 잘할 수 있잖습니까." <<He>>【은는】 아주 조금만 홀짝인다.<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<<elseif $avery_mansion?.food is $gift or !$avery_mansion>>
+		에이버리는 술잔을 빛에 비춰 들고 잔을 돌린다. 그러고는 그것을 <<his>> 코밑에 가져간 뒤 아주 조금만 홀짝인다.<<glove>><<npcincr Avery love 1>><<if !$avery_mansion>><<gendear>><<set $endear += 10>><<else>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+		<br><br>
+		"훌륭하군요," <<he>>【이가】 말한다. "직접 만든 겁니까? 인상적입니다. 당신 같은 요리사를 반길 친구들이 몇 있죠. 하지만 당신은 제가 독차지해야겠습니다."
+	<<else>>
+		에이버리가 술잔을 보고 눈살을 찌푸린다. "이건 제가 부탁한 게 아닙니다." <<He>>【은는】 아주 조금만 홀짝인다. "하지만 고마워해야겠죠."<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Avery Gifts End]]>><</link>>
+	<br>
+<<else>>
+	<<if $avery_mansion?.food_last is $gift and $avery_mansion?.food isnot $gift>>
+		에이버리는 <<recipe_name $gift>>【을를】 빤히 바라본다. "또요? 이거 데운 겁니까?" 그래도 <<he>>【은는】 한입 먹는다.<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<<elseif $avery_mansion?.food is $gift or !$avery_mansion>>
+		에이버리는 <<recipe_name $gift>> 한입을 먹고 생각에 잠긴 채 몸을 기댄다. "전혀 나쁘지 않군요," <<he>>【이가】 말하며 하나 더 집어 먹는다.
+		<<if $daily.averyIntroRecipe>>
+			"그리고 생각해보니, 오늘 아침만 해도, 당신은 이걸 어떻게 만드는지조차 몰랐잖아요. 빨리 배우는군요."
+		<<else>>
+			"요리사에게 찬사를 보냅니다."
+		<</if>>
+		<<He>>【은는】 당신에게 미소 짓는다.<<glove>><<npcincr Avery love 1>><<if !$avery_mansion>><<gendear>><<set $endear += 10>><<else>><<set $avery_mansion.rage.dinner_wrong to false>><</if>>
+	<<elseif $daily.averyIntroRecipe>>
+		에이버리는 <<recipe_name $gift>>【을를】 바라보다가 당신을 본다. "이건 제가 부탁한 게 아닙니다." <<He>>【은는】 한입 먹는다. "오늘 앞서 나눈 대화를 생각하면 예상했어야 했겠군요. 그래도 앞으로는 이보다 잘해야 합니다. <span class="purple">다음에는 넘어가지 않겠습니다.</span>"
+	<<else>>
+		에이버리는 <<recipe_name $gift>>【을를】 바라보다가 당신을 본다. "이건 제가 부탁한 게 아닙니다." <<He>>【은는】 한입 먹는다. "이보다는 잘해야 합니다."<<llove>><<npcincr Avery love -1>><<if $avery_mansion>><<set $avery_mansion.rage.dinner_wrong to true>><</if>>
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Avery Gifts End]]>><</link>>
+	<br>
+<</if>>
+
+:: Avery Gifts Soufflé Cute
+<<effects>>
+
+<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+	"당신만큼 달콤하진 않아요." 당신은 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"단맛에 대해선 미안해요." 당신은 말한다. "그릇에 손가락을 담갔을지도 몰라요."
+<<else>>
+	"너무 달다고요?" 당신은 묻는다. "당신처럼 달콤한 사람에겐 딱 맞아요."
+<</if>>
+<br><br>
+
+<<if $avery_mansion>>
+	에이버리가 웃는다. "말솜씨가 좋군요." <<he>>【이가】 말한다. "믹싱볼을 다루는 솜씨와 합쳐지니, 당신은 정말 특별한 선물이군요."
+	<br><br>
+	<<He>>【은는】 숟가락이 그릇에 달그락거리게 내려놓고, 만족한 듯 일어난다.
+	<br><br>
+	<<avery_mansion_food_select>>
+	<br>
+<<else>>
+	에이버리가 웃는다. 가게 주인이 놀란 듯이 구석에서 힐끗 쳐다본다. "말솜씨가 좋군." 에이버리가 말한다. "너무 오랫동안 방종하게 굴었어. 그 데이트, 내가 받아주지."
+	<br><br>
+
+	에이버리가 당신을 밖으로 이끌고, 기다리고 있던 <<his>> 차에 다시 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts Soufflé Cheeky
+<<effects>>
+
+<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+	"다음번엔 설탕을 덜 넣을게요." 당신이 말한다. "몸무게가 걱정되신다면요."
+<<elseif $speech_attitude is "bratty">>
+	"그렇게 달진 않아요." 당신이 말한다. "그래도 몸무게에 신경 쓰신다니 다행이네요."
+<<else>>
+	"다음번엔 설탕을 덜 넣을게요." 당신이 말한다. "몸매 관리에 좋을 거예요."
+<</if>>
+<br><br>
+
+<<if $avery_mansion>>
+	에이버리가 당신을 똑바로 쳐다본다. "조심해, <<girl>>." <<he>>【이가】 말한다. "그런 디저트 하나로 용서받을 수 있는 건 한계가 있어."
+	<br><br>
+
+	에이버리가 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+
+	에이버리가 당신을 똑바로 쳐다본다. "조심해, <<girl>>." <<he>>【이가】 말한다. "그런 디저트 하나로 용서받을 수 있는 건 한계가 있어."
+	<br><br>
+
+	에이버리는 자리에서 일어난다. <<He>>【은는】 당신을 밖으로 이끌고, 기다리고 있던 <<his>> 차에 다시 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts Soufflé Silent
+<<effects>>
+
+<<if $avery_mansion>>
+	당신은 침묵을 지킨다. 에이버리가 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+	당신은 침묵을 지킨다. 에이버리는 자리에서 일어난다. <<He>>【은는】 당신을 밖으로 이끌고, 기다리고 있던 <<his>> 차에 다시 태운다.
+	<br><br>
+
+<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts Linguine Nod
+<<effects>>
+
+<<if $avery_mansion>>
+	당신은 예의 바르게 고개를 끄덕인다. 에이버리는 다시 <<his>> 입가를 톡톡 닦고 자리에서 일어난다. 에이버리는 식사를 마치고 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+	당신은 예의 바르게 고개를 끄덕인다. 에이버리는 다시 <<his>> 입가를 톡톡 닦고 자리에서 일어난다. <<He>>【은는】 당신을 밖으로 이끌고, 기다리고 있던 <<his>> 차에 다시 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts Linguine Brag
+<<effects>>
+
+<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+	"제 실력을 인정해주셔서 기뻐요." 당신이 말한다. "눈이 높으시잖아요."
+<<elseif $speech_attitude is "bratty">>
+	"전 훌륭한 요리사예요." 당신이 말한다. "그리고 당신도 그걸 알고 있을 거라 확신해요."
+<<else>>
+	"전 '쓸만한 요리사' 이상이에요." 당신이 말한다. "당신 입맛이 그걸 구별할 만큼은 된다는 거 알아요."
+<</if>>
+<br><br>
+
+<<if $avery_mansion>>
+	에이버리는 다시 <<his>> 입가를 톡톡 닦으며 눈썹을 치켜올리고, 미소를 반쯤 가린다. "자기애가 넘치는군요," <<he>>【이가】 말한다. "괜찮습니다만, 지나치지는 마세요."
+	<br><br>
+
+	에이버리가 <<his>> 식사를 마치고 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+	에이버리는 다시 <<his>> 입가를 톡톡 닦으며 눈썹을 치켜올리고, 미소를 반쯤 가린다. "자기애가 넘치는군요," <<he>>【이가】 말한다. "괜찮습니다만, 지나치지는 마세요."
+	<br><br>
+
+	<<He>>【은는】 자리에서 일어나, 당신을 밖으로 이끌고 기다리고 있던 <<his>> 차에 다시 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+
+<</if>>
+
+:: Avery Gifts Steak Ask
+<<effects>>
+
+<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+	"만족스러우신가요?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"그래서, 어떻게 생각하세요?" 당신이 묻는다.
+<<else>>
+	"마음에 들어요?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+<<if $avery_mansion>>
+	에이버리는 한 입 더 삼킨 후에 대답한다. "훌륭해." <<he>>【이가】 말한다. "보통은 좀 더 레어로 익힌 걸 선호하지만, 이 자체로는 흠잡을 데가 없군. 와인이 도움이 되긴 했지만."
+	<br><br>
+	에이버리가 <<his>> 식사를 마치고 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+	에이버리는 한 입 더 삼킨 후에 대답한다. "훌륭해." <<he>>【이가】 말한다. "보통은 좀 더 레어로 익힌 걸 선호하지만, 이 자체로는 흠잡을 데가 없군. 와인이 도움이 되긴 했지만."
+	<br><br>
+
+	<<He>>【은는】 식사를 마치고 일어서서, 당신을 밖으로 이끌고 기다리고 있던 <<his>> 차에 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts Steak Silent
+<<effects>>
+
+<<if $avery_mansion>>
+	에이버리가 <<his>> 식사를 마치고 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+	에이버리가 <<his>> 식사를 마치는 동안 당신은 조용히 있는다. <<He>>【은는】 일어나서 당신을 밖으로 이끌고, 기다리고 있던 <<his>> 차에 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts End
+<<pass 10>><<effects>>
+
+<<if $avery_mansion>>
+	에이버리가 <<his>> 식사를 마치고 일어선다.
+	<<avery_mansion_food_select>>
+<<else>>
+	에이버리가 <<his>> 식사를 마치고 일어선다. <<He>>【은는】 당신을 밖으로 이끌고, 기다리고 있던 <<his>> 차에 태운다.
+	<br><br>
+
+	<<avery_date_options>>
+<</if>>
+
+:: Avery Gifts Recipe
+<<effects>>
+
+<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+	"죄송해요." 당신이 말한다. "하지만 그건 어떻게 만드는지 몰라요."
+<<elseif $speech_attitude is "bratty">>
+	"아직 학교에서 배우지 않았어요." 당신이 말한다.
+<<else>>
+	"그건 어떻게 만드는지 몰라요." 당신이 말한다.
+<</if>>
+<<set $avery_mansion.study_unlocked to 1>><<set $avery_mansion.recipe.pushUnique($avery_mansion.food)>>
+<br><br>
+에이버리가 열쇠를 꺼내 당신에게 건넨다. "내 서재에 요리책들이 있어. 필요한 걸 찾을 수 있을 거야."
+<br><br>
+
+에이버리는 식사를 마치고 자리에서 일어난다.
+<br><br>
+
+<<link [[다음|Mansion Dining]]>><<endevent>><</link>>
+<br>
+
+:: Avery Gifts Ingredients
+<<effects>><<set $phase2 to 0>>
+
+<<if $speech_attitude is "meek" or $speech_attitude_avery>>
+	"원하시는 대로 <<recipe_name $avery_requested_food "article">>【을를】 만들어드리지 못해 죄송해요." 당신이 말한다. "하지만 주방에 필요한 게 다 없었어요."
+	<br><br>
+
+	Avery
+<<elseif $speech_attitude is "bratty">>
+	주방에 재료도 없는데 어떻게 <<recipe_name $avery_requested_food "article">>【을를】 만들라고 하시는 거예요?" 당신이 씩씩거린다.
+	<br><br>
+
+	에이버리가 당신의 말투에 경고하는 눈빛을 보내고,
+<<else>>
+	주방에 <<recipe_name $avery_requested_food "article">>【을를】 만들 재료가 다 없었어요." 당신이 말한다.
+	<br><br>
+
+	에이버리는
+<</if>>
+혀를 찬다. "요리사를 꿈꾼다면 필요한 재료쯤은 스스로 구할 수 있어야죠." <<He>>【은는】 잠시 당신을 살피더니 한숨을 쉰다. "뭐가 없었습니까? 앞으로는 떨어지지 않게 해두죠."
+<br><br>
+
+<<if $avery_mansion.kitchen_stock.requested.length is 3>>
+	<<He>>【은는】 머릿속으로 계산을 하는 듯하다. "<span class="purple">새 재료를 들이려면 <<recipe_name $avery_mansion.kitchen_stock.requested[0] "plural">> 재고를 중단해야겠군요.</span> 부엌 공간을 무한정 쓸 수는 없으니까요."
+	<br><br>
+<</if>>
+
+<<for _i range setup.foodstuff[$avery_requested_food].recipe.ingredients>>
+	<<if !$avery_mansion.kitchen_stock.normal.concat($avery_mansion.kitchen_stock.requested).includes(_i)>>
+		<<capture _i>>
+			<<foodstufficon _i>><<link [[<<recipe_name _i "cap">>|Avery Gifts Ingredients 2]]>><<set $phase to _i>><</link>>
+		<</capture>>
+		<br>
+	<</if>>
+<</for>>
+<br>
+<<ind>><<link [[그만둔다|Avery Gifts Ingredients 2]]>><<unset $avery_requested_food>><<set $phase to "back">><</link>>
+
+:: Avery Gifts Ingredients 2
+<<effects>>
+
+<<if $phase is "back">>
+	에이버리가 <<his>> 코로 숨을 내쉰다. "훌륭해. 마음을 바꿔줘서 정말 기쁘군. 정말로."
+	<<npcincr Avery rage 1>><<garage>>
+<<elseif $avery_mansion.kitchen_stock.requested.includes($phase)>>
+	<<set $averyragerevealed to 1>><<set $avery_mansion.rage.ingredients to true>><<avery_housework_change "dining" 1>>
+	에이버리는 말없이 당신을 한참 바라본다. 그러더니 얼굴을 찌푸리고, <<he>>【은는】 <span class="red"><<recipe_name $gift "article">>【을를】 바닥으로 쓸어버린 뒤 일어서서 당신의 손목을 움켜쥔다</span>. "다시 말해봐," <<he>>【이가】 으르렁거린다. "방금 나한테 부탁한 걸 다시 말해보라고."
+	<<pain 2>><<gpain>><<npcincr Avery rage 5>><<ggarage>>
+	<br><br>
+
+	당신이 대답할 틈도 주지 않고, <<he>>【은는】 당신을 식당에서 부엌으로 질질 끌고 간다. <<He>>【은는】 손바닥으로 조리대를 내리치고, <span class="red">이미 재고가 있는 <<recipe_name $phase "plural">>【을를】 가리킨다</span>.
+	<br><br>
+
+	"은혜도 모르는 멍청한 꼬맹이," <<he>>【이가】 당신의 팔을 아플 만큼 쥐며 으르렁거린다. "그렇게 무능할 거면, 적어도 건망증까지 맞추지는 말 수 없나?" <<He>>【은는】 마침내 손을 놓고 깊은 숨을 내쉰 뒤, 아무 말 없이 성큼성큼 걸어가 버린다.
+	<br><br>
+
+	<<link [[다음|Mansion Dining]]>><<endevent>><<set $phase2 to 0>><</link>>
+	<br>
+	<<exit>>
+<<elseif $foodstuff[$phase].supermarket isnot undefined>>
+	<<money 5000>>
+	에이버리가 낮게 웃는다. "아, <<recipe_name $phase>> 말입니까? 그 정도는 당신 능력으로도 가능하겠군요." <<He>>【은는】 <<his>> 지갑을 꺼내 <<printmoney 5000>>【을를】 탁자 위에 던진다. "<span class="gold">하이 가 쇼핑 센터의 슈퍼마켓에서 그걸 팝니다.</span> 다음에 <<recipe_name $phase "plural">>【이가】 필요하면 거기서 구하세요."
+<<elseif setup.foodstuff[$phase].recipe?.ingredients.length>>
+	<<if $phase2 gte 1>>
+		에이버리는 짜증이 난 듯하다. "<<recipe_name $phase "cap">>도? 직접 요리할 수도 있는 걸 또."
+	<<else>>
+		에이버리가 눈썹을 치켜올린다. "<<recipe_name $phase "cap">>? 직접 만들 수도 있는데 왜 사는 거지?"
+	<</if>>
+	<<if $foodstuff[$phase].knows_recipe>>
+		<<He>>【은는】 못마땅한 눈으로 당신을 본다.
+	<<else>>
+		<<set $avery_mansion.study_unlocked to 1>><<set $avery_mansion.recipe.pushUnique($phase)>>
+		에이버리가 열쇠를 꺼내 당신에게 건넨다. "내 서재에 요리책들이 있어. 필요한 걸 찾을 수 있을 거야."
+	<</if>>
+
+	<<for _i range setup.foodstuff[$phase].recipe.ingredients>>
+		<<if $foodstuff[_i].amount is 0 and !$avery_mansion.kitchen_stock.normal.concat($avery_mansion.kitchen_stock.requested).includes(_i)>>
+			<<set _missingIngredients to true>>
+		<</if>>
+	<</for>>
+	<<if _missingIngredients>>
+		<br><br>
+		<<for _i range setup.foodstuff[$phase].recipe.ingredients>>
+			<<if !$avery_mansion.kitchen_stock.normal.concat($avery_mansion.kitchen_stock.requested).includes(_i)>>
+				<<capture _i>>
+					<<foodstufficon _i>><<link [[`<<recipe_name _i>>【이가】 없어서 <<recipe_name $phase>>도 만들 수 없다고 말한다`|Avery Gifts Ingredients 2]]>><<set $phase to _i>><<set $phase2++>><</link>>
+				<</capture>>
+				<br>
+			<</if>>
+		<</for>>
+		<<exit>>
+	<</if>>
+<<else>>
+	<<if ["ghostshroom","wolfshroom"].includes($phase) or $phase is "wild_honeycomb" and (!$settings.beesEnabled or !$settings.bestialityEnabled)>>
+		에이버리가 인상을 찌푸린다. "미안하지만,"
+		<<if $phase is "wild_honeycomb">>
+			벌집을 원한다고? 신선한 벌집을?
+		<<else>>
+			뭐-버섯이라고?
+		<</if>>
+		<span class="purple">그건 네가 알아서 해야 한다.</span>.
+	<<else>>
+		<<set $avery_mansion.kitchen_stock.requested.pushUnique($phase)>>
+		<<if $avery_mansion.kitchen_stock.requested.length gte 4>>
+			<<set _removed_ingredient to $avery_mansion.kitchen_stock.requested.shift()>>
+		<</if>>
+		<<if $phase2 gte 1>>
+			에이버리는 짜증이 난 듯하지만 고개를 끄덕인다.
+		<<else>>
+			에이버리는 당신이 그렇게 말할 줄 알았다는 듯 고개를 끄덕인다.
+		<</if>>
+		"좋습니다. <span class="green">부엌에 <<recipe_name $phase "plural">> 재고를 두기 시작하죠.</span>" <<He>>【은는】 <<his>> 포크로 당신을 가리킨다. "그러니 다음번에는 제가 부탁한 걸 만들 수 있길 바라겠습니다, 알겠습니까?"
+	<</if>>
+	<<if _removed_ingredient>>
+		<span class="purple">에이버리의 부엌에서는 더 이상 <<recipe_name _removed_ingredient "plural">>【을를】 제공하지 않습니다.</span>
+	<</if>>
+<</if>>
+<br><br>
+
+<<He>>【은는】 식사를 마치고 자리에서 일어난다.
+<br><br>
+
+<<link [[다음|Mansion Dining]]>><<endevent>><<set $phase2 to 0>><</link>>
+<br>

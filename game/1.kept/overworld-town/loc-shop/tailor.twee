@@ -1,0 +1,364 @@
+:: Tailor Shop
+<<set $outside to 0>><<set $location to "shopping_centre">><<effects>>
+
+당신은 양복점에 있다. 다양한 색상의 천이 옷걸이에 걸려 있다.
+<br><br>
+
+<<if $sewingKit isnot 1 and $debug is 1>>
+	가게 진열장에 새로운 재봉틀이 판매용으로 나온 것 같다.
+	<br><br>
+<</if>>
+<<if $sewingBought is 1>>
+	"구매해 주셔서 감사합니다. 돌아가실 때까지 방으로 배달해 드리겠습니다."
+	<br><br>
+	<<set $sewingBought to 0>>
+<</if>>
+
+<<set $tailor_cost to 0>>
+<<set $outfitRepair to []>>
+<<set _time to 0>>
+<<set _outfitTime to 0>>
+<<set _brokenOutfit to 0>>
+
+<<for _active_clothes range Object.keys($worn)>>
+	<<if _active_clothes is "butt_plug">>
+		<<continue>>
+	<</if>>
+
+	<<if _active_clothes is "lower" or _active_clothes is "under_lower">>
+		<<if $worn[_active_clothes].one_piece is 1>>
+			<<if $worn[_active_clothes].integrity lt clothingData(_active_clothes,$worn[_active_clothes],'integrity_max')>>
+				<<set _outfitTime += 5>>
+			<</if>>
+			<<continue>>
+		<</if>>
+	<</if>>
+
+	<<if $worn[_active_clothes].integrity lt clothingData(_active_clothes,$worn[_active_clothes],'integrity_max') and $worn[_active_clothes].integrity gt 0 and clothingData(_active_clothes,$worn[_active_clothes],'integrity_max') gt 0>>
+		<<set $tailor_cost += Math.trunc(tailorClothingCost($worn[_active_clothes],_active_clothes) * (1 - $worn[_active_clothes].integrity / clothingData(_active_clothes,$worn[_active_clothes],'integrity_max')))>>
+		<<set _time += 5>>
+	<</if>>
+
+	<<if _brokenOutfit is 0>>
+		<<set _brokenOutfit to getOutfitPair()>>
+		<<if _brokenOutfit.length is 0>>
+			<<set _brokenOutfit to 1>>
+		<</if>>
+	<</if>>
+<</for>>
+
+<<if $stress gte $stressmax>>
+	<<passoutshop "shop">>
+<<else>>
+	<<if Time.hour is 21>>
+		폐점 시간이다. 경비원이 모든 사람을 밖으로 몰아내고 있다. <<if $exposed gte 1>>경비원이 이 옷차림을 본다면 얼마나 노출되어 있을지 깨닫고 공황 상태에 빠진다.<</if>>
+		<br><br>
+
+		<<if $exposed lte 0>>
+			<<highicon>><<link [[밖으로 나간다|High Street]]>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<ind>><<link [["끝날 때까지 숨는다 (1:00)"|Tailor Shop]]>><<pass 1 hour>><<endevent>><</link>>
+		<</if>>
+	<<else>>
+		<<if Time.dayState is "night">>
+			어둠 속에 당신 혼자 있다.
+			<br><br>
+
+			<<if Time.hour isnot $closinghour and !$weekly.theft.tailor>>
+			<<shopicon "register">><<link [[금전 등록기를 살펴본다|Tailor Register]]>><</link>>
+			<br>
+			<</if>>
+
+		<<elseif $exposed gte 1>>
+
+			당신은 존엄성을 지키기 위해 천 더미 뒤에 숨어 있다.
+			<br><br>
+
+			<<if _brokenOutfit isnot 0 && _brokenOutfit isnot 1>>
+				<<generate1>><<person1>>카운터 뒤에서 일하는 <<person>>【이가】 당신을 발견하고는 도와줄 수 있다고 말한다.
+
+				<<for _i = 0; _i lt _brokenOutfit.length; _i++>>
+					<<set _brokenOutfitTime to 15>><<set _tailorCostMod to .55>>
+					<<set _tailorCostMod += .43 * (1 - $worn[_brokenOutfit[_i].wornHalf].integrity / clothingData(_brokenOutfit[_i].wornHalf,$worn[_brokenOutfit[_i].wornHalf],'integrity_max'))>>
+
+					<<if _brokenOutfit[_i].brokenHalf.includes("under")>>
+						<<set _brokenOutfitTime += 5>><<set _tailorCostMod += .06>>
+						<<He>>【은는】 당신이 감수한다면 당신의 <<print _brokenOutfit[_i].name>>【을를】 고치는 데 시간과 노력이 조금 더 들 것이라고 말한다. 수리 비용은 <<printmoney `Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)`>>이다.
+					<<else>>
+						<<He>>【은는】 당신의 잃어버린 <<print _brokenOutfit[_i].name>>【을를】 <<printmoney `Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)`>>에 수선할줄 수 있다.
+					<</if>>
+					<br>
+
+					<<set _tempText to `수선하기 ` + _brokenOutfit[_i].name + ` (0:` + (_brokenOutfitTime lt 10 ? "0":"") + _brokenOutfitTime + `)`>>
+
+					<<capture _i>>
+						<<link [[_tempText|Fix Outfit]]>> <<set $outfitRepair to _brokenOutfit[_i]>><<pass _brokenOutfitTime>><<money `-Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)` "tailor">> <</link>>
+					<</capture>>
+					<br><br>
+				<</for>>
+
+				<<unset _tempText>>
+			<</if>>
+
+		<<else>>
+			<<generate1>><<person1>>"어서 오세요." 재단사가 말한다. "오늘은 어떤 서비스가 필요하신가요?
+			저희는 옷 수선 서비스를 제공합니다. 매주 배달을 통한 수선 서비스도 제공하고 있습니다."
+			<br><br>
+			<<if $tailor_cost gte 1 and $money gte $tailor_cost>>
+				<<He>>【은는】 현재 당신이 입고 있는 옷을 <<printmoney `Math.trunc($tailor_cost)`>>에 고쳐주겠다고 제안한다.
+				<br>
+				<<shopicon "tailor">><<print '<<link [[옷 수선하기 (0:'+(_time lt 10 ? "0":"")+_time+')|Fix Clothes]]>><<money '+ -$tailor_cost + ' "tailor">><<pass _time>><</link>>'>>
+				<br><br>
+				<<set _options to true>>
+			<<elseif $money lt $tailor_cost>>
+				현재 입고 있는 옷을 수선할 돈이 부족하다. (<<printmoney `Math.trunc($tailor_cost)` "red">>.)
+				<br><br>
+				<<set _options to true>>
+			<</if>>
+
+			<<if ($worn.upper.set is $worn.lower.set and $worn.lower.integrity lt clothingData('lower',$worn.lower,'integrity_max')) or ($worn.under_upper.set is $worn.under_lower.set and $worn.under_lower.integrity lt clothingData('under_lower',$worn.under_lower,'integrity_max'))>>
+				재단사가 옷의 하의 부분을 무료로 수선해 줄 것이다.
+				<br>
+				<<shopicon "tailor">><<print '<<link [[옷을 수선한다 (0:'+(_outfitTime lt 10 ? "0":"")+_outfitTime+')|Fix Lower]]>><<pass _outfitTime>><</link>>'>>
+				<br><br>
+				<<set _options to true>>
+			<</if>>
+
+			<<if _brokenOutfit isnot 0 && _brokenOutfit isnot 1>>
+
+				<<He>>【은는】 당신의 <<print _brokenOutfit[random(0,_brokenOutfit.length -1)].name>>【이가】 망가진 것을 알아차린다.
+				"시간은 좀 걸리겠지만, 다른 반쪽에 맞춰서 온전하게 만들어 줄 수 있어요." <<He>>【은는】 당신의 반응을 살피기 위해 잠시 멈춘다. "관심 있나요?"
+				<br><br>
+
+				<<set _secondUnderItem to false>><<set _secondOverItem to false>>
+
+				<<for _i = 0; _i lt _brokenOutfit.length; _i++>>
+					<<set _brokenOutfitTime to 15>><<set _tailorCostMod to .55>>
+					<<set _outfitSlot to _brokenOutfit[_i].wornHalf>>
+					<<set _integrityMax to Math.clamp(clothingData(_outfitSlot, $worn[_outfitSlot], 'integrity_max'), 1, 100_000)>>
+					<<set _tailorCostMod += Math.max(.43 * (1 - $worn[_outfitSlot].integrity / _integrityMax), 0)>>
+
+					<<if _brokenOutfit[_i].brokenHalf.includes("under")>>
+						<<set _brokenOutfitTime += 5>><<set _tailorCostMod += .06>>
+
+						<<if _secondUnderItem isnot true>>
+							<<set _secondUnderItem to true>>
+							"아, <<print _brokenOutfit[_i].name>> 같은 건 다른 옷보다 고치는 데 시간과 노력이 조금 더 듭니다." <<He>>【은는】 말을 멈추고 작업에 필요한 특수 원단을 보여준다.
+							"괜찮으시다면, <<printmoney `Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)`>>에 새것으로 교체해 드릴 수 있습니다."
+						<<else>>
+							<<He>>【은는】 당신의 <<print _brokenOutfit[_i].name>>【을를】 <<printmoney `Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)`>>에 수선할 수 있다.
+						<</if>>
+
+					<<elseif _brokenOutfit[_i].brokenHalf.includes("over")>>
+						<<set _brokenOutfitTime -= 5>><<set _tailorCostMod -= .08>>
+
+						<<if _secondOverItem isnot true>>
+							<<set _secondOverItem to true>>
+							"제 실력이라면 <<print _brokenOutfit[_i].name>> 수선쯤은 아주 간단합니다." <<He>>【은는】 증거로 가게 안의 좀 더 복잡한 옷들을 가리킨다.
+							"이 수선은 비교적 쉬운 편이라 <<printmoney `Math.trunc(_brokenOutfit.over.outfitCost * _tailorCostMod)`>>에 해드릴 수 있습니다. 어떠신가요?"
+						<<else>>
+							수선이 쉬워서 <<he>>【은는】 당신의 <<print _brokenOutfit[_i].name>>【을를】 <<printmoney `Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)`>>에 고쳐줄 수 있다.
+						<</if>>
+
+					<<else>>
+						<<He>>【은는】 잃어버린 <<print _brokenOutfit[_i].name>>【을를】 <<printmoney `Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)`>>에 새것으로 교체해 주겠다고 제안한다.
+					<</if>>
+					<br>
+
+					<<set _tempText to `수선하기 ` + _brokenOutfit[_i].name + ` (0:` + (_brokenOutfitTime lt 10 ? "0":"") + _brokenOutfitTime + `)`>>
+					<<capture _i>>
+						<<link [[_tempText|Fix Outfit]]>> <<set $outfitRepair to _brokenOutfit[_i]>><<pass _brokenOutfitTime>><<money `-Math.trunc(_brokenOutfit[_i].cost * _tailorCostMod)` "tailor">> <</link>>
+					<</capture>>
+					<br><br>
+				<</for>>
+
+				<<unset _tempText>><<unset _secondUnderItem>><<unset _secondOverItem>>
+				<<set _options to true>>
+			<</if>>
+
+			<<if _options isnot true>>
+				당신이 현재 입고 있는 옷은 이미 완전히 수선되었다.
+				<br><br>
+			<</if>>
+
+			<<if $wardrobeRepair isnot undefined>>
+				수선된 옷을 찾으러 옷장에 가야 한다.
+			<<elseif $tailorMonthlyService is undefined>>
+				재단사는 당신이 <<him>> 옆에 있는 작은 나무 상자를 쳐다보는 것을 눈치챈다. "아, 마침 매주 배달 서비스가 필요하시다면 운이 좋으시네요. 지역 내라면 무료로 배달해 드립니다."
+				<br>
+				/*<<link [[낡은 옷을 얼마에 쳐주는지 묻는다|Tailor Monthly Discard]]>><</link>>*/
+				<br>
+				<<socialiseicon "ask">><<link [[모든 옷을 수선하는 데 얼마인지 묻는다|Tailor Monthly Repair]]>><</link>>
+			<<elseif $tailorMonthlyService is "repair">>
+				/* TODO: Rename these variables to tailorWeeklyService and change in version update code. Also rename "monthly" passages to "weekly" and move players to the new passages through Config.navigation.override */
+				수선할 옷을 담을 상자가 기다리고 있다.
+			<<elseif $tailorMonthlyService is "discard">>
+				팔 옷을 담을 상자가 기다리고 있다.
+			<<elseif $tailorMonthlyService gt 0>>
+				당신은 최근에 이 서비스를 이용했으며, 다시 이용하려면 $tailorMonthlyService일 동안 기다려야 한다.
+			<</if>>
+			<br><br>
+
+			<<if $sewingKit isnot 1 and $debug is 1>>
+				<<ind>><<link [[진열장으로 다가간다|Tailor Shop Sewing Machine]]>><</link>>
+				<br><br>
+			<</if>>
+		<</if>>
+		<<getouticon>><<link [[떠난다|Shopping Centre Top]]>><<endevent>><<unset $outfitRepair>><</link>>
+	<</if>>
+<</if>>
+
+:: Fix Clothes
+
+당신의 옷이 수선되었다.
+<br><br>
+<<set _equip to setup.clothingLayer.all>>
+<<for _i to 0; _i lt _equip.length; _i++>>
+	<<set $worn[_equip[_i]].integrity = clothingData(_equip[_i],$worn[_equip[_i]],'integrity_max')>>
+<</for>>
+
+<<link [[돌아가기|Tailor Shop]]>><<endevent>><</link>>
+
+:: Fix Lower
+
+당신의 하의가 수선되었다.
+<br><br>
+<<if $worn.upper.set is $worn.lower.set>>
+	<<set $worn.lower.integrity = getSetupClothing('lower', $worn.lower)?.integrity_max>>
+<</if>>
+
+<<if $worn.under_upper.set is $worn.under_lower.set>>
+	<<set $worn.under_lower.integrity = getSetupClothing('under_lower', $worn.under_lower)?.integrity_max>>
+<</if>>
+
+<<link [[돌아가기|Tailor Shop]]>><<endevent>><</link>>
+
+:: Tailor Shop Sneak
+<<set $outside to 0>><<effects>><<set $lock to 0>>
+
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔이 묶여 있지만 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+		<<lockicon "pick">><<link [[자물쇠를 딴다 (0:10)|Tailor Shop]]>><<pass 10>><<crimeUp 10 "trespassing">><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 능력 밖인 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Shopping Centre Top]]>><<endevent>><</link>>
+
+:: Tailor Shop Sewing Machine
+<<effects>>
+	진열장으로 다가가자 재봉틀이 놓여 있다. 진열장 옆에 광고 포스터가 걸려 있고, 이렇게 적혀 있다:
+
+	<br><br>
+	재봉의 신-9000 <sup>tm</sup>
+	<br><br>
+	- 개가 속옷을 물어뜯었나요? <span class="pink">~촉수~</span>가 옷을 찢었나요? 문제없습니다!
+	<br><br>
+	- 1분 만에 어떤 옷이든 고칠 수 있습니다!
+	<br><br>
+	- <span class="green">기술</span>이 필요 없습니다! 베일리조차도 사용할 수 있습니다!
+	<br><br>
+	- 평생 쓸 수 있는 수선용 천을 제공합니다!
+	<br><br>
+	- 단돈 <span class ="gold">£1000.00!</span>
+	<br><br>
+
+	<<if $money gte 100000>>
+		<<link [[재봉틀 구매 - 방에서 옷 수선하기! £1000|Tailor Shop]]>><<money -100000 "tailor">><<set $sewingKit to 1>><<set $sewingBought to 1>><<endevent>><</link>>
+		<br>
+	<</if>>
+	<<link [[돌아가기|Tailor Shop]]>><<endevent>><</link>>
+
+:: Tailor Monthly Discard
+"알겠습니다, <<if $player.gender_appearance is "m">>손님<<else>>사모님<</if>>. 상자를 배달해 드리겠습니다. 팔 준비가 되시면 상자를 채워주세요. 단, 어떤 품목도 반품은 안 된다는 점을 명심해 주세요. 수선해서 되팔 수 있는 품목만 취급합니다."
+<br><br>
+
+<<set _value to 0>>
+<<for _label, _items range $wardrobe>>
+	<<for _i to 0; _i lt _items.length; _i++>>
+		<<if setup.clothes[_label][clothesIndex(_label,_items[_i])].shop.length is 0>>
+			<<continue>>
+		<</if>>
+		<<if _items[_i].outfitSecondary isnot undefined>>
+			<<continue>>
+		<</if>>
+		<<set _value += Math.floor(getClothingCost(_items[_i]) * (_items[_i].integrity / clothingData(_label,_items[_i],'integrity_max')) / 3,_label)>>
+	<</for>>
+<</for>>
+보증금을 돌려받고 나면 현재 <<printmoney `_value + 5000`>> 정도를 벌 수 있을 것 같다.
+
+<br><br>
+<<if $money gte 5000>>
+	<<shopicon "tailor">><<link [[판매를 확정하고 보증금 £50를 낸다|Tailor Monthly Driver]]>>
+		<<money -5000 "tailor">>
+		<<set $tailorMonthlyService to "discard">>
+	<</link>>
+<<else>>
+	보증금을 낼 돈이 부족하다.
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[판매를 물린다|Tailor Shop]]>><<endevent>><</link>>
+
+:: Tailor Monthly Repair
+"알겠습니다, <<if $player.gender_appearance is "m">>손님<<else>>사모님<</if>>. 상자를 배달해 드리겠습니다. 수선할 준비가 되시면 상자를 채워주세요. 옷을 돌려받으시려면 <span class="gold">하루</span>가 걸린다는 점을 명심해 주세요.
+옷을 저희에게 보낸 뒤에 너무 많은 새 옷을 사지 않도록 주의해 주세요. 그렇지 않으면 배달 기사가 기부금으로 가져가야 할 테니까요."
+<br><br>
+
+<<set _value to 0>>
+<<for _label, _items range $wardrobe>>
+	<<for _i to 0; _i lt _items.length; _i++>>
+		<<set _value += Math.floor(tailorClothingCost(_items[_i],_label) * (1 - (_items[_i].integrity / clothingData(_label,_items[_i],'integrity_max'))) * 1.25,_label)>>
+	<</for>>
+<</for>>
+비용은
+<<if _value gt 5000>>
+	<<printmoney `_value - 5000`>>
+<<else>>
+	무료
+<</if>>
+일 것 같다. 보증금으로 비용이 줄었기 때문이다.
+
+<br><br>
+<<if $money gte 5000>>
+	<<shopicon "tailor">><<link [[수선을 확정하고 보증금 £50를 낸다|Tailor Monthly Driver]]>>
+		<<money -5000 "tailor">>
+		<<set $tailorMonthlyService to "repair">>
+	<</link>>
+<<else>>
+	보증금을 낼 돈이 부족하다.
+<</if>>
+<br>
+<<getouticon>><<link [[수선을 물린다|Tailor Shop]]>><<endevent>><</link>>
+
+:: Tailor Monthly Driver
+재단사가 상자를 집어 들고 가게 안쪽으로 들어간다.
+<br><br>
+<<link [[다음|Tailor Shop]]>><<endevent>><</link>>
+
+:: Fix Outfit
+	<<if $exposed gte 1>>
+		재단사가 필요한 수선을 하는 동안 당신은 계속 숨어 있는다. 영원할 것 같은 시간이 지난 후, <<he>>【이가】 당신의 <<print $outfitRepair.name>>【을를】 돌려주고 당신은 옷을 입는다.
+		<br><br>
+	<<else>>
+		가게를 서성거리자 재단사가 몇 가지 사소한 조정을 위해 당신을 부른다.
+		그러자 당신의 <<print $outfitRepair.name>>【은는】 새것처럼 깨끗해진다.
+		<br><br>
+	<</if>>
+
+	<<set $worn[$outfitRepair.wornHalf].integrity = clothingData($outfitRepair.wornHalf,$worn[$outfitRepair.wornHalf],'integrity_max')>>
+	<<set makeMissingOutfit($outfitRepair)>>
+	<<unset $outfitRepair>>
+
+<<link [[돌아가기|Tailor Shop]]>><<endevent>><</link>>

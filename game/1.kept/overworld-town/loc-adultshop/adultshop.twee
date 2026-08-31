@@ -1,0 +1,527 @@
+:: Adult Shop Lock
+<<set $outside to 0>><<effects>><<set $lock to 400>>
+성인용품점이 닫혀 있다. 표지판에는 이렇게 쓰여 있다: "영업시간: 평일 <<ampm 16 00>> - <<ampm 21 00>>. 토요일 <<ampm 9 00>> - <<ampm 21 00>>."
+<br><br>
+
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔만 묶여 있지 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+
+		<<lockicon "pick">>
+		<<link [[자물쇠 따기 (0:10)|Adult Shop]]>>
+			<<pass 10>><<crimeUp 5 "trespassing">>
+			<<if $adultShop.ban gt 0 or crimeSumCurrent() gte 50000 or $adultShop.rng gte $skulduggery>>
+				<<set $adultShop.spotted to true>>
+			<</if>>
+		<</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠나기|Elk Street]]>><</link>>
+<br>
+
+:: Adult Shop
+/* TEMPORARY fix to clean up NPC overflow issues */
+<<if $enemyno gte 1 or $phase gte 1>>
+	<<endevent>>
+<</if>>
+
+/* Variables */
+<<set $outside to 0>><<set $location to "adult_shop">><<effects>><<run statusCheck("Sydney")>>
+
+<<set $adultshopstate to "closed">>
+<<getadultshopstate>>
+<<if $adultshopintro is undefined>>
+	<<set $adultshopintro to 0>>
+<</if>>
+<<rng>>
+<<if $rng is 100>>
+	<<set _shopnameshort to "오버진스">>
+<<else>>
+	<<set _shopnameshort to "가게">>
+<</if>>
+<<set _shopnamelong to "에로틱 성인 장난감: 오버진스의 관능적인 비밀">>
+<<set _shopgreeting to [
+	"딜도로 서로 때리지 마세요,",
+	"가랑이에서 손 떼세요,",
+	"항상 바지를 입고 계세요,",
+	"사용한 팬티는 팔지 않아요,",
+	"사용한 물건은 반품 불가입니다,"
+	]>>
+<<set _shopmusic to ["스무스 재즈","살사","탱고","레게","R&B","로맨틱 라운지","클래식 록","클래식 팝"]>>
+
+<<set _binds to pcAreArmsBound("any") or $feetuse is "bound">>
+<<set _gag to ($worn.face.type.includes("gag") and $worn.face.cursed is 1)>>
+<<set _both to (_binds and _gag)>>
+<<set _gagname to $worn.face.name>>
+<<set _predicament to ( (_binds ? "속박" : "") + (_both ? " 그리고 " : "") + (_gag ? _gagname : "") )>>
+
+/* Shop text */
+<<if $adultshopintro is 0 and $rng is 100>>
+	당신은 "_shopnamelong"이라는 재미있는 이름의 성인용품점에 있다. 선반에는 다양한 종류의 페니스 밴드, 란제리, 페티시 의상, 그리고 온갖 종류의 섹스 토이가 진열되어 있다.
+<<else>>
+	당신은 성인용품점에 있다. 선반에는 다양한 종류의 페니스 밴드, 란제리, 페티시 의상, 그리고 온갖 종류의 섹스 토이가 진열되어 있다.
+<</if>>
+<br>
+<<if !$brothelVending and $brotheljob and $fame.business gte 100>>
+	<<set $brothelVending to {status: "idea", products: 0, condoms: 0, lube: 0, condomsSold: 0, lubeSold: 0, condomsToRefill: 0, lubeToRefill: 0, weeksRent: 0, weeksEmpty: 0}>>
+	/* $brothelVending.status
+	idea - PC has had the idea but not talked to Briar
+	asked - Talked with Briar But not bought the machine
+	bought Bought the vending machine but not installed it
+	sold - Briar sold the machine since it was empty for so long
+	set Installed the vending machine
+	BITS of $brothelVending.products
+	bit 0 - 1 Talked to the pharmacy nurse about reselling condoms
+	bit 1 - 2 Talked to Sirris about selling lube */
+	<br>
+	성인용품점에서 판매되는 제품들을 보고, <span class="pink">아이디어가 떠오른다</span>. 창관 탈의실에 자판기를 설치해서 직원들이 업무에 필요한 윤활제나 다른 유용한 물품을 살 수 있게 하면 좋겠다는 생각이 든다. <span class="gold">당신은 브라이어에게 이 아이디어를 이야기해보기로 결심한다.</span>
+	<br><br>
+<</if>>
+
+<<if $adultshopstate isnot "closed">>
+	<<print _shopmusic[random(0,_shopmusic.length-1)]>> 음악이 배경에서 부드럽게 흘러나온다.
+	<br><br>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	너무 무리했다.
+	<br><br>
+	<<passoutadultshop>>
+	<<pass 1 hour>>
+	<<trauma 6>><<set $stress -= 2000>>
+<<elseif Time.hour is 21 and Time.weekDay isnot 1>>
+	폐점 시간이다. 시리스가 모두를 밖으로 내보내고 있다.
+	<<if $exposed gte 1>>
+		시리스가 당신의 이런 옷차림을 발견하면 얼마나 노출될지 깨닫자 공포가 밀려온다.
+	<</if>>
+	<br><br>
+
+	<<set $adultshopstate to "closed">>
+	<<if $exposed lte 0>>
+		<<elkicon>><<link [[밖으로 나간다|Elk Street]]>><<adultShopClear>><</link>>
+		<br>
+		<<if C.npc.Sirris.love gt 10>>
+			<br>
+			시리스가 집에 태워다 줄지 묻는다.<br>
+			<<homeicon>><<link [[시리스와 함께 집에 간다 (0:15)|Sydney Ride Home]]>><<adultShopClear>><<pass 15>><</link>>
+			<<if $temple_rank is "monk" or $temple_rank is "priest">>
+				<br>
+				<<wolficon>><<link [[시리스와 함께 신전으로 간다 (0:10)|Sydney Ride Temple]]>><<adultShopClear>><<pass 10>><</link>>
+			<</if>>
+		<</if>>
+	<<else>>
+		<<ind>><<link [[끝날 때까지 숨는다 (1:00)|Adult Shop]]>><<pass 1 hour>><</link>>
+	<</if>>
+<<else>>
+	/* States */
+<<switch $adultshopstate>>
+        <<case "sirris">>
+            <<npc "Sirris">>
+            <<if $adultshopintro is 0>>
+                <<set _shopgreeting.push(
+                    "점보 애널 플러그 할인 중입니다.",
+                    "언제든 기쁘게 도와드릴게요.",
+                    "향 첨가 콘돔 한 번 써보세요.",
+                    "우리 동네 최고의 성인용품점이죠.",
+                    "우리 동네 최고의 성인용품점이죠.",
+                    "고객님을 위해 항상 대기 중입니다.",
+                    "만나서 정말 반갑습니다.",
+                    "만나서 정말 반갑습니다.",
+                    "대용량 윤활유 20% 할인 중입니다.")
+                >>
+                /* Shop intro text*/
+                "_shopnameshort에 오신 것을 환영합니다! <<print _shopgreeting[random(0,_shopgreeting.length-1)]>>" 시리스가 <<print either("환하게 웃는다","따뜻하게 반긴다","반갑게 맞이한다","손을 흔들며 미소 짓는다","미소 지으며 윙크한다","윙크하며 엄지를 치켜세운다","차분하게 말한다")>>.
+                <<He>>【은는】 <<print either("다시 페니스 밴드의 장점에 대해 설명하기 시작한다","하던 계산을 마저 끝낸다","다시 손님들에게 다양한 딜도를 보여준다","다시 윤활유에 대해 설명하기 시작한다","다시 페티시 의상을 보여준다")>>.
+                <br><br>
+                <<set $adultshopintro to 1>>
+            <</if>>
+			<<if _binds or _gag>> <!-- Remove bindings and forced gags, dynamically -->
+				<<set _oblige to ( (_gag ? "<<him>>【을를】 의아하게 바라보며" : "시리스에게 자세히 설명해 달라고 부탁하지만") + (_binds ? " <<he>>【이가】 당신을 카운터 위로 올려 주는 동안" : " 당신이 카운터 위로 올라타는 동안") )>>
+				시리스가 당신의 _predicament【을를】 알아차리고 킥킥 웃는다. 당신이 <<if _gag>>재갈 너머로 끙끙거리자,<<else>>무언가 말하려고 입을 열자,<</if>> <<he>>【이가】 손을 들어 막는다. "앗, 저… 여기서는 생각보다 자주 있는 일이에요. 카운터 위로 올라오세요."
+				<br><br>
+				당신은 _oblige, 따른다. <<He>>【이가】 몸을 숙여 무언가를 찾는다. "손님들이 허락도 없이 장비를 시험해 보는 일이 많거든요. 벌로 그냥 내버려 둔 적도 있었지만… 대부분은 그걸 원했던 것 같더라고요."
+				<<He>>【이가】 절단기를 들고 다시 일어선다. "가만히 계세요."
+				<br><br>
+				<<He>>【이가】 절단기로 당신의
+				<<if _binds>>결박을<</if>>
+				<<if _both>>【와과】 당신의<</if>>
+				<<if _gag>>_gagname【을를】<</if>>
+				전문가의 솜씨로 잘라낸다.
+				<<if _binds>>그것들이<<else>>그것이<</if>> 순식간에 바닥으로 쨍그랑 소리를 내며 떨어진다. <<He>>【이가】 당신이 내려오는 것을 도와주고, 계속 <<his>> 일을 한다.
+				<br><br>
+				<<if _binds>><<unbind>><</if>>
+				<<if _gag>><<set $worn.face.type.push("broken")>><<faceruined>><</if>>
+			<</if>>
+			<<adultShopEvents>>
+			<br><br>
+
+		<<case "sydney">>
+			<<npc "Sydney">><<run statusCheck("Sydney")>>
+			<<if $adultshopintro is 0>>
+				<<set _sydneysays to ["따뜻하게 인사한다","맞이한다","손을 흔들며 미소 짓는다"]>>
+				<<set _sydneyactivity to [
+					", 선반을 채우다 말고 고개를 들며",
+					" 카운터 뒤에서",
+					", 창고에서 재고가 실린 수레를 밀고 나오며",
+					", 반품 처리를 하다 고개를 들며",
+					", 클립보드에서 고개를 들며",
+					", 깃털 먼지떨이를 손에 들고",
+					", 손버릇 나쁜 손님을 피하며"
+				]>>
+				/* Switch tone between corrupt and noncorrupt */
+				<<if !_sydneyStatus.includes("corrupt")>>
+					<<set _shopgreeting to [
+						"소품으로 서로 때리지 마세요,",
+						"언제나 기꺼이 도와드립니다,",
+						"다른 손님들을 존중해주세요,",
+						"마을 최고의 성인용품점,",
+						"손님들을 위해 여기 있으니까요,",
+						"언제나 만나서 반가워요,"]>>
+						<<set _sydneysays.push("암송한다","무덤덤하게 말한다","읊조린다")>>
+				<<else>>
+					<<set _shopgreeting to [
+						"딜도로 서로 때리지 마세요,",
+						"가랑이에서 손 떼세요,",
+						"항상 바지를 입고 계세요,",
+						"사용한 팬티는 팔지 않아요,",
+						"언제나 기꺼이 도와드립니다,",
+						"사용한 물건은 반품 불가입니다,",
+						"여기는 창관이 아니에요,",
+						"마을 최고의 성인용품점,",
+						"손님들을 위해 여기 있으니까요,",
+						"언제나 뵙게 되어 반갑습니다,",
+						"다른 손님에게 추근대지 마세요,",
+						"당신 사진 보고 싶지 않아요,",
+						"저희는 윤활제를 재활용하지 않습니다,"]>>
+						<<set _sydneysays.push("활짝 웃는다","윙크한다","노래하듯 말한다","딜도를 흔든다")>>
+				<</if>>
+				<<if $sydneyromance is 1>>
+					<<set _shopgreeting to ["왔구나,","안녕,", "보니까 좋네!"]>>
+					<<set _sydneysays to ["활짝 웃는다","키스를 날린다","손가락총을 쏜다","얼굴을 붉히며 손을 흔든다"]>>
+
+					/* Shop intro text */
+					"<<print _shopgreeting[random(0,_shopgreeting.length-1)]>>" 시드니가 <<print _sydneysays[random(0,_sydneysays.length-1)]>><<print _sydneyactivity[random(0,_sydneyactivity.length-1)]>>.
+				<<else>>
+					/* Shop intro text */
+					"_shopnameshort에 오신 걸 환영합니다, <<print _shopgreeting[random(0,_shopgreeting.length-1)]>>"
+					시드니가 <<print _sydneysays[random(0,_sydneysays.length-1)]>><<print _sydneyactivity[random(0,_sydneyactivity.length-1)]>>.
+				<</if>>
+				<br><br>
+				<<set $adultshopintro to 1>>
+			<</if>>
+
+			<<if _binds or _gag>> <!-- Remove bindings and forced gags, dynamically -->
+				시드니의 눈이 당신의 _predicament【을를】 알아차리고 커진다.
+				<<if _sydneyStatus.includes("corrupt")>>
+					"그냥... 물어보셔도 되는데." 얼굴이 달아오른다<<if !_gag>>, 당신은 변명하려 한다<</if>>. 시드니는 킥킥 웃으며<<if !_gag>>, 손을 저어 당신의 변명을 넘기고<</if>> 카운터 아래에서 무언가를 찾는다.
+				<<else>>
+					"괜찮으세요? 누가 그랬어요? 아니면 그냥... 소품을 시험해 보다가 사고가 난 건가요?" 당신이 설명하는 동안 시드니는 카운터 아래로 사라진다.
+				<</if>>
+				<br><br>
+				<<He>>【이가】 절단기를 들고 나타나 카운터 뒤로 오라고 손짓한다. <<He>>【이가】 당신의
+				<<if _binds>>결박을<</if>>
+				<<if _both>>【와과】 당신의<</if>>
+				<<if _gag>>_gagname【을를】<</if>>
+				정확하게 잘라내자,
+				<<if _binds>>그것들이<<else>>그것이<</if>>
+				금세 바닥으로 떨어진다.
+				<<if $sydneyromance gte 1>>
+					당신이 <<him>>에게 감사 인사를 하기도 전에, <<he>>【이가】 당신의 뺨에 키스한다. "더 조심하세요, 제발."
+				<</if>>
+				<<He>> 당신이 괜찮은지 확인한 후 일터로 돌아간다.
+				<br><br>
+				<<if _binds>><<unbind>><</if>>
+				<<if _gag>><<set $worn.face.type.push("broken")>><<faceruined>><</if>>
+			<</if>>
+			<<adultShopEvents>>
+			<br><br>
+
+		<<default>> /* I.E. closed */
+			가게는 닫혔다. 당신은 신기한 모양의 남근 램프에서 나오는 희미한 불빛만이 비추는 어둠 속에 홀로 서 있다.
+			<<if (Time.hour lt 16 or Time.hour gt $closinghour) and !$weekly.theft.adultShop>>
+					<br><br>
+					<<shopicon "register">><<link [[금전 등록기를 살펴본다|Adult Shop Register]]>><</link>>
+				<</if>>
+			<br><br>
+
+	<</switch>>
+
+	/* Links */
+	<<if $adultshopclerk and $adultshopstate isnot "closed">>
+		/* work in this shop */
+		<<if pcAreArmsBound("both")>>
+			<<ind>><span class="red">양팔이 모두 묶여 있어</span> 여기서 일할 수 없습니다.
+		<<else>>
+			<<ind>><<link [[일한다 (1:00)|Adult Shop Clerk Job]]>><<endevent>><<pass 60>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+	<<if !$adultshopclerk and $debug is 1>>
+		<<ind>><<link [[디버그: 점원 직업 해금|$passage]]>><<set $adultshopclerk to true>><</link>>
+		<br>
+	<</if>>
+	<<if $adultshopstate isnot "closed">>
+		<<socialiseicon>><<link [[시리스에게 다가간다 (0:01)|Adult Shop Approach Sirris]]>><<pass 1>><<endevent>><</link>>
+		<br>
+	<</if>>
+	<<if $adultshopstate is "sydney" and $debug is 1>>
+		<<socialiseicon>><<link [[시드니에게 다가간다 (0:01)|Adult Shop Approach Sydney]]>><<pass 1>><<endevent>><</link>>
+		<br>
+	<</if>>
+	<<icon "adult-clothing.png">><<link [[의류 둘러보기 (0:01)|Adult Shop Store]]>><<pass 1>><</link>>
+	<<if $adultshopstate isnot "closed" or $debug is 1>>
+		<br>
+		<<sextoysicon "strap-on">><<link [[장난감 둘러보기 (0:01)|Adult Shop Menu]]>><<pass 1>><</link>>
+	<</if>>
+	<br><br>
+	<<elkicon>><<link [[엘크 가 (0:01)|Elk Street]]>><<pass 1>><<adultShopClear>><</link>>
+
+<</if>>
+
+:: Adult Shop Store
+/*<<exiticon>><<link [[나간다 (0:01)|Adult Shop]]>><<pass 1>><</link>>*/
+<div id="clothingShop-div" class="main-shop-div">
+	<<adultShop-main>>
+</div>
+
+:: Adult Shop Approach Sirris
+/*<<npc "Sirris">> clothes bug */
+/*Unfinished content. Removes binds etc but demonstrates this to the customers.*/
+<<effects>>
+당신이 다가가자 시리스가 미소 짓는다.
+<<if $adultshopclerk and C.npc.Sirris.love gt 50>>
+	"잘하고 있어요." <<nnpc_He Sirris>>【이가】 말한다.
+<</if>>
+"필요한 건 없으세요?"
+<br><br>
+
+<<if !$adultshopclerk>>
+	<<socialiseicon "ask">><<link [[일거리에 대해 묻는다|Adult Shop Approach Sirris Ask]]>><</link>>
+	<br>
+<</if>>
+<<if $brothelVending and $brothelVending.status is "set">>
+	<<if $brothelVending.products gte 2 and !$weekly.brothelVMLube and $brothelVending.lubeToRefill gte 10>>
+		<<sextoysicon "lube">><<link [[창관에 납품할 윤활제 구매하기 (0:10)|Adult Shop Buy Lube in Bulk]]>><<pass 10>><</link>>
+		<br>
+	<<elseif $brothelVending.products lt 2>>
+		<<sextoysicon "lube">><<link [[윤활제 대량 구매에 대해 묻기 (0:15)|Adult Shop Buy Lube in Bulk]]>><<pass 15>><</link>>
+		<br>
+	<</if>>
+<</if>>
+<<getouticon>><<link [[뒤로|Adult Shop]]>><</link>>
+
+:: Adult Shop Approach Sirris Ask
+<<effects>>
+
+"도움이 필요하던 참이었어요!" 시리스가 말한다. "선반도 채워야 하고, 손님 응대도 해야 하거든요." <<nnpc_He Sirris>>【이가】 잠시 말을 멈춘다. "카운터에서 말이죠."
+<br><br>
+
+"가게가 열려있을 때면 언제든 일할 수 있고, 시간당 <<printmoney 1500>>【을를】 지급할게요." <<nnpc_he Sirris>>【이가】 덧붙인다. "시드니도 많이 도와주고 있고요."
+<br><br>
+
+<<link [[수락한다|Adult Shop Approach Sirris Accept]]>><<set $adultshopclerk to 1>><</link>>
+<br>
+<<link [[뒤로|Adult Shop]]>><</link>>
+<br>
+
+:: Adult Shop Approach Sirris Accept
+<<effects>>
+
+시리스가 <<nnpc_his Sirris>> 손뼉을 친다. "훌륭해요." <<nnpc_he Sirris>>【이가】 말한다. "언제든 원할 때 시작할 수 있어요."
+<br><br>
+
+<<link [[다음|Adult Shop]]>><</link>>
+<br>
+
+:: Adult Shop Approach Sydney
+<<npc "Sydney">>
+<<run statusCheck("Sydney")>>
+당신은 시드니에게 다가간다.
+<<sydneyGreeting>>
+<br>
+"뭐 필요한 거라도 있어?"
+<br><br>
+<<sydneyOptions>>
+<<link [[뒤로|Adult Shop]]>><</link>>
+
+:: Adult Shop Approach Sydney Ask
+<<effects>>
+<<run statusCheck("Sydney")>>
+
+<<if _sydneyStatus.includes("corrupt") or _sydneyStatus.includes("corruptLust")>>
+	시드니가 씨익 웃는다. "발길을 끊을 수가 없나 보네?" <<he>>【이가】 묻는다. "나도 그 기분 알아. 손님들이 보통내기가 아니거든. 같이 있을 사람도, 도와줄 사람도 필요해. 일은 주로 선반을 채우고 카운터 뒤에서 손님을 응대하는 거야." <<He>>【이가】 잠시 말을 멈춘다. "그런 뜻 말고."
+<<elseif _sydneyStatus.includes("pure") or _sydneyStatus.includes("pureLust")>>
+	시드니의 표정은 변하지 않는다. "우린 일손을 구하고 있어. 선반 채우기, 카운터 뒤에서 손님 응대하기, 뭐 그런 일들. 조심하는 게 좋을 거야. 손님들이 좀 음탕한 부류거든."
+<<else>>
+	시드니가 미소 짓는다. "네가 물어봐 주길 바랐어." <<he>>【이가】 말한다. "손님들이 보통내기가 아니거든. 같이 있을 사람도, 도와줄 사람도 필요해. 일은 주로 선반을 채우고 카운터 뒤에서 손님을 응대하는 거야."
+<</if>>
+<br><br>
+
+"나는 시간당 <<printmoney 1500>>【을를】 받는데, 너도 똑같이 받을 거야."
+<br><br>
+
+<<link [[수락한다|Adult Shop Approach Sydney Accept]]>><</link>>
+<br>
+<<link [[뒤로|Adult Shop]]>><</link>>
+<br>
+
+:: Adult Shop Approach Sydney Accept
+<<effects>>
+<<run statusCheck("Sydney")>>
+
+<<if _sydneyStatus.includes("corrupt") or _sydneyStatus.includes("corruptLust")>>
+	"잘됐다!" 시드니가 <<his>> 손뼉을 치며 말한다. "언제든 원할 때 시작할 수 있어."
+<<elseif _sydneyStatus.includes("pure") or _sydneyStatus.includes("pureLust")>>
+	시드니가 고개를 끄덕인다. "언제든 원할 때 시작할 수 있어."
+<<else>>
+	시드니가 고개를 끄덕인다. "너랑 같이 일하게 돼서 기쁘네." <<he>>【이가】 말한다. "언제든 원할 때 시작할 수 있어."
+<</if>>
+<br><br>
+<<link [[다음|Adult Shop]]>><</link>>
+<br>
+
+:: Adult Shop Clerk Job
+
+당신은 카운터 뒤에서 성인용품을 팔고 선반을 채우는 일을 한다.
+<br><br>
+<<adultshopclerkevents>>
+<<if $debug is 1>>
+<br><br><br>
+	<<link [[디버그 귀환|Adult Shop]]>><</link>>
+<</if>>
+
+:: Adult Shop Buy Lube in Bulk
+<<effects>>
+<<if $brothelVending.products gte 2>>
+	<<if $weekly.brothelVMLube>>
+		이번 주에는 이미 자판기에 윤활제를 채워 넣었습니다.
+		<br><br>
+		<<link [[돌아가기|Adult Shop Approach Sirris]]>><</link>>
+	<<elseif $brothelVending.lubeToRefill lt 10>>
+		자판기에 윤활제를 채울 필요가 없습니다.
+		<br><br>
+		<<link [[돌아가기|Adult Shop Approach Sirris]]>><</link>>
+	<<elseif $money lt 20000>>
+		자판기를 채울 윤활제를 살 돈이 없습니다.
+		<br><br>
+		<<link [[돌아가기|Adult Shop Approach Sirris]]>><</link>>
+	<<else>>
+		당신은 시리스에게 필요한 양의 윤활제를 요청합니다:
+		<br><br>
+		<<lubePrice 10>>
+		<<link [[10병 구매 (£200)|Adult Shop Bought Lube in Bulk]]>><<set $lubeBought to 10>><</link>>
+		<br>
+		<<if $brothelVending.lubeToRefill gte 25>>
+			<<lubePrice 25>>
+			<<if $money gte _price>>
+			<<formatmoney _price>>
+				<<link [[`25병 구매 (${_printmoney})`|Adult Shop Bought Lube in Bulk]]>><<set $lubeBought to 25>><</link>>
+				<br>
+			<<else>>
+				25병을 살 돈이 없습니다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.lubeToRefill gte 50>>
+			<<lubePrice 50>>
+			<<if $money gte _price>>
+			<<formatmoney _price>>
+				<<link [[`50병 구매 (${_printmoney})`|Adult Shop Bought Lube in Bulk]]>><<set $lubeBought to 50>><</link>>
+				<br>
+			<<else>>
+				50병을 살 돈이 없습니다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.lubeToRefill gte 100>>
+			<<lubePrice 100>>
+			<<formatmoney _price>>
+			<<if $money gte _price>>
+				<<link [[`100병 구매 (${_printmoney})`|Adult Shop Bought Lube in Bulk]]>><<set $lubeBought to 100>><</link>>
+				<br>
+			<<else>>
+				100병을 살 돈이 없습니다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.lubeToRefill gte 150>>
+			<<lubePrice 150>>
+			<<formatmoney _price>>
+			<<if $money gte _price>>
+				<<link [[`150병 구매 (${_printmoney})`|Adult Shop Bought Lube in Bulk]]>><<set $lubeBought to 150>><</link>>
+				<br>
+			<<else>>
+				150병을 살 돈이 없습니다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.lubeToRefill gte 11 and ![25, 50, 100, 150].includes($brothelVending.lubeToRefill)>>
+			<<lubePrice $brothelVending.lubeToRefill>>
+			<<formatmoney _price>>
+			<<if $money gte _price>>
+				<<link [[`${$brothelVending.lubeToRefill}병 구매 (${_printmoney})`|Adult Shop Bought Lube in Bulk]]>><<set $lubeBought to $brothelVending.lubeToRefill>><</link>>
+				<br>
+			<<else>>
+				$brothelVending.lubeToRefill 병을 살 돈이 없습니다.
+				<br>
+			<</if>>
+		<</if>>
+		<<link [["사지 않는다"|Adult Shop Approach Sirris]]>><</link>>
+	<</if>>
+<<else>>
+	당신은 시리스에게 창관에 자판기를 설치했고, 그곳을 윤활제 병으로 채워둘 계획이라고 설명한다. "우리 둘 모두에게 사업 기회예요. 당신은 판매량을 늘릴 수 있고, 저는 수익을 낼 수 있을 거예요." 당신은 <<nnpc_him Sirris>>에게 윤활제를 몇 병 사면 할인을 해줄 수 있는지 묻는다.
+	<br><br>
+	"창관이라고요?" <<nnpc_he Sirris>>【이가】 충격받은 듯 대답한다. "창관은 학생에게 안전한 장소가 아니에요. 무엇을 하시는지는 알겠지만, 부디 조심하세요. 이미 그곳에 기계가 있다면 대량 구매 할인도 이야기해 볼 수 있겠네요. 어디 보자…" 시리스는 청구서처럼 보이는 종이를 찾을 때까지 <<nnpc_his Sirris>> 서류들을 뒤적인다.
+	<br><br>
+	"좋아요, 여기요. 10개 이상 구매하시면 가격을 2% 깎아드릴 수 있어요. 50개 이상 구매하시면, 그 병들에 대해 5% 할인을 적용해 드릴 수 있고요. 150병을 초과하여 추가로 구매하는 모든 병에 대해서는 8% 할인을 해드릴게요. 괜찮은 조건인가요?" 시리스는 멍한 표정으로 잠시 생각하더니, 당신의 대답을 기다리지도 않고, 당신이 직접 갈 필요가 없도록 창관까지 물건을 배달해 주겠다고 말한다.
+	<br><br>
+	<<set $brothelVending.products += 2>>
+	<<set $brothelVending.lubeToRefill to 200>>
+	<<link [[창관용 윤활제 구매 (0:10)|Adult Shop Buy Lube in Bulk]]>><<pass 10>><</link>>
+	<br>
+	<<link [["사지 않는다"|Adult Shop Approach Sirris]]>><</link>>
+<</if>>
+
+:: Adult Shop Bought Lube in Bulk
+<<effects>>
+<<set _partial to Math.min($lubeBought, 50)>>
+<<lubePrice _partial>>
+<<formatmoney _price>>
+"자, <<girl>>, 세어보자. 윤활제는 $lubeBought 병이야." <<nnpc_he Sirris>>【이가】 제품을 조심스럽게 판지 상자에 넣으며 말한다. "_partial 개는 개당 £20에 2% 할인해서, _printmoney야.
+<<lubePrice $lubeBought>>
+<<if $lubeBought gt 50>>
+	<<set _partial to Math.min($lubeBought - 50, 100)>>
+	<<set _price2 to _partial * 2000 * .95>>
+	<<formatmoney _price2>>
+	거기에 _partial 개는 개당 £20에서 5% 할인해서, _printmoney.
+	<<if $lubeBought gt 150>>
+		<<set _partial to $lubeBought - 150>>
+		<<set _price2 to _partial * 2000 * .92>>
+		<<formatmoney _price2>>
+		그리고 _partial 개는 개당 £20에 8% 할인해서, _printmoney.
+	<</if>>
+	응, 총 <<printmoney _price>>【이】야.
+<</if>>
+창관으로 즉시 배달되도록 할게. 내 사업을 도와줘서 고마워."
+<br><br>
+돈을 세어 <<nnpc_him Sirris>>에게 건넨다.
+<br><br>
+<<money `-_price` "lube">>
+<<set $brothelVending.lube += $lubeBought>>
+<<set $brothelVending.lubeToRefill -= $lubeBought>>
+<<set $brothelVending.weeksEmpty to 0>>
+<<set $weekly.brothelVMLube to true>>
+<<unset $lubeBought>>
+<<earnFeat "Brothel Provider">>
+<<link [[다음|Adult Shop]]>><</link>>

@@ -1,0 +1,491 @@
+:: Prison Rut
+<<location "underground">><<set $outside to 0>><<effects>>
+당신은 교도소 아래, 러트 구덩이에 있다.
+<<if $rut gte 100>>
+	<span class="green">대리석 계단을 발견했다.</span> 당신의 발이 닿자 어둠이 물러나고, 분홍빛 안개에 휩싸인 계단이 드러난다. 꼭대기로 올라가니 꽃무늬 조각으로 장식된 돌 상자가 있고, 가운데에는 감은 눈이 새겨져 있다. 잠겨 있지는 않은 것 같다.
+	<br><br>
+
+	<<prisonicon "chest">><<link [[연다|Prison Rut Chest]]>><</link>>
+	<br>
+<<elseif $stress gte $stressmax>>
+	<br><br>
+	<<passout_rut>>
+<<else>>
+	<<if $worn.face.type.includes("blindfold")>>
+		이 안대 때문에 아무것도 볼 수 없지만, 바닥과 벽은 축축하다. 산들바람이 느껴지고, 탁 트인 공간에 있다는 느낌이 든다.
+		<br><br>
+
+		<<link [[산들바람을 향해 비틀거리며 걷는다 (0:10)|Prison Rut Walk]]>><<pass 10>><<hallucinogen 10>><<set $phase to 1>><<set $rut += 8>><</link>>
+		<br>
+	<<else>>
+		안개처럼 답답한 어둠이 당신을 둘러싸고 있지만, 몇 피트 앞은 볼 수 있다. 바닥은 축축하고 미끄러운 천연 암석이다. 산들바람이 느껴진다. 탁 트인 공간에 있는 것 같다.
+		<br><br>
+
+		<<link [[산들바람을 향해 걷는다 (0:10)|Prison Rut Walk]]>><<pass 10>><<hallucinogen 10>><<set $phase to 0>><<set $rut += 10>><</link>>
+		<br>
+	<</if>>
+	<<prison_map rut>>
+<</if>>
+
+:: Prison Rut Chest
+<<effects>>
+
+당신은 상자를 연다.
+
+<<if $prison_egg isnot 1 and $prison.watchers_friend isnot 2>>
+	<<set $prison_egg to 1>>
+	안에는 보라색 촉수 덩어리에 거의 삼켜질 뻔한 커다란 알이 있다. 당신은 조심스럽게 껍질에서 촉수들을 떼어낸다.
+	<<if $rut_entry is "punish">>
+		<br><br>
+		주변 안개에서 나오는 빛으로 분홍빛을 띠는 다이아몬드도 있다. 이걸로 경비원들을 만족시킬 수 있을 것이다.
+	<</if>>
+
+<<else>>
+	<<if $rut_entry is "punish">>
+		안에는 주변 안개에서 나오는 빛으로 분홍빛을 띠는 커다란 다이아몬드가 있다. 이걸로 경비원들을 만족시킬 수 있을 것이다.
+	<<else>>
+		비어 있다.
+	<</if>>
+<</if>>
+<br><br>
+
+당신은 계단을 내려간다.
+<br><br>
+
+<<link [[떠난다 (0:30)|Prison Rut Return]]>><<pass 30>><</link>>
+<br>
+
+:: Prison Rut Return
+<<effects>>
+
+어둠이 물러나고, 이전에 지나왔던 지하 동굴이 드러난다. 동굴은 협곡으로 가로질러져 있고 커다란 석순들이 박혀 있다. 어디서 빛이 오는지 확실하지 않다. 너무 오래 쳐다보면 불편해져서 시선을 피한다.<<gstress>><<stress 6>>
+<br><br>
+왔던 길로 돌아간다. 이제 어디로 가는지 볼 수 있어서 여정이 더 빨라졌다.
+<<if $rut_entry is "rope">>
+	<<wearProp "rope climb">>
+	밧줄은 당신이 떠난 곳에 감겨 있다. 당신은 빛을 향해 올라간다.
+	<br><br>
+
+	<<link [[다음|Prison Spire]]>><<endevent>><<rut_end>><<location "prison">><</link>>
+	<br>
+<<else>>
+	당신이 빠졌던 웅덩이는 여전히 그곳에 있고, 이제 저 멀리 위에 있는 처벌 명판이 보인다.
+	<br><br>
+
+	<<link [[소리친다|Prison Rut Shout]]>><</link>>
+	<br>
+<</if>>
+
+:: Prison Rut Shout
+<<effects>><<effects_prison>>
+
+<<if $speech_attitude is "meek">>
+	<<gagged_speech "누-누구 들리는 사람 있어요?">>라고 당신은 소리친다. <<gagged_speech "여기 아래 무서워요.">>
+<<elseif $speech_attitude is "bratty">>
+	<<gagged_speech "개자식들아,">>라고 당신은 소리친다. <<gagged_speech "가져오라는 거 가져왔어. 이제 올려 줘.">>
+<<else>>
+	<<gagged_speech "다이아몬드를 찾았어,">>라고 당신은 소리친다. <<gagged_speech "올라가도 돼?">>
+<</if>>
+몇 순간의 침묵 후, <span class="green">밧줄 한쪽 끝이 당신 옆에 떨어진다.</span>
+<br><br>
+
+<<link [[다음|Prison Rut End]]>><<endevent>><<rut_end>><<location "prison">><</link>>
+<br>
+
+:: Prison Rut End
+<<effects>><<wearProp "rope climb">>
+
+<<generate_relaxed_guard 0>>
+<<generate_anxious_guard 1>>
+<<generate_veteran_guard 2>>
+<<generate_methodical_guard 3>>
+
+경비원들이 당신을 꼭대기까지 끌어올리는 동안 당신은 밧줄에 매달린다. <<relaxed_guard 0 cap>>【와과】 <<anxious_guard 1>>【이가】 당신을 부축하지만, 마치 다시 밀어 떨어뜨릴 준비가 된 것처럼 더 이상 다가오지 못하게 한다.
+<br><br>
+
+<<methodical_guard 3 cap>>【이가】 <<person4>><<his>> 손을 내민다. 당신은 <<him>>에게 다이아몬드를 준다. <<He>>【은는】 그것을 자세히 살핀다. 그러고는 눈살을 찌푸린다. "진짜군." <<he>>【이가】 말한다. "<<phim>>【을를】 올려보내."
+<br><br>
+
+<<veteran_guard 2 cap>>【은는】 <<person3>><<his>> 팔짱을 낀 채 지켜본다. "꽤 인상적이군." <<he>>【이가】 말한다. "솔직히 말해서." <<lllsuspicion>><<prison_guards 12>>
+<br>
+<<if $prison.active_punishments.length gte 1>>
+	<span class="green">"다른 처벌들은 취소되는 거죠, 맞죠?"</span>
+	<br>
+	<<methodical_guard 3 cap>>【이가】 고개를 끄덕인다.
+	<<remove_punishments>>
+	<<if _punishments_removed is true>>
+		"서류는 내가 처리하지. 장비 제거하고, <<phim>>【을를】 내보내."
+		<br><br>
+		다른 세 명이 다양한 금속 도구를 들고 다가와, 곧 당신을 다시 어느 정도 품위 있는 모습으로 만들어준다.
+	<<else>>
+		"서류는 내가 처리하지. <<phim>>【을를】 내보내."
+	<</if>>
+<<else>>
+	<<methodical_guard 3 cap>>【이가】 고개를 끄덕인다. "서류는 내가 처리하지. <<phim>>【을를】 내보내."
+<</if>>
+<br><br>
+
+<<set $prison.active_punishments to []>>
+<<remove_punishments>>
+
+<<destination_prison_walkway>>
+
+:: Prison Rut Inhale
+<<effects>>
+
+당신은 숨을 깊게 들이마신다. 현기증에 거의 땅에 쓰러질 뻔했지만, 그것이 지나가자 활력이 넘치고 따뜻해지는 것을 느낀다.
+<br><br>
+
+<<link [[다음|Prison Rut]]>><</link>>
+<br>
+
+:: Prison Rut Walk
+<<effects>>
+
+<<if $phase is 1>>
+	당신은 넘어지지 않도록 조심하며 앞으로 비틀거리며 나아간다.
+<<else>>
+	당신은 넘어지지 않도록 조심하며 어둠 속을 가로지른다.
+<</if>>
+<<if $worn.feet.type.includes("shackle")>>
+	발에 채워진 족쇄 때문에 움직이기 어렵다.<<gstress>><<stress 1>>
+<</if>>
+<br><br>
+
+<<set _rng to random(1, 10)>>
+<<switch _rng>>
+<<case 1>>
+	<<if $settings.slimesEnabled>>
+		젤리 같은 슬라임이 당신의 어깨 위로 떨어진다.
+		<<if pcAreArmsBound("both")>>
+			당신은 그것을 떨쳐내려 하지만,
+		<<else>>
+			당신은 그것을 떼어내려 하지만,
+		<</if>>
+		그것은 놀라운 속도로 당신의 몸을 기어올라 <<bottom>> 위에 자리 잡는다.
+		<br><br>
+
+		<<link [[다음|Prison Slime]]>><<set $struggle_start to 1>><</link>>
+		<br>
+	<<else>>
+		젤리 같은 슬라임이 동굴 천장에서 떨어져 당신 옆 땅바닥에 철퍽 부딪힌다. 위협이 되기 전에 서둘러 지나가지만, 꽤 놀랐다.
+		<<lcontrol>><<gtrauma>><<ggstress>><<control -10>><<trauma 6>><<stress 12>>
+		<br><br>
+		<<link [[다음|Prison Rut]]>><</link>>
+		<br>
+	<</if>>
+<<case 2>>
+	<<if !$worn.face.type.includes("blindfold")>>
+		어둠이 스며들어, 마침내 당신을 삼켜버린다.
+	<</if>>
+	발소리와 함께 낮은 쉭쉭거리는 소리가 들린다. 이름 모를 생물이 당신 위로 뛰어올라 땅바닥으로 밀어 넘어뜨린다.<<gpain>><<pain 4>>
+	<br><br>
+	<<if $settings.bestialityEnabled>>
+		<<link [[다음|Prison Beast]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		그것은 나타났을 때처럼 빠르게 사라졌다. 심장이 진정되기까지 한참이 걸린다.
+		<<lcontrol>><<gtrauma>><<ggstress>><<control -10>><<trauma 6>><<stress 12>>
+		<br><br>
+		<<link [[다음|Prison Rut]]>><</link>>
+		<br>
+	<</if>>
+<<case 3>>
+	<<if $settings.tentaclesEnabled>>
+		어둠이 당신 주위에서 맥동하는 것 같다. 그것은 여러 곳에서 터져 나오며, 기이한 보라색 촉수들을 뿜어낸다.
+		<br><br>
+
+		<<link [[다음|Prison Tentacles]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		어둠 속에서 정체불명의 팔다리가 튀어나와 당신을 붙잡고 더듬는다. 당신은 그 손아귀에서 몸을 비틀어 빠져나와 계속 나아간다.
+		<<lcontrol>><<gtrauma>><<ggstress>><<control -10>><<trauma 6>><<stress 12>>
+		<br><br>
+		<<link [[다음|Prison Rut]]>><</link>>
+		<br>
+	<</if>>
+<<case 4>>
+	<<if $settings.slimesEnabled and $settings.swarmsEnabled>>
+		물이 당신을 향해 밀려와 발목 주위에서 부자연스럽게 엉겨 붙는다. 발이 꼼짝 못 하게 되었다. 발을 빼내려 하지만, 엉겨 붙은 물은 다리를 타고 올라와 무릎까지 닿는다. 그것이 당신을 땅바닥으로 끌어당긴다.
+		<br><br>
+
+		<<link [[다음|Prison Swarm]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		물이 당신을 향해 밀려와 발목 주위에서 부자연스럽게 엉겨 붙는다. 당신은 그것을 흔들어 떼어내지만, 더러워진 기분이 든다.
+		<<lcontrol>><<gtrauma>><<ggstress>><<control -10>><<trauma 6>><<stress 12>>
+		<br><br>
+		<<link [[다음|Prison Rut]]>><</link>>
+		<br>
+	<</if>>
+<<case 5>>
+	<<if $worn.face.type.includes("blindfold")>>
+		<span class="red">안대 때문에 어디로 가는지 볼 수 없어서,</span> 튀어나온 돌에 걸려 넘어진다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+	<<else>>
+		당신은 튀어나온 돌을 조심스럽게 넘어간다.
+	<</if>>
+	<br><br>
+	<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+	<br>
+<<case 6>>
+	<<if $worn.feet.type.includes("shackle")>>
+		물이 당신 쪽으로 천둥 같은 소리를 내며 밀려온다. 근처 바위 위로 올라가려 하지만, <span class="red">족쇄가 방해된다.</span> 물이 당신을 덮쳐 왔던 길로 휩쓸어 버린다.<<set $rut -= 10>><<gpain>><<gtrauma>><<gstress>><<pain 4>><<trauma 6>><<stress 6>>
+		<br><br>
+
+		<<water>>
+		<<waterbr 2>>
+	<<else>>
+		물이 당신 쪽으로 천둥 같은 소리를 내며 밀려온다. 당신은 근처 바위 위로 올라가 홍수가 지나가기를 기다린다.
+		<br><br>
+	<</if>>
+
+	<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+	<br>
+<<case 7>>
+	이상한 분홍색 버섯을 발견했다. 달콤한 냄새가 난다.
+	<<if $worn.face.type.includes("gag")>>
+		<span class="red">재갈만 아니었다면</span> 먹을 수 있었을 텐데. 당신은 계속 나아간다.
+		<br><br>
+
+		<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		먹을 수 있을 것 같다.
+		<br><br>
+
+		<<link [[먹는다|Prison Rut]]>><<endevent>><<stress -6>><<arousal 600>><<drugs 30>><</link>><<garousal>><<lstress>>
+		<br>
+		<<link [[무시한다|Prison Rut]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<case 8>>
+	<<if $settings.tentaclesEnabled>>
+		길이 좁은 협곡으로 이어진다. 벽에는 이상한 식물들이 자라고 있다. 그 식물들의 구근 모양 잎사귀가 당신을 쫓는다.
+		<<if pcAreArmsBound("both")>>
+			<span class="red">팔이 묶여 있어서,</span> 밀고 나아가는 것 외에는 할 수 있는 게 별로 없다. 식물들이 몸에 스치자 몸이 떨린다. 그 끝은 따뜻하다.<<gstress>><<garousal>><<stress 6>><<arousal 600>><<drugs 30>>
+		<<else>>
+			당신은 지나가면서 그것들을 옆으로 쳐낸다.
+		<</if>>
+		<br><br>
+		<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		벽에 이상한 보라색 이끼가 자라고 있다. 기분이 언짢아진다.<<gstress>><<stress 6>>
+		<br><br>
+
+		<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<case 9>>
+	위 어딘가에서 물이 떨어져 얕은 웅덩이를 만들고 땅의 갈라진 틈으로 사라진다.
+	<br><br>
+
+	<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+	<br>
+<<default>>
+	벽이 흔들리고 천장에서 작은 돌들이 떨어진다.<<gstress>><<stress 6>>
+	<br><br>
+
+	<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+	<br>
+<</switch>>
+
+:: Prison Slime
+<<effects>>
+
+<<if $struggle_start is 1>>
+	<<struggle_init>>
+	<<set $struggle.creature to "slime">>
+	<<struggle_creatures 1 2>>
+	<<set $combat to 1>>
+	<<controlloss>>
+	<<violence 1>>
+	<<molested>>
+	<<set $struggle.anus.creature to "slime">><<set $anususe to "struggle">><<set $anusstate to "struggle">><<set $struggle.enemy[0].location to "anus">>
+	<<unset $struggle_start>>
+	<<set $timer to 12>>
+<</if>>
+
+<<if $timer is 8 and random(1, 2) is 2 or $timer is 4 and random(1, 2) is 2>>
+	<<struggle_add 1 2>>/*Adds more creatures, with a specific health.*/
+	<span class="pink">천장에서 또 다른 슬라임이 떨어집니다!</span>
+	<br><br>
+<</if>>
+
+<<struggle>>
+
+<<if $struggle.done gte $struggle.number>>
+	<span id="next"><<link [[다음|Prison Slime End]]>><</link>></span>
+	<br>
+<<else>>
+	<span id="next"><<link [[다음|Prison Slime]]>><</link>></span>
+	<br>
+<</if>>
+
+:: Prison Slime End
+<<effects>>
+
+슬라임들이 바위 틈새로 미끄러져 들어간다. <<tearful>> 당신은 어둠 속을 계속 나아간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Prison Rut]]>><<endevent>><</link>>
+<br>
+
+:: Prison Beast
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastNEWinit 1 creature>>
+	<<beastCombatInit>>
+	<<set $NPCList[_n].stance to "top">><<set $head to "grappled">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Prison Beast Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Prison Beast]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Prison Beast Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+
+	<<beastejaculation>>
+
+	그 생물은 어둠 속으로 돌아간다.
+
+<<else>>
+
+	그 생물은 어둠 속으로 달아난다.
+
+<</if>>
+<br><br>
+
+<<tearful>> 당신은 일어선다. 어둠이 조금 물러난다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Prison Rut]]>><</link>>
+<br>
+
+:: Prison Tentacles
+<<effects>>
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+
+	<<tentaclestart 2 12>>
+
+<</if>>
+
+<<statetentacles>>
+
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<actionstentacles>>
+
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Prison Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Prison Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Prison Tentacles Finish
+<<effects>>
+
+어둠이 다시 한번 촉수들을 삼킨다.
+<br><br>
+
+<<tearful>> 당신은 비틀거리며 러트 속으로 더 깊이 들어간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Prison Rut]]>><</link>>
+<br>
+
+:: Prison Swarm
+<<effects>>
+
+<<if $molestationstart is 1>><<set $molestationstart to 0>>
+	<<molested>>
+	<<controlloss>>
+	<<set $combat to 1>>
+
+	<<set $enemytype to "swarm">>
+
+	<<swarminit "slimes" "슬라임 덩어리" "당신을 향해 다가온다" "당신을 포위한다" "뿌리친다" 4 2>>
+	<<set $timer to 8>>
+<</if>>
+
+<<swarmeffects>>
+
+<<swarm>>
+
+<<swarmactions>>
+
+<<if $timer lte 0>>
+	<span id="next"><<link [[다음|Prison Swarm Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Prison Swarm]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Prison Swarm Finish
+<<effects>>
+
+급류가 지나가며 생물들을 함께 데려간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Prison Rut]]>><</link>>
+
+:: Passout Rut
+<<effects>>스스로를 너무 몰아붙였습니다.
+<br><br>
+<<passout>>
+<<link [[깨어난다|Passout Rut 2]]>><</link>>
+<br>
+<<pass 1 hour>>
+<<trauma 6>><<set $stress -= 2000>>
+
+:: Passout Rut 2
+<<effects>>
+
+<<badEndTrackingEnd "Prison" { reason: "prisonRut" }>>
+<<prison_bondage_removal>>당신은 땅속 깊은 어두운 곳에서 깨어난다. 거센 물살이 당신을 휩쓴다. 의식이 오락가락한다. 당신은 이상한 꿈을 꾼다. 거대한 상아색 곤충들이 쓰러진 신을 포식하는 꿈이다.
+<<if $awareness lt 600>>
+	<<ggawareness>><<awareness 10>>
+<</if>>
+<br><br>
+
+다음에 깨어났을 때, 당신은 바다에 등을 대고 떠 있다. <<gggcrime>>
+<br><br>
+
+<<link [[다음|Sea]]>><<set $sea to 100>><<prison_end>><<prisoncrimeUp>><<pass 30>><</link>>
+<br>

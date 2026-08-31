@@ -1,0 +1,784 @@
+:: Sea Beach
+<<location "seabeach">><<water>><<waterbr 2>><<effects>>
+
+당신은 해변을 따라 바다에서 수영하고 있다.
+<<if Time.dayState is "day">>
+	<<if Weather.precipitation is "rain">>
+		비 때문에 해변 자체는 대부분 텅 비어 있지만, 거친 파도가 서퍼들을 끌어들였다.
+	<<elseif Weather.isFreezing>>
+		추운 날씨 때문에 대부분의 사람들은 멀리 떨어져 있지만, 거친 파도는 서퍼들을 끌어들였다.
+	<<elseif !Weather.isOvercast>>
+		해변은 방문객들로 넘쳐난다. 아이들은 모래성을 쌓고 물에서 놀고, 부모들은 햇볕을 쬐고 있다. 한 무리의 학생들이 배구를 하고 있다.
+	<<else>>
+		구름 때문에 대부분의 방문객들이 떠났지만, 여전히 물가를 따라 산책하는 사람들이 있다.
+	<</if>>
+<<elseif Time.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		비 때문에 해변 자체는 대부분 텅 비어 있지만, 거친 파도가 서퍼들을 끌어들였다.
+	<<elseif Weather.isFreezing>>
+		추운 날씨 때문에 대부분의 사람들은 멀리 떨어져 있지만, 거친 파도는 서퍼들을 끌어들였다.
+	<<elseif !Weather.isOvercast>>
+		이곳은 조깅하는 사람들에게 인기 있는 장소이며, 몇몇은 개를 데리고 오기도 한다. 몇몇 가족들은 바람막이를 설치하고 있다. 한 무리의 학생들이 배구를 하고 있다.
+	<<else>>
+		이곳은 조깅하는 사람들에게 인기 있는 장소이며, 몇몇은 개를 데리고 오기도 한다. 안개가 바다를 가리고 있다.
+	<</if>>
+<<elseif Time.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		비 때문에 해변 자체는 대부분 텅 비어 있지만, 거친 파도가 서퍼들을 끌어들였다.
+	<<elseif Weather.isFreezing>>
+		추운 날씨 때문에 대부분의 사람들은 멀리 떨어져 있지만, 거친 파도는 서퍼들을 끌어들였다.
+	<<elseif !Weather.isOvercast>>
+		해가 지면서 가족들이 떠나고 있다. 한 무리의 학생들이 배구를 하고 있다.
+	<<else>>
+		대부분 텅 비어 있지만, 몇몇 사람들이 물가를 따라 산책하고 있다.
+	<</if>>
+<<elseif Time.dayState is "night">>
+	<<if !Weather.isOvercast && Weather.precipitation === "none">>
+		불 주위에서 술을 마시는 한 무리의 학생들을 제외하고는 텅 빈 것처럼 보인다.
+	<<else>>
+		텅 빈 것처럼 보인다.
+	<</if>>
+<</if>>
+<br><br>
+<<if $seaswim is 1>>
+	<<set $seaswim to 0>>
+	당신은 잠시 수영을 한다.
+	<<physique 3>><<swimmingskilluse>>
+	<<pass 30>>
+	<br><br>
+<</if>>
+<<if $exposed gte 1>>
+	당신은 <<lewdness>>【을를】 수면 아래에 숨긴다.
+	<<if Time.dayState isnot "night">>
+		여기서 물 밖으로 나가면 사람들이 당신을 볼 것이다!
+	<</if>>
+	<br><br>
+<</if>>
+<<if $stress gte $stressmax>>
+	<<passoutbeach>>
+<<else>>
+
+	<<if dangerEvent() and $eventskip is 0>>
+		<<eventsseabeach>>
+	<<else>>
+		<<if $exposed lte 0 or Time.dayState is "night">>
+			<<beachicon>><<link [[물 밖으로 나가기 (0:02)|Beach]]>><<pass 2>><</link>>
+			<br>
+		<<elseif $exposed is 1 and hasSexStat("exhibitionism", 2)>>
+			<<beachicon>><<link [[물 밖으로 나가기 (0:02)|Beach Exposed]]>><<pass 2>><<set $phase to 1>><</link>><<exhibitionist2>>
+			<br>
+		<<elseif $exposed gte 2 and hasSexStat("exhibitionism", 5)>>
+			<<beachicon>><<link [[물 밖으로 나가기 (0:02)|Beach Exposed]]>><<pass 2>><<set $phase to 0>><</link>><<exhibitionist5>>
+			<br>
+		<<else>>
+			<<beachicon>><<insufficientStat "exhibitionism" "그렇게 노출된 상태로 물 밖으로 나가기엔">>
+			<br>
+		<</if>>
+		<<swimicon "back">><<link [[수영 연습하기 (0:30)|Sea Beach]]>><<stress -6>><<tiredness 6>><<set $seaswim to 1>><<slimeEventEnd "swimming">><</link>><<gswimming>><<lstress>><<gtiredness>>
+		<br>
+		<<swimicon>><<link [[바다로 헤엄쳐 나가기 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea to 0>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+		<br><br>
+		<<searocks>><<swimmingdifficultytext0>>
+		<br>
+		<<seadocks>><<swimmingdifficultytext0>>
+		<br>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Sea Rocks
+<<location "searocks">><<water>><<waterbr 2>>
+
+당신은 해변 서쪽, 바위 근처 바다에서 수영하고 있다.
+<<if Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		어두운 물 위로 사방에서 비가 쏟아져 내린다.
+	<<elseif Weather.precipitation is "snow">>
+		어두운 물이 떨어지는 눈을 삼킨다.
+	<<else>>
+		물은 어둡고 불길하다.
+	<</if>>
+<<else>>
+	<<if Weather.precipitation is "rain">>
+		수면은 쏟아지는 비로 일렁인다.
+	<<elseif Weather.precipitation is "snow">>
+		마른 곳에는 눈이 쌓인다.
+	<<else>>
+		물은 잔잔하고 맑다.
+	<</if>>
+<</if>>
+<br><br>
+<<if $seaswim is 1>>
+	<<set $seaswim to 0>>
+	당신은 잠시 수영을 한다.
+	<<physique 3>><<swimmingskilluse>>
+	<<pass 30>>
+	<br><br>
+<</if>>
+<<if $exposed gte 1>>
+	당신은 <<lewdness>>【을를】 수면 아래에 숨긴다.
+	<br><br>
+<</if>>
+<<if $stress gte $stressmax>>
+	<<passoutbeach>>
+<<else>>
+
+	<<if dangerEvent() and $eventskip is 0>>
+		<<eventssea>>
+	<<else>>
+		<<swimicon "leave">><<link [[바위 위로 올라가기 (0:02)|Rocks]]>><<pass 2>><</link>>
+		<br><br>
+		<<swimicon "back">><<link [[수영 연습하기 (0:30)|Sea Rocks]]>><<stress -6>><<tiredness 6>><<set $seaswim to 1>><<slimeEventEnd "swimming">><</link>><<gswimming>><<lstress>><<gtiredness>>
+		<br>
+		<<swimicon>><<link [[바다로 헤엄쳐 나가기 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea to 0>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+		<br><br>
+		<<seabeach>><<swimmingdifficultytext0>>
+		<br>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Rocks
+<<location "searocks">><<effects>>
+당신은 해변 서쪽의 바위 위에 있다. 대부분의 바위는 조수에 따라 물에 잠긴다. 바위 덕분에 마을에서는 당신이 보이지 않는다.
+<br><br>
+깊은 물웅덩이 위, 바위 꼭대기 중 한 곳에 숨겨진 공간이 있다.
+<br>
+<<if $smuggler_location is "beach" and $smuggler_timer is 0 and Time.dayState is "night" and Time.hour gte 18>>
+	<<smugglerdifficultytext>>
+<</if>>
+<<if $phase is "oxygenrecovery">>
+	<<set $phase to 0>>
+<</if>>
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	임시 옷을 만들기에 충분히 길고 튼튼한 해초 조각을 찾는다. 적당한 것을 몇 개 찾아 가슴에 둘러 묶는다. 엉성하고 속이 비치며, 찢지 않고는 벗을 수 없을 것 같지만, 아무것도 없는 것보다는 낫다.
+	<<plantupper "seaweed">>
+	<br><br>
+	<<if $rng gte 91 and $parasite.nipples.name is undefined and $settings.parasitesEnabled>>
+		<<nipples>>에 무언가 꼬집는 듯한 감각이 느껴져 만족감이 깨진다. 깜짝 놀라 윗옷을 내려 범인을 찾는다. 작은 성게 두 마리가 젖꼭지에 달라붙어 있다. 마치 젖을 빨려는 듯 젖꼭지를 마사지하고 빨아댄다. 전혀 아프지는 않지만, 그 감각이 당신을 흥분시킨다. 성가신 행위에서 벗어나려고 잡아당겨 보지만, 너무 단단히 붙어 있다. 게다가 힘을 주어 만질수록 더 강하게 빨아들인다. 이것들을 떼어내려면 도움이 필요할 것이다.
+		<<parasite nipples urchin>><<garousal>><<arousal 600 "breasts">>
+		<br><br>
+	<</if>>
+<</if>>
+<<if $phase is 2>>
+	<<set $phase to 0>>
+	임시 옷을 만들기에 충분히 길고 튼튼한 해초 조각을 찾는다. 적당한 것을 몇 개 찾아 허리에 둘러 묶는다. 엉성하고 속이 비치며, 찢지 않고는 벗을 수 없을 것 같지만, 아무것도 없는 것보다는 낫다.
+	<<plantlower "seaweed">>
+	<br><br>
+	<<if $parasite.penis.name is "parasite" or $parasite.clit.name is "parasite">>
+		/* Prevents the 2 types of parasites from interacting */
+	<<elseif $rng gte 91 and $parasite.penis.name is undefined and $player.penisExist and $settings.parasitesEnabled and !playerChastity("penis")>>
+		<<penis>>에 무언가 꼬집는 듯한 감각이 느껴져 만족감이 깨진다. 깜짝 놀라 치마를 들어 범인을 찾는다. 작은 성게 한 마리가 달라붙어 있다. 마치 젖을 빨려는 듯 마사지하고 빨아댄다. 전혀 아프지는 않지만, 그 감각이 수치스럽게도 당신을 흥분시킨다. 성가신 행위에서 벗어나려고 잡아당겨 보지만, 너무 단단히 붙어 있다. 게다가 힘을 주어 만질수록 더 강하게 빨아들인다. 이것을 떼어내려면 도움이 필요할 것이다.
+		<<parasite penis urchin>><<garousal>><<arousal 600 "genitals">>
+		<br><br>
+	<<elseif $rng gte 91 and $parasite.clit.name is undefined and $player.vaginaExist and $settings.parasitesEnabled and !playerChastity("hidden") and !$player.penisExist>>
+		<<pussy>>에 무언가 꼬집는 듯한 감각이 느껴져 만족감이 깨진다. 깜짝 놀라 치마를 들어 범인을 찾는다. 작은 성게 한 마리가 클리토리스에 달라붙어 있다. 마치 젖을 빨려는 듯 마사지하고 빨아댄다. 전혀 아프지는 않지만, 그 감각이 수치스럽게도 당신을 흥분시킨다. 성가신 행위에서 벗어나려고 잡아당겨 보지만, 너무 단단히 붙어 있다. 게다가 힘을 주어 만질수록 더 강하게 빨아들인다. 이것을 떼어내려면 도움이 필요할 것이다.
+		<<parasite clit urchin>><<garousal>><<arousal 600 "genitals">>
+		<br><br>
+	<</if>>
+<</if>>
+<<if $stress gte $stressmax>>
+	<<passoutbeach>>
+<<else>>
+	<<storeactions "beachrocks">>
+	<<if $smuggler_location is "beach" and $smuggler_timer is 0 and Time.dayState is "night" and Time.hour gte 18>>
+		<<smugglerdifficultyactions>>
+		<br>
+	<</if>>
+	<<if $worn.upper.exposed gte 2 and $worn.under_upper.exposed gte 1
+	or $worn.upper.exposed gte 2 and $underupperwetstage gte 3
+	or $upperwetstage gte 3 and $worn.under_upper.exposed gte 1
+	or $upperwetstage gte 3 and $underupperwetstage gte 3>>
+		<<beachicon "seaweed">><<link [[해초로 윗옷 만들기 (0:20)|Rocks]]>><<pass 20>><<set $phase to 1>><</link>>
+		<br>
+	<</if>>
+	<<if $worn.lower.exposed gte 2 and $worn.under_lower.exposed gte 1
+	or $worn.lower.exposed gte 2 and $underlowerwetstage gte 3
+	or $lowerwetstage gte 3 and $worn.under_lower.exposed gte 1
+	or $lowerwetstage gte 3 and $underlowerwetstage gte 3>>
+		<<beachicon "seaweed">><<link [[해초로 치마 만들기 (0:20)|Rocks]]>><<pass 20>><<set $phase to 2>><</link>>
+		<br>
+	<</if>>
+	<<swimicon "down">><<link [[물웅덩이로 들어가기 (0:01)|Rocks Pool]]>><<pass 1>><</link>>
+	<br>
+	<<oxygenrecovery>>
+	<br>
+	<<swimicon>><<link [[바다로 헤엄쳐 가기 (0:02)|Sea Rocks]]>><<pass 2>><</link>>
+	<br>
+<</if>>
+<<set $eventskip to 0>>
+<<storecleanup>>
+
+:: Rocks Pool
+<<location "searocks">>
+
+당신은 작은 물고기 떼를 헤치며 <<= $passagePrev.includes("Up") ? "수면 위로 솟아오릅니다" : "웅덩이로 들어갑니다">>. 바닷물보다 따뜻합니다.
+<br><br>
+
+<<water>><<waterbr 2>><<effects>>
+
+<<if $museumAntiques.antiques.antiquediamond isnot "found" and $museumAntiques.antiques.antiquediamond isnot "talk" and $museumAntiques.antiques.antiquediamond isnot "museum">>
+	저 아래 깊은 곳에서 무언가 빛을 반사합니다. 웅덩이는 깊습니다.
+	<br><br>
+<<else>>
+<</if>>
+
+<<if $settings.swarmsEnabled and hasSexStat("deviancy", 5) and $daily.rocksPoolInvite isnot 1>>
+	<<icon "invite-fish.png">><<link [[물고기 초대하기 (0:05)|Rocks Swarm Invite]]>><<set $daily.rocksPoolInvite to 1>><<pass 5>><</link>><<deviant5>>
+	<br>
+<</if>>
+<<swimicon "dive">><<link [[잠수하기 (0:01)|Rocks Dive]]>><<set _oxygenRecoveryBlocked to true>><<pass 1>><<set $phase to 0>><</link>>
+<br>
+<<swimicon "leave">><<link [[밖으로 나가기 (0:01)|Rocks]]>><<pass 1>><</link>>
+<br>
+
+:: Rocks Up
+<<effects>>
+
+<<if Time.dayState is "night">>
+	<<if !Weather.isOvercast>>
+		당신은 위쪽의 달빛을 향해 헤엄쳐, 차가운 밤바람 속으로 나옵니다.
+	<<else>>
+		너무 어두워서 어느 쪽이 위인지 분간하기 어렵습니다. 공황 상태에 빠지기 전에 차가운 밤바람 속으로 나옵니다.<<gstress>><<stress 6>>
+	<</if>>
+<<else>>
+	당신은 위쪽의 빛을 향해 헤엄쳐, 시원한 바닷바람 속으로 나옵니다.
+<</if>>
+<br><br>
+
+<<link [[다음|Rocks Pool]]>><</link>>
+<br>
+
+:: Rocks Dive
+<<set $outside to 0>><<underwater>><<effects>>
+
+<<if $phase is 0>>
+	물속으로 잠수합니다.
+	<<if $museumAntiques.antiques.antiquediamond isnot "found" and $museumAntiques.antiques.antiquediamond isnot "talk" and $museumAntiques.antiques.antiquediamond isnot "museum">>
+		아래에서 틀림없는 빛이 반짝입니다.
+	<<else>>
+		아래에 있는 동굴의 희미한 윤곽이 보입니다.
+	<</if>>
+<<elseif $phase is 1>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어가자, 지나가는 길에 물고기들이 놀랍니다.
+<<elseif $phase is 2>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 벽에 늘어선 성게들이 당신이 지나가자 닫힙니다.
+<<elseif $phase is 3>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 웅덩이 양옆에서 뭉텅이로 솟아난 해초가 당신을 둘러쌉니다.
+<<elseif $phase is 4>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 웅덩이가 좁아집니다.
+<<elseif $phase is 5>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 해초가 듬성듬성해집니다.
+<<elseif $phase is 6>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 절반 지점을 지났습니다.
+<<elseif $phase is 7>>
+	<<if $hallucinations gte 2>>
+		웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 바위벽에서 날카로운 돌출부가 아래를 향해 튀어나와 있습니다. 가시 돋친 이빨 같습니다.
+	<<else>>
+		날카로운 바위 돌출부를 피하며 웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다.
+	<</if>>
+<<elseif $phase is 8>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 벽이 더 매끄러워지고 어두워집니다.
+<<elseif $phase is 9>>
+	웅덩이 속으로 더 깊이 헤엄쳐 들어갑니다. 칠흑 같은 바위가 당신을 둘러쌉니다.
+	<<if $museumAntiques.antiques.antiquediamond isnot "found" and $museumAntiques.antiques.antiquediamond isnot "talk" and $museumAntiques.antiques.antiquediamond isnot "museum">>
+		빛이 가깝습니다.
+	<<else>>
+		동굴이 가깝습니다.
+	<</if>>
+<<elseif $phase is 10>>
+	더 깊이 헤엄쳐,
+	<<if $museumAntiques.antiques.antiquediamond isnot "found" and $museumAntiques.antiques.antiquediamond isnot "talk" and $museumAntiques.antiques.antiquediamond isnot "museum">>
+		반짝이는 것에 팔이 닿을 만큼 가까워집니다.
+	<<else>>
+		동굴과 같은 높이가 될 때까지.
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $phase is 10>>
+	<<if $rng lte 10>>
+		<<if $settings.voreEnabled>>
+			<<if $museumAntiques.antiques.antiquediamond isnot "found" and $museumAntiques.antiques.antiquediamond isnot "talk" and $museumAntiques.antiques.antiquediamond isnot "museum">>
+				빛을 향해 손을 뻗자 그 아래 모래가 움직입니다. 위로 헤엄치려 하지만 무언가 다리를 꽉 잡는 것이 느껴집니다. 몸을 비틀어 보니 거대한 굴이 당신을 삼키려 하고 있습니다!
+				<br><br>
+				<<link [[다음|Sea Vore]]>><<set $molestationstart to 1>><<set $vorecreature to "oyster">><</link>>
+			<<else>>
+				물속을 헤쳐 나아가자 무언가 다리를 꽉 잡습니다. 몸을 비틀어 보니 거대한 굴이 당신을 삼키려 하고 있습니다!
+				<br><br>
+				<<link [[다음|Sea Vore]]>><<set $molestationstart to 1>><<set $vorecreature to "oyster">><</link>>
+			<</if>>
+		<<else>>
+			물속을 헤엄치던 당신은 하마터면 다리를 물어뜯을 뻔한 거대한 굴을 간신히 피했다. 당신은 발차기를 세게 하며 위로 헤엄쳐 그것으로부터 멀어졌다.
+			<<trauma 12>><<stress 24>><<gtrauma>><<ggstress>>
+			<br><br>
+			<<swimicon "up">><<link [[위로 헤엄치기|Rocks Up]]>><<set $phase to 0>><</link>>
+			<br>
+			<<swimicon "down">><<link [[더 깊이 헤엄친다|Rocks Dive]]>><<wateraction>><</link>><<loxygen>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if $museumAntiques.antiques.antiquediamond isnot "found" and $museumAntiques.antiques.antiquediamond isnot "talk" and $museumAntiques.antiques.antiquediamond isnot "museum">>
+			<<antiqueicon "diamond">><<link [[잡아본다|Rocks Diamond]]>><<wateraction>><</link>><<swimmingdifficulty 450 550>><<loxygen>>
+			<br>
+		<<else>>
+			<<swimicon "back">><<link [[안으로 헤엄쳐 들어가기|Beach Cave Entrance]]>><</link>>
+			<br>
+		<</if>>
+		<<swimicon "up">><<link [[위로 헤엄치기|Rocks Up]]>><<set $phase to 0>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<swimicon "up">><<link [[위로 헤엄치기|Rocks Up]]>><<set $phase to 0>><</link>>
+	<br>
+	<<swimicon "down">><<link [[더 깊이 헤엄치기|Rocks Dive]]>><<wateraction>><<set $phase += 1>><</link>><<loxygen>>
+	<br>
+<</if>>
+
+:: Rocks Diamond
+<<underwater>><<effects>>
+
+<<if $swimmingSuccess>>
+	<<wearProp "antique diamond">>
+	<<set $antiquemoney += 2000>><<museumAntiqueStatus "antiquediamond" "found">>
+		<span class="green">당신은 해류를 거슬러 힘차게 헤엄친다.</span> 모래 한 줌과 함께 빛을 움켜쥐고 살펴본다. 손톱만한 하얀색 보석인데, 수집가에게는 가치가 있을지도 모른다.
+	<br><br>
+	<<earnFeat "Spelunking">>
+	당신은 모래에 발을 디디고 웅덩이에서 이어지는 동굴을 발견한다. 희미한 푸른빛이 동굴을 비추고 있다.
+	<br><br>
+	<<swimicon "up">><<link [[위로 헤엄친다|Rocks Up]]>><<set $phase to 0>><</link>>
+	<br>
+<<else>>
+	<<set $phase to 9>>
+		당신은 빛을 잡으려 하지만, <span class="red">해류가 당신을 밀어낸다.</span>
+		<br> 중심을 잡자, 웅덩이에서 이어지는 동굴이 보인다. 희미한 푸른빛이 동굴을 비추고 있다. 바닥에 있는 다른 불빛은 당신 아래쪽 가까이에 있다.
+	<br><br>
+
+	<<swimicon "up">><<link [[위로 헤엄친다|Rocks Up]]>><<set $phase to 0>><</link>>
+	<br>
+	<<swimicon "down">><<link [[더 깊이 헤엄친다|Rocks Dive]]>><<wateraction>><<set $phase += 1>><</link>><<loxygen>>
+	<br>
+<</if>>
+
+<<swimicon "back">><<link [[동굴로 헤엄쳐 들어가기|Beach Cave Entrance]]>><</link>>
+<br>
+
+:: Rocks Swarm Invite
+<<effects>>
+
+웅덩이 한가운데로 떠올라 다리를 벌립니다. 물고기들은 조심스럽게 다가왔다가 다시 어둠 속으로 사라집니다. 그러다 한 마리가 당신의 <<bottom>>【을를】 스치는 것이 느껴집니다. 그리고 <<breasts>>【을를】 스칩니다. 더 많은 물고기가 합류하고, 곧 당신 피부의 모든 부분을 미끄러지듯 지나갑니다.
+<<deviancy5>>
+
+<<link [[다음|Rocks Swarm]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Rocks Swarm
+<<location "searocks">><<effects>>
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<set $combat to 1>>
+	<<set $enemytype to "swarm">>
+	<<swarminit "fish" "물고기" "당신을 향해 다가온다" "당신을 포위한다" "뿌리친다" 6 6>>
+	<<set $water to 1>>
+	<<set $timer to 15>>
+<</if>>
+<br><br>
+<<swarmeffects>>
+<<swarm>>
+<<swarmactions>>
+<<if $orgasmdown gte 1>>
+	<span id="next"><<link [[다음|Rocks Swarm Finish]]>><</link>></span><<nexttext>>
+<<elseif $timer lte 0>>
+	<span id="next"><<link [[다음|Rocks Swarm Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Rocks Swarm]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Rocks Swarm Finish
+<<effects>>
+
+<<if $orgasmdown gte 1>>
+	당신의 절정 경련에 물고기들이 놀랍니다. 물고기들은 깊은 곳으로 헤엄쳐 가고, 당신은 물속에서 몸을 떨며 남겨집니다.
+	<br><br>
+<<else>>
+	만족한 물고기들은 깊은 곳으로 헤엄쳐 가고, 당신은 웅덩이에 홀로 남겨집니다.
+	<br><br>
+<</if>>
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Rocks Pool]]>><</link>>
+
+:: Sea Docks
+
+<<location "seadocks">><<water>><<waterbr 2>><<effects>>
+
+You are swimming in the sea near the docks, east of the beach.
+<<if Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		The dark water is hammered by rain all around you.
+	<<elseif Weather.precipitation is "snow">>
+		Dark water devours snow all around you.
+	<<else>>
+		The water is dark and foreboding.
+	<</if>>
+<<else>>
+	<<if Weather.precipitation is "rain">>
+		The surface is agitated by the deluge of rain.
+	<<elseif Weather.precipitation is "snow">>
+		The docks bustle with activity, workers wrapped warm against the cold.
+	<<else>>
+		The docks bustle with activity. The water is calm and clear.
+	<</if>>
+<</if>>
+<br><br>
+<<if $seaswim is 1>>
+	<<set $seaswim to 0>>
+	You spend some time swimming.
+	<<physique 3>><<swimmingskilluse>>
+	<<pass 30>>
+	<br><br>
+<</if>>
+<<if $exposed gte 1>>
+	You keep your <<lewdness>> hidden beneath the surface of the water.
+	<br><br>
+<</if>>
+<<if $stress gte $stressmax>>
+	<<passoutbeach>>
+<<else>>
+
+	<<if dangerEvent() and $eventskip is 0>>
+		<<eventssea>>
+	<<else>>
+		<<if $earSlime.forcedCommando isnot undefined and $worn.under_lower.name isnot "naked" and $hypnosis_traits.silence isnot 1>>
+			<span class="red">The slime in your ear refuses to allow you to climb onto the docks with swimwear on.</span>
+		<<else>>
+			<<docksicon>><<link [[Climb onto the docks (0:02)|Mer Street]]>><<pass 2>><</link>>
+		<</if>>
+		<br>
+		<<docksicon>><<link [[Climb the pilings (0:05)|Sea Docks Climb]]>><<pass 5>><</link>><<athleticsdifficulty 600 1500>>
+		<br>
+		<<swimicon "back">><<link [[Practise swimming (0:30)|Sea Docks]]>><<stress -6>><<tiredness 6>><<set $seaswim to 1>><<slimeEventEnd "swimming">><</link>><<gswimming>><<lstress>><<gtiredness>>
+		<br>
+		<<swimicon>><<link [[Swim out to sea (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea to 0>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+		<br><br>
+		<<seabeach>><<swimmingdifficultytext0>>
+		<br>
+		<<seacliffs>><<swimmingdifficulty 1 100>>
+		<br>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Sea Docks Climb
+<<effects>>
+
+<<if $daily?.fishing?.fishingPier?.fisher?.phase is "fishing">>
+	<<loadNPC 0 "fishing_pier_npc_fisher">><<person1>>
+	As you try and climb the piling, you see the <<person1>><<person>> above you, leaning over the railing with <<his>> arm outstretched, fishing rod forgotten on the planks of the pier. You grasp <<his>> hand, and <<he>> hauls you up and over the railing.
+	<br><br>
+
+	<<link [[Thank <<him>>|Fishing Pier Fisher Saved From Water]]>><</link>>
+	<br>
+	<<link [[Tell <<him>> you didn't need help|Sea Docks Fisher No Help]]>><</link>>
+<<else>>
+	You grab one of the pilings and try to haul yourself up, but the wood is slick with slime with nothing to get a proper grip on.
+	<br><br>
+
+	<<if $athleticsSuccess>>
+		<span class="green">But despite that, manage to get your arms over a cross-beam</span> and drag yourself up onto the pier over the railing.
+		<br><br>
+		<<if ["idle", "bet"].includes($daily?.fishing?.fishingPier?.whitney?.phase) and $whitneyromance isnot 1 and $rng lte 10>>
+			Just as you begin to climb up over the railing, Whitney's foot connects with your face and shoves you back down into the water.<<pain 4>><<gpain>>
+			<br><br>
+
+			When you surface again, you see Whitney doubled over with laughter, and soon waves to <<nnpc_he "Whitney">> friends and they begin walking down the pier, laughing and jeering at you as they walk away.<<stress 4>><<gstress>>
+			<br><br>
+
+			<<set $daily.fishing.fishingPier.whitney.phase to "finished">>
+			<<link [[Next|Sea Docks]]>><<set $eventskip to 1>><</link>>
+		<<else>>
+			<<link [[Next|Mer Pier]]>><</link>>
+		<</if>>
+	<<else>>
+		<span class="red">Your grip slips</span> and you drop back into the water.
+		<br><br>
+		<<if ["idle", "bet"].includes($daily?.fishing?.fishingPier?.whitney?.phase)>>
+			<<set $daily.fishing.fishingPier.whitney.climbAttempt to ($daily.fishing.fishingPier.whitney.climbAttempt ?? 0) + 1>>
+			<<if $daily.fishing.fishingPier.whitney.climbAttempt is 1>>
+				As you surface, you hear Whitney and <<nnpc_his "Whitney">> friends burst out in laughter.<<gstress>><<stress 4>>
+				<br><br>
+			<<elseif $daily.fishing.fishingPier.whitney.climbAttempt is 2>>
+				As you surface, you hear Whitney and <<nnpc_his "Whitney">> friends burst out in laughter. An empty can of cider bounces off your head.<<gpain>><<pain 5>><<gstress>><<stress 7>>
+				<br><br>
+			<<else>>
+				As you surface, Whitney leans over the railing. "You're pathetic, you know that?" <<nnpc_He "Whitney">> says. "Only good for one thing." <<nnpc_He "Whitney">> laughs, then jerks <<nnpc_his "Whitney">> head at <<nnpc_his "Whitney">> friends, and they all begin walking off the pier, laughing and jeering as they go.<<gstress>><<stress 7>>
+				<br><br>
+				<<set $daily.fishing.fishingPier.whitney.phase to "finished">>
+			<</if>>
+		<</if>>
+		<<link [[Next|Sea Docks]]>><<set $eventskip to 1>><</link>>
+	<</if>>
+<</if>>
+
+
+:: Sea Cliffs
+<<location "seacliffs">><<water>><<waterbr 2>><<effects>>
+
+당신은 부두 동쪽, 절벽 아래 바다에서 수영하고 있다. 위쪽에는 커다란 폭풍 배수구가 있어 폭포를 만들고 있다.
+<<if Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		어두운 물 위로 사방에서 비가 쏟아져 내린다.
+	<<elseif Weather.precipitation is "snow">>
+		어두운 물이 눈을 삼켜버린다.
+	<<else>>
+		물은 어둡고 불길하다.
+	<</if>>
+<<else>>
+	<<if Weather.precipitation is "rain">>
+		수면은 쏟아지는 비로 일렁인다.
+	<<elseif Weather.precipitation is "snow">>
+		눈 내리는 하늘 아래 물은 잔잔하다.
+	<<else>>
+		물은 잔잔하고 맑다.
+	<</if>>
+<</if>>
+<br><br>
+<<if $seaswim is 1>>
+	<<set $seaswim to 0>>
+	당신은 잠시 수영을 한다.
+	<<physique 3>><<swimmingskilluse>>
+	<<pass 30>>
+	<br><br>
+<</if>>
+<<if $exposed gte 1>>
+	당신은 <<lewdness>>【을를】 수면 아래에 숨긴다.
+	<br><br>
+<</if>>
+<<if $stress gte $stressmax>>
+	<<passoutbeach>>
+<<else>>
+
+	<<if dangerEvent() and $eventskip is 0>>
+		<<eventssea>>
+	<<else>>
+		<<swimmingdifficulty 1 100 true>>
+		<<if $swimmingSuccess>>
+			<span class="green">당신은 성공적으로 조류를 거슬러 헤엄칩니다.</span>
+			<br><br>
+			<<swimicon "back">><<link [[수영 연습하기 (0:30)|Sea Cliffs]]>><<stress -6>><<tiredness 6>><<set $seaswim to 1>><<slimeEventEnd "swimming">><</link>><<gswimming>><<lstress>><<gtiredness>><<swimmingdifficulty 1 100>>
+			<br>
+			<<swimicon>><<link [[바다로 헤엄쳐 나가기 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea to 0>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+			<br><br>
+			<<seadocks>><<swimmingdifficultytext0>>
+			<br>
+		<<else>>
+			조류를 거슬러 헤엄치려 하지만, <span class="red">당신에게는 너무 강합니다.</span> 당신은 바다로 휩쓸려 나갑니다.
+			<br><br>
+			<<link [[다음|Sea]]>><<set $sea to 0>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Sea
+<<location "sea">><<water>><<waterbr 2>><<effects>>
+
+<<if $sea is 0>>
+	당신은 바다에서 수영하고 있다. 마을 바깥 해변 근처다.
+	<<if Weather.dayState is "night">>
+		물 위로 불빛이 반짝인다.
+	<<elseif Weather.dayState is "dawn">>
+		아침 햇살에 그림자가 길어진다.
+	<<elseif Weather.dayState is "dusk">>
+		지는 해에 그림자가 길어진다.
+	<<else>>
+		활기로 북적인다.
+	<</if>>
+	<<physique>>
+	<br><br>
+	<<if $stress gte $stressmax>>
+		<<passoutsea>>
+	<<else>>
+
+		<<if dangerEvent() and $eventskip is 0>>
+			<<eventsdeepsea>>
+		<<else>>
+			<<swimmingdifficulty 1 100 true>>
+			<<if $swimmingSuccess>>
+				<span class="green">조류를 거슬러 헤엄치는 데 성공했다.</span>
+				<br><br>
+				<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<set $sea += 10>><<pass 10>><<tiredness 2>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+				<br>
+				<<swimicon "back">><<link [[해안으로 헤엄쳐 간다 (0:10)|Sea Beach]]>><<pass 10>><<tiredness 2>><<set $sea to 0>><</link>><<gtiredness>><<swimmingdifficultytext0>>
+				<br>
+			<<else>>
+				조류를 거슬러 헤엄치려 했지만, <span class="red">물살이 너무 강하다.</span> 당신은 더 먼 바다로 휩쓸려 나간다.
+				<br><br>
+				<<link [[다음|Sea]]>><<set $sea += 10>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<<elseif $sea lte 20>>
+	당신은 바다에서 수영하고 있다.
+	<<if Time.dayState is "night">>
+		가까운 마을이 보이고, 그 불빛이 물 위에서 반짝인다.
+	<<else>>
+		가까운 마을이 보인다.
+	<</if>>
+	<<physique>>
+	<br><br>
+	<<if $stress gte $stressmax>>
+		<<passoutsea>>
+	<<else>>
+
+		<<if dangerEvent() and $eventskip is 0>>
+			<<eventsdeepsea>>
+		<<else>>
+			<<swimmingdifficulty 1 100 true>>
+			<<if $swimmingSuccess>>
+				<span class="green">조류를 거슬러 헤엄치는 데 성공했다.</span>
+				<br><br>
+				<<if $sea gte 40>>
+					<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea += 10>><</link>><<gtiredness>><<swimmingdifficulty 1 200>>
+					<br>
+				<<else>>
+					<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea += 10>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+					<br>
+				<</if>>
+				<<swimicon "back">><<link [[해안으로 헤엄쳐 간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea -= 10>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+				<br>
+			<<else>>
+				조류를 거슬러 헤엄치려 했지만, <span class="red">물살이 너무 강하다.</span> 당신은 더 먼 바다로 휩쓸려 나간다.
+				<br><br>
+				<<link [[다음|Sea]]>><<set $sea += 10>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<<elseif $sea lte 50>>
+	당신은 바다에서 수영하고 있다.
+	<<if Time.dayState is "night">>
+		<<if !Weather.isOvercast>>
+			멀리서 마을이 밤하늘을 배경으로 빛나고 있다.
+		<<else>>
+			멀리 마을이 보인다. 주황색 불빛이 그 위 구름을 밝히고 있다.
+		<</if>>
+	<<else>>
+		멀리 마을이 보인다.
+	<</if>>
+	<<physique>>
+	<br><br>
+	<<if $stress gte $stressmax>>
+		<<passoutsea>>
+	<<else>>
+
+		<<if dangerEvent() and $eventskip is 0>>
+			<<eventsdeepsea>>
+		<<else>>
+			<<swimmingdifficulty 1 200 true>>
+			<<if $swimmingSuccess>>
+				<span class="green">조류를 거슬러 헤엄치는 데 성공했다.</span>
+				<br><br>
+				<<if $sea gte 40>>
+					<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea += 10>><</link>><<gtiredness>><<swimmingdifficulty 1 300>>
+					<br>
+				<<else>>
+					<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea += 10>><</link>><<gtiredness>><<swimmingdifficulty 1 200>>
+					<br>
+				<</if>>
+				<<swimicon "back">><<link [[해안으로 헤엄쳐 간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea -= 10>><</link>><<gtiredness>><<swimmingdifficulty 1 100>>
+				<br>
+			<<else>>
+				조류를 거슬러 헤엄치려 했지만, <span class="red">물살이 너무 강하다.</span> 당신은 더 먼 바다로 휩쓸려 나간다.
+				<br><br>
+				<<link [[다음|Sea]]>><<set $sea += 10>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<<elseif $sea lte 99>>
+	당신은 바다에서 수영하고 있다.
+	<<if Time.dayState is "night">>
+		<<if !Weather.isOvercast>>
+			수평선 너머로 마을이 빛나는 것이 보인다.
+		<<else>>
+			수평선 너머로 마을이 보이고, 그 위 구름을 밝히고 있다.
+		<</if>>
+	<<else>>
+		수평선 너머로 마을이 보인다.
+	<</if>>
+	<<physique>>
+	<br><br>
+	<<if $stress gte $stressmax>>
+		<<passoutsea>>
+	<<else>>
+
+		<<if dangerEvent() and $eventskip is 0>>
+			<<eventsdeepsea>>
+		<<else>>
+			<<swimmingdifficulty 1 300 true>>
+			<<if $swimmingSuccess>>
+				<span class="green">조류를 거슬러 헤엄치는 데 성공했다.</span>
+				<br><br>
+				<<if $sea gte 90>>
+					<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea += 10>><</link>><<gtiredness>><<swimmingdifficulty 1 400>>
+					<br>
+				<<else>>
+					<<swimicon>><<link [[더 멀리 헤엄쳐 나간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea += 10>><</link>><<gtiredness>><<swimmingdifficulty 1 300>>
+					<br>
+				<</if>>
+				<<if $sea lte 60>>
+					<<swimicon "back">><<link [[해안으로 헤엄쳐 간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea -= 10>><</link>><<gtiredness>><<swimmingdifficulty 1 200>>
+					<br>
+				<<else>>
+					<<swimicon "back">><<link [[해안으로 헤엄쳐 간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea -= 10>><</link>><<gtiredness>><<swimmingdifficulty 1 300>>
+					<br>
+				<</if>>
+			<<else>>
+				조류를 거슬러 헤엄치려 했지만, <span class="red">물살이 너무 강하다.</span> 당신은 더 먼 바다로 휩쓸려 나간다.
+				<br><br>
+				<<link [[다음|Sea]]>><<set $sea += 10>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<<elseif $sea gte 100>>
+	<<set $sea to 100>>
+	당신은 바다에서 수영하고 있다.
+	<<if Time.dayState is "night">>
+		근처에 섬이 하나 있다. 밤이라 어둠에 가려져 있지만 등대 덕분에 볼 수 있다. 불빛은 불규칙한 패턴으로 각도를 바꾸며 호를 그린다.
+	<<else>>
+		근처에 섬이 하나 있다. 요새가 섬을 장악하고 있으며, 들쭉날쭉한 바위들로 둘러싸여 있다.
+	<</if>>
+	<<physique>>
+	<br><br>
+	<<earnFeat "The Endless Deep">>
+	<<if $stress gte $stressmax>>
+		<<passoutsea>>
+	<<else>>
+
+		<<if dangerEvent() and $eventskip is 0>>
+			<<eventsdeepsea>>
+		<<else>>
+			<<swimmingdifficulty 1 400 true>>
+			<<if $swimmingSuccess>>
+				<span class="green">조류를 거슬러 헤엄치는 데 성공했다.</span>
+				<br><br>
+				<<swimicon "back">><<link [[해안으로 헤엄쳐 간다 (0:10)|Sea]]>><<pass 10>><<tiredness 2>><<set $sea -= 10>><</link>><<gtiredness>><<swimmingdifficulty 1 300>>
+				<br>
+			<<else>>
+				조류를 거슬러 헤엄치려 했지만, <span class="red">물살이 너무 강하다.</span> 당신은 더 먼 바다로 휩쓸려 나간다.
+				<br><br>
+				<<link [[다음|Sea]]>><<set $sea += 10>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>

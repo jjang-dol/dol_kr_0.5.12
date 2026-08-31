@@ -1,0 +1,268 @@
+:: Alex Gifts List
+<<effects>>
+<<npc "Alex">>
+
+알렉스에게 무엇을 주고 싶으신가요?
+<br><br>
+<<food_gift_list>>
+
+<<if _food_gift_found is true>>
+	<<skinicon "give">><<link [[선물 주기 (0:05)|Alex Gifts]]>><<endevent>><<pass 5>><<give_gift Alex>><</link>>
+	<br>
+<</if>>
+<<refuseicon>><<link [[다시 생각한다|Alex Gifts Reconsider]]>><</link>>
+<br>
+
+:: Alex Gifts Reconsider
+<<effects>>
+
+알렉스가 당신을 보고 미소 짓는다.
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts
+<<effects>>
+<<npc Alex>><<person1>>
+<<set _gift to setup.foodstuff[$gift].name + (setup.foodstuff[$gift].food.handheld_gift ? " gift" : "")>>
+<<wearProp _gift>>
+
+<<if $phase is 1>>
+	"I've brought you something," you say.
+<<elseif $phase is 2>>
+	"I made something," you say. "Just for you."
+<<else>>
+	"I've made you a gift," you say. "I hope you like it."
+<</if>>
+<br><br>
+
+<<if $gift is "full_english_breakfast">>
+	Alex grins. "It's never the wrong time of day for such a breakfast," <<he>> says, grabbing a handy knife and fork from a drawer. <<He>> tucks in at once, pausing only to wipe grease from <<his>> chin.<<gglove>><<npcincr Alex love 3>>
+	<br><br>
+
+	<<link [["Tell " + $NPCList[0].pronouns.him + " to eat more gracefully"|Alex Gifts Breakfast Tell]]>><<npcincr Alex dom -1>><</link>><<ldom>>
+	<br>
+	<<link [[Just watch|Alex Gifts Breakfast Watch]]>><</link>>
+	<br>
+	<<saveFavoriteFood "Alex" $gift>>
+	<<earnFeat "Home Cooking">>
+<<elseif $gift is "apple_crumble">>
+	"Apple crumble!" Alex says as you place the dessert in front of <<him>>. "My favourite!" <<He>> tucks in, shovelling large spoonfuls into <<his>> mouth in one go.
+	<br><br>
+	"The fruit has just the right amount of tartness," <<he>> says with <<his>> mouth full. "You're a good cook."<<gglove>><<npcincr Alex love 3>>
+	<br><br>
+	<<link [[Thank|Alex Gifts Crumble Thank]]>><</link>>
+	<br>
+	<<link [[Compliment|Alex Gifts Crumble Compliment]]>><<npcincr Alex dom 1>><</link>><<gdom>>
+	<br>
+	<<saveFavoriteFood "Alex" $gift>>
+	<<earnFeat "Home Cooking">>
+<<elseif $gift is "steak">>
+	<<if !$per_npc.alexs_parent2>>
+		<<generate2>>
+		<<saveNPC 1 "alexs_parent2">>
+	<<else>>
+		<<loadNPC 1 "alexs_parent2">>
+	<</if>>
+	"This looks fancy," Alex says, observing the steak in front of <<him>>. "Like something prepared in a restaurant." <<He>> slices part of the meat, and seems surprised by its tenderness.
+	<br><br>
+	"Wow," <<he>> says through a mouthful. "My <<person2>><<ma>> would love this."<<gglove>><<npcincr Alex love 3>>
+	<br><br>
+	<<person1>><<He>> eats a bit too fast. You're worried <<hes>> going to choke.
+	<br><br>
+
+	<<link [[Get some water|Alex Gifts Steak Water]]>><<npcincr Alex love 1>><</link>><<glove>>
+	<br>
+	<<link [[Just wait|Alex Gifts Steak Wait]]>><</link>>
+	<br>
+	<<saveFavoriteFood "Alex" $gift>>
+	<<earnFeat "Home Cooking">>
+<<elseif $gift is "valentines_chocolate" and $valentines>>
+	<<earnFeat "Be My Valentine">>
+	You hand Alex the box of chocolates. <<He>> smiles. "Valentines chocolates!
+	<<if $farm_stage gte 7>>
+		Of course I'll be your Valentine."
+	<<else>>
+		You surprise me, but it's not unwelcome. I'll be your Valentine if you'll be mine."
+	<</if>>
+	<<gglove>><<npcincr Alex love 3>>
+	<br><br>
+	<<He>> opens the box, and pops one of the chocolates into <<his>> mouth. "Very nice," <<he>> says while chewing. "You've so many talents." <<He>> eats another, and another. Seems <<hes>> worked up quite the appetite for chocolate.
+	<br><br>
+	<<if $farm_stage gte 7 and $alex_countdown is undefined>>
+		<<He>> puts the empty box aside, and smiles at you. "Do I owe you a kiss?"
+		<br><br>
+
+		<<link [[Kiss|Alex Gifts Valentines Kiss]]>><<npcincr Alex love 3>><</link>><<kissvirginitywarning>><<gglove>>
+		<br>
+		<<link [[Present your cheek|Alex Gifts Valentines Cheek]]>><<npcincr Alex love 1>><</link>>
+		<br>
+		<<link [[Say it's not necessary|Alex Gifts Valentines Not]]>><</link>>
+		<br>
+	<<else>>
+		<<He>> puts the empty box aside, and smiles at you. "Don't tell my parents I ate them so fast. They were always on at me for that."
+		<br><br>
+		<<link [[Next|Farm Alex Bedroom]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif setup.foodstuff[$gift].food.tags.includes("spicy")>>
+	You place the <<recipe_name $gift>> in front of Alex. <<He>> licks <<his>> lips. "Smells spicy," <<he>> says, lifting <<his>> cutlery. "I hope it's really hot."
+	<br><br>
+	<<He>> tucks in, showing no sign of pain at first, but it's not long before tears start to stream. <<He>> doesn't stop eating though, until the dish is empty.
+	<br><br>
+	"Thanks," <<he>> says, wiping <<his>> cheeks with a tissue. "It's like you'd get at a restaurant, but more wholesome, somehow."<<glove>><<npcincr Alex love 1>>
+	<br><br>
+	<<link [[Next|Farm Alex Bedroom]]>><<endevent>><</link>>
+	<br>
+<<elseif setup.foodstuff[$gift].food.tags.includes("drink")>>
+	You hand Alex the <<recipe_name $gift>>. <<He>> swirls it around. "Looks refreshing," <<he>> says. Then takes a sip. "Mmm." <<He>> takes a gulp. "That hits the spot."<<glove>><<npcincr Alex love 1>>
+	<br><br>
+
+	<<He>> finishes the rest of the drink in one go, and releases a satisfied sigh as <<he>> slams the empty vessel against <<his>> desk. "Thanks."
+	<br><br>
+
+	<<link [[Next|Farm Alex Bedroom]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if !$per_npc.alexs_parent1>>
+		<<generate2>>
+		<<saveNPC 1 "alexs_parent1">>
+	<<else>>
+		<<loadNPC 1 "alexs_parent1">>
+	<</if>>
+	You hold out the <<recipe_name $gift>>. Alex whistles. "That looks delicious," <<he>> says. "All for me? Thank you."
+	<br><br>
+	<<He>> takes a bite. <<His>> enjoyment is clear at once. "You're a good cook," <<he>> says. "Better than <<person2>><<Mum>>." Another bite. "Don't tell <<him>> I said that."
+	<br><br>
+	<<person1>><<He>> puts down the plate. "Don't hesitate to feed me again should the idea strike you."<<glove>><<npcincr Alex love 1>>
+	<br><br>
+	<<link [[Next|Farm Alex Bedroom]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Alex Gifts Valentines Kiss
+<<effects>>
+
+당신은 알렉스의 허리를 감싸 안고 몸을 기댄다. <<His>> 키스는 깊고 오래 지속된다.
+<<takeKissVirginity "Alex" "loveInterest">>
+<br><br>
+
+알렉스가 미소를 지으며 몸을 뗀다. "그 초콜릿은 그렇게 낮은 가격에 거저나 다름없지." <<he>>【이가】 말한다. "아예 가격이 없는 거나 마찬가지야."
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Valentines Cheek
+<<effects>>
+
+알렉스는 당신의 뜻을 알아차리고, 허리에 팔을 두른 뒤 뺨에 키스한다.
+<br><br>
+
+"고마워, 자기." <<he>>【이가】 다시 미소를 지으며 말한다. "일 년 중 어느 때라도 초콜릿은 더 먹을 수 있지."
+<br><bR>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Valentines Not
+<<effects>>
+
+"상처받았어." 알렉스가 <<his>> 심장에 손을 얹고 맞은 것처럼 뒤로 기대며 말하지만, <<he>>【은는】 미소를 멈추지 않는다. "네 사랑을 얻을 방법을 찾아야겠네. 그리고 네 초콜릿도 더 많이."
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Breakfast Tell
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"좀 흘리고 있잖아." 당신이 말한다. "카펫 주려고 만든 게 아니라, 너 주려고 만든 거야."
+<<elseif $speech_attitude is "bratty">>
+	"돼지처럼 먹네." 당신이 말한다.
+<<else>>
+	"고아원에서는 그렇게 지저분하게 먹으면 혼났을 텐데." 당신이 말한다.
+<</if>>
+<br><br>
+
+"미안." 알렉스가 입에 음식을 가득 넣은 채 말한다. "너무 맛있어서 그래." <<He>>【은는】 부스러기를 치우고, 좀 더 차분한 속도로 먹기 시작한다.
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Breakfast Watch
+<<effects>>
+<<loadNPC 1 "alexs_parent2">>당신은 알렉스가 음식을 게걸스럽게 먹는 것을 지켜본다. <<He>>【은는】 식사를 마치자 의자에 등을 기대고, <<his>> 눈을 감는다. 만족스러운 미소가 <<his>> 얼굴에 번진다. "고마워." <<he>>【이가】 말한다. "<<person2>><<ma>>【이가】 만들어주던 것보다 훨씬 맛있네." <<person1>>
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Crumble Thank
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"고마워." 당신이 말한다. "정말 큰 힘이 돼."
+<<elseif $speech_attitude is "bratty">>
+	"알아줘서 고마워." 당신이 말한다.
+<<else>>
+	"고마워." 당신이 말한다.
+<</if>>
+<br><br>
+
+"별거 아니야." 알렉스가 말하며 부스러기를 흘린다. "너 같은 사람이 있어서 난 행운아야."
+<br><br>
+
+<<He>>【은는】 디저트를 다 먹고 기지개를 켠다.
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Crumble Compliment
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"농장에서 정말 열심히 일하잖아." 당신이 말한다. "그래서 나도 최선을 다했어."
+<<elseif $speech_attitude is "bratty">>
+	"네 기운을 북돋아 줘야지." 당신이 말한다. "정말 열심히 일하잖아."
+<<else>>
+	"농장에서 정말 열심히 일하잖아." 당신이 말한다. "그러니 당연한 거야."
+<</if>>
+<br><br>
+
+알렉스가 자랑스럽게 미소 짓는다. "고마워." <<he>>【이가】 말하며 <<his>> 셔츠에 부스러기를 떨어뜨린다. "정말 친절하구나."
+<br><br>
+
+<<He>>【은는】 크럼블을 다 먹고 만족스럽게 트림한다.
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Steak Water
+<<effects>>
+
+당신은 알렉스에게 물을 가져다준다. <<He>>【은는】 물을 벌컥벌컥 마신다. "고마워, 자기." <<he>>【이가】 말하고는, 스테이크를 <<his>> 입에 더 쑤셔 넣는다.
+<br><br>
+
+<<He>>【은는】 식사를 마치고 등을 기대며 <<his>> 배를 두드린다. "요리 잘하네."
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>
+
+:: Alex Gifts Steak Wait
+<<effects>>
+
+당신은 알렉스가 식사를 마칠 때까지 기다린다. 한 번은, <<he>>【이가】 급하게 먹던 스테이크 조각에 목이 막혔지만, 당신의 도움을 거절하며 <<his>> 손을 들어 보이고는 기침으로 뱉어내는 데 성공한다.
+<br><br>
+
+<<He>>【은는】 숨을 들이쉬고, 한숨을 내쉬며 미소 짓는다. "요리 잘하네."
+<br><br>
+
+<<link [[다음|Farm Alex Bedroom]]>><<endevent>><</link>>
+<br>

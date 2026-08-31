@@ -1,0 +1,803 @@
+:: Widgets Photo [widget]
+<<widget "street_niki">>
+	<<npc Niki>><<person1>>
+	차 한 대가 당신 옆에 차를 댄다. 입에 하얀 막대를 문 젊은 <<personsimple>>【이가】 몸을 내민다.
+
+	<<if $nikiSeen.includes("farm")>>
+		니키다. 레미 농장의 그 사진작가다. 당신은 발걸음을 재촉한다.
+		<br><br>
+		"잠깐만," 당신과 보조를 맞추기 위해 속도를 높이며 <<he>>【이가】 말한다. "금방 끝낼게. 그때 난... 제정신이 아니었어. <span class="gold">난 나이팅게일 가에서 사진관을 운영하고 있어.</span> 전부 합법적인 일이지. 일거리가 필요하면 언제 한 번 들러."
+		<br><br>
+
+		당신은 골목으로 쏜살같이 들어가, 차를 몰고 떠나게끔 <<him>>【을를】 남겨둔다.
+		<br><br>
+
+		<<endevent>>
+		<<destinationeventend>>
+	<<else>>
+		"안녕," <<he>>【이가】 말한다. "시간 좀 있어?"
+		<br><br>
+
+		<<link [[멈춰 선다|Photo Street Stop]]>><<npcincr Niki love 1>><</link>><<glove>>
+		<br>
+		<<link [[걸음을 재촉한다|Photo Street Hasten]]>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "photo_evidence_upload">>
+	<<He>>【은는】 과장된 몸짓으로 핸드폰 화면을 두드리더니, <span class="pink">인터넷에 영상을 업로드해버린다.</span>
+	<<if $photo.blackmail is 1>>
+		<<fameexhibitionism 20 "vid">>
+		<<if playerBellyVisible()>><<famepregnancy `Math.ceil(playerBellySize() / 10)`>><</if>>
+		당신의 벗은 몸이 만천하에 공개된다.
+		<<if !$worn.face.type.includes("mask")>>
+			<<set $photo.nude_footage to 1>>
+		<</if>>
+	<<elseif $photo.blackmail is 2>>
+		<<famerape 20 "vid">>
+		<<fameexhibitionism 20 "vid">>
+		<<if playerBellyVisible()>><<famepregnancy `Math.ceil(playerBellySize() / 10)`>><</if>>
+		당신이 강간당하는 영상이 만천하에 공개되어 버린다.
+		<<set $photo.assault_footage to 1>>
+	<</if>>
+<</widget>>
+
+<<widget "photo_end">>
+	<<pass $photo.time>>
+	<<timeTrackingManual "photoStudio" $photo.time "minute">>
+	<<tiredness 18>>
+	<<set $photo.time to 0>>
+	<<set $photo.blackmail to 0>>
+	<<set $photo.money to 0>>
+	<<unset $photo_upper_index>>
+	<<unset $photo_lower_index>>
+	<<unset $photo_under_index>>
+	<<unset $photo_upper_f_index>>
+	<<unset $photo_lower_f_index>>
+	<<unset $photo_under_f_index>>
+	<<unset $photo_upper_m_index>>
+	<<unset $photo_lower_m_index>>
+	<<unset $photo_under_m_index>>
+	<<set $eventskip to 1>>
+	<<endevent>>
+<</widget>>
+
+<<widget "photo_high_money_calc">>
+	<<set _photo_money to ($photo_flyers + ($photo_interest * 10))>>
+<</widget>>
+
+<<widget "photo_high_calc">>
+	<<photo_high_money_calc>>
+	<<set _photo_fame to Math.trunc($photo_interest / 10)>>
+	<<if $photo_flyers gte 100>>
+		<<earnFeat "Stomping Down The Street">>
+	<</if>>
+	<<if $photo_flyers gte 250>>
+		<<earnFeat "Hear Me Roar">>
+	<</if>>
+<</widget>>
+
+<<widget "photo_high_abduction_options">>
+	<<if !$photo_high_abduction_options.includes("camera")>>
+		<<link [[카메라가 안 된다고 말한다|Photo High Exhibitionism Abduction Camera]]>><<set $photo_high_abduction_options.pushUnique("camera")>><</link>><<skill_difficulty currentSkillValue('science') "Science" 1 1000>>
+		<br>
+	<</if>>
+	<<if !$worn.face.type.includes("mask") and !$photo_high_abduction_options.includes("mask")>>
+		<<link [[얼굴을 가릴 마스크가 필요하다고 말한다|Photo High Exhibitionism Abduction Mask]]>><<set $photo_high_abduction_options.pushUnique("mask")>><</link>><<englishdifficulty 1 1000>>
+		<br>
+	<</if>>
+	<<if !$photo_high_abduction_options.includes("tell")>>
+		<<link [[사람들이 당신을 찾고 있다고 말한다|Photo High Exhibitionism Abduction Tell]]>><<set $photo_high_abduction_options.pushUnique("tell")>><</link>><<englishdifficulty 1 600>>
+		<br>
+	<</if>>
+	<<if !$photo_high_abduction_options.includes("flirt")>>
+		<<link [[추파를 던져 시선을 분산시킨다|Photo High Exhibitionism Abduction Flirt]]>><<set $photo_high_abduction_options.pushUnique("flirt")>><</link>>
+		<br>
+	<</if>>
+	<<if !$photo_high_abduction_options.includes("hair")>>
+		<<link [[머리를 단정히 해야 한다고 말한다|Photo High Exhibitionism Abduction Hair]]>><<set $photo_high_abduction_options.pushUnique("hair")>><</link>>
+		<br>
+	<</if>>
+	<<link [[그냥 그들이 원하는 대로 한다|Photo High Exhibitionism Abduction 2]]>><</link>>
+	<br>
+<</widget>>
+
+
+<<widget "photo_high_events">>
+<<photo_high_check_location>>
+<<cleareventpool>>
+<<addinlineevent "photo_high_1" 1>>
+	당신은 팬들을 위해 포즈를 취하려 멈춰 서고는, 이 기회를 틈타 전단지를 더 나누어준다.<<ginterest>><<photo_interest 1>>
+	<<wearProp "flyers">>
+	<br><br>
+	<<set $photo_flyers += 3>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_2" 1>>
+	<<generate1>><<person1>>
+	<<person>>【이가】 길 건너편에서 당신에게 소리친다.
+	<br>
+	<<rng 4>>
+	<<switch $rng>>
+		<<case 5>>
+			"그 의상 밑에 아주 죽여주는 엉덩이가 숨겨져 있을 거라 장담하지."
+		<<case 4>>
+			"그 밑에 아무것도 안 입고 있을 거라 장담하지."
+		<<case 3>>
+			"간식 좀 먹을래?" <<He>>【은는】 <<his>> 사타구니를 가리킨다.
+		<<case 2>>
+			"요즘 창녀들은 옷을 이상하게 입고 다닌다니까."
+	<</switch>>
+	<<gstress>><<stress 6>>
+	<br><br>
+	무슨 소란인지 사람들이 쳐다본다.<<gattention>><<photo_attention 1>>
+	<br><br>
+
+	<<endevent>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_3" 1>>
+	<<beastNEWinit 1 dog>>
+	당신의 의상이 <<beasttype>>【을를】 놀라게 했다. <<bHe>>【은는】 <<bhis>> 주인을 끌고 도망친다.<<gattention>><<photo_attention 1>>
+	<br><br>
+
+	<<endevent>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_4" 1>>
+	<<generate1>><<person1>>
+	<<person1>><<person>>【이가】 지나가다가,
+
+	<<if currentSkillValue("dancing") gte random(1, 1000)>>
+		당신 손에 든 전단지를 쳐내려 한다. 의상의 무게가 무색하게 날렵한 스텝으로, 당신은 비켜선다. <span class="green"><<He>>【은는】 당신을 놓친다.</span> 그 반동으로 <<he>>【은는】 바닥에 엎어진다.<<ginterest>><<photo_interest 1>>
+		<<wearProp "flyers">>
+		<br><br>
+
+		<<He>>【은는】 자리에서 일어나, 당신을 보지도 않고 걸어가 버린다.
+		<br><br>
+
+		<<endevent>>
+		<<photo_high_options>>
+	<<else>>
+		<span class="red">당신 손에 든 전단지를 쳐내 버린다.</span> 전단지를 다 줍는 데 1분이 걸린다.<<photo_pass 1>><<photo_heat 1>>
+		<br><br>
+
+		<<endevent>>
+		<<photo_high_options>>
+	<</if>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_5" 1>>
+	길 건너편에 있는 두 명의 관광객이 당신을 가리키며 사진을 찍는다.<<famemodel 1 "pic">>
+	<br><br>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_6" 1>>
+	<<beastNEWinit 1 dog>>
+	주인이 개를 부를 때까지, 개 한 마리가 당신 의상의 꼬리를 물어뜯는다.
+	<br><br>
+	<<endevent>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_7" 1>>
+	<<generate1>><<person1>>
+	사람들이 식당 창문 너머로 당신을 구경한다. <<person1>><<person>>【이가】 사진을 찍는다.<<famemodel 1 "pic">>
+	<br><br>
+
+	<<endevent>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_8" 1>>
+	<<generatey1>><<generatey2>><<person1>>
+	저 앞에 <<person>>【와과】 <<person2>><<person>>【이가】 보인다. 학교에서 본 적 있는 얼굴들이다.
+
+	<<photo_high_options_check>>
+	<<if $rng gte 67>>
+		그들은 인기가 많고 가십거리를 좋아하기로 유명하다.<<gstress>><<stress 6>>
+		<br><br>
+		<<if _photo_options>>
+			<<link [[인사한다|Photo High School Popular Hello]]>><</link>><<skill_difficulty $cool "School Status" 1 240>>
+			<br>
+		<</if>>
+	<<elseif $rng gte 33>>
+		그들은 예전에 당신에게 친근하게 대해준 적이 있다.
+		<br><br>
+		<<if _photo_options>>
+			<<link [[인사한다|Photo High School Friendly Hello]]>><<photo_interest 1>><</link>><<ginterest>>
+			<br>
+		<</if>>
+	<<else>>
+		그들은 꽤 괴짜 같아서 아마 당신의 의상을 좋아할 것이다.
+		<br><br>
+		<<if _photo_options>>
+			<<link [[인사한다|Photo High School Nerdy Hello]]>><<photo_interest 1>><</link>><<ginterest>>
+			<br>
+		<</if>>
+	<</if>>
+	<br>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_9" 1>>
+	비둘기 한 마리가 당신의 머리 위에 내려앉는다. 구경꾼들은 이를 재미있어한다.<<ginterest>><<photo_interest 1>>
+	<br><br>
+
+	<<endevent>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<addinlineevent "photo_high_10" 1>>
+	<<generate1>><<person1>>
+	<<person>>【이가】 당신을 향해 으르렁거린다.
+	<br><br>
+
+	<<photo_high_options_check>>
+	<<if _photo_options>>
+		<<link [[마주 으르렁거린다|Photo High Growl]]>><<photo_attention 1>><<photo_interest 1>><</link>><<gattention>><<ginterest>>
+		<br>
+	<</if>>
+	<<photo_high_options>>
+<</addinlineevent>>
+
+<<if Weather.precipitation is "rain">>
+	<<addinlineevent "photo_rain_1" 1>>
+		<<generatey1>><<person1>>
+		가는 길에 웅덩이를 발견한다. 꼬리를 들어 올리고 웅덩이를 넘어간다. 지켜보던 <<person>>【은는】 이 모습을 웃기다고 생각한다.<<ginterest>><<photo_interest 1>>
+		<br><br>
+
+		<<endevent>>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if Weather.precipitation is "snow">>
+	<<addinlineevent "photo_snow_2" 1>>
+		빙판에 미끄러진다. 두꺼운 의상 덕분에 다치지는 않았지만, 기분이 좋지는 않다.<<gattention>><<gstress>><<photo_attention 1>><<stress 6>>
+		<br><br>
+
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_attention[_photo_location] gte 2>>
+	<<addinlineevent "photo_high_danger_1" 1.15>>
+		<<generate1>><<generate2>><<person1>>
+		<<person>>【와과】 <<person2>><<person>>【이가】 당신에게 다가온다. "같이 사진 좀 찍어도 될까요?" <<person2>><<person>>【이가】 묻는다.
+		<br><br>
+
+		<<link [[동의한다|Photo High Agree]]>><</link>>
+		<br>
+		<<link [[동의하고, 알맞은 포즈를 취한다|Photo High Agree Pose]]>><<famemodel 1 "pic">><<photo_interest 1>><<photo_attention 1>><</link>><<gattention>><<ginterest>>
+		<br>
+		<<if $wolfgirl gte 6 or $cat gte 6 or $harpy gte 6>>
+			<<link [[동의하고, 포식자 같은 포즈를 취한다|Photo High Agree Predatory]]>><<famemodel 1 "pic">><<photo_interest 2>><<photo_attention 1>><</link>>
+			<<defianttext>>
+			<<if $wolfgirl gte 6>>
+				<<wolfgirl>>
+			<</if>>
+			<<if $cat gte 6>>
+				<<cat>>
+			<</if>>
+			<<if $harpy gte 6>>
+				<<harpy>>
+			<</if>>
+			<<gattention>><<gginterest>>
+			<br>
+		<</if>>
+		<<link [[거절한다|Photo High Decline]]>><</link>>
+		<br>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_attention[_photo_location] gte 4>>
+	<<addinlineevent "photo_high_danger_2" 1.30>>
+		<<generate1>><<person1>>
+		<<person>>【이가】 다가오더니 주저함이나 예고도 없이 손을 뻗어 당신의 <<breasts>>【을를】 더듬는다.<<gstress>><<stress 6>><<garousal>><<arousal 600>>
+		<br><br>
+
+		<<if $worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked")>>
+			"내 그럴 줄 알았지." 구경꾼들을 향하듯 고개를 돌리며 <<he>>【이가】 말한다. "<<pShe>>【은는】 이 밑에 아무것도 안 입었어." 몇 명의 사람들이 고개를 더 돌린다.<<gstress>><<gattention>><<ginterest>><<stress 6>><<photo_attention 1>><<photo_interest 1>>
+			<br><br>
+		<</if>>
+
+		<<link [[견딘다|Photo High Endure]]>><<trauma 6>><<stress 6>><<photo_interest 1>><</link>><<gtrauma>><<gstress>><<ginterest>>
+		<br>
+		<<link [[찰싹 때린다|Photo High Smack]]>><<famescrap 1 "pic">><<photo_attention 1>><<stress -6>><</link>><<gattention>><<lstress>>
+		<br>
+		<<if $submissive lte 500>>
+			<<link [[포효한다|Photo High Roar]]>><<famescrap 1 "pic">><<photo_attention 1>><<photo_interest 2>><<stress -6>><<famemodel 1 "pic">><</link>><<defianttext>><<gattention>><<gginterest>><<lstress>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+<</if>>
+
+
+<<if $photo_attention[_photo_location] gte 6>>
+	<<addinlineevent "photo_high_danger_3" 1.45>>
+		<<generatey1>><<generatey2>><<person1>>
+		당신은 길 건너편에서 이상한 눈빛으로 쳐다보는 <<person>>【을를】 알아차린다. 그때 등 뒤에서 발소리가 들려온다. <<person2>><<person>>【이가】 달려와 당신의 <<bottom>>【을를】 세게 찰싹 때린다. 범인을 보려고 뒤돌아보려는 찰나, 등을 돌린 틈을 타 <<person1>><<person>>【이가】 달려드는 소리가 들린다.
+		<br><br>
+
+		부피가 큰 의상 때문에 제때 몸을 돌리지 못하고 한 대 더 맞는다.<<gattention>><<photo_attention 1>><<gpain>><<gstress>><<pain 4>><<stress 6>>
+		<br><br>
+
+		<<link [[견딘다|Photo High Bottom Endure]]>><</link>>
+		<br>
+		<<link [[꼬리로 그들의 발을 걸어 넘어뜨리려 한다|Photo High Bottom Trip]]>><</link>><<dancedifficulty 1 1000>>
+		<br>
+		<<if $submissive gte 1500 or $masochism gte 800>>
+			<<link [[장단에 맞춰준다|Photo High Bottom Play]]>><<sub 1>><<photo_attention 1>><<photo_interest 2>><<arousal 600>><<pain 4>><</link>>
+			<<if $submissive gte 1500>>
+				<<submissivetext>>
+			<</if>>
+			<<if $masochism gte 800>>
+				| <span class="red">마조히스트</span>
+			<</if>>
+			<<gattention>><<gginterest>><<gpain>><<garousal>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_attention[_photo_location] gte 8>>
+	<<addinlineevent "photo_high_danger_4" 1.60>>
+		<<generate1>><<generate2>><<person1>>
+		<<person>>【이가】 가슴 위, 의상 앞쪽으로 손을 뻗는다.
+		<br><br>
+
+		<<link [[견딘다|Photo High Expose Endure]]>><<fameexhibitionism 3 "pic">><<photo_attention 1>><<trauma 6>><<stress 6>><</link>><<gattention>><<gtrauma>><<gstress>>
+		<br>
+		<<link [[<<him>>【을를】 밀쳐낸다|Photo High Expose Shove]]>><</link>><<physiquedifficulty 1 16000>>
+		<br>
+	<</addinlineevent>>
+<</if>>
+
+<<set _photo_high_danger_chance to ($photo_attention[_photo_location] / 10)>>
+<<if $photo_attention[_photo_location] gte 12>>
+	<<addinlineevent "photo_high_danger_5" _photo_high_danger_chance>>
+		<<generate1>><<person1>><<generate2>><<generate3>><<generate4>><<generate5>><<generate6>>
+		달려오는 발소리만이 유일한 경고였다. 누군가 뒤에서 당신을 밀치고 들어온다. 바닥에 쓰러지자마자 여러 팔이 당신에게 달려들어 <span class="red">의상에서 당신을 벗겨내려 한다.</span>
+		<br><br>
+
+		<<link [[니키를 부르며 소리친다|Photo High Danger Niki]]>><</link>><<difficulty 50>>
+		<br>
+		<<link [[최선을 다해 방어한다|Photo High Danger Defend]]>><</link>>
+		<br>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 1>>
+	<<addinlineevent "photo_high_forest" 1.2>>
+		신전에서 온 수행사제 무리가 지나가며 당신의 의상을 보고 킥킥거린다.
+		<br><br>
+
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[포효한다|Photo High Acolyte Roar]]>><<photo_attention 1>><<photo_interest 1>><</link>><<gattention>><<ginterest>>
+			<br>
+			<<if $fallenangel gte 2>>
+				<<link [[겁준다|Photo High Acolyte Scare]]>><<photo_interest 1>><</link>><<fallenangel>><<ginterest>>
+				<br>
+			<</if>>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 2>>
+	<<addinlineevent "photo_high_park" 1.2>>
+		다람쥐 한 마리가 근처 나무에서 뛰어내려 당신의 의상 안으로 뛰어든다.
+		<br><br>
+		<<link [[침착함을 유지한다|Photo High Squirrel Calm]]>><</link>><<willpowerdifficulty 1 1000>>
+		<br>
+		<<link [[패닉에 빠진다|Photo High Squirrel Panic]]>><</link>>
+		<br>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 3>>
+	<<addinlineevent "photo_high_shopping_centre" 1.2>>
+		큰 인파가 당신을 피해 양옆으로 갈라져 지나간다. 사람들이 너무 가까이 몰려들어 움직이기가 힘들다.
+		<br><br>
+
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[지나가는 사람들에게 전단지를 나눠준다|Photo High Shopping Flyers]]>><</link>><<dancedifficulty 1 600>>
+			<br>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 4>>
+	<<addinlineevent "photo_high_shop" 1.2>>
+		<<generate1>><<person1>>
+		조금 떨어진 곳에서 <<person>>【이가】 당신 위쪽과 뒤쪽을 가리키며 당신을 바라보는 것이 보인다. 벽에는 당신의 의상과 같은 캐릭터가 그려진 포스터가 붙어 있다.
+		<br><br>
+
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[포스터의 포즈를 따라 한다|Photo High Poster Copy]]>><<photo_attention 1>><<photo_interest 1>><</link>><<gattention>><<ginterest>>
+			<br>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 5>>
+	<<addinlineevent "photo_high_bus_stop" 1.2>>
+		버스가 멈춰 서고 엄청난 수의 사람들이 우르르 쏟아져 나온다. 그들은 시골 사람들처럼 차려입었다. 그들은 당신 주위로 몰려든다.
+		<br><br>
+
+		"내가 제일 좋아하는 악당이잖아!"
+		<br>
+		"진짜 별걸 다 생각하네."
+		<br>
+		"내 양 떼를 놀라게 한 괴물처럼 생겼구만."
+		<br><br>
+
+		그들은 전단지를 흔쾌히 받아 간다. 만족한 인파는 새로운 구경거리를 찾아 흩어진다.<<ginterest>><<photo_interest 1>>
+		<br><br>
+		<<set $photo_flyers += 12>>
+		<<endevent>>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 6>>
+	<<addinlineevent "photo_high_statue" 1.2>>
+		당신이 다가가자 근처에 있던 비둘기 한 마리가 날아오르며 다른 새들을 놀라게 하고, 곧 동상 주위에 있던 모든 새가 푸드덕거리며 날아간다.<<gattention>><<photo_attention 1>>
+		<br><br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $photo_location is 7>>
+	<<addinlineevent "photo_high_sea" 1.2>>
+		바다에서 불어오는 바람이 거세진다. 바람이 의상의 후드를 휘어잡아 뒤로 젖히는 바람에 그 힘에 밀려 뒤로 넘어지고 만다.
+		<br><br>
+		누군가 킥킥거린다. 당신은 몸을 일으킨다.<<gstress>><<gattention>><<stress 6>><<photo_attention 1>>
+		<br><br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<set _photo_model_chance to (1 + ($photo_attention[_photo_location] / 10))>>
+<<set Math.clamp(_photo_model_chance, 1, 2)>>
+
+<<if $fame.model gte 200>>
+	<<addinlineevent "photo_high_model_1" _photo_model_chance>>
+		<<generate1>><<person1>>
+		<<person>>【이가】 당신과 폰을 번갈아 힐끗거리는 모습이 보인다. "어디서 본 것 같더라니." 그들이 폰을 돌려 당신이 촬영용 의상을 차려입은 사진을 보여주며 말한다.
+		<br><br>
+
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[같이 셀카를 찍자고 제안한다|Photo High Recognised Offer]]>><<famemodel 1 "pic">><</link>>
+			<br>
+			<<link [[미소 짓는다|Photo High Recognised Smile]]>><<famemodel 1 "pic">><</link>>
+			<br>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $fame.model gte 400>>
+	<<addinlineevent "photo_high_model_2" _photo_model_chance>>
+		<<generate1>><<person1>>
+		한 무리의 사람들이 당신 쪽을 바라보고 있다. <<person>>【이가】 당신을 가리키며 말하고 있지만, 거리가 너무 멀어 들리지 않는다.
+		<br><br>
+		그들이 다가온다. "당신 맞네요." <<person1>><<person>>【이가】 말한다. "제게 당신 포스터가 있어요!" <<His>> 일행은 당신을 알아보지 못했지만, 꽤 인상 깊어하는 눈치다. 그들은 열성적으로 전단지를 챙겨간다.<<ginterest>><<photo_interest 1>>
+		<<wearProp "flyers">>
+		<br><br>
+		<<set $photo_flyers += 6>>
+		<<endevent>>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $fame.model gte 600>>
+	<<addinlineevent "photo_high_model_3" _photo_model_chance>>
+		<<generate1>><<person1>>
+		<<person>>【이가】 당신에게 다가온다. "사인 좀 받을 수 있을까요?"
+		<br><br>
+
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[사인을 해준다|Photo High Autograph Give]]>><</link>>
+			<br>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $fame.model gte 800>>
+	<<addinlineevent "photo_high_model_4" _photo_model_chance>>
+		<<generate1>><<person1>>
+		전문가용 카메라를 든 <<person>>【이가】 나타난다. <<He>>【은는】 당신이 언제라도 사라질까 봐 걱정하는 듯 연신 셔터를 눌러댄다.<<famemodel 1 "pic">>
+		<br><br>
+		니키가 <<him>>【을를】 처리할 것이다.
+		<br><br>
+
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[직접 <<him>>【을를】 처리한다|Photo High Photographer]]>><</link>>
+			<br>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<if $fame.model gte 1000>>
+	<<addinlineevent "photo_high_model_5" _photo_model_chance>>
+		<<generate1>><<generate2>><<person1>>
+		<<person>>【와과】 <<person2>><<person>>【이가】 흥분한 표정으로 달려온다.
+		<br><br>
+		"완전 열성 팬이에요." <<person1>><<person>>【이가】 말한다. "카메라 앞에서 몇 가지만 물어봐도 될까요? 오래 안 걸려요." <<person2>><<person>>【이가】 <<his>> 폰을 들어 올린다.
+		<br><br>
+		<<photo_high_options_check>>
+		<<if _photo_options>>
+			<<link [[1분을 내어준다|Photo High Interview One]]>><<photo_pass 1>><<photo_interest 1>><</link>><<ginterest>>
+			<br>
+			<<link [[5분을 내어준다 (0:05)|Photo High Interview Five]]>><<photo_pass 5>><<photo_interest 1>>
+			<<if $photo_heat gte 60>>
+				<<photo_heat -12>>
+			<<elseif $photo_heat gte 30>>
+				<<photo_heat -8>>
+			<<else>>
+				<<photo_heat -4>>
+			<</if>>
+			<</link>>
+			<<if $photo_heat gte 60>>
+				<<lllheat>>
+			<<elseif $photo_heat gte 30>>
+				<<llheat>>
+			<<else>>
+				<<lheat>>
+			<</if>>
+			<<ginterest>>
+			<br>
+		<</if>>
+		<br>
+		<<photo_high_options>>
+	<</addinlineevent>>
+<</if>>
+
+<<runeventpool>>
+<</widget>>
+
+<<widget "photo_high_options_check">>
+	<<if $stress gte $stressmax>>
+		<<unset _photo_options>>
+	<<elseif $photo_timer lte 0>>
+		<<unset _photo_options>>
+	<<else>>
+		<<set _photo_options to true>>
+	<</if>>
+<</widget>>
+
+<<widget "photo_high_options">>
+	<<if $stress gte $stressmax>>
+		<<endevent>>
+		<<passout>>
+		<<photo_pass 60>>
+		You've pushed yourself too much. You pass out.
+		<br><br>
+		<<link [[Next|Photo High Passout]]>><<overruined>><</link>>
+		<br>
+	<<elseif $photo_timer lte 0>>
+
+		<<photo_high_description>>
+		<span class="teal">Niki appears beside you.</span> "Job done," <<nnpc_he "Niki">> says, examining the back of the camera. "Get dressed, and we'll discuss money."
+		<br><br>
+
+		<<link [[Next|Photo High End]]>>
+			<<endevent>>
+			<<pass 2>>
+			<<overruined>>
+			<<storeon "photo_high_suit">>
+		<</link>>
+		<br>
+	<<else>>
+		<<photo_high_description>>
+
+		<<if $arousal gte $arousal_max>>
+			A heat builds, until it overcomes you. <<orgasm>>
+
+			Arms point at you, and heads turn to whisper. You've attracted the wrong sort of attention.<<gstress>><<stress 6>><<gggattention>><<photo_attention 3>>
+			<br><br>
+		<</if>>
+
+		<<link [[Hand out flyers (0:01)|Photo High Flyer]]>><<endevent>><<photo_heat 1>><<photo_attention 1>><<photo_interest 1>><<photo_pass 1>><</link>><<gheat>><<gattention>><<ginterest>>
+		<br>
+		<<if $photo_location lte 6>>
+			<<link [[Walk seaward (0:01)|Photo High Walk]]>><<endevent>><<photo_heat 1>><<set $photo_location += 1>><<photo_pass 1>><</link>><<gheat>>
+			<br>
+		<</if>>
+		<<if $photo_location gte 2>>
+			<<link [[Walk forestward (0:01)|Photo High Walk]]>><<endevent>><<photo_heat 1>><<photo_pass 1>><<set $photo_location -= 1>><</link>><<gheat>>
+			<br>
+		<</if>>
+		<<link [[Rest in the shade (0:05)|Photo High Rest]]>>
+			<<endevent>>
+			<<photo_attention 1>>
+			<<if $photo_heat gte 60>>
+				<<photo_heat -12>>
+			<<elseif $photo_heat gte 30>>
+				<<photo_heat -8>>
+			<<else>>
+				<<photo_heat -4>>
+			<</if>>
+		<<photo_pass 5>>
+		<</link>>
+		<<gattention>>
+		<<if $photo_heat gte 60>>
+			<<lllheat>>
+		<<elseif $photo_heat gte 30>>
+			<<llheat>>
+		<<else>>
+			<<lheat>>
+		<</if>>
+		<br>
+		<<link [[Find Niki (0:01)|Photo High Niki]]>><<photo_pass 1>><</link>>
+		<br>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "photo_high_check_location">>
+	<<switch $photo_location>>
+		<<case 7>>
+			<<set _photo_location to "sea">>
+		<<case 6>>
+			<<set _photo_location to "statue">>
+		<<case 5>>
+			<<set _photo_location to "bus_stop">>
+		<<case 4>>
+			<<set _photo_location to "shop">>
+		<<case 3>>
+			<<set _photo_location to "shopping_centre">>
+		<<case 2>>
+			<<set _photo_location to "park">>
+		<<default>>
+			<<set _photo_location to "forest">>
+	<</switch>>
+<</widget>>
+
+<<widget "photo_high_description">>
+	<hr>
+	장소:
+	<<switch $photo_location>>
+		<<case 7>>해안가 근처
+		<<case 6>>광장
+		<<case 5>>버스 정류장
+		<<case 4>>게임 가게
+		<<case 3>>쇼핑센터
+		<<case 2>>공원
+		<<case 1>>숲 근처
+		<<default>><span class="red">하이 스트리트 어딘가 (버그입니다)</span>
+	<</switch>>
+	|
+	남은 시간: <<print Math.max(0, $photo_timer)>>분
+	|
+	<<set Math.clamp($photo_location, 1, 7)>>
+	돌린 전단지 수: <<print $photo_flyers>>
+	|
+	<<photo_high_check_location>>
+	<<if $photo_attention[_photo_location] gte 9>>
+		<span class="red">더 안전한 곳으로 이동해야 한다</span>
+	<<elseif $photo_attention[_photo_location] gte 5>>
+		<span class="purple">불쾌한 시선을 끌고 있다</span>
+	<<elseif $photo_attention[_photo_location] gte 1>>
+		<span class="blue">사람들이 당신 쪽을 쳐다본다</span>
+	<<else>>
+		<span class="lblue">몇 번 의상을 흘끗 쳐다보는 것을 제외하면 사람들은 당신을 무시한다</span>
+	<</if>>
+	|
+	<<if $photo_heat gte 60>>
+		<span class="red">너무 더워서 쪄 죽을 것 같다</span><<ggstress>><<stress 12>>
+	<<elseif $photo_heat gte 30>>
+		<span class="purple">불쾌할 정도로 덥다</span><<gstress>><<stress 6>>
+	<<elseif $photo_heat gte 10>>
+		<span class="blue">몸에 열이 오르고 있다</span>
+	<<else>>
+		<span class="green">너무 덥지는 않다</span>
+	<</if>>
+	<br><br>
+<</widget>>
+
+<<widget "photo_heat">>
+	<<set _photo_heat to _args[0]>>
+	<<if _photo_heat gt 0>>
+		<<set _photo_heat *= ((Weather.temperature + 90) / 100)>>
+		<<if $worn.upper.name isnot "naked">>
+			<<set _photo_heat *= 1.2>>
+		<</if>>
+		<<if $worn.under_lower.name isnot "naked">>
+			<<set _photo_heat *= 1.2>>
+		<</if>>
+	<</if>>
+	<<set $photo_heat += _photo_heat>>
+	<<set Math.clamp($photo_heat, 0, 100)>>
+<</widget>>
+
+<<widget "photo_attention">>
+	<<photo_high_check_location>>
+	<<if _args[0]>>
+		<<set $photo_attention[_photo_location] += _args[0]>>
+	<</if>>
+<</widget>>
+
+<<widget "photo_interest">>
+	<<if _args[0]>>
+		<<set $photo_interest += _args[0]>>
+	<</if>>
+<</widget>>
+
+<<widget "photo_pass">>
+	<<pass _args[0]>>
+	<<set $photo_timer -= _args[0]>>
+<</widget>>
+
+<<widget "photo_init">>
+	<<set $photo_heat to 0>>
+	<<set $photo_timer to 120>>
+	<<set $photo_interest to 0>>
+	<<set $photo_attention to {
+		sea: 0,
+		statue: 0,
+		bus_stop: 0,
+		shop: 0,
+		shopping_centre: 0,
+		park: 0,
+		forest: 0,
+	}>>
+	<<set $photo_location to 4>>
+	<<set $photo_flyers to 0>>
+<</widget>>
+
+<<widget "photo_unset">>
+	<<unset $photo_heat>>
+	<<unset $photo_timer>>
+	<<unset $photo_interest>>
+	<<unset $photo_attention>>
+	<<unset $photo_abduction_timer>>
+	<<unset $photo_location>>
+	<<unset $photo_flyers>>
+<</widget>>
+
+<<widget "photo_high_gang_load">>
+	<<if $per_npc.photo_high_gang_1>>
+		<<loadNPC 0 "photo_high_gang_1">>
+		<<loadNPC 0 "photo_high_gang_2">>
+		<<loadNPC 0 "photo_high_gang_3">>
+		<<loadNPC 0 "photo_high_gang_4">>
+	<<else>>
+		<<generate1>>
+		<<generate2>>
+		<<generate3>>
+		<<generate4>>
+		<<person1>>
+	<</if>>
+<</widget>>
+
+<<widget "photo_high_gang_clear">>
+	<<clearNPC "photo_high_gang_1">>
+	<<clearNPC "photo_high_gang_2">>
+	<<clearNPC "photo_high_gang_3">>
+	<<clearNPC "photo_high_gang_4">>
+	<<unset $photo_high_abduction_options>>
+<</widget>>

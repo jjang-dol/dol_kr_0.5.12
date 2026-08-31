@@ -1,0 +1,1024 @@
+:: Temple Garden
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+
+당신은 신전 정원에 있다. 꽃들이 신전 본관에서부터 길게 이어져 있으며, 숲에 가까워질수록 제멋대로 자라나 있다. 신전 부지의 끝과 숲의 경계가 불분명하다. 중앙에는 분수대가 있다.
+
+<<if Weather.dayState is "day">>
+나무들이 바람에 흔들린다.
+<<elseif Weather.dayState is "dusk">>
+햇빛이 나뭇가지 사이로 스며든다.
+<<elseif Weather.dayState is "dawn">>
+태양이 나무 커튼 위에서 빛난다.
+<<elseif Weather.dayState is "night">>
+신전에서 나온 빛이 가장 가까운 나무들을 비춘다.
+<</if>>
+<br><br>
+
+<<if $temple_garden gte 100>>
+정원은 <span class="green">아름답고,</span> 울타리는 잘 다듬어졌으며 꽃들도 잘 관리되어 있다.
+<<elseif $temple_garden gte 80>>
+정원은 <span class="teal">깔끔하게 정돈되어 있다.</span>
+<<elseif $temple_garden gte 60>>
+정원은 <span class="lblue">말끔하지만,</span> 숲에 가까워질수록 조금씩 무성해진다.
+<<elseif $temple_garden gte 40>>
+정원은 <span class="blue">제법 정돈되어 있지만</span>, 다듬어야 할 울타리가 많다.
+<<elseif $temple_garden gte 20>>
+정원은 <span class="purple">어수선하지만,</span> 울타리들은 의도한 형태에 가깝다.
+<<elseif $temple_garden gte 10>>
+정원은 <span class="pink">무성하게 엉망이 되었고,</span> 야생화가 화단을 침범하고 울타리도 제멋대로 자랐다.
+<<else>>
+정원은 <span class="red">야생지처럼</span> 보이며, 거의 정원이라고 할 수 없다. 울타리는 덤불처럼 우거졌고 야생화가 주변을 뒤덮어 다른 꽃들을 옥죈다.
+<</if>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passouttemple>>
+<<else>>
+	<<if $exposed gte 1>>
+	당신은 체면을 지키기 위해 울타리 뒤에 숨는다.
+	<br><br>
+	<<investigateicon>><<link [[몸을 가릴 것을 찾는다|Temple Garden Exposed]]>><</link>>
+	<br>
+	<<else>>
+		<<if Time.dayState is "night">>
+			정원에서 일하기에는 너무 어둡다.
+			<br>
+		<<elseif $temple_garden gte 100>>
+			<span class="green">정원은 완벽하고, 오늘은 더 할 일이 없다.</span>
+			<br>
+		<<elseif pcAreArmsBound("both")>>
+			<span class="red">두 팔이 모두 묶여 있어</span>, 정원에서 일할 수 없다.
+			<br>
+		<<else>>
+			<<templeicon "garden">>
+			<<link [[정원에서 일한다 (1:00)|Temple Garden Work]]>>
+			<<if currentSkillValue('tending') gte 1500>>
+				<<set $temple_garden += 9>>
+			<<elseif currentSkillValue('tending') gte 1200>>
+				<<set $temple_garden += 8>>
+			<<elseif currentSkillValue('tending') gte 800>>
+				<<set $temple_garden += 7>>
+			<<elseif currentSkillValue('tending') gte 600>>
+				<<set $temple_garden += 6>>
+			<<elseif currentSkillValue('tending') gte 400>>
+				<<set $temple_garden += 5>>
+			<<elseif currentSkillValue('tending') gte 200>>
+				<<set $temple_garden += 4>>
+			<<else>>
+				<<set $temple_garden += 3>>
+			<</if>>
+			<<pass 60>><<grace 1 monk>><<tiredness 6>><<tending 1>><</link>><<gtending>><<ggrace monk>><<gtiredness>><<note "관리 스킬이 효율에 영향을 줍니다" "blue">>
+			<br>
+		<</if>>
+	<</if>>
+
+	<br>
+	<<wolficon>><<link [[사원|Temple]]>><</link>>
+	<br>
+	<<foresticon>><<link [[숲 (0:10)|Forest]]>><<pass 10>><<set $forest to 0>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Work
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+
+
+<<generate1>><<person1>>
+You ask a <<priest>> what work needs doing around the garden.
+<<endevent>>
+<<if $rng gte 81>>
+	<<wearProp "hedge shears">>
+	You're asked to trim a row of hedges. You take a pair of shears and get to work.
+	<br><br>
+	<<if dangerEvent() and $settings.tentaclesEnabled and ($hallucinations gte 2 or $backgroundTraits.includes("plantlover"))>>
+		<<tending_text>> It's hard going, but you neaten things up a great deal. <<physique 6>>
+		<br><br>
+		You're reaching in to cut a rogue branch when your wrist gets stuck. You reach your other hand in to help free yourself, and that gets stuck too. You feel something wrap around both ankles. A force pulls you off your feet and into the hedge.
+		<br><br>
+		You find yourself suspended within its branches, held aloft by tendrils wrapped around your body. More tendrils emerge from every direction.
+		<br><br>
+
+		<<link [[Struggle|Temple Garden Tentacles]]>><<set $molestationstart to 1>><</link>>
+		<br>
+		<<link [[Soothe|Temple Garden Soothe]]>><</link>><<tendingdifficulty 1 1200>>
+		<br>
+	<<else>>
+		<<tending_text>> It's hard going, but you neaten things up a great deal. <<physique 6>>
+		<br><br>
+		<<link [[Next|Temple Garden]]>><</link>>
+		<br>
+	<</if>>
+<<elseif $rng gte 61>>
+	You're asked to deweed the flower beds. You drop to your knees and get to work.
+	<br><br>
+	<<beastNEWinit 1 wolf>>
+	<<if dangerEvent() and ($monster is 1 or $settings.bestialityEnabled)>>
+		<<tending_text>> Your hands get dirty, and beads of sweat slip down your cheek, but the flowers have lots more space when you're done. <<physique 6>>
+		<br><br>
+			<<if $syndromewolves is 1>>
+				You hear footsteps behind you. You turn just as a <<beasttype>> jumps on top of you. <<bHe>> licks your face. You can't help but laugh.
+				<<if $monster is 1>>
+					"Smelled <<ppackbrother>>. Had to see. Come home soon? Pack misses you."
+				<</if>>
+				<<ltrauma>><<lstress>><<trauma -6>><<stress -6>>
+				<br><br>
+				You watch as <<bhe>> returns to the forest.
+				<br><br>
+
+				<<link [[Next|Temple Garden]]>><<endevent>><</link>>
+				<br>
+			<<else>>
+				You hear footsteps behind you. Before you can turn, <span class="red">a <<beasttype>> leaps atop you</span>.
+				<br><br>
+				<<link [[Next|Temple Garden Work Wolf]]>><<set $molestationstart to 1>><</link>>
+				<br>
+			<</if>>
+	<<else>>
+		<<tending_text>> Your hands get dirty, and beads of sweat slip down your cheek, but the flowers have lots more space when you're done. <<physique 6>>
+		<br><br>
+
+		<<link [[Next|Temple Garden]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $rng gte 41>>
+	You're asked to gather fruit from the trees growing near the temple proper.
+	<br><br>
+
+	<<set _fruit to either("lemon", "lime", "apple", "orange", "pear")>>
+	<<wearProp _fruit>>
+	<<if dangerEvent()>>
+		Basket in hand, you climb a stepladder and start picking <<print _fruit>>s. <<tending_text>> It's pleasant, though you need to stretch pretty far to reach some of them. <<physique 6>><<lstress>><<stress -6>>
+		<br><br>
+
+		<<generateTemple 1>><<person1>>
+		"Need a hand up there?" a <<monk>> says behind you. Without waiting for a response, <<he>> climbs the step ladder. There's not much room at the top. <<He>> grasps your hips to steady <<himself>>.<<if $NPCList[0].penis isnot "none">> <span class="lewd">You feel something hard beneath <<his>> habit, rubbing against your <<bottom>>.</span><</if>>
+		<br><br>
+
+		<<link [[Shove|Temple Garden Shove]]>><<trauma -6>><<stress -6>><<grace -5 monk>><</link>><<llgrace monk>><<ltrauma>><<lstress>>
+		<br>
+		<<link [[Put up with it|Temple Garden Put]]>><<grace 1 monk>><</link>><<ggrace monk>>
+		<br>
+	<<else>>
+		Basket in hand, you climb a stepladder and start picking <<print _fruit>>s. <<tending_text>> It's pleasant, though you need to stretch pretty far to reach some of them. <<physique 6>><<lstress>><<stress -6>>
+		<br><br>
+
+		<<link [[Next|Temple Garden]]>><</link>>
+		<br>
+	<</if>>
+<<elseif $rng gte 21>>
+	<<wearProp "shovel">>
+	You're asked to tend the fire in the hedge maze.
+	<br><br>
+
+	<<rng>>
+	<<if $rng gte 81>>
+		<<npc Jordan>><<generate2>><<generatey3>><<person2>>
+		You shovel coal onto the fire. A <<monk>> keeps an eye on you as <<he>> trims the hedges around the clearing. <<physique 6>>
+		<br><br>
+
+		<<tending_text>> It doesn't take long. You're just finishing up when Jordan arrives from the temple, a <<person3>><<person>> in tow.
+		<br><br>
+
+		Jordan whispers to the <<person2>><<monk>>, who smiles and looks at you. "Keep shovelling," <<he>> says. "This one is attempting the trial." You return to work, shovelling more coal onto the fire while the <<monk>> encourages the flame with a pair of bellows.
+		<br><br>
+
+		The <<monk>> grabs a shovel and starts spreading the coals into a thin bed. You follow suit. You soon have the bed ready. The <<person3>><<person>> looks on, apprehensive.
+		<br><br>
+
+		Jordan gives <<him>> a brief explanation, and <<he>> steps onto the coals.
+
+		<<rng>>
+		<<if $rng gte 91>>
+			<<He>> walks across at a brisk pace. <<His>> determined expression strains as <<he>> moves, but <<he>> makes it to the other side before stumbling and checking <<his>> feet. The <<person2>><<person>> cheers. You find yourself cheering too.
+			<<ltrauma>><<trauma -6>>
+			<br><br>
+			Jordan steers the triumphant <<person3>><<person>> back to the temple while explaining the duties of an initiate.
+		<<elseif $rng gte 71>>
+			<<He>> almost makes it to the other end before pain gets the better of <<him>>. Jordan reassures <<him>> as <<person1>><<he>> steers <<person3>><<him>> back to the temple.
+		<<elseif $rng gte 51>>
+			<<He>> makes it to <<his>> second step before leaping away in pain. Jordan reassures <<him>> as <<person1>><<he>> steers <<person3>><<him>> back to the temple.
+		<<else>>
+			<<He>> recoils in pain as soon as <<his>> toe comes in contact with the heat. The <<person2>><<person>> chuckles. Jordan reassures the <<person3>><<person>> as <<person1>><<he>> steers <<person3>><<him>> back to the temple.
+		<</if>>
+		<br><br>
+
+		<<link [[Next|Temple Garden]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<generate1>><<person1>>
+		You shovel coal onto the fire. A <<monk>> keeps an eye on you as <<he>> trims the hedges around the clearing. <<physique 6>>
+		<br><br>
+		<<tending_text>> It doesn't take long. The <<monk>> asks you to help clean up the coals left over from a previous trial, which takes a bit longer.
+		<br><br>
+
+		<<link [[Next|Temple Garden]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<generateTemple 1>><<person1>>
+	You're asked to assist the <<monk>> tending to the crops at the forest's edge.
+	<br><br>
+	You find <<him>> tending to a row of trellises, each bearing a vibrant vine of hops.
+	<<rng>>
+	<<if $rng gte 81>>
+		<<He>> has you search the plants for mites. <<tending_text>>
+	<<elseif $rng gte 61>>
+		<<He>> has you search the plants for mildew. <<tending_text>>
+	<<elseif $rng gte 41>>
+		<<He>> has you remove weeds from the soil. <<tending_text>>
+	<<elseif $rng gte 21>>
+		<<He>> has you remove weeds from the soil. <<tending_text>>
+	<<else>>
+		<<He>> has you harvest the riper plants. <<tending_text>>
+	<</if>>
+	<<physique 6>>
+	<br><br>
+
+	<<if playerBellyVisible()>>
+		"Nice work," <<he>> says once you're finished. "You work well despite your condition. It's admirable."
+		<br><br>
+		<<He>> sits down, glances around, then pulls a bottle and a mug out from under <<his>> chair. <<He>> pours a brown liquid into it.
+		<br><br>
+		"We brew these into beer," <<he>> continues, gesturing at the vines. "Makes the temple a nice little side income. We're not supposed to drink really, but a little tipple for those working the fields is overlooked. After your child is born, you should come back and try some."
+		<br><br>
+
+		<<link [[Next|Temple Garden]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		"Nice work," <<he>> says once you're finished. <<He>> sits down, glances around, then pulls a bottle and two mugs out from under <<his>> chair. <<He>> pours a brown liquid into them.
+		<br><br>
+		"How about a little treat? We brew these into beer," <<he>> continues, gesturing at the vines. "Makes the temple a nice little side income. We're not supposed to drink really, but a little tipple for those working the fields is overlooked." <<He>> hands you a mug. "Go on. I insist."
+		<br><br>
+
+		<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+			<<foodicon "beerbottle">><span class="blue">You can't bring yourself to drink while you know you're with child.</span>
+		<<else>>
+			<<if dangerEvent() and $grace lt 0 or dangerEvent() and random(1, 10) is 10>>
+				<<foodicon "beerbottle">><<link [[Drink|Temple Drink Drugged]]>><<drunk 180>><<drugs 180>><</link>><<ggdrunk>>
+			<<else>>
+				<<foodicon "beerbottle">><<link [[Drink|Temple Drink]]>><<drunk 180>><</link>><<ggdrunk>>
+			<</if>>
+		<</if>>
+		<br>
+		<<if playerIsPregnant() and playerAwareTheyArePregnant() and $templePromised is "Sydney">>
+			<<refuseicon>><<link [[Refuse|Temple Drink Refuse]]>><</link>>
+		<<else>>
+			<<refuseicon>><<link [[Refuse|Temple Drink Refuse]]>><<grace -1>><</link>><<lgrace>>
+		<</if>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Temple Garden Soothe
+<<effects>>
+
+당신을 둘러싼 덩굴을 쓰다듬자 덩굴이 부드럽게 웅웅거린다.
+
+<<if $tendingSuccess>>
+	몸을 떨더니 <span class="green">그것들이 움직임을 멈추고,</span> 당신의 팔다리를 놓아 바닥으로 떨어뜨린다. 당신은 울타리 밑에서 기어 나온다.
+	<br><br>
+
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+
+<<else>>
+	<span class="red">소용없다.</span> 덩굴손들이 다가온다.
+
+	<br><br>
+	<<link [[다음|Temple Garden Tentacles]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Temple Drink Refuse
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+
+<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+	<<if $templePromised is "Sydney">>
+		<<if $rng gte 51>>
+			<<He>> 미소 짓는다. "아, 몰랐군요. 아이를 가진 걸 축하합니다," <<he>> 말하더니 당신의 머그잔을 가져가 그것까지 마신다.
+		<<else>>
+			<<He>> 고개를 끄덕인다. "아, 그렇군요. 아이를 가진 <<pmother>>【은는】 정원에서 일하면 안 됩니다. 당신의 헌신은 대단하지만, 조심하세요." <<He>> 일어나 당신을 혼자 두고 떠난다.
+		<</if>>
+	<<else>>
+		<<if $rng gte 51>>
+			<<He>> 고개를 끄덕인다. "그렇군요. 뭐, 아이를 위해선 그게 최선이지요," <<he>> 말한다. <<He>> 당신의 머그잔을 가져가 마신다.
+		<<else>>
+			<<He>> 고개를 끄덕인다. "그렇군요. 아이를 가진 <<pmother>>【은는】 정원에서 일하면 안 됩니다. 조심하세요," <<he>> 말하고는 걸어간다.
+		<</if>>
+	<</if>>
+<<else>>
+	당신은 술을 거절한다. <<monk>>【은는】 실망했지만, 강요하지는 않는다.
+<</if>>
+<br><br>
+
+<<link [[다음|Temple Garden]]>><<endevent>><</link>>
+<br>
+
+:: Temple Drink
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+<<wearProp "beer mug">>
+
+당신은 술을 한 모금 마신다. 씁쓸하지만 과일 향이 난다. "괜찮으십니까?" <<monk>>【이가】 말한다. <<He>> 대답을 기다리지 않고 말을 잇는다. "더 독한 술도 만들지만, 판매하지는 않습니다. 의식에 쓰이지요. <<monk>>가 될 때 마시게 하는데, 그 안에 무엇이 들었는지는 사제들과 주교만 압니다."
+<br><br>
+<<monk>>【이가】 말하는 사이 당신은 머그잔을 비운다. "도와주셔서 감사합니다," <<he>> 말한다.
+<br><br>
+
+<<link [[다음|Temple Garden]]>><<endevent>><</link>>
+<br>
+
+:: Temple Drink Drugged
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+<<wearProp "beer mug">>
+
+당신은 술을 한 모금 마신다. <span class="red">달콤하고</span> 과일 향이 난다. "괜찮으십니까?" <<monk>>【이가】 말한다. <<He>> 대답을 기다리지 않고 말을 잇는다. "우린 더 독한 것도 만들어, 하지만 그건 팔지..." <<His>> 목소리가 멀어지고 시야가 흐려진다. 모든 것이 어둠에 잠긴다.
+<br><br>
+
+<<set $temple_harassed += 1>>
+
+<<link [[다음|Temple Garden Bound]]>><</link>>
+<br>
+
+:: Temple Garden Bound
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<generateTemple 2>><<pass 60>>
+<<bind>><<facewear "gag and blindfold">>
+당신은 어둠 속에서 깨어난다. <span class="red">팔은 묶였고 입에는 재갈이 물려 있다.</span> 머리 주변에 무언가가 감긴 느낌이다. 눈가리개다. 당신은 앉혀져 있다.
+<br><br>
+"<<pShes>> 깨어났군." 익숙한 목소리가 말한다. 정원의 그 <<monk>>【이】다.
+<br><br>
+
+"사랑스럽군," 낯선 <<person2>><<personsimple>>【이가】 말한다. <<person2>><<His>> 목소리가 울린다. "말랑하고 풋풋해. 딱 내 취향이야." 왼쪽에서 덜컹거리는 소리가 들린다. 꽤 멀리서 난 것 같았다.
+<br><br>
+
+"이제 잘 들어," <<person1>><<monk>>【이가】 말한다. 오른쪽에서 멀리 울부짖는 소리가 들린 것 같지만, 착각일지도 모른다. "착한 <<girl>>답게 우리가 시키는 대로 하는 거야. 알아들었어?" 손들이 당신의 <<bottom>>【와과】 <<breasts>>【을를】 주무른다.
+<br><br>
+
+<<link [[순순히 따른다|Temple Garden Obedient]]>><<sub 1>><<grace 3 monk>><</link>><<gggrace monk>>
+<br>
+<<link [[탈출한다|Temple Garden Defiant]]>><<def 1>><<grace -1>><</link>><<lgrace>>
+<br>
+
+:: Temple Garden Obedient
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+당신은 고개를 끄덕인다. "좋아," <<monk>>【이가】 말한다. "이제 가만히 있어."
+<br><br>
+
+<<link [[다음|Temple Garden Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Temple Garden Defiant
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+팔이 묶이고, 입에 재갈이 물리며, 눈이 가려진 채로 무엇을 할 수 있을지 확신할 수 없다. 하지만 시도해야만 한다.
+<br><br>
+
+당신은 벌떡 일어나 달린다.
+<br><br>
+
+<<link [[왼쪽|Temple Garden Left]]>><</link>>
+<br>
+<<link [[오른쪽|Temple Garden Right]]>><</link>>
+<br>
+
+:: Temple Garden Left
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+왼쪽으로 달려 누군가와 부딪힌다. 당신은 비틀거렸지만, 간신히 균형을 잡는다. 당신과 부딪힌 사람은 운이 좋지 않았다. "젠장." 당신 아래에서 <<person2>><<personsimple>>【이가】 말하는 소리가 들린다. 당신은 계속 달린다.
+<br><br>
+
+발소리가 울리기 시작한다. 뒤에서 다른 발소리도 들린다. 앞쪽에서 퀴퀴한 공기가 몰아칠 때까지 계속 달린다.
+<br><br>
+
+"네 앞에 낭떠러지가 있다, <<girl>>." <<person1>><<monk>>【이가】 빠르게 다가오며 소리친다. "막다른 길이야. 포기해."
+<br><br>
+
+<<link [[앞으로 달린다|Temple Garden Pit]]>><</link>>
+<br>
+<<link [[왼쪽으로 달린다|Temple Garden Wall]]>><</link>>
+<br>
+<<link [[오른쪽으로 달린다|Temple Garden Escape]]>><</link>>
+<br>
+<<link [[포기한다|Temple Garden Give up]]>><<sub 1>><</link>>
+<br>
+
+:: Temple Garden Wall
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+왼쪽으로 달려 벽에 부딪힌다.
+<<gpain>><<pain 4>>
+<br><br>
+
+몸을 돌리지만, 달아나기도 전에 손들이 당신을 붙잡는다. "잡았다," <<person1>><<monk>>【이가】 말한다. "이제 네 참회 차례야."
+<br><br>
+
+<<link [[다음|Temple Garden Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Temple Garden Escape
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+당신은 오른쪽으로 달린다. 앞을 막는 것은 없다. 계단을 헛디뎌 비틀거리며 올라간다. 덜컹거리는 소리가 더 커진다. 계단 꼭대기에 도착하자 단단하고 따뜻한 무언가와 부딪힌다.
+<br><br>
+
+손 하나가 당신의 어깨에 놓인다. 당신이 몸을 빼려 하자 다른 손이 얼굴에서 안대를 들어 올린다.
+<br><br>
+<<set $worn.face.type.push("broken")>>
+<<faceruined>>
+<<unbind>>
+<<generateTemple 3>><<generateTemple 4>><<person3>>
+
+한 <<person>>【이가】 <<his>> 손에 당신의 안대를 든 채 미소 짓고 있는 것이 보인다. <<He>>【은는】 <<priestapo>> 복장을 하고 있다. <<He>>【은는】 당신의 재갈을 풀고 팔의 결박을 풀기 시작한다. <<person4>><<person>> 한 명이 <<person3>><<him>> 뒤에 서 있다. <<his>> 얼굴에는 걱정이 서려 있다.
+
+<<if $exposed gte 1>>
+<<He>>【은는】 당신의 몸에 수건을 둘러준다.<<towelup>>
+<</if>>
+<br><br>
+
+<<link [[다음|Temple Garden Escape 2]]>><</link>>
+<br>
+
+:: Temple Garden Escape 2
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+발소리가 들린다. 홉 덩굴에 있던 <<person1>><<monk>>【이가】 <<person2>><<person>> 한 명을 옆에 데리고 계단 꼭대기에 나타난다. 그들은 <<person3>><<person>>【와과】 <<person4>><<person>>【을를】 보자 얼어붙는다. <<person3>><<person>>【은는】 <<his>> 두 손을 <<his>> 허리에 얹는다.
+<br><br>
+
+"이런 짓에 대해 경고했었지." <<he>>【이가】 말한다. "주교님의 용서는 유한하다."
+<br><br>
+
+"보기와는 달라요," <<person1>><<monk>>【이가】 애원한다. "우린 <<phim>> 저런 상태로 발견했을 뿐입니다. 우린—"
+<br><br>
+
+<<person3>><<person>>【이가】 <<person1>><<him>>의 말을 가로막는다. "주교님께 고해성사하는 게 좋을 거야. 내가 말하기 전에."
+<br><br>
+
+<<monk>>【은는】 반박할 기세였지만, 대신 기가 죽어 한숨을 쉰다. <<He>>【와과】 <<person2>><<person>>【은는】 고개를 숙인 채 지나간다.
+<br><br>
+
+<<link [[다음|Temple Garden Escape 3]]>><</link>>
+<br>
+
+:: Temple Garden Escape 3
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+안전해졌다고 느끼며, 당신은 방을 둘러본다.
+<<if $temple_brewery_known is 1>>
+	당신은 양조장에 있다. 눈이 가려진 채 증류기 중 하나와 부딪친 것이다.
+<<else>>
+	<<set $temple_brewery_known is 1>>
+	긴 홀이고, 금속 탱크들이 줄지어 있다. 당신은 눈이 가려진 채 그중 하나와 부딪쳤다. "여기는 양조장입니다," <<person3>><<person>>【이가】 말한다.
+	<<if $temple_rank is "initiate">>
+		"수련생은 보통 들어올 수 없어. 하지만 그건 걱정하지 않아도 돼."
+	<<else>>
+	<</if>>
+<</if>>
+<<wearProp "tea">>
+<<person4>>미소 짓는 <<person>>【이가】 당신을 위해 의자를 빼주고 차 한 잔을 건넨다.
+<<gggrace monk>><<grace 5 monk>><<ltrauma>><<lstress>><<trauma -6>><<stress -6>>
+<br><br>
+그들은 당신이 괜찮다고 확신할 때까지 양조장에 머물게 해준다.
+<<pass 20>>
+안심한 뒤, 그들은 당신을 출구로 안내한다. 당신은 그들에게 손을 흔들어 작별하고 신전 정원으로 나온다.
+<br><br>
+/* For older saves when combat wasn't ended at this point */
+<<link [[다음|Temple Garden]]>><<if $combat>><<endcombat>><</if>><<endevent>><</link>>
+<br>
+
+:: Temple Garden Give up
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 가만히 있는다. <<person1>><<monk>>【와과】 <<his>> 친구가 곧 따라잡는다. 누군가 당신의 어깨를 잡고 뒤로 잡아당긴다. "거기서 넘어질 뻔했잖아." <<monk>>【이가】 말한다. "우리가 돌봐주고 있어서 다행이지." 당신은 목덜미에 닿는 <<his>> 숨결을 느끼고 등골이 오싹해진다.
+<br><br>
+<<link [[다음|Temple Garden Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Temple Garden Pit
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 앞으로 달려가 거의 수직에 가까운 낭떠러지를 미끄러져 내려가기 시작한다. "멍청한 <<girl>>." 당신 위에서 <<person1>><<monk>>【이가】 소리치는 것이 들린다. 당신의 미끄러짐은 굴러떨어지는 것으로 바뀌어, 알 수 없는 어둠 속으로 떨어진다.
+<br><br>
+
+<<link [[다음|Temple Underground Escape]]>><<endevent>><</link>>
+<br>
+
+:: Temple Underground Escape
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 부드러운 흙 위에 떨어진다. 해변에 부딪히는 파도 소리가 들리고 소금 냄새가 난다. 하지만 바람은커녕 미풍조차 없다.
+<br><br>
+당신은 힘겹게 일어나 소리가 나는 쪽으로 몇 걸음 내딛는다. 물이 발에 찰랑인다. 당신은 몸을 돌려 반대 방향으로 걷는다. 이따금 바위 표면에 부딪히지만, 언제나 돌아갈 길은 있다.
+<br><br>
+땅이 위로 기울어진다. 당신은 올라가다 교통 소리를 듣는다. 다리에 타는 듯한 통증을 무시하고 곧 느낀다.
+<<if Weather.precipitation is "rain">>
+	비가 얼굴에 불어온다.
+<<elseif Weather.precipitation is "snow">>
+	눈이 얼굴에 내려앉는다.
+<<else>>
+	신선한 바람이 얼굴에 불어온다.
+<</if>>
+<br><br>
+탈출했지만, 여전히 눈이 가려지고 재갈이 물려 있다.
+<<lllstress>><<stress -24>>
+<br><br>
+<<blindfoldintro>>
+<<set $eventskip to 1>>
+<<link [[다음|Bondage Wolf]]>><</link>>
+<br>
+
+:: Temple Garden Right
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+오른쪽으로 달려 모퉁이에 부딪힌다.
+<<gpain>><<pain 4>>
+<br><br>
+그것은 잠시 당신을 늦출 뿐이다. 뒤에서 무언가 긁히는 소리가 들린다. 달릴 때마다 발소리가 울린다.
+<br><br>
+또 다른 벽에 정면으로 부딪힌다.
+<<gpain>><<pain 4>>
+<br><br>
+"막다른 길이야, <<girl>>." <<person1>><<person>>【이가】 등 뒤에서 소리친다. "포기해."
+<br><br>
+<<link [[왼쪽으로 달린다|Temple Garden Forest]]>><</link>>
+<br>
+<<link [[오른쪽으로 달린다|Temple Garden Maiden]]>><</link>>
+<br>
+<<link [[포기한다|Temple Garden Give up]]>><<sub 1>><</link>>
+<br>
+
+:: Temple Garden Forest
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 왼쪽으로 달린다. 막는 것은 없다. 발소리가 사방에서 울린다. 곧게 달리려 하지만, 이따금 양옆 벽에 스친다.
+<br><br>
+<<pass 5>>
+터널은 어딘가로 이어져 있겠지만, 길다. 몇 분이 지나도 <<person1>><<monk>>【와과】 <<his>> 친구는 계속 따라온다. "후회하게... 될 거다!" <<he>>【이가】 헐떡이며 소리친다.
+<<gtiredness>><<tiredness 1>>
+<br><br>
+공기가 점점 따뜻해지는 것을 깨닫는다. 그러다 또 다른 벽에 부딪힌다. 당신은 차가운 바닥으로 튕겨 나간다. 간신히 일어서지만, 두 사람이 따라잡기에는 충분한 시간이었다.
+<<gpain>><<pain 4>>
+<br><br>
+누군가 당신의 머리에서 $worn.face.name【을를】 찢어낸다. 당신은 어두컴컴한 터널 안에 있다. 갈색 돌 벽돌이 벽을 이루고 있다. <<monk>>【이가】 당신의 목을 움켜쥐고 음흉하게 쳐다본다. "이걸 더 즐겨주지." <<he>>【이가】 말한다. <<him>> 옆에는 <<person2>><<person>>【이가】 서 있다. <<person>>【은는】 당신을 쳐다보지 않는다. <<He>>【은는】 위를 올려다보는데, <<his>> 얼굴이 공포로 일그러져 있다.
+<br><br>
+<<set $worn.face.type.push("broken")>>
+<<faceruined>>
+<<link [[다음|Temple Garden Forest 2]]>><</link>>
+
+:: Temple Garden Forest 2
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+위에서 으르렁거리는 소리가 들린다. <<person1>><<person>>【은는】 위를 쳐다보더니 당신에게서 물러난다. 두 사람은 돌아서서 달아난다.
+<br><br>
+<<endevent>>
+<<beastNEWinit 1 wolf>>
+그림자 하나가 위에서 뛰어내려 몇 걸음 떨어진 곳에 착지한다. <<beasttype>>【이】다. <<bHe>>【은는】 두 사람이 도망치는 것을 지켜본다.
+<br><br>
+<<if $syndromewolves gte 1>>
+	<<bHe>> 당신 쪽으로 돌아서더니 앞으로 달려든다. <<bHe>> <<bhis>> <<if $monster is 1>>손<<else>>이빨<</if>>로 당신의 결박을 붙잡아 갈기갈기 찢는다. 망설임 없이 <<beasttype>>【은는】 위쪽 난간으로 뛰어오른다. 당신도 뒤따른다.
+	<br><br>
+	당신은 또 다른 터널을 따라 계속 내려간다. 벽돌이 자연석으로 바뀐다. 얼마 지나지 않아 숲으로 나온다.
+	<br><br>
+
+	<<link [[다음|Forest]]>><<endevent>><<set $forest to 30>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	<<bHe>> 당신을 향해 돌아서며 이빨을 드러낸다.
+	<br><br>
+	<<link [[다음|Temple Garden Forest Wolf Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Forest Wolf Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br><br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Temple Garden Forest Wolf Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Garden Forest Wolf Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Garden Forest Wolf Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<beasttype>>【은는】 선반 위로 뛰어올라 사라진다.
+	<br><br>
+	<<tearful>> 당신은 스스로 기어 올라간다. 또 다른 터널을 따라가자 벽돌이 돌로 바뀐다. 당신은 숲으로 나온다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Forest]]>><<set $eventskip to 1>><<set $forest to 30>><</link>>
+	<br>
+<<else>>
+	낑낑거리며, <<beasttype>>【은는】 선반 위로 뛰어올라 사라진다.
+	<br><br>
+	<<tearful>> 당신은 스스로 기어 올라간다. 또 다른 터널을 따라가자 벽돌이 돌로 바뀐다. 당신은 숲으로 나온다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Forest]]>><<set $eventskip to 1>><<set $forest to 30>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Maiden
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+오른쪽으로 달려 또 다른 벽을 발견한다. 이 벽은 더 차갑다. 무언가 무거운 것이 등 뒤에서 쾅 닫힌다. 몸을 돌리려 하지만, 단단한 가시가 엉덩이를 찌른다. 다른 쪽으로 돌려 하지만, 또 다른 가시만 있을 뿐이다.
+<<ggpain>><<pain 8>>
+<br><br>
+움직이기가 두렵고 어디에 있는지 알 수 없어, 당신은 차가운 표면에 기댄다. 당신은 갇혔다.
+<br><br>
+ 먹먹한 웃음소리, 그리고 갈리는 소리가 들린다. "막다른 길이라고 했잖아, <<girl>>," <<person1>><<monk>>【이가】 말한다. 팔들이 당신의 어깨를 붙잡고 뒤로 끌어당긴다.
+<br><br>
+<<link [[다음|Temple Garden Rape]]>><<set $molestationstart to 1>><</link>>
+
+:: Temple Garden Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Temple Garden Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Garden Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Garden Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"봤지?" <<person1>><<monk>>【이가】 말한다. "그렇게 나쁘진 않았잖아, 그렇지."
+	<br><br>
+	"<<phim>>【을를】 고문대에 올려도 될까?" <<person2>><<person>>【이가】 묻는다. "너무 오래됐어."
+	<br><br>
+	"안 돼." <<person1>><<monk>>【이가】 말한다. "지난번에 무슨 일이 있었는지 기억하잖아."
+	<br><br>
+	그들은 잠시 다투다가 <<person2>><<person>>【이가】 굴복한다. 당신은 일으켜 세워져 끌려간다. 한 손은 묶인 팔을 단단히 잡고, 다른 한 손은 머리카락을 잡고 있다. 문이 열리는 소리가 들린다. 신선한 공기 냄새가 난다.
+	<br><br>
+	누군가 당신의 $worn.face.name【을를】 머리에서 잡아당겨 벗긴다. 눈이 빛에 적응하기도 전에 당신은 풀밭 위로 밀쳐진다. 뒤에서 문이 쾅 닫힌다.
+	<br><br>
+	<<set $worn.face.type.push("broken")>>
+	<<faceruined>><<unbind>>
+	당신은 신전 정원에 있다. <<tearful>> 당신은 몸을 일으킨다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<<else>>
+	눈이 가려지고 재갈이 물렸음에도 불구하고, 당신은 틈을 만들어낸다. <<tearful>> 당신은 무작위 방향으로 달린다.
+	<br><br>
+	<<clotheson>>
+	<<saveNPC 0 "temp0">>
+	<<saveNPC 1 "temp1">>
+	<<endcombat>>
+	<<loadNPC 0 "temp0">>
+	<<loadNPC 1 "temp1">>
+	<<clearNPC "temp0">>
+	<<clearNPC "temp1">>
+
+	<<link [[다음|Temple Garden Escape]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Shove
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 <<monk>>【을를】 밀쳐낸다. <<He>> 가장자리에서 비틀거리다 외치며 뒤로 넘어진다. <<His>> 수도복이 걷혀, <<his>> <span class="lewd"><<if $NPCList[0].penis isnot "none">>자지<<else>>보지<</if>></span>가 드러난다. 몇몇 입문자가 그쪽을 보고 키득거린다.
+<br><br>
+<<He>> 힘겹게 일어나 당신을 노려본 뒤 성큼성큼 걸어간다.
+<br><br>
+
+<<link [[다음|Temple Garden]]>><<endevent>><</link>>
+<br>
+
+:: Temple Garden Put
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 참는다. 이제 <<monk>>【이가】 돕는 가운데 계속 나무에서 과일을 딴다. <<He>> 한 손으로 당신의 어깨를 붙잡고, 다른 손으로는 팔을 뻗는다.
+<br><br>
+<<if $rng gte 51>>
+	미묘하지만, <<his>> 골반은 필요 이상으로 활발하게 움직인다. 당신은 <<him>>【이가】 당신의 <<bottom>>에 몸을 비비는 것을 느낀다. 점점 거칠어지더니, 마침내 <<he>>【은는】 당신의 양 어깨를 잡고 허리를 숙이게 한다. 사다리에서 떨어지지 않으려고 버티는 것이 고작이다. 당신은 <<him>>【이가】 등 뒤에서 떨고 경련하는 것을 느낀다.
+	<<trauma 6>><<stress 6>><<gtrauma>><<gstress>>
+	<br><br>
+	<<set $temple_harassed += 1>>
+	"다 되었습니다," <<he>> 사다리에서 내려오며 말한다. "도와주셔서 감사합니다." <<He>> 키득이며 신전으로 돌아간다.
+	<br><br>
+	<<tearful>> 당신도 사다리에서 내려온다.
+	<br><br>
+
+	<<link [[다음|Temple Garden]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	"다 되었습니다," <<he>> 사다리에서 내려오며 말한다. "도와주셔서 감사합니다." <<He>> 신전으로 돌아간다.
+	<br><br>
+	당신도 내려온다.
+	<br><br>
+
+	<<link [[다음|Temple Garden]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Work Wolf
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<if Time.dayState isnot "night">>
+		<<enable_rescue>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Temple Garden Work Wolf Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Garden Work Wolf]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Garden Work Wolf Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<beasttype 0>>【은는】 숲으로 돌아간다. <<tearful>> 당신은 몸을 일으킨다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	<<beasttype 0>>【은는】 낑낑거리며 절뚝여 숲으로 돌아간다. <<tearful>> 당신은 몸을 일으킨다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<<else>>
+	<<generate2>><<person2>>
+	<<beasttype 0>>의 귀가 쫑긋 선다. 잠시 후 당신도 그 소리를 듣는다. 발소리다.<<silently>><<clotheson>><</silently>>
+	<br><br>
+	<<if $current_sex is 1>>
+		<<beasttype 0>>【은는】 도망치려 하지만, 당신에게서 빠져나가지 못한다. 발소리가 가까워진다. 당신은 떨어지려 애쓰지만 소용없다. 당신들이 아직 붙어 있는 사이 한 <<monk>>【이가】 모퉁이를 돈다.
+		<br><br>
+		<<if $exposed gte 1>>
+			<<He>> 멈춰 서서 당신을 빤히 바라본다. <<covered>> <<He>> 말하려 하지만 말을 찾지 못한다. <<beasttype 0>>【이가】 마침내 빠져나와 숲으로 달아나는 동안, <<He>> 몸을 가누려 해시계에 기댄다.
+			<br><br>
+			<<clotheson>>
+			"저—" <<he>> 가까스로 말하다 다시 멈춰 몸을 가눈다. "절대 용납할 수 없습니다. 주교님께 보고하겠습니다." <<He>> <<his>> 수도복에서 수건 몇 장을 꺼내 당신 위에 떨어뜨리고 성큼성큼 떠난다.<<lllgrace>><<gtrauma>><<gstress>><<grace -8>><<trauma 9>><<stress 9>>
+			<<towelup>>
+			<br><br>
+		<<else>>
+			<<He>> 멈춰 서서 당신을 빤히 바라본다. <<He>> 말하려 하지만 말을 찾지 못한다. <<beasttype 0>>【이가】 마침내 빠져나와 숲으로 달아나는 동안, <<He>> 몸을 가누려 해시계에 기댄다.
+			<br><br>
+			<<clotheson>>
+			"저—" <<he>> 가까스로 말하다 다시 멈춰 몸을 가눈다. "절대 용납할 수 없습니다. 주교님께 보고하겠습니다." <<He>> 돌아서서 성큼성큼 떠난다.<<lllgrace>><<gtrauma>><<gstress>><<grace -8>><<trauma 9>><<stress 9>>
+			<br><br>
+		<</if>>
+<<tearful>> 당신은 생울타 뒤에 숨는다.<<famebestiality 1>>
+		<br><br>
+		<<endcombat>>
+		<<link [[다음|Temple Garden]]>><</link>>
+	<<else>>
+		<<if $exposed gte 1>>
+			<<beasttype 0>>【은는】 숲을 향해 달려가고, 바로 그 직전에 <<monk>> 한 명이 울타리를 돌아 나온다.
+			<br><br>
+			"세상에나," <<he>> 당신을 바라보며 말한다. <<covered>> <<clotheson>>
+			<<He>> <<his>> 눈을 돌리고 <<his>> 수도복 아래를 뒤적인다. <<He>> 수건 몇 장을 꺼내 당신 위에 던진다. <<He>> 혀를 차며 걸어간다.
+			<<llgrace>><<gtrauma>><<gstress>><<grace -5>><<trauma 6>><<stress 6>>
+			<<towelup>>
+			<br><br>
+		<<else>>
+			<<beasttype 0>>【은는】 숲을 향해 달려가고, 바로 그 직전에 <<monk>> 한 명이 울타리를 돌아 나온다. <<He>>【은는】 당신을 힐끗 보지만, 뭔가 잘못되었다는 것을 깨닫지 못한다.
+			<br><br>
+			<<clotheson>>
+		<</if>>
+		<<tearful>> 당신은 몸을 일으킨다.
+		<br><br>
+		<<endcombat>>
+		<<link [[다음|Temple Garden]]>><</link>>
+	<</if>>
+<</if>>
+
+:: Temple Garden Tentacles
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+	<<tentaclestart 4 15 "vine" "vine" true>>
+<</if>>
+<<statetentacles>>
+
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<actionstentacles>>
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Temple Garden Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Garden Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Garden Tentacles Finish
+<<effects>>
+덩굴손들이 축 늘어지고, 당신은 덤불 속으로 추락한다.
+<br><br>
+<<tearful>> 당신은 울타리 밑에서 기어 나온다.
+<br><br>
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Temple Garden]]>><</link>>
+<br>
+
+:: Temple Garden Exposed
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 울타리 사이를 이동하며 몸을 낮게 유지하고, 또 한 번 미친 듯이 질주하기 전에 각 모퉁이를 엿본다. 그들이 가끔 이곳에 옷을 말린다는 것을 알고 있다.
+<<if Weather.precipitation is "rain">>
+	아마 비를 피해 근처에 보관해 두었을지도 모른다.
+<<elseif Weather.precipitation is "snow">>
+	아마 눈을 피해 근처에 보관해 두었을지도 모른다.
+<</if>>
+<br><br>
+<<rng>>
+<<beastNEWinit 1 wolf>>
+<<if $rng gte 51 and ($monster is 1 or $settings.bestialityEnabled)>>
+	등 뒤에서 무언가 소리가 들린다.
+	<<if $syndromewolves is 1>>
+		<<beasttype>> 한 마리가 울타리 아래에서 모습을 드러낸다. <<bhis>> <<if $monster is 1>>팔 안에 천 꾸러미를 안고 있다. "가려. 몸, 나쁜 사람들 보라고 있는 거 아냐."<<else>>입에 천 꾸러미를 물고 있다.<</if>>
+		<<bHe>> 당신 옆에 수건 몇 장을 떨어뜨리고 숲으로 달려 돌아간다.
+		<br><br>
+		<<towelup>>
+		<<link [[다음|Temple Garden]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<beasttype>> 한 마리가 울타리 밑에서 나타난다. <<bHe>>【이가】 당신 위로 뛰어오른다.
+		<br><br>
+		<<link [[다음|Temple Garden Wolf]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<endevent>>
+	<<generate1>><<generate2>>
+	당신은 줄에 걸린 수녀복 한 벌을 본다. <<if Weather.precipitation is "rain">>급히 비를 피해 옮겨 놓은 것 같다<<elseif Weather.precipitation is "snow">>급히 눈을 피해 옮겨 놓은 것 같다<<else>>화단 위에 걸려 있다<</if>>. 같은 줄에는 수건 몇 장도 걸려 있다. 수건 쪽이 더 가깝다. 수도복을 입은 <<fullGroup>>【이가】 근처 화단을 돌보고 있다. 그들의 등은 돌아서 있다.
+	<br><br>
+	<<set $skulduggerydifficulty to 700>>
+	<<link [[수도복을 훔친다|Temple Garden Habit]]>><<set $skulduggerydifficulty to 700>><<crimeUp 50 "thievery">><</link>><<skulduggerydifficulty>><<crime "thievery">>
+	<br>
+	<<set $skulduggerydifficulty to 300>>
+	<<link [[수건을 가져간다|Temple Garden Towels]]>><<set $skulduggerydifficulty to 300>><</link>><<skulduggerydifficulty>>
+	<br>
+<</if>>
+
+:: Temple Garden Habit
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 <<nudity>>【을를】 의식하며 엎드린 채 빨랫줄을 향해 기어간다.
+<br><br>
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	당신은 그 쌍 옆으로 기어간다. <<persons>> 팔이 뒤로 뻗어 뭔가를 찾는 듯 땅을 더듬는다. 근처에 모종삽이 있어, 당신은 그것을 들어 손잡이를 <<his>> 손에 쥐여준다. <span class="green"><<He>> 당신이 있는 줄도 모르고 다시 정원 일을 계속한다.</span>
+	<br><br>
+	<<skulduggeryuse>>
+	당신은 수도복 아래로 기어들어가 빨랫줄에서 그것을 잡아당긴다. 이 상태로는 옷을 입을 수 없으므로, 당신은 다시 울타리의 안전한 곳으로 기어간다.
+	<br><br>
+	<<upperwear "nun's habit">>
+	<<endevent>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<<else>>
+	당신은 그 쌍 옆으로 기어간다. <<person1>><<persons>> 팔이 뒤로 뻗어 뭔가를 찾는 듯 땅을 더듬는다. <span class="red"><<His>> 손이 대신 당신의 <<bottom>>【을를】 찾아낸다.</span> <<He>> 비명을 지르며 벌떡 일어난다. <<He>>【와과】 <<person2>><<person>>【은는】 신전 쪽으로 달려간다.
+	<<llgrace>><<grace -5>><<garousal>><<arousal 600>>
+	<br><br>
+	<<skulduggeryuse>>
+	당신은 수도복으로 달려가 빨랫줄에서 그것을 낚아채고, 다시 울타리의 안전한 곳으로 달려간다.
+	<br><br>
+	<<upperwear "nun's habit">>
+	<<endevent>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Towels
+<<set $outside to 1>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 <<nudity>>【을를】 의식하며 엎드린 채 빨랫줄을 향해 기어간다.
+<br><br>
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	거의 줄에 닿을 무렵 <<person1>><<person>>【이가】 뒤돌아본다. 당신은 얼어붙는다. <<He>> 모종삽을 집어 들고 <span class="green">당신이 있는 줄도 모른 채 다시 정원 일을 계속한다.</span>
+	<br><br>
+	<<skulduggeryuse>>
+	당신은 수건 아래로 기어들어가 빨랫줄에서 그것들을 잡아당긴다. 이 상태로는 옷을 입을 수 없으므로, 당신은 다시 울타리의 안전한 곳으로 기어간다.
+	<br><br>
+	<<towelup>>
+	<<endevent>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<<else>>
+	거의 줄에 닿을 무렵 <<person1>><<person>>【이가】 뒤돌아본다. 당신은 얼어붙는다. <span class="red"><<person>>【이가】 당신을 발견하고</span> 비명을 지르며 벌떡 일어난다. <<He>>【와과】 <<person2>><<person>>【은는】 신전 쪽으로 달려간다.
+	<<llgrace>><<grace -5>><<garousal>><<arousal 600>>
+	<br><br>
+	<<skulduggeryuse>>
+	당신은 수건으로 달려가 빨랫줄에서 그것들을 낚아채고, 다시 울타리의 안전한 곳으로 달려간다.
+	<br><br>
+	<<towelup>>
+	<<endevent>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Garden Wolf
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<if Time.dayState isnot "night">><<enable_rescue>><</if>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend>>
+	<span id="next"><<link [[다음|Temple Garden Wolf Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Garden Wolf]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Garden Wolf Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<beasttype 0>>【은는】 숲으로 돌아간다. <<tearful>> 당신은 울타리 뒤에 숨는다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Garden]]>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	<<beasttype 0>>【은는】 숲속으로 도망친다. <<tearful>> 당신은 울타리 뒤에 숨는다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Garden]]>><</link>>
+<<else>>
+	<<generate2>><<person2>>
+	<<beasttype 0>>의 귀가 쫑긋 선다. 잠시 후 당신도 그 소리를 듣는다. 발소리다.
+	<br><br>
+	<<if $current_sex is 1>>
+		<<beasttype 0>>【은는】 도망치려 하지만, 당신에게서 빠져나가지 못한다. 발소리가 가까워진다. 당신은 떨어지려 애쓰지만 소용없다. 당신들이 아직 붙어 있는 사이 한 <<monk>>【이가】 모퉁이를 돈다.
+		<br><br>
+		<<He>> 멈춰 서서 당신을 빤히 바라본다. <<covered>> <<He>> 말하려 하지만 말을 찾지 못한다. <<beasttype 0>>【이가】 마침내 빠져나와 숲으로 달아나는 동안, <<He>> 몸을 가누려 해시계에 기댄다.
+		<br><br>
+		"저—" <<he>> 가까스로 말하다 다시 멈춰 몸을 가눈다. "절대 용납할 수 없습니다. 주교님께 보고하겠습니다." <<He>> <<his>> 수도복에서 수건 몇 장을 꺼내 당신 위에 떨어뜨리고 성큼성큼 떠난다.<<lllgrace>><<gtrauma>><<gstress>><<grace -8>><<trauma 9>><<stress 9>>
+		<br><br>
+<<tearful>> 당신은 몸을 가린다.<<famebestiality 1>>
+		<br><br>
+		<<clothesontowel>>
+		<<endcombat>>
+		<<link [[다음|Temple Garden]]>><</link>>
+	<<else>>
+		<<beasttype 0>>【은는】 숲을 향해 달아나고, 그 직후 한 <<monk>>【이가】 울타리 모퉁이를 돈다. "세상에나," <<he>> 당신을 바라보며 말한다. <<covered>> <<He>> <<his>> 눈을 돌리고 <<his>> 수도복 아래를 뒤적인다. <<He>> 수건 몇 장을 꺼내 당신 위에 던진다. <<He>> 혀를 차며 걸어간다.
+		<<llgrace>><<gtrauma>><<gstress>><<grace -5>><<trauma 6>><<stress 6>>
+		<br><br>
+		<<tearful>> 당신은 몸을 가린다.
+		<br><br>
+		<<clothesontowel>>
+		<<endcombat>>
+		<<link [[다음|Temple Garden]]>><</link>>
+	<</if>>
+<</if>>

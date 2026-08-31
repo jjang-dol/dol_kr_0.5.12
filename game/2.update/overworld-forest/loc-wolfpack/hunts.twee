@@ -1,0 +1,1284 @@
+:: Wolf Cave Hunt
+<<set $location to "wolf_cave">><<effects>>
+
+<<if $wolfpacktrust gte 18 or $wolfpackleader gte 1>>
+	<<if playerIsPregnant() and playerBellySize() gte 15>>
+		<<set _pregnancy to getPlayerPregnancy()>>
+		<<npc "Black Wolf">>
+		You try to follow the <<wolf_cave_plural>>, but the Black Wolf turns and sniffs around your belly.
+		<<if $monster is 1>>
+			"Stay! Watch young. Protect belly."
+			<<if childBaseSpecies(_pregnancy.donorSpecies) is "wolf" and couldBeDonor(_pregnancy, "Black Wolf")>>
+				As <<bhe>> proudly looks at your belly.<<set $blackWolfPregnancyHunt to true>>
+			<</if>>
+		<<else>>
+			<<bHe>>
+			<<if childBaseSpecies(_pregnancy.donorSpecies) is "wolf" and couldBeDonor(_pregnancy, "Black Wolf")>>
+				looks more confidant than normal and clearly<<set $blackWolfPregnancyHunt to true>>
+			<</if>>
+			wants you to stay with the younger <<wolf_cave_plural>> to protect you and your growing belly.
+		<</if>>
+		<br><br>
+		<<endevent>>
+
+		You watch as they depart between the trees.
+		<br><br>
+
+		<<destinationwolfcave>>
+	<<elseif $blackWolfNotHunting>>
+		<<npc "Black Wolf">>
+		The Black Wolf sits, watching from <<bhis>> rock with <<bhis>> extended belly showing.
+		<<endevent>>
+		<br><br>
+		<<if $wolfpackleader gte 1>>
+			The pack bays and howls as members nip and bite each other in excitement. But no one has started running yet. They're all looking at you.
+		<<else>>
+			Members of the pack snarl and bite over who gets to lead the hunt.
+		<</if>>
+		<<set $outside to 1>>
+		<br><br>
+		<<link [[Take the lead (0:15)|Wolf Cave Hunt No Black Wolf Start]]>><<set $phase to 1>><</link>>
+		<br>
+		<<link [[Look away (0:30)|Wolf Cave Hunt No Black Wolf Start]]>><</link>>
+	<<else>>
+		<<set $dateCount.Total++>><<set $dateCount.BlackWolfHunts++>>
+
+		You follow the <<wolf_cave_plural>> as they depart between the trees. They don't stop you.
+		<br><br>
+		<<set $outside to 1>>
+		Not far from the cave they break into a run. They move fast. It's hard to keep up.
+		<<physique 1>><<gathletics>><<athletics 1>><<pass 10>>
+		<br><br>
+
+		<<wolfhuntevents>>
+	<</if>>
+<<else>>
+	You try to follow the <<wolf_cave_plural>>, but the Black Wolf turns and growls at you.
+	<<npc "Black Wolf">>
+	<<if $monster is 1>>
+		"Stay! Watch young. Build trust."
+	<<else>>
+		<<bHe>> wants you to stay with the younger <<wolf_cave_plural>>.
+	<</if>>
+	<br><br>
+	<<endevent>>
+
+	You watch as they depart between the trees.
+	<br><br>
+
+	<i>If they trusted you more, they might be willing to let you come along.</i>
+	<br><br>
+
+	<<destinationwolfcave>>
+<</if>>
+
+:: Wolf Cave Hunt Leave
+
+<<set $location to "wolf_cave">><<effects>>
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	<<npc "Black Wolf">>
+	검은 늑대는 킁킁거리지만, 충실하게 일어선다.
+	<<if playerIsPregnant() and playerBellySize() gte 15>>
+		<<if $monster is 1>>
+			"사냥감 가져올 거다, 새끼들 위해."
+		<<else>>
+			<<bHe>> 떠나기 전에 당신의 임신한 배를 핥는다.
+		<</if>>
+	<<elseif $wolfpackleader is 1 and (statusCheck("Black Wolf").love lt 125 or $wolfpackharmony lt 18)>>
+		<<if $monster is 1>>
+			"우두머리가 사냥 이끌어야 한다."
+		<<else>>
+			<<bHe>> 못마땅해 보이지만, 그럼에도 당신의 결정에 따른다.
+		<</if>>
+		<<if $wolfpackharmony lt 18>>
+			<<npcincr "Black Wolf" love -1>><<llove>>
+		<</if>>
+	<<else>>
+		<<if $monster is 1>>
+			"사냥감 가져올 거다, 내 짝."
+		<<else>>
+			<<bHe>> 떠나기 전에 당신의 뺨을 핥는다.
+		<</if>>
+	<<gharmony>>
+	<<gferocity>>
+	<</if>>
+	<br><br>
+	<<bHe>>【은는】 어린 <<wolf_cave_plural>>【와과】 당신을 남겨두고, 나무 사이로 떠나는 무리를 이끌기 위해 뛰쳐나간다.
+	<<endevent>>
+<<elseif $blackWolfNotHunting>>
+	무리는 당신과 검은 늑대를 어린 <<wolf_cave_plural>>【와과】 함께 남겨두고 나무 사이로 떠난다.
+	<<if $wolfpackleader gte 1>>
+		<<npc "Black Wolf">>
+		<<if $monster is 1>>
+			<br><br>
+			"우두머리가 이끌어야 하는데." 당신이 쳐다보는 것을 알아차린 <<bhe>>【은는】 실망한 듯 킁킁거린다.
+		<</if>>
+		<<endevent>>
+	<</if>>
+<<else>>
+	무리는 어린 <<wolf_cave_plural>>【와과】 당신을 남겨두고 나무 사이로 떠난다.
+<</if>>
+<br><br>
+
+
+<<if $wolfpackferocity gte 15 and $rng gte 91>>
+	<<link [[다음|Wolf Cave Bear]]>><</link>>
+<<else>>
+	<<destinationwolfcave>>
+<</if>>
+
+:: Wolf River
+<<location "forest">><<effects>>
+당신은 강가를 따라 무리와 함께 달린다. 부드러운 풀밭에 다다른다. <<wolf_cave_plural>> 중 몇몇이 휴식을 위해 눕는다.
+<br><br>
+<<if $wolfpackleader gte 1>>
+	<<link [[휴식한다 (1:00)|Wolf River Rest]]>><<tiredness -12>><</link>>
+	<br>
+	<<link [[쉴 시간 없다|Wolf River Rouse]]>><</link>>
+	<br>
+	<<if $rng gte 51>>
+		<<link [[검은 늑대가 결정하게 둔다|Wolf River Rest]]>><<tiredness -12>><</link>>
+		<br>
+	<<else>>
+		<<link [[검은 늑대가 결정하게 둔다|Wolf River Rouse]]>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<npc "Black Wolf">>
+	<<if $rng gte 51>>
+		검은 늑대도 눕자, 당신과 다른 <<wolf_cave_plural>>【이가】 그 뒤를 따른다.
+		<<if $monster is 1>>
+			"휴식. 힘 아껴라."
+		<</if>>
+		<br><br>
+		<<link [[다음 (1:00)|Wolf River Rest]]>><<tiredness -12>><</link>>
+		<br>
+	<<else>>
+		<<if $monster is 1>>
+			검은 늑대가 짖는다. "쉴 시간 없다! 바람에 냄새. 서둘러라."
+		<<else>>
+			검은 늑대가 그들에게 으르렁거리자, 그들은 다시 일어선다.
+		<</if>>
+		<br><br>
+		<<link [[다음|Wolf River Rouse]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+<<endevent>>
+
+:: Wolf Cliff
+<<location "forest">><<effects>>
+당신은 절벽 아래 썩어가는 그루터기에 다다른다. 그 밑동에는 버섯 무리가 자라고 있는데, 일부는 붉고 일부는 분홍색이다.
+<<if currentSkillValue('science') gte 400>>
+	당신은 붉은 버섯이 울프쉬룸이라는 것을 알아본다. 고대 전사들이 힘을 준다고 믿어 귀하게 여겼던 것이다. 분홍색 버섯도 알아본다. 그것은 최음제이며, <<wolf_cave_plural>>【을를】 포함한 많은 동물에게 독이 된다.
+<<elseif currentSkillValue('science') gte 200>>
+	당신은 붉은 버섯이 울프쉬룸이라는 것을 알아본다. 고대 전사들이 힘을 준다고 믿어 귀하게 여겼던 것이다. 분홍색 버섯은 알아보지 못한다.
+<<else>>
+	당신은 둘 다 알아보지 못한다.
+<</if>>
+<br><br>
+<<foodstufficon "wolfshroom">><<link [[붉은 버섯을 줍는다|Wolf Cliff2]]>><<set $wolfpackshroom to "red">><</link>>
+<br>
+<<icon "tending/mushroom-aphrodisiac.png">><<link [[분홍 버섯을 줍는다|Wolf Cliff2]]>><<set $wolfpackshroom to "pink">><<arousal 600>><</link>><<garousal>>
+<br>
+<<refuseicon>><<link [[그냥 둔다|Wolf Cliff2]]>><</link>>
+<br>
+
+:: Wolf River Rest
+<<location "forest">><<effects>>
+무리는 잠시 휴식을 취한다. 당신은 잠이 들기까지 한 것 같다.
+<<pass 45>>
+<<gharmony>><<lferocity>><<ltiredness>>
+<br><br>
+사냥 무리는 곧 안절부절못하게 되고, 사냥은 계속된다.
+<<physique 1>><<gathletics>><<athletics 1>><<pass 10>>
+<br><br>
+<<wolfhuntevents>>
+
+:: Wolf River Rouse
+<<location "forest">><<effects>>
+무리가 깨어나고 사냥은 계속된다.
+<<physique 1>><<gathletics>><<athletics 1>><<pass 10>>
+<br><br>
+<<wolfhuntevents>>
+
+:: Wolf Cliff2
+<<location "forest">><<effects>>
+무리가 다시 움직이기 시작하자, 당신은 그들을 따라잡기 위해 달린다.
+<<physique 1>>
+<<gathletics>><<athletics 1>><<pass 10>>
+<br><br>
+<<wolfhuntevents>>
+
+:: Wolf Deer
+<<npc "Black Wolf">>
+<<location "forest">><<effects>>
+사슴의 발자국을 따라간다. 사슴들은 당신이 맡을 수 없는 냄새라도 맡은 듯, 더욱 자주 고개를 든다. 잠시 후, 사슴들은 전력 질주하기 시작한다.
+<br><br>
+<<if $athleticsSuccess>>
+	사슴들은 당신을 위해 속도를 늦추지 않지만, <span class="green">당신은 따라잡을 수 있다.</span> 당신은 곧 공터에 도착한다. 반대편에는 홀로 있는 사슴 한 마리가 서 있다. 사슴은 무리를 보자 풀을 뜯는 것을 멈추고 겁에 질려 달아나기 시작한다.
+	<br><br>
+	<<if 20 + $wolfpackharmony + $wolfpackferocity gte $rng>>
+		사슴은 숲속을 뛰어다니며 나무 사이를 헤치고 시야에서 사라진다. 검은 늑대가 무리에서 이탈해 그 뒤를 쫓는다. 당신이 또 다른 공터로 들어서자, 검은 늑대가 <<bhis>> 사냥감 위에 의기양양하게 서 있는 것을 발견한다.
+		<br><br>
+		<<if random(1,5) is 1>>
+			<<endevent>><<beastNEWinit 1 wolf>><<saveNPC 0 rival_wolf>>
+			무리가 사냥감 주위로 모여들지만, 포식을 시작하기도 전에 무언가가 그들을 멈춰 세운다. 다른 무리가 당신 앞에 모습을 드러낸다. 이빨을 드러낸 채, 그들은 위협적인 자세로 다가온다.
+			<br><br>
+			<<if $wolfpackleader is 1>>
+				그들의 우두머리인 더 큰 <<beasttype>>【은는】 <<bhis>> 시선을 당신에게 고정하고 있다.
+				<<if $monster is 1>>
+					"네가 우두머리?" <<bhe>>【이가】 으르렁거린다. "무리 물러서라! 사냥감 지금 내놔!"
+				<<else>>
+					<<bHe>>【은는】 당신에게 사냥감을 <<bhim>>에게 넘기라고 요구하며 공격적으로 으르렁거린다.
+				<</if>>
+				<br><br>
+				처음에는 작은 무리인 줄 알았지만, 곧 더 많은 경쟁 무리의 구성원들이 덤불 뒤에서 나와 당신의 동족들을 포위하는 것을 알아차린다. 그들의 수가 더 많다.
+				<br><br>
+				<<endevent>><<npc "Black Wolf">>
+				검은 늑대가 당신 곁에 선다.
+				<<if $monster is 1>>
+					"명령을 내려라," <<bhe>>【이가】 당신에게 속삭인다. "무리가 따를 것이다."
+				<</if>>
+				<br><br>
+				<<wolf_cave_plural>>【이가】 당신의 신호를 기다린다.
+				<br><br>
+				<<endevent>><<loadNPC 0 rival_wolf>>
+				<<link [[우두머리와 싸운다|Wolf Rival Challenge]]>><</link>>
+				<br>
+				<<if hasSexStat("deviancy", 2)>>
+					<<link [[무리에게 자신을 바친다|Wolf Rival Offer]]>><</link>><<deviant2>>
+					<br>
+				<</if>>
+				<<link [[후퇴한다|Wolf Rival Retreat]]>><</link>>
+			<<else>>
+				그들의 우두머리인 더 큰 <<beasttype>>【은는】 <<bhis>> 시선을 검은 늑대에게 고정하고 있다.
+				<<if $monster is 1>>
+					"네가 우두머리?" <<bhe>>【이가】 으르렁거린다. "무리 물러서라! 사냥감 지금 내놔!"
+				<<else>>
+					<<bHe>>【은는】 검은 늑대를 섬뜩하게 노려보며, 무리에게 사냥감을 <<bhim>>에게 넘기라고 요구한다.
+				<</if>>
+				<br><br>
+				<<endevent>><<npc "Black Wolf">>
+				검은 늑대가 맞받아 으르렁거리지만, <<bhis>> 귀를 납작하게 눕힌다. 당신은 더 많은 경쟁 무리의 구성원들이 덤불 뒤에서 나와 당신의 동족들을 포위하는 것을 알아차린다. 그들의 수가 더 많다.
+				<br><br>
+				갑작스러운 접근에 자신감을 잃은 검은 늑대는 어떻게 반응해야 할지 확신하지 못하는 것 같다.
+				<br><br>
+				<<if hasSexStat("deviancy", 2)>>
+					<<endevent>><<loadNPC 0 rival_wolf>>
+					<<link [[무리에게 자신을 바친다|Wolf Rival Offer]]>><</link>><<deviant2>>
+					<br>
+				<</if>>
+				<<link [[도망친다|Wolf Rival Flee]]>><</link>><<athleticsdifficulty 1 1000>>
+			<</if>>
+		<<else>>
+			검은 늑대는 맛있는 부위를 <<bhimself>> 차지한다. 당신은 근처에서 자라는 산딸기를 발견하고, 그것이 더 나은 식사가 된다. 당신은 사슴 옆에 앉는다.
+			<<if $monster is 1>>
+				<<bHe>>【은는】 당신 옆에 앉아 머리에 손을 얹는다. "좋은 사냥이었다. <<ppackbrother>> 덕분에 성공했다."
+			<</if>>
+			<<stress -12>><<lstress>>
+			<br><br>
+			무리는 빈둥거리며 여유롭게 식사를 한다. 작은 다툼이 일어나자 검은 늑대가 그것을 진정시키기 위해 사슴 곁의 <<bhis>> 자리를 떠난다.
+			<br><br>
+			<<endevent>>
+			<<wolfpackhuntoptions>>
+		<</if>>
+	<<else>>
+		사슴은 숲속을 뛰어다니며 나무 사이를 헤쳐나간다. 무리가 그 뒤를 쫓지만, 그런 속도로 달리자 금세 지쳐버린다. 사슴은 도망쳤다.
+		<br><br>
+		<i>화합과 흉포함이 높을수록 사냥 성공 확률이 증가합니다.</i>
+		<br><br>
+		낙담했지만 좌절하지는 않은 <<wolf_cave_plural>>【은는】 더 쉬운 사냥감의 냄새를 맡으려 애쓴다. 그들은 바람에 실려 온 무언가를 포착하고 달리기 시작한다.
+		<<physique 2>><<gathletics>><<athletics 4>>
+		<br><br>
+		<<endevent>>
+		<<set $bus to "wolfcaveclearing">>
+		<<wolfhuntevents>>
+	<</if>>
+<<else>>
+	사슴들은 당신을 위해 속도를 늦추지 않고, <span class="red">당신은 따라잡을 수 없다</span>. 당신은 숲에서 그들을 놓친다.
+	<br><br>
+	<<link [[다음|Forest]]>><<endevent>><<set $forest to 60>><</link>>
+	<br>
+<</if>>
+<<pass 60>>
+
+:: Wolf Carrion
+<<location "forest">><<effects>>
+<<beastNEWinit 1 boar>><<npc "Black Wolf" 2>>
+흔적을 따라가자 풀이 무성한 작은 언덕에 도착한다. 언덕 꼭대기에는 사슴 사체가 놓여 있고, 야생 <<beasttype>> 한 마리가 그것을 뜯어먹고 있다. <<bHe 0>>【은는】 무리를 발견하고 아래를 쏘아본다.
+<br><br>
+
+<<if $rng gte 51>>
+	후방의 <<wolf_cave_plural>> 무리가 도착하기도 전에, <<beasttype 0>>【이가】 사체를 뛰어넘어 언덕 아래로, 당신을 향해 똑바로 돌진한다!
+	<br><br>
+
+	<<link [[자리를 지킨다|Wolf Carrion Stand]]>><</link>><<physiquedifficulty 2000 12000>>
+	<br>
+	<<link [[도망친다|Wolf Carrion Run]]>><</link>>
+	<br>
+
+<<else>>
+	무리의 마지막이 도착하기 전에, <<beasttype 0>>【이가】 사체를 뛰어넘어 언덕 아래로, 검은 늑대를 향해 똑바로 돌진한다.
+	<br><br>
+
+	<<if $wolfpackharmony + $wolfpackferocity + 20 gte $rng>>
+		검은 늑대는 <<bhis 1>> 자리를 지킨다. 공격자는 방향을 틀어 숲속으로 달아난다.
+		<br><br>
+
+		검은 늑대는 <<bhimself 1>>【을를】 위해 가장 좋은 부위를 챙긴다. 당신은 근처에서 자라는 산딸기를 발견하는데, 이게 더 나은 식사가 된다. 당신은 사슴 옆에 앉는다.
+		<<if $monster is 1>>
+			<<bHe 1>>【이가】 당신 옆에 앉아 머리에 손을 얹는다. "좋은 사냥이었다. 항상 자리를 지켜라, <<ppackbrother>>."
+		<</if>>
+		<<stress -12>><<lstress>>
+		<br><br>
+
+		무리는 빈둥거리며 여유롭게 식사를 한다. 작은 다툼이 벌어지자 검은 늑대는 그것을 진정시키기 위해 사슴 곁의 <<bhis 1>> 자리를 떠난다.
+		<br><br>
+		<<endevent>>
+		<<wolfpackhuntoptions>>
+
+	<<else>>
+		검은 늑대는 <<bhis 1>> 자리를 지키지만, 공격자의 돌진에 <<bhim 1>> 옆으로 나가떨어진다. <<bHe 0>>【은는】 무리 사이에서 날뛰고, 무리는 공황에 빠져 안전한 나무들 사이로 도망친다.
+		<br><br>
+
+		<i>화합과 흉포함이 높을수록 사냥 성공 확률이 증가합니다.</i>
+		<br><br>
+
+		당신은 무리와 함께 숲속으로 달린다. 더 쉬운 사냥감이 분명 있을 것이다.
+		<<physique 2>><<gathletics>><<athletics 4>>
+		<br><br>
+		<<endevent>>
+		<<set $bus to "wolfcaveclearing">>
+		<<wolfhuntevents>>
+	<</if>>
+<</if>>
+<<pass 60>>
+
+:: Wolf Bear
+<<location "forest">><<effects>>
+<<beastNEWinit 1 bear>><<npc "Black Wolf" 2>>
+작은 동굴에 도착하자, 거대한 형체가 일정한 리듬으로 오르내리는 것이 보인다. 그것은 <<beasttype 0>> 한 마리로, 갓 잡은 사냥감 옆에서 <<bhis 0>> 눈을 감고 누워 있다. 사슴처럼 보인다. 무리는 더 가까이 다가간다. 기습이 필요할 것이다.
+<br><br>
+
+<<set $skulduggerydifficulty to 300>>
+<<link [[주의를 끈다|Wolf Bear Distract]]>><</link>><<skulduggerydifficulty>>
+<br>
+<<link [[공격한다|Wolf Bear Attack]]>><</link>>
+<br>
+
+:: Wolf Hunters
+<<location "forest">><<effects>>
+
+무리가 불안해 보인다. 상황이 절박하지 않다면 보통 인간 무리를 추적하지는 않을 것이다. 그럼에도 무리는 당신을 따른다. 달리던 속도가 살금살금 걷는 속도로 느려지고, 곧 앞에서 웃음소리가 들려온다. 당신은 앞으로 살금살금 다가간다. 사냥꾼 세 명이 모닥불 주위에 앉아 있다. 그들 옆 땅바닥에는 사슴 사체가 놓여 있다. 각자 소총을 가지고 있다.
+<br><br>
+
+정면 공격은 매우 위험할 것이다.
+<br><br>
+
+<<if $exposed gte 2>>
+	<<if hasSexStat("exhibitionism", 5)>>
+		다른 사람들과 마주하니 당신의 <<lewdness>> 상태가 더 의식된다. 이런 모습으로 그들 한가운데로 걸어 들어가는 것은 정말 당혹스러울 것이다. 하지만 이것이 당신에게 유리하게 작용할 수도 있다.
+		<br><br>
+
+		<<set $skulduggerydifficulty to 400>>
+		<<link [[그들의 주의를 끈다|Wolf Hunters Distract]]>><<set $phase to 0>><</link>><<skulduggerydifficulty>><<exhibitionist5>>
+		<br>
+	<<else>>
+		다른 사람들과 마주하니 당신의 <<lewdness>> 상태가 더 의식된다. 그들에게 당신을 보이게 할 수는 없다.
+		<br><br>
+	<</if>>
+<<elseif $exposed gte 1>>
+	<<if hasSexStat("exhibitionism", 3)>>
+		다른 사람들과 마주하니 당신의 <<lewdness>> 상태가 더 의식된다. 이런 모습으로 그들 한가운데로 걸어 들어가는 것은 정말 당혹스러울 것이다. 하지만 이것이 당신에게 유리하게 작용할 수도 있다.
+		<br><br>
+
+		<<set $skulduggerydifficulty to 600>>
+		<<link [[그들의 주의를 끈다|Wolf Hunters Distract]]>><<set $phase to 1>><</link>><<skulduggerydifficulty>><<exhibitionist3>>
+		<br>
+	<<else>>
+		다른 사람들과 마주하니 당신의 <<lewdness>> 상태가 더 의식된다. 그들에게 당신을 보이게 할 수는 없다.
+		<br><br>
+	<</if>>
+<<else>>
+	<<set $skulduggerydifficulty to 800>>
+	<<link [[그들의 주의를 끈다|Wolf Hunters Distract]]>><<set $phase to 2>><</link>><<skulduggerydifficulty>>
+	<br>
+<</if>>
+
+<<link [[공격한다|Wolf Hunters Attack]]>><</link>>
+<br>
+<<link [[떠난다|Wolf Hunter Leave]]>><</link>>
+<br>
+
+:: Wolf Deer2
+<<location "forest">><<effects>>
+<<npc "Black Wolf">>
+<<if $phase is 0>><<set $wolfpackshroom to "none">>
+	<<wearProp "wolfshroom">>
+	당신은 붉은 버섯을 부수어 검은 늑대의 먹이에 뿌린다. <<bHe>>【이가】 당신을 발견하고 으르렁거리지만, 당신이 아무것도 가져가지 않는 것을 보고는 누그러진다. <<bHe>>【은는】 <<bhis>> 자리로 돌아가 계속 먹는다. 몇 시간 동안 <<bhe>>【은는】 점점 더 영역 의식이 강해져, 사슴에게 다가오는 다른 <<wolf_cave_plural>> 무리를 쏘아본다.
+	<<gferocity>>
+	<br><br>
+<<elseif $phase is 1>><<set $wolfpackshroom to "none">>
+	<<wearProp "pinkshroom">>
+	당신은 분홍 버섯을 부수어 검은 늑대의 먹이에 뿌린다. <<bHe>>【이가】 당신을 발견하고 으르렁거리지만, 당신이 아무것도 가져가지 않는 것을 보고는 누그러진다. <<bHe>>【은는】 <<bhis>> 자리로 돌아가 계속 먹는다. 몇 시간 동안 <<bhe>>【은는】 무기력해진다. 다른 <<wolf_cave_plural>> 무리는 이를 눈치채고 평소에는 허락되지 않았을 사슴 부위를 노린다.
+	<<lferocity>><<set $wolfpackpoisoned to 1>>
+	<br><br>
+<</if>>
+<<endevent>><<beastNEWinit 1 wolf>>
+당신은 <<beasttype>> 한 마리에게 머리를 기댄 채 풀밭에 눕는다. 그렇게 달렸더니 피곤하다. 당신은 눈을 감고 잠이 든다. 기대고 있던 <<beasttype>>【이가】 일어나자 잠에서 깬다.
+<br><br>
+<<endevent>>
+
+<<set $huntstate to "success">>
+<<wolfhuntevents>>
+
+:: Wolf Hunters Attack
+<<location "forest">><<effects>>
+<<generate1>><<generate2>><<generate3>>
+무리는 야영지 주위에 자리를 잡고, 사방에서 돌진한다!
+<br><br>
+
+<<if $wolfpackharmony + $wolfpackferocity - 20 gte $rng>>
+
+	사냥꾼들은 재빨리 반응하지만, 충분히 빠르지는 못하다. <<person1>><<person>>【이가】 앉아 있던 자리에 둔 <<his>> 총에 손을 뻗지만, 너무 늦었다. 검은 늑대가 달려들어 <<his>> 팔을 붙잡는다.
+	<br><br>
+
+	다른 <<wolf_cave_plural>> 무리도 검은 늑대의 선도를 따른다. 무리가 사냥꾼들을 서로 등을 맞댄 좁은 원 안으로 몰아넣자 당신은 뒤로 물러선다.
+	<br><br>
+
+	"이-이건 미-미친 짓이야." <<person>>【이가】 말을 더듬는다.
+	<br><br>
+	<<earnFeat "Top of the Food Chain">>
+	<<link [[귀중품을 요구한다|Wolf Hunters Valuables]]>><</link>><<crime "thievery">>
+	<br>
+	<<link [[그들을 보내준다|Wolf Hunters Go]]>><</link>>
+	<br>
+
+<<else>>
+	사냥꾼들은 재빨리 반응한다. 그들은 소총을 잡고 무리를 향해 발사한다. 총알이 윙 소리를 내며 숲속으로 날아간다. 다치지는 않았지만, <<wolf_cave_plural>> 무리는 꼬리를 내리고 안전한 곳으로 달아난다. 당신도 그들과 함께 간다.
+	<<lharmony>><<lferocity>>
+	<br><br>
+
+	<i>화합과 흉포함이 높을수록 사냥 성공 확률이 증가합니다.</i>
+	<br><br>
+
+	당신은 다시 한번 숲속으로 달려가고, 무리가 바로 뒤를 따른다. 더 쉬운 사냥감이 분명 있을 것이다.
+	<<physique 1>><<gathletics>><<athletics 1>><<pass 15>>
+	<br><br>
+	<<endevent>>
+	<<set $bus to "wolfcaveclearing">>
+	<<wolfhuntevents>>
+<</if>>
+
+:: Wolf Hunters Distract
+<<location "forest">><<effects>>
+<<generate1>><<generate2>><<generate3>>
+<<if $phase is 0>>
+	<<flaunting>> 당신은 나무들 사이의 안전한 곳에서 알몸으로 나온다. 등 뒤 어딘가에서 무리 동료 중 하나가 낑낑거리는 소리가 들리지만, 당신은 멈추지 않는다. 이제 사냥꾼들이 더 선명하게 보이고, 당신은 그들 한가운데로 똑바로 걸어 들어간다.
+	<<exhibitionism5>>
+
+	그들은 당신을 보고 입을 떡 벌린다. 가장 가까이 있던 <<person1>><<person>>【이가】 먼저 입을 연다. "이런, 숲의 님프가 아니신가. 우리 몸 좀 덥혀주러 오셨나 보네." <<He>>【이가】 일어서자, 다른 이들도 따라 일어선다.
+	<br><br>
+
+<<elseif $phase is 1>>
+	<<flaunting>> 당신은 그렇게 노출된 상태임에도 불구하고, 나무들 사이의 안전한 곳에서 모습을 드러낸다. 등 뒤 어딘가에서 무리 동료 중 하나가 낑낑거리는 소리가 들리지만, 당신은 멈추지 않는다. 이제 사냥꾼들이 더 선명하게 보이고, 당신은 그들 한가운데로 똑바로 걸어 들어간다.
+	<<exhibitionism3>>
+
+	그들은 당신을 보고 입을 떡 벌린다. 가장 가까이 있던 <<person1>><<person>>【이가】 먼저 입을 연다. "옷을 제대로 챙겨 입는 걸 잊었나 보네." <<He>>【이가】 일어서자, 다른 이들도 따라 일어선다.
+	<br><br>
+
+<<else>>
+	당신은 나무들 사이의 안전한 곳에서 나온다. 등 뒤 어딘가에서 무리 동료 중 하나가 낑낑거리는 소리가 들리지만, 당신은 멈추지 않는다. 이제 사냥꾼들이 더 선명하게 보이고, 당신은 그들 한가운데로 똑바로 걸어 들어간다.
+	<br><br>
+
+	그들은 당신을 보자마자 벌떡 일어나 총에 손을 뻗지만, 이내 진정한다. 가장 가까이 있던 <<person1>><<person>>【이가】 먼저 입을 연다. "그런 식으로 사람들한테 몰래 다가오면 안 되지." <<he>>【이가】 말한다. "다치기 십상이라고." <<He>>【이가】 일어서면서 당신을 음흉하게 쳐다보자, 다른 이들도 따라 일어선다.
+	<br><br>
+<</if>>
+
+<<skulduggerycheck>>
+<<skulduggeryuse>>
+<<if $skulduggerysuccess is 1>>
+	<<person2>><<person>> 한 명이 무언가 들으려는 듯 <<his>> 고개를 갸웃거리지만, <span class="green">아무것도 듣지 못한다.</span> <<He>>【이가】 당신을 보며 씩 웃는다. "숲속을 혼자 걷고 있었나? 걱정 마, 우리가 돌봐줄 테니."
+	<br><br>
+
+	"그래, 맞아." 다음으로 <<person3>><<person>> 한 명이 당신을 위아래로 훑어보며 말한다. "문제는, 널 데리고 뭘 할까 하는 거지."
+	<br><br>
+
+	그들은 당신에게 정신이 팔려, 어둠 속에서 빛나며 점점 다가오는 수많은 눈들을 알아채지 못한다. <<person1>><<person>>【이가】 <<his>> 친구의 어깨 너머를 보고는 <<his>> 얼굴에 공포가 번진다. <<He>>【이가】 앉아 있던 자리에 둔 <<his>> 총에 손을 뻗지만, 너무 늦었다. 검은 늑대가 달려들어 <<his>> 팔을 붙잡는다.
+	<br><br>
+
+	다른 <<wolf_cave_plural>>도 검은 늑대의 뒤를 따른다. 당신은 그들이 사냥꾼들을 서로 등을 맞댄 좁은 원 안으로 몰아넣는 동안 뒤로 물러선다.
+	<br><br>
+
+	"이-이건 ㅁ-미친 짓이야." <<person>>【이가】 말을 더듬는다.
+	<br><br>
+	<<earnFeat "Top of the Food Chain">>
+	<<link [[귀중품을 요구한다|Wolf Hunters Valuables]]>><</link>><<crime "thievery">>
+	<br>
+	<<link [[그들을 보내준다|Wolf Hunters Go]]>><</link>>
+	<br>
+<<else>>
+	<span class="red">"방금 그거 들었어."</span> <<person2>><<person>> 한 명이 외치고는, 재빠른 동작으로 돌멩이 하나를 집어 야영지 주변 덤불 속으로 던진다. 바스락거리는 소리와 후다닥거리는 발소리가 들린다. 소리는 점점 멀어진다. 무리는 잔뜩 긴장해 있었기에, 그 정도만으로도 놀라서 달아나기에 충분했다.
+	<br><br>
+
+	"네 친구들은 도망친 모양이네." <<person3>><<person>> 한 명이 말한다. "아쉽군. 분명 너처럼 귀여웠을 텐데." <<He>>【이가】 당신을 향해 손을 뻗는다. "자, 이리 와."
+	<br><br>
+
+	<<link [[다음|Wolf Hunter Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Wolf Hunter Leave
+<<location "forest">><<effects>>
+
+위험을 감수할 가치가 없다. 당신은 돌아서서 달아나고, 안도한 <<wolf_cave_plural>> 무리가 바로 뒤따라온다.
+<<physique 1>><<gathletics>><<athletics 1>><<pass 15>>
+<br><br>
+
+<<set $bus to "wolfcaveclearing">>
+<<wolfhuntevents>>
+
+:: Wolf Hunters Valuables
+<<location "forest">><<effects>>
+<<set $wolfpackrob to 1>>
+
+<<if $speech_attitude is "meek">>
+	"돈과 귀중품을 내놔." 당신이 말한다. "그리고 우리가 평화롭게 식사할 수 있도록 떠나."
+<<elseif $speech_attitude is "bratty">>
+	"돈과 귀중품을 내놔." 당신이 말한다. "내 가족의 먹이로 주기 전에."
+<<else>>
+	"돈과 귀중품을 내놔." 당신이 말한다. "서둘러, 내가 저들을 영원히 막을 수는 없어."
+<</if>>
+무리가 으르렁거린다.
+<br><br>
+
+그들은 주머니에서 돈을 꺼내고 장신구를 벗는다. 그들은 발치에 모든 것을 쌓아둔 뒤, 발뒤꿈치를 물어뜯는 <<wolf_cave_plural>>에 의해 야영지에서 쫓겨난다. 그들이 소리가 들리지 않는 곳까지 가자, 무리는 사슴 사체로 달려든다.
+<br><br>
+
+<<if $rng gte 96>>
+	당신은 현금 <<moneyGain 200 true true>>【와과】 함께 매우 값비싸 보이는 여러 장신구를 발견한다.
+	<<set $blackmoney += 800>><<crimeUp 800 "thievery">>
+<<elseif $rng gte 51>>
+	당신은 현금 <<moneyGain 50 true true>>【와과】 함께 꽤 값비싸 보이는 여러 장신구를 발견한다.
+	<<set $blackmoney += 50>><<crimeUp 50 "thievery">>
+<<else>>
+	당신은 현금 <<moneyGain 20 true true>>【와과】 함께 꽤 값비싸 보이는 여러 장신구를 발견한다.
+	<<set $blackmoney += 30>><<crimeUp 30 "thievery">>
+<</if>>
+
+<<endevent>>
+<<npc "Black Wolf">>
+검은 늑대는 <<bhimself>>【을를】 위해 사슴의 좋은 부위를 챙긴다. 당신은 사냥꾼들이 남기고 간 가방을 뒤져 당신에게 더 잘 맞는 통조림 음식을 찾는다. 당신은 사슴 옆에 앉는다.
+<<stress -12>><<lstress>>
+<br><br>
+
+<<if $wolfpackspray isnot 1>><<set $wolfpackspray to 1>>
+	<<wearProp "pepper spray">>
+	당신은 그들의 물건 속에서 이상한 원통을 발견한다. 후추 스프레이 충전기처럼 보이지만, 바닥에 컴퓨터 칩이 노출되어 있다. 당신은 그것을 집어넣는다.
+	<<gspraymax>><<set $spraymax += 1>><<spray 5>>
+	<br><br>
+	<span class="gold">후추 스프레이 충전 횟수가 추가로 1회 늘어났습니다.</span>
+	<br><br>
+<</if>>
+<<if $monster is 1>>
+	검은 늑대가 당신 옆에 앉아 머리에 손을 얹는다. "훌륭한 사냥. 인간, 최상위 포식자. 너와 함께라면, 우린 뭐든 할 수 있다, <<ppackbrother>>."
+<</if>>
+
+무리는 한가롭게 주변을 어슬렁거리며 여유롭게 식사를 한다. 작은 다툼이 일어나자 검은 늑대는 사슴 옆에 있던 <<bhis>> 자리를 떠나 그것을 진정시킨다.
+<br><br>
+<<wolfpackhuntoptions>>
+
+:: Wolf Hunters Go
+<<location "forest">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"우리를 내버려 둬." 당신은 말한다. "우린 그저 평화롭게 식사하고 싶을 뿐이야."
+<<elseif $speech_attitude is "bratty">>
+	"꺼져." 당신은 말한다. "마음이 바뀌어서 널 내 가족의 먹이로 주기 전에."
+<<else>>
+	"꺼져." 당신은 말한다. "내가 저들을 영원히 막을 수는 없어."
+<</if>>
+무리가 으르렁거린다.
+<br><br>
+
+사냥꾼들은 고개를 끄덕이고 야영지를 떠난다. <<wolf_cave_plural>>【이가】 그들의 발뒤꿈치를 물어뜯는다. 그들이 들리지 않는 곳으로 가자마자 무리는 사슴 사체로 달려든다.
+<br><br>
+
+<<endevent>>
+<<npc "Black Wolf">>
+검은 늑대는 <<bhimself>>【을를】 위해 가장 좋은 부위를 챙긴다. 당신은 사냥꾼들이 남기고 간 가방을 뒤져 당신에게 더 잘 맞는 통조림 음식을 찾는다. 당신은 사슴 옆에 앉는다.
+<<stress -12>><<lstress>>
+<br><br>
+
+<<if $wolfpackspray isnot 1>>
+	<<set $wolfpackspray to 1>>
+	<<wearProp "pepper spray">>
+	당신은 그들의 물건 속에서 이상한 원통을 발견한다. 후추 스프레이 충전기처럼 보이지만, 바닥에 컴퓨터 칩이 노출되어 있다. 당신은 그것을 집어넣는다.
+	<<gspraymax>><<set $spraymax += 1>><<spray 5>>
+	<br><br>
+	<span class="gold">후추 스프레이 충전 횟수가 추가로 1회 늘어났습니다.</span>
+	<br><br>
+<</if>>
+<<if $monster is 1>>
+	검은 늑대가 당신 옆에 앉아 머리에 손을 얹는다. "훌륭한 사냥. 인간, 최상위 포식자. 너와 함께라면, 우린 뭐든 할 수 있다, <<ppackbrother>>."
+<</if>>
+
+무리는 한가롭게 주변을 어슬렁거리며 여유롭게 식사를 한다. 작은 다툼이 일어나자 검은 늑대는 사슴 옆에 있던 <<bhis>> 자리를 떠나 그것을 진정시킨다.
+<br><br>
+<<wolfpackhuntoptions>>
+
+:: Wolf Hunter Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<set $enemyanger += 50>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Wolf Hunter Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Wolf Hunter Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Wolf Hunter Rape Finish
+<<location "forest">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	"이 여행이 그럴 만한 가치가 있을 거라고 했잖아." <<person1>><<person>>【이가】 말한다. "이제 어떡하지?"
+	<br><br>
+
+	<<person2>>"알아." <<person>>【이가】 말한다. <<He>>【은는】 불 옆에 있는 가방에서 밧줄을 꺼내 당신의 팔을 함께 묶는다. "자. 늑대 밥이 되는 걸 즐겨." <<tearful>> 당신은 야영지를 떠난다. 그들의 웃음소리가 등 뒤로 사라질 때까지 걷는다.
+	<br><br>
+	<<set $leftarm to "bound">><<set $rightarm to "bound">><<handheldruined>>
+<<else>>
+	<<person1>><<person>>【이가】 뒤로 비틀거리다 불 속으로 발을 들인다. <<tearful>> 당신은 <<him>>【을를】 밀치고 숲으로 달아난다.
+	<br><br>
+
+<</if>>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Forest]]>><<set $forest to 1>><</link>>
+
+:: Wolf Bear Distract
+<<location "forest">><<effects>>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	당신은 동굴로 몰래 다가간다. <<beasttype 0>>【이가】 코 고는 소리가 들리는 것 같다. <span class="green">당신은 <<bhim 0>> 뒤로 몰래 다가간다.</span> 나머지 무리가 조금씩 더 가까이 다가온다. 그들 중 하나가 나뭇가지를 밟자, <<beasttypes>>의 눈이 번쩍 뜨인다. 당신은 <<bhim 0>>에게 돌을 던지고, <<bhe 0>>【은는】 당신을 마주본다. <<bHe 0>>【은는】 바로 뒤에 있는 <<wolf_cave_plural>>【을를】 알아채지 못한 채, 몸을 일으켜 포효한다. 그들은 <<bhim 0>> 뒤에서 공격하며, <<bhis 0>> 팔다리를 물어뜯고 <<bhis 0>> 등을 발톱으로 할퀸다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	몽롱하고 포위된 <<beasttype 0>>【은는】 동굴에서 비틀거리며 멀어져, 사슴 사체를 무방비 상태로 남겨둔다. <<if $monster is 1>>"도둑놈 같은 늑대들... 그렇게 원하면 사슴을 가져가라!"<</if>> 검은 늑대는 <<bhimself 1>>【을를】 위해 가장 좋은 부위를 챙긴다. 당신은 근처에서 자라는 베리를 발견하는데, 이게 당신에게 더 잘 맞는다. 당신은 사슴 옆에 앉는다.
+	<<stress -12>><<lstress>>
+	<br><br>
+	<<endevent>>
+	<<npc "Black Wolf">>
+	<<if $monster is 1>>
+		검은 늑대가 당신을 부른다. "곰, 무리의 힘에 상대 안 돼. <<pPackbrother>>【이가】 잘했다."
+	<</if>>
+
+	무리는 한가롭게 주변을 어슬렁거리며 여유롭게 식사를 한다. 작은 다툼이 일어나자 검은 늑대는 사슴 옆에 있던 <<bhis>> 자리를 떠나 그것을 진정시킨다.
+	<br><br>
+	<<wearProp "rock">>
+	<<wolfpackhuntoptions>>
+<<else>>
+	당신은 동굴로 몰래 다가간다. <<beasttype 0>>【이가】 코 고는 소리가 들리는 것 같다. <span class="red">당신이 <<bhim 0>> 바로 옆에 있을 때, <<bhe 0>>【이가】 <<bhis 0>> 눈을 뜨고 당신을 똑바로 쳐다본다!</span> <<wolf_cave_plural>>【은는】 밤 속으로 달아나고 <<beasttype 0>>【은는】 당신 위로 몸을 일으킨다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Wolf Bear Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Wolf Bear Attack
+<<location "forest">><<effects>>
+무리가 동굴로 살금살금 다가간다. <<beasttype 0>>의 눈이 뜨이고, 무리는 <<bhim 0>>에게 달려든다.
+<br><br>
+
+<<if $wolfpackharmony + $wolfpackferocity + 20 gte $rng>>
+
+	<<beasttype 0>>【은는】 일어서려 하지만, 너무 늦었다. 여러 개의 턱이 <<bhis 0>> 몸에 단단히 박힌다. <<bHe 0>>【은는】 고통에 울부짖으며 공격자들을 후려치지만, 그들은 안전하게 뒤로 물러난다.
+	<br><br>
+
+	몽롱하고 다친 <<beasttype 0>>【은는】 동굴에서 비틀거리며 멀어져, 사슴 사체를 무방비 상태로 남겨둔다. <<if $monster is 1>>"도둑놈 같은 늑대들... 그렇게 원하면 사슴을 가져가라!"<</if>> 검은 늑대는 <<bhimself 1>>【을를】 위해 가장 좋은 부위를 챙긴다. 당신은 근처에서 자라는 베리를 발견하는데, 이게 당신에게 더 잘 맞는다.
+	<<stress -12>><<lstress>>
+	<br><br>
+	<<endevent>>
+	<<npc "Black Wolf">>
+	<<if $monster is 1>>
+		검은 늑대가 당신을 부른다. "곰, 무리의 힘에 상대 안 돼. <<pPackbrother>>【이가】 잘했다."
+	<</if>>
+
+	무리는 한가롭게 주변을 어슬렁거리며 여유롭게 식사를 한다. 작은 다툼이 일어나자 검은 늑대는 사슴 옆에 있던 <<bhis>> 자리를 떠나 그것을 진정시킨다.
+	<br><br>
+
+	<<endevent>>
+	<<wolfpackhuntoptions>>
+
+<<else>>
+	검은 늑대가 공격하지만, <<beasttype 0>>【은는】 너무 빠르다. <<bHe 0>>【은는】 검은 늑대를 옆으로 후려치고, 다른 <<wolf_cave_plural>>【은는】 돌아서 달아난다. 검은 늑대는 <<bhis 1>> 자존심 외에는 다치지 않은 채 그들을 따른다.
+	<br><br>
+
+	<i>화합과 흉포함이 높을수록 사냥 성공 확률이 증가합니다.</i>
+	<br><br>
+
+	당신은 무리와 함께 숲으로 달려간다. 더 쉬운 사냥감이 있을 것이다.
+	<<physique 1>><<gathletics>><<athletics 1>><<pass 15>>
+	<br><br>
+	<<endevent>>
+
+	<<set $bus to "wolfcaveclearing">>
+	<<wolfhuntevents>>
+<</if>>
+
+:: Wolf Bear Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $enemytrust -= 40>><<set $enemyanger += 40>><<set $enemyhealthmax to 400>><<set $enemyhealth to 400>><<set $enemyarousalmax to 1000>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Wolf Bear Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Wolf Bear Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Wolf Bear Rape Finish
+<<location "forest">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	만족한 <<beasttype>>【은는】 다시 잠이 든다.
+<<elseif $enemyhealth lte 0>>
+	당신은 거대한 <<beasttype>>【을를】 겁준다. <<bHe>>【은는】 <<bhis>> 거처 깊숙이 달아난다. 무리가 도망친 것이 아쉽다. 사체를 지키는 것이 아무것도 없기 때문이다.
+<</if>>
+<br><br>
+<<tearful>> 당신은 동굴에서 비틀거리며 나온다.
+<br><br>
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Forest]]>><<set $forest to 60>><</link>>
+<br>
+
+:: Wolf Carrion Stand
+<<location "forest">><<effects>>
+당신은 발을 딛고 버틴다.
+<<if $physiqueSuccess>>
+	<span class="green"><<beasttype 0>>【이가】 당신을 피해 방향을 튼다.</span> 그대로 숲으로 달려간다.
+	<br><br>
+	검은 늑대는 <<bhimself 1>>【을를】 위해 가장 좋은 부위를 챙긴다. 당신은 근처에서 자라는 베리를 발견하는데, 이게 당신에게 더 잘 맞는다. 당신은 사슴 옆에 앉는다.
+	<<endevent>><<npc "Black Wolf">>
+	<<if $monster is 1>>
+		<<bHe>>【은는】 당신 옆에 앉아 머리에 손을 얹는다. "훌륭한 사냥. 항상 버텨라, <<ppackbrother>>."
+	<</if>>
+	<<stress -12>><<lstress>>
+	<br><br>
+	무리는 한가롭게 주변을 어슬렁거리며 여유롭게 식사를 한다. 작은 다툼이 일어나자 검은 늑대는 사슴 옆에 있던 <<bhis>> 자리를 떠나 그것을 진정시킨다.
+	<br><br>
+	<<endevent>>
+	<<wolfpackhuntoptions>>
+<<else>>
+	<span class="red"><<beasttype 0>>【은는】 멈추지 않는다.</span> <<bHe 0>>【은는】 당신을 옆으로 밀치고 무리 사이에서 날뛴다. 무리는 숲의 안전한 곳으로 달아난다. 당신이 비틀거리며 일어서기도 전에 <<beasttype 0>>【이가】 당신 위에 올라탄다.
+	<br><br>
+	<<link [[다음|Wolf Carrion Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Wolf Carrion Run
+<<location "forest">><<effects>>
+당신은 <<beasttype 0>>에게서 도망친다. <<bHe 0>>【은는】 무리 사이에서 날뛰고, 무리는 공황에 빠져 나무들 사이 안전한 곳으로 달아난다.
+<br><br>
+당신은 무리와 함께 숲으로 달려간다. 더 쉬운 사냥감이 있을 것이다.
+<<physique 1>><<gathletics>><<athletics 1>><<pass 15>>
+<br><br>
+<<endevent>>
+<<set $bus to "wolfcaveclearing">>
+<<wolfhuntevents>>
+
+:: Wolf Carrion Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $NPCList[0].stance to "top">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Wolf Carrion Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Wolf Carrion Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Wolf Carrion Rape Finish
+<<location "forest">><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	만족한 <<beasttype>>【은는】 언덕을 올라가 계속 먹는다.
+<<elseif $enemyhealth lte 0>>
+	당신은 <<beasttype>>【을를】 겁줘서 쫓아낸다. <<bHe>>【은는】 비명을 지르며 달아난다. 무리가 도망친 것이 아쉽다. 사체를 지키는 것이 아무것도 없기 때문이다.
+<</if>>
+<br><br>
+<<tearful>> 당신은 나무 사이로 걸어 들어간다.
+<br><br>
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Forest]]>><<set $forest to 60>><</link>>
+<br>
+
+:: Wolf Rival Challenge
+<<effects>>
+당신의 무리는 이 싸움에서 이길 가능성이 없다. 당신은 일대일로 결판을 내고 싶어 더 큰 <<beasttype>> 쪽으로 걸어간다. 당신이 사정거리에 들어오자 상대는 두 번 생각하지 않고 당신에게 달려든다.
+<br><br>
+
+<<link [[다음|Wolf Rival Fight]]>><<set $fightstart to 1>><</link>>
+
+:: Wolf Rival Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<set $enemyanger += 200>>
+	<<set $enemyhealth to 300>><<set $enemyhealthmax to 300>>
+<</if>>
+<<set $enemyanger += 10>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Wolf Rival Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Wolf Rival Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Wolf Rival Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<set _victory to 1>>
+	<<beastejaculation>>
+	<<beasttype>>의 눈의 초점이 흐려지고, <<bhe>>【은는】 멍하니 떠나간다. 경쟁 무리는 혼란스러워 보이지만, 그들의 우두머리가 떠나자 마지못해 당신과 당신의 무리에게서 물러난다. <<tearful>> 당신은 일어선다.
+<<elseif $enemyhealth lte 0>>
+	<<set _victory to 1>>
+	<<tearful>> 당신은 패배한 적 위에서 의기양양하게 서 있다. <<beasttype>>【은는】 당신에게서 재빨리 달아나 자기 무리의 안전한 곳으로 들어간다. 그들은 재빨리 떠나기 시작하고, 당신의 무리는 정당한 사냥감을 차지하며 환호한다.
+<<else>>
+	<<set _victory to 0>>
+	당신은 더 이상 싸울 수 없어 땅에 쓰러진다. <<beasttype>>【은는】 당신의 목을<<if $monster isnot 1>> <<bhis>> 이빨로<</if>> 물고 있다가 놓아준다. <<trauma 6>><<gtrauma>>
+	<br><br>
+	<<if $monster is 1>>
+		"약한 우두머리." <<bhe>>【이가】 비웃는다. "무리가 부끄러워하겠군. 꼬리 말고 집으로 꺼져라, 애송이."
+		<br><br>
+	<</if>>
+	경쟁 무리가 사체를 끌고 가고, 당신은 형제들의 실망스러운 시선을 마주하게 된다. <<tearful>> 당신은 그들의 눈을 피하며 일어선다. <<lharmony>><<lferocity>>
+<</if>>
+<br>
+<<endcombat>><<clearNPC rival_wolf>><<npc "Black Wolf">>
+<<clotheson>>
+
+<<if _victory is 1>>
+	검은 늑대가 하울링하고, 당신과 무리가 함께한다. 숲은 당신의 승리의 노래로 메아리친다. <<stress -12>><<trauma -6>><<llstress>><<ltrauma>><<gharmony>><<gferocity>>
+	<br><br>
+
+	<<if $wolfpackharmony gte $wolfpackferocity>>
+		검은 늑대가 당신의 옆구리를 툭 친다.
+		<<if $monster is 1>>
+			"좋은 지도자, 강하게 행동한다." <<bhe>>【이가】 말한다. "위대한 지도자, 힘을 증명한다. 무리는 <<ppackbrother>>【을를】 둬서 운이 좋다."
+		<<else>>
+			<<bHe>>【은는】 당신의 손을 핥는다.
+		<</if>>
+	<<else>>
+		검은 늑대는 다른 무리가 떠난 방향으로 야만적인 울음소리를 낸다.
+		<<if $monster is 1>>
+			"싸움을 끝냈어야 했다." <<bhe>>【이가】 으르렁거린다. "다시는 경쟁자에 대해 걱정할 필요 없게. 강한 지도자는 자비를 보이지 않는다!"
+		<</if>>
+	<</if>>
+<<else>>
+	<<if $wolfpackharmony gte $wolfpackferocity>>
+		검은 늑대가 당신에게 부드럽게 코를 비빈다.
+		<<if $monster is 1>>
+			"지도자, 용감하게 싸웠다." <<bhe>>【이가】 말한다. "하지만 무리는 힘을 존중한다. 무리가 따르게 하려면 지도자는 강해야 한다."
+		<<else>>
+			<<bHe>> 적어도 당신의 패배를 비난하지는 않는다.
+		<</if>>
+	<<else>>
+		검은 늑대가 당신 앞에 서서 낮게 으르렁거린다.
+		<<if $monster is 1>>
+			"무리가 사냥을 위해 약한 지도자에게 의존해야 한다면, 무리는 굶주릴 것이다!" <<bhe>>【이가】 으르렁거린다. "우두머리는 다음번에 이겨라, 아니면 우두머리는 무리를 잃을 것이다!"
+		<</if>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<endevent>>
+<<wolfpackhuntoptions>>
+
+:: Wolf Rival Offer
+<<effects>>
+
+당신은 경쟁 무리를 향해 걷기 시작한다. 당신이 다가가자 우두머리 <<beasttype>>【이가】 으르렁거린다. 당신은 손과 무릎을 꿇고 <<beastsplural>> 앞에서 짝짓기 자세를 취한다.
+<br><br>
+
+<<if $monster is 1>>
+	<<beasttype>>【은는】 당신에게 다가와 당신의 머리를 땅에 눌러붙이고 단단히 붙잡는다. "먹이를 가져가라." <<bhe>>【이가】 검은 늑대에게 말한다. "우리는 더 맛있는 먹이를 찾았으니..." <<beasttype>>의 나머지 무리가 가까이 다가오고, 당신의 무리는 원래의 사냥감을 되찾을 수 있게 된다.
+<<else>>
+	그들의 우두머리가 다가와 당신의 냄새를 맡더니, 당신의 머리카락을 이빨로 물고 뒤에서 당신에게 올라탄다. 나머지 무리가 가까이 다가오고, 이전의 사냥감은 방치되어 당신의 친구들이 가져갈 수 있게 된다.
+<</if>>
+<br><br>
+
+우두머리 <<beasttype>>【이가】 먼저 다가온다.
+<br><br>
+
+<<for _wolfNum = 2; _wolfNum < 5; _wolfNum++>>
+	<<generateBEAST _wolfNum "wolf">>
+<</for>>
+<<link [[다음|Wolf Rival Molestation]]>><<set $molestationstart to 1>><<set $phase to 1>><</link>>
+
+:: Wolf Rival Molestation
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<beastTrainGenerate>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<br>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Wolf Rival Molestation Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Wolf Rival Molestation]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Wolf Rival Molestation Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<if $combatTrain.length gt 0>>
+		만족한 <<beasttype>>【은는】 당신을 내버려 둔다. 다른 녀석이 <<bhis>> 자리를 차지한다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Wolf Rival Molestation]]>><</link>>
+	<<else>>
+		만족한 <<beasttype>>【은는】 당신을 내버려 둔다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Wolf Rival Molestation End]]>><</link>>
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+	<<beastwound>>
+	<<if $combatTrain.length gt 0>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러들지만, 다른 녀석이 <<bhis>> 자리를 차지한다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Wolf Rival Molestation]]>><</link>>
+	<<else>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러든다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Wolf Rival Molestation End]]>><</link>>
+	<</if>>
+<</if>>
+
+:: Wolf Rival Molestation End
+<<effects>>
+
+<<if $enemyejaculated is 0>>
+	<<if $phase is 1>>
+		엄청난 수적 우위에도 불구하고, 당신은 굶주린 무리를 물리치는 데 성공하고, 그들은 꼬리를 내리고 덤불 너머로 도망친다.
+	<<else>>
+		당신이 가치보다 더 귀찮은 존재라고 느낀 <<beasttype>>【은는】 후퇴한다.
+	<</if>>
+<<else>>
+	만족한 그들은 당신을 땅에 남겨두고 회복하게 한 뒤, 재빨리 달아나 밤 속으로 사라진다.
+<</if>>
+<<tearful>> 당신은 일어선다.
+<br><br>
+
+<<endcombat>><<clotheson>><<clearNPC rival_wolf>>
+
+당신은 일어서서 몇 분간 회복한다. 다행히도, 사슴이 있던 곳에 당신의 무리가 남긴 발자국 흔적을 발견하고, 그것을 성공적으로 따라 동굴의 안전한 곳으로 돌아간다.<<gharmony>><<lferocity>>
+<br><br>
+<<set $huntstate to "finished">>
+<<if $wolfstate is "hunt">>
+	<<set $wolfstate to "cave">>
+<</if>>
+
+<<link [[다음|Wolf Cave Clearing]]>><</link>>
+
+:: Wolf Rival Flee
+<<effects>>
+
+<<endevent>><<beastNEWinit 1 wolf>>
+이어질 싸움에 휘말리고 싶지 않았던 당신은, 도망칠 기회를 엿보며 짐승들을 유심히 살핀다. 싸움이 터지자마자 당신은 돌아서서 달리기 시작한다. <<beasttype>> 한 마리가 당신이 도망치려는 것을 눈치채고 뒤쫓기 시작한다.
+<br><br>
+<<if $athleticsSuccess>>
+	<<clearNPC rival_wolf>>
+	당신은 전속력으로 달리고, <span class="green">곧 <<beasttype>>의 시야에서 벗어난다</span>. 추격자를 따돌린 당신은 잠시 숨을 고른다.
+	<br><br>
+	<<link [[다음|Forest]]>><<endevent>><<set $forest to 60>><</link>>
+<<else>>
+	당신은 전속력으로 달리지만, <span class="red">결국 <<beasttype>>에게 따라잡히고 만다</span>. <<bHe>>【이가】 당신을 바닥으로 넘어뜨린다.
+	<br><br>
+
+	<<if $monster is 1>>
+		"겁쟁이, 도망가려고?" <<bHe>>【이가】 으르렁거린다. "본때를 보여주마!"
+		<br><br>
+	<</if>>
+	<<link [[다음|Wolf Rival Molestation]]>><<set $molestationstart to 1>><</link>>
+<</if>>
+
+:: Wolf Rival Retreat
+<<effects>>
+
+당신은 선택지를 저울질하다가 이 싸움은 피하는 것이 최선이라는 것을 깨닫는다. 당신은 남은 <<wolf_cave_plural>> 무리를 보고 떠나라고 손짓한다.
+<br><br>
+
+상대 무리의 <<beasttype>>【이가】 공격하려 다가오지만, 우두머리에게 저지당한다.
+<<if $monster is 1>>
+	"겁쟁이는 보내줘라." <<bhe>>【이가】 무시하듯 말한다. "싸울 가치도 없어. 손실을 줄여라."
+<</if>>
+<br><br>
+<<endevent>><<clearNPC rival_wolf>>
+
+경쟁 무리는 사체를 끌고 가고, 당신의 <<wolf_cave_plural>> 무리는 빈손으로 떠나게 된다. 그들은 가면서 당신을 경멸적으로 쳐다본다.
+
+<<npc "Black Wolf">>
+검은 늑대가 당신 곁에 멈춰 서서 슬픈 눈으로 당신을 바라본다.
+<<if $monster is 1>>
+	"우두머리는 강하고 야성이 넘쳤었다." <<bhe>>【이가】 말한다. "무리는 약한 우두머리를 따르지 않을 것이다."
+<</if>>
+<br><br>
+
+<<endevent>>
+<<wolfpackhuntoptions>>
+
+:: Wolf Cave Hunt No Black Wolf Start
+<<effects>>
+
+<<if $phase is 1>>
+	<<beastNEWinit 1 wolf>>
+	당신은 나무 사이로 달려가기 전에 심호흡을 한다. 무리원들이 당신 뒤를 쫓는다. 일부는 따라오고, 일부는 당신의 선두 자리를 뺏으려 한다. 특히 한 <<beasttype>>【은는】 사냥의 주도권을 잡으려는 의지가 강해 보인다.
+	<<physique 1>><<gathletics>><<athletics 1>>
+	<br><br>
+	<<pass 15>>
+	<<link [[발 걸기 (0:30)|Wolf Cave Hunt Outrun]]>><<set $phase to 1>><</link>><<dancedifficulty 600 1200>>
+	<br>
+	<<link [[앞질러 달려본다 (0:30)|Wolf Cave Hunt Outrun]]>><<set $phase to 0>><</link>><<athleticsdifficulty 600 1200>>
+<<else>>
+	선두에 서고 싶지 않아서, 당신은 고개를 숙이고 다른 누군가가 이끌어주기를 기다린다.<<if $wolfpackleader gte 1>> 등 뒤에서 검은 늑대가 으르렁거리는 소리가 들린다.<</if>>
+	<br><br>
+	마침내, 더 큰 늑대가 지휘를 맡자 사냥이 시작된다.
+	<br><br>
+	달리는 와중에도 몇몇 다른 늑대들은 여전히 선두를 차지하기 위해 싸운다. <<physique 1>><<gathletics>><<athletics 3>>
+	<<pass 30>>
+	<br><br>
+	<<link [[다음 (1:00)|Wolf Cave Hunt Not Taking the Lead]]>><<pass 60>><</link>>
+<</if>>
+
+:: Wolf Cave Hunt Outrun
+<<effects>>
+
+<<if $phase is 1>>
+	<<if $danceSuccess>>
+		잠시 동안 선두를 유지했지만, 다리에 무리가 오기 시작한다. 지고 싶지 않아서 발을 뻗어, <span class="green"><<beasttype>>【을를】 넘어뜨린다</span>. <<bhe>>【이가】 넘어지면서 낑낑거리는 소리가 들린다. <<gferocity>>
+		<br><br>
+		<<link [[다음 (0:15)|Wolf Cave Hunt Taking the Lead]]>><<pass 15>><</link>>
+	<<else>>
+		잠시 동안 선두를 유지했지만, 다리에 무리가 오기 시작한다. 지고 싶지 않아서 발을 뻗었지만, <<beasttype>>【이가】 재빨리 피하는 바람에 당신이 대신 넘어지고 만다.
+		<<physique 6>><<gdanceskill>><<danceskill 6>><<pass 30>>
+		<br><br>
+		<<link [[다음 (0:30)|Wolf Cave Hunt Not Taking the Lead]]>><<pass 30>><</link>>
+	<</if>>
+	<<clearsinglenpc 0>>
+	<br>
+<<else>>
+	<<if $athleticsSuccess>>
+		경주에서 앞서기 위해 힘껏 달리자, 시간이 갈수록 이마에서 땀이 흘러내린다. <span class="green">당신은 선두를 유지한다.</span> 경쟁자는 결국 작은 연못에서 물을 마시기 위해 이탈한다.
+		<br><br>
+		무리는 뒤처지지 않으려 힘껏 달렸고, 대부분의 구성원들은 잠시 멈춰 물을 마신다. <<gharmony>>
+		<br><br>
+		<<link [[다음 (0:15)|Wolf Cave Hunt Taking the Lead]]>><<pass 15>><</link>>
+	<<else>>
+		경주에서 앞서기 위해 힘껏 달리자, 시간이 갈수록 이마에서 땀이 흘러내린다. 다리가 타는 듯한 고통을 무시할 수 없어 결국 뒤처지고 만다.
+		<<physique 1>><<gathletics>><<athletics 3>><<pass 30>>
+		<br><br>
+		다른 구성원들도 마찬가지로 거친 숨을 몰아쉰다. 작은 연못이 나타나자 모두 반갑게 물을 마시며 잠시 휴식을 취한다.
+		<br><br>
+		<<link [[다음 (0:30)|Wolf Cave Hunt Not Taking the Lead]]>><<pass 30>><</link>>
+	<</if>>
+	<br>
+<</if>>
+
+:: Wolf Cave Hunt Taking the Lead
+<<effects>>
+<<if $wolfgirl gte 6>>
+	선두에 서자, 냄새가 코를 찌른다. 익숙한 냄새다. 사슴이다. 몇몇 무리 구성원들도 냄새를 맡고 당신을 쳐다본다.
+<<else>>
+	선두에 서서 진흙에 난 발자국을 본다. 발굽 자국, 아마도 사슴일 것이다. 무리 구성원들이 흥분해서 꼬리를 흔들며 냄새를 맡는다.
+<</if>>
+<br><br>
+당신은 목표를 염두에 두고 다시 달리기 시작한다.
+<br><br>
+<<link [[다음 (1:00)|Wolf Cave Hunt Taking the Lead 2]]>><<pass 60>><</link>>
+
+:: Wolf Cave Hunt Taking the Lead 2
+<<effects>>
+당신은 검은 늑대가 무리를 이끌던 방식을 기억하며 대열을 유지하려 애쓴다. 나이 든 늑대들은 주도권을 잡으려 하고, 어린 늑대들은 뒤처져 장난을 치려 하기에 쉽지 않은 일이다.
+<br><br>
+무리는 공터의 사슴이 보일 만큼 가까이 다가간다. 사슴은 경계심이 높은 듯, 자주 고개를 들고 풀을 거의 뜯지 않는다. 다행히 당신들은 모두 바람을 등지고 덤불에 몸을 숨기고 있다.
+<br><br>
+사슴을 쓰러뜨린다는 생각은 여전히 마음에 들지 않는다. 대신, 당신은 그 역할을 맡고 싶어 하는 경험 많은 늑대 한 마리를 고른다.
+<br><br>
+무리의 늑대들이 공격하기 전에 각자 자리를 잡는다. 겁에 질린 사슴이 달아나지만, 무리는 끈질기게 뒤쫓는다.
+<br><br>
+<<link [[다음 (0:30)|Wolf Cave Hunt No Black Wolf Deer]]>><<pass 30>><</link>>
+
+:: Wolf Cave Hunt Not Taking the Lead
+<<effects>>
+
+숨을 고르기 시작하자마자 흥분한 짖음소리와 낑낑거리는 소리가 들려온다. 냄새를 찾았고, 본격적인 사냥이 시작되었다.
+<br><br>
+<<link [[다음 (1:00)|Wolf Cave Hunt Not Taking the Lead 2]]>><<pass 60>><</link>>
+
+:: Wolf Cave Hunt Not Taking the Lead 2
+<<effects>>
+더 많은 늑대들이 무리를 조직하려 하면서 권력 다툼이 더 심해지는 것 같다. 일부는 서로를 물고, 일부는 짖고, 일부는 밀치며 모두가 함께 있도록 한다.
+<br><br>
+무리가 사슴의 사정거리에 들어서자 모든 소리가 조용해진다. 바람을 등지고 덤불에 숨은 채, <<wolf_cave_singular>> 한 마리가 다른 늑대들을 제자리에 배치하며 사냥감에게 뛰어들 준비를 하는 것을 본다.
+<br><br>
+리더가 천천히 속보로 달리기 시작한다. 사슴이 달아나고, 추격이 다시 시작된다.
+<br><br>
+<<link [[다음 (0:30)|Wolf Cave Hunt No Black Wolf Deer]]>><<pass 30>><</link>>
+
+:: Wolf Cave Hunt No Black Wolf Deer
+<<effects>>
+당신은 사슴의 발목을 물어뜯는 다른 무리 구성원들보다 더 멀리 떨어진 채, 사슴의 왼쪽에서 간신히 따라붙는다.
+<br><br>
+나무들 사이를 헤치며, 당신은 사냥의 선두에 서게 된다. 사슴은 점점 지쳐가고, 더 많은 늑대들이 따라잡는다.
+<br><br>
+사슴이 온 힘을 다해 밀어붙이자 사냥이 성공할 것처럼 보인다. 사슴이 거의 손아귀에서 벗어날 뻔하자 날카로운 이빨들이 그 뒤를 쫓아 허공을 문다.
+<br><br>
+당신 뒤에서는 강물이 급류 위로 포효하고, 쓰러진 나무가 다리 역할을 하고 있다. 만약 사슴이 탈출하여 건너편으로 건너가면, 무리는 굶주리게 될 것이다.
+<br><br>
+당신은 나무줄기에 도착한다. 사냥의 혼란이 등 뒤에서 더욱 커지고, 사슴은 간신히 다시 잡힐 뻔한다.
+<br><br>
+<<link [[나무줄기를 민다|Wolf Cave Hunt Push the trunk]]>><<tiredness 2>><</link>><<physiquedifficulty 5000 15000>><<gtiredness>>
+<br>
+<<link [[아무것도 하지 않는다|Wolf Cave Hunt Do nothing]]>><</link>>
+
+:: Wolf Cave Hunt Push the trunk
+<<effects>>
+<<if $physiqueSuccess>>
+	계속 달린 탓에 팔다리가 뻐근하고 아프다. 그럼에도 불구하고, 당신은 이를 악물고 통나무를 물속으로 굴려 빠뜨린다.
+	<br><br>
+	잠시 후, 사슴은 무리에서 벗어났지만 강둑 가장자리에서 비틀거리며 멈칫한다. 도망칠 곳이 없자, 무리를 뛰어넘어 공터로 다시 달려가려 하지만... <span class="green">성공하지 못한다.</span>
+	<br><br>
+	무리는 흥분하여 울부짖는다. 큰 사냥감이었고, 오늘 밤 모두 배불리 먹을 것이다.
+	<br><br>
+	당신 역시 배가 고파 눈을 돌린다. 눈에 들어온 것은 낮은 사과나무, 잘 익어 맛있는 열매가 달려있다.
+	<<endevent>>
+
+	<<set $huntstate to "success">>
+	<<wolfhuntevents>>
+<<else>>
+	계속 달린 탓에 팔다리가 뻐근하고 아프다. 고통이 너무 심해 깊이 느껴지고, 다리에 경련이 퍼지기 시작한다. 통나무를 굴려내기 전에 땅에 쓰러진다.
+	<br><br>
+	사슴은 마지막 탈출을 시도하며, 당신을 뛰어넘어 통나무 위로 올라선다. <<wolf_cave_singular>> 한 마리가 뒤따르려 하지만, 사슴이 반대편에 도착하는 순간 쓰러진 나무가 반으로 부러진다.
+	<br><br>
+	무리는 실망하고 배고파하며 낑낑거리고 울부짖는다. 그들은 여전히 음식을 필사적으로 찾아 곧 당신을 내버려 둔다. 당신은 검은 늑대가 먹을 작은 토끼를 잡아 충분히 잘 먹는다.
+	<br><br>
+
+	<<set $huntstate to "failure">>
+	<<wolfhuntevents>>
+<</if>>
+
+:: Wolf Cave Hunt Do nothing
+<<effects>>
+
+싸움에 끼고 싶지 않아, 당신은 더 쉬운 먹이를 찾아 나선다. 몇 미터 떨어진 곳에 사과나무가 서 있어, 먹을 수 있을 것이다. 먹이를 찾는 동안 사냥꾼의 덫에 걸린 토끼를 발견한다.
+<br><br>
+<<if $wolfpackharmony + $wolfpackferocity gte $rng>>
+	사슴은 마지막 탈출을 시도하며, 당신을 뛰어넘어 통나무를 향해 달려가지만, <span class="green">도착하기 전에 <<wolf_cave_singular>> 한 마리에게 덮쳐진다.</span>
+	<br><br>
+	무리는 흥분하여 울부짖는다. 큰 사냥감이었고, 오늘 밤 모두 배불리 먹을 것이다.
+	<br><br>
+	당신 역시 배가 고파 눈을 돌린다. 눈에 들어온 것은 낮은 사과나무, 잘 익어 맛있는 열매가 달려있다.
+	<<endevent>>
+
+	<<set $huntstate to "success">>
+	<<wolfhuntevents>>
+<<else>>
+	사슴은 마지막 탈출을 시도하며, 당신을 뛰어넘어 통나무 위로 올라선다. <<wolf_cave_singular>> 한 마리가 뒤따르려 하지만, 사슴이 반대편에 도착하는 순간 쓰러진 나무가 반으로 부러진다.
+	<br><br>
+	<<if $wolfpackleader gte 1>>
+		무리 구성원들이 당신에게 등을 돌리고, 으르렁거리며 피부를 물어뜯는다. 일부 나이 든 <<wolf_cave_plural>>들은 당신이 거기 서서 아무것도 하지 않은 것을 꾸짖는다.
+		"<<print ["우두머리가 정말 자격이 있는가?", "무리원이 약하다."][random(0,1)]>>"
+		<br><br>
+	<</if>>
+	그들은 여전히 음식을 필사적으로 찾아 곧 당신을 내버려 둔다. 당신은 검은 늑대가 먹을 작은 토끼를 잡아 충분히 잘 먹는다.
+	<<endevent>>
+
+	<<set $huntstate to "failure">>
+	<<wolfhuntevents>>
+<</if>>

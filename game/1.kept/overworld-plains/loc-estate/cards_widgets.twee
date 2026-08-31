@@ -1,0 +1,2281 @@
+:: Widgets Blackjack [widget]
+<!--
+
+End conditions
+
+1. Wren finishes early
+   estate_cards_end: "wren_finished_early" (or gets replaced with "oral")
+   Desc: The PC has out-endured Wren, so technically Wren finished first
+   Bets: allowed to take the pot
+   End Location: Estate
+   Clothes: oral for towel (if naked)
+   Reason: while Wren didn't get to take PC, PC also hasn't gotten all they wanted from Wren, so it's really a tie. Wren does end up better off, so technically he'd still be dominant enough to demand oral for towel, rather than demanding oral for clothes buy-back
+
+2. Wren finishes with PC
+   estate_cards_end: "sex" ("oral" setter is ignored), or "sex_safe" ("oral" can replace it)
+   Desc: The PC has lost, and Wren took his reward. PC lost
+   Bets: allowed to take the pot
+   End Location: Estate
+   Clothes: oral for towel (if naked)
+   Reason: Wren completely dominated PC, so definitely only oral for towel. It does have a variation where PC can have a chastity (so no sex), but we consider this to still be end 2
+
+3. PC cheats, ends up being forgiven
+   estate_cards_end: "cheat_moor"
+   Desc: The PC was caught cheating, so it's a disqualification. Thrown into the moor
+   Bets: pot confiscated
+   End Location: Moor
+   Clothes: none
+   Reason: getting caught cheating is considered a complete loss
+
+4. PC cheats, ends up surrendering
+   estate_cards_end: "cheat_remy"
+   Desc: The PC was caught cheating, so it's a disqualification. Given to Remy. Can also be reached by failing plead (failed 3) and surrendering, or not trying to plead and surrendering
+   Bets: pot confiscated
+   End Location: Remy
+   Clothes: none
+   Reason: getting caught cheating is considered a complete loss
+
+5. PC cheats, ends up successfully running
+   estate_cards_end: "cheat_run"
+   Desc: The PC was caught cheating, disqualification. Can also be reached by failing plead (failed 3) and running, or not trying to plead and surrendering
+   (???) Bets: pot confiscated, but perhaps we should let the player try and steal the pot for a much lower escape chance
+   End Location: Estate
+   Clothes: none
+   Reason: obviously, because we ran, no option to get clothes/a towel back
+
+6. PC cheats, ends up running, but fails
+   estate_cards_end: "cheat_remy"
+   Desc: The PC was caught cheating, disqualification. Can also be reached by failing plead (failed 3) and running, or not trying to plead and surrendering. Got caught, given to Remy.
+   Bets: pot confiscated
+   End Location: Remy
+   Clothes: none
+   Reason: obviously, because we ran and got caught, no option to get clothes/a towel back
+
+7. PC runs after loss, ends up successfully running
+   estate_cards_end: "run"
+   Desc: not as bad as cheating, PC lost and ran
+   (???) Bets: pot confiscated, but perhaps we should let the player try and steal the pot for a much lower escape chance
+   End Location: Estate
+   Clothes: none
+
+8. PC runs after loss, ends up getting caught
+   estate_cards_end: "run"
+   Desc: not as bad as cheating, PC lost and tried running, got caught, thrown into moor
+   Bets: pot confiscated
+   End Location: Moor
+   Clothes: none
+
+9. PC leaves early
+   estate_cards_end: "naked" or "left_early"
+   Desc: The PC has left early.
+   Bets: allowed to take pot
+   End Location: Estate
+   Clothes: oral for towel (if naked)
+   Reason: Wren is disappointed that PC is leaving the game essentially in the middle of it (with no one having won). Too annoyed to let the player get the clothes back
+
+10. (todo) PC declares victory
+   estate_cards_end: "pc_won" (or gets replaced by "pc_won_and_oral")
+   Desc: The PC gets all favours they needed from Wren, and declares that they don't need anything else. Considered a win because Wren has exhausted his usefulness and PC hasn't. PC can either rebuy the clothes after satisfying the goons, or leave
+   Bets: allowed to take the pot
+   End Location: Estate
+   Clothes: allowed to buy back (all states)
+   Reason: Wren realises they've done a ton of favours already and didn't get much from you, so they must feel defeated enough to let you take the clothes you've lost back
+
+For each of these outcomes, we need to call <<card_pot_confiscated>> right after the PC abandons the pot (if the bets are confiscated) or <<card_pot_collected>> right before the player leaves the table (if the player collects the bet)
+Each also calls <<estate_cards_finish>> and calls <<endevent>> and some set $estate_cards_end
+Some also call <<estate_end>> if they kick the player directly into the moor/remy's farm
+
+Coverage:
+	bets conf/coll | <<estate_cards_finish>>            | <<endevent>>        | <<estate_end>> (opt)      | Clothes (todo)         | $estate_cards_end
+1   collected      | + calls <<cards_naked_end>>        | + <--------         | - estate <------          | towel                  | "wren_finished_early" (can be replaced by "oral")
+2   collected      | + calls <<cards_naked_end>>        | + <--------         | - estate <------          | towel                  | "sex" or "sex_safe" ("safe_sex" can be replaced by "oral")
+3   confiscated    | +                                  | +                   | + moor                    | none                   | "cheat_moor"
+4   confiscated  | + calls <<bl...Surrender>>         | + <--------         | + remy <--------          | none                   | "cheat_remy" <--------
+5   confiscated    | +                                  | +                   | - estate                  | none                   | "cheat_run"
+6   confiscated  | + calls <<bl...Surrender>>         | + <--------         | + remy <--------          | none                   | "cheat_remy" <--------
+7   confiscated    | +                                  | +                   | - estate                  | none                   | "run"
+8   confiscated    | +                                  | +                   | - estate                  | none                   | "run"
+9   collected      | + (or + <<cards_naked_end>>)       | + (or + <----)      | - estate (or - estate <-) | none (or towel)        | "left_early" or "naked"
+10  collected      | + (or + <<cards_oral_options>>)    | + (or + <----)      | - estate (or - estate <-) | none (or rebuy)        | "pc_won" (can be replaced by "pc_won_and_oral")
+
+(with estate end 9, if you're naked, the parentheses cover the case, otherwise - the outside part of the parentheses)
+
+<<widget "cards_naked_end">>
+	calls <<cards_oral_options>>
+<</widget>>
+
+<<widget "cards_oral_options">>
+	Initiates oral scene.
+	if leave without oral:
+		calls <<estate_cards_finish>>
+		calls <<endevent>>
+	else if leave after attempt:
+		if $estate.cards.clothesRebuyTerms:
+			sets $estate_cards_end to "pc_won_and_oral"
+		else:
+			sets $estate_cards_end to "oral", if it isn't "sex"
+		calls <<estate_cards_finish>>
+		calls <<endevent>>
+	else:
+		if $estate.cards.clothesRebuyTerms:
+			sets $estate_cards_end to "pc_won_and_oral"
+		else:
+			sets $estate_cards_end to "oral", if it isn't "sex"
+		calls <<estate_cards_finish>>
+		calls <<endevent>>
+<</widget>>
+
+<<widget "blackjackCaughtCheatingSurrender">>
+	sets $estate_cards_end to "cheat_remy"
+	sets $estate.cards_done to true
+	calls <<endevent>>
+	calls <<estate_end>>
+<</widget>>
+ -->
+
+<!--Needs to be run in a previous passage to prevent cheating-->
+<<widget "blackjackStart">>
+	<<if _args[0]>>
+		<<set $blackjack to {
+			cards:shuffle(shuffle(shuffle(deck()))),
+			dealerCards: [],
+			dealerSecondCardHidden: true,
+			dealerState: null,
+			dealerScore: null,
+			playersCards: [],
+			playersState: null,
+
+			isFirstTurn: true,
+			/*
+			a turn is stale once the player goes into the cheating menu
+			this is to prevent peeking checks/suspicion increase from just going back into the same menu
+			ideally, I'd just have the cheating options open a window like with the Help and Options tab
+			*/
+			turnIsStale: false,
+			susRoseInThisRound: false,
+			/* we don't want to increase suspicion for already seen marked cards */
+			seenMarkedCardsSoFar: new Set(),
+			caughtType: null,
+			susCritHit: false,
+
+			cheatChoice: null,
+			playersScore: null,
+			turn: null,
+			winner: null,
+			caughtCheating: false,
+			endPassage: _args[0]
+		}>>
+	<</if>>
+<</widget>>
+
+<<widget "calculateBlackjackLuckStats">>
+	<!-- currently very basic. instead of taking into account HOW the user won (hitting on 19, for example), it just calculates stats of the last X games -->
+	<!--
+	// use this to see all distributions for a given number of games,
+	// with an optional filter func for only showing the distributions that fit the given filter formula
+
+	let max = 6;
+	let nums = [];
+	let pcts = [];
+
+	let filterFuncs = [];
+
+	// filterFuncs.push(ind) => {
+	//    // example formula: the player has a bad streak if less than 70% of the games are ties, and the opponent has won twice as many games
+	//    return pcts[ind].wins >= pcts[ind].losses*2 && pcts[ind].ties < .7
+	// }
+	let generateBasicFilterFunc = (tiesCutoff, winMult) => {
+		filterFuncs.push(["Player lucky cases", (ind) => pcts[ind].wins >= pcts[ind].losses*winMult && pcts[ind].ties < tiesCutoff])
+		filterFuncs.push(["Wren lucky cases", (ind) => pcts[ind].losses >= pcts[ind].wins*winMult && pcts[ind].ties < tiesCutoff])
+		filterFuncs.push(["Neutral cases", (ind) => !( (pcts[ind].losses >= pcts[ind].wins*winMult && pcts[ind].ties < tiesCutoff) || (pcts[ind].wins >= pcts[ind].losses*winMult && pcts[ind].ties < tiesCutoff) )])
+	}
+	generateBasicFilterFunc(0.7, 2)
+	// in all other cases, the flow of luck is considered "neutral"
+
+	for (let i = 0; i < max; ++i) {
+		for (let j = 0; j < max; ++j) {
+			for (let k = 0; k < max; ++k) {
+				if ((i + j + k) !== max) {
+					continue;
+				}
+
+				nums.push({wins:i,losses:j,ties:k});
+			}
+		}
+	}
+
+	let s = [];
+	for (let sub of nums) {
+		let wPct = sub.wins/max;
+		let lPct = sub.losses/max;
+		let tPct = sub.ties/max;
+
+		pcts.push({wins: wPct, losses: lPct, ties: tPct});
+
+		s.push(`wins ${(wPct*100).toFixed(2)}% losses ${(lPct*100).toFixed(2)}% ties ${(tPct*100).toFixed(2)}%`)
+	}
+
+	for (let [filterName, filterFunc] of filterFuncs) {
+		console.log(filterName);
+		for (let i = 0; i < s.length; ++i) {
+			if (!filterFunc(i)) continue;
+			console.log(`${nums[i].wins} wins / ${nums[i].losses} losses / ${nums[i].ties} ties | ${s[i]}`)
+		}
+	}
+
+	-->
+	<<if $estate.cards.gameResults eq null>>
+		<<set $estate.cards.gameResults to []>>
+		<<run delete $estate.cards.luckStats>>
+	<<else>>
+		<<set $_lookback to Math.min($estate.cards.gameResults.length, 6)>>
+		<<set $_slice to $estate.cards.gameResults.slice($_lookback * -1)>>
+		<<set $_stats to {"wins": 0, "losses": 0, "ties": 0, "winPct": 0, "lossPct": 0, "tiePct": 0, "total": $_lookback}>>
+		/* only taking into account the last 6 games */
+		<<for $_result range $_slice>>
+			<<switch $_result.result>>
+				<<case "tie">>
+					<<run $_stats.ties += 1>>
+				<<case "win">>
+					<<run $_stats.wins += 1>>
+				<<case "loss">>
+					<<run $_stats.losses += 1>>
+			<</switch>>
+		<</for>>
+
+		<<set $_stats.winPct to $_stats.wins/$_lookback>>
+		<<set $_stats.lossPct to $_stats.losses/$_lookback>>
+		<<set $_stats.tiePct to $_stats.ties/$_lookback>>
+
+		<<set $estate.cards.luckStats to $_stats>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackEnd">>
+	/* win|loss|tie */
+	<<set $_result to _args[0]>>
+	<<unset $blackjack>>
+
+	<<if $estate.cards.bettingEnabled and $estate.cards.currentBetInput gt 0>>
+		<<switch $_result>>
+			<<case "win">>
+				<<set $estatePersistent.totalBetRoundsWon += 1>>
+			<<case "loss">>
+				<<set $estatePersistent.totalBetRoundsLost += 1>>
+			<<case "tie">>
+				<<set $estatePersistent.totalBetRoundsTied += 1>>
+		<</switch>>
+	<</if>>
+	<!-- these include betting wins -->
+	<<switch $_result>>
+		<<case "win">>
+			<<set $estatePersistent.totalRoundsWon += 1>>
+		<<case "loss">>
+			<<set $estatePersistent.totalRoundsLost += 1>>
+		<<case "tie">>
+			<<set $estatePersistent.totalRoundsTied += 1>>
+	<</switch>>
+
+	<<if $estate.cards.gameResults eq null>>
+		<<set $estate.cards.gameResults to []>>
+	<</if>>
+	<<run $estate.cards.gameResults.push({"result": $_result})>>
+
+	<<if $_result is "win">>
+		<<set $estatePersistent.winStreak += 1>>
+		<<if $estatePersistent.winStreak gt $estatePersistent.winStreakHighScore>>
+			<<set $estatePersistent.winStreakHighScore to $estatePersistent.winStreak>>
+		<</if>>
+	<<else>>
+		<<set $estatePersistent.winStreak to 0>>
+	<</if>>
+
+	<<if $_result is "loss">>
+		<<set $estatePersistent.lossStreak += 1>>
+		<<if $estatePersistent.lossStreak gt $estatePersistent.lossStreakHighScore>>
+			<<set $estatePersistent.lossStreakHighScore to $estatePersistent.lossStreak>>
+		<</if>>
+	<<else>>
+		<<set $estatePersistent.lossStreak to 0>>
+	<</if>>
+
+	<<if $estatePersistent.winStreak gte 5>>
+		<<earnFeat "Five in a Row">>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackScore">>
+	<<if _args[0]>>
+		<<set _aces to 0>>
+		<<set _score to 0>>
+		<<for $_i to 0; $_i lt _args[0].length; $_i++>>
+			<<switch _args[0][$_i].name>>
+				<<case "A">><<set _score += 11>><<set _aces++>>
+				<<case "K" "Q" "J">><<set _score += 10>>
+				<<default>><<set _score += _args[0][$_i].value>>
+			<</switch>>
+		<</for>>
+		<<for $_i to 0; $_i lt _aces; $_i++>>
+			<<if _score gt 21>>
+				<<set _score -= 10>>
+			<</if>>
+		<</for>>
+		<<if _args[1]>>
+			<<if _args[0].length is 2 and _score is 21>>
+					<<set $_blackjack to true>>
+			<</if>>
+			<<switch _args[1]>>
+				<<case "dealer">><<set $blackjack.dealerScore to _score>><<if $_blackjack>><<set $blackjack.dealerState to "blackjack">><</if>>
+				<<case "players">><<set $blackjack.playersScore to _score>><<if $_blackjack>><<set $blackjack.playersState to "blackjack">><</if>>
+			<</switch>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "initEstatePersistent">>
+	<<if not $estatePersistent>>
+		<<set $estatePersistent to {
+			"suspicion": 0,
+			"newDeckTimer": 3,
+			"markedCards": new Set(),
+		}>>
+	<</if>>
+	<!-- betting update -->
+	<<if $estatePersistent.stakesRaised eq null>>
+		<<run Object.assign($estatePersistent, {
+			"stakesRaised": false,
+			"suggestedRaisingStakes": false,
+			"playerRejectedRaisingStakes": false,
+			/* total of all the bets we've won, even if the money was abandoned in the end or lost in a subsequent round */
+			"totalBetMoneyMade": 0,
+			/* same, but for bets we've lost */
+			"totalBetMoneyLost": 0,
+			/* total counter for how much we've made from tips */
+			"totalTipMoneyMade": 0,
+			/* NOT included in totalBetMoneyLost, counts all the pot money we've lost due to running away or getting caught cheating
+			includes the ante */
+			"totalMoneyConfiscated": 0,
+			/* to calculate total revenue (including loss of ante): totalBetMoneyMade + totalTipMoneyMade - totalBetMoneyLost - totalMoneyConfiscated */
+
+			/* these stats are not retroactive, but their sum has been tracked already in original blackjack: $blackjack_played, $blackjack_won, $blackjack_streak etc */
+			/* total rounds won (betting or not) */
+			"totalRoundsWon": 0,
+			/* total rounds lost (betting or not) */
+			"totalRoundsLost": 0,
+			/* total rounds tied (betting or not) */
+			"totalRoundsTied": 0,
+			/* these stats are not retroactive */
+			/* same as above, but only for rounds where you bet money */
+			"totalBetRoundsWon": 0,
+			"totalBetRoundsLost": 0,
+			"totalBetRoundsTied": 0,
+
+			/* counts entire sessions - not the individual rounds */
+			/* counts the total games you've played with an ante */
+			"totalGamesPlayedWithBetting": 0,
+			/* counts the total games you've played with or without an ante */
+			"totalGamesPlayed": 0,
+			/* counts the total amount of times the player has been caught cheating */
+			"totalCaughtCheating": 0,
+			"winStreakHighScore": 0,
+			"winStreak": 0,
+			"lossStreakHighScore": 0,
+			"lossStreak": 0
+		});>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackSuspicion">>
+	<<set $_susGain to _args[0]>>
+	<<set $_caughtType to _args[1]>>
+	<<set $blackjack.caughtType to null>>
+
+	<<set _consts__danger_zone_suspicion to 70>>
+	<<if $_susGain gt 0 and $estatePersistent.suspicion gt _consts__danger_zone_suspicion>>
+		<<set $blackjack.susCritHit to random(1,8) eq 1>>
+	<<else>>
+		<<set $blackjack.susCritHit to false>>
+	<</if>>
+	<<if $blackjack.susCritHit>>
+		<<set $estatePersistent.suspicion to 100>>
+	<<else>>
+		<<set $estatePersistent.suspicion to Math.clamp($estatePersistent.suspicion + $_susGain, 0, 100)>>
+	<</if>>
+
+	<<if $_susGain gt 0 and $estatePersistent and $estatePersistent.suspicion gte 100>>
+		<<set $blackjack.caughtType to $_caughtType>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackGetCanMarkCount">>
+	<<set _marked_count to $estatePersistent.markedCards ? $estatePersistent.markedCards.size : 0>>
+	<<set _consts__max_marked to 8>>
+	<<set _can_mark_count to _consts__max_marked - _marked_count>>
+	<<set _non_marked_in_hand to 0>>
+	<<for _i to 0; _i lt $blackjack.playersCards.length; ++_i>>
+		<<set _c to $blackjack.playersCards[_i]>>
+		<<if !$estatePersistent.markedCards or !$estatePersistent.markedCards.has(`${_c.name}${_c.suits[0]}`)>>
+			<<set _non_marked_in_hand++>>
+		<</if>>
+	<</for>>
+	<<set _can_mark_count to Math.min(_can_mark_count, _non_marked_in_hand)>>
+<</widget>>
+
+<<widget "blackjackCalculate">>
+	<<if $blackjack.turn is null>>
+		<<set $blackjack.turn to "players">>
+		<<set $blackjack.playersCards.push($blackjack.cards[0])>>
+		<<set $blackjack.dealerCards.push($blackjack.cards[1])>>
+		<<set $blackjack.playersCards.push($blackjack.cards[2])>>
+		<<set $blackjack.dealerCards.push($blackjack.cards[3])>>
+		<<set $blackjack.cards.deleteAt(0,1,2,3)>>
+		<<blackjackScore $blackjack.dealerCards "dealer">>
+		<<if $blackjack.dealerScore is 21>>
+			<<set $blackjack.turn to "dealer">>
+		<</if>>
+		<<set _colour to $cardcover.colour.replace("-", " ")>>
+		<<wearProp "cards" _colour>>
+	<<else>>
+		<<set $blackjack.isFirstTurn to false>>
+	<</if>>
+
+	<!-- <STARTING CHEATS> -->
+
+	<<if $blackjack.playersState is "cheat">>
+		<<if $blackjack.cheatChoice is "mark">>
+			<<if $estatePersistent.markedCards is null or $estatePersistent.markedCards is undefined>>
+				<<set $estatePersistent.markedCards to new Set()>>
+			<</if>>
+
+			<<blackjackGetCanMarkCount>>
+
+			<<set _loop_min_ind to $blackjack.playersCards.length - _can_mark_count>>
+
+			<<for _i to $blackjack.playersCards.length - 1; _i gte _loop_min_ind; --_i>>
+				<<set _c to $blackjack.playersCards[_i]>>
+				<<set $estatePersistent.markedCards.add(`${_c.name}${_c.suits[0]}`)>>
+			<</for>>
+
+			<<set $_marked_text to `카드 ${_can_mark_count}장`>>
+			<<set $_plural to _can_mark_count gt 1 ? "them" : "it">>
+			당신은 $_marked_text【을를】 성공적으로 표시했다. <<print _can_mark_count gt 1 ? "그 카드들이" : "그 카드가">> 덱 맨 위에 나오거나 렌의 손패에 들어가면 알아볼 수 있을 것이다.<br>
+		<</if>>
+		<<set $blackjack.cheatChoice to null>>
+	<</if>>
+
+	<<if $blackjack.playersState is "hit">>
+		<<set $blackjack.playersState to null>>
+		<<set $blackjack.playersCards.push($blackjack.cards[0])>>
+		<<set $blackjack.cards.deleteAt(0)>>
+		<<blackjackScore $blackjack.playersCards "players">>
+	<</if>>
+	<<blackjackScore $blackjack.playersCards "players">>
+	<<if $blackjack.playersScore is 21>>
+		<<set $blackjack.turn to "dealer">>
+	<</if>>
+	<<if $blackjack.turn is "dealer">>
+		<<set $blackjack.dealerSecondCardHidden to false>>
+		<<for _i to 0; _i lt 20; _i++>>
+			<<blackjackScore $blackjack.dealerCards "dealer">>
+			<<if $blackjack.dealerScore gte 17 or $blackjack.playersState is "blackjack">>
+				<<break>>
+			<</if>>
+			<<set $blackjack.dealerCards.push($blackjack.cards[0])>>
+			<<set $blackjack.cards.deleteAt(0)>>
+		<</for>>
+	<</if>>
+<</widget>>
+
+<!-- args[0] to lost? true if lost, more decay.
+you will lose suspicion every round you play fairly, and you lose
+more suspicion if you actually lose the round. -->
+<<widget "blackjackControlsPostGameSuspicion">>
+	<<set $_lostGame to _args[0]>>
+	<!-- no decay if suspicion was gained (through seeing new cards or peeking at dealer card) -->
+	<<if !$blackjack.susRoseInThisRound and $estatePersistent.suspicion gte 1>>
+		<<set $_suspicionDecay to -(($_lostGame ? 4 : 2) + C.npc.Wren.love * 0.05)>>
+
+		<<if $_lostGame>>
+			당신은 이 라운드에서 정정당당하게 패배했다.<<llsuspicion>>
+		<<else>>
+			당신은 이 라운드를 공정하게 플레이했다.<<lsuspicion>>
+		<</if>>
+		<br>
+		<<blackjackSuspicion $_suspicionDecay>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackCheatingCaught">>
+	<!--
+		worth considering the option to make Wren throw the player to the moor/give them to Remy if lust isn't high enough
+		also worth considering having a longer arousal increase assault, with the player getting kicked out if they endure it
+
+		if the player loses in the ride state, they have no other options provided to them
+		the reason I haven't done that is because, if the state is "ride" and the player loses - the moor option is not available to then
+		  as they'd have to run for that (which is not possible in that position)
+		so this means the consequence of losing before the ride state is, at worst, being given to Remy or being sent to the moor,
+		  but after we've reached the state - the consequence is fornication
+
+		otherwise players could intentionally get caught cheating in this phase in a lost hand and avoid the consequences, but perhaps that
+		  should be allowed as a valid strategy
+	-->
+	<!-- if the player is caught cheating, the deck will be replaced as soon as the player returns for another game -->
+
+	<<set $estatePersistent.newDeckTimer to 0>>
+	<<if $estate.cards.state is "ride">>
+		<<if $estate.cards.position isnot "wren_lap">>
+			"오늘은 기분이 좋네," <<he>>【이가】 말한다. "그러니까 <span class="pink"><<nnpc_him "Remy">></span>에게 넘기는 대신 - 네가 진 걸로 쳐주지. 이제 내 전리품을 챙길 시간이네."<br><br>
+			<br><br>
+			<<if $estate.cards.position is "pc_lap" or $estate.cards.position is "penile">>
+				<span class="blue">렌의 체중이 당신을 억눌러 도망치지 못하게 한다.</span>
+			<<else>>
+				<span class="blue"><<he>>【이가】 놔준다 한들, 제때에 렌에게서 내려오지 못할 것이다.</span>
+			<</if>>
+			<br><br>
+			<!-- can we even assume consent here? -->
+			<<link [[다음|Estate Cards Sex]]>><</link>>
+			<br>
+		<<else>>
+			<!-- I'm not sure what this branch actually is and how it's reached, so I'll just go with this -->
+			"오늘은 기분이 좋네," <<he>>【이가】 말한다. "그러니까 <span class="pink"><<nnpc_him "Remy">></span>에게 넘기는 대신 - 네가 진 걸로 쳐주지."<br><br>
+			<br><br>
+			<<link [[다음|Estate Cards Sex Safe]]>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		"얘는 좀 혼나야 정신을 차릴 것 같네," <<he>>【이가】 능글맞게 웃으며 말한다. "거기에 딱 맞는 <<nnpc_gender "Remy">>【을를】 하나 알고 있지."<br><br>
+		<<He>>【은는】 <<his>> 패거리들을 보며 당신을 향해 턱짓한다. 그들이 당신에게 다가오기 시작한다.
+		<br><br>
+		<<blackjackCaughtControls 1>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackCaughtControls">>
+	<<set _caught_phase to _args[0]>>
+	<<if _caught_phase eq 1>>
+		<<set $estatePersistent.totalCaughtCheating += 1>>
+		<span class="green">만약 도망칠 거라면, 지금 시간을 낭비하지 않는 편이 성공 확률을 더 높여줄 것이다.</span>
+
+		<<set $estate.prev_apologised to $estatePersistent.cur_apologised is true>>
+
+		<!--
+		Static plead base chance modifiers (Wren love, English) are calculated here, but the RNG dynamic modifiers are calculated in the plead passage, to allow save-scumming.
+		I don't know the stance of the development team on save-scumming outside of ironman mode,
+		and it seems like it's not a requirement to prevent save-scumming as the athleticscheck also calculates the success chance after the link is clicked,
+		so I'll fallback onto my own belief of letting players play the game the way they want.
+		Feel free to move the success calculations from the plead passage to here, though.
+		-->
+		<<set $estate._plead_required_points to 800>>
+		<<set $estate._base_plead_points to 0>>
+		<<set $estate._plead_rng_min to 0>>
+		<<set $estate._plead_rng_max to 1000>>
+		<<set _base_chance to 1-inverseLerp($estate._plead_required_points, $estate._plead_rng_min, $estate._plead_rng_max)>>
+		<<set _base_chance_str to formatDecimals(_base_chance*100, 1)>>
+		<!-- 0-200 points for love (proportionate to 0,50 love) (as in 50 love is always full 200 points)-->
+		<<set _extra_wren to lerp(Math.clamp(C.npc.Wren.love / 50, 0, 1), 0, 250)>>
+		<<set $estate._base_plead_points += _extra_wren>>
+		<<set _extra_wren_chance_str to formatDecimals((1-inverseLerp($estate._plead_required_points, $estate._plead_rng_min + _extra_wren, $estate._plead_rng_max + _extra_wren) - _base_chance)*100, 1)>>
+		<!-- 0-200 points for English (proportionate to 0,1000 english)-->
+		<<set _extra_english to lerp(Math.clamp(currentSkillValue('english') / 1000, 0, 1), 0, 250)>>
+		<<set $estate._base_plead_points += _extra_english>>
+		<<set _extra_english_chance_str to formatDecimals((1-inverseLerp($estate._plead_required_points, $estate._plead_rng_min + _extra_english, $estate._plead_rng_max + _extra_english) - _base_chance)*100, 1)>>
+		<!-- 0-100 extra points for submissiveness (1000,2000) -->
+		<<set _extra_sub to lerp(inverseLerp($submissive, 1000, 2000), 0, 100)>>
+		<<set $estate._base_plead_points += _extra_sub>>
+		<<set _extra_sub_chance_str to formatDecimals((1-inverseLerp($estate._plead_required_points, $estate._plead_rng_min + _extra_sub, $estate._plead_rng_max + _extra_sub) - _base_chance)*100, 1)>>
+
+		<<set _plead_difficulty to Math.round((1-inverseLerp(800, $estate._base_plead_points + $estate._plead_rng_min, $estate._base_plead_points + $estate._plead_rng_max))*100)>>
+		<<set _plead_chance_str to formatDecimals(_plead_difficulty, 1)>>
+
+		<!--
+		+ 0,1000 RNG points
+		this means you have at least a 20% chance to convince Wren, and at most 70%.
+		-->
+
+		<br><br>
+		<<if $estate.prev_apologised>>
+			<span class="red">저번에 들켰을 때 당신은 이미 사과했다. 또 사과가 통할지 확신할 수 없다.</span>
+			<br>
+		<</if>>
+		용서받을 확률:
+		<br>
+		기본: <span class="black"><<print _base_chance_str>>%</span>
+		<<if _extra_english gt 0>>
+			<br>
+			<span class="green">영어</span> <span class="black">+<<print _extra_english_chance_str>>%</span>
+		<</if>>
+		<<if _extra_wren gt 0>>
+			<br>
+			<span class="green">렌의 애정</span> <span class="black">+<<print _extra_wren_chance_str>>%</span>
+		<</if>>
+		<<if _extra_sub gt 0>>
+			<br>
+			<span class="green">순종도</span> <span class="black">+<<print _extra_sub_chance_str>>%</span>
+		<</if>>
+		<<if (_extra_english + _extra_wren + _extra_sub) gt 0>>
+			<br>
+			합계: <span class="black"><<print _plead_chance_str>>%</span>
+		<</if>>
+
+		<br><br>
+
+		<<link [[도망친다|Estate Cards Cheating Run]]>><<set $estatePersistent.cur_apologised to false>><<npcincr Wren love -10>><</link>><<athleticsdifficulty 500 1000>><<llllove>>
+		<br>
+		<<link [[애원한다|Estate Cards Cheating Plead]]>><<set $estatePersistent.cur_apologised to true>><<trauma 15>><<stress 15>><<npcincr Wren love 3>><</link>><<ggtrauma>><<ggstress>><<glove>>
+			<<if $settings.skillCheckStyle is "skillname">>
+				| <span class="lblue">용서받을 확률</span>
+			<<else>>
+				| <span class="lblue">용서받을 확률</span>:
+				<<skillDifficultyText _plead_difficulty>>
+			<</if>>
+		<br>
+		<<link [[항의한다|Estate Cards Cheating Protest]]>><<set $estatePersistent.cur_apologised to false>><<trauma -6>><<stress -6>><<npcincr Wren love -1>><</link>><<lstress>><<ltrauma>><<llove>>
+		<br>
+		<<link [[항복한다|Estate Cards Cheat Surrender]]>><<set $estatePersistent.cur_apologised to false>><<npcincr Wren love 2>><</link>><<glove>>
+		<!-- idea - fight option? -->
+	<<else>>
+		<span class="red"><<His>> 패거리들이 거의 당신을 에워쌌다. 이제 도망치는 건 더 어려워질 것이다.</span>
+		<br><br>
+		<<link [[도망친다|Estate Cards Cheating Run]]>><<npcincr Wren love -10>><</link>><<athleticsdifficulty 800 1200>><<llllove>>
+		<br>
+		<<link [[항복한다|Estate Cards Cheat Surrender]]>><<npcincr Wren love 2>><</link>><<glove>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackControls">>
+	<<set _player_can_choose to $blackjack.turn is "players" and $blackjack.playersScore lte 20>>
+	<<set _consts__max_marked_see_depth to 3>>
+	<<set _seen_cards_deck to []>>
+	<<set _seen_cards_indexes to []>>
+	<<set _seen_cards_index_strings to []>>
+	<<set _seen_new_marked_card_this_turn to false>>
+	<<set _seen_dealer_card to false>>
+
+	<!-- we don't want to make the player to be punished for seeing marked cards when it's the dealer's turn (since the player wouldn't be actively looking for them) -->
+	<<if _player_can_choose>>
+		<<for $_i to 0; $_i lt _consts__max_marked_see_depth; $_i++>>
+			<<set _c to $blackjack.cards[$_i]>>
+			<<if $estatePersistent.markedCards and $estatePersistent.markedCards.has(`${_c.name}${_c.suits[0]}`)>>
+				<<set _seen_cards_deck.push(_c)>>
+				<<set _seen_cards_indexes.push($_i)>>
+				<<set _seen_cards_index_strings.push(ordinalSuffixOf($_i+1))>>
+				<<if !$blackjack.seenMarkedCardsSoFar.has(`${_c.name}${_c.suits[0]}`);>>
+					<<set _seen_new_marked_card_this_turn to true>>
+					<<set $blackjack.seenMarkedCardsSoFar.add(`${_c.name}${_c.suits[0]}`);>>
+				<</if>>
+			<</if>>
+		<</for>>
+		<<if _seen_cards_deck.length gt 0>>
+			<<set $_plural to "카드">>
+			<<set _max_card_index to Math.max(...(_seen_cards_indexes))>>
+			<<if _seen_cards_deck.length eq 1 and _seen_cards_indexes[0] eq 0>>
+				덱 맨 위에 올려져 있는 카드가 눈에 익다. 그것은 당신이 표시해 둔 카드 중 하나다:
+			<<else>>
+				<<set $_indexes_str to formatList(_seen_cards_index_strings)>>
+				당신은 덱의 맨 위에서 $_indexes_str 번째 $_plural【을를】 알아본다:
+			<</if>>
+			<br>
+			<<for _i to 0; _i lte _max_card_index; _i++>>
+				<<set _hidden to !_seen_cards_indexes.includes(_i)>>
+				<div class="left"><<cardImage $blackjack.cards[_i] _hidden>></div>
+			<</for>>
+			<div style="clear:both;"></div>
+		<</if>>
+
+		<<set _c to $blackjack.dealerCards[1]>>
+		<<if $estatePersistent.markedCards and $estatePersistent.markedCards.has(`${_c.name}${_c.suits[0]}`)>>
+			<<if !$blackjack.turnIsStale>>
+				<<if !$blackjack.seenMarkedCardsSoFar.has(`${_c.name}${_c.suits[0]}`);>>
+					<<set _seen_new_marked_card_this_turn to true>>
+					<<set $blackjack.seenMarkedCardsSoFar.add(`${_c.name}${_c.suits[0]}`);>>
+				<</if>>
+				<!-- we've seen the card, so we can display it -->
+				<<set $blackjack.dealerSecondCardHidden to false>>
+				<<set _seen_dealer_card to true>>
+				<br><br>
+				당신은 렌의 홀카드가 당신이 표시를 남겨 둔 그 카드라는 것을 알아본다.<br>
+				<div class="left"><<cardImage _c>></div>
+				<div style="clear:both;"></div>
+			<<else>>
+				<!-- reminding the user that they know Wren's hole card is probably redundant, since they can see it now -->
+			<</if>>
+		<<elseif $estate.cards.cheatPeeking and $blackjack.isFirstTurn>>
+			<<if !$blackjack.turnIsStale>>
+				<!-- idea - an alternative, where we handle the deck and the chance to see the card is higher -->
+				<!--
+					skulduggery affects your chance to see the card. base chance is 10%, skulduggery adds from 0 to 15% chance.
+					different levels of exposure have a chance to affect the chance as well, as you're distracting the dealer every now and then.
+				-->
+				<<set _chance_to_see to Math.clamp(10 + Math.round(currentSkillValue('skulduggery')/100), 10, 25)>>
+				<<set _dealer_distracted to false>>
+				<<set _dealer_distracted_text to "딜러가 이따금 당신을 몰래 훔쳐보는 것을 눈치챈다.">>
+				<!-- we generate two numbers because we want a different chance for the text appearing: we don't want it tied to the chance_to_see -->
+				/* base 10-25% chance */
+				<<if $estate.cards.state is "ride">>
+					<<if random(1, 5) gt 1>>
+						/* 4/5 * .75 to +60% chance = 70% - 85% */
+						<<set _chance_to_see += 75>>
+						<<set _dealer_distracted to true>>
+						<<person2>>
+						<<silently>><<his>><</silently>>
+						<<set _dealer_distracted_text to "딜러가 " + _text_output + " 눈에 욕망을 담고 당신과 렌을 바라보는 것을 눈치챈다.">>
+						<<person1>>
+					<</if>>
+				<<elseif $exposed eq 2>>
+					<!-- actual chance bonus to random_chance * extra_chance_to_see (so .5*.75=0.375) -->
+					<<if random(1, 2) eq 1>>
+						/* 1/2 * .75 to +37.5% chance = 47.5% - 62.5% */
+						<<set _chance_to_see += 75>>
+						<<set _dealer_distracted to true>>
+						<<person2>>
+						<<silently>><<he>><</silently>>
+						<<set _dealer_distracted_text to "당신이 보지 않는다고 생각할 때, 딜러가 당신의 몸을 음흉하게 훑어보는 것을 눈치챈다.">>
+						<<person1>>
+					<</if>>
+				<<elseif $exposed eq 1>>
+					<<if random(1, 2) eq 1>>
+						/* 0.5 * .4 to +20% chance = 30 - 45% */
+						<<set _chance_to_see += 40>>
+						<<set _dealer_distracted to true>>
+						<<set _dealer_distracted_text to "딜러가 이따금 당신을 몰래 훔쳐보는 것을 눈치챈다.">>
+					<</if>>
+				<</if>>
+				/* if fully clothed = 10% - 25% */
+				<<if _dealer_distracted>>
+					<span class="pink">_dealer_distracted_text</span>
+					<br>
+				<</if>>
+				<<rng>>
+				<<if $rng lt _chance_to_see>>
+					딜러가 주의가 산만해졌는지, <<person2>><<he>>【은는】<<person1>> 서투르게 렌에게 <<his>> 두 번째 카드를 건네준다.
+					<br>
+					<span class="green">당신은 어떻게든 렌의 홀카드를 훔쳐보는 데 성공한다.</span>
+					<br>
+					<div class="left"><<cardImage _c>></div>
+					<div style="clear:both;"></div>
+					<<blackjackSuspicion 10 "holecardingsuccess">>
+					<<if !$blackjack.susCritHit>>
+						<<switch random(1,3)>>
+							<<case 1>>
+								렌 역시 딜러의 실수를 알아차리고 당신을 힐끗 보지만, 아무 말도 하지 않는다.
+							<<case 2>>
+								렌 역시 딜러의 실수를 알아차리고 당신을 힐끗 본다. "네 눈길이 자기 손에만 가 있었으면 좋겠네," <<he>>【이가】 말한다.
+							<<case 3>>
+								"아, 제발," 렌이 딜러에게 말한다. "카드를 돌릴 땐 좀 더 빨라야지." <<He>>【은는】 당신을 힐끗 보지만, 다른 말은 하지 않는다.
+						<</switch>>
+						<<gsuspicion>>
+					<<else>>
+						하지만 렌을 쳐다보았을 때, 당신은 <<he>>【이가】 <span class="red">능글맞은 미소를 지으며 당신의 눈을 응시하는 것을</span> 발견한다.<<gggsuspicion>>
+					<</if>>
+					<br><br>
+					<!-- we've seen the card, so we can display it -->
+					<<set $blackjack.dealerSecondCardHidden to false>>
+					<<set $blackjack.susRoseInThisRound to true>>
+				<<else>>
+					<<set $blackjack.susRoseInThisRound to true>>
+					<<blackjackSuspicion 5 "holecardingfail">>
+					당신은 분배될 때 렌의 두 번째 카드를 훔쳐보려 했지만, 아무것도 보지 못했다.<br>
+					<<if !$blackjack.susCritHit>>
+						<<switch random(1,3)>>
+							<<case 1>>
+								당신은 그들이 당신이 훔쳐보고 있다는 걸 아는 건지 궁금해진다.
+							<<case 2>>
+								당신은 렌이 당신을 빤히 바라보고 있는 것을 눈치챈다.
+							<<case 3>>
+								<<his>> 카드를 받은 후 렌이 당신을 빤히 바라보는 것이 느껴진다.
+						<</switch>>
+						<<gsuspicion>>
+					<<else>>
+						하지만 렌을 쳐다보았을 때, 당신은 <<he>>【이가】 <span class="red">능글맞은 미소를 지으며 당신의 눈을 응시하는 것을</span> 발견한다.<<gggsuspicion>>
+					<</if>>
+					<br><br>
+				<</if>>
+			<<else>>
+				<!-- reminding the user that they know Wren's hole card is probably redundant, since they can see it now -->
+			<</if>>
+		<</if>>
+	<</if>>
+
+	<<set _marked_card_show_sus_warning to false>>
+	<<if _player_can_choose and $blackjack.turnIsStale neq true>>
+		<<if _seen_new_marked_card_this_turn>>
+			<!--
+			we do this here to make sure all automatic suspicion raising actions are performed before this check
+			we set a simple bool value for simplicity (so that we don't copy-paste the checks)
+			-->
+			<<set _marked_card_show_sus_warning to true>>
+			<<set $blackjack.susRoseInThisRound to true>>
+			<<blackjackSuspicion `Math.round($estatePersistent.markedCards.size * 0.4)` "markedcardseen">>
+		<</if>>
+	<</if>>
+
+	<<if $estatePersistent.suspicion gte 100>>
+		<<switch $blackjack.caughtType>>
+			<<case "holecardingfail" "holecardingsuccess">>
+				"조심하라고," 렌이 말한다. "<span class="red">너무 대놓고 훔쳐보는데.</span> 그러다 네 목 부러지겠다."
+				<br><br>
+				<<if $speech_attitude is "meek">>
+					"죄-죄송해요, 보려고 한 건 아니었어요!" 당신이 말한다.
+				<<elseif $speech_attitude is "bratty">>
+					"훔쳐봐? 네 딜러가 허튼수작 부리는 건 아닌지 확인하는 것뿐이야," 당신이 말한다. "겁나?"
+				<<else>>
+					"훔쳐보지 않았어," 당신이 말한다.
+				<</if>>
+				<br><br>
+				렌이 콧방귀를 뀐다. <<He>>【은는】 당신의 말을 믿지 않는 눈치다.
+				<br><br>
+				<<blackjackCheatingCaught>>
+			<<case "markedcardseen">>
+				<<if _seen_dealer_card>>
+					렌이 잠시 당신을 응시하더니, 조심스럽게 <<his>> 홀카드를 살핀다. 이내, <span class="red"><<he>>【이가】 콧방귀를 뀐다</span>.
+					<br><br>
+				<<else>>
+					렌이 잠시 당신을 응시하더니, 덱에서 카드를 집어든다. <<He>>【은는】 카드를 이리저리 살피다 - <span class="red">콧방귀를 뀐다</span>.
+				<</if>>
+				<br><br>
+				<<He>>【은는】 당신이 카드에 남긴 표시를 가리킨다. "잔머리 굴리긴," 렌이 말한다.
+				<br><br>
+				<<if $speech_attitude is "meek">>
+					"내-내가 한 거 아냐, 난 아무것도 안 했어!" 당신이 말한다.
+				<<elseif $speech_attitude is "bratty">>
+					"멍청하게 굴지 마," 당신이 말한다. "그냥 스크래치잖아. 우리가 아는 한 저건 딜러 잘못일 수도 있다고."
+				<<else>>
+					"그건 그냥 스크래치야," 당신이 말한다. "고의로 한 것도 아닐뿐더러, 내가 했다는 뜻도 아니지."
+				<</if>>
+				<br><br>
+				렌이 콧방귀를 뀐다. <<He>>【은는】 당신의 말을 믿지 않는 눈치다.
+				<br><br>
+				<<blackjackCheatingCaught>>
+			<<default>>
+				<br><br>
+				<<blackjackCheatingCaught>>
+		<</switch>>
+	<<else>>
+		<<blackjackShowCards>>
+		<<blackjackCheatingAlertsFooter>>
+		<<blackjackControlsChoices>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackShowCards">>
+	렌의 패:
+	<br>
+	<<for _i to 0; _i lt $blackjack.dealerCards.length; _i++>>
+		<div class="left">
+			<<if _i is 0>>
+				<<cardImage $blackjack.dealerCards[0]>>
+			<<else>>
+				<<cardImage $blackjack.dealerCards[_i] $blackjack.dealerSecondCardHidden>>
+			<</if>>
+		</div>
+	<</for>>
+	<div style="clear:both;"></div>
+	<<if $blackjack.dealerSecondCardHidden>>
+		<<blackjackScore `[$blackjack.dealerCards[0]]` "dealer">>
+		확인된 총점: <<print $blackjack.dealerScore>>
+	<<else>>
+		<<blackjackScore $blackjack.dealerCards "dealer">>
+		총점: <<print $blackjack.dealerScore>>
+	<</if>>
+	<br><br>
+	당신의 패:
+	<br>
+	<<for _i to 0; _i lt $blackjack.playersCards.length; _i++>>
+		<div class="left"><<cardImage $blackjack.playersCards[_i]>></div>
+	<</for>>
+	<div style="clear:both;"></div>
+	총점: <<print $blackjack.playersScore>>
+<</widget>>
+
+<<widget "blackjackCheatingAlertsFooter">>
+	<<if _marked_card_show_sus_warning>>
+		<br><br>
+		당신이 표시된 카드들을 살펴보는 동안, 렌과 <<his>> 패거리들이 가끔 당신을 흘끗거리는 것이 느껴졌다.<<gsuspicion>>
+	<</if>>
+
+	<<if $blackjack.turn is "players" and $blackjack.playersScore lte 20>>
+		<div id="blackjackChoicesCheatingInformationDiv" style="display: none">
+			<br><br>
+			<<set _marked_count to $estatePersistent.markedCards ? $estatePersistent.markedCards.size : 0>>
+			<<set _consts__max_marked to 8>>
+			당신은 이 덱에서 카드 <<print _marked_count>>장에 표시를 남겼다.<br>
+			<<set _d to deck()>>
+			<<for _i to 0; _i lt _d.length; ++_i>>
+				<<set _c to _d[_i]>>
+				<<if $estatePersistent.markedCards and $estatePersistent.markedCards.has(`${_c.name}${_c.suits[0]}`)>>
+					<div class="left"><<cardImage _c>></div>
+				<</if>>
+			<</for>>
+			<div style="clear:both;"></div>
+			<br>
+			<<if _marked_count gte _consts__max_marked>>
+				이게 당신이 남기고 기억할 수 있는 한계다. 렌이 덱을 교체하기 전까지는 더 이상 카드에 표시를 남길 수 없다.
+			<<else>>
+				앞으로 <<print _consts__max_marked - _marked_count>>장 더 표시를 남길 수 있다. 그것이 당신이 남기고 기억할 수 있는 한계다.
+			<</if>>
+		</div>
+	<</if>>
+
+	<<if $estatePersistent.suspicion is undefined>>
+		<<set $estatePersistent.suspicion to 0>>
+	<</if>>
+	<<set _player_cheating_virginity_warned to false>>
+	<<if $estatePersistent.suspicion gt 0>>
+		<br><br>
+		의심:
+		<<statbar 0 $estatePersistent.suspicion 100>>
+		<<set _consts__danger_zone_suspicion to 70>>
+		<<if $estatePersistent.suspicion gt _consts__danger_zone_suspicion>>
+			<br>
+			<span class="red">렌과 <<his>> 패거리들이 당신을 심하게 의심하고 있으며, 현재 당신은 예의주시되고 있다.</span>
+			<<if $estate.cards.state is "ride">>
+				<<set _player_cheating_virginity_warned to true>>
+				<<cards_cheating_virginity_warning>>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackCheatingPeekingChoiceGenerate">>
+	<<if $estate.cards.cheatPeeking>>
+		<<link "패를 돌릴 때 렌의 홀카드를 훔쳐보지 않는다">><<set $estate.cards.cheatPeeking to false>><<replace "#blackjackCheatingPeekingChoice">><<blackjackCheatingPeekingChoiceGenerate>><</replace>><<run Links.generateLinkNumbers($(".passage"))>><</link>>
+	<<else>>
+		<<link "패를 돌릴 때 렌의 홀카드를 훔쳐본다">><<set $estate.cards.cheatPeeking to true>><<replace "#blackjackCheatingPeekingChoice">><<blackjackCheatingPeekingChoiceGenerate>><</replace>><<run Links.generateLinkNumbers($(".passage"))>><</link>>
+		<!-- | <span class="orange">Skulduggery</span> -->
+		<mouse class="tooltip linkBlue">(?)<span>매 첫 턴, 패가 분배될 때 당신은 렌의 홀카드를 훔쳐보려 시도할 것입니다. 속임수 기술, 딜러의 경계도 등에 따라 성공 확률이 영향을 받습니다.</span></mouse>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackCheatingChoicesGenerate">>
+	<<set $_showCheating to _args[0]>>
+	<<if $_showCheating>>
+		<<run $("#blackjackChoicesCheatingInformationDiv").show()>>
+		<<link "뒤로 (일반 선택지)">><<replace "#blackjackChoicesDiv">><<blackjackCheatingChoicesGenerate false>><</replace>><<run Links.generateLinkNumbers($(".passage"))>><</link>>
+
+		<<if _marked_count lt _consts__max_marked>>
+			<<set _can_mark_count to _consts__max_marked - _marked_count>>
+			<<set _non_marked_in_hand to 0>>
+			<<for _i to 0; _i lt $blackjack.playersCards.length; ++_i>>
+				<<set _c to $blackjack.playersCards[_i]>>
+				<<if !$estatePersistent.markedCards or !$estatePersistent.markedCards.has(`${_c.name}${_c.suits[0]}`)>>
+					<<set _non_marked_in_hand++>>
+				<</if>>
+			<</for>>
+			<<set _can_mark_count to Math.min(_can_mark_count, _non_marked_in_hand)>>
+
+			<<if _can_mark_count gt 0>>
+				<<if _can_mark_count gt 1>>
+					<<set $_link_text to `새로 받은 카드 ${_can_mark_count}장에 표시를 남긴다`>>
+				<<else>>
+					<<set $_link_text to `새로 받은 카드에 표시를 남긴다`>>
+				<</if>>
+				<br>
+				<<set $skulduggerydifficulty to 400 + _can_mark_count*100 + $estatePersistent.suspicion*25>>
+				<<link [[$_link_text|Estate Blackjack Cheat]]>><<set $blackjack.playersState to "cheat">><<set $blackjack.cheatChoice to "mark">><</link>>
+					<<skulduggerydifficulty>>
+					<<if $estate.cards.state is "ride" and !_player_cheating_virginity_warned>>
+						<<set _player_cheating_virginity_warned to false>>
+						<<cards_cheating_virginity_warning true>>
+					<</if>>
+			<</if>>
+		<</if>>
+
+		<br>
+		<span id="blackjackCheatingPeekingChoice">
+			<<blackjackCheatingPeekingChoiceGenerate>>
+		</span>
+
+		<!-- // idea
+		<br>
+		<<link [[덱 카드를 바꾼다|$passage]]>><<set $blackjack.playersState to "cheat">><<set $blackjack.cheatChoice to "swap_deck">><</link>>
+		<br>
+		<<link [[홀 카드를 엿본다|$passage]]>><<set $blackjack.playersState to "peek">><<set $blackjack.cheatChoice to "peek_hole_card">><</link>>
+		-->
+
+		<br>
+		<<link "도움말 및 옵션">><<overlayReplace "blackjackHelp">><</link>>
+	<<else>>
+		<<run $("#blackjackChoicesCheatingInformationDiv").hide()>>
+		<<link [[히트|$passage]]>><<set $blackjack.playersState to "hit">><<set $blackjack.turnIsStale to false>><<set $blackjack.isFirstTurn to false>><</link>> |
+		<<link [[스탠드|$passage]]>><<set $blackjack.turn to "dealer">><<set $blackjack.turnIsStale to false>><<set $blackjack.playersState to "stand">><<set $blackjack.isFirstTurn to false>><</link>> |
+		<<link "치트 옵션">><<replace "#blackjackChoicesDiv">><<blackjackCheatingChoicesGenerate true>><</replace>><<run Links.generateLinkNumbers($(".passage"))>><</link>> |
+		<<link "도움말 및 옵션">><<overlayReplace "blackjackHelp">><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackControlsChoices">>
+	<br><br>
+	<<if $blackjack.turn is "players" and $blackjack.playersScore lte 20>>
+		<div id="blackjackChoicesDiv">
+			<<blackjackCheatingChoicesGenerate false>>
+		</div>
+	<<elseif $blackjack.turn is "players" and $blackjack.playersScore gt 21>>
+		<span class="red">버스트</span>
+		<br>
+		<<blackjackControlsPostGameSuspicion true>>
+
+		<<link [[게임을 종료한다|Estate Blackjack Lose]]>><</link>>
+		<br>
+	<<elseif $blackjack.turn is "dealer">>
+		<<if $blackjack.playersState is "blackjack" and $blackjack.dealerState is "blackjack">>
+			<<set $blackjack.winner to "tie">>
+			<span class="blue">양측 모두 내추럴 블랙잭으로 무승부</span>
+		<<elseif $blackjack.playersState is "blackjack">>
+			<<set $blackjack.winner to "player">>
+			<span class="green">내추럴 블랙잭으로 승리</span>
+		<<elseif $blackjack.dealerState is "blackjack">>
+			<<set $blackjack.winner to "dealer">>
+			<span class="red">내추럴 블랙잭에 패배</span>
+		<<elseif $blackjack.playersScore gt $blackjack.dealerScore or $blackjack.dealerScore gt 21>>
+			<<set $blackjack.winner to "player">>
+			<span class="green">당신의 승리</span>
+		<<elseif $blackjack.playersScore is $blackjack.dealerScore>>
+			<<set $blackjack.winner to "tie">>
+			<span class="blue">무승부</span>
+		<<else>>
+			<<set $blackjack.winner to "dealer">>
+			<span class="red">당신의 패배</span>
+		<</if>>
+		<br><br>
+		<<if $blackjack.winner is "tie">>
+			<<blackjackControlsPostGameSuspicion>>
+			<<blackjackEnd "tie">>
+			<<blackjackStart "Blackjack Finish">>
+			<<link [[다음|Estate Blackjack]]>><<pass 1>><</link>>
+			<br>
+		<<elseif $blackjack.winner is "dealer">>
+			<<blackjackControlsPostGameSuspicion true>>
+			<<link [[다음|Estate Blackjack Lose]]>><</link>>
+			<br>
+		<<else>>
+			<<blackjackControlsPostGameSuspicion>>
+			<<link [[다음|Estate Blackjack Win]]>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackCaughtCheatingSurrender">>
+	<<if $wren_intro isnot undefined>>
+		<<set $estate_cards_end to "cheat_remy">>
+	<</if>>
+
+	<<if !($worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked") and $worn.lower.type.includes("naked") and $worn.under_lower.type.includes("naked"))>>
+		<<clothesruined>><<exposure>>
+		"<<phim>> 준비시켜," <<person2>><<person>>【이가】 말한다. 사방에서 손이 다가와 옷을 움켜쥐고 당기며 찢어발기더니, 당신의 몸을 완전히 노출시킨다. <<covered>>
+		<br><br>
+	<</if>>
+	<<fameexhibitionism 7>>
+
+	그들은 알몸인 당신을 들어 올리고 저택을 가로질러, <<if $estate.chaos gte 100>>당신이 일으킨 모든 혼란을 뚫고,<</if>> 작은 헛간 쪽으로 옮긴다.
+	<br><br>
+	경비원 몇 명이 다가오는 당신을 보고 비웃는다. 렌은 당신을 경비원들에게 넘겨준다.
+	<br><br>
+	<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1>>
+		경비원 중 한 명이 헛간으로 들어가 사슬을 가져오더니, 당신의 익숙한 목걸이에 단단히 고정한다. 경비원이 그것을 당기자, <span class="green">가장 안쪽의 고리가 부서진다</span>. 남은 사슬은 바닥에 떨어진다.
+		<br><br>
+
+		모두가 이제 망가져 버린 사슬을 응시한다.
+		<<if C.npc.Wren.love gte 20>>
+			렌이 웃기 시작한다. "너 아주 기막힌 묘기 목걸이를 차고 있네. 또 같이 놀자고," 렌이 말한다. "금방 다시 올 거잖아."
+		<<else>>
+			렌이 낄낄거린다. "멋진 묘기 목걸이네. 쟤들 너무 애먹이지 말라고," <<nnpc_he "Wren">>【이가】 말한다.
+		<</if>>
+		<br><br>
+		<!-- estate ends 4, 6 -->
+		<<card_pot_confiscated>>
+		<<estate_cards_finish>>
+		<<badEndTracking "Underground Farm" { reason: "cardCheating" }>>
+		<<link [[다음|Livestock Intro Familiar Collar]]>><<endevent>><<estate_end>><</link>>
+		<br>
+	<<else>>
+		<<leash 21>>
+		경비원 중 한 명이 헛간으로 들어가 목걸이와 사슬을 가져오더니, 당신의 목에 고정한다. 경비원이 거기에 연결된 사슬을 당겨 당신을 강제로 끌고 간다.
+		<br><br>
+		<<if C.npc.Wren.love gte 20>>
+			"또 같이 놀자고," 렌이 말한다. "어떻게든 금방 다시 올 거잖아."
+		<<else>>
+			"쟤들 너무 애먹이지 말라고," 렌이 말한다.
+		<</if>>
+		<br><br>
+		<!-- estate ends 4, 6 -->
+		<<card_pot_confiscated>>
+		<<estate_cards_finish>>
+		<<badEndTracking "Underground Farm" { reason: "cardCheating" }>>
+		<<link [[다음|Livestock Intro]]>><<endevent>><<estate_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackHelp">>
+	<<set _consts__max_marked to 8>>
+	<ul>
+		<li>당신의 목표는 총점이 21을 넘지 않으면서 딜러보다 높은 점수를 얻는 것입니다.</li>
+		<li>카드의 값은 2부터 11까지입니다. 잭(Jack), 퀸(Queen), 킹(King)은 각각 10의 가치를 가지며, 에이스(Ace)는 1이나 11 중 플레이어에게 더 유리한 쪽으로 계산됩니다.</li>
+		<li>2장의 카드로 21점을 만드는 것을 "내추럴 블랙잭(Natural Blackjack)"이라 부르며, 무승부가 아닌 이상 어떠한 다른 카드 조합이더라도 내추럴 블랙잭이 이깁니다.</li>
+		<li>당신이나 딜러 중 누구든 21을 넘기면(bust), 넘긴 쪽이 패배합니다.</li>
+		<li>스탠드(Stand)를 하면 차례가 끝나고, 히트(Hit)를 하면 카드를 한 장 더 받습니다.</li>
+		<li>딜러는 항상 정해진 규칙에 따라 플레이하므로, 이를 유리하게 이용하세요. 딜러는 점수가 17점 미만일 때 반드시 히트해야 합니다.</li>
+	</ul>
+	<h3>속임수 가이드</h3>
+	<ul>
+		<li>블랙잭에서 "홀카드(Hole card)"는 딜러가 감춘 두 번째 카드입니다. "홀카딩(Hole carding)"은 이 감춰진 카드가 무엇인지 알아내려는 시도를 의미합니다. 카드가 분배될 때 <b>훔쳐보기(peek)</b>를 시도하여 알아낼 수 있습니다. 하지만 카드가 나뉘는 걸 고의로 훔쳐보려는 행위는 규칙 위반입니다.</li>
+		<li>카드 표시란 당신이 나중에 알아볼 수 있도록 카드에 어떠한 흔적을 남기는 것을 말합니다. 당신이 들고 있는 카드에 최대 _consts__max_marked번 표시를 남길 수 있습니다. 카드 표시는 규칙 위반이므로 주의하세요.</li>
+		<li>한 번 카드에 표시를 남기면, 그 표시는 덱이 교체될 때까지 남아 있습니다. 카드 뒷면에서 표시를 찾으려는 행동은 눈에 띄기 쉬우니 주의해야 합니다.</li>
+		<li>카드는 딜러가 분배합니다. 딜러가 당신의 시야에 있는 한, 딜러가 렌에게 주는 카드를 훔쳐보려 시도할 수 있습니다.</li>
+	</ul>
+
+	<h3>설정</h3>
+	<<link [[저장 후 닫기|$passage]]>><<set $worn.handheld.colour to $cardcover.colour.replace("-", " ")>><</link>>
+	<br><br>
+	카드 뒷면:
+	<br>
+
+	<div id="card-cover-options" @class="'clothes-' + $cardcover.colour">
+		<<for _i to 0; _i lte 7; _i++>>
+			<div @class="'div-link card cardcover' + _i + ($cardcover.style eq _i ? ' active' : '')">
+				<<if _i eq 0>>
+					<span class="number">?</span>
+					<span class="suit">?</span>
+				<</if>>
+				<<capture _i>>
+					<<link "">>
+						<<set $cardcover.style to _i>>
+						<<run $('#card-cover-options .card').removeClass('active')>>
+						<<run $('#card-cover-options .card:nth-child(' + (_i+1) + ')').addClass('active')>>
+					<</link>>
+				<</capture>>
+			</div>
+		<</for>>
+	</div>
+	<label>
+		색상:
+		<<listbox "$cardcover.colour" autoselect>>
+			<<option "검은색" "black">>
+			<<option "네이비" "navy">>
+			<<option "블루 스틸" "blue-steel">>
+			<<option "밝은 회색" "grey">>
+			<<option "흰색" "pale-white">>
+			<<option "은색" "silver">>
+			<<option "흑백" "white">>
+			<<option "금색" "gold">>
+			<<option "검정과 주황" "yellow">>
+			<<option "노란색" "pale-yellow">>
+			<<option "청동색" "bronze">>
+			<<option "갈색" "brown">>
+			<<option "모래색" "sand">>
+			<<option "올리브색" "olive">>
+			<<option "주황색" "tangerine">>
+			<<option "다홍색" "pale-tangerine">>
+			<<option "빨간색" "red">>
+			<<option "초록색" "green">>
+			<<option "연두색" "light-green">>
+			<<option "파란색" "blue">>
+			<<option "하늘색" "light-blue">>
+			<<option "분홍색" "pink">>
+			<<option "연분홍색" "light-pink">>
+			<<option "보라색" "purple">>
+			<<option "청록색" "teal">>
+		<</listbox>>
+	</label>
+
+	<<run $(() => {
+		linkifyDivs('#card-cover-options');
+		$('#listbox-cardcovercolour').on('change', () => {
+			$('#card-cover-options').removeClass().addClass('clothes-' + $cardcover.colour)
+		});
+	})>>
+<</widget>>
+
+:: Widgets High Low [widget]
+
+<!--Needs to be run in a previous passage to prevent cheating-->
+<<widget "highLowStart">>
+	<<if _args[0]>>
+		<<set $highlow to {
+			cards:shuffle(shuffle(shuffle(deck()))),
+			correct: 0,
+			dealerCard: null,
+			playersCard: null,
+			playersCardHidden: null,
+			gamestart: false,
+			turn: null,
+			choice: null,
+			endPassage: _args[0]
+		}>>
+	<</if>>
+<</widget>>
+
+<<widget "highLowEnd">>
+	<<unset $highlow>>
+<</widget>>
+
+<<widget "cardText">>
+	<<if _args[0]>>
+		<<if _args[1]>>
+			뒤집혔다.
+		<<else>>
+			<<switch _args[0].name>>
+				<<case "A">>에이스
+				<<case "K">>킹
+				<<case "Q">>퀸
+				<<case "J">>잭
+				<<default>>_args[0].name
+			<</switch>>
+			<<print _args[0].suits>>.
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "highLowCalculate">>
+	<<if $highlow.gamestart is false>>
+		<<set $highlow.gamestart to true>>
+		<<set $highlow.turn to "players">>
+	<</if>>
+
+	<<if $highlow.turn is "players">>
+		플레이어 턴
+		<br>
+		<<set $highlow.dealerCard to $highlow.cards[0]>>
+		<<set $highlow.playersCard to $highlow.cards[1]>>
+		<<set $highlow.cards.deleteAt(0,1)>>
+		<<set $highlow.playersCardHidden to true>>
+	<<elseif $highlow.turn is "dealer">>
+		딜러 턴
+		<br>
+		<<set $highlow.playersCardHidden to false>>
+		<<if ($highlow.choice is "lower" and $highlow.playersCard.value lt $highlow.dealerCard.value) or ($highlow.choice is "higher" and $highlow.playersCard.value gt $highlow.dealerCard.value)>>
+			<<if $highlow.correct is 0>>
+				<<set $highlow.correct++>>
+			<<else>>
+				<<set $highlow.correct*=2>>
+			<</if>>
+		<</if>>
+		<<if $highlow.cards.length lt 30>>
+			<<set $highlow.cards to shuffle(shuffle(shuffle(deck())))>>
+			카드를 다시 섞는다.
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "highLowControls">>
+	<div class="highlow">
+		<div><span class="title">딜러의 카드:</span> <<cardImage $highlow.dealerCard>></div>
+		<div><span class="title">당신의 카드:</span> <<cardImage $highlow.playersCard $highlow.playersCardHidden>></div>
+	</div>
+	<div style="clear:both;"></div>
+	현재 점수: <<print $highlow.correct>>
+	<br>
+
+	<<if $highlow.turn is "players">>
+		<<link [[낮다에 건다|$passage]]>><<set $highlow.choice to "lower">><<set $highlow.turn to "dealer">><</link>> |
+		<<link [[높다에 건다|$passage]]>><<set $highlow.choice to "higher">><<set $highlow.turn to "dealer">><</link>> |
+		<<if $highlow.correct gt 4>>
+			<br>
+			<<link [[게임을 끝낸다|$highlow.endPassage]]>><<set $highlow.correct/=2>><</link>><<note "점수를 절반 잃음" "red">> |
+		<</if>>
+	<<elseif $highlow.turn is "dealer">>
+
+		<<if ($highlow.choice is "lower" and $highlow.playersCard.value lt $highlow.dealerCard.value) or ($highlow.choice is "higher" and $highlow.playersCard.value gt $highlow.dealerCard.value)>>
+			정답
+			<br>
+			<<link [[계속한다|$passage]]>><<set $highlow.turn to "players">><</link>> |
+			<br>
+			<<link [[게임을 끝낸다|$highlow.endPassage]]>><</link>> |
+		<<elseif $highlow.playersCard.value is $highlow.dealerCard.value>>
+			무승부
+			<br>
+			<<link [[계속한다|$passage]]>><<set $highlow.turn to "players">><</link>> |
+			<br>
+			<<link [[게임을 끝낸다|$highlow.endPassage]]>><</link>> |
+		<<else>>
+			당신의 패배
+			<br>
+			<<link [[게임을 끝낸다|$highlow.endPassage]]>><<set $highlow.correct to 0>><</link>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cardImage">>
+	<<if _args[0]>>
+		<div @class="'card ' + (_args[1] ? 'cardcover' + $cardcover.style : '') + ' clothes-' + $cardcover.colour">
+			<<if _args[1]>>
+				<<if $cardcover.style eq 0>>
+					<span class="number">?</span>
+					<span class="suit">?</span>
+				<</if>>
+			<<else>>
+				<<if _args[0].suits is "Diamonds">>
+					<<set _suits to "diams">>
+				<<else>>
+					<<set _suits to _args[0].suits.toLowerCase()>>
+				<</if>>
+				<span class="number"><<print _args[0].name>></span>
+				<span class="suit"><<print _args[0].suits>></span>
+			<</if>>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "estate_cards_bet">>
+	<<if $worn.over_upper.name isnot "naked">>
+		<<set $estate.cards.desire to "over_upper">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.over_upper.name【으로로】 손가락을 가리킨다. <span class="blue">"<<overupperthat>>【을를】 잃는 거야."</span>
+	<<elseif $worn.over_lower.name isnot "naked">>
+		<<set $estate.cards.desire to "over_lower">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.over_upper.name【으로로】 손가락을 가리킨다. <span class="blue">"<<overlowerthat>>【을를】 잃는 거야."</span>
+
+	<<elseif $worn.feet.name isnot "naked" and $worn.feet.cursed isnot 1>>
+		<<set $estate.cards.desire to "feet">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.feet.name【으로로】 손가락을 가리킨다. <span class="blue">"네 신발을 잃는 거야."</span>
+
+	<<elseif $worn.legs.name isnot "naked">>
+		<<set $estate.cards.desire to "legs">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.legs.name【으로로】 손가락을 가리킨다. <span class="blue">"<<legsthat>>【을를】 잃는 거야."</span>
+
+	<<elseif $worn.upper.name isnot "naked">>
+		<<set $estate.cards.desire to "upper">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.upper.name【으로로】 손가락을 가리킨다. <span class="purple">"네 <<dress>>【을를】 잃는 거야."</span>
+
+	<<elseif $worn.lower.name isnot "naked">>
+		<<set $estate.cards.desire to "lower">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.lower.name【으로로】 손가락을 가리킨다. <span class="purple">"네 <<skirt>>【을를】 잃는 거야."</span>
+
+	<<elseif $worn.hands.name isnot "naked">>
+		<<set $estate.cards.desire to "hands">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.hands.name【으로로】 손가락을 가리킨다. <span class="blue">"그 장갑들을 잃는 거야."</span>
+
+	<<elseif $worn.under_upper.name isnot "naked">>
+		<<set $estate.cards.desire to "under_upper">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.under_upper.name【으로로】 손가락을 가리킨다. <span class="pink">"네 <<bra>>【을를】 잃는 거야."</span>
+
+	<<elseif $worn.under_lower.name isnot "naked">>
+		<<set $estate.cards.desire to "under_lower">>
+		"내가 이기면—" <<He>>【이가】 당신의 $worn.under_lower.name【으로로】 손가락을 가리킨다. <span class="pink">"네 <<panties>>【을를】 가져가겠어."</span>
+
+	<<else>>
+
+		<<if $estate.cards.state is "ride">>
+		"내가 이기면—"
+			<<rng 4>>
+			<<if $rng is 4>>
+				<<set $estate.cards.desire to "kiss">>
+				당신의 입술에 <<his>> 입김이 느껴질 때까지 <<He>>【이가】 입을 가까이 댄다. "우리 키스하는 거야."
+			<<elseif $rng is 3>>
+				<<He>>【이가】 씩 웃는다. "네
+				<<if $player.penisExist and $player.vaginaExist>>
+					<<if random(1, 2) is 2>>
+						<<set $estate.cards.desire to "penis_grope">>
+						자지를 애무할 거야."
+					<<else>>
+						<<set $estate.cards.desire to "pussy_grope">>
+						보지를 애무할 거야."
+					<</if>>
+				<<elseif $player.penisExist>>
+					<<set $estate.cards.desire to "penis_grope">>
+					자지를 애무할 거야."
+				<<else>>
+					<<set $estate.cards.desire to "pussy_grope">>
+					보지를 애무할 거야."
+				<</if>>
+			<<elseif $rng is 2>>
+				<<set $estate.cards.desire to "bottom_grope">>
+				<<He>>【이가】 씩 웃는다. "네 엉덩이를 애무할 거야."
+			<<elseif $rng is 1>>
+				<<set $estate.cards.desire to "chest_grope">>
+				<<He>>【이가】 씩 웃는다. "네 가슴을 가지고 놀 거야."
+			<</if>>
+		<<else>>
+			<<if $estate.cards.lust gte 2>>
+				<<if $NPCList[0].penis isnot "none">>
+					"내가 이기면—" <<He>>【이가】 씩 웃는다.
+					<<if $player.vaginaExist and !playerChastity("hidden")>>
+						"내 무릎 위에 앉아. 걱정 마. 네 보지는 건드리지 않을 테니. 아직은."
+						<<set $estate.cards.desire to "vaginal">>
+					<<elseif $settings.analEnabled and !playerChastity("anus")>>
+						"내 무릎 위에 앉아. 걱정 마. 나쁜 짓은 안 할 테니. 아직은."
+						<<set $estate.cards.desire to "anal">>
+					<<elseif !playerChastity("hidden")>>
+						"내 무릎 위에 앉아. 걱정 마. 나쁜 짓은 안 할 테니. 아직은."
+						<<set $estate.cards.desire to "wren_lap">>
+					<<else>>
+						<<He>>【이가】 당신의 $worn.genitals.name【을를】 바라본다. "거기 흥미로운 장치를 하고 있네," <<he>>【이가】 의자에 기대어 말한다. "<span class="blue">그 밑을 보고 싶긴 한데.</span> 하지만 지금으로선, 네게서 원하는 건 다 얻었어. 조심히 돌아가렴." <<His>> 친구들이 웃는다.
+						<<set $estate.cards.desire to "chastity">>
+					<</if>>
+				<<else>>
+					"내가 이기면—" <<He>>【이가】 씩 웃는다.
+					<<if $player.penisExist and !playerChastity("penis")>>
+						"내가 네 무릎 위에 앉을게. 걱정 마. 네 자지는 건드리지 않을 테니. 아직은."
+						<<set $estate.cards.desire to "penile">>
+					<<elseif !playerChastity("hidden")>>
+						"내가 네 무릎 위에 앉을게. 걱정 마. 나쁜 짓은 안 할 테니. 아직은."
+						<<set $estate.cards.desire to "pc_lap">>
+					<<else>>
+						<<He>>【이가】 당신의 $worn.genitals.name【을를】 바라본다. "거기 흥미로운 장치를 하고 있네," <<he>>【이가】 의자에 기대어 말한다. "<span class="blue">그 밑을 보고 싶긴 한데.</span> 하지만 지금으로선, 네게서 원하는 건 다 얻었어. 조심히 돌아가렴." <<His>> 친구들이 웃는다.
+						<<set $estate.cards.desire to "chastity">>
+					<</if>>
+				<</if>>
+			<<elseif $estate.cards.lust gte 1>>
+				<<set $estate.cards.desire to "bend">>
+				"내가 이기면—" <<He>>【이가】 씩 웃는다. "네 의자 위로 올라가서 허리를 숙여. 널 좀 더 자세히 보게 해 줘."
+			<<else>>
+				<<set $estate.cards.desire to "twirl">>
+				"내가 이기면—" <<He>>【이가】 씩 웃는다. "그 자리에서 한 바퀴 돌아. 우리에게 볼거리를 제공하라고. 그리고 손으로 가리지도 마." 다른 사람들도 열광하며 수군거린다.
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cards_strip_text">>
+	"우릴 기다리게 하지 마.
+	<<if $rng gte 91>>
+		이리 넘겨."
+	<<elseif $rng gte 81>>
+		벗어."
+	<<elseif $rng gte 71>>
+		벗어."
+	<<elseif $rng gte 61>>
+		벗을 시간이야."
+	<<elseif $rng gte 51>>
+		그 밑에 뭐가 있는지 좀 보자."
+	<<elseif $rng gte 41>>
+		그건 이제 내 소유야."
+	<<elseif $rng gte 31>>
+		벗어."
+	<<elseif $rng gte 21>>
+		네가 벗는 걸 보자."
+	<<elseif $rng gte 11>>
+		스스로 벗든가, 아니면 강제로 벗겨지든가."
+	<<else>>
+		난 참을성이 많은 <<nnpc_gender "Wren">>【이가】 아니야."
+	<</if>>
+<</widget>>
+
+<<widget "cards_exposure_text">>
+	<<if random(1, 10) is 10>>
+		<<if $worn.over_upper.exposed gte 2 and $worn.upper.exposed gte 2 and $worn.under_upper.exposed gte 1 and ($player.sex is "f" or $player.gender_appearance is "f")>>
+			<<if $uncomfortable.nude is true>>
+				<span class="lewd">당신은 한쪽 팔로 당신의 <<breasts>>【을를】 가려, 렌과 <<his>> 친구들의 음흉한 시선으로부터 보호한다.</span>
+				<br>
+			<<else>>
+				<span class="lewd">렌과 <<his>> 친구들의 시선이 당신의 <<breasts>>에 꽂히는 것을 느낄 수 있지만, 당신은 신경 쓰지 않는다. 그저 게임에 집중할 뿐이다.</span>
+				<br>
+			<</if>>
+		<<elseif $worn.over_upper.exposed gte 1 and $worn.upper.exposed gte 1 and ($player.sex is "f" or $player.gender_appearance is "f")>>
+			<<if $uncomfortable.underwear is true>>
+				<span class="lewd">가슴을 가릴 옷이 없다는 사실에 수치심을 느끼며, 당신은 한쪽 팔로 가슴을 가린다.</span>
+				<br>
+			<<else>>
+				<span class="lewd">가슴을 가릴 옷이 거의 없다는 사실에도 당신은 전혀 개의치 않는다.</span>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+	<<if random(1, 10) is 10>>
+		<<if $worn.over_lower.exposed gte 2 and $worn.lower.exposed gte 2 and $worn.under_lower.exposed gte 1>>
+			<<if $uncomfortable.nude is true>>
+				<span class="lewd">다리를 탁자 밑에 넣고 앉아 있음에도 불구하고, 맨바닥에 닿는 맨 <<bottom>>【와과】 <<genitals>> 때문에 극도의 노출감이 든다.</span>
+				<br>
+			<<else>>
+				<span class="lewd">당신은 벌거벗은 <<bottom>>【와과】 <<genitals>>에 전혀 개의치 않는다. 어차피 탁자 아래에 숨겨져 있으니까.</span>
+				<br>
+			<</if>>
+		<<elseif $worn.over_lower.exposed gte 1 and $worn.lower.exposed gte 1 and !$worn.under_lower.type.includes("lower_covering")>>
+			<<if $uncomfortable.underwear is true>>
+				<span class="lewd">허리 아래에 걸친 옷이 너무 없어, 당신은 불편함을 느낀다.</span>
+				<br>
+			<<else>>
+				<span class="lewd">당신은 허리 아래에 걸친 옷이 거의 없다는 사실에 전혀 개의치 않는다.</span>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+	<<if random(1, 10) is 10>>
+		<<if $estate.cards.wren_top is 0 and $estate.cards.wren_under_top is 0>>
+			<<if $pronoun is "f">>
+				<span class="lewd">렌은 한 팔로 <<his>> <<print window.KR.getBreastSizeKr($NPCList[0].breastsdesc)>>【을를】 가리려 <<if $NPCList[0].breastsize gte 5>>애를 쓴다<<else>>한다<</if>>.</span>
+				<br>
+
+			<<else>>
+				<span class="lewd">당신이 맨가슴을 흘끗 쳐다보자, 렌은 불편한 듯 몸을 뒤척인다.</span>
+				<br>
+			<</if>>
+		<<elseif $estate.cards.wren_top is 0>>
+			<<if $pronoun is "f">>
+				<span class="lewd">당신이 브래지어를 흘끗 쳐다보자, 렌은 불편한 듯 몸을 뒤척인다.</span>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+	<<if random(1, 10) is 10>>
+		<<if $estate.cards.wren_bottoms is 0 and $estate.cards.wren_under_bottoms is 0>>
+			<<if $pronoun is "f">>
+				<span class="lewd">렌은 맨 사타구니를 가리기 위해 다리를 꼬고 앉는다.</span>
+				<br>
+			<<else>>
+				<span class="lewd">렌은 양다리를 단단히 모은 채 앉아 있다.</span>
+				<br>
+			<</if>>
+		<<elseif $estate.cards.wren_bottoms is 0>>
+			<span class="lewd">동료가 <<his>> <<if $pronoun is "f">>팬티<<else>>삼각팬티<</if>>【을를】 힐끗거리자, 렌은 불편한 기색으로 몸을 뒤척인다.</span>
+			<br>
+		<</if>>
+	<</if>>
+	<<if random(1, 10) is 10>>
+		<<if $estate.cards.state is "ride">>
+			<<switch $estate.cards.position>>
+			<<case "wren_lap">>
+
+			<<case "pc_lap">>
+
+			<<case "penile">>
+				<span class="lewd">렌은 <<his>> 보지로 당신의 <<penis>>에 키스하듯 비벼댄다.</span>
+				<br>
+			<<case "vaginal">>
+				<span class="lewd">렌은 <<his>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【으로로】 당신의 <<pussy>>【을를】 쿡쿡 찌른다.</span>
+				<br>
+			<<case "anal">>
+				<span class="lewd">렌은 <<his>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【을를】 당신의 <<bottom>>에 문지른다.</span>
+				<br>
+			<</switch>>
+		<</if>>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "cards_naked_cover">>
+	<<if $uncomfortable.nude is true>>
+		<span class="lewd">당신은 한쪽 팔로 <<breasts>>【을를】 가리고, 양 허벅지를 빈틈없이 꽉 조여 오므린다.</span>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "cards_bottom_cover">>
+	<<if $uncomfortable.nude is true>>
+		<span class="lewd">당신은 양 허벅지를 빈틈없이 꽉 조여 오므린다.</span>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "cards_top_cover">>
+	<<if $uncomfortable.nude is true>>
+		<span class="lewd">당신은 한 팔로 <<breasts>>【을를】 가린다.</span>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "cards_underwear_cover">>
+	<<if $uncomfortable.underwear is true>>
+		<span class="lewd">당신은 한 팔로 $worn.under_upper.name【을를】 가리고, $worn.under_lower.name<<underlowerplural>> 제대로 입혀져 있는지 확인한다.</span>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "cards_bra_cover">>
+	<<if $uncomfortable.underwear is true>>
+		<span class="lewd">당신은 한쪽 팔로 $worn.under_upper.name【을를】 가린다.</span>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "cards_virginity_all_warnings">>
+	<<set _player_suspicious to $estatePersistent.suspicion gt 0>>
+	<<if $estate.cards.position is "vaginal">>
+		<<if $player.virginity.vaginal is true>>
+			<<if _player_suspicious>>
+				<span class="red">만약 당신이 절정에 달하거나 속임수를 쓰다 들키면 - 렌이 당신의 처녀를 빼앗을 것입니다.</span>
+			<<else>>
+				<span class="red">만약 당신이 절정에 달하면, 렌이 당신의 처녀를 빼앗을 것입니다.</span>
+			<</if>>
+		<</if>>
+	<<elseif $estate.cards.position is "penile">>
+		<<if $player.virginity.penile is true>>
+			<<if _player_suspicious>>
+				<span class="red">만약 당신이 절정에 달하거나 속임수를 쓰다 들키면 - 렌이 당신의 처녀를 빼앗을 것입니다.</span>
+			<<else>>
+				<span class="red">만약 당신이 절정에 달하면, 렌이 당신의 처녀를 빼앗을 것입니다.</span>
+			<</if>>
+		<</if>>
+	<<elseif $estate.cards.position is "anal">>
+		<<if $player.virginity.anal is true>>
+			<<if _player_suspicious>>
+				<span class="red">만약 당신이 절정에 달하거나 속임수를 쓰다 들키면 - 렌이 당신의 항문 처녀를 빼앗을 것입니다.</span>
+			<<else>>
+				<span class="red">만약 당신이 절정에 달하면, 렌이 당신의 항문 처녀를 빼앗을 것입니다.</span>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cards_virginity_warning">>
+	<<if $estate.cards.position is "vaginal">>
+		<<if $player.virginity.vaginal is true>>
+			<span class="red">만약 당신이 절정에 달하면, 렌이 당신의 처녀를 빼앗을 것입니다.</span>
+		<</if>>
+	<<elseif $estate.cards.position is "penile">>
+		<<if $player.virginity.penile is true>>
+			<span class="red">만약 당신이 절정에 달하면, 렌이 당신의 처녀를 빼앗을 것입니다.</span>
+		<</if>>
+	<<elseif $estate.cards.position is "anal">>
+		<<if $player.virginity.anal is true>>
+			<span class="red">만약 당신이 절정에 달하면, 렌이 당신의 항문 처녀를 빼앗을 것입니다.</span>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cards_cheating_virginity_warning">>
+	<<set _is_inline to _args[0]>>
+	<<if $estate.cards.position is "vaginal">>
+		<<if $player.virginity.vaginal is true>>
+			<<if !_is_inline>><br><<else>> | <</if>>
+			<span class="red">만약 속임수를 쓰다 들키면, 렌이 당신의 처녀를 앗아갈 것이다.</span>
+		<</if>>
+	<<elseif $estate.cards.position is "penile">>
+		<<if $player.virginity.penile is true>>
+			<<if !_is_inline>><br><<else>> | <</if>>
+			<span class="red">만약 속임수를 쓰다 들키면, 렌이 당신의 처녀를 앗아갈 것이다.</span>
+		<</if>>
+	<<elseif $estate.cards.position is "anal">>
+		<<if $player.virginity.anal is true>>
+			<<if !_is_inline>><br><<else>> | <</if>>
+			<span class="red">만약 속임수를 쓰다 들키면, 렌이 당신의 항문 처녀를 앗아갈 것이다.</span>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cards_arousal_check">>
+	<<if $arousal gte $arousalmax>>
+		쾌감이 너무 벅차오른다. <<orgasm>>
+		<br><br>
+		<<set _cards_orgasm to true>><<set $consensual to 1>>
+
+	<<elseif $arousal gte ($arousalmax / 5) * 4>>
+
+	<<elseif $arousal gte ($arousalmax / 5) * 3>>
+
+	<<elseif $arousal gte ($arousalmax / 5) * 2>>
+
+	<<else>>
+
+	<</if>>
+<</widget>>
+
+<<widget "card_clothes_lost">>
+	<<set $_cloth_type to _args[0]>>
+	<<if $estate.cards.confiscatedClothes eq null>>
+		<<set $estate.cards.confiscatedClothes to []>>
+	<</if>>
+	<<run $estate.cards.confiscatedClothes.push({
+		"type": $_cloth_type,
+		"copy": clone($worn[$_cloth_type])
+	})>>
+	<<generalStrip $_cloth_type>>
+<</widget>>
+
+<<widget "card_clothes_rebuy_calculate">>
+	<<set $_total_price to 0>>
+	<<for $_obj range $estate.cards.confiscatedClothes>>
+		<<set $_cur to $_obj["copy"]>>
+		<<set $_base to setup.clothes[$_obj["type"]][$_cur["index"]]>>
+
+		<<if $_base.cost gt 0>>
+			<!-- base 20% reduction for having been worn -->
+			<<set $_price to $_base.cost * 0.8>>
+			<<set $_integrity_frac to inverseLerp($_cur.integrity, 0, $_base.integrity_max)>>
+			<!-- making the price drop exponentially relative to the integrity y = (1-x)^2 -->
+			<!-- basically, clothes appear more worn out than they are, and drop the price further -->
+			<<set $_integrity_frac to $_integrity_frac * $_integrity_frac>>
+
+			<<set $_price to $_price * $_integrity_frac>>
+			<<set $_total_price += $_price>>
+		<</if>>
+	<</for>>
+
+	<<set $estate.cards.clothesRebuyTerms to {"price": $_total_price}>>
+<</widget>>
+
+<<widget "estate_cards_finish">>
+	<<if $estate.cards.confiscatedClothes and $estate.cards.confiscatedClothes.length gt 0>>
+		<<for $_cloth_obj range $estate.cards.confiscatedClothes>>
+			<<generalRuined $_cloth_obj["type"]>>
+		<</for>>
+		<<set $estate.cards.confiscatedClothes to []>>
+	<</if>>
+	<<run delete $estate.cards.clothesRebuyTerms>> <!-- we should just unset cards, but I'm not 100% that it won't cause any side effects within some code I haven't seen -->
+	<<set $estate.cards_done to true>>
+	<<set $estatePersistent.totalGamesPlayed += 1>>
+	<<if $estate.cards.bettingEnabled>>
+		<<set $estatePersistent.totalGamesPlayedWithBetting += 1>>
+	<</if>>
+<</widget>>
+
+<<widget "card_pot_confiscated">>
+	<<person1>>
+	<<if $estate.cards.bettingEnabled>>
+		<<set $_potValue to $estate.cards.playerPot>>
+		<<if $_potValue gt 0>>
+			<span class="red"><<printmoney $_potValue>>【으로로】 이루어진 당신의 판돈은 고스란히 남아 렌과 <<his>> 부하들에게 압수당했다.</span>
+			<<set $estatePersistent.totalMoneyConfiscated += $_potValue>>
+		<<else>>
+			<span class="gold">당신은 게임 도중 판돈을 모두 잃었다. 만약 남은 판돈이 있었다면 그마저도 고스란히 남아 렌과 <<his>> 부하들에게 압수당했을 것이다.</span>
+		<</if>>
+		<br><br>
+		<!-- the money just doesn't get added to PC's account and is automatically reset by <<estate_end>>, whenever it gets called -->
+		<!-- the player won't be able to get into the cottage until $estate.cards_done is reset by <<estate_end>>, so this is safe -->
+		<<money `-$_potValue` "blackjack" { recordOnly: true }>>
+	<</if>>
+<</widget>>
+
+<<widget "card_pot_collected">>
+	<<if $estate.cards.bettingEnabled>>
+		<<set $_potValue to $estate.cards.playerPot>>
+		<<set $_moneyDiff to $estate.cards.playerPot - $estate.cards.ante>>
+		<<set $_resStr to $_moneyDiff gte 0 ? "이익" : "손실">>
+		<<if $_potValue gt 0>>
+			<span class="green">당신은 판돈으로 다가가 상금을 챙긴다. <<money $_potValue "blackjack">><<printmoney $_potValue>>【을를】 얻어, 총 <<printmoney $_moneyDiff>>의 $_resStr【으로로】 게임을 마친다.</span>
+		<<else>>
+			<span class="red">당신은 게임 도중 판돈을 모두 잃었기에, 빈손으로 떠나야 한다.</span>
+		<</if>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackPostGameThrowTips">>
+	<<if $estate.cards.bettingEnabled>>
+		<!-- the goons throw in tips even if you're not betting, as long as you've paid the ante -->
+		<!-- the goons throw in 5-15% of your bet, plus a random base of 1-5 -->
+		<<set $_tipAmount to random(100,500)>>
+		<<set $_tipPct to random(5,15)/100>>
+		<<set $_tipAmount += $estate.cards.currentBetInput * 100 * $_tipPct>>
+
+		렌의 부하들이 팁으로 <<printmoney $_tipAmount>>【을를】 당신의 판돈에 던져 넣는다.
+		<br><br>
+
+		<<set $estate.cards.playerPot += $_tipAmount>>
+		<<set $estatePersistent.totalTipMoneyMade += $_tipAmount>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackPostGameBettingResult">>
+	<<set $_playerWon to _args[0]>>
+
+	<<if $estate.cards.bettingEnabled and $estate.cards.currentBetInput gt 0>>
+		<<set $_bet to $estate.cards.currentBetInput * 100>>
+		<<if $_playerWon>>
+			<<set $estate.cards.playerPot += $_bet>>
+			<<set $estate.cards.wrenMoney -= $_bet>>
+			<<set $estatePersistent.totalBetMoneyMade += $_bet>>
+		<<else>>
+			<<set $estate.cards.playerPot -= $_bet>>
+			<<set $estate.cards.wrenMoney += $_bet>>
+			<<set $estatePersistent.totalBetMoneyLost += $_bet>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "blackjackResultText">>
+
+	<<set $_playerWon to _args[0]>>
+
+	<<calculateBlackjackLuckStats>>
+	<<set $_luckFlow to "neutral">> <!-- wren|player|neutral -->
+	<!-- the player has a bad streak if less than 50% of the games are ties, and the opponent has won 2x as many games. 6 games are considered normally. -->
+	<!-- here's all the possible cases (generated with the code in the comment of calculateBlackjackLuckStats) -->
+	<!--
+
+	Player lucky cases
+	3 wins / 1 losses / 2 ties | wins 50.00% losses 16.67% ties 33.33%
+	4 wins / 0 losses / 2 ties | wins 66.67% losses 0.00% ties 33.33%
+	4 wins / 1 losses / 1 ties | wins 66.67% losses 16.67% ties 16.67%
+	4 wins / 2 losses / 0 ties | wins 66.67% losses 33.33% ties 0.00%
+	5 wins / 0 losses / 1 ties | wins 83.33% losses 0.00% ties 16.67%
+	5 wins / 1 losses / 0 ties | wins 83.33% losses 16.67% ties 0.00%
+
+	Wren lucky cases
+	0 wins / 4 losses / 2 ties | wins 0.00% losses 66.67% ties 33.33%
+	0 wins / 5 losses / 1 ties | wins 0.00% losses 83.33% ties 16.67%
+	1 wins / 3 losses / 2 ties | wins 16.67% losses 50.00% ties 33.33%
+	1 wins / 4 losses / 1 ties | wins 16.67% losses 66.67% ties 16.67%
+	1 wins / 5 losses / 0 ties | wins 16.67% losses 83.33% ties 0.00%
+	2 wins / 4 losses / 0 ties | wins 33.33% losses 66.67% ties 0.00%
+
+	Neutral cases
+	0 wins / 1 losses / 5 ties | wins 0.00% losses 16.67% ties 83.33%
+	0 wins / 2 losses / 4 ties | wins 0.00% losses 33.33% ties 66.67%
+	0 wins / 3 losses / 3 ties | wins 0.00% losses 50.00% ties 50.00%
+	1 wins / 0 losses / 5 ties | wins 16.67% losses 0.00% ties 83.33%
+	1 wins / 1 losses / 4 ties | wins 16.67% losses 16.67% ties 66.67%
+	1 wins / 2 losses / 3 ties | wins 16.67% losses 33.33% ties 50.00%
+	2 wins / 0 losses / 4 ties | wins 33.33% losses 0.00% ties 66.67%
+	2 wins / 1 losses / 3 ties | wins 33.33% losses 16.67% ties 50.00%
+	2 wins / 2 losses / 2 ties | wins 33.33% losses 33.33% ties 33.33%
+	2 wins / 3 losses / 1 ties | wins 33.33% losses 50.00% ties 16.67%
+	3 wins / 0 losses / 3 ties | wins 50.00% losses 0.00% ties 50.00%
+	3 wins / 2 losses / 1 ties | wins 50.00% losses 33.33% ties 16.67%
+	3 wins / 3 losses / 0 ties | wins 50.00% losses 50.00% ties 0.00%
+	-->
+	<!-- to tweak these values, check calculateBlackjackLuckStats -->
+	<!-- the first 4 games will always be neutral -->
+	<<if $estate.cards.luckStats and $estate.cards.luckStats.total gte 5>>
+		/* pcts[ind][0] >= pcts[ind][1]*2 && pcts[ind][2] < .7 */
+		<<if $estate.cards.luckStats["winPct"] gte $estate.cards.luckStats["lossPct"] * 2.5 and $estate.cards.luckStats["tiePct"] lt 0.5>>
+			<<set $_luckFlow to "player">>
+		<<elseif $estate.cards.luckStats["lossPct"] gte $estate.cards.luckStats["winPct"] * 2.5 and $estate.cards.luckStats["tiePct"] lt 0.5>>
+			<<set $_luckFlow to "wren">>
+		<<else>>
+			<<set $_luckFlow to "neutral">>
+		<</if>>
+	<</if>>
+
+	<<if $estate.cards.bettingEnabled and $estate.cards.currentBetInput gt 0>>
+		<<formatmoney `$estate.cards.currentBetInput * 100`>>
+		<<set $_money to '<span class="' + ($_playerWon ? 'gold' : 'red') + '">' + _printmoney + '</span>'>>
+
+		<<if $_playerWon>>
+			<<if $_luckFlow is "neutral">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"좋은 게임이었어," 렌은 패배에 연연하지 않는 듯이, $_money【을를】 한쪽으로 밀어 당신의 판돈 쪽으로 넘기며 말한다.
+					<<case 2>>
+						렌은 미소 지으며 느릿느릿 당신의 $_money【을를】 당신의 판돈 쪽으로 밀어 넣는다. 좌절감을 느꼈다 하더라도, 아주 잘 숨기고 있다.
+					<<case 3>>
+						"뭐, 그래," 렌은 미소 지으며 <<his>> 부하들에게 눈짓해 $_money【을를】 당신의 판돈 쪽으로 밀게 하며 말한다.
+				<</switch>>
+			<<elseif $_luckFlow is "wren">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"매번 이길 순 없지," 렌은 패배에 연연하지 않는 듯이, $_money【을를】 한쪽으로 밀어 당신의 판돈 쪽으로 넘기며 말한다.
+					<<case 2>>
+						"행운의 여신이 드디어 네게 미소를 지은 것 같네," 렌은 <<his>> 부하들에게 눈짓해 $_money【을를】 당신의 판돈 쪽으로 밀게 하며 말한다.
+					<<case 3>>
+						"꽤 잘 풀린다 싶었는데," 렌은 미소를 지으며 $_money【을를】 당신의 판돈 쪽으로 넘기며 말한다.
+				<</switch>>
+			<<else>>
+				<<switch random(1,5)>>
+					<<case 1>>
+						렌은 콧방귀를 뀌며 느릿하게 손을 휘저어 쌓인 $_money【을를】 당신의 판돈 쪽으로 밀어 넣는다.
+					<<case 2>>
+						"오늘 넌 기분 나쁠 정도로 운이 좋네," 렌이 약간의 짜증을 얼굴에 드러내며 $_money【을를】 당신의 판돈 쪽으로 넘기며 말한다.
+					<<case 3>>
+						렌이 <<his>> 부하들에게 눈짓해 $_money【을를】 당신의 판돈 쪽으로 밀도록 지시한다. 아주 짧은 순간이었지만, 당신은 짜증으로 이를 악무는 <<him>>【을를】 본 것 같다.
+					<<case 4>>
+						"오늘 내 앞길로 검은 고양이가 지나갔나 보네," 렌은 체념한 듯 씁쓸한 웃음을 지으며 $_money【을를】 당신의 판돈 쪽으로 밀어 넣는다.
+					<<case 5>>
+						"복권이라도 하나 사 봐," 렌이 <<his>> 부하들에게 눈짓해 $_money【을를】 당신의 판돈 쪽으로 밀게 하며 말한다.
+				<</switch>>
+			<</if>>
+		<<else>>
+			<<if $_luckFlow is "neutral">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"좋은 게임이었어," 렌은 히죽이며 판돈을 향해 손을 뻗어 한 부하에게 넘겼고, 부하는 안전하게 $_money【을를】 보관한다.
+					<<case 2>>
+						렌은 느릿느릿 손을 뻗어 판돈이 된 $_money【을를】 챙겨 부하에게 넘겼고, <<his>> 얼굴엔 만족스러운 미소가 떠오른다.
+					<<case 3>>
+						"다음엔 운이 더 따라주길 바랄게," 렌은 미소 지으며 <<his>> 부하에게 눈짓해 $_money【을를】 가져가게 하며 말한다.
+				<</switch>>
+			<<elseif $_luckFlow is "wren">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"게임 아주 잘 굴러가네," 렌은 판돈을 향해 손을 뻗어 한 부하에게 넘겼고, 부하는 안전하게 $_money【을를】 보관한다.
+					<<case 2>>
+						"행운의 여신이 내게 미소를 지은 것 같네," 렌은 느릿느릿 손을 뻗어 판돈이 된 $_money【을를】 챙겨 부하에게 넘기며 말했고, <<his>> 얼굴엔 만족스러운 미소가 떠오른다.
+					<<case 3>>
+						"행운의 여신이 네게서 등을 돌렸나 봐," 렌은 미소 지으며 <<his>> 부하에게 눈짓해 $_money【을를】 가져가게 하며 말한다.
+				<</switch>>
+			<<else>>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"드디어, 좀 운이 따르네," 렌은 판돈을 향해 손을 뻗어 한 부하에게 넘겼고, 부하는 안전하게 $_money【을를】 보관한다.
+					<<case 2>>
+						"네 연승도 영원히 갈 순 없지," 렌은 느릿느릿 손을 뻗어 판돈이 된 $_money【을를】 챙겨 부하에게 넘기며 말했고, <<his>> 얼굴엔 만족스러운 미소가 떠오른다.
+					<<case 3>>
+						"운도 이젠 끝난 것 같네," 렌은 미소 지으며 <<his>> 부하에게 눈짓해 $_money【을를】 가져가게 하며 말한다.
+				<</switch>>
+			<</if>>
+		<</if>>
+	<<else>>
+		<<if $_playerWon>>
+			<<if $_luckFlow is "neutral">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"좋은 게임이었어," 렌이 말한다.
+					<<case 2>>
+						렌이 당신에게 가벼운 미소를 짓는다.
+					<<case 3>>
+						"뭐, 그래," 렌이 미소 지으며 말한다.
+				<</switch>>
+			<<elseif $_luckFlow is "wren">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"매번 이길 순 없지," 렌이 의자에 등을 기대며 말한다.
+					<<case 2>>
+						"행운의 여신이 드디어 네게 미소를 지은 것 같네," 렌이 말한다.
+					<<case 3>>
+						"꽤 잘 풀린다 싶었는데," 렌이 미소를 지으며 말한다.
+				<</switch>>
+			<<else>>
+				<<switch random(1,5)>>
+					<<case 1>>
+						렌이 콧방귀를 뀌며 의자에 등을 기댄다.
+					<<case 2>>
+						"오늘 넌 기분 나쁠 정도로 운이 좋네," 렌이 말한다.
+					<<case 3>>
+						렌은 팔짱을 끼고 의자에 기대며 당신에게 체념한 미소를 보낸다.
+					<<case 4>>
+						"오늘 내 앞길로 검은 고양이가 지나갔나 보네," 렌이 체념한 듯 씁쓸한 웃음을 지으며 말한다.
+					<<case 5>>
+						"복권이라도 하나 사 봐," 렌이 말한다.
+				<</switch>>
+			<</if>>
+		<<else>>
+			<<if $_luckFlow is "neutral">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"좋은 게임이었어," 렌이 히죽인다.
+					<<case 2>>
+						렌이 똑바로 앉아 몸을 숙이며, <<his>> 얼굴에 만족스러운 웃음을 띤다.
+					<<case 3>>
+						"다음엔 운이 더 따라주길 바랄게," 렌이 미소를 지으며 말한다.
+				<</switch>>
+			<<elseif $_luckFlow is "wren">>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"게임 아주 잘 굴러가네," 렌이 똑바로 앉아 몸을 숙이며 말한다.
+					<<case 2>>
+						"행운의 여신이 내게 미소를 지은 것 같네," 렌이 말한다.
+					<<case 3>>
+						"행운의 여신이 네게서 등을 돌렸나 봐," 렌이 미소를 지으며 말한다.
+				<</switch>>
+			<<else>>
+				<<switch random(1,3)>>
+					<<case 1>>
+						"드디어, 좀 운이 따르네," 렌이 똑바로 앉아 몸을 숙이며 말한다.
+					<<case 2>>
+						"네 연승도 영원히 갈 순 없지," 렌이 몸을 앞으로 숙이며 말한다.
+					<<case 3>>
+						"운도 이젠 끝난 것 같네," 렌이 미소를 지으며 말한다.
+				<</switch>>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cards_oral_options">>
+	<<if $estate.cards.clothesRebuyTerms and $estate.cards.clothesRebuyTerms.price gt $money>>
+		<span class="blue">거래를 받아들일 돈이 부족합니다.</span>
+		<br><br>
+	<<elseif hasSexStat("promiscuity", 4)>>
+		<<link [[수락한다|Estate Cards Oral]]>><</link>><<promiscuous4>><<goralskill>>
+		<br>
+	<<else>>
+		<<insufficientStat "promiscuity" "그런 제안을 받아들이기엔">> 하지만 빈손으로 떠나는 것은 위험할 것입니다.
+		<br><br>
+
+		<<link [[수락한다|Estate Cards Oral]]>><<trauma 6>><<stress 6>><</link>><<gtrauma>><<gstress>>
+		<br>
+	<</if>>
+	<<link [[거절한다|Estate Cards Oral Refuse]]>><</link>>
+	<br>
+<</widget>>
+
+<<widget "cards_naked_end">>
+	<<covered>>
+	<<if $speech_attitude is "meek">>
+		"오-옷이 하나도 없잖아," 당신이 말한다. "뭐, 가릴 것 좀 주면 안 될까?"
+	<<elseif $speech_attitude is "bratty">>
+		"정말 이대로 발가벗겨둘 셈이야?" 당신이 묻는다. "적어도 수건 같은 거라도 줘."
+	<<else>>
+		"수건이라도 하나 줄 수 없어?" 당신이 묻는다. "이러다간 위험해질 거야."
+	<</if>>
+	<br><br>
+
+	렌은 등 뒤로 손을 뻗어 서랍을 연다. <<He>>【은는】 안을 더듬거리더니, 작은 수건 하나를 꺼내 든다. "이걸 주지," <<he>>【이가】 말한다. "하지만 공짜는 아니야. 여기 있는 내 친구들도 즐길 권리가 있거든."
+	<br><br>
+
+	"네 입으로 녀석들을 만족시켜 줘." <<he>>【이가】 말을 잇는다. "그러면 수건을 두르게 해 주지."
+	<br><br>
+
+	<<cards_oral_options>>
+<</widget>>
+
+<<widget "cards_play_options">>
+	<<if $estate.cards.bettingEnabled>>
+		<<person1>>
+		<!-- would it perhaps be better to recover the previous bet input here, so that the player doesn't have to manually input the max bet every time? -->
+		<<set $estate.cards.currentBetInput to 0>>
+		<!-- the player can't bet more than Wren has, or more than the player has in the pot (including tips), or more than the max bet-->
+		<<set $_maxBetAmount to Math.min($estate.cards.baseMaxBet, $estate.cards.wrenMoney, $estate.cards.playerPot)>>
+		<!-- rounding down to nearest multiple of X (X pounds = step) -->
+		<<set $_step to $estate.cards.betStep>>
+		<<set $_maxBetAmount to Math.floor($_maxBetAmount / $_step) * $_step>>
+
+		<<set $_moneyDiff to $estate.cards.playerPot - $estate.cards.ante>>
+		<div>
+			<div><span>테이블 위 당신의 판돈<mouse class="tooltip">(?)<span>당신이 벌어들인 돈 중 보험용으로 테이블에 남겨둔 금액 (팁과 판돈 포함). 만약 속임수를 쓰다 들키거나 도망칠 경우, 위험을 무릅쓰고 돈을 챙겨가거나 포기해야 합니다.</span></mouse>:
+			<<printmoney $estate.cards.playerPot>></span></div>
+			<div><span>현재 딴 돈<mouse class="tooltip">(?)<span>전체 상황으로, 게임에서 얼마나 돈을 벌거나 잃었는지 (팁 포함) 나타냅니다. 덜 위험한 도주를 위해 딴 돈을 포기할 수도 있으므로, 최종적으로 가져갈 금액을 의미하지는 않습니다.</span></mouse>:
+			<<printmoney $_moneyDiff>></span></div>
+			<div><span>렌의 판돈<mouse class="tooltip">(?)<span>당신이 따갈 수 있는 렌의 자금 (<<his>> 판돈 포함). 팁은 불량배들에게서 나오므로 포함되지 않습니다. 렌의 판돈이 바닥나면, <<he>>【은는】 다음 날까지 더 이상 베팅할 수 없습니다.</span></mouse>:
+			<<printmoney $estate.cards.wrenMoney>></span></div>
+			<<if $_maxBetAmount gt 0>>
+				<div><span>당신의 베팅액:</span><<numberslider "$estate.cards.currentBetInput" 0 0 `$_maxBetAmount/100` `$_step/100`>></div>
+			<<elseif $estate.cards.playerPot lt $_step>>
+				<span class="blue">판돈에 최소 베팅액을 걸 만큼의 돈이 없습니다 (<<printmoney $_step>> 필요).</span>
+			<<else>>
+				<span class="blue">렌의 판돈에 최소 베팅액을 맞출 만큼의 돈이 남아있지 않습니다.</span>
+			<</if>>
+		</div>
+		<br><br>
+	<</if>>
+	<<if $estate.cards.desire is "chastity">>
+		<<getouticon>><<link [[떠난다|Estate Cards Leave]]>><</link>>
+		<br>
+	<<else>>
+		<<gameicon "cards">><<link [[카드 게임을 한다 (0:01)|Estate Blackjack]]>><<pass 1>><</link>>
+		<<if $estate.cards.state is "ride">>
+			<span class="purple">지면 흥분도가 증가할 수 있습니다.</span> <<cards_virginity_all_warnings>>
+		<</if>>
+		<<if _cards_desire is "kiss" and $player.virginity.kiss is true>>
+			<span class="red">지면 렌이 당신의 첫 키스를 빼앗을 것입니다.</span>
+		<</if>>
+		<br>
+		<<getouticon>><<link [[떠난다|Estate Cards Leave]]>><<npcincr Wren love -1>><</link>><<llove>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "cards_start_play_options">>
+	<<if $farm_stage gte 5>>
+		<<gameicon "cards">><<link [[카드 게임을 한다|Estate Cards Intro 2]]>><</link>>
+
+		<<if $estatePersistent.stakesRaised>>
+			<<set $_anteMaxNum to setup.estateBlackjack.anteSizes.length - 1>>
+
+			<<for _i to 0; _i lte $_anteMaxNum; _i++>>
+				<<set _anteAmount to setup.estateBlackjack.anteSizes[_i]>>
+				<<set _cards to "cards-" + _i>>
+				<<formatmoney _anteAmount>>
+
+				<<set $_confidenceMoney to setup.estateBlackjack.confidenceMoney[_i]>>
+				<<set $_primaryReq to setup.estateBlackjack.primaryRequirements[_i]>>
+
+
+				<<if $money gte $_confidenceMoney or Scripting.evalTwineScript($_primaryReq.check)>>
+					<<if $money lt _anteAmount>>
+						<br>
+						<span class="blue">돈을 걸고 카드 게임을 한다 (선금 _printmoney): 자신감은 있지만 돈이 부족합니다.</span>
+					<<else>>
+						<<set _linkText to "돈을 걸고 카드 게임을 한다 (" + _printmoney + " 선금)">>
+						<br>
+						<<capture _linkText, _anteAmount, _i>>
+							<<gameicon _cards>><<link [[_linkText|Estate Cards Intro 2]]>><<estate_betting_start _i>><</link>>
+						<</capture>>
+					<</if>>
+				<<else>>
+					<br>
+					<span class="blue">돈을 걸고 카드 게임을 한다 (선금 _printmoney): 그렇게 많은 돈을 감수할 만큼 자신감이 충분하지 않습니다. <i><<print $_primaryReq.message>></i></span>
+				<</if>>
+			<</for>>
+		<<elseif $wren_intro isnot undefined and not ($estate.cards.suggestedRaisingStakesToday or $estatePersistent.playerRejectedRaisingStakes)>>
+			<!-- $estate.cards.suggestedRaisingStakesToday prevents you from trying to convince Wren again until you leave the estate once, to give them time to think -->
+			<br>
+			<<if not $estatePersistent.suggestedRaisingStakes>>
+				<<gameicon "cards-0">><<link [[판돈 올리기를 제안한다|Estate Cards Suggest Betting Init]]>><</link>>
+			<<else>>
+				<<gameicon "cards-0">><<link [[판돈 올리기를 제안한다|Estate Cards Suggest Betting Again]]>><</link>>
+			<</if>>
+		<<elseif $estatePersistent.playerRejectedRaisingStakes>>
+			<br>
+			<<gameicon "cards-0">><<link [[판돈 올리기를 받아들인다|Estate Cards Reconsider Accept Betting]]>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+
+	<<if isPubfameTaskAccepted("wren")>>
+		<<icon "manila-envelope.png">><<link [[렌에게 편지를 건넨다|Estate Fame Letter]]>><</link>>
+		<br>
+	<</if>>
+
+	<<getouticon>><<link [[떠난다|Estate Cards Intro Leave]]>><</link>>
+<</widget>>
+
+<<widget "cards_lap_return">>
+	<<if $estate.cards.state is "ride">>
+		<<if $estate.cards.position is "pc_lap">>
+			당신이 자리에 앉자, 렌은 당신 위로 다리를 넘겨 걸터앉아 원래의 자세를 취한다.
+		<<elseif $estate.cards.position is "wren_lap">>
+			렌이 자리에 앉아 <<his>> 무릎을 가리킨다. 당신은 다리를 넘겨 걸터앉아, 원래의 자세를 취한다.
+		<<elseif $estate.cards.position is "penile">>
+			당신이 자리에 앉자, 렌은 당신 위로 다리를 넘겨 걸터앉아 원래의 자세를 취한다.
+			<<cards_lap_clothes>>
+			<<His>> 보지가 당신의 <<penis>>【을를】 다시 한번 위협한다.
+		<<elseif $estate.cards.position is "vaginal">>
+			렌이 자리에 앉아 <<his>> 무릎을 가리킨다. 당신은 다리를 넘겨 걸터앉아, 원래의 자세를 취한다.
+			<<cards_lap_clothes>>
+			<<His>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【이가】 당신의 <<pussy>>【을를】 다시 한번 위협한다.
+		<<elseif $estate.cards.position is "anal">>
+			렌이 자리에 앉아 <<his>> 무릎을 가리킨다. 당신은 다리를 넘겨 걸터앉아, 원래의 자세를 취한다.
+			<<cards_lap_clothes>>
+			<<His>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【이가】 당신의 <<bottom>>【을를】 다시 한번 위협한다.
+		<</if>>
+		"우리가 어디까지 했더라?" <<he>>【이가】 짓궂게 묻는다.
+	<<else>>
+
+	<</if>>
+<</widget>>
+
+<<widget "cards_lap_clothes">>
+	<<if $estate.cards.wren_bottoms is 1>>
+		<<if $estate.cards.wren_under_bottoms is 1>>
+			<<if C.npc.Wren.pronoun is "f">>
+				<<He>>【은는】 치마를 걷어 올리고 팬티를 옆으로 젖힌다.
+			<<else>>
+				<<He>>【은는】 바지 지퍼를 내리고 삼각팬티를 옆으로 젖힌다.
+			<</if>>
+		<<else>>
+			<<if C.npc.Wren.pronoun is "f">>
+				<<He>>【은는】 치마를 걷어 올린다.
+			<<else>>
+				<<He>>【은는】 바지 지퍼를 내린다.
+			<</if>>
+		<</if>>
+	<<else>>
+		<<if $estate.cards.wren_under_bottoms is 1>>
+			<<if C.npc.Wren.pronoun is "f">>
+				<<He>>【은는】 팬티를 옆으로 젖힌다.
+			<<else>>
+				<<He>>【은는】 삼각팬티를 옆으로 젖힌다.
+			<</if>>
+		<<else>>
+			<<if C.npc.Wren.pronoun is "f">>
+				렌은 보란 듯이 당신에게 하반신을 비벼댄다.
+			<<else>>
+				렌은 보란 듯이 당신에게 하반신을 비벼댄다.
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "cards_lap_clothes_intro">>
+	<<if $estate.cards.wren_bottoms is 1>>
+		<<if $estate.cards.wren_under_bottoms is 1>>
+			<<if C.npc.Wren.pronoun is "f">>
+				렌은 치마를 걷어 올리고 팬티를 젖히더니,
+			<<else>>
+				렌은 바지 지퍼를 내리고 삼각팬티를 옆으로 젖히더니,
+			<</if>>
+			<<if $estate.cards.position is "penile">>
+				<span class="lewd"><<his>> 보지를 드러낸다.</span>
+			<<else>>
+				<span class="lewd"><<his>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【을를】 드러낸다.</span>
+			<</if>>
+		<<else>>
+			<<if C.npc.Wren.pronoun is "f">>
+				렌은 치마를 걷어 올리더니,
+			<<else>>
+				렌은 바지 지퍼를 내리더니,
+			<</if>>
+			<<if $estate.cards.position is "penile">>
+				<span class="lewd"><<his>> 보지를 드러낸다.</span>
+			<<else>>
+				<span class="lewd"><<his>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【을를】 드러낸다.</span>
+			<</if>>
+		<</if>>
+	<<else>>
+		<<if $estate.cards.wren_under_bottoms is 1>>
+			<<if C.npc.Wren.pronoun is "f">>
+				렌은 팬티를 젖히더니,
+			<<else>>
+				렌은 삼각팬티를 옆으로 젖히더니,
+			<</if>>
+			<<if $estate.cards.position is "penile">>
+				<span class="lewd"><<his>> 보지를 드러낸다.</span>
+			<<else>>
+				<span class="lewd"><<his>> <<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【을를】 드러낸다.</span>
+			<</if>>
+		<<else>>
+			<<if C.npc.Wren.pronoun is "f">>
+
+			<<else>>
+
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "wren_sabotage_nude">>
+	<<if $estate.cards.wren_under_bottoms is 0 and $estate.cards.wren_exposed_text lt 2>>
+		렌은 문으로 걸어가며, 손으로 <<his>>
+		<<if $NPCList[0].penis isnot "none">>
+			<<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>.
+		<<else>>
+			보지를 가린다.
+		<</if>>
+		"그, 그럼 따라와," <<he>>【이가】 말한다.
+		<<set $estate.cards.wren_exposed_text to 2>>
+	<<elseif $estate.cards.wren_under_top is 0 and $NPCList[0].pronoun is "f" and $estate.cards.wren_exposed_text lt 1>>
+		렌은 팔로 <<his>> <<print window.KR.getBreastSizeKr($NPCList[0].breastsdesc)>>【을를】 가린 채 문으로 걸어간다. "이런 건 아무것도 아니야," <<he>>【이가】 거짓말을 한다. "해변에선 항상 상의를 벗고 다닌다고."
+		<<set $estate.cards.wren_exposed_text to 1>>
+	<<elseif $estate.cards.wren_top is 0 or $estate.cards.wren_bottoms is 0 or $estate.cards.wren_under_top is 0 and !$estate.cards.wren_exposed_text>>
+		렌은 옷을 입지 않고 문으로 걸어간다. "내가 못 할 줄 알았지?" <<he>>【이가】 묻는다.
+
+		<<set $estate.cards.wren_exposed_text to 1>>
+	<<else>>
+		렌은 성큼성큼 문으로 걸어간다.
+	<</if>>
+
+	<<if $exposed gte 2 and $uncomfortable.nude is true and $estate.cards.pc_exposed_text lt 2>>
+		당신은 벌거벗은 상태라 불안해한다. <<He>>【이가】 문틀에 기댄다. "너도 따라와. 내가 끝까지 해내는지 확인하고 싶잖아, 안 그래?"
+		<br><br>
+
+		당신은 최대한 몸을 가린 채 뒤따라간다.
+		<br><br>
+		<<set $estate.cards.pc_exposed_text to 2>>
+	<<elseif $exposed is 1 and $uncomfortable.underwear is true and $estate.cards.pc_exposed_text lt 1>>
+		당신은 옷차림이 걱정되어 불안해한다. <<He>>【이가】 문틀에 기댄다. "너도 따라와. 내가 끝까지 해내는지 확인하고 싶잖아, 안 그래?"
+		<br><br>
+
+		당신은 최대한 몸을 가린 채 뒤따라간다.
+		<br><br>
+		<<set $estate.cards.pc_exposed_text to 1>>
+	<<else>>
+		<br><br>
+	<</if>>
+
+	<<if $estate.cards.wren_top is 0 or $estate.cards.wren_bottoms is 0 or $estate.cards.wren_under_top is 0 or $estate.cards.wren_under_bottoms is 0>>
+		<<if $exposed gte 2 and $uncomfortable.nude is true and $estate.cards.pc_exposed_walk lt 3>>
+			당신은 렌 옆에서 사유지를 걷고, <<his>> 동료들이 뒤를 따른다. 그들의 노골적인 시선이 느껴지지만, 그들 역시 렌을 보고 있을 거라 생각한다.
+			<br><br>
+			당신은 레미의 다른 부하 두 명을 지나친다. 그들은 당신을 막지 않고, 렌의 행색을 보며 어리둥절한 표정을 짓는다. <<His>> 걸음이 빨라진다.
+			<br><br>
+			<<set $estate.cards.pc_exposed_walk to 3>>
+		<<elseif $exposed is 1 and $uncomfortable.underwear is true and $estate.cards.pc_exposed_walk lt 2>>
+			당신은 렌 옆에서 사유지를 걷고, <<his>> 동료들이 뒤를 따른다. 그들의 노골적인 시선이 느껴지지만, 그들 역시 렌을 보고 있을 거라 생각한다.
+			<br><br>
+			당신은 레미의 다른 부하 두 명을 지나친다. 그들은 당신을 막지 않고, 렌의 행색을 보며 어리둥절한 표정을 짓는다. <<His>> 걸음이 빨라진다.
+			<br><br>
+			<<set $estate.cards.pc_exposed_walk to 2>>
+		<<elseif !$estate.cards.pc_exposed_walk>>
+			당신은 <<his>> 동료들과 나란히, 렌의 뒤를 따라 사유지를 가로질러 걷는다. 당신은 레미의 다른 부하 두 명을 지나친다. 그들은 렌의 모습에 한눈이 팔려 당신을 막아세우지 않는다.
+			<br><br>
+			<<set $estate.cards.pc_exposed_walk to 1>>
+		<</if>>
+	<<else>>
+		<<if $exposed gte 2 and $uncomfortable.nude is true and $estate.cards.pc_exposed_walk lt 3>>
+			당신은 사유지를 가로질러 걷는다. 렌은 당신이 앞장서야 한다고 고집한다. 당신의 <<bottom>>【을를】 훔쳐보는 <<him>>의 노골적인 시선이 느껴진다. 당신은 레미의 다른 부하 두 명을 지나친다. 그들은 당신을 막지 않고 음흉한 눈빛으로 쳐다보는 데 만족하는 듯하다.
+			<br><br>
+			<<set $estate.cards.pc_exposed_walk to 3>>
+		<<elseif $exposed is 1 and $uncomfortable.underwear is true and $estate.cards.pc_exposed_walk lt 2>>
+			당신은 사유지를 가로질러 걷는다. 렌은 당신이 앞장서야 한다고 고집한다. 당신의 <<bottom>>【을를】 훔쳐보는 <<him>>의 노골적인 시선이 느껴진다. 당신은 레미의 다른 부하 두 명을 지나친다. 그들은 당신을 막지 않고 음흉한 눈빛으로 쳐다보는 데 만족하는 듯하다.
+			<br><br>
+			<<set $estate.cards.pc_exposed_walk to 2>>
+		<<elseif !$estate.cards.pc_exposed_walk>>
+			당신은 렌과 <<his>> 동료들 옆에서 사유지를 가로질러 걷는다. 당신은 레미의 다른 부하 두 명을 지나친다. 한 명이 눈살을 찌푸리지만, 그들은 당신을 멈춰 세우지 않는다. 렌을 신뢰하는 모양이다.
+			<br><br>
+			<<set $estate.cards.pc_exposed_walk to 1>>
+		<</if>>
+	<</if>>
+<</widget>>

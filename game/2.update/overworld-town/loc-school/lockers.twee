@@ -1,0 +1,463 @@
+:: School Lockers
+<<set $outside to 0>><<schooleffects>><<effects>><<set $lock to 100>>
+
+
+학교 사물함은 잘 따이는 것으로 악명 높지만, 다행히 당신은 아직 사물함에서 물건을 도둑맞은 적이 없다.
+<<if ["early", "late", "earlynoschool", "latenoschool", "daynoschool"].includes($schoolstate)>>
+	수업 중에는 다른 학생들의 사물함에 귀중품이 남아 있을 수 있다.
+<<else>>
+	<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+<</if>>
+<br><br>
+
+<<if clothingInStorage("locker").length lt 1>>
+	<span class="blue">책가방이나 다른 손에 드는 아이템을 사물함 안에 보관할 수 있습니다.</span>
+	<br>
+	<<lockerclothes>>
+	<<lockerclothes2>>
+	/*kind of a hacky solution to allow players to swap out their current handheld item for the stored handheld item instead of sending it back to the wardrobe but hey, it's effective and doesn't fuck w how the other storage locations work.*/
+	<<lockerClothesAutoOption>>
+<</if>>
+
+<<if !["early", "late", "earlynoschool", "latenoschool", "daynoschool"].includes($schoolstate)>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔이 묶여 있지만 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<set $skulduggerydifficulty to 100>>
+		<<lockicon "pick">><<link [[사물함 따기 (0:15)|School Lockers Sneak]]>><<handheldon>><<pass 15>><<crimeUp 30 "petty">><<skulduggerycheck "silent">><</link>><<skulduggerydifficulty>><<crime "petty">>
+		<br>
+	<</if>>
+<</if>>
+<<getouticon>><<link [[떠난다 (0:01)|Hallways]]>><<pass 1>><</link>>
+<br>
+
+:: School Lockers Sneak
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<wearProp "lockpick">>
+<<if $skulduggerysuccess>>
+	당신은 앞으로 나아가 자물쇠를 만지작거리기 시작한다. 얼마 지나지 않아 <span class="green">찰칵 소리를 내며 열린다.</span>
+	<br><br>
+
+	<<skulduggeryuse 100 "locks" 5>>
+
+	<<cleareventpool>>
+	<<if $settings.condomLevel gt 1>>
+		<<addinlineevent "Condom...will you poke" 0.25>>
+			책 몇 권 뒤에 콘돔이 숨겨져 있는 것을 발견한다.
+			<br><br>
+
+			<<link [[가져간다|School Lockers Condom Steal]]>><<handheldon>><<crimeUp 2 "petty">><</link>><<crime "petty">>
+			<br>
+			<<if hasSexStat("promiscuity", 5)>>
+				<<link [[망가뜨린다|School Lockers Condom Sabotage]]>><<handheldon>><</link>><<garousal>><<promiscuous5>>
+				<br>
+			<</if>>
+			<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+			<br>
+		<</addinlineevent>>
+
+		<<if $studentCondomPrank and !$studentCondomPrank.test.seen and Time.date.timeStamp gte $studentCondomPrank.test.start and Time.date.timeStamp lt $studentCondomPrank.test.end>>
+			<<addinlineevent "condom prank result" 15>>
+				<<set $studentCondomPrank.test.seen to true>>
+				소지품을 뒤지자, 흩어진 책들 아래에서 양성 임신 테스트기를 발견한다. 스쳐 지나가는 생각에 등골이 오싹해진다. <span class="lewd">당신이 저지른 콘돔 장난을 생각하면, 이것은 당신의 장난이 역효과를 낳았다는 증거일 수 있다.</span>
+				<br><br>
+
+				<<link [[다음|School Lockers]]>><<handheldon>><</link>>
+				<br>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+	<<addinlineevent "Bus Fare" 0.3>>
+		<<wearProp "antique silver coin">>
+		주변에 흩어져 있는 <<moneyGainDisplay 6 true true>> 상당의 동전을 발견한다. 아마 버스 요금으로 쓰려던 것 같다.
+		<br><br>
+
+		<<link [[가져간다|School Lockers]]>><<handheldon>><<crimeUp 1 "petty">><<money _money_gain>><</link>><<crime "petty">>
+		<br>
+		<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+		<br>
+	<</addinlineevent>>
+	<<addinlineevent "PensPencils" 0.2>>
+		사물함 안에는 흥미로운 것이 아무것도 없다. 펜과 연필 몇 자루만 흩어져 있을 뿐이다.
+		<br><br>
+
+		<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+		<br>
+	<</addinlineevent>>
+	<<addinlineevent "SmolMonies" 0.2>>
+		<<wearProp "wallet">>
+		조금 뒤지자 <<moneyGainDisplay 30 true true>>【을를】 발견한다.
+		<br><br>
+
+		<<link [[가져간다|School Lockers]]>><<handheldon>><<crimeUp 5 "petty">><<money _money_gain>><</link>><<crime "petty">>
+		<br>
+		<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+		<br>
+	<</addinlineevent>>
+	<<addinlineevent "Worthless" 0.4>>
+		소지품을 뒤져보지만, 값나가는 것은 아무것도 찾지 못한다.
+		<br><br>
+
+		<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+		<br>
+	<</addinlineevent>>
+	<<addinlineevent "Caught" 0.3>>
+		<<generatey1>>소지품을 뒤지고 있는데 등 뒤에서 목소리가 들린다. "야, 그거 내 사물함이야!" 목소리의 주인은 <<person1>><<person>>【이】며, 당신의 침입에 화가 난 듯 보인다.
+		<br><br>
+		<<link [[사과한다|School Lockers Apology]]>><<status -10>><<handheldon>><</link>><<llcool>>
+		<br>
+		<<link [[거짓말한다|School Lockers Lie]]>><<detention 3>><<handheldon>><</link>><<gdelinquency>>
+		<br>
+		<<link [[싸운다|School Lockers Fight]]>><<set $fightstart to 1>><<handheldon>><</link>>
+		<br>
+	<</addinlineevent>>
+	<<if C.npc.Kylar.init is 1>>
+		<<addinlineevent "KylarLocker" 0.015>>
+			<<if C.npc.Kylar.state is "prison">>
+				사물함을 연다. 내부는 거의 텅 비어 있고 바닥에는 얇은 먼지 층이 쌓여 있다. 인접한 사물함 번호를 확인하고, 당신은 이것이 아마도 카일라의 사물함이라는 것을 깨닫는다. 경찰이 증거물로 내용물을 모두 수거해 간 것 같다.
+				<br><br>
+			<<else>>
+				가장 먼저 보이는 것은 종이 위에서 당신을 올려다보는 당신 자신의 얼굴이다. 그 광경에 당신은 놀라서 뒤로 물러선다. <<gstress>><<stress 10>>
+				<br><br>
+				마음을 진정시키고 사물함을 자세히 살펴보니, 그것이 카일라의 제단이라는 것을 깨닫는다. 제단은 당신 얼굴의 연필 초상화가 머리에 테이프로 붙여진 음란한 조각상으로 이루어져 있다. 바닥에는 꽃들이 원을 그리고 있고, 사물함 옆면에는 당신을 끔찍할 정도로 상세하게 묘사한 여러 초상화가 점점이 박혀 있다. 언제 그렸는지는 알 수 없다.
+				<<if isLoveInterest("Kylar")>>
+					<br><br>
+					당신은 <<nnpc_his "Kylar">> 사물함을 조용히 닫고, 당신의 <<nnpc_girlfriend "Kylar">>에게서 훔치고 싶지 않아 물러선다.
+					<br><br>
+				<</if>>
+			<</if>>
+			사물함을 닫는다.
+			<br><br>
+			<<link [[다음|School Lockers]]>><<handheldon>><</link>>
+		<</addinlineevent>>
+	<</if>>
+	<<if C.npc.Whitney.init is 1>>
+		<<addinlineevent "WhitneyLocker" 0.015>>
+			<<if C.npc.Whitney.state is "dungeon">>
+				사물함을 연다. 안에서 먼지 구름이 피어오르고, 당신은 쏟아지는 먼지에 재채기를 간신히 참는다. 재채기 욕구가 가라앉자, 버려진 시험지와 담배 갑으로 가득한 먼지투성이 속을 뒤지기 시작하는데, 실종자 포스터를 발견한다. 휘트니의 얼굴이 찍혀 있다. 이것은 휘트니의 사물함이었다.
+				<br><br>
+				훔칠 것이 없어 사물함을 닫는다.
+			<<else>>
+				문을 열자 퀴퀴한 공기가 덮쳐와 얼굴을 찡그린다. 사물함 안은 포장지, 구겨진 종이, 낱개 담배들로 어질러져 있다. 뒤쪽에는 낙서와 휘갈겨 쓴 글씨로 뒤덮인 버려진 숙제가 끼워져 있다. 번진 연필 자국에도 불구하고, 맨 위에 적힌 "휘트니"라는 이름을 선명하게 알아볼 수 있다.
+				<br><br>
+				<<if isLoveInterest("Whitney")>>
+					주위를 재빨리 둘러보고 서둘러 사물함을 닫는다. 휘트니의 성질을 긁어 부스럼 만들 필요는 없다.
+				<<else>>
+					사물함을 닫는다.
+				<</if>>
+			<</if>>
+			<br><br>
+			<<link [[다음|School Lockers]]>><<handheldon>><</link>>
+		<</addinlineevent>>
+	<</if>>
+	<<if C.npc.Robin.init is 1>>
+		<<addinlineevent "RobinLocker" 0.015>>
+			사물함 내부는 놀라울 정도로 휑하다. 장식이라고 할 만한 것도 거의 없고, 안에 있는 물건은 짧은 연필 몇 자루와 당신이 즉시 로빈의 것이라고 알아본 바인더뿐이다. 사물함의 텅 빈 모습은 고아원에 있던 로빈의 방을 강하게 떠올리게 한다.
+			<br><br>
+			<<if isLoveInterest ("Robin")>>
+				당신의 <<nnpc_girlfriend "Robin">>【을를】 떠올리며 작은 미소를 짓고 사물함을 닫는다.
+			<<else>>
+				사물함을 닫는다.
+			<</if>>
+			<br><br>
+			<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+		<</addinlineevent>>
+	<</if>>
+	<<if C.npc.Sydney.init is 1>>
+		<<addinlineevent "SydneyLocker" 0.015>>
+			<<wearProp "pen">>
+			문을 열자마자 무언가 바닥에 덜그럭거리며 떨어진다. 몸을 굽혀 주워보니, 뚜껑이 단단히 닫힌 빨간 펜이다. 사물함을 재빨리 훑어보니, 교과서와 작은 우산과 함께 수십 개의 펜이 사물함 벽에 상자째로 깔끔하게 쌓여 있다. 뒤쪽에는 십자가가 걸려 있어, 이 사물함이 시드니의 것일 가능성이 높다는 것을 깨닫는다.
+			<br><br>
+			<<if isLoveInterest ("Sydney")>>
+				시드니의 펜 컬렉션에 조용히 감탄하며 사물함을 닫는다.
+			<<else>>
+				사물함을 닫는다.
+			<</if>>
+			<br><br>
+			<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+		<</addinlineevent>>
+	<</if>>
+	<<runeventpool>>
+<<else>>
+	몇 분 동안 자물쇠를 만지작거렸지만, 소용이 없다. <span class="red">자물쇠를 열 수 없다.</span>
+	<br><br>
+
+	<<skulduggeryuse 100 "locks" 2>>
+	<<link [[떠난다|School Lockers]]>><<handheldon>><</link>>
+<</if>>
+
+:: School Lockers Apology
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 수치심에 발끝을 내려다본다. "죄, 죄송해요. 그냥 한번 보고 싶었어요."
+<br><br>
+
+<<person>>【은는】 탐탁지 않아 보였지만, 화가 난 것 같지는 않다. "그냥 꺼져," <<he>>【이가】 <<his>> 소지품을 뒤지며 말한다. 아마도 없어진 물건이 있는지 확인하는 것 같다.
+<br><br>
+
+<<link [[다음|School Lockers]]>><<endevent>><</link>>
+<br>
+
+:: School Lockers Lie
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 혼란스러운 척한다. "네 사물함이라고? 난 내 건 줄 알았네. 바보 같으니."
+<br><br>
+
+"네 사물함은 이 근처에 있지도 않아, 내가 바보인 줄 알아?" <<he>>【이가】 <<his>> 소지품을 뒤지며 말한다. 아마도 없어진 물건이 있는지 확인하는 것 같다.
+<br><br>
+
+<<link [[다음|School Lockers]]>><<endevent>><</link>>
+<br>
+
+:: School Lockers Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<enableSchoolRescue "Whitney">>
+	<<set $enemytrust -= 100>>
+	<<set $enemyhealthmax -= 100>>
+	<<set $enemyhealth -= 100>>
+	<<set $enemyanger += 100>>
+	<<npcidlegenitals>>
+	"오, 그래," 당신이 말한다. "어쩔 건데?" <<He>>【이가】 달려와 당신에게 부딪히고, 둘 다 바닥으로 굴러떨어진다.
+	<br><br>
+	<<set $timer to 10>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if $alarm is 1 and $rescue gte 1>>
+	<span id="next"><<link [[다음|Whitney Rescue]]>><<set $whitneyRescueExit to "hallways">><</link>></span><<nexttext>>
+<<elseif _combatend or $timer lte 0>>
+	<span id="next"><<link [[다음|School Lockers Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|School Lockers Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: School Lockers Fight Finish
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	절정은 <<him>>에게서 남은 분노를 앗아간 것 같다. "다시는 그러지 마," <<he>>【이가】 멋쩍은 표정으로 말한다. <<He>>【은는】 <<his>> 사물함을 닫고 걸어간다. <<tearful>> 당신은 자리에서 일어선다.
+<<elseif $enemyhealth lte 0>>
+	"더, 더는 안 돼! 네가 이겼어," <<he>>【이가】 현장에서 도망치며 눈물을 글썽이며 말한다. <<tearful>> 당신은 의기양양하게 우뚝 선다.
+	<<ltrauma>><<lstress>><<gcool>><<trauma -6>><<stress -12>><<status 1>>
+<<elseif $timer lte 0>>
+	<<if $pillory.tenant.special.name isnot "Leighton">>
+		레이튼이 현장으로 뛰어들어와 당신 둘을 물리적으로 떼어놓는다.
+		<<endevent>><<npc Leighton>><<person1>>
+		"이건 절대로 용납할 수 없는 일이다," <<he>>【이가】 당신을 보며 말한다. "방과 후에 내 사무실에서 보자. 예의 바르게 행동하는 법을 가르쳐주도록 하지."
+	<<else>>
+		윈터가 현장으로 뛰어들어온다. <<person1>><<person>>【은는】 <<nnpc_his "Winter">> 도착에 달아난다.
+		<<endevent>><<npc Winter>><<person1>>
+		"얼마나 야만적인가," <<he>>【이가】 혀를 차며 당신을 본다. "네 벌을 내 손으로 직접 처리하고 싶은 마음이 굴뚝같지만, <<nnpc_title "Leighton">>【이가】 돌아오면 <<nnpc_he "Leighton">>【이가】 알아서 처리하도록 맡기겠다."
+	<</if>>
+	<<gdelinquency>><<detention 4>>
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|School Lockers]]>><</link>>
+<br>
+
+:: School Lockers Condom Steal
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<wearProp "condom">>
+당신은 재빨리 콘돔을 주머니에 넣는다. 그들보다 당신에게 더 필요하다. <<gcondoms 1>>
+<br><br>
+
+<<link [[다음|School Lockers]]>><<handheldon>><</link>>
+<br>
+
+:: School Lockers Condom Sabotage
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+<<wearProp "condom">>
+You find a small pin in the locker, and use the tip to poke a tiny hole in the condom. <<promiscuity5>>
+
+<<script>>
+	if (V.studentCondomPrank && Time.date.timeStamp > V.studentCondomPrank.npc.end) {
+		delete V.studentCondomPrank;
+	}
+
+	if (!V.studentCondomPrank) {
+		const date = new DateTime(Time.date);
+		const days = random(7, 7 + V.settings.humanPregnancyMonths*3);
+		const start = date.addDays(days).timeStamp;
+		const end = date.addDays(7).timeStamp;
+		const pregnancyStartDate = new DateTime(Time.date);
+		const pregnancyStart = pregnancyStartDate.addDays(V.settings.humanPregnancyMonths*18).timeStamp;
+		const pregnancyEndDate = new DateTime(Time.date);
+		const pregnancyEnd = pregnancyEndDate.addMonths(V.settings.humanPregnancyMonths).timeStamp;
+		V.studentCondomPrank = {
+			test: {
+				start: start,
+				end: end,
+				seen: false
+			},
+			npc: {
+				start: pregnancyStart,
+				end: pregnancyEnd,
+				seen: false
+			}
+		}
+	}
+<</script>>
+
+<<link [[Next|School Lockers]]>><<handheldon>><</link>>
+<br>
+
+:: Widgets Locker [widget]
+
+<<widget "lockerclothes">>
+	<<if !$possessed>>
+		<<storeactions "lockers">>
+		<<wardrobeSelection true>>
+		<<set _store_location to "lockers">>
+		<<storeon _store_location "check">>
+		<<if _store_check is 1>>
+			<<set _clothes to clothingInStorage(_store_location)>>
+			<<if _clothes.length gt 0>>
+				당신의 _clothes[0].name【이가】 사물함 안에 안전하게 들어가 있다.
+				<br><br>
+				<<if $worn.handheld.name is "naked">>
+					<<lockericon>>
+					<<link [[`${_clothes[0].name} 꺼내기`|$passage]]>><<set $lockerSwapLock to true>><<set $eventskip to 1>><<storeload "lockers">><</link>>
+				<<else>>
+					<<lockericon>>
+					<<link [[`${$worn.handheld.name}【와과】 교환하기`|$passage]]>><<set $eventskip to 1>><<handheldundress "lockers2">><<storeload "lockers">><</link>>
+				<</if>>
+				<br>
+			<</if>>
+		<</if>>
+		<<unset $wearoutfittext>>
+	<</if>>
+<</widget>>
+
+<<widget "lockerclothes2">>
+	<<if !$possessed>>
+		<<storeactions "lockers2">>
+		<<wardrobeSelection true>>
+		<<set _store_location to "lockers2">>
+		<<storeon _store_location "check">>
+		<<if _store_check is 1>>
+			<<set _clothes to clothingInStorage(_store_location)>>
+			<<if _clothes.length gt 0>>
+				<br>
+				당신의 _clothes[0].name【이가】 사물함 안에 안전하게 들어가 있다.
+				<br><br>
+				<<if $worn.handheld.name is "naked">>
+					<<lockericon>>
+					<<link [[`${_clothes[0].name} 꺼내기`|$passage]]>><<set $lockerSwapLock to true>><<set $eventskip to 1>><<storeload "lockers2">><</link>>
+				<<else>>
+					<<lockericon>>
+					<<link [[`${$worn.handheld.name}【와과】 교환하기`|$passage]]>><<set $eventskip to 1>><<handheldundress "lockers">><<storeload "lockers2">><</link>>
+				<</if>>
+				<br>
+			<</if>>
+		<</if>>
+		<<unset $wearoutfittext>>
+	<</if>>
+<</widget>>
+
+<<widget "lockerClothesAutoOption">>
+	<<lockericon>>
+	<<if $autoLockerEnabled>>
+		<<link [[손에 든 아이템 자동 보관 중지|$passage]]>><<set $eventskip to 1>><<set $autoLockerEnabled to false>><<set $lockerSwapLock to false>><</link>>
+	<<else>>
+		<<link [[손에 든 아이템 자동 보관|$passage]]>><<set $eventskip to 1>><<set $autoLockerEnabled to true>><<set $lockerSwapLock to true>><</link>>
+	<</if>>
+	/* The lockerSwapLock variable prevents swapping the player's handheld item multiple times during the schoolday */
+	/* The variable is unset when going to one of the exits (currently front/back courtyards and bathroom) */
+	<br>
+<</widget>>
+
+<<widget "lockerClothesAutoEquip">>
+	<<if $autoLockerEnabled and !$possessed>>
+		<<wardrobeSelection true>>
+		<<set _store_location to "lockers">>
+		<<storeon _store_location "check">>
+		<<if _store_check is 1>>
+			<<set _clothes to clothingInStorage(_store_location)>>
+			<<if _clothes.length gt 0>>
+				<<if $worn.handheld.name is "naked">>
+					당신은 수업에 들어가기 전에 사물함에서 <<print _clothes[0].name>>【을를】 꺼낸다.<<storeload "lockers">>
+					<br><br>
+				<<elseif $lockerSwapLock is false>>
+					당신은 수업에 들어가기 전에 <<print $worn.handheld.name>>【을를】 <<print _clothes[0].name>>【으로로】 바꾼다.<<handheldundress "lockers2">><<storeload "lockers">>
+					<br><br>
+				<</if>>
+				<<set $lockerSwapLock to true>>
+			<</if>>
+		<</if>>
+		<<unset $wearoutfittext>>
+
+		<<wardrobeSelection true>>
+		<<set _store_location to "lockers2">>
+		<<storeon _store_location "check">>
+		<<if _store_check is 1>>
+			<<set _clothes to clothingInStorage(_store_location)>>
+			<<if _clothes.length gt 0>>
+				<<if $worn.handheld.name is "naked">>
+					당신은 수업에 들어가기 전에 사물함에서 <<print _clothes[0].name>>【을를】 꺼낸다.<<storeload "lockers2">>
+					<br><br>
+				<<elseif $lockerSwapLock is false>>
+					당신은 수업에 들어가기 전에 <<print $worn.handheld.name>>【을를】 <<print _clothes[0].name>>【으로로】 바꾼다.<<handheldundress "lockers">><<storeload "lockers2">>
+					<br><br>
+				<</if>>
+				<<set $lockerSwapLock to true>>
+			<</if>>
+		<</if>>
+		<<unset $wearoutfittext>>
+	<</if>>
+<</widget>>
+
+<<widget "lockerClothesAutoStore">>
+	<<if $autoLockerEnabled and $lockerSwapLock and $worn.handheld.name isnot "naked" and $passagePrev is "Hallways" and !$possessed>>
+		<<wardrobeSelection true>>
+		<<set _store_location to "lockers">>
+		<<storeon _store_location "check">>
+		<<set _clothes to clothingInStorage(_store_location)>>
+		<<if _clothes.length gt 0>>
+			<<print $worn.handheld.name>>【을를】 <<print _clothes[0].name>>【으로로】 바꿔 들고 중앙 복도를 나섭니다.<<set $lockerSwapLock to false>><<handheldundress "lockers2">><<storeload "lockers">>
+			<br><br>
+		<<else>>
+			<<storeon "lockers2" "check">>
+			<<if _store_check isnot 1>>
+				당신은 중앙 복도를 나서기 전에 $worn.handheld.name【을를】 사물함에 넣는다.<<set $lockerSwapLock to false>><<handheldundress "lockers">>
+				<br><br>
+			<</if>>
+		<</if>>
+		<<unset $wearoutfittext>>
+
+		<<wardrobeSelection true>>
+		<<set _store_location to "lockers2">>
+		<<storeon _store_location "check">>
+		<<set _clothes to clothingInStorage(_store_location)>>
+		<<if $lockerSwapLock>>
+			<<if _clothes.length gt 0>>
+				<<print $worn.handheld.name>>【을를】 <<print _clothes[0].name>>【으로로】 바꿔 들고 중앙 복도를 나섭니다.<<set $lockerSwapLock to false>><<handheldundress "lockers">><<storeload "lockers2">>
+				<br><br>
+			<<else>>
+				<<storeon "lockers" "check">>
+				<<if _store_check isnot 1>>
+					당신은 중앙 복도를 나서기 전에 $worn.handheld.name【을를】 사물함에 넣는다.<<set $lockerSwapLock to false>><<handheldundress "lockers">>
+					<br><br>
+				<</if>>
+			<</if>>
+		<</if>>
+		<<unset $wearoutfittext>>
+	<</if>>
+<</widget>>

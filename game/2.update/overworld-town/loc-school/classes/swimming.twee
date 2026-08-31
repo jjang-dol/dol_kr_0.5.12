@@ -1,0 +1,959 @@
+:: School Pool
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+<<unset $previousClothes>>
+<<set _masonCanUnlock to playerChastity() and $worn.genitals.origin is "Winter" and C.npc.Mason.chastityKeyCarried and !$weekly.masonChastityRemovalDeclined and !$daily.masonChastityRemovalDeclined
+	and getVisibleClothesList().find(o => o === V.worn.genitals) and (C.npc.Mason.love gte 10 or C.npc.Mason.lust gte 15)>>
+<<if Time.minute lt 45 and $schoolstate is "fifth">>
+	<<classRoomEarSlime "swimming">>
+<</if>>
+<<if $poolroomstate is "own">>
+	<<if Time.minute gte 45>>
+		<<if $daily.school.attended.swimming>>
+			수영장으로 들어간다.
+			<br><br>
+			수업이 막 끝났다. 몇몇 학생들이 아직 탈의실로 가고 있다. 메이슨은 남겨진 수건들을 모으고 있다.
+			<br><br>
+			<<if $exposed lte 0>>
+				<<destinationpoolchangingroom>>
+			<<elseif $exposed gte 1>>
+				<<destinationpoolchangingroom "towels">>
+			<</if>>
+		<<else>>
+			<<include "School Swimming Late">>
+			<<set $daily.school.swimmingLate to true>><!-- still a missed lesson -->
+		<</if>>
+	<<elseif $exposed gte 2 and $swimall is 1>>
+		<<npc Mason>><<person1>>
+		<<if $daily.school.attended.swimming>>
+			수영 수업에 다시 참여한다.
+			<<schoolpoolmasoncheck>>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				<br><br>
+
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+		<<elseif Time.minute lt 5>>
+			수영장으로 들어간다.
+			메이슨은 수영장 옆에 서서, 나머지 학생들이 들어오는 동안 학생들에게 스트레칭을 하도록 독려하며 <<his>> 몸을 가리고 있다.
+			<<schoolpoolmasoncheck>>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				<br><br>
+
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+
+		<<else>>
+			수영장으로 들어간다.
+
+			메이슨과 학생들은 이미 물속에 있다.
+			<<if $daily.school.swimmingExcused>>
+				<<run delete $daily.school.swimmingExcused>>
+				"이제 왔구나." <<he>>【이가】 손짓하며 말한다. "걱정 마, 넌 봐줬으니까. 어서 들어와!"
+			<<else>>
+				"와줘서 기쁘군!" <<he>>【이가】 손짓하며 말한다.
+				<<gdelinquency>><<detention 1>>
+			<</if>>
+			<br><br>
+			<<schoolpoolmasoncheck>>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				메이슨이 수업을 계속하는 동안 당신은 물속으로 들어간다.
+				<br><br>
+
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+		<</if>>
+	<<elseif $exposed gte 2 and $swimall isnot 1>>
+		<<npc Mason>><<person1>>
+		<<schoolpoolexposed>>
+		<<if hasSexStat("exhibitionism", 5) and $swimall isnot 1>>
+			<<socialiseicon "ask">><<link [[알몸으로 수영하게 해달라고 부탁한다|School Pool Ask Naked]]>><<fameexhibitionism 15>><<endevent>><<set $swimnudecounter += 1>><</link>><<exhibitionist5>>
+			<br>
+		<</if>>
+	<<elseif $swimall is 1>>
+		<<npc Mason>><<person1>>
+		<<if $daily.school.attended.swimming>>
+			수영 수업에 다시 참여한다.
+			<<schoolpoolmasoncheck>>
+			<br>
+		<<else>>
+			수영장으로 들어간다.
+			메이슨은 수영장 옆에 서서, 나머지 학생들을 기다리며 스트레칭을 하도록 독려하고 있다.
+		<</if>>
+
+		<<if $exposed gte 2>>
+			<br>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				<br><br>
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+		<<else>>
+			<br><br>
+			<<He>>【이가】 당신을 쏘아본다. "자, 어떤 녀석 덕분에, 네가 완전히 알몸이 아니면 수영장에 들여보낼 수 없게 됐어."
+			<br><br>
+			<<link [[알몸으로 수영한다|Swimming Lesson]]>><<schoolpoolundress>><<endevent>><</link>>
+		<</if>>
+	<<elseif ($worn.under_lower.type.includes("swim") or $worn.lower.type.includes("swim"))
+	and ($worn.under_upper.type.includes("swim") or $worn.upper.type.includes("swim") or ($worn.under_upper.type.includes("naked") and $worn.upper.type.includes("naked") and ($player.gender_appearance is "m" or $daily.swimCrossdressPermission)))
+	and (($worn.upper.type.includes("naked") or $worn.upper.type.includes("swim")) and ($worn.lower.type.includes("naked") or $worn.lower.type.includes("swim")))>>
+		<<npc Mason>><<person1>>
+		<<if $daily.school.attended.swimming>>
+			수영 수업에 다시 참여한다.
+			<<schoolpoolmasoncheck>>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				<br><br>
+
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+		<<elseif Time.minute lt 5>>
+			수영장으로 들어간다.
+			메이슨은 수영장 옆에 서서, 나머지 학생들을 기다리며 스트레칭을 하도록 독려하고 있다.
+			<<schoolpoolmasoncheck>>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				<br><br>
+
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+		<<else>>
+			수영장으로 들어간다.
+
+			메이슨과 학생들은 이미 물속에 있다.
+			<<if $daily.school.swimmingExcused>>
+				<<run delete $daily.school.swimmingExcused>>
+				"이제 왔구나." <<he>>【이가】 손짓하며 말한다. "걱정 마, 넌 봐줬으니까. 어서 들어와!"
+			<<else>>
+				"와줘서 기쁘군!" <<he>>【이가】 손짓하며 말한다.
+				<<gdelinquency>><<detention 1>>
+			<</if>>
+			<br><br>
+			<<schoolpoolmasoncheck>>
+			<<if _masonCanUnlock>>
+				<<include "Mason Chastity Prompt">>
+			<<else>>
+				메이슨이 수업을 계속하는 동안 당신은 물속으로 들어간다.
+				<br><br>
+
+				<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+			<</if>>
+			<br>
+		<</if>>
+	<<else>>
+		수영장으로 들어간다.
+		<<npc Mason>><<person1>>
+		<<if $daily.school.swimmingExcused>>
+			"수업은 면제됐지만, 그래도 옷은 갈아입어야지.
+		<<else>>
+			"그렇게 입고 수영할 순 없잖아!
+		<</if>>
+		<<if _masonCanUnlock>>
+			<<include "Mason Chastity Prompt">>
+		<<else>>
+			가서 갈아입어."
+			<br><br>
+
+			<<if hasSexStat("exhibitionism", 5) and $swimall isnot 1>>
+				<<set _hasAskLink to true>>
+				<<socialiseicon "ask">><<link [[알몸으로 수영하게 해달라고 부탁한다|School Pool Ask Naked]]>><<fameexhibitionism 15>><<endevent>><<set $swimnudecounter += 1>><</link>><<exhibitionist5>>
+				<br>
+			<</if>>
+
+			<<if $player.sex is "f" or ($player.sex is "h" and $player.gender_appearance is "f")>>
+				<<if !$daily.swimCrossdressPermission>>
+					<<set _hasAskLink to true>>
+					<<socialiseicon>><<link [[남자 수영복밖에 없다고 말한다|School Pool Wrong]]>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				<<if !$daily.swimCrossdressPermission>>
+					<<set _hasAskLink to true>>
+					<<socialiseicon>>
+					<<if ($worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked")) and
+					($worn.lower.type.includes("swim") or ($worn.lower.type.includes("naked") and $worn.under_lower.type.includes("swim")))>>
+						<<link [[남자 수영복밖에 없다고 말한다|School Pool Wrong]]>><<set $phase to 1>><</link>>
+					<<else>>
+						<<link [[여자 수영복밖에 없다고 말한다|School Pool Wrong]]>><</link>>
+					<</if>>
+					<br>
+				<</if>>
+			<</if>>
+			<<if !$daily.swimSpareClothes>>
+				<<set _hasAskLink to true>>
+				<<socialiseicon>><<link [[갈아입을 옷이 없다고 말한다|School Pool Spare]]>><</link>>
+			<br>
+			<</if>>
+			<<if _hasAskLink>>
+				<br>
+			<</if>>
+			<<destinationpoolchangingroom>>
+		<</if>>
+	<</if>>
+
+<<elseif $poolroomstate is "other">>
+	<<if $exposed gte 1>>
+		<<npc Mason>><<person1>>
+		<<schoolpoolexposed>>
+	<<else>>
+		수영장으로 들어간다.
+		<<if $daily.school.swimmingInterrupted is 1>>
+			<<npc Mason>><<person1>>메이슨은 하던 일을 멈추고 당신 쪽을 본다. "수업 중이다.
+			방해하지 마." <<He>>【이가】 문을 가리킨다.
+			<<gdelinquency>>
+			<br><br>
+			<<detention 1>>
+
+			<<destinationpoolchangingroom>>
+		<<else>>
+			<<npc Mason>><<person1>>
+			메이슨은 하던 일을 멈추고 당신에게 미소 짓는다. "길 잃었니? 아니면 나한테 할 말이라도 있어?"
+			아무래도 수업을 방해한 것 같다.
+			<br><br>
+			<<set $daily.school.swimmingInterrupted to 1>>
+
+			<<link [[사과한다|Swimming Classroom Apology]]>><<trauma 1>><<stress 1>><</link>><<gstress>><<gtrauma>>
+			<br>
+			<<if $trauma gte 1>>
+				<<link [[조롱한다|Swimming Classroom Mock]]>><<status 1>><<stress -12>><</link>><<lstress>><<gcool>><<gdelinquency>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<<elseif $weekly.schoolNightPoolParty is "party" and Time.hour is 6>>
+	<<schoolnightpoolpartyend>>
+<<elseif ["changingRoom", "party"].includes($weekly.schoolNightPoolParty) and Time.dayState is "night">>
+	<<if $weekly.schoolNightPoolParty is "changingRoom">>
+		<<generates1>><<generates2>>
+		수영장으로 들어서자, 알몸의 사람들이 홍수처럼 밀려온다. <span class="lewd">사방에서 신음, 키스, 젖은 몸이 서로 뒤엉켜 꿈틀거리는 소리로 가득하다.</span>
+		<<ggarousal>><<arousal 1200>>
+		<br><br>
+		난교 중인 몇몇 얼굴은 수업에서 본 <<= $delinquency gte 400 ? "동료" : "알려진">> 불량 학생들임을 알아본다. 몇몇은 평범한 학생처럼 보인다. 하지만, 전에 본 적 없는 얼굴도 있다. 이 학교 학생이 맞긴 한가?
+		<br><br>
+		육욕적인 행위에 몰두해 있음에도 불구하고, 누군가 당신을 발견하기까지는 오래 걸리지 않았다. 누군가 비명을 지르며 당신을 가리키자, 곧 방 안의 모든 사람이 당신을 쳐다본다.
+		<br><br>
+		"잠깐, 누가 <<phim>>【을를】 불렀어?" 한 <<person1>><<person>>【이가】 소리친다.
+		<br><br>
+		"난 아냐!" 다른 <<person2>><<person>>【이가】 힘겨운 목소리로 대답한다.
+		<br><br>
+		<<if $speech_attitude is "meek">>
+			"저... 저, 당신들이 들어오는 걸 봤어요." 당신의 소심한 목소리가 수영장에 울려 퍼진다. "담을 넘는 걸 보고... 궁금해서, 뭘 하는지 알고 싶었어요."
+		<<elseif $speech_attitude is "bratty">>
+			"그냥 따라왔어." 당신의 큰 목소리가 수영장에 울려 퍼진다. "너희들 정말 숨는 데 젬병이네. 어쨌든, 무슨 소란인지 보러 왔어."
+		<<else>>
+			"당신들이 들어오는 걸 봤어요." 당신의 목소리가 수영장에 울려 퍼진다. "몇몇이 담을 넘는 걸 보고, 무슨 일인지 알고 싶었어요."
+		<</if>>
+		<br><br>
+
+		<<if hasSexStat("promiscuity", 5) or hasSexStat("exhibitionism", 5)>>
+			<<link [[머물러도 되는지 묻는다|School Night Pool Party]]>><</link>>
+		<<else>>
+			<<insufficientStat "custom" "남아 있기에는" "blue" "음란함이나 노출증이">>
+		<</if>>
+		<br>
+		<<if $changingRoomGender is "boys">>
+			<<link [[자리를 비킨다|School Boy Changing Room]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<<else>>
+			<<link [[자리를 비킨다|School Girl Changing Room]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<</if>>
+		<br>
+	<<else>>
+		<<outfitChecks>>
+		<<if $drunk gte random(480, 1000) or $stress gte $stressmax>>
+			<<set $weekly.schoolNightPoolParty to false>>
+
+			갑작스러운 현기증이 덮치고, 곧 방 전체가 빙빙 도는 것 같다. <<if $stress gte $stressmax>>스스로를 너무 몰아붙인 탓에,<<else>>마신 술이 이제야 올라오는 건지 궁금해할 틈도 없이<</if>> 시야가 까맣게 변한다.
+			<br><br>
+			정신을 잃는다.
+			<br><br>
+
+			<<link [[다음|School Night Pool Party Drunk]]>><<if $stress gte $stressmax>><<set $stress -= 2000>><</if>><</link>>
+			<br>
+		<<else>>
+			학교 수영장이다. 불량 학생들이 비밀 파티를 열고 있다. 수영장의 염소 냄새만으로는 술과 정액 냄새를 가릴 수 없다.
+			<br><br>
+			<<if !_fullyNaked>>
+				<<generates1>><<person1>>
+				한 <<person>>【이가】 당신을 발견하고 비틀거리며 다가온다. "바보같이 차려입고 여기서 뭐 하는 거야?" <<He>>【이가】 웃으며 당신의 옷을 잡아당기지만, 해를 끼칠 의도는 없어 보인다. "옷은 금지야! 다 벗고 다시 와."
+				<br><br>
+				<<He>>【은는】 당신을 내버려 두고 수영장 가에 있는 친구들 무리로 술에 취해 걸어간다.
+			<<else>>
+
+				몇몇 학생들이 자기들끼리 잡담하고 있다.<br>
+				<<socialiseicon>><<link [[어울린다|School Night Pool Party Socialise]]>><</link>>
+				<br><br>
+
+				수영장 곳곳에서 성적인 난잡함이 펼쳐진다.<br>
+				<<investigateicon>><<link [[주변을 둘러본다 (0:10)|School Night Pool Party Around]]>><<pass 10>><</link>>
+			<</if>>
+			<br><br>
+
+			<<if $exposed lte 0>>
+				<<destinationpoolchangingroom>>
+			<<elseif $exposed gte 1>>
+				<<destinationpoolchangingroom "towels">>
+			<</if>>
+		<</if>>
+	<</if>>
+<<else>><!-- $poolroomstate is "empty" -->
+	수영장 안이다. 염소 냄새가 진동한다.
+	<br><br>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "emptySwimClassroom">>
+	<</if>>
+
+	<<exhibitionclassroom>>
+
+	<<destinationpoolchangingroom>>
+<</if>>
+
+:: School Pool Ask Naked
+<<set $outside to 0>><<set $location to "pool">><<schoolpoolundress>><<schooleffects>><<effects>><<exposure>>
+
+<<set _masonCanUnlock to playerChastity() and $worn.genitals.origin is "Winter" and C.npc.Mason.chastityKeyCarried and !$weekly.masonChastityRemovalDeclined and !$daily.masonChastityRemovalDeclined
+	and getVisibleClothesList().find(o => o === V.worn.genitals) and (C.npc.Mason.love gte 10 or C.npc.Mason.lust gte 15)>>
+
+<<if $swimnudecounter lte 1>>
+	<<npc Mason>>
+
+	<<if $speech_attitude is "meek">>
+		"알몸으로 수영해도 될까요?" 당신은 묻는다. "물이 기분 좋아요."
+	<<elseif $speech_attitude is "bratty">>
+		"저 알몸으로 수영할 거예요." 당신은 선언한다.
+	<<else>>
+		"알몸으로 수영해도 돼요?" 당신은 묻는다.
+	<</if>>
+	<br><br>
+
+	<<schoolpoolmasoncheck>>
+	<<person1>><<His>> 얼굴이 더욱 붉어지고, 반 아이들은 흥분하기 시작한다. "ㅈ, 좋아." <<he>>【이가】 말한다. <<He>>【은는】 돌아서서 다른 학생들을 조용히 시키려고 최선을 다한다.
+<<elseif $swimnudecounter lte 2>>
+	<<npc Mason>><<generatey2>>
+
+	<<if $speech_attitude is "meek">>
+		"알몸으로 수영해도 될까요?" 당신은 묻는다. "물이 기분 좋아요."
+	<<elseif $speech_attitude is "bratty">>
+		"저 알몸으로 수영할 거예요." 당신은 선언한다.
+	<<else>>
+		"알몸으로 수영해도 돼요?" 당신은 묻는다.
+	<</if>>
+	<br><br>
+
+	<<person1>><<His>> 얼굴이 더욱 붉어지고, 반 아이들은 흥분하기 시작한다. "ㄸ, 또?" <<he>>【이가】 끽 소리를 낸다. <<he>>【은는】 몸을 돌리기도 전에, <<person2>><<person>> 한 명도 탈의실에서 알몸으로 나온다.
+	<br><br>
+
+	<<person2>>"<<pshe>>만 알몸으로 수영하는 건 불공평하잖아요." <<he>>【이가】 말한다. 메이슨은 너무 놀라 아무 말도 못 하고, 당신과 그 학생이 수영장에 들어가는 것을 내버려 둔다.
+<<elseif $swimnudecounter lte 3>>
+	<<npc Mason>><<generatey2>><<generatey3>><<generatey4>>
+
+	당신이 나오자, <<person2>><<person>>, <<person3>><<person>>, 그리고 <<person4>><<person>> 한 명이 이미 방 안에 알몸으로 있는 것이 보인다. 수영장 안의 학생들은 즐거워하고 메이슨은 경악한다.
+	<br><br>
+
+	<<person1>>네 번째 학생까지 기꺼이 모든 것을 벗어 던지자 반 아이들이 박수를 치고, 메이슨의 얼굴은 더욱 붉어진다. "너희들까지?"
+	<<he>>【은는】 고개를 저으며 말한다.
+	<br><br>
+
+	<<if $speech_attitude is "meek">>
+		"다들 같이 하고 싶었나 봐요." 당신은 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"아무래도 선생님이 수적으로 불리한 것 같네요." 당신은 말한다.
+	<<else>>
+		"이 수영복을 싫어하는 게 저뿐만이 아니네요." 당신은 말한다.
+	<</if>>
+<<elseif $swimnudecounter lte 4>>
+	<<npc Mason>><<generatey2>><<generatey3>><<generatey4>>
+
+	당신이 수영장에 들어가자, 지난번보다 훨씬 더 많은 학생들이 이미 알몸으로 와 있는 것이 보인다. 당신 뒤로도 몇 명이 더 나온다. 아마 반의 절반 정도가 알몸으로 수업에 참여하는 것 같다.
+	<br><br>
+
+	<<person2>><<person>> 한 명이 가장자리에서 물장구를 치며 당신에게 손을 흔든다. 한편 <<person1>>메이슨은 옷을 입은 학생들이 알몸으로 수영하는 무리에게서 시선을 돌리게 하려고 최선을 다하고 있다.
+
+	<<if $cool gte 80>>
+		<br><br>
+		그들 중 몇몇은 수영장 가장자리에서 스트레칭을 하고 있다. <<person3>><<person>> 한 명이 당신을 발견하고 <<person4>><<person>>에게 당신을 가리키자, 둘 다 당신에게 손을 흔든다.
+	<</if>>
+<<else>>
+	<<npc Mason>><<generatey2>><<generatey3>>
+
+	<<person1>>이제 거의 반 전체가 알몸으로 수영하고 있다. <<person2>><<person>>【와과】 <<person3>><<person>>【을를】 포함한 몇몇 버티던 학생들은 메이슨이 수업을 진행하는 동안 시선을 피하려고 애쓴다.
+<</if>>
+<br><br>
+
+<<if _masonCanUnlock>>
+	<<include "Mason Chastity Prompt">>
+<<else>>
+	<<person1>><<He>>【은는】 그들의 흥분을 가라앉히려는 노력은 거의 하지 않는다.
+	<<if $exposed gte 2>>
+		<<flaunting>> 당신이 물속으로 미끄러져 들어갈 때 그들의 시선이 느껴진다.
+	<<else>>
+		<<flaunting>> 당신이 <<nervously>> <<lewdness>>만 남기고 옷을 벗은 뒤 물속으로 미끄러져 들어갈 때 그들의 시선이 느껴진다. <<covered>>
+	<</if>>
+	<<exhibitionism5>>
+
+	<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+<</if>>
+
+:: Pool Leighton Nude Punishment
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>><<set $swimall to 1>><<underlowerstrip>><<underupperstrip>>
+
+레이튼이 학생들에게 옷을 벗으라고 명령한다. 학생들은 그대로 따른다. 그러고 나서 <<he>>【은는】 돌아서서 메이슨을 빤히 쳐다본다.
+<br>
+"ㅈ, 저도요?"
+<br>
+"자네는 반을 통제하지 못했어. 해고하지 않는 걸 다행으로 알게."
+<br>
+모두가 벗자, 레이튼은 수영복을 가져가 세탁 바구니에 넣는다.
+<br>
+"너희 중 단 한 명도 옷을 입고 수영하지 않을 거다, 알겠나?" <<He>>【은는】 메이슨에게로 돌아선다. "자네도 포함해서. 이 반에서는 안 돼."
+<br>
+"왜요?" 학생 중 한 명이 묻는다.
+<br>
+"네 반 친구들을 탓해라. 수업 중에 알몸 수영을 하고 싶어 했으니, 이제 그렇게 하게 된 거다."
+<br><br>
+<<link [[다음|Swimming Lesson]]>><<endevent>><</link>>
+
+:: Swimming Lesson
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>><<set $phase to 0>>
+<<set $daily.school.attended.swimming to true>>
+<<if $daily.whitney.whitneyCrossdressSwimwear and Object.values($worn).find(item => item.type.includes("swim") and item.gender is "m")>>
+	<<run $daily.whitney.whitneyCrossdressSwimwear.push("boys swimwear")>>
+<</if>>
+
+<<if $swimnudecounter gte 10 and $swimall isnot 1>>
+	<<npc Leighton>><<person1>>레이튼이 분노에 차 수영장으로 난입한다. "메이슨!" <<he>>【이가】 소리친다. "이게 어떻게 된 건지 설명해 봐! 왜 이 반이 알몸으로 수영하고 있는 거지?"
+	<br><br>
+
+	<<endevent>><<npc Mason>><<person1>>
+	"저, 저는..." 메이슨은 당신을 향해 돌아보지만, 말을 잇지 못한다. 레이튼이 <<his>> 시선을 따라간다.
+	<br><br>
+
+	<<endevent>><<npc Leighton>><<person1>>
+	"역시나." <<he>>【이가】 으르렁거린다. "모두 수영장에서 나와."
+	<br><br>
+
+	<<link [[다음|Pool Leighton Nude Punishment]]>><<pass 5>><</link>>
+<<elseif $stress gte $stressmax>>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "schoolPool">>
+	<<else>>
+		너무 무리했다.
+		<br><br>
+		<<link [[모든 것이 암전된다...|Mason CPR]]>><<passout>><</link>>
+	<</if>>
+<<else>>
+	<<if Time.minute lt 5>>
+		<<if $swimall is 1 and $exposed gte 2>>
+			당신은 당신의 <<lewdness>>에 대해 신경 쓰지 않는다. 이 시점에서는 모두가 알몸이기 때문이다.
+			<br><br>
+		<<elseif $exposed gte 1>>
+			당신은 <<lewdness>>【을를】 수면 아래에 숨기지만, 여전히 취약하고 노출된 기분이다.
+			나머지 반 아이들은 당신이 보지 못한다고 생각할 때 훔쳐본다.
+			<br><br>
+		<</if>>
+		<<if $arousal gte $arousalmax>>
+			<<orgasmLocation "swimClassroom">>
+		<</if>>
+		수영 수업이 시작된다. 어떻게 행동하시겠습니까?
+		<br><br>
+	<<else>>
+		<<if $swimall is 1 and $exposed gte 2>>
+			당신은 당신의 <<lewdness>>에 대해 신경 쓰지 않는다. 이 시점에서는 모두가 알몸이기 때문이다.
+			<br><br>
+		<<elseif $exposed gte 1>>
+			물이 당신을 가리는 데 도움이 되지만, 여전히 노출된 기분이다. 나머지 반 아이들은 당신이 보지 못한다고 생각할 때 훔쳐본다.
+			<br><br>
+		<</if>>
+		<<if $arousal gte $arousalmax>>
+			<<orgasmLocation "swimClassroom">>
+		<</if>>
+		수영 수업이 계속된다. 어떻게 행동하시겠습니까?
+		<br><br>
+	<</if>>
+	<<water>>
+	<<waterbr 2>>
+	<<swimmingicon>><<link [[수업에 집중한다|Swimming Lesson Focus]]>><</link>><<gstress>><<gswimming>><<gtiredness>>
+	<br>
+	<<socialiseicon>><<link [[반 친구들과 어울린다|Swimming Lesson Socialise]]>><</link>><<gcool>><<ltrauma>><<lstress>><<gharass>>
+	<br>
+	<<if $exposed gte 2 and hasSexStat("exhibitionism", 5)>>
+		<<swimicon "back">><<link [[배영을 연습한다|Swimming Lesson Naked Backstroke]]>><</link>><<gswimming>><<gtiredness>><<exhibitionist5>>
+		<br>
+	<</if>>
+	<<daydreamicon>><<link [[공상에 잠긴다|Swimming Lesson Daydream]]>><</link>><<lstress>><<lharass>>
+	<br>
+	<<if hasSexStat("exhibitionism", 4)>>
+		<<skinicon "masturbate">><<link [[자위한다|Swimming Lesson Masturbate]]>><<set $masturbationstart to 1>><</link>><<exhibitionist4>>
+		<br>
+	<</if>>
+<</if>>
+
+:: School Pool Wrong
+<<set $outside to 0>><<set $location to "pool">><<set $daily.swimCrossdressPermission to true>><<set _alreadyWearing to false>><<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+You speak in a low voice, so only the teacher will hear you.
+
+<<if $player.sex is "f" or ($player.sex is "h" and $player.gender_appearance is "f") or $phase is 1>>
+	<<if $player.gender_appearance is "f" or $genderknown.includes("Mason") or $phase is 1>>
+		<<set $phase to 0>>
+		"I only have a pair of boy's shorts, <<sir>>."
+		<br><br>
+		<<He>> blushes. "Oh. That's better than nothing.
+		<<if ($worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked")) and
+			($worn.lower.type.includes("swim") or ($worn.lower.type.includes("naked") and $worn.under_lower.type.includes("swim")))>>
+			Go ahead." You join the rest of the class.<<set _alreadyWearing to true>>
+		<<else>>
+			Go get changed." <<He>> turns back to <<his>> class.
+		<</if>>
+	<<else>>
+		"I only have a pair of boy's shorts, <<sir>>."
+		<br><br>
+		<<He>> looks at you blankly. "I don't see the..." <<He>> blushes as realisation dawns on <<his>> youthful face.
+		"Oh. That's better than nothing, and it's not like you have a problem dressing as a boy.
+		<<if ($worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked")) and
+			($worn.lower.type.includes("swim") or ($worn.lower.type.includes("naked") and $worn.under_lower.type.includes("swim")))>>
+			Go ahead." You join the rest of the class.<<set _alreadyWearing to true>>
+		<<else>>
+			Go get changed." <<He>> turns back to <<his>> class.
+		<</if>>
+		<<set $genderknown.pushUnique("Mason")>>
+	<</if>>
+	<br><br>
+<<else>>
+	<<if $player.gender_appearance is "m" or $genderknown.includes("Mason")>>
+		"I only have a girl's suit, <<sir>>."
+		<br><br>
+		<<He>> blushes. "Oh. That's better than nothing. Go get changed." <<He>> turns back to <<his>> class.
+	<<else>>
+		"I only have a girl's suit, <<sir>>."
+		<br><br>
+		<<He>> looks at you blankly. "I don't see the..." <<He>> blushes as realisation dawns on <<his>> youthful face.
+		"Oh. That's better than nothing, and it's not like you have a problem dressing as a girl. Go get changed." <<He>> turns back to <<his>> class.
+		<<set $genderknown.pushUnique("Mason")>>
+	<</if>>
+	<br><br>
+<</if>>
+
+<<if _alreadyWearing>>
+	<<link [[Next|Swimming Lesson]]>><<endevent>><</link>>
+<<else>>
+	<<destinationpoolchangingroom>>
+<</if>>
+
+:: School Pool Spare
+<<set $outside to 0>><<set $location to "pool">><<set $daily.swimSpareClothes to true>><<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+"I don't have a swimming costume, <<sir>>."
+<br><br>
+<<He>> sighs and climbs out the pool. "Come on, we might have some spares."
+<br><br>
+
+<<He>> takes you into a small room and rummages inside a cupboard.
+
+<<if $rng gte 81 and $delinquency gte 200>>
+	"I'm sorry but we don't have anything to spare. You'll have to swim naked."
+	<br><br>
+	<<He>> doesn't wait for you to give voice to your anxiety. "The rest of the class will be distracted, just quietly slip into the water.
+	No one will be able to see anything once you're in."
+	<br><br>
+
+	<<link [[Accept|School Pool Nude]]>><<endevent>><</link>>
+	<br>
+	<<link [[Refuse (0:05)|School Pool Refuse]]>><<pass 5>><<detention 6>><<endevent>><</link>><<ggdelinquency>>
+<<elseif $rng gte 41 or !$settings.forcedCrossdressingEnabled>>
+	<<if $player.gender_appearance is "f">>
+		<<He>> produces a bundle of fabric and passes it to you.
+		<br><br>
+		"Don't be long!" <<he>> says, before leaving you alone in the room.
+		<br><br>
+		You unfurl the fabric to reveal a rather tattered swimsuit.
+		<br><br>
+
+		<<link [[Get changed|School Pool Crossdress]]>><<schoolpoolundress>><<spareschoolswimsuit>><<endevent>><<exposure>><<set $phase to 1>><</link>>
+	<<else>>
+		<<He>> produces a bundle of fabric and passes it to you.
+		<br><br>
+		"Don't be long!" <<he>> says, before leaving you alone in the room.
+		<br><br>
+
+		You unfurl the fabric to reveal a rather tattered pair of swim shorts.
+		<br><br>
+
+		<<link [[Get changed|School Pool Crossdress]]>><<schoolpoolundress>><<spareschoolswimshorts>><<endevent>><<exposure>><<set $phase to 0>><</link>>
+		<!-- A crossdressing girl may now have her assets on display, "School Pool Crossdress" will handle that -->
+	<</if>>
+<<elseif $rng gte 1>>
+	<<if $player.gender_appearance is "f">>
+		<<He>> produces a bundle of fabric and passes it to you.
+		<br><br>
+		"Don't be long!" <<he>> says, before leaving you alone in the room.
+		<br><br>
+
+		You unfurl the fabric to reveal a rather tattered pair of boy's swim shorts. You rummage in the cupboard yourself, but find not a scrap of clothing.
+		It's the shorts or nothing.
+		<br><br>
+
+		<<link [[Wear the shorts|School Pool Crossdress]]>><<schoolpoolundress>><<spareschoolswimshorts>><<endevent>><<exposure>><<set $phase to 0>><</link>>
+		<br>
+		<<link [[Skip the lesson (0:05)|School Pool Refuse]]>><<pass 5>><<detention 6>><<endevent>><</link>><<ggdelinquency>>
+	<<else>>
+		<<He>> produces a bundle of fabric and passes it to you.
+		<br><br>
+		"Don't be long!" <<he>> says, before leaving you alone in the room.
+		<br><br>
+
+		You unfurl the fabric to reveal a rather tattered girl's swimsuit. You rummage in the cupboard yourself, but find not a scrap of clothing.
+		It's the swimsuit or nothing.
+		<br><br>
+
+		<<link [[Wear the swimsuit|School Pool Crossdress]]>><<schoolpoolundress>><<spareschoolswimsuit>><<endevent>><<exposure>><<set $phase to 1>><</link>>
+		<br>
+		<<link [[Skip the lesson (0:05)|School Pool Refuse]]>><<pass 5>><<detention 6>><<endevent>><</link>><<ggdelinquency>>
+	<</if>>
+<</if>>
+
+:: Swimming Classroom Apology
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+당신은 당황하며 사과하고 떠난다.
+<br><br>
+
+<<destinationpoolchangingroom "towels">>
+
+:: Swimming Classroom Mock
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+당신은 선생님을 조롱한다. "방해해서 죄송해요, <<sir>>. 그냥 선생님이 입은
+<<if $pronoun is "f">>그 꽉 끼는 수영복을<<else>>그 꽉 끼는 반바지를<</if>> 보고 싶었을 뿐이에요." 몇몇 학생들이 웃고, 다른 학생들은 얼굴을 붉히기 시작한다.
+<br><br>
+
+메이슨도 얼굴을 붉힌다. "ㅁ, 못 들은 걸로 하마." <<He>>【은는】 당신에게서 재빨리 시선을 피하며 탈의실을 가리킨다.
+<<gdelinquency>>
+<br><br>
+<<detention 1>><<npcincr Mason love -1>>
+<<destinationpoolchangingroom>>
+
+:: School Pool Nude
+<<set $outside to 0>><<set $location to "pool">><<schoolpoolundress>><<exposure>><<schooleffects>><<effects>>
+
+당신은 <<nervously>> 옷을 벗고 찬장 안에 옷을 넣어둔다. 문을 살짝 열고 틈새로 엿본다.
+서른 명 남짓한 학생들과 선생님. 합류하지 않으면 곤란해지겠지만, 정말 이렇게 많은 사람들 앞에서 자신을 노출할 수 있을까?
+<br><br>
+
+<<link [[수영장에 들어간다|School Pool Nude Entry]]>><</link>>
+<br>
+<<link [[수업을 빠진다 (0:05)|School Pool Refuse]]>><<pass 5>><<storeload _store_location>><<detention 6>><<endevent>><</link>><<ggdelinquency>>
+
+:: School Pool Refuse
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+이런 짓은 도저히 할 수 없다. 당신은 옷을 입고 존엄성을 지킨 채 수영장을 떠나지만, 선생님을 거역한 데에는 대가가 따를 것이다.
+<br><br>
+
+<<link [[다음|School Pool Entrance]]>><</link>>
+
+:: School Pool Crossdress
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+<!-- phase 0 is shorts, 1 is a swimsuit, 2 is internal looping -->
+
+<!-- Note that the gender_appearance may have changed with the ersatz swimwear and the player may have crossdressed before and isn't anymore -->
+<<if isCrossdressing()>>
+	<<if $phase is 2>>
+		<<set $phase to 0>>
+		당신은 마음을 다잡고 문을 통과해 걸어간다. <<lewdness>>【이가】 드러난 채로. 당신은 간신히 물의 보잘것없는 보호 아래로 들어가지만, 그전에 이미 반 아이들이 당신의 상태를 알아차린다.
+		<<garousal>><<arousal 600>>
+		<br><br>
+
+		<<link [[다음|Swimming Lesson]]>><</link>>
+		<br>
+	<<elseif $exposed gte 1>>
+		당신은 <<nervously>> 옷을 벗고 사물함 안에 옷을 넣어둔 뒤, 낡은 <<if $phase is 1>>수영복을<<else>>수영 반바지를<</if>> 입는다.
+		<<if $player.breastsize gt 0>>당신은 당신의 <<breasts>>【을를】 내려다본다. 남자처럼 보이기는 절대 무리다.<</if>> 문을 살짝 열고 틈새로 엿본다.
+		서른 명 남짓한 학생들과 선생님. 합류하지 않으면 곤란해지겠지만, 정말 이렇게 많은 사람들 앞에서 자신을 노출할 수 있을까?
+		<br><br>
+
+		<<link [[이건 실수였어!|School Pool Refuse]]>><</link>>
+		<br>
+		<<link [[선택의 여지가 없어|School Pool Crossdress]]>><<set $phase to 2>><</link>>
+	<<elseif $exposed lte 0>>
+		당신은 <<nervously>> 옷을 벗고 찬장 안에 옷을 넣어둔 뒤, 낡은 <<if $phase is 1>>수영복을<<else>>수영 반바지를<</if>> 입는다.
+		<br><br>
+
+		당신은 수영장으로 제대로 들어선다. 몇몇이 고개를 돌리지만, 당신이 물속으로 들어갈 때 아무도 다시 쳐다보지 않는다.
+		<br><br>
+
+		<<link [[다음|Swimming Lesson]]>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	낡은 <<if $phase is 1>>수영복을<<else>>수영 반바지를<</if>> 입고 옷을 찬장에 보관한 뒤, 수업을 받으러 나간다.
+	<br><br>
+
+	<<link [[다음|Swimming Lesson]]>><</link>>
+<</if>>
+
+:: School Pool Nude Entry
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<effects>>
+
+당신은 마음을 다잡고 문을 통과해 걸어가며, 드러난 <<nudity>>【을를】 가리려고 최선을 다한다.
+당신은 간신히 물의 보잘것없는 보호 아래로 들어가지만, 그전에 이미 반 아이들이 당신의 상태를 알아차린다.
+<<garousal>><<arousal 600>>
+<br><br>
+
+<<link [[다음|Swimming Lesson]]>><</link>>
+<br>
+
+:: Swimming Lesson Focus
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<water>><<waterbr 2>><<effects>>
+
+<<if $exposed lte 0 or $swimall is 1>>
+	당신은 메이슨의 지시를 따르고 몸을 움직이는 데 집중한다. 힘들지만, 진전이 있는 것 같다.
+	<<physique 3>><<swimmingskilluse>>
+<<elseif $exposed gte 1>>
+	당신은 메이슨의 지시를 따르고 몸을 움직이는 데 집중한다. 몸을 수면 아래에 숨긴 채로 그렇게 하기는 어렵다.
+	<<physique 3>><<swimmingskilluse>>
+<</if>>
+<br><br>
+
+<<advancelesson>>
+<<stress _lesson_progress>>
+<<tiredness _lesson_progress>>
+
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	<<if $swimall is 1>>
+		종이 울리며 수업 종료를 알린다.
+		<<if playerBellyVisible()>>
+			메이슨이 허락하자 당신은 수영장에서 나오고, <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다. 모두가 알몸임에도 불구하고 아무도 신경 쓰지 않는 것 같다. <<generatey1>><<person1>><<person>> 한 명이 지나가는 다른 학생들에게 수건을 나눠주며 눈을 마주치지 않으려 애쓴다.<<endevent>>
+		<<else>>
+			당신은 수영장에서 나온다. 모두가 알몸임에도 불구하고 아무도 신경 쓰지 않는 것 같다. 메이슨은 지나가는 각 학생에게 수건을 나눠주며 눈을 마주치지 않으려 애쓴다.
+		<</if>>
+		<br><br>
+	<<elseif $exposed gte 1>>
+		종이 울리며 수업 종료를 알린다.
+		<<if playerBellyVisible()>>
+			당신은 다른 학생들이 떠나기를 기다렸다가, 메이슨이 허락하자 수영장에서 나온다. <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다.
+		<<else>>
+			당신은 다른 학생들이 떠나기를 기다린다.
+		<</if>>
+		몇몇 학생들이 남아 있는데, 의심할 여지 없이 당신이 나올 때 좋은 구경을 하려는 속셈이다. 하지만 메이슨이 그들을 몰아내 당신에게 사적인 공간을 마련해 준다.
+		<br><br>
+	<<elseif $exposed lte 0>>
+		종이 울리며 수업 종료를 알린다.
+		<<if playerBellyVisible()>>
+			메이슨이 허락하자 당신은 수영장에서 나오고, <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다.
+		<<else>>
+			당신은 수영장에서 나온다.
+		<</if>>
+		<br><br>
+	<</if>>
+	<<if $exposed lte 0>>
+		<<destinationpoolchangingroom>>
+	<<elseif $exposed gte 1>>
+		<<destinationpoolchangingroom "towels">>
+	<</if>>
+<<else>>
+	<<set _mod to 0.2>>
+	<<if $exposed gte 1>>
+		<<set _mod to 1>>
+	<</if>>
+
+	<<if dangerEvent(_mod, 8900)>>
+		<<eventsswimming>>
+	<<else>>
+		<<eventsswimmingsafe>>
+	<</if>>
+<</if>>
+
+:: Swimming Lesson Naked Backstroke
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<water>><<waterbr 2>><<effects>>
+
+당신은 수업에 거의 집중하지 않고, 대신 배영을 연습하기로 한다.
+<<swimmingskilluse>>
+<br><br>
+당신이 완전히 알몸으로 등을 대고 수영하며, <<if playerBellyVisible()>>임신한 배<<if $player.penisExist and $player.vaginaExist>>,<<else>>【와과】<</if>><</if>> <<genitals>>【을를】 모두가 볼 수 있도록 공중에 드러내자 반 친구들이 숨을 헐떡인다.
+<<exhibitionism5>>
+
+메이슨은 당신의 활동 선택에 불쾌해하는 것 같다.
+<<if $player.penisExist>>
+	<<if $player.vaginaExist>>
+		<<peopley>> 중 일부는 당신의 독특한 생식기를 경외감에 차서 쳐다본다.
+	<<elseif $player.penissize lte 2>>
+		몇몇 여학생들은 그 광경에 킥킥거리고, 몇몇은 히죽 웃는다. <<incgpenisinsecurity>>
+	<<elseif $player.penissize is 6>>
+		몇몇 여학생들은 그 광경에 킥킥거리고, 몇몇 남학생들은 얼굴을 찌푸린다.
+		<<if random(1,5) gte 4>>
+			몇몇 남학생들은 다른 학생들보다 조금 더 오래 시선을 머문다.
+		<</if>>
+		<<incgpenisinsecurity>>
+	<<else>>
+		몇몇 학생들은 당신의 알몸에 시선을 조금 더 머물게 하고, 몇몇 여학생들은 그 광경에 약간 킥킥거린다.
+	<</if>>
+<<else>>
+	몇몇 남학생들은 그 광경에 킥킥거리고, 몇몇 여학생들은 얼굴을 찌푸린다.
+	<<if random(1,5) gte 4>>
+		몇몇 여학생들은 다른 학생들보다 조금 더 오래 시선을 머문다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<status 1>>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+<<set _trauma to _lesson_progress * -0.5>>
+<<trauma _trauma>>
+
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	<<if $swimall is 1>>
+		종이 울리며 수업 종료를 알린다. 당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>. 모두가 알몸임에도 불구하고 아무도 신경 쓰지 않는 것 같다. 메이슨은 지나가는 각 학생에게 수건을 나눠주며 눈을 마주치지 않으려 애쓴다.
+		<br><br>
+	<<elseif $exposed gte 1>>
+		종이 울리며 수업 종료를 알린다. 당신은 다른 학생들이 떠나기를 기다린다. 몇몇 학생들이 남아 있는데,
+		의심할 여지 없이 당신이 나올 때 좋은 구경을 하려는 속셈이다. 하지만 메이슨이 그들을 몰아내 당신에게 사적인 공간을 마련해 준다.
+		당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>.
+		<br><br>
+	<<elseif $exposed lte 0>>
+		종이 울리며 수업 종료를 알린다. 당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>.
+		<br><br>
+	<</if>>
+	<<if $exposed lte 0>>
+		<<destinationpoolchangingroom>>
+	<<elseif $exposed gte 1>>
+		<<destinationpoolchangingroom "towels">>
+	<</if>>
+<<else>>
+	<<set _mod to 0.1>>
+	<<if $exposed gte 1>>
+		<<set _mod to 0.5>>
+	<</if>>
+
+	<<if dangerEvent(_mod, 8900)>>
+		<<eventsswimming>>
+	<<else>>
+		<<eventsswimmingsafe>>
+	<</if>>
+<</if>>
+
+:: Swimming Lesson Socialise
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<water>><<waterbr 2>><<effects>>
+
+<<if $exposed gte 1 and $swimall isnot 1>>
+	당신은 수업에 거의 집중하지 않고, 대신 동료 학생들과 잡담을 나눈다. 몇몇은 당신이 말을 걸려고 할 때 수줍게 시선을 피하지만,
+	이따금 당신을 쳐다보는 것을 포착한다.
+	<br><br>
+<<elseif $exposed lte 0>>
+	당신은 수업에 거의 집중하지 않고, 대신 동료 학생들과 잡담을 나눈다.
+	<br><br>
+<</if>>
+
+<<status 1>>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+<<set _trauma to _lesson_progress * -0.5>>
+<<trauma _trauma>>
+
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	<<if $swimall is 1>>
+		종이 울리며 수업 종료를 알린다. 당신은 수영장에서 나온다. 모두가 알몸임에도 불구하고 아무도 신경 쓰지 않는 것 같다. 메이슨은 지나가는 각 학생에게 수건을 나눠주며 눈을 마주치지 않으려 애쓴다.
+		<br><br>
+	<<elseif $exposed gte 1>>
+		종이 울리며 수업 종료를 알린다. 당신은 다른 학생들이 떠나기를 기다린다. 몇몇 학생들이 남아 있는데,
+		의심할 여지 없이 당신이 나올 때 좋은 구경을 하려는 속셈이다. 하지만 메이슨이 그들을 몰아내 당신에게 사적인 공간을 마련해 준다.
+		당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>.
+		<br><br>
+	<<elseif $exposed lte 0>>
+		종이 울리며 수업 종료를 알린다. 당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>.
+		<br><br>
+	<</if>>
+	<<if $exposed lte 0>>
+		<<destinationpoolchangingroom>>
+	<<elseif $exposed gte 1>>
+		<<destinationpoolchangingroom "towels">>
+	<</if>>
+<<else>>
+	<<set _mod to 0.5>>
+	<<if $exposed gte 1>>
+		<<set _mod to 2>>
+	<</if>>
+
+	<<if dangerEvent(_mod, 8900)>>
+		<<eventsswimming>>
+	<<else>>
+		<<eventsswimmingsafe>>
+	<</if>>
+<</if>>
+
+:: Swimming Lesson Daydream
+<<set $outside to 0>><<set $location to "pool">><<schooleffects>><<water>><<waterbr 2>><<effects>>
+
+<<if $trauma gte (($traumamax / 10) * 7)>>
+	당신은 한 번의 잘못된 행동이 반 전체가 당신을 성추행하는 결과로 이어질까 두려워 조용히 있는다.
+<<elseif $trauma gte (($traumamax / 10) * 2)>>
+	당신은 스멀스멀 피어오르는 불안감을 억누르려 애쓰며 자신의 생각에 집중한다.
+<<else>>
+	<<if $swimall is 1>>
+		모두가 무방비한 상태지만, 당신은 수업에 그다지 집중하지 않고, 대신 한가롭게 물장구를 치며 당신의 <<lewdness>>【을를】 과시한다. 누가 신경이나 쓸지 궁금하다.
+	<<elseif $exposed gte 1>>
+		무방비한 상태지만 당신은 수업에 그다지 집중하지 않고, 대신 한가롭게 물장구를 치며 당신의 <<lewdness>>【을를】 가린다.
+	<<elseif $exposed lte 1>>
+		당신은 수업에 그다지 집중하지 않고, 대신 한가롭게 물장구를 치며 방과 후에 무엇을 할지 생각한다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<advancelesson>>
+<<set _stress to _lesson_progress * -1>>
+<<stress _stress>>
+<<set _trauma to _lesson_progress * -0.5>>
+<<trauma _trauma>>
+
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	<<if $swimall is 1>>
+		수업 종료를 알리는 종이 울립니다. 당신은 수영장에서 나옵니다<<if playerBellyVisible()>>. 메이슨이 허락하자, <<nnpc_he "Mason">>【은는】 당신을 돕기 위해 가까이 다가옵니다<</if>>. 모두가 알몸임에도 불구하고 아무도 신경 쓰지 않는 것 같다. 메이슨은 지나가는 각 학생에게 수건을 나눠주며 눈을 마주치지 않으려 애쓴다.
+		<br><br>
+	<<elseif $exposed gte 1>>
+		종이 울리며 수업 종료를 알린다. 당신은 다른 학생들이 떠나기를 기다린다. 몇몇 학생들이 남아 있는데,
+		의심할 여지 없이 당신이 나올 때 좋은 구경을 하려는 속셈이다. 하지만 메이슨이 그들을 몰아내 당신에게 사적인 공간을 마련해 준다.
+		당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>.
+		<br><br>
+	<<elseif $exposed lte 0>>
+		종이 울리며 수업 종료를 알린다. 당신은 수영장에서 나온다<<if playerBellyVisible()>>. 메이슨이 허락하자 <<nnpc_he "Mason">> 당신을 돕기 위해 가까이 붙어 있는다<</if>>.
+		<br><br>
+	<</if>>
+	<<if $exposed lte 0>>
+		<<destinationpoolchangingroom>>
+	<<elseif $exposed gte 1>>
+		<<destinationpoolchangingroom "towels">>
+	<</if>>
+<<else>>
+		<<set _mod to 0.1>>
+		<<if $exposed gte 1>>
+			<<set _mod to 0.5>>
+		<</if>>
+
+		<<if dangerEvent(_mod, 8900)>>
+			<<eventsswimming>>
+		<<else>>
+			<<eventsswimmingsafe>>
+		<</if>>
+<</if>>

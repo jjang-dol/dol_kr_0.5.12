@@ -1,0 +1,1380 @@
+:: Street Stalk Eden
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<violence 1>>
+	<<neutral 1>>
+
+	<<maninit>>
+	<<stalk_init>>
+	<<set $combatgoal to "confront">>
+	<<set $NPCList[0].bold to 10000>>
+<</if>>
+
+<<effects>>
+
+<<effectsman>><<man>>
+
+<<stateman>>
+<<actionsman>>
+
+<<if $stalk_end>>
+	<span id="next"><<link [[다음|Street Stalk Eden Finish]]>><<if $feetaction is "confront">><<set $phase to 1>><<else>><<set $phase to 0>><</if>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Street Stalk Eden]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Street Stalk Eden Finish
+<<set $outside to 1>><<set $location to "town">><<effects>>
+
+<<person1>>
+<<if $stalk_end is "confront">>
+	<<if $phase is 1>>
+		에덴이 당신의 팔을 잡는다. <<his>> 손아귀 힘이 고통스럽다. <<He>>【은는】 화가 난 것 같다.
+	<<else>>
+		<<if $stalk_assess>>
+			에덴이 당신의 팔을 고통스러울 정도로 꽉 잡은 채, <<he>>【은는】 당신을 돌려세워 <<him>>【을를】 마주 보게 한다. <<He>>【은는】 화가 난 것 같다.
+		<<else>>
+			당신은 빙글 돌아, 거대한 인물과 마주하게 된다. 에덴이다. <<He>>【은는】 화가 난 것 같다.
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<endcombat>>
+	<<npc Eden>><<person1>>
+
+	<<if $edenCagedEscape>>
+		"다시 찾을 거라고 했지?" <<he>>【이가】 으르렁거리며 당신을 가까이 끌어당긴다. "아직 네 분수를 모르는 것 같군. 이리 와."
+	<<else>>
+		"씨발 어디 갔었어?" <<he>>【이가】 으르렁거리며 당신을 가까이 끌어당긴다.
+		<<if $allure gte (3000 * $settings.allureModifier)>>
+			"난 걱정돼 죽는 줄 알았는데, 넌 헤픈 년처럼 마을을 돌아다니고 있었어!"
+		<<else>>
+			"난 걱정돼 죽는 줄 알았는데, 넌 그냥 마을을 돌아다니고 있었어!"
+		<</if>>
+		<<if C.npc.Eden.love gte 70>>
+			<<set C.npc.Eden.love to 70>>
+			<<llllove>>
+		<</if>>
+		<br><br>
+
+		말을 꺼내기도 전에 에덴은 당신을 끌고 가기 시작한다. "변명도 듣고 싶지 않아." <<He>>【은는】 불편한 듯, 걸으면서 시선을 이리저리 굴린다. <<His>> 입술 한쪽이 혐오스럽게 일그러진다. "게다가 날 여기까지 나오게 만들었지. 집에 가면 곱게 끝나진 않을 거다."
+	<</if>>
+	<br><br>
+
+	<<link [[싸운다|Eden Caged Caught Resist]]>><<set $fightstart to 1>><<def 1>><</link>>
+	<br>
+	<<link [[떨쳐내려 한다|Eden Caged Caught Pull]]>><<def 1>><<npcincr Eden dom -1>><</link>><<physiquedifficulty 2000 18000>><<ldom>>
+	<br>
+	<<link [[얌전히 따른다 (0:30)|Eden Caged Caught]]>><<set $phase to 1>><<pass 30>><<sub 1>><<npcincr Eden dom 1>><</link>><<gdom>>
+	<br>
+<<elseif $stalk_end is "hide">>
+	당신은 숨어 있던 곳에서 나온다. <<if $stalk_assess>>에덴은<<else>>당신을 따라오던 누군가는<</if>> 어디에도 보이지 않는다. <<tearful>> 당신은 다시 길을 간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<destinationeventend>>
+<<elseif $stalk_end is "ambush">>
+	<<if $stalk_assess>>
+		당신은 이렇게 <<him>>【을를】 제압할 수 있었다는 사실에 놀랐고, <<hes>> 또한 못지않게 놀랐다.
+	<<else>>
+		당신은 어색하게 에덴의 가슴 위에 엎드린 채, 다음에 뭘 해야 할지 머릿속을 바쁘게 굴린다.
+	<</if>>
+	<<His>> 눈이 뜨인다.
+	<br><br>
+
+	<<silently>><<endcombat>><</silently>>
+	<<npc Eden>><<person1>>
+
+	<<link [[싸운다|Eden Caged Caught Resist]]>><<set $fightstart to 1>><<def 1>><<npcincr Eden dom -1>><</link>><<ldom>>
+	<br>
+	<<link [[달아난다|Eden Stalk Ambush]]>><<def 1>><<npcincr Eden dom -1>><</link>><<ldom>>
+	<br>
+	<<if $syndromeeden is 1>>
+		<<link [[에덴에게 키스하고 달아난다|Eden Stalk Ambush]]>><<set $phase to 1>><<npcincr Eden love 1>><<npcincr Eden dom -1>><</link>><<glove>><<ldom>><<kissvirginitywarning>>
+		<br>
+	<</if>>
+<<else>>
+	<<if $stalk_assess>>에덴의<<else>>익숙한<</if>> 목소리가 <<if Time.dayState is "night">>어둠<<else>>인파<</if>> 속으로 달아나는 당신의 뒤를 향해 외치지만, 당신은 계속 달린다. 마침내 그 목소리도 멀리 사라진다. <<tearful>> 당신은 속도를 늦춰 걷기 시작하고, 다시 길을 간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<destinationeventend>>
+<</if>>
+
+:: Eden Stalk Ambush
+<<effects>>
+
+<<if $phase is 1>>
+	<<he>>【이가】 정신을 차리기 전에, 당신은 에덴의 입술에 바로 키스한다. <<takeKissVirginity "Eden" "romantic">>
+	<br><br>
+<</if>>
+
+당신은 <<him>>에게서 몸을 떼어내고 달아난다. <<if Time.dayState is "night">>어둠<<else>>인파<</if>> 속으로 도망치는 당신의 등 뒤로 <<his>> 목소리가 들려오지만, 계속 달린다. 마침내 목소리가 멀리 사라진다. <<tearful>> 걸음을 늦추고, 가던 길을 계속 간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<destinationeventend>>
+
+:: Eden Caged Caught Pull
+<<effects>>
+
+에덴이 당신에게 무슨 짓을 할지 두려워, 당신은 세게 잡아당긴다.
+<<if $physiqueSuccess>><<set $edenCagedEscape to true>>
+	<<He>>【은는】 저항하며, 경고하는 눈빛으로 당신을 돌아본다. 몇 번의 실랑이 끝에, <span class="green">당신이 빠져나와 전력으로 도망칠 수 있을 만큼 <<his>> 손아귀 힘이 풀린다.</span> 팔이 따끔거리지만, 당신은 그 감각을 무시한다.<<pain 2>><<gpain>>
+	<br><br>
+
+	에덴이 몇 분 동안 당신의 바로 뒤까지 바싹 추격해온다. <<He>>【은는】 당신이 앞서나가자 소리친다. <<his>> 분노가 역력하다.
+	<br><br>
+
+	몇 분 후, <<his>> 목소리는 점점 희미해지더니 완전히 사라진다.
+	<br><br>
+
+	<<if $location is "forest">>
+		당신은 위기에서 벗어났지만, 에덴이 이미 당신을 추적하고 있다는 것을 안다. <span class="red">무언가가 당신을 사냥하고 있다.</span>
+		<<set $foresthunt to 1>>
+		<<set $forestHunter to "Eden">>
+		<br><br>
+
+		<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<endevent>>
+		<<destinationeventend>>
+	<</if>>
+<<else>>
+	<<His>> 손아귀 힘은 여전히 뼈를 으스러뜨릴 듯하다. <span class="red">뿌리칠 수 없다.</span> 에덴은 당신을 붙잡은 <<his>> 손에 힘을 더 주며 조용히 당신을 노려본다.<<pain 4>><<gpain>>
+	<br><br>
+
+	<<link [[싸운다|Eden Caged Caught Resist]]>><<set $fightstart to 1>><<def 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Eden Caged Caught]]>><<set $phase to 0>><<pass 30>><<stress 6>><<sub 1>><<npcincr Eden dom 1>><</link>><<gstress>><<gdom>>
+	<br>
+<</if>>
+
+:: Forest Eden Rage
+<<set $outside to 1>><<set $location to "forest">><<effects>>
+
+<<if $phase is 1>>
+	에덴의 말이 맞다. 너무 오랫동안 떠나 있었다. 어차피 벗어날 수도 없을 것이다.
+	<br><br>
+
+	<<He>>【은는】 붙잡은 손을 풀지 않았지만, 숲을 헤쳐나가는 동안 당신을 다루는 손길은 조금 누그러뜨린다.
+<<else>>
+	에덴이 당신에게 무슨 짓을 할지 두려워, 당신은 힘껏 몸을 비튼다.
+	<<if $physiqueSuccess>>
+		<<He>>【은는】 경고의 눈빛으로 당신을 돌아보며 저항한다. 몇 번의 실랑이 끝에, <span class="green">마침내 <<his>> 손아귀가 느슨해진 틈을 타 빠져나와 전력으로 달아나기 시작한다.</span> 팔이 따끔거리지만, 그 감각을 무시하고 나아간다.<<pain 2>><<gpain>>
+		<br><br>
+
+		에덴이 추격해오고, 몇 분 동안 바로 뒤까지 쫓아온다. 당신이 앞서나가자 <<He>>【은는】 당신을 부르는데, <<his>> 분노가 역력하다.
+		<br><br>
+
+		몇 분 후, <<his>> 목소리가 점점 멀어지더니 완전히 사라진다.
+		<br>
+		위기에서 벗어났지만, 에덴이 이미 당신을 추적하고 있다는 것을 안다. <span class="red">무언가가 당신을 사냥하고 있다.</span>
+		<<set $foresthunt to 1>>
+		<<set $forestHunter to "Eden">>
+		<<set $edenCagedEscape to true>>
+	<<else>>
+		<<His>> 손아귀 힘은 거의 뼈를 으스러뜨릴 정도다. <span class="red">뿌리칠 수 없다.</span> 에덴은 당신을 더 가까이 끌어당기며 말없이 노려본다.
+		<br><br>
+
+		<<He>>【은는】 당신을 오두막으로 끌고 간다. 당신은 도와달라고 소리치지만, 아무도 대답하지 않는다.<<trauma 3>><<gtrauma>>
+		<<set $phase to 1>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $phase is 1>>
+	<<set $outside to 0>><<set $location to "cabin">>
+	당신은 오두막으로 끌려 들어간다. 에덴이 등 뒤에서 문을 쾅 닫는다. 모든 것이 당신이 떠났을 때와 같다. 잠자는 공간 근처의 우리만 빼고.
+	<br><br>
+
+	<<link [[저항한다|Eden Caged Intro]]>><<set $phase to 0>><<def 1>><<npcincr Eden dom -1>><</link>><<physiquedifficulty 2000 18000>><<ldom>>
+	<br>
+	<<link [[굴복한다|Eden Caged Intro]]>><<set $phase to 1>><<sub 1>><<stress 6>><<npcincr Eden dom 1>><</link>><<gstress>><<gdom>>
+	<br>
+<<else>>
+	<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged Caught Resist
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+
+	<<neutral 1>>
+
+	<<maninit>>
+	<<npcidlegenitals>>
+
+	<<set $enemytrust -= 100>>
+	<<set $enemyhealth to 600>>
+	<<set $enemyhealthmax to 600>>
+	<<if $stalk_end is "ambush">>
+		<<set $enemyhealth -= 150>>
+	<</if>>
+	<<set $enemyanger += 200>>
+	<<if $settings.asphyxiaLevel gte 3>>
+		<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1>>
+			<<set $enemyanger += 50>><<set $enemyhealth -= 20>>
+			에덴이 당신의 목을 조르려고 <<his>> 손을 들어 올린다. <span class="blue">당신 목의 개목걸이가 힘으로 진동한다.</span> <<He>>【은는】 욕설과 함께 <<his>> 손을 홱 뗀다. <span class="red">대신 <<He>>【은는】 당신의 뺨을 때린다.</span>
+			<br><br>
+
+			"네 분수를 다시 깨닫게 해 주지." <<he>>【이가】 말한다. <<violence 3>>
+		<<else>>
+			<<set $NPCList[0].righthand to "throat">><<set $NPCList[0].lefthand to "throat">><<set $neckuse to "hand">>
+			"이러고 싶지 않아." 에덴이 당신의 목으로 <<his>> 손을 옮기며 말한다. <span class="red">목이 졸리고 있다!</span>
+		<</if>>
+	<<else>>
+		<span class="red">에덴이 당신의 뺨을 때린다.</span> "스스로 일을 더 어렵게 만들 뿐이야." <<he>>【이가】 으르렁거린다.
+		<<violence 6>>
+	<</if>>
+	<<forestRescueSetup>>
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+
+<<if $location is "forest">>
+	<<forestRescueCheck "Eden">>
+<</if>>
+
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or $pain gte 100 and $willpowerpain is 0>>
+	<span id="next"><<link [[다음|Eden Caged Caught Resist Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Caged Caught Resist]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Caged Caught Resist Finish
+<<set $outside to 1>><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>><<if $foresthunt gte 1>><<set $foresthunt to 0>><</if>>
+	<<ejaculation "short">>
+	에덴이 근처의 <<if $location is "forest">>나무<<else>>가로등<</if>>에 쓰러진다.
+	<br><br>
+
+	<<tearful>> 당신은 기회를 포착하고 <<if $location is "forest">>숲<<else>>거리<</if>> 속으로 도망친다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<set $edenCagedEscape to true>>
+
+	<<if $location is "forest">>
+		<<link [[다음|Forest]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<destinationeventend>>
+	<</if>>
+<<elseif $enemyhealth lte 0>><<if $foresthunt gte 1>><<set $foresthunt to 0>><</if>>
+	에덴이 근처의 <<if $location is "forest">>나무<<else>>가로등<</if>>에 쓰러진다.
+	<br><br>
+
+	<<tearful>> 당신은 기회를 포착하고 <<if $location is "forest">>숲<<else>>거리<</if>> 속으로 도망친다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<set $edenCagedEscape to true>>
+
+	<<if $location is "forest">>
+		<<link [[다음|Forest]]>><<set $eventskip to 1>><</link>>
+		<br>
+	<<else>>
+		<<destinationeventend>>
+	<</if>>
+<<elseif $rescue is 1 and $location is "forest">>
+	<<forestRescue>>
+<<else>>
+	당신은 땅에 쓰러진다. 너무 다쳐서 계속할 수 없다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<npc Eden>><<person1>>
+
+	<<link [[다음|Eden Caged Caught]]>><<set $phase to 0>><<pass 30>><</link>>
+<</if>>
+
+:: Eden Caged Caught
+<<set $outside to 1>><<effects>>
+
+<<if $phase is 1>>
+	에덴의 말이 맞다. 너무 오랫동안 떠나 있었다. 어차피 벗어날 수도 없을 것이다.
+	<br><br>
+
+	<<if $location is "forest">>
+		<<He>>【은는】 붙잡은 손을 풀지 않았지만, 숲을 헤쳐나가는 동안 당신을 다루는 손길은 조금 누그러뜨린다.
+	<<else>>
+		<<He>>【은는】 당신을 숲 쪽으로 이끈다. 대부분의 사람들은 당신을 무시한다. <<his>> 빠른 걸음을 따라가기가 벅차다.
+	<</if>>
+	<br><br>
+
+	당신은 오두막으로 끌려 들어간다. 에덴이 등 뒤에서 문을 쾅 닫는다. 모든 것이 당신이 떠났을 때와 같다. 잠자는 공간 근처의 우리만 빼고.
+	<br><br>
+<<else>>
+	<<if $location is "forest">>
+		에덴이 당신의 손목을 거칠게 잡아끌어, 집으로 향하는 <<him>> 뒤를 비틀거리며 따라가게 만든다.
+	<<else>>
+		에덴이 숲으로 당신을 이끄는 동안, <<his>> 손아귀 힘은 거의 뼈를 으스러뜨릴 정도다. 당신이 지나갈 때 사람들이 쳐다보지만, 도와달라는 당신의 외침에도 불구하고 아무도 끼어들지 않는다.<<trauma 3>><<gtrauma>>
+		<br><br>
+
+		마을 외곽을 벗어났음에도, 에덴은 숲 속으로 당신을 끌고 가면서 긴장을 풀지 않는다. 문명의 소음은 점차 자연의 죽음 같은 침묵에 자리를 내준다.
+	<</if>>
+	<br><br>
+
+	오두막의 평소 익숙함과 편안함은 뱃속에서부터 차오르는 불길한 예감에 의해 깨진다. 구석에 있는 우리를 보자 당신의 공포는 더욱 커진다.
+<</if>>
+<<set $outside to 0>><<set $location to "cabin">>
+<br><br>
+
+<<link [[저항한다|Eden Caged Intro]]>><<set $phase to 0>><<def 1>><<npcincr Eden dom -1>><</link>><<physiquedifficulty 2000 18000>><<ldom>>
+<br>
+<<link [[굴복한다|Eden Caged Intro]]>><<set $phase to 1>><<sub 1>><<stress 6>><<npcincr Eden dom 1>><</link>><<gstress>><<gdom>>
+<br>
+
+:: Eden Robin Caged Caught
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+<<npc Eden>><<person1>>
+
+<<he>>【이가】 당신을 안고 숲을 지나는 동안, <<he>>【은는】 붙잡은 손을 풀지 않는다. 오두막으로 끌려 들어갈 때도 당신을 다루는 손길은 조금도 누그러지지 않는다. <<He>>【은는】 당신을 바닥에 아무렇게나 내려놓는다.
+<br><br>
+에덴이 <<him>> 등 뒤로 문을 쾅 닫는다. 오두막의 익숙하고 편안한 분위기는 뱃속에서부터 차오르는 불길한 예감에 깨진다. 구석에 있는 우리를 보자 공포는 더욱 커진다.
+<br><br>
+
+<<link [[다음|Eden Caged Intro]]>><<set $phase to 2>><</link>>
+<br>
+
+:: Eden Caged Intro
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 1>>
+	다음에 일어날 일이 유쾌하지 않을 것이 분명함에도, 당신은 굴복한다.
+	<br><br>
+
+	"오, 이제야 얌전해지시겠다?" 에덴이 뱉어낸다. "타이밍 한번 좆같게 좋네, 안 그래? 좆도 빠져나갈 구멍 없을 때나 착한 척하는 거 말이야."
+	<br><br>
+<<elseif $phase is 0>>
+	<<if $physiqueSuccess>>
+		곧 닥쳐올 벌을 알기에, 당신은 바닥에 발뒤꿈치를 박고 버틴다. 집에 돌아왔다는 생각에 자신감이 붙은 에덴은 <<his>> 손아귀 힘을 조금 풀고 있었고, 그 틈에 몸을 빼낼 수 있었다.
+		<br><br>
+
+		<<he>>【이가】 몸을 돌려 덤벼들기 전에, 당신은 문으로 달려가 거의 경첩에서 뜯어낼 기세로 열고 숲으로 다시 뛰쳐나간다. 에덴이 바로 뒤에서 쫓아오며, 무거운 발소리가 땅을 울린다.
+		<br><br>
+
+		나무 사이를 재빨리 헤치며 에덴의 시야에서 벗어나는 데 성공하고, 몇 분 후 <<him>>【을를】 완전히 따돌린다.<<pass 10>>
+		<br><br>
+
+		"씨발, 또 잡아내고 말 거야! 언제나 그랬듯이!" 에덴이 뒤에서 소리친다. 당신은 아랑곳하지 않고 폐가 타들어 갈 때까지 달린다. 결국, 더는 갈 수 없어 멈춰 선다.<<stress 6>><<tiredness 3>><<gstress>><<gtiredness>>
+		<br>
+		혼자임에도 불구하고, 익숙한 한기가 등골을 타고 흐른다. <span class="red">무언가가 당신을 사냥하고 있다.</span>
+		<<set $edenCagedEscape to true>>
+		<<set $forestHunter to "Eden">>
+		<<set $foresthunt to 1>>
+		<br><br>
+	<<else>>
+		곧 닥쳐올 벌을 알기에, 당신은 바닥에 발뒤꿈치를 박고 버틴다. 당신의 반항에 지친 에덴이 돌아서서 당신의 뺨을 후려친다. <<pain 4>><<gpain>>
+		<br><br>
+
+		"네가 애새끼처럼 구는 건 이제 지긋지긋해. 네 의무를 다시 상기시켜 줘야겠군." <<he>>【이가】 으르렁거린다.
+		<<set $phase to 1>>
+		<br><br>
+	<</if>>
+<</if>>
+
+<<if $phase gte 1>>
+	뒷덜미를 잡힌 채, <<nnpc_title "Eden">>에게 옷을 벗겨지고 우리 안으로 억지로 밀어 넣어진다. 무거운 자물쇠가 문을 잠근다.
+	<<ruined>>
+	<br><br>
+
+	"얌전히 굴면 그때 꺼내주지." 에덴이 경고한다. <<He>>【은는】 당신을 혼자 남겨두고
+	<<if Time.hour lte 6>>/* bedtime */
+		침대로 터벅터벅 걸어간다. <<He>>【은는】 곧 깊이 잠든다.
+	<<elseif Time.hour lte 8>>/* breakfast */
+		아침을 준비하러 부엌으로 성큼성큼 걸어간다.
+	<<elseif Time.hour lte 16>>/* out hunting */
+		밖으로 뛰쳐나간다.
+	<<elseif Time.hour lte 18>>/* bathtime */
+		목욕물을 받으러 자리를 뜬다.
+	<<elseif Time.hour lte 22>>/* dinnertime */
+		저녁을 준비하러 부엌으로 성큼성큼 걸어간다.
+	<<else>>/* bedtime */
+		침대로 터벅터벅 걸어간다. <<He>>【은는】 곧 깊이 잠든다.
+	<</if>>
+	<<unset $edenCagedEscape>>
+	<<unset $edenescape>>
+	<<set C.npc.Eden.trust to 0>>
+	<<set $edenCaged to {}>>
+	<<set $edenCaged.escape to 0>>
+	<<set $edenCaged.days to 0>>
+	<br><br>
+
+	<<link [[다음|Eden Caged]]>><<set $phase to 0>><</link>>
+	<br>
+<<else>>
+	<<set $forest to random(50, 75)>>
+	<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+당신은 에덴의 오두막에 있는 우리 안에 갇혔다. 안은 비좁아서 똑바로 서는 것이 불가능하다. 바닥에는 털 담요가 깔려 있다.
+<br><br>
+
+<<if Time.hour lte 6>>/* bedtime */
+	<<if $phase is 2>>
+		불편한 자세에도 불구하고, 당신은 담요 더미 위에서 몸을 웅크리고 눈을 감는다. 이내 잠이 든다.
+	<<elseif $phase is 1>>
+		에덴이 평화롭게 코를 고는 동안, 당신은 다시 발로 찰 자세를 잡는다.
+		<<if $edenCaged.escape gte 9>>
+			우리 전체가 당신 주위에서 덜컹거린다. <span class="green">반복된 발길질에 문이 버티지 못하고 헐거워지는 것이 느껴진다.</span> 잠결에 <<he>>【이가】 움찔하고, 당신은 잠시 <<he>>【이가】 깰까 봐 두려워한다. <<he>>【이가】 다시 코를 고는 소리를 듣고 안도의 한숨을 내쉰다.<<stress 2>><<gstress>>
+			<br><br>
+
+			<span class="blue">문이 충분히 헐거워져서 한 번만 더 제대로 걷어차면 풀려날 수 있다. 하지만 에덴이 다른 데 정신이 팔릴 때까지 기다려야 한다.</span>
+			<br><br>
+
+			할 수 있는 건 다 했으니, 당신은 옆으로 누워 잠을 청한다.
+		<<else>>
+			하지만 한 번 걷어차자마자 당신은 얼어붙는다. 생각보다 소리가 훨씬 컸다. 털 매트리스 위에서 <<nnpc_title "Eden">>【이가】 잠시 뒤척이다가 다시 잠잠해진다.
+			<br><br>
+
+			너무 위험하다. 에덴의 주의가 다른 곳에 쏠렸을 때 다시 시도해야 한다.
+			<br><br>
+
+			패배감에 한숨을 쉬며, 당신은 옆으로 누워 잠을 청한다.<<stress 6>><<gstress>>
+		<</if>>
+	<<else>>
+		에덴의 코 고는 소리만이 당신의 유일한 친구인 채로, 당신은 무엇을 해야 할지 고민한다.
+	<</if>>
+	<br><br>
+
+	<<if $phase gte 1>>
+		<<link [[잠자기|Eden Caged]]>><<set $phase to 1>><<cabintime>><<set $edenCaged.days += 1>><</link>><<ltiredness>>
+		<br>
+	<<else>>
+		<<if $edenCaged.escape gte 9>>
+			<span class="purple">문은 헐거워졌지만, 에덴이 너무 가까이 있어서 멀리 가지는 못할 것이다.</span> <<he>>【이가】 다른 데 정신이 팔릴 때까지 기다려야 한다.
+			<br>
+		<<else>>
+			<<link [[탈출 시도하기|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><</link>>
+		<</if>>
+		<br>
+		<<link [[밤새 잠자기|Eden Caged]]>><<set $phase to 2>><</link>>
+		<br>
+	<</if>>
+<<elseif Time.hour lte 8>>/* breakfast */
+	<<if C.npc.Eden.trust gte 100 or $edenCaged.days gte 5>>
+		우리 문이 삐걱거리며 열리는 소리에 당신은 잠에서 깬다. 에덴이 열린 문 앞에 웅크리고 있다. "이리 와. 벌은 끝났어."
+		<br><br>
+
+		당신이 기어 나오자 <<He>>【은는】 옆으로 비켜서서, 당신이 일어서서 기지개를 켜는 것을 지켜본다. 멀리 가기 전에, <<nnpc_title "Eden">>【이가】 당신의 턱을 붙잡고 <<his>> 눈을 똑바로 보도록 고개를 돌린다.
+		<br><br>
+
+		"이제부터 얌전히 구는 게 좋을 거야. 이건 내가 친절을 베푼 거니까." <<he>>【이가】 손을 놓자 <<his>> 얼굴은 근엄하다. 당신은 홀로 서서 경고의 말을 곱씹는다.
+		<br>
+		<i><span class="gold">에덴이 당신을 용서했습니다, 일단은.</span>
+		<<if $edenfreedom gte 1>>
+			<<unset $edenfreedom>>
+			<<he>>【이가】 당신을 다시 오두막 밖으로 내보내주기 전에, <<his>> 신뢰를 되찾아야 할지도 모른다.
+		<</if>>
+		</i>
+		<br><br>
+
+		<<link [[다음|Eden Cabin]]>><<unset $edenCaged>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<if $phase gte 1>>
+			아침 식사 냄새에 잠에서 깬다. 당신이 일어나 졸린 눈을 비비자, 우리 전체가 덜컹거린다. 우리 바로 앞에 앉아 있는 에덴이 당신을 맞이한다. <<his>> 무릎 위에는 달걀 접시가 놓여 있다.
+			<br>
+			"좋은 아침. 솔직히, 네가 이걸 요리했으면 좋겠는데. 아직 널 충분히 믿지 못해서 말이야."
+		<<else>>
+			에덴이 부엌에서 달걀 접시와 의자를 들고 돌아온다. <<He>>【은는】 우리 바로 앞에 자리를 잡고 앉는다.
+			<br>
+			"솔직히, 네가 이걸 요리했으면 좋겠는데. 아직 널 충분히 믿지 못해서 말이야."
+		<</if>>
+		<br><br>
+
+		<<He>>【은는】 당신을 무시한 채, 느리고 과장된 몸짓으로 음식을 씹으며 식사한다. 당신은 <<he>>【이가】 늘 먹던 방식대로 조리된 계란을 쳐다본다. 배에서 꼬르륵 소리가 난다.
+		<br><br>
+
+		에덴이 식기를 내려놓았을 때 음식은 약간 남아있었고, 그제야 <<he>>【은는】 당신을 쳐다본다. "배고픈가?"
+		<br><br>
+
+		<<He>>【은는】 접시를 내려놓고 우리를 연다. 당신이 음식을 향해 손을 뻗자, <<he>>【은는】 당신의 손목을 꽉 붙잡는다. "손은 쓰지 마. 입만 사용해."
+		<br><br>
+
+		<<link [[시키는 대로 한다|Eden Caged Breakfast]]>><<set $phase to 1>><<sub 1>><<npcincr Eden trust 5>><<npcincr Eden dom 1>><</link>><<gtrust>><<gdom>>
+		<br>
+		<<link [[먹기를 거부한다|Eden Caged Breakfast]]>><<set $phase to 0>><<def 1>><<npcincr Eden trust -5>><<npcincr Eden dom -1>><</link>><<ltrust>><<ldom>>
+		<br>
+	<</if>>
+<<elseif Time.hour lte 16>>/* out hunting */
+	에덴이 밖에 나가자, 당신은 우리 안에 홀로 남겨진다. 몸을 제대로 펼 수도 없는 답답한 자세로는 <<he>>【이가】 얼마나 멀리 있는지, 혹은 오두막에 있기는 한 건지 알 수 없다.
+	<br><br>
+
+	<<switch Time.hour>>
+		<<case 9>>
+			<<set _edenCagedPass to 8>>
+		<<case 10>>
+			<<set _edenCagedPass to 7>>
+		<<case 11>>
+			<<set _edenCagedPass to 6>>
+		<<case 12>>
+			<<set _edenCagedPass to 5>>
+		<<case 13>>
+			<<set _edenCagedPass to 4>>
+		<<case 14>>
+			<<set _edenCagedPass to 3>>
+		<<case 15>>
+			<<set _edenCagedPass to 2>>
+		<<default>>
+			<<set _edenCagedPass to 1>>
+	<</switch>>
+
+	<<capture _edenCagedPass>>
+		<<if $edenCaged.escape gte 9>>
+			<span class="purple">문이 헐거워졌지만, 에덴이 이렇게 가까이 있어서는 멀리 가지 못할 것이다.</span> <<he>>【은는】 다른 데 정신이 팔릴 때까지 기다려야 한다.
+			<br>
+		<<else>>
+			<<link [[탈출을 시도한다|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass _edenCagedPass hours>><</link>>
+		<</if>>
+		<br>
+		<<link [[휴식한다|Eden Caged]]>><<set $phase to 2>><<pass _edenCagedPass hours>><</link>>
+		<br>
+	<</capture>>
+<<elseif Time.hour lte 18>>/* bathtime */
+	<<if $phase is 2>>
+		<<if random(1)>>
+			오직 당신의 생각만이 친구이자 오락거리로 남은 채, 당신은 드러누워 시간이 흐르는 동안 공상에 잠긴다.
+		<<else>>
+			하루의 스트레스로 지친 당신은 최대한 편안하게 몸을 웅크리고 눈을 감는다. 몇 분 후, 당신은 불안한 잠에 빠져든다.
+		<</if>>
+	<<elseif $phase is 1>>
+		혼자 있는 시간을 유리하게 활용하여, 당신은 발로 경첩을 집중적으로 걷어찬다. 처음 몇 번의 발길질에는 에덴이 들어오지 않는다. 지금으로선 <<He>>【은는】 당신의 소리를 들을 수 없다.
+		<br><br>
+
+		<<if $edenCaged.escape gte 9>>
+			우리 전체가 당신 주위에서 덜컹거린다. <span class="green">반복적인 공격에 문이 무너져 내리는 것이 느껴진다.</span> 밖에서 에덴이 장작을 패는 소리가 갑자기 멈추고, 당신은 잠시 <<he>>【이가】 조사하러 올까 봐 두려워한다. <<his>> 도끼가 내려쳐지는 소리에 당신은 안도의 한숨을 내쉰다.<<stress 2>><<gstress>>
+			<br><br>
+
+			<span class="blue">문이 충분히 헐거워져서 한 번만 더 제대로 걷어차면 풀려날 수 있다. 하지만 에덴이 다른 데 정신이 팔릴 때까지 기다려야 한다.</span>
+		<<else>>
+			여러 번 걷어차자,
+			<<if $edenCaged.escape gte 5>>
+				문이 헐거워지긴 했지만, 당신의 공격에도 충분히 버티고 있다.
+			<<else>>
+				문이 약간 휘는 게 보인다.
+			<</if>>
+			밖에서 에덴이 일하는 소리가 들리자 더 밀어붙이기가 망설여진다.
+		<</if>>
+	<<else>>
+		당신에게 혼자 있을 시간은 많이 주어지지 않는다. <<he>>【이가】 떠나자마자, 에덴이 반쯤 옷을 벗은 채로 욕실에서 돌아온다.
+	<</if>>
+	<br><br>
+
+	<<if $edenCaged.days gte 1>>
+		에덴이 소매로 <<his>> 이마의 땀을 닦으며 돌아온다. <<He>>【은는】 당신의 우리로 곧장 향한다. "다시 네 의무를 할 시간이다."
+	<<else>>
+		<<if $phase is 2>>
+			얼마 후, 자물쇠가 풀리고 문이 열리는 소리에 에덴이 당신을 깨운다.
+		<<elseif $phase is 1>>
+			오두막 문이 활짝 열린다. 에덴이 우리로 성큼성큼 다가와 자물쇠를 푼다.
+		<</if>>
+		"네가 이행해야 할 의무가 있다."
+		<<He>> <<npcUndressText `C.npc.Eden` "lower" "self">>.
+	<</if>>
+	<br><br>
+
+	<<link [[저항한다|Eden Caged Sex]]>><<set $molestationstart to 1>><<def 1>><<npcincr Eden trust -10>><<npcincr Eden dom -1>><</link>><<ltrust>><<ldom>>
+	<br>
+	<<link [[순순히 따른다|Eden Caged Sex]]>><<set $sexstart to 1>><<sub 1>><<npcincr Eden trust 10>><<npcincr Eden dom 1>><</link>><<gtrust>><<gdom>>
+	<br>
+<<elseif Time.hour lte 22>>/* dinnertime */
+	<<if $phase is 2>>
+		우리 안에서 할 일이 없어 체념한 채, 당신은 잠을 청하기로 한다. 잠에서 깨어나니, 불편한 자세로 있었던 탓에 옆구리가 아프다.
+		<br><br>
+
+		에덴이 저녁을 준비하는 소리에 잠에서 깬다. <<He>>【은는】 당신에게 아무것도 주지 않고, 그 후에는 독서를 하며 당신을 무시한다.
+	<<elseif $phase is 1>>
+		흐르는 물소리를 이용해 당신의 몸부림을 위장하며, 당신은 등을 대고 누워 우리 문을 걷어찬다.
+		<br><br>
+
+		<<if $edenCaged.escape gte 9>>
+			우리 전체가 당신 주위에서 덜컹거린다. <span class="green">반복된 발길질에 문이 버티지 못하고 헐거워지는 것이 느껴진다.</span> 에덴이 확인하러 욕실에서 성큼성큼 걸어 나오자 젖은 발소리가 다가온다. <<He>>【은는】 몸을 수건으로 가릴 생각도 하지 않는다.
+			<br>
+			"방금 그 소리는 뭐지?" <<he>>【이가】 묻는다. 당신은 순진한 척 어깨를 으쓱한다. <<He>>【은는】 당신을 샅샅이 훑어보더니, 다시 욕실로 돌아간다. 안도의 한숨이 새어 나온다.<<stress 2>><<gstress>>
+			<br><br>
+
+			<span class="blue">문이 충분히 헐거워져서 한 번만 더 제대로 걷어차면 풀려날 수 있다. 하지만 에덴이 다른 데 정신이 팔릴 때까지 기다려야 한다.</span>
+		<<elseif $edenCaged.escape gte 5>>
+			손상이 더 생겼지만, 풀려나기에는 충분하지 않다. 당신은 에덴이 눈치채지 않기를 바란다.
+		<<else>>
+			당신은 겨우 흠집만 낼 뿐이다. 아픈 다리 때문에 제대로 된 손상을 입히기도 전에 멈출 수밖에 없다.
+		<</if>>
+		<br><br>
+
+		목욕을 마친 뒤, 에덴은 늘 앉던 자리에 앉아 책을 읽으며, 식사할 때도 당신에게 아무것도 주지 않고 완전히 무시한다.
+	<<else>>
+		에덴은 조용히 저녁을 먹는다. <<He>>【은는】 당신에게 아무것도 권하지 않고, 그 후에는 독서를 하며 당신을 무시한다.
+	<</if>>
+	<br><br>
+
+	<<link [[밖에 나가게 해달라고 부탁한다|Eden Caged Evening]]>><<set $phase to 1>><</link>>
+	<br>
+	<<link [[조용히 있기|Eden Caged Evening]]>><<npcincr Eden trust 5>><<set $phase to 0>><</link>><<gtrust>>
+	<br>
+<<else>>/* bedtime */
+	<<if $phase is 2>>
+		불편한 자세에도 불구하고, 당신은 여러 겹의 담요 위에 몸을 웅크리고 눈을 감는다. 곧, 당신은 잠에 빠져든다.
+	<<elseif $phase is 1>>
+		에덴이 평화롭게 코를 고는 동안, 당신은 자세를 잡고 온 힘을 다해 걷어찬다.
+		<<if $edenCaged.escape gte 9>>
+			우리 전체가 당신 주위에서 덜컹거린다. <span class="green">반복된 발길질에 문이 버티지 못하고 헐거워지는 것이 느껴진다.</span> 잠결에 <<he>>【이가】 움찔하고, 당신은 잠시 <<he>>【이가】 깰까 봐 두려워한다. <<he>>【이가】 다시 코를 고는 소리를 듣고 안도의 한숨을 내쉰다.<<stress 2>><<gstress>>
+			<br><br>
+
+			<span class="blue">문이 충분히 헐거워져서 한 번만 더 제대로 걷어차면 풀려날 수 있다. 하지만 에덴이 다른 데 정신이 팔릴 때까지 기다려야 한다.</span>
+			<br><br>
+
+			할 수 있는 모든 것을 다 한 당신은, 옆으로 누워 잠을 청하려 애쓴다.
+		<<else>>
+			하지만 한 번 걷어차자마자, 당신은 얼어붙는다. 예상했던 것보다 훨씬 소리가 컸다. 털가죽 매트리스 위에서, <<nnpc_title "Eden">>【이가】 잠시 뒤척이다가 다시 잠잠해진다.
+			<br><br>
+
+			너무 위험하다. 에덴이 다른 데 정신이 팔렸을 때 다시 시도해야 한다.
+			<br><br>
+
+			패배감에 한숨을 쉬며, 당신은 옆으로 누워 잠을 청하려 애쓴다.<<stress 6>><<gstress>>
+		<</if>>
+	<<else>>
+		에덴의 코 고는 소리만이 당신의 유일한 친구인 채로, 당신은 무엇을 해야 할지 고민한다.
+	<</if>>
+	<br><br>
+
+	<<if $phase gte 1>>
+		<<link [[잠자기|Eden Caged]]>><<set $phase to 1>><<cabintime>><<set $edenCaged.days += 1>><</link>>
+		<br>
+	<<else>>
+		<<if $edenCaged.escape gte 9>>
+			<span class="purple">문은 헐거워졌지만, 에덴이 너무 가까이 있어서 멀리 가지는 못할 것이다.</span> <<he>>【이가】 다른 데 정신이 팔릴 때까지 기다려야 한다.
+			<br>
+		<<else>>
+			<<link [[탈출 시도하기|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><</link>>
+		<</if>>
+		<br>
+		<<link [[밤새 잠자기|Eden Caged]]>><<set $phase to 2>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Eden Caged Sex
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>><<set $enemytrust to -200>>
+	당신이 몸을 빼자 에덴의 얼굴이 사납게 일그러진다. <<He>>【은는】 당신의 머리채를 잡아 앞으로 끌어당긴다. "시키는 대로 해." <<he>>【이가】 으르렁거린다.
+	<<controlloss>>
+	<br><br>
+<<elseif $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>><<set $enemytrust to -200>>
+
+	당신이 몸을 빼지 않자, 에덴은 만족한 듯 <<himself>>【을를】 내보인다. "착한 <<girl>>." <<he>>【은는】 부드럽게 속삭인다. "봐, 그렇게 어렵지 않지?"
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Caged Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Caged Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Caged Sex Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	만족한 에덴이 뒤로 물러나 당신의 머리를 쓰다듬는다. "날 위해 이걸 해줘야 해. 네가 너무 오래 떨어져 있는 게 싫은 이유가 바로 이거야."<<npcincr Eden trust 10>><<gtrust>>
+	<br><br>
+
+	<<He>>【은는】 당신을 다시 우리 안으로 밀어 넣고 문을 잠근다. 하지만 <<his>> 목욕물을 받으러 가기 전에 당신에게 미소를 지어 보인다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<npc Eden>><<person1>>
+
+	<<tearful>> 당신은 우리 안에 앉아 무엇을 해야 할지 고민한다.
+	<br><br>
+
+	<<if $edenCaged.escape gte 9>>
+		<span class="teal">문이 헐거워졌다. 한 번만 더 세게 차면 풀려날 수 있을 것이다.</span>
+		<br>
+		<<link [[탈출한다|Eden Caged Escape]]>><</link>>
+	<<else>>
+		<<link [[탈출을 시도한다 (2:00)|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass 2 hours>><</link>>
+	<</if>>
+	<br>
+	<<link [[휴식한다 (2:00)|Eden Caged]]>><<set $phase to 2>><<pass 2 hours>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	"이런 씨발, 작은 창년 같으니!" 에덴이 <<his>> 옆구리를 문지르며 소리친다. <<He>>【은는】 당신을 다시 우리 안으로 걷어차고, 재빨리 문을 잠가버린다.<<pain 10>><<npcincr Eden trust -10>><<ggpain>><<ltrust>>
+	<br><br>
+
+	<<he>>【은는】 당신을 다시 혼자 남겨두기 전에 "널 나무에 묶어놓고 아무나 쓰도록 내버려 두지 않는 게 신기할 지경이야." 하고 위협한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<npc Eden>><<person1>>
+
+	<<tearful>> 당신은 우리 안에 앉아 무엇을 해야 할지 고민한다.
+	<br><br>
+
+	<<if $edenCaged.escape gte 9>>
+		<span class="teal">문이 헐거워졌다. 한 번만 더 제대로 차면 풀려날 수 있다.</span>
+		<br>
+		<<link [[탈출한다|Eden Caged Escape]]>><</link>>
+	<<else>>
+		<<link [[탈출을 시도한다 (2:00)|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass 2 hours>><</link>>
+	<</if>>
+	<br>
+	<<link [[휴식한다 (2:00)|Eden Caged]]>><<set $phase to 2>><<pass 2 hours>><</link>>
+	<br>
+<<else>>
+	에덴이 당신을 우리로 이끌다가, 갑자기 멈춰 선다. <<He>>【은는】 비웃으며 당신을 뒤로 잡아당긴다.
+	<br><br>
+
+	<<he>>【이가】 으르렁거린다. "안 돼. 언제 끝낼지는 내가 정해."
+	<<set $consensual to 0>><<molested>><<controlloss>>
+	<<trauma 3>><<npcincr Eden trust -5>><<gtrauma>><<ltrust>>
+	<br><br>
+
+	<<link [[다음|Eden Caged Sex]]>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged Evening
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 1>>
+	<<if $speech_attitude is "meek">>
+		"ㅇ-에덴?" 당신이 중얼거린다. "다리가 아파. ㅈ-잠깐만 걸어 다녀도 될까, 제발?"
+	<<elseif $speech_attitude is "bratty">>
+		"이봐, 나 여기 아프다고." 당신이 소리친다. "몇 분만 꺼내줄래?"
+	<<else>>
+		"저기, 다리가 쑤셔." 당신이 말한다. "스트레칭 좀 할 수 있을까?"
+	<</if>>
+	<br><br>
+
+	당신의 요청에 에덴이 눈썹을 치켜올리고는, <<his>> 책을 내려놓고 우리 쪽으로 걸어온다. <<he>>【은는】 눈을 맞추기 위해 쭈그려 앉으며 씨익 웃는다. "대가로 뭘 해줄 건데?"
+	<br><br>
+
+	<<link [[<<him>>【을를】 해소시켜 주겠다고 제안한다|Eden Caged Evening 2]]>><<set $phase to 0>><<npcincr Eden trust 5>><<npcincr Eden dom 1>><</link>><<gtrust>><<gdom>>
+	<br>
+	<<link [[아무것도 아니라고 한다|Eden Caged Evening 2]]>><<set $phase to 1>><<npcincr Eden trust -5>><<npcincr Eden dom -1>><</link>><<ltrust>><<ldom>>
+	<br>
+<<else>>
+	밤의 나머지는 고요하고, 타닥거리는 불꽃 소리와 에덴의 책장이 넘어가는 소리만이 들린다. 몇 시간이 지나자 <<nnpc_title "Eden">>【이가】 일어나 잠자리에 들 준비를 한다.
+	<br><br>
+
+	<<he>>【은는】 털 매트리스 위로 올라가 잠들기 전에 "얌전히 굴면 언젠가 다시 침대로 들여보내 줄지도 모르지." 하고 말한다.
+	<br><br>
+
+	에덴의 코 고는 소리만이 당신의 곁을 지키는 가운데, 당신은 무엇을 해야 할지 고민한다.
+	<br><br>
+
+	<<if $edenCaged.escape gte 9>>
+		<span class="purple">문은 헐거워졌지만, 에덴이 너무 가까이 있어서 멀리 가지는 못할 것이다.</span> <<he>>【이가】 다른 데 정신이 팔릴 때까지 기다려야 한다.
+		<br>
+	<<else>>
+		<<link [[탈출을 시도한다 (5:00)|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass 5 hours>><</link>>
+	<</if>>
+	<br>
+	<<link [[밤새 잠을 잔다 (5:00)|Eden Caged]]>><<set $phase to 2>><<pass 5 hours>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged Evening 2
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 1>>
+	"사실, 괜찮아요." 당신이 고집한다.
+	<br><br>
+
+	에덴의 표정이 굳어지고, <<he>>【은는】 이를 간다. <<He>>【은는】 자물쇠를 풀고 안으로 손을 뻗어 당신의 머리채를 잡는다. <<He>>【은는】 당신을 우리 밖으로 끌어내고 다리를 벌리기 시작한다.
+	<br><br>
+
+	"그런 식으로 날 놀리는 건 불공평하잖아, 알아? 분수를 알아야지."
+	<br><br>
+
+	<<link [[다음|Eden Caged Evening Sex]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"ㅇ-원하신다면, 제 '아내의 의무'를 다할 수 있어요?" 당신은 덧붙여 속눈썹을 몇 번 깜빡인다.
+	<<elseif $speech_attitude is "bratty">>
+		"날 꺼내서 직접 확인해 보는 건 어때." 당신은 <<him>>【을를】 올려다보며 윙크한다.
+	<<else>>
+		"네, 할게요." 당신은 <<he>>【이가】 만족했기를 바라며 <<him>>【을를】 올려다보고 미소 짓는다.
+	<</if>>
+	<br><br>
+
+	에덴은 당신이 스스로 앞으로 움직이는 와중에도 안으로 손을 뻗어 당신을 끌어내려고 자물쇠를 만지작거리며 안달이 난 듯 보인다.
+	<br><br>
+
+	<<he>>【은는】 "나한테 잘해주네." 하고 킬킬거린다. "어쩌면 나도 네가 해소하게 도와줄까?"
+	<br><br>
+
+	<<link [[다음|Eden Caged Evening Sex]]>><<set $sexstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged Evening Sex
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>><<set $enemytrust to -200>>
+<<elseif $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>><<set $enemytrust to -200>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Caged Evening Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Caged Evening Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Caged Evening Sex Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	<<if $consensual is 1>>
+		<<he>>【이가】 당신의 뺨을 어루만지는 동안, 아주 잠깐 에덴이 다시 다정해 보인다.<<npcincr Eden trust 10>><<gtrust>>
+		<br>
+		<<he>>【은는】 당신의 이마에 키스하고는 뒤로 물러선다. "자. 5분 동안 밖에 있어도 좋아."
+		<br><br>
+
+		<<clotheson>>
+		<<endcombat>>
+		<<npc Eden>><<person1>>
+
+		<<link [[다음|Eden Caged Evening Stretch]]>><</link>>
+		<br>
+	<<else>>
+		에덴의 얼굴에서 분노가 가라앉고, <<he>>【이가】 당신을 놓아주자 눈썹이 풀어진다.<<npcincr Eden trust 10>><<gtrust>>
+		<br>
+		"착한 애완동물이네. 거래를 무른 건 아쉽지만. 그랬다면 자기 전에 목줄을 매고 조금 돌아다니게 해줬을지도 모르는데."
+		<br><br>
+
+		당신에게서 일어난 에덴은 <<his>> 옷을 바로잡고, 당신을 다시 우리에 집어넣고 단단히 잠근다. <<He>>【은는】 벽난로 옆 자리로 돌아간다.
+		<br><br>
+
+		<<clotheson>>
+		<<endcombat>>
+		<<npc Eden>><<person1>>
+
+		<<link [[다음|Eden Caged Evening]]>><<set $phase to 0>><</link>>
+		<br>
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+	좌절감에 으르렁거리며, <<nnpc_title "Eden">>【은는】 당신을 우리 안으로 다시 밀어 넣는다. 당신이 균형을 되찾기도 전에 문이 단단히 잠긴다.
+	<br>
+	<<he>>【은는】 "정말 내 인내심을 시험하는군." 하고 투덜거린다. "지금은 내가 얌전히 구는 거야, 곧 알게 될걸."<<npcincr Eden trust -10>><<ltrust>>
+	<br><br>
+
+	바닥에서 일어난 에덴은 <<his>> 옷을 바로잡는다. 그리고 <<he>>【은는】 약간 절뚝거리며 벽난로 옆 자리로 돌아간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<npc Eden>><<person1>>
+
+	<<link [[다음|Eden Caged Evening]]>><<set $phase to 0>><</link>>
+	<br>
+<<else>>
+	에덴이 당신을 우리로 이끌다가, 갑자기 멈춰 선다. <<He>>【은는】 비웃으며 당신을 뒤로 잡아당긴다.
+	<br><br>
+
+	<<he>>【이가】 으르렁거린다. "안 돼. 언제 끝낼지는 내가 정해."
+	<<set $consensual to 0>><<molested>><<controlloss>>
+	<<trauma 3>><<npcincr Eden trust -5>><<gtrauma>><<ltrust>>
+	<br><br>
+
+	<<link [[다음|Eden Caged Evening Sex]]>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged Evening Stretch
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<tearful>> 당신은 우리에서 기어 나온다. 일어서자 몸의 뻣뻣함이 서서히 풀린다.
+<br><br>
+
+<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1>>
+	<<He>>【은는】 당신의 목을 보고 <<his>> 입술을 굳게 다문다.<<npcincr Eden trust -5>><<ltrust>>
+	<br><br>
+
+	<<he>>【은는】 "도망칠 생각조차 한다면, 좋게 끝나지 않을 거야." 하고 위협한다.
+<<elseif $worn.neck.collared isnot 1>>
+	당신이 서서 스트레칭을 하는 동안, 차가운 무언가가 익숙한 딸깍 소리와 함께 목을 감싸는 것이 느껴진다. 새로운 목걸이다.
+	<<leash 21>>
+<<elseif $worn.neck.collared is 1 and !$worn.neck.type.includes("leash")>>
+	당신이 서서 스트레칭을 하는 동안, 무언가 당신의 목걸이에 딸깍하고 채워지는 것이 느껴진다. 목줄이다.
+	<<attach_leash>>
+<</if>>
+"이리 와." 에덴이 문으로 향하며 당신의 <<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1>>손목<<else>>목줄<</if>>【을를】 잡아당긴다. 당신은 <<him>>【을를】 따라 밖으로 나가 신선한 공기를 들이마신다.
+<<nnpc_title "Eden">>【은는】 당신이 공터를 돌아다니는 동안 <<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1>>당신 가까이에 붙어 있다<<else>>당신의 목줄을 <<his>> 손에 쥐고 있다<</if>>. <<He>>【은는】 당신의 모든 움직임을 지켜본다.<<stress -6>><<lstress>>
+<br><br>
+
+몇 분 후, <<he>>【이가】 다시 당신을 부른다. "그만하면 됐어. 이리 와, 이제 잘 시간이야."
+<br><br>
+
+당신은 다시 안으로 끌려가, 이제 집이라고 부르는 금속 감옥 안으로 돌아간다. 에덴은 침대로 올라간다.
+<br>
+"그렇게 계속 착하게 굴면, 곧 침대로 다시 들여보내 줄게."
+<br><br>
+
+에덴의 코 고는 소리만이 당신의 곁을 지키는 가운데, 당신은 무엇을 해야 할지 고민한다.
+<br><br>
+
+<<if $edenCaged.escape gte 9>>
+	<span class="purple">문은 헐거워졌지만, 에덴이 너무 가까이 있어서 멀리 가지는 못할 것이다.</span> <<he>>【이가】 다른 데 정신이 팔릴 때까지 기다려야 한다.
+	<br>
+<<else>>
+	<<link [[탈출을 시도한다 (5:00)|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass 5 hours>><</link>>
+<</if>>
+<br>
+<<link [[밤새 잠을 잔다 (5:00)|Eden Caged]]>><<set $phase to 2>><<pass 5 hours>><</link>>
+<br>
+
+:: Eden Caged Breakfast
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 1>>
+	<<if $speech_attitude is "meek">>
+		굶주림에 못 이겨, 당신은 게걸스럽게 접시를 핥는다. 그 모습을 본 에덴이 피식 웃는다. 얼굴이 붉어지지만, <<him>>에게 신경 쓰지 않는다.
+	<<elseif $speech_attitude is "bratty">>
+		수치심에 뺨이 달아오르지만, 굶주림이 위장을 갉아먹는다. 당신은 자존심을 삼키고 에덴이 남긴 음식을 쪼아 먹는다.
+	<<else>>
+		굴욕적이지만, 너무 배가 고파 신경 쓸 겨를이 없다. 고개를 숙인 당신은 에덴이 남긴 아침 식사를 먹는다.
+	<</if>>
+	<br><br>
+
+	엉망으로 먹어서 얼굴 전체에 음식이 묻는다. 에덴이 격려하듯 당신의 머리를 부드럽게 쓰다듬는다. 당신이 다 먹자, <<he>>【은는】 접시를 치우고는 당신의 얼굴을 닦아줄 수건을 가지고 돌아온다. 당신을 다시 가두려 재촉하는 <<his>> 눈에는 뜨거운 시선이 담겨 있다. "조금 이따 운동하러 데리러 오지. 쉬어."
+	<br><br>
+
+	에덴은 옷을 갈아입고 밖으로 나가, 오두막에 당신 혼자 남겨진다. 당신은 우리 안에 앉아 무엇을 해야 할지 고민한다.
+	<br><br>
+
+	<<if $edenCaged.escape gte 9>>
+		<span class="purple">문이 헐거워졌지만, 폐소공포증을 유발하는 이 자세에서는 에덴이 얼마나 멀리 갔는지 알 수 없다.</span> 아직 탈출을 시도하기엔 위험하다.
+		<br>
+	<<else>>
+		<<link [[탈출 시도 (10:00)|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass 10 hours>><</link>>
+	<</if>>
+	<br>
+	<<link [[휴식 (10:00)|Eden Caged]]>><<set $phase to 2>><<pass 10 hours>><</link>>
+	<br>
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"ㄱ-그렇게 배고프지 않아요, 괜찮아요," 당신은 바닥을 보며 말을 더듬는다.
+	<<elseif $speech_attitude is "bratty">>
+		"됐거든," 당신은 이를 악물고 말한다. "나중에 먹을게."
+	<<else>>
+		"괜찮아요," 당신은 고개를 저으며 말한다. "배고프지 않아요."
+	<</if>>
+	<br><br>
+
+	에덴이 접시를 집어 싱크대 옆에 놓는다. 그 덕에 지키는 이가 없는 문이 언뜻 보이지만, 당신이 뛰쳐나가기 전에 <<he>>【이가】 돌아온다. 그리고 <<he>>【은는】 화가 난 것처럼 보인다.
+	<br><br>
+
+	"뭐, 내 요리가 네 입맛에 안 맞나? 좋아. 다른 걸 먹게 해주지."
+	<br><br>
+
+	<<link [[다음|Eden Caged Breakfast Oral]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Eden Caged Breakfast Oral
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<He>>【은는】 당신의 얼굴을 <<his>> 가랑이로 끌어당긴다.
+	<<controlloss>>
+	<br><br>
+	<<npcoral>><<set $NPCList[0].lefthand to "hair">>
+	<<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>><<set $enemytrust to -200>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Caged Breakfast Oral Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Caged Breakfast Oral]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Caged Breakfast Oral Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	<<nnpc_title "Eden">>【이가】 당신을 놓아주며 숨을 헐떡인다. "맛있었어? 난 정말 좋았는데," <<he>>【이가】 웃는다.<<npcincr Eden trust 10>><<gtrust>>
+	<br><br>
+
+	<<He>>【은는】 당신을 뒤로 민다. 힘이 많이 실리진 않았지만, 예상치 못한 터라 당신은 우리 안으로 넘어진다. 다시 한번 갇힌다. "나중에 데리러 올게." <<He>>【은는】 히죽거린다. "멀리 가지 마."
+<<else>>
+	격분한 에덴이 당신의 따귀를 때리고는 우리 안으로 차 넣는다. "씨발, 거기 처박혀서 왜 그따위로 버릇없게 구는지나 생각해 봐. 이번엔 마음을 바꾸길 바라지."<<npcincr Eden trust -10>><<ltrust>>
+	<br><br>
+
+	<<He>>【은는】 밖으로 나가기 전 준비를 하기 위해 칸막이 쪽으로 성큼성큼 걸어간다.
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+<<npc Eden>><<person1>>
+
+<<tearful>> 당신은 우리 안에 앉아 무엇을 해야 할지 고민한다.
+<br><br>
+
+<<if $edenCaged.escape gte 9>>
+	<span class="purple">문이 헐거워졌지만, 폐소공포증을 유발하는 이 자세에서는 에덴이 얼마나 멀리 갔는지 알 수 없다.</span> 아직 탈출을 시도하기엔 위험하다.
+	<br>
+<<else>>
+	<<link [[탈출 시도 (10:00)|Eden Caged]]>><<set $phase to 1>><<set $edenCaged.escape += 1>><<pass 10 hours>><</link>>
+<</if>>
+<br>
+<<link [[휴식 (10:00)|Eden Caged]]>><<set $phase to 2>><<pass 10 hours>><</link>>
+<br>
+
+:: Eden Caged Escape
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+흐르는 물소리를 방패 삼아 다시 한번 문을 걷어찬다. 온 힘을 다해 한 번, 두 번, 세 번 내지르자 경첩이 헐거워지며 빠져나온다.
+<br><br>
+
+아드레날린이 혈관을 타고 솟구친다. 탈출하고 싶다면, 지금이 기회다.
+<br><br>
+
+<<link [[도망친다|Eden Caged Freedom]]>><<set $phase to 1>><<set $stress -= 1000>><<npcincr Eden dom -1>><</link>><<llltrust>><<ldom>>
+<br>
+<<link [[머무른다|Eden Caged Freedom]]>><<set $phase to 0>><<npcincr Eden trust 200>><<npcincr Eden dom 1>><</link>><<gggtrust>><<gdom>>
+<br>
+
+:: Eden Caged Freedom
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 1>>
+	자유를 갈망하며, 당신은 쇠 우리에서 기어 나온다. 일어서자 무릎에서 뚝 소리가 난다. 당신은 수건 한 장을 낚아채 몸에 두르고 문으로 살금살금 다가간다. 한 걸음 내디딜 때마다 심장이 거세게 뛴다. 하지만 에덴은 눈치채지 못한다.
+	<<towelup>>
+	<br><br>
+
+	문을 살짝 열어 생긴 틈으로 빠져나오자, 뇌가 상황을 인지하기도 전에 발이 먼저 움직인다. 전속력으로 숲속으로 달려간다. 멀어질수록 오두막은 나무 뒤로 사라져간다.
+	<br><br>
+
+	에덴이 당신을 다시 찾아내면 화를 낼 것이라는 걸 안다.
+	<br><br>
+
+	<<link [[다음|Forest]]>><<unset $edenCaged>><<set $edenCagedEscape to true>><<endevent>><<set $eventskip to 1>><<set $forest to 80>><</link>>
+	<br>
+<<else>>
+	우리 문이 경첩에서 빠져나가 열리고, 탈출할 수 있다는 생각에 아주 잠깐 가슴속에 희망이 피어난다. 하지만, 에덴이 당신을 집으로 데려올 때 얼마나 상처받았는지 기억하자 희망은 곧 죄책감으로 바뀐다.
+	<br><br>
+
+	침을 삼키고, 당신은 다시 주저앉아 무릎을 끌어안는다. 곧, 에덴이 욕실에서 나와 수건으로 <<his>> 머리를 말린다. <<He>>【은는】 우리의 상태를 보고 잠시 멈춘다.
+	<br><br>
+
+	"그렇게 갇혀 있는 게 지긋지긋했나 보군, 응?" <<he>>【이가】 말한다. "뭐, 그걸로 널 탓할 순 없지. 이리 와, 넌 네 자리를 얻었어. 다시는 날 화나게 하지 마." 당신이 기어 나오자 에덴이 당신 얼굴 앞에 <<his>> 손가락을 들이댄다.
+	<br><br>
+
+	당신은 <<he>>【이가】 우리를 접어서 치우는 것을 지켜본다. 다시는 저것을 보지 않기를 바란다.
+	<br>
+	<i><span class="gold">에덴은 일단 당신을 용서했습니다.</span>
+	<<if $edenfreedom gte 1>>
+		<<unset $edenfreedom>>
+		당신은 <<he>>【이가】 다시 오두막 밖으로 내보내주기 전에 <<his>> 신뢰를 되찾아야 할지도 모릅니다.
+	<</if>>
+	</i>
+	<br><br>
+
+	<<link [[다음|Eden Cabin]]>><<unset $edenCaged>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Eden Fluids Punishment
+<<set $outside to 1>><<set $location to "cabin">><<effects>><<set $bus to "edenclearing">>
+<<npc Eden>><<person1>>
+
+<<if $edenFluidsCheck is "run">> /* after run, return to the cabin */
+	초조하게, 당신은 공터로 걸어 들어간다. 에덴은 아직 화가 나 있을지도 모른다.
+	<br><br>
+	처음에는 <<him>>【이가】 보이지 않다가, 등 뒤에서 나뭇가지가 부러지는 소리가 들린다.
+	<<if $goocount gt 0 or $semencount gt 0>> /* with fluids on you */
+		"아직도 그딴 걸 뒤집어쓰고 있군. 역겨워."<<npcincr Eden love -20>><<llllove>>
+		<br><br>
+		곁눈질로 보니 에덴이 당신에게 손을 뻗는 것이 보인다.
+
+	<<else>> /* clean */
+		"씻었다고 해서 내가 잊었을 거라 생각하지 마."
+		<br><br>
+		곁눈질로 보니 에덴이 당신에게 손을 뻗는 것이 보인다.
+
+		<<set $edenFluidsCheck to "clean">>
+	<</if>>
+<<else>>
+	<<for _bodyPart, _fluids range $player.bodyliquid>>
+		<<if _fluids.goo gte 1 or _fluids.semen gte 1>>
+			<<set _bodyFluids to _bodyPart>>
+			<<break>>
+		<</if>>
+	<</for>>
+
+	당신은 나무 사이를 헤치고 공터로 뛰쳐나온다. 에덴은 하던 일을 멈추고 당신을 쳐다본다. <<He>>【은는】 당신을 다시 한번 쳐다보고는, 당신의 <<bodypart _bodyFluids>>에 묻은 체액을 보고 얼굴을 찌푸린다. <<stress 6>><<gstress>>
+	<br><br>
+	에덴이 으르렁거리며 당신을 향해 성큼성큼 걸어온다. "누가 널 건드렸지?"<<npcincr Eden love -30>><<llllove>>
+<</if>>
+
+<br><br>
+<<link [[도망친다|Eden Fluids Punishment 2]]>><<set $phase to 1>><<def 1>><<npcincr Eden love -10>><<npcincr Eden dom -1>><</link>><<lllove>><<ldom>><<athleticsdifficulty 650 900>>
+<br>
+<<link [[가만히 있는다|Eden Fluids Punishment 2]]>><<set $phase to 0>><<sub 1>><<npcincr Eden dom 1>><</link>><<gdom>>
+
+:: Eden Fluids Punishment 2
+<<set $outside to 1>><<set $location to "cabin">><<effects>><<set $bus to "edenclearing">>
+<<if $phase is 0>> /* Stay still */
+	<<if $edenFluidsCheck is "run" or $edenFluidsCheck is "clean">>
+		에덴이 당신의 팔을 거칠게 붙잡는다. <<nnpc_title "Eden">>【은는】 어찌나 세게 잡았는지 <<his>> 손톱이 당신의 피부를 파고든다. <<pain 2>><<gpain>>
+	<<else>>
+		에덴이 다가오자 당신은 몸을 떤다. <<his>> 손이 당신의 팔을 잡자 깜짝 놀란다. <<He>>【은는】 당신을 더 자세히 살피며, 혐오감에 입술을 비튼다.
+		<br><br>
+		"내가 너무 부드럽게 대해줬군."
+	<</if>>
+	<br><br>
+	<<link [[다음|Eden Fluids Punishment 3]]>><</link>>
+<<else>> /* Run */
+	<<if $edenFluidsCheck is "run">>
+		다시 다치고 싶지 않아서, 당신은 몸을 돌려 숲속으로 전력 질주하기 시작한다.
+	<<else>>
+		에덴이 무슨 짓을 할지 두려워서, 당신은 몸을 돌려 숲속으로 전력 질주하기 시작한다.
+	<</if>>
+	<<He>>【은는】 돌아오라며 당신 뒤에서 소리친다. 당신은 <<he>>【이가】 뒤쫓아 달려오는 소리를 들을 수 있다. <<stress 6>><<gstress>>
+	<br><br>
+	<<if $athleticsSuccess>>
+		당신은 한동안 나뭇가지를 헤치며 달리고, 그 사이 피부가 긁힌다. <<gpain>><<pain 2>>
+		<br><br>
+		마침내 에덴의 고함 소리가 점점 작아지더니 완전히 멈춘다. <span class="green"><<him>>【을를】 따돌렸다.</span>
+		<br><br>
+		아드레날린이 온몸에 퍼져 숨을 고르는 데 시간이 좀 걸린다. <span class="red">오두막으로 돌아가는 것은 위험할 수 있습니다.</span>
+		<br><br>
+		<<link [[다음|Forest]]>><<set $edenFluidsCheck to "run">><<endevent>><<set $eventskip to 1>><<set $forest to random(50, 75)>><</link>>
+	<<else>>
+		있는 힘껏 달리지만, <span class="red">에덴에게 따라잡히고 맙니다.</span> <<He>>【은는】 당신을 땅으로 넘어뜨리고, 흙바닥에 부딪히면서 폐에서 공기가 빠져나간다. <<pain 4>><<gpain>>
+		<br><br>
+		<<if $edenFluidsCheck is "clean">>
+			"이런 배은망덕한 꼬맹이 같으니." <<he>>【이가】 당신의 뒤통수를 치며 으르렁거린다. <<pain 4>><<gpain>>
+		<<else>>
+			"<<if $edenFluidsCheck is "run">>네가 속임수를 쓸 줄은 몰랐는데,<<else>>내가 해준 게 얼만데, 고작 이런 식으로 보답하는 건가?<</if>>" 에덴이 당신을 주먹으로 치며 으르렁거린다. <<pain 8>><<ggpain>>
+		<</if>>
+		<br><br>
+		주먹에 맞아 어지러워서, <<he>>【이가】 당신을 <<his>> 어깨에 둘러멜 때 저항할 수 없다. 정신을 차리고 버둥거릴 때마다 에덴은 당신의 엉덩이를 때린다. 얼마 지나지 않아 오두막으로 돌아온다.
+		<br><br>
+		<<link [[다음|Eden Fluids Punishment 3]]>><</link>>
+	<</if>>
+<</if>>
+
+:: Eden Fluids Punishment 3
+<<set $outside to 0>><<set $location to "cabin">><<effects>><<set $bus to "edencabin">>
+<<if $edenFluidsCheck is "clean">>
+	<<if $phase is 0>> /* Stay still */
+		에덴이 당신의 손을 잡고 오두막 안으로 다시 끌고 들어간다. <<He>>【은는】 당신을 바닥에 내동댕이치고 옷장 뒤로 손을 뻗는다. 그건 새장이다. <<stress 6>><<gstress>>
+	<<else>> /* Run */
+		당신은 안으로 끌려 들어가고, 에덴이 옷장 뒤로 손을 뻗는 동안 나무 바닥에 내팽개쳐진다. <<He>>【은는】 새장을 꺼낸다. <<stress 6>><<pain 4>><<gstress>><<gpain>>
+	<</if>>
+<<else>>
+	<<if $phase is 0>> /* Stay still */
+		에덴이 오두막 뒤에 있는 샘으로 당신을 끌고 간다. <<his>> 손아귀 힘은 전혀 풀리지 않는다. 샘가에 다다랐을 때, <<he>>【은는】 당신이 <<him>>에게 뭘 하는 거냐고 묻기도 전에 당신을 밀어 넣는다.
+		<br><br>
+	<<else>> /* Run */
+		에덴은 오두막으로 걸어가면서도 멈추지 않고, 오두막을 지나쳐 뒤편의 샘으로 향한다. "<<if $edenFluidsCheck is "run">>지금 네게서 나는 냄새가 싫어.<<else>>깨끗해지기 전까진 안에 못 들어와.<</if>>"
+		<br><br>
+		에덴이 당신을 샘으로 던져 넣을 때 아무런 경고도 없었다.
+	<</if>>
+	<<if $edenspring gte 4>> /* spring is clean */
+		차가운 물에 충격을 받고, 에덴이 당신의 머리채를 잡아 몇 초간 물속에 처박자 공황 상태에 빠진다.
+	<<else>>
+		차가운 물에 충격을 받고, 손이 당신의 목덜미를 잡아 몇 초간 짓누르는 동안 물속의 부유물들이 몸에 부딪혀 아프다. <<pain 2>><<gpain>>
+	<</if>>
+	<br><br>
+	에덴이 당신을 다시 끌어올려 숨을 헐떡이게 내버려 둔 채 옷을 벗기기 시작한다.
+	<<wash>><<ruined>>
+	<br><br>
+	<<He>>【은는】 말이 없다. <<he>>【은는】 <<his>> 허리띠에 있던 천으로 당신을 거칠게 씻긴다. <<him>>의 냄새가 난다. 일하고 나서 땀을 닦던 수건인 것 같다. <<npcincr Eden lust 5>><<glust>>
+	<br><br>
+	"상처받았어." <<he>>【이가】 마침내 말한다. <<His>> 목소리는 여전히 화가 나 있다.
+	<br><br>
+	당신이 깨끗해지자, 에덴은 당신의 손을 잡고 오두막으로 다시 끌고 들어간다. <<He>>【은는】 당신을 바닥에 내동댕이치고 옷장 뒤로 손을 뻗는다. 그건 새장이다. <<stress 6>><<gstress>>
+	<br><br>
+	"네가 한 짓에 대해 생각할 시간이 더 필요한 게 분명하군."
+<</if>>
+
+<<set $edenFluidsCheck to "Eden">>
+<br><br>
+<<link [[도망친다|Eden Fluids Punishment 4]]>><<set $phase to 1>><<def 1>><<npcincr Eden love -10>><<npcincr Eden dom -1>><</link>><<lllove>><<ldom>><<athleticsdifficulty 650 900>>
+<br>
+<<link [[벌을 받아들인다|Eden Fluids Punishment 4]]>><<set $phase to 0>><<sub 1>><<npcincr Eden dom 1>><</link>><<gdom>>
+
+:: Eden Fluids Punishment 4
+<<effects>>
+<<if $phase is 0>> /* Accept your punishment */
+	에덴의 말이 맞다. 당신은 <<his>> 신뢰를 배신했다. 벌을 받아들여야 한다.
+	<br><br>
+	에덴이 문을 열어주자 당신은 새장 안으로 기어 들어간다. <<he>>【이가】 문을 쾅 닫자 움찔한다.
+	<br><br>
+	"지금 얌전히 군다고 해서 내가 더 친절해질 거라고 생각하지 마."
+
+	<<ruined>>
+	<<unset $edenCagedEscape>>
+	<<unset $edenescape>>
+	<<set $NPCName[$NPCNameList.indexOf("Eden")].trust to 0>>
+	<<set $edenCaged to {}>>
+	<<set $edenCaged.escape to 0>>
+	<<set $edenCaged.days to 0>>
+	<br><br>
+	<<link [[다음|Eden Caged]]>><<set $phase to 0>><</link>>
+<<else>> /* Run */
+	<<if $athleticsSuccess>>
+		갇히고 싶지 않아서, 당신은 문밖으로 뛰쳐나간다. 에덴은 욕을 하며 뒤쫓기 시작한다. 당신은 뒤돌아보지 않고 숲속으로 계속 달려간다.
+		<br><br>
+		당신은 한동안 달리고, 나뭇가지를 헤치며 긁힌다. <<gpain>><<pain 2>>
+		<br><br>
+		마침내 에덴의 고함 소리가 점점 작아지더니 완전히 멈춘다. <span class="green">당신은 <<him>>【을를】 따돌렸다.</span>
+		<br><br>
+		아드레날린이 온몸에 퍼져 숨을 고르는 데 시간이 좀 걸린다. <span class="red">오두막으로 돌아가는 것은 위험할 수 있습니다.</span>
+		<br><br>
+		<<link [[다음|Forest]]>><<set $edenCagedEscape to true>><<endevent>><<set $eventskip to 1>><<set $forest to random(50, 75)>><</link>>
+	<<else>>
+		갇히고 싶지 않아서, 당신은 문으로 뛰쳐나가려 한다. <span class="red">에덴이 당신보다 빠르다.</span> <<He>>【은는】 당신의 머리채를 잡고 새장 쪽으로 다시 끌고 간다.
+		<br><br>
+		"이번 일로 제대로 배우는 게 좋을 거야."
+		<br><br>
+		에덴은 당신을 새장에 던져 넣고 자물쇠로 잠가버린다.
+
+		<<ruined>>
+		<<unset $edenCagedEscape>>
+		<<unset $edenescape>>
+		<<set $NPCName[$NPCNameList.indexOf("Eden")].trust to 0>>
+		<<set $edenCaged to {}>>
+		<<set $edenCaged.escape to 0>>
+		<<set $edenCaged.days to 0>>
+		<br><br>
+		<<link [[다음|Eden Caged]]>><<set $phase to 0>><</link>>
+	<</if>>
+<</if>>
+
+:: Eden Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Rape Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>><<npcincr Eden lust -20>>
+	에덴은 당신 위에서 몇 초간 숨을 고르다가 물러난다.<<lllust>>
+	<br><br>
+	"버릇없이 군 것치고 다시 묶지 않은 걸 다행으로 알아." <<he>>【은는】 당신을 바닥에 내버려 두고 떠나며 중얼거린다.<<stress 20>><<gstress>>
+	<br><br>
+	<<tearful>> 당신은 에덴의 시선을 피한다.
+<<else>>
+	<<npcincr Eden love -10>>
+	쉿 소리를 내며, 에덴이 당신에게서 물러난다.
+	<br><br>
+	"애초에 네가 제안한 거잖아." <<he>>【이가】 뱉어낸다. "이런 식이라면 그렇게 오래 떨어져 있게 두지 말아야겠군."
+	<br><br>
+	<<He>>【은는】 당신을 바닥에 혼자 남겨두고 홱 가버린다.<<lllove>>
+	<br><br>
+
+	<<tearful>> 당신은 몸을 추스른다.
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Eden Cabin]]>><</link>>

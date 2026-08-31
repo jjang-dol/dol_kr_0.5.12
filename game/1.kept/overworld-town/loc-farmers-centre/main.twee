@@ -1,0 +1,308 @@
+:: Farmers Centre
+<<set $outside to 0>><<set $location to "factory">><<effects>>
+<<if $farmersProduce is undefined>>
+	<<set $farmersProduce to {
+		selling:{},
+		toSell:{},
+		money:0,
+		sold:0,
+		totalSold:0,
+	}>>
+<</if>>
+
+<<if !$NPCList[0].pronoun>>
+	<<generate1>>
+<</if>>
+<<person1>>
+
+<<if $factory_intro is undefined>>
+	<<set $factory_intro to 1>>
+	당신은 마을 입구에 있는 거대한 벽돌 건물인 공장으로 다가간다. 한 <<person>>【이가】 문 옆에 서서 줄지어 들어오는 트럭들에게 손짓하고 있다.
+	<br><br>
+	문이 쾅 닫히자 <<He>>【은는】 당신에게로 돌아선다. "여기서 볼 건 아무것도 없어." <<he>>【이가】 말한다. "팔 농산물이 많지 않은 이상은 말이야. 우리가 처리해 줄 수는 있지. 수수료를 떼고."
+	<br><br>
+	<<link [[다음|Farmers Centre]]>><</link>>
+	<br>
+<<else>>
+	당신은 하베스트 가에 있는 공장 밖에 있다. 그들은 당신을 대신해 농산물을 가공하고 판매하지만, 속도가 그리 빠르지 않고 시장의 고객들만큼 값을 쳐주지도 않는다.
+	<br><br>
+
+	<<if $rng gte 91>>
+		한 <<person>>【이가】 바깥 매표소에 앉아 잡지를 넘기고 있다.
+	<<elseif $rng gte 81>>
+		한 <<person>>【이가】 벽에 기대어 담배를 피우고 있다.
+	<<elseif $rng gte 71>>
+		한 <<person>>【이가】 바깥 매표소에 앉아 구석에 있는 작은 텔레비전을 쳐다보고 있다.
+	<<elseif $rng gte 61>>
+		한 <<person>>【이가】 바깥 매표소에 앉아 <<his>> 휴대폰을 쳐다보고 있다.
+	<<elseif $rng gte 51>>
+		한 <<person>>【이가】 문을 통과하는 트럭 행렬에 손을 흔들고 있다.
+	<<elseif $rng gte 41>>
+		한 <<person>>【이가】 바깥 매표소에 앉아 <<his>> 휴대폰으로 통화하고 있다.
+	<<elseif $rng gte 31>>
+		한 <<person>>【이가】 바깥 매표소에 앉아 서류를 넘기고 있다.
+	<<elseif $rng gte 21>>
+		한 <<person>>【이가】 벽에 기대어 지나가는 차량들을 지켜보고 있다.
+	<<elseif $rng gte 11>>
+		한 <<person>>【이가】 매표소에서 당신을 지켜보고 있다.
+	<<else>>
+		한 <<person>>【이가】 바깥 매표소에 앉아 의자에 기대어 있다.
+	<</if>>
+	<br><br>
+
+	<<if $farmersProduce.money gt 10000>>
+		<<highicon>><<link [[돈 수령하기|Farmers Centre Money Collection]]>><</link>>
+		<br>
+	<</if>>
+	<<socialiseicon "ask">><<link [[농산물 판매에 대해 문의한다|Farmers Centre Produce Sale]]>><</link>>
+	<br>
+	<<harvesticon>><<link [[떠난다|Harvest Street]]>><<endevent>><</link>>
+
+<</if>>
+
+:: Farmers Centre Money Collection
+그 <<person>>【이가】 공장 안으로 들어가더니 지폐 뭉치를 들고 나온다. 당신은 <<printmoney $farmersProduce.money>>【을를】 벌었다<<money $farmersProduce.money "factoryProduce">>.
+<<set $farmersProduce.money to 0>>
+<br><br>
+<<getouticon>><<link [[떠난다|Farmers Centre]]>><</link>>
+
+:: Farmers Centre Produce Sale
+그 <<person>>【이가】 노트북을 연다. "그래서 뭘 가져왔지?"
+<br><br>
+<i>판매된 농산물 대금은 매일 정오에 수령할 수 있습니다. 사업 명성이 높으면 공장에서 농산물을 더 빨리 판매하는 데 도움이 됩니다.</i>
+<br><br>
+<<set $farmersProduce.toSell to {}>>
+<<set _foodstuffKeys to Object.keys($foodstuff)>>
+<<set _foodstuffItems to {}>>
+<<if _foodstuffKeys.length gte 1>>
+	<<for _i to 0; _i lt _foodstuffKeys.length; _i++>>
+		<<if ["produce","vegetable","fruit","mushroom"].includes(setup.foodstuff[_foodstuffKeys[_i]].category)>>
+			<<set _foodstuffItems[_foodstuffKeys[_i]] to clone($foodstuff[_foodstuffKeys[_i]])>>
+		<</if>>
+	<</for>>
+	<div id="supermarketDisplay" class="food_ui no-numberify">
+		<<produceDisplay>>
+	</div>
+<<else>>
+	농산물이 없습니다.
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[떠난다|Farmers Centre]]>><<set $farmersProduce.toSell to {}>><</link>>
+
+:: Farmers Centre Produce Sale Confirm
+문이 덜컹거리며 열리고, 당신의 농산물을 수거하러 가는 트럭 한 대가 굉음을 내며 빠져나온다.
+<br><br>
+<<getouticon>><<link [[떠난다|Farmers Centre]]>><</link>>
+
+:: Farmers Centre Widgets [widget]
+
+<<widget "produceDisplay">>
+	<div id="mobileHeader">
+		<div class="mobileOnly">
+			<<produceDisplayBasket>>
+		</div>
+	</div>
+	<div id="body">
+		<div id="mainSection">
+			<div id="search">
+				검색: <<textbox "_foodSearch" "">>
+				<<run $(() => {
+					var foodTimer = null;
+					$('#textbox--foodsearch').on('input change keypress', e => {
+						_foodSearch = e.target.value;
+						clearTimeout(foodTimer);
+						foodTimer = setTimeout(updateUI, 300);
+					});
+					var updateUI = () => {
+						Wikifier.wikifyEval('<<replace "#itemList">><<produceDisplayItems>><</replace>>');
+					}
+				})>>
+			</div>
+			<div id="itemList">
+				<<produceDisplayItems>>
+			</div>
+		</div>
+		<div id="altSection" class="mobileHidden">
+			<div id="basket">판매 중:</div>
+			<<produceDisplayBasket>>
+		</div>
+		<div id="mobileCloser" class="mobileOnly mobileHidden" onclick="wikifier('addclass', '#altSection', 'mobileHidden'); wikifier('addclass', '#mobileCloser', 'mobileHidden');"></div>
+	</div>
+<</widget>>
+
+<<widget "produceDisplayItems">>
+	<<set _keys to [...new Set([...Object.keys(_foodstuffItems), ...Object.keys($farmersProduce.toSell)])]
+	.sort((a, b) => (setup.foodstuff[a]?.plural || setup.foodstuff[a]?.name || a)
+		.localeCompare(setup.foodstuff[b]?.plural || setup.foodstuff[b]?.name || b))>>
+
+	<<set _foodKeys to []>>
+	<<set _foodGroups to []>>
+	<<run Object.values(_keys).forEach(key => {
+		const item = setup.foodstuff[key];
+
+		const filter = _foodSearch ? _foodSearch.toLowerCase().split(/[_ ]/g) : false;
+		if (filter and !filter.find(term =>
+				item.name.includes(term) or
+				item.category.includes(term) or
+				item.plural?.includes(term) or
+				item.singular?.includes(term)
+			)) {
+			return;
+		}
+
+		_foodKeys.pushUnique(key);
+		if (V.foodstuff[key].amount > 250) {
+			_foodGroups.pushUnique("Sellable Produce");
+		} else {
+			_foundSoldOut to true;
+		}
+	})>>
+	<<if _foundSoldOut>><<run _foodGroups.pushUnique("Owned Produce")>><</if>>
+	<<for _category range _foodGroups>>
+		<<set _categoryVar to "_" + _category.replace(" ", "")>>
+		<<set _open to _category is "Sellable Produce" ? true : false>>
+		<<foldout _open _categoryVar>>
+			<span class="gold"><<print ({ "Sellable Produce": "판매 가능한 농산물", "Owned Produce": "보유 중인 농산물" }[_category] || _category.toLocaleUpperFirst())>></span>
+			<<set _keys to _foodKeys.filter(key => (_category isnot "Owned Produce" && $foodstuff[key].amount > 250) || (_category is "Owned Produce" && ($foodstuff[key] === undefined || V.foodstuff[key].amount <= 250))
+			)>>
+			<<for $_i, $_key range _keys>>
+				<div @id="$_key" class="item"><<produceDisplayItem $_key>></div>
+				<<if $_i lt _keys.length - 1>><hr><</if>>
+			<</for>>
+		<</foldout>>
+	<</for>>
+<</widget>>
+
+<<widget "produceDisplayBasket">>
+	<div id="itemSummary">
+		<<set $_total to 0>>
+		<<for _label, _value range $farmersProduce.toSell>>
+			<<if _value gt 0>>
+				<<set $_total += bulkProduceValue(setup.foodstuff[_label],_value)>>
+			<</if>>
+		<</for>>
+		총액: <<printmoney $_total>>
+		<<if $_total gt 0>>
+			|
+			<<link [[농산물 판매|Farmers Centre Produce Sale Confirm]]>>
+				<<for _label, _value range $farmersProduce.toSell>>
+					<<if _value gt 0>>
+						<<if $farmersProduce.selling[_label] is undefined>>
+							<<set $farmersProduce.selling[_label] to _value>>
+						<<else>>
+							<<set $farmersProduce.selling[_label] += _value>>
+						<</if>>
+						<<set $foodstuff[_label].amount -= _value>>
+					<</if>>
+				<</for>>
+				<<set $farmersProduce.toSell to {}>>
+			<</link>>
+		<<else>>
+
+		<</if>>
+	</div>
+<</widget>>
+
+<<widget "produceDisplayItem">>
+	<<if _args[0]>>
+		<<set _item to _args[0]>>
+		<<capture _item>>
+			<div>
+				<<if $farmersProduce.toSell[_item] is undefined>>
+					<<set $farmersProduce.toSell[_item] to 0>>
+				<</if>>
+				<<foodstufficon _item>>
+				<<if $foodstuff[_item] is undefined>>
+					당신은 현재 <<print setup.foodstuff[_item].plural>>【을를】 전혀 가지고 있지 않다.
+				<<elseif $foodstuff[_item].amount lt 250>>
+					<<print setup.foodstuff[_item].plural.toLocaleUpperFirst()>> | 소지량: <span class="gold"><<print $foodstuff[_item].amount>></span>
+					<br>
+					팔기에 충분하지 않다.
+					<<if $farmersProduce.selling[_item]>><br><</if>>
+				<<else>>
+					<<set _max to $foodstuff[_item].amount - ($foodstuff[_item].amount % 250)>>
+					<<set _base to bulkProduceValue(setup.foodstuff[_item])>>
+					<<set _title to setup.foodstuff[_item].plural.toLocaleUpperFirst()>>
+					| 250개당 가치: <<printmoney _base>>
+					<<numberStepper "_title" 0 {
+						callback: (value, arr) => {
+							V.farmersProduce.toSell[arr[0]] = value;
+							Wikifier.wikifyEval('<<replace "#altSection">><div id="basket">판매 중:</div><<produceDisplayBasket>><</replace>>');
+							if (!$('#mobileHeader').hasClass('hidden')) {
+								Wikifier.wikifyEval('<<replace "#mobileHeader">><div class="mobileOnly"><<produceDisplayBasket>></div><</replace>>');
+							};
+						},
+						valueFormat: (value, percentage, values) => {
+							return `${value}/${values[1]}`;
+						},
+						values: [_item, $foodstuff[_item].amount],
+						disableMinMax: false,
+						step: 250,
+						max: _max,
+						colorArr:["--yellow"],
+						percentage: false
+					}>>
+				<</if>>
+				<<if $farmersProduce.selling[_item]>>
+					<span class="teal">그들은 여전히 <<print window.KR.getFoodstuffCountKr(_item, $farmersProduce.selling[_item])>>【을를】 처리 중이다.</span>
+				<</if>>
+			</div>
+		<</capture>>
+	<</if>>
+<</widget>>
+
+<<widget "dailySellProduce">>
+	<<if $farmersProduce is undefined>>
+	<<elseif Object.keys($farmersProduce.selling).length gt 0>>
+		<<set _baseSaleQuantity to 100>>
+		<<set _baseSaleQuantity += 400>>
+		<<if between($fame.business, 1900, 2000)>>
+			<<set _baseSaleQuantity to _baseSaleQuantity * 6>>
+		<<elseif between($fame.business, 1500, 1900)>>
+			<<set _baseSaleQuantity to _baseSaleQuantity * 5>>
+		<<elseif between($fame.business, 1000, 1500)>>
+			<<set _baseSaleQuantity to _baseSaleQuantity * 4>>
+		<<elseif between($fame.business, 500, 1000)>>
+			<<set _baseSaleQuantity to _baseSaleQuantity * 3>>
+		<<elseif between($fame.business, 200, 500)>>
+			<<set _baseSaleQuantity to _baseSaleQuantity * 2>>
+		<</if>>
+		<<if !$farmersProduce.soldData>><<set $farmersProduce.soldData = {}>><</if>>
+		<<for _label, _value range $farmersProduce.selling>>
+			<<set _quantity to clone(_baseSaleQuantity)>>
+			<<if !setup.foodstuff[_label].tending?.seasons?.includes(Time.season)>>
+				<<set _quantity to Math.floor(_quantity * 0.9)>>
+			<</if>>
+			<<set _rng to 800 + Math.floor(currentSkillValue('tending') / 5)>>
+			<<set _quantity to Math.floor(_quantity * (random(_rng,_rng + 400)/1000))>>
+			<<if _value lt _quantity>>
+				<<set _quantity to _value>>
+			<</if>>
+			<<set $farmersProduce.sold += _quantity>>
+			<<set $farmersProduce.totalSold += _quantity>>
+
+			<<set $farmersProduce.money += bulkProduceValue(setup.foodstuff[_label],_quantity)>>
+			<<set $farmersProduce.selling[_label] -= _quantity>>
+
+			<<if !$farmersProduce.soldData[_label]>>
+				<<set $farmersProduce.soldData[_label] to {
+					amount: _quantity,
+					total: bulkProduceValue(setup.foodstuff[_label],_quantity),
+				}>>
+			<<else>>
+				<<set $farmersProduce.soldData[_label].amount += _quantity>>
+				<<set $farmersProduce.soldData[_label].total += bulkProduceValue(setup.foodstuff[_label],_quantity)>>
+			<</if>>
+
+			<<if $farmersProduce.selling[_label] lte 0>>
+				<<run delete $farmersProduce.selling[_label]>>
+			<</if>>
+		<</for>>
+		<<if $farmersProduce.sold gt 5000>>
+			<<set _famebusinessSold to $farmersProduce.sold - ($farmersProduce.sold % 5000)>>
+			<<set $farmersProduce.sold -= _famebusinessSold>>
+			<<famebusiness `Math.floor(_famebusinessSold / 5000)`>>
+		<</if>>
+	<</if>>
+<</widget>>

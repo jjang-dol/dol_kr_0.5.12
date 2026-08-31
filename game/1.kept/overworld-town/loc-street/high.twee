@@ -1,0 +1,136 @@
+:: High Street
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "high">><<getTarget true>>
+당신은 마을의 상업 활동 중심지인 하이 가에 있다. 이곳에는 새 옷을 살 수 있는 쇼핑 센터가 있다.
+<<if Time.dayState is "day">>
+	<<if Weather.precipitation is "rain">>
+		비에도 불구하고 거리는 분주하다.
+	<<elseif Weather.isFreezing>>
+		추위에도 불구하고 거리는 분주하다.
+	<<else>>
+		거리는 사방으로 걷는 사람들로 붐빈다.
+	<</if>>
+	<<if $weekly.policeHigh>>
+		<span class="purple">경찰 병력이 삼엄하게 배치되어 있다.</span> 최근의 거리 싸움 때문이다.
+	<</if>>
+<<elseif Time.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		손님들이 벌써 서둘러 상점으로 들어가고 있다.
+	<<elseif Weather.isFreezing>>
+		일부 상점은 이미 문을 열었고, 어둠 속에서 불을 밝히고 있다.
+	<<else>>
+		일부 상점은 이미 문을 열었다.
+	<</if>>
+	<<if $weekly.policeHigh>>
+		<span class="purple">경찰 병력이 삼엄하게 배치되어 있다.</span> 최근의 거리 싸움 때문이다.
+	<</if>>
+<<elseif Time.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		일부 상점은 문을 닫고 있고, 직원들은 가게 문을 잠그고 서둘러 빗속을 빠져나간다.
+	<<elseif Weather.isFreezing>>
+		일부 상점은 문을 닫았지만, 다른 상점들은 여전히 열려 있어 거리 곳곳을 밝히고 있다.
+	<<else>>
+		일부 상점은 문을 닫았지만, 다른 상점들은 여전히 열려 있다.
+	<</if>>
+	<<if $weekly.policeHigh>>
+		<span class="purple">경찰 병력이 삼엄하게 배치되어 있다.</span> 최근의 거리 싸움 때문이다.
+	<</if>>
+<<elseif Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		거의 모든 곳이 문을 닫았음에도 불구하고, 몇몇 사람들은 여전히 비를 무릅쓰고 있다.
+	<<elseif Weather.isFreezing>>
+		거의 모든 곳이 문을 닫았음에도 불구하고, 몇몇 사람들은 여전히 추위를 무릅쓰고 있다.
+	<<else>>
+		거의 모든 곳이 문을 닫았음에도 불구하고, 몇몇 사람들은 여전히 거리를 걷고 있다.
+	<</if>>
+	<<if $exposed gte 2 and hasSexStat("exhibitionism", 4) or $exposed gte 1 and hasSexStat("exhibitionism", 2) and $daily.ex.high isnot 1>>
+		주유소 편의점 하나가 아직 열려 있다. <span class="lewd">음란한 생각이 떠오른다.</span> 그 생각에 몸이 떨린다.
+	<</if>>
+<</if>>
+<<streeteffects>>
+<br><br>
+<<if $exposed gte 1>>
+	<<exhibitionism "street">>
+<</if>>
+<<if $arousal gte $arousalmax>>
+	<<orgasmstreet>>
+<</if>>
+<<if $stress gte $stressmax and !$possessed>>
+	<<passoutstreet>>
+<<else>>
+
+	<<if (dangerEvent() or $eventforced) and $eventskip is 0>>
+		<<eventsstreet>>
+	<<else>>
+		<<if $options.mapTop is true>>
+			<<map "high">>
+			<br>
+		<</if>>
+		주요 장소
+		<br>
+		<<if Time.dayState is "night" and Time.hour isnot 21>>
+			<<shopicon>><<link [[쇼핑 센터 (0:02)|Shopping Centre Sneak]]>><<pass 2>><</link>>
+			<br>
+		<<elseif Time.hour is 21>>
+			<<shopicon>><span class="blue">사람들이 쇼핑 센터를 떠나고 있다.</span> 문 닫을 시간인 것 같다.
+			<br>
+		<<else>>
+			<<shopicon>><<link [[쇼핑 센터 (0:02)|Shopping Centre]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if $avery_fate is "ascended">>
+			<<if $skyscraper_office_intro is undefined>>
+				<<officebuildingicon>><<link [[사무실 건물 (0:01)|Office New Location]]>><<set $skyscraper_office_intro to 1>><<pass 1>><</link>>
+				<br>
+			<</if>>
+		<<else>>
+			<<officebuildingicon>><<link [[사무실 건물 (0:02)|Office Lobby]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if Time.dayState is "day" and $exposed is 0 and $photo and $photo.street is "ready">> /* currently unused */
+			<<ind>><<link [[모델 일 (3:00)|Model Silly]]>><</link>><<gtiredness>>
+			<br>
+		<</if>>
+		<<if Time.dayState is "night" and $exposed gte 2 and hasSexStat("exhibitionism", 4) and $daily.ex.high isnot 1>>
+			<<foodicon "sweets">><<link [[주유소 편의점에서 과자 사기 (0:05)|Service Naked]]>><<pass 5>><<set $daily.ex.high to 1>><</link>><<exhibitionist4>>
+			<br>
+		<<elseif Time.dayState is "night" and $exposed gte 1 and hasSexStat("exhibitionism", 2) and $daily.ex.high isnot 1>>
+			<<foodicon "sweets">><<link [[주유소 편의점에서 과자 사기 (0:05)|Service Undies]]>><<pass 5>><<set $daily.ex.high to 1>><</link>><<exhibitionist2>>
+			<br>
+		<</if>>
+		<br>
+		<<if $exposed gte 1 and Time.dayState isnot "night">>
+		<<else>>
+			<<add_link "이동<br>">><<hideDisplay>>
+			<<cliff>>
+			<<wolf>>
+			<<starfish>>
+			<<nightingale>>
+			<<if $exposed lte 0>>
+				<<buswait>>
+			<</if>>
+			<<loiter>>
+		<</if>>
+		<<add_link "<br>다른 경로<br>">><<hideDisplay>>
+		<<commercial>>
+		<<park>>
+		<<stormdrain>>
+		<<displayLinks>>
+		<<if $options.mapTop isnot true>>
+			<br>
+			<<map "high">>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Office New Location
+<<effects>>
+
+사무실 건물에 다가간다. 문은 잠겨 있지만, 앞쪽에 표지판이 놓여 있다.
+<br><br>
+
+"새 건물로 이전했습니다. 엘크 가 132번지에서 찾아주세요." 그곳은 에이버리의 고층 빌딩 주소다.
+<br><br>
+
+<<link [[떠난다 (0:01)|High Street]]>><<pass 1>><</link>>
+<br>

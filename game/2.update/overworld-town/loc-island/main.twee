@@ -1,0 +1,2745 @@
+:: Island Beach
+<<location "island">><<set $outside to 1>><<effects>>
+
+당신은 낯선 섬의 해변에 있다. 이곳의 모래는 단단하지만 젖어 있어서, 해변의 다른 곳도 이렇게 안정적일지는 알 수 없다.
+<br><br>
+<<island_init>>
+<<if $settings.tentaclesEnabled and ($hallucinations gte 2 or $world_corruption_soft gte 50)>>
+	<span class="purple">바다에서 수많은 촉수가 솟구쳐 오른다.</span> 어떤 것은 위로 솟아 있고, 다른 것들은 마치 당신을 잡으려는 듯 뻗어 나오지만, 너무 멀리 있다.
+	<br><br>
+	파도가 당신의 발치에 닿는다. 조수가 빠르게 차오르고 있다.
+	<br><br>
+<<else>>
+	포효하는 파도가 당신의 주의를 끈다. 물살이 거세고, 조수가 빠르게 차오르고 있다.
+	<br><br>
+<</if>>
+
+<<island_tide_text>>
+<br><br>
+
+<<island_tide_options>>
+
+:: Island Beach Walk
+<<effects>>
+
+<<if $phase is 1>>
+	당신은 네 발로 엎드려 해변을 기어 올라간다. 손으로 모래의 단단함을 확인한 뒤에 온 체중을 싣는다. 조수가 점점 더 가까워지는 소리가 들린다.
+	<br><br>
+<<elseif $phase is 2>>
+	당신은 해변을 걸어 올라간다. 발을 내딛기 전에 매번 모래의 단단함을 확인한다.
+	<br><br>
+<<else>>
+	당신은 최대한 빨리 해변을 달려 올라가, 조수를 뒤로한다.
+	<br><br>
+<</if>>
+
+<<if $island.tide_distance gte 10>>
+	숲 경계선에 다다르자 모래는 더 단단해지다가 흙으로 바뀐다. 당신은 나무들이 있는 안전한 곳으로 피신한다.
+	<br><br>
+	<<link [[다음|Island Treeline]]>><</link>>
+	<br>
+<<elseif $island.tide gte 5>>
+	<<if $settings.tentaclesEnabled and ($hallucinations gte 2 or $world_corruption_soft gte 50)>>
+		조수가 당신을 덮쳐 발을 떼게 만들고, 수많은 촉수가 당신의 몸을 휘감는다.
+		<br><br>
+
+		<<link [[다음|Island Beach Tentacles]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		조수가 당신을 덮쳐 발을 떼게 만들고, 파도 아래로 당신을 끌어당긴다.
+		<br><br>
+
+		<<link [[다음|Passout Beach]]>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<if $phase is 1 and $rng gte 91 or $phase is 2 and $rng gte 71 or $phase is 3 and $rng gte 51>>
+
+		<<if $phase is 1>>
+			조심했음에도 불구하고, <span class="purple">당신의 손과 무릎이 유사 속으로 가라앉는다.</span>
+		<<elseif $phase is 2>>
+			<span class="purple">유사가 당신의 발을 발목까지 삼켜버린다.</span>
+		<<else>>
+			<span class="purple">유사가 당신의 발을 발목까지 삼켜버리는 바람에 거의 넘어질 뻔한다.</span>
+		<</if>>
+
+		<<if random(1, 8) is 8 and $settings.voreEnabled>>
+			<br><br>
+
+			모래가 울리더니, <span class="pink">거대한 아가리가 모래에서 튀어나오면서</span> 가라앉는다.
+			<br><br>
+			<<link [[다음|Island Beach Vore]]>><<set $molestationstart to 1>><</link>>
+			<br>
+
+		<<else>>
+
+			<<if $quicksand gte 5>>
+				<span class="green">하지만,</span> 당신은 체중을 분산시켜 안전하게 꿈틀거리며 건널 수 있다.<<note "지식: 유사" "Green">>
+				<br><br>
+			<<else>>
+				그다지 깊지는 않지만, 진흙탕에서 몸을 빼내는 데 시간이 좀 걸린다.<<island_pass 1>><<island_tide 1>><<gisland_tide>>
+				<br><br>
+			<</if>>
+			<<island_tide_options>>
+		<</if>>
+	<<else>>
+		<<set $rng to random(1, 100)>>
+		<<if $rng gte 81 and $settings.slugsEnabled>>
+			<<if $settings.slugsEnabled>>
+				살찐 민달팽이들이 모래 바로 아래에 숨어 있다가, 당신이 지나갈 때 덤벼든다.
+				<br><br>
+				<<if pcAreArmsBound("both")>>
+					<span class="blue">팔이 묶여 있어서, 자신을 방어하기 어렵다.</span>
+					<br>
+				<<else>>
+					<<link [[팔로 쳐낸다|Island Beach Slug Bat]]>><</link>>
+					<br>
+				<</if>>
+				<<link [[몸을 숙인다|Island Beach Slug Duck]]>><</link>>
+				<br>
+			<<else>>
+				축축하고 질척한 모래 때문에 속도가 상당히 느려진다.<<island_pass 1>><<island_tide 1>><<gisland_tide>>
+				<br><br>
+
+				<<island_tide_options>>
+			<</if>>
+		<<else>>
+
+			<<island_tide_options>>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Island Beach Slug Bat
+<<effects>>
+
+당신은 팔로 뛰어오르는 민달팽이들을 쳐낸다. 마지막 녀석에게서 점액 한 줄기가 뿜어져 나온다.
+<<random_goo>>
+<br><br>
+
+<<island_tide_options>>
+
+:: Island Beach Slug Duck
+<<effects>>
+
+몸을 숙여 뛰어오르는 민달팽이 두어 마리를 피했지만, 세 번째 녀석이 얼굴에 부딪혀 당신을 넘어뜨린다.
+<br><br>
+
+민달팽이들은 더 이상 당신을 괴롭히지 않지만, 진흙탕에서 몸을 빼내는 것은 힘겨운 일이다.<<island_pass 1>><<island_tide 1>><<gisland_tide>>
+<br><br>
+
+<<island_tide_options>>
+
+:: Island Beach Tentacles
+<<effects>>
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+
+	<<tentaclestart 12 15>>
+
+<</if>>
+<<water>>
+<<waterbr 1>>
+<<statetentacles>>
+
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<actionstentacles>>
+
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Island Beach Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Island Beach Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Island Beach Tentacles Finish
+<<effects>>
+
+더 많은 촉수가 나타나 당신을 파도 아래로 끌고 간다.
+<br><br>
+
+<<endcombat>>
+
+<<link [[다음|Passout Beach]]>><</link>>
+<br>
+
+:: Island Beach Vore
+<<set $outside to 1>><<effects>>
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<molested>>
+	<<controlloss>>
+
+	<<if $settings.tentaclesEnabled and $hallucinations gte 1>>
+		<<set $enemytype to "tentacles">>
+		<<tentaclestart 2 15>>
+		<<set $voretentacles to 1>>
+	<<else>>
+		<<set $enemytype to "vore">>
+		<<set $voretentacles to 0>>
+	<</if>>
+
+	<<set $vorestage to 1>>
+	<<set $vorecreature to "giant lurker">>
+	<<set $vorestrength to 1>><<set $position to "doggy">>
+	<<resetLastOptions>>
+	<<getCombatDefaultsType>>
+<</if>>
+
+<<if $settings.tentaclesEnabled and $hallucinations gte 1 and $enemytype is "tentacles">>
+	<<voreeffects>><<effectstentacles>>
+	<<vore>><<tentacles>>
+	<<statetentacles>>
+	<br><br>
+	<<actionsvorentacles>>
+<<else>>
+	<<voreeffects>>
+	<<vore>>
+	<<voreactions>>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	<span id="next"><<link [[다음|Island Beach Vore Finish]]>><</link>></span><<nexttext>>
+<<elseif $vorestage lte 0>>
+	<span id="next"><<link [[다음|Island Beach Vore Finish]]>><</link>></span><<nexttext>>
+<<elseif $vorestomach gte 5>>
+	<span id="next"><<link [[다음|Island Beach Vore Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Island Beach Vore]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Island Beach Vore Finish
+<<effects>>
+<<if $stress gte $stressmax or $vorestomach gte 5>>
+	당신에게는 너무 벅차다. 당신은 정신을 잃는다.
+	<br><br>
+	<<if $upperoff isnot 0>>
+		<<upperruined>>
+	<</if>>
+	<<if $loweroff isnot 0>>
+		<<lowerruined>>
+	<</if>>
+	<<if $underloweroff isnot 0>>
+		<<underlowerruined>>
+	<</if>>
+	<<if $underupperoff isnot 0>>
+		<<underupperruined>>
+	<</if>>
+	<<endcombat>>
+	<<if isPregnancyEnding()>>
+		정신을 차렸을 때, 거대한 럴커는 어디에도 보이지 않는다. 일어서려고 하지만, 수축이 너무 심해 일어설 수 없다.
+		<<pregnancyPassout "island">>
+	<<else>>
+		<<link [[다음|Island Passout]]>><<trauma 6>><<passout>><<island_pass 60>><</link>>
+		<br>
+	<</if>>
+	<br>
+<<else>>
+	<<tearful>> 당신은 간신히 몸을 끌어 모래 위로 다시 올라온다.
+	<<if $settings.tentaclesEnabled and $hallucinations gte 1 and $enemytype is "tentacles">>
+		두 개의 촉수가 당신을 뒤쫓아 더듬거리지만, 당신은 간신히 굴러 안전한 곳으로 피한다.
+	<</if>>
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	조수가 더 가까이 다가온다.<<island_pass 1>><<island_tide 1>><<gisland_tide>>
+	<br><br>
+	<<island_tide_options>>
+<</if>>
+
+:: Island Treeline
+<<effects>>
+
+빽빽하게 들어찬 나무들 사이를 비집고 들어가자, 머리 위 캐노피가 하늘을 가린다. 등 뒤에서 들려오던 바다 소리는 사라지고, 나뭇잎 스치는 소리가 그 자리를 대신한다.
+<br><br>
+<<generateRole 0 0 "islander">><<person1>>
+등 뒤에서 인기척이 느껴진다. 돌아보니, 방금 전 당신이 걸어왔던 곳에 한 인물이 웅크리고 있어 거의 뛰어오를 뻔한다. <<His>> 얼굴은 눈구멍이 둥글게 뚫린 사슴뿔 달린 가면으로 가려져 있다. <<his>> 손에는 화살이 시위에 매겨진 활이 들려 있다.
+<br><br>
+
+<<if $islander_language gte 100>>
+	"길 잃은 자가 돌아왔군." <<he>>【이가】 말한다.
+<<elseif $islander_language gte 50>>
+	<<He>>【은는】 당신에게 말을 걸지만, 그 말을 이해할 수 없다.
+<<else>>
+	<<He>>【은는】 익숙하지만 이해할 수 없는 언어로 말한다.
+<</if>>
+한 번의 동작으로, <<he>>【이가】 <span class="pink">활시위를 당겼다가 당신 쪽으로 화살을 쏜다.</span> 화살은 당신 옆 나무에 쿵 소리를 내며 박힌다.
+<br><br>
+
+<<link [[도망친다 (0:05)|Island Treeline Run]]>><<island_pass 5>><<tiredness 6>><<stress 6>><</link>><<gtiredness>><<gstress>>
+<br>
+<<link [[항복한다|Island Treeline Surrender]]>><<stress 12>><</link>><<ggstress>>
+<br>
+
+:: Island Treeline Run
+<<effects>>
+
+당신은 돌아서서 최대한 빨리 달린다. 등 뒤에서 웃음소리가 들리지만, 섬 주민은 따라오지 않는 것 같다. 그럼에도 당신은 다리에 힘이 풀려 쓰러질 때까지 달린다.
+<br><br>
+
+<<link [[다음|Island Treeline Search]]>><<island_pass 60>><</link>>
+<br>
+
+:: Island Treeline Surrender
+<<effects>>
+
+당신은 무릎을 꿇고 머리를 숙인다. 항복의 뜻을 어떻게 전달해야 할지 알 수 없었기 때문이다. 섬 주민이 웃더니, 이내 조용해진다. 고개를 들어보니, <<He>>【은는】 사라지고 없다.
+<br><br>
+
+<<link [[다음|Island Treeline Search]]>><<island_pass 60>><</link>>
+<br>
+
+:: Island Treeline Search
+<<effects>>
+
+이 섬은 위험할 수 있지만, 해변이 안전하지 않으므로 더 깊이 들어가는 수밖에 없다.
+<br><br>
+
+땅이 가팔라지고 길을 막는 바위가 점점 많아지면서 나무가 듬성듬성해진다. 작은 언덕 꼭대기에 오르자 주변 경관이 잘 보인다. 사방으로 바다가 보이지만, 섬 자체는 빽빽한 캐노피에 가려져 있다.
+<br><br>
+
+지붕처럼 튀어나온 바위 아래 암벽에서 작은 시냇물이 졸졸 흘러나온다. 이 섬에 얼마나 머물게 될지 알 수 없지만, 이곳은 방향을 잡기 위한 좋은 거점으로 보인다.
+<br><br>
+<<set $island.home to "rocky_hillock">>
+<i>섬에서는 식량을 쉽게 구할 수 없습니다. 직접 찾아야 합니다.</i>
+<br><br>
+<<link [[다음|Island]]>><<endevent>><</link>>
+<br>
+
+:: Island
+<<location "island">><<set $outside to 1>><<effects>>
+
+<<hunger_description>>
+<br><br>
+<<if $island.home is "rocky_hillock">>
+	You are on a strange island, in your camp atop a rocky hillock. You have a good view of your surroundings.
+<<elseif $island.home is "waterfall">>
+	You are on a strange island, in your camp atop a waterfall. The river emerges from the trees nearby.
+<<elseif $island.home is "gulch">>
+	You are on a strange island, in your camp within a gulch. Rocks and trees loom above you.
+<</if>>
+<br><br>
+
+<<if $island_simple_decor_message is 1>><<unset $island_simple_decor_message>>
+	As you enter the camp, the sight of your <<print $island[$island.home].decoration>> buoys your spirits.<<lstress>><<stress -1>>
+	<br><<if $island_bird_message isnot 1>><br><</if>>
+<<elseif $island_basic_decor_message is 1>><<unset $island_basic_decor_message>>
+	As you enter the camp, the sight of your <<print $island[$island.home].decoration>> and other decorations lift your spirits.<<lstress>><<stress -2>>
+	<br><<if $island_bird_message isnot 1>><br><</if>>
+<<elseif $island_advanced_decor_message is 1>>
+	As you enter the camp, the sight of your <<print $island[$island.home].decoration>> and other decorations bolster your spirits.<<lstress>><<stress -3>><<unset $island_advanced_decor_message>>
+	<br><<if $island_bird_message isnot 1>><br><</if>>
+<</if>>
+<<if $island_bird_message is 1>><<unset $island_bird_message>>
+	<span class="teal">A visiting bird has left you a handful of walnuts.</span><<gwalnut>><<set $island.walnut += 1>>
+	<br><br>
+<</if>>
+
+<<if pcAreArmsBound("any")>>
+	<<unbind>>
+	<span class="lblue">You tear through your bonds using a sharp stone.</span>
+	<br><br>
+<</if>>
+
+
+<<if $stress gte $stressmax>>
+	It's too much for you. You pass out.
+	<br><br>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "island">>
+	<<else>>
+		<<link [[Next|Island Passout]]>><<trauma 6>><<passout>><<island_pass 60>><</link>>
+		<br>
+	<</if>>
+<<elseif $hunger gte 2000>>
+	You are ravenous. The hunger gnaws at your belly, a desperation heightened by the knowledge that your next meal might never come.
+	<br><br>
+
+	You find yourself wandering the island, searching for any morsel of edible matter, heedless of all danger.
+	<br><br>
+
+	<<link [[Next (0:30)|Island Hunger]]>><<pass 30>><</link>>
+	<br>
+<<else>>
+
+Where do you want to explore?
+<br>
+<label>Near your camp <<radiobutton "$island.explore" "none" autocheck>></label>
+<<if $island.explore_locations.includes("shore")>>
+	<label>| The shore for a higher chance of food <<radiobutton "$island.explore" "shore" autocheck>></label>
+<</if>>
+<<if $island.explore_locations.includes("wood")>>
+	<label>| The lush woodland for a higher chance of wood <<radiobutton "$island.explore" "wood" autocheck>></label>
+<</if>>
+<<if $island.explore_locations.includes("battleground")>>
+	<label>| The battleground for a higher chance of encountering natives <<radiobutton "$island.explore" "battleground" autocheck>></label>
+<</if>>
+<<if $island.explore_locations.includes("plain")>>
+	<label>| The plain for a higher chance of finding antiques <<radiobutton "$island.explore" "plain" autocheck>></label>
+<</if>>
+<br>
+<<islandicon "explore">><<link [[Explore (1:00)|Island Explore]]>><<physique 6>><<island_pass 60>><<set $island.explore_count += 1>><</link>><<gphysique>>
+<br><br>
+
+<<if $island.walnut gte 1 or $island.walnut_dried gte 1>>
+	You have
+	<<if $island.walnut + $island.walnut_dried is 1>>
+		a handful
+	<<else>>
+		<<number `$island.walnut + $island.walnut_dried`>> handfuls
+	<</if>>
+	of walnuts stashed away. <<if $island.walnut_dried gte 1>><<Number $island.walnut_dried>> <<print $island.walnut_dried is 1 ? 'handful is' : 'handfuls are'>> dried and all the more nutritious for it.<</if>>
+	<br>
+	<<if $island.walnut gte 1>>
+		<<islandicon "nuts">><<link [[Eat a handful of raw walnuts|Island Walnut Eat]]>><<set $island.walnut-->><<hunger -200>><</link>><<lhunger>>
+		<br>
+	<</if>>
+	<<if $island.walnut_dried gte 1>>
+		<<islandicon "nuts">><<link [[Eat a handful of dried walnuts (0:05)|Island Walnut Eat Dried]]>><<set $island.walnut_dried-->><<island_pass 5>><<hunger -400>><</link>><<llhunger>>
+		<br>
+	<</if>>
+	<br>
+<</if>>
+
+	Furniture:
+	<<if $island[$island.home].trap is "simple">>
+		<span class="blue">Simple</span> trap |
+	<<elseif $island[$island.home].trap is "basic">>
+		<span class="lblue">Basic</span> trap |
+	<<elseif $island[$island.home].trap is "advanced">>
+		<span class="teal">Advanced</span> trap |
+	<</if>>
+	<<if $island[$island.home].curtains is "simple">>
+		<span class="blue">Simple</span> curtains |
+	<<elseif $island[$island.home].curtains is "basic">>
+		<span class="lblue">Basic</span> curtains |
+	<<elseif $island[$island.home].curtains is "advanced">>
+		<span class="teal">Advanced</span> curtains |
+	<</if>>
+	<<if $island[$island.home].decor is "simple">>
+		<span class="blue">Simple</span> decor with <<print $island[$island.home].decoration>> |
+	<<elseif $island[$island.home].decor is "basic">>
+		<span class="lblue">Basic</span> decor with <<print $island[$island.home].decoration>> |
+	<<elseif $island[$island.home].decor is "advanced">>
+		<span class="teal">Advanced</span> decor with <<print $island[$island.home].decoration>> |
+	<</if>>
+	<<if $island[$island.home].bird_feeder is "simple">>
+		<span class="blue">Simple</span> bird feeder |
+	<<elseif $island[$island.home].bird_feeder is "basic">>
+		<span class="lblue">Basic</span> bird feeder |
+	<<elseif $island[$island.home].bird_feeder is "advanced">>
+		<span class="teal">Advanced</span> bird feeder |
+	<</if>>
+	<<if $island[$island.home].chair is "simple">>
+		<<icon "island-stool.png">><span class="blue">Stool</span> |
+	<<elseif $island[$island.home].chair is "basic">>
+		<<icon "island-chair.png">><span class="lblue">Chair</span> |
+	<<elseif $island[$island.home].chair is "advanced">>
+		<<icon "island-throne.png">><span class="teal">Throne</span> |
+	<</if>>
+	<<if $island[$island.home].camouflage is "simple">>
+		<span class="blue">Simple</span> camouflage |
+	<<elseif $island[$island.home].camouflage is "basic">>
+		<span class="lblue">Basic</span> camouflage |
+	<<elseif $island[$island.home].camouflage is "advanced">>
+		<span class="teal">Advanced</span> camouflage |
+	<</if>>
+	<br>
+	<<if $island[$island.home].space is 0>>
+		You have no more space for furniture.
+		<br>
+	<</if>>
+	<<choreicon "fix">><<link [[Build|Island Build]]>><</link>>
+	<br>
+	<br>
+	<<if $drugged gte 1>>
+		<span class="pink">You feel a lewd haze within you.</span>
+		<br>
+		<<skinicon "masturbate">><<link [[Masturbate|Island Masturbation]]>><<set $masturbationstart to 1>><</link>>
+		<br>
+	<<elseif $arousal gte ($arousalmax / 2)>>
+		You feel aroused.
+		<br>
+		<<skinicon "masturbate">><<link [[Masturbate|Island Masturbation]]>><<set $masturbationstart to 1>><</link>>
+		<br>
+	<</if>>
+	<<skinicon "wash">><<link [[Wash (0:10)|Island]]>><<island_pass 10>><<wash>><</link>>
+	<br>
+	<<mirroricon>><<link [[Look at your reflection|Island Mirror]]>><<preMirror>><</link>>
+	<br>
+	<<if ($worn.upper.exposed gte 2 and $worn.under_upper.exposed gte 1
+	or $worn.upper.exposed gte 2 and $underupperwetstage gte 3
+	or $upperwetstage gte 3 and $worn.under_upper.exposed gte 1
+	or $upperwetstage gte 3 and $underupperwetstage gte 3)
+	and !pcAreArmsBound("both")>>
+		<<foresticon "bush">><<link [[Make a top out of plants and twigs (0:20)|Island Clothes]]>><<set $phase to 1>><<island_pass 20>><</link>>
+		<br>
+	<</if>>
+	<<if ($worn.lower.exposed gte 2 and $worn.under_lower.exposed gte 1
+	or $worn.lower.exposed gte 2 and $underlowerwetstage gte 3
+	or $lowerwetstage gte 3 and $worn.under_lower.exposed gte 1
+	or $lowerwetstage gte 3 and $underlowerwetstage gte 3)
+	and !pcAreArmsBound("both")>>
+		<<foresticon "bush">><<link [[Make a skirt out of plants and twigs (0:20)|Island Clothes]]>><<set $phase to 2>><<island_pass 20>><</link>>
+		<br>
+	<</if>>
+
+
+
+	<<bedicon "zzz">><<link [[Sleep|Island Bed]]>><</link>>
+	<br>
+	<br>
+
+	<<if $island.explore_locations.includes("castle")>>
+		<<birdicon "tower">><<link [[Walk to castle (0:20)|Island Castle]]>><<island_pass 20>><</link>>
+		<br>
+	<</if>>
+	<<if $worn.face.name is "islander mask">>
+		<<islandicon "mask">><<link [[Store mask|Island]]>><<set $island.mask_stored to 1>><<faceruined true>><</link>>
+		<br>
+	<<elseif $island.mask_stored is 1>>
+		<<islandicon "mask">><<link [[Retrieve mask|Island]]>><<set $island.mask_stored to undefined>><<facewear "islander mask">><</link>>
+		<br>
+	<</if>>
+	<<if $debug is 1>>
+		<<ind>><<link [[Get wood|$passage]]>><<set $island.wood += 100>><</link>> (debug)
+		<br>
+	<</if>>
+<</if>>
+
+:: Island Mirror
+<<effects>>
+
+<<getouticon>><<link [[물러선다|Island]]>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</link>>
+<br><br>
+
+<<mirror "물 안">>
+<br><br>
+
+:: Island Bed
+<<set $outside to 0>><<effects>>
+
+<<if $island.home is "rocky_hillock">>
+	당신은 돌출부 아래, 부드러운 이끼 침대 위에 누워 있다. 주변의 바위가 바람과 비로부터 당신을 보호해 준다.
+	<br><br>
+<</if>>
+
+<<generateSleepLinks "Island Sleep">>
+
+<<link [[침대에서 나온다|Island]]>><<storeon "bed">><<set $wardrobe_location to "wardrobe">><<loadTempHairStyle>><<endevent>><</link>>
+<br><br>
+
+:: Island Sleep
+<<set _autosavehere to true>>
+<<effects>>
+
+<<sleep>><<effects>>
+<<sleepeffects>>
+
+<<if $island_wake_3 is 1>>
+	<<unset $island_wake_3>>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<generateRole 2 0 "islander">>
+	<<generateRole 3 0 "islander">>
+	<<person1>>
+	<<if $island[$island.home].trap is "simple" and random(1, 2) is 2 or $island[$island.home].trap is "basic" and random(1, 4) gte 2 or $island[$island.home].trap is "advanced">>
+		비명 소리에 잠에서 깬다. 당신의 덫에 누군가 걸렸다. 하지만 다른 세 사람의 목소리가 이쪽으로 다가오고 있다.<<lcamp_concealment>><<set $island.hide += 1>>
+		<br><br>
+		<<endevent>>
+		<<generateRole 0 0 "islander">>
+		<<generateRole 1 0 "islander">>
+		<<generateRole 2 0 "islander">>
+		<<person1>>
+		<<link [[몸을 지킨다|Island Sleep Defend]]>><<set $phase to 1>><<unset $island_roll>><</link>>
+		<br>
+		/*
+		<<set $island_roll to random(1, 100)>><<set $island_roll += (13 * $island.hide)>>
+		<<link [[슬쩍 자리를 피한다|Island Sleep Skulk]]>><<set $phase to 1>><</link>><<difficulty $island_roll>>
+		<br>
+		*/
+		<<set $skulduggerydifficulty to (800 + (50 * $island.hide))>>
+		<<link [[슬쩍 피한다|Island Sleep Hide 3]]>><<set $phase to 1>><<unset $island_roll>><</link>><<skulduggerydifficulty>>
+		<br>
+	<<else>>
+		<<if $islander_language gte 100>>
+			<span class="pink">요란한 목소리</span>에 잠에서 깬다. 그들은 자신들의 존재를 알리고 있다.
+			<br>
+			"안에 있는 거 다 알아." <<personssimple>> 목소리가 말한다.
+			<br>
+			"순순히 굴면 얌전히 대해주지." 다른 목소리가 말한다.
+		<<elseif $islander_language gte 50>>
+			<span class="pink">요란한 목소리</span>에 잠에서 깬다. 그들은 자신들의 존재를 알리고 있다. 조롱하는 어조로 당신을 부르는 것 같다.
+		<<else>>
+			<span class="pink">요란한 목소리</span>에 잠에서 깬다. 그들은 자신들의 존재를 알리고 있다. 그들의 언어는 이해할 수 없지만, 점점 가까워지고 있다.
+		<</if>>
+		<<lcamp_concealment>><<set $island.hide += 1>>
+		<br><br>
+		<<link [[몸을 지킨다|Island Sleep Defend]]>><<unset $island_roll>><</link>>
+		<br>
+		/*
+		<<set $island_roll to random(1, 100)>><<set $island_roll += (12 * $island.hide)>>
+		<<link [[슬쩍 자리를 피한다|Island Sleep Skulk]]>><</link>><<difficulty $island_roll>>
+		<br>
+		*/
+		<<set $skulduggerydifficulty to (700 + (50 * $island.hide))>>
+		<<link [[슬쩍 피한다|Island Sleep Hide 3]]>><<unset $island_roll>><</link>><<skulduggerydifficulty>>
+		<br>
+		<br>
+	<</if>>
+<<elseif $island_wake_2 is 1>>
+	<<unset $island_wake_2>>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<generateRole 2 0 "islander">>
+	<<person1>>
+	<<if $island[$island.home].trap is "simple" and random(1, 2) is 2 or $island[$island.home].trap is "basic" and random(1, 4) gte 2 or $island[$island.home].trap is "advanced">>
+		<<personssimple>> 비명 소리에 잠에서 깬다. 당신의 덫에 누군가 걸렸지만, 다른 두 사람의 목소리가 이쪽으로 다가오고 있다.<<lcamp_concealment>><<set $island.hide += 1>>
+		<<endevent>>
+		<<generateRole 0 0 "islander">>
+		<<generateRole 1 0 "islander">>
+		<<person1>>
+		<br><br>
+		<<link [[기습한다|Island Sleep Ambush]]>><<unset $island_roll>><</link>>
+		<br>
+		/*
+		<<set $island_roll to random(1, 100)>><<set $island_roll += (6 * $island.hide)>>
+		<<link [[슬그머니 자리를 피한다|Island Sleep Slink]]>><</link>><<difficulty $island_roll>>
+		<br>
+		*/
+		<<set $skulduggerydifficulty to (300 + (50 * $island.hide))>>
+		<<link [[슬그머니 피한다|Island Sleep Hide 2]]>><<set $phase to 1>><<unset $island_roll>><</link>><<skulduggerydifficulty>>
+		<br>
+	<<else>>
+		<span class="pink">목소리들</span>에 잠에서 깬다. 세 사람이 소곤거리며 이야기하고 있다. 그들은 점점 가까워지고 있다.<<lcamp_concealment>><<set $island.hide += 1>>
+		<br><br>
+
+		<<link [[기습한다|Island Sleep Ambush]]>><<unset $island_roll>><</link>>
+		<br>
+		/*
+		<<set $island_roll to random(1, 100)>><<set $island_roll += (11 * $island.hide)>>
+		<<link [[슬그머니 자리를 피한다|Island Sleep Slink]]>><</link>><<difficulty $island_roll>>
+		<br>
+		*/
+		<<set $skulduggerydifficulty to (600 + (50 * $island.hide))>>
+		<<link [[슬그머니 피한다|Island Sleep Hide 2]]>><<unset $island_roll>><</link>><<skulduggerydifficulty>>
+		<br>
+	<</if>>
+<<elseif $island_wake_1 is 1>>
+	<<unset $island_wake_1>>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<person1>>
+	<<if $island[$island.home].trap is "simple" and random(1, 2) is 2 or $island[$island.home].trap is "basic" and random(1, 4) gte 2 or $island[$island.home].trap is "advanced">>
+		<<person1>><<personsimple>> 비명 소리에 잠에서 깬다. 누군가 당신의 덫을 건드렸다. 두 번째 목소리가 들려오며 점점 커진다. 곧 도착할 테지만, 혼자인 것 같다.<<lcamp_concealment>><<set $island.hide += 1>>
+		<<endevent>>
+		<<generateRole 0 0 "islander">>
+		<br><br>
+		<<link [[일어나서 맞선다|Island Sleep Confront Trapped]]>><<unset $island_roll>><</link>>
+		<br>
+		/*
+		<<set $island_roll to random(1, 100)>><<set $island_roll += (5 * $island.hide)>>
+		<<link [[미동도 하지 않는다|Island Sleep Motionless Trapped]]>><</link>><<difficulty $island_roll>>
+		<br>
+		*/
+		<<set $skulduggerydifficulty to (200 + (100 * $island.hide))>>
+		<<link [[숨는다|Island Sleep Hide Trapped]]>><<unset $island_roll>><</link>><<skulduggerydifficulty>>
+		<br>
+	<<else>>
+		<span class="pink">위험을 감지</span>하고 깜짝 놀라 잠에서 깬다. 속삭이는 소리가 들린다.<<lcamp_concealment>><<set $island.hide += 1>>
+		<br><br>
+
+		<<link [[일어나서 속삭임의 근원과 맞선다|Island Sleep Confront]]>><<unset $island_roll>><</link>>
+		<br>
+		/*
+		<<set $island_roll to random(1, 100)>><<set $island_roll += (10 * $island.hide)>>
+		<<link [[미동도 하지 않는다|Island Sleep Motionless]]>><</link>><<difficulty $island_roll>>
+		<br>
+		*/
+		<<set $skulduggerydifficulty to (500 + (100 * $island.hide))>>
+		<<link [[숨는다|Island Sleep Hide]]>><<unset $island_roll>><</link>><<skulduggerydifficulty>>
+		<br>
+	<</if>>
+<<else>>
+	편안하게 잠을 잔다,
+	<<if Time.dayState is "night">>
+		그리고 바람 소리에 잠에서 깬다.
+	<<else>>
+		그리고 지저귀는 새소리에 잠에서 깬다.
+	<</if>>
+		<br><br>
+	<<link [[다음|Island]]>><</link>>
+	<br>
+<</if>>
+
+:: Island Sleep Defend
+<<effects>>
+
+<<if $phase is 1>>
+	당신이 왕좌에서 기다리자 목소리가 가까워진다. <<person1>><<person>>, <<person2>><<person>>, 그리고 <<person3>><<person>>【이가】 나무들 사이에서 걸어 나온다.
+<<else>>
+	당신이 왕좌에서 기다리자 목소리가 가까워진다. <<person1>><<person>>, <<person2>><<person>>, <<person3>><<person>>, 그리고 <<person4>><<person>>【이가】 나무들 사이에서 걸어 나온다.
+<</if>>
+<<if $island[$island.home].chair is "advanced">>
+	당신의 자세에 그들이 잠시 멈칫한다.
+	<br><br>
+	<<if $islander_language gte 100>>
+		"이 무력한 창녀가 섬을 지배할 수 있다고 생각하는군." <<person1>><<person>>【이가】 소리친다. "<<phim>>에게 <<pher>> 분수를 가르쳐주자."
+	<<elseif $islander_language gte 50>>
+		<<person1>><<person>>【이가】 당신에게 분수를 가르쳐주겠다는 내용의 말을 소리치더니, 그들이 돌격한다.
+	<<else>>
+		<<person1>><<person>>【이가】 이해할 수 없는 언어로 무언가 소리치더니, 그들이 돌격한다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+<<else>>
+	<br><br>
+	<<if $islander_language gte 100>>
+		"드루이드가 원하는 게 바로 이 자다." <<person1>><<person>>【이가】 소리친다. "돌격!"
+	<<elseif $islander_language gte 50>>
+		<<person1>><<person>>【이가】 특별히 당신을 찾고 있었다는 내용의 말을 소리치더니, 그들이 돌격한다.
+	<<else>>
+		<<person1>><<person>>【이가】 이해할 수 없는 언어로 소리치더니, 그들이 돌격한다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Island Sleep Skulk
+<<effects>>
+
+<<if $phase is 1>>
+	당신은 잠자리에서 살금살금 빠져나와, <<person1>><<person>>, <<person2>><<person>>, 그리고 <<person3>><<person>>【이가】 시야에 들어올 때까지 잎사귀 사이에 몸을 낮춘다.
+<<else>>
+	당신은 잠자리에서 살금살금 빠져나와, <<person1>><<person>>, <<person2>><<person>>, <<person3>><<person>>, 그리고 <<person4>><<person>>【이가】 시야에 들어올 때까지 잎사귀 사이에 몸을 낮춘다.
+<</if>>
+<<if $rng gte $island_roll>>
+	<span class="green">그들은 당신을 알아채지 못하고 바로 지나간다.</span> 그리고는 알 수 없는 곳으로 계속 나아간다.
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if $islander_language gte 100>>
+		그들이 서로 속삭인다.
+		<br>
+		"잃어버린 그 아이인 것 같나?"
+		<br>
+		"조용히 해, 들키겠어."
+		<br>
+		"맞아!" <<person1>><<person>>【이가】 소리친다. "저기다!" <<He>>【이가】 당신을 똑바로 가리킨다.
+	<<elseif $islander_language gte 50>>
+		그들은 서로 속삭이며, 무언가를 찾는 듯 땅을 훑어보며 질문을 던진다. <<person2>><<person>>【이가】 <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<<else>>
+		그들은 이해할 수 없는 언어로 서로 속삭이며 무언가를 찾는 듯 땅을 훑어본다. <<person2>><<person>>【이가】 <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<</if>>
+	<br><br>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+<</if>>
+<<unset $island_roll>>
+
+:: Island Sleep Hide 3
+<<effects>>
+
+당신은 그림자 속으로 사라져 미동도 하지 않는다. 이제 그들의 속삭임이 더 선명하게 들린다.
+<<if $islander_language gte 100>>
+	여러 사람이 말하고 있다.
+	"나오면, 얌전히 대해주지."
+	<br>
+	"난 차라리 제대로 저항해줬으면 좋겠는데."
+	<br>
+	"너무 다치게 하면 드루이드가 화낼지도 몰라."
+<<elseif $islander_language gte 50>>
+	여러 사람이 말하고 있다. 그들이 당신을 찾고 있다는 것을 알 수 있을 만큼은 이해할 수 있다.
+<<else>>
+	여러 사람이 말하고 있지만, 당신에게는 이해할 수 없는 언어다.
+<</if>>
+<br><br>
+
+<<if $phase is 1>>
+	당신은 그림자 속에 누워, <<person>>, <<person2>><<person>>, 그리고 <<person3>><<person>>【이가】 시야에 들어오는 것을 지켜본다. 각자 이상한 사슴뿔 가면을 쓰고 있다.
+<<else>>
+	당신은 그림자 속에 누워, <<person>>, <<person2>><<person>>, <<person3>><<person>>, 그리고 <<person4>><<person>>【이가】 시야에 들어오는 것을 지켜본다. 각자 이상한 사슴뿔 가면을 쓰고 있다.
+<</if>>
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	그들은 당신의 잠자리 앞에 멈춰 서더니, <span class="green">당신 쪽은 쳐다보지도 않고</span> 계속 나아간다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+
+<<else>>
+
+	그들은 당신의 은신처 앞에 멈춰 서서 서로를 쳐다본다. <span class="red">그러자 <<person>>【이가】 당신 위로 덮친다</span>, 그리고 당신을 땅에 꼼짝 못하게 눕힌다./*<<gcamp_concealment>>*/<<set $island.hide -= 3>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Island Sleep Ambush
+<<effects>>
+
+당신은 나무에 등을 기댄 채 다가오는 발소리를 들으며 기다린다. <<person1>><<person>>【이가】 지나가지만, 당신을 알아채지 못한다.
+<br><br>
+
+그 뒤를 <<person2>><<person>>【이가】 따른다. 그가 더 예리한 건지, 아니면 그냥 운이 좋은 건지 모르겠지만, 그의 고개가 당신을 향해 돌아간다. <<His>> 가면은 아무것도 드러내지 않지만, 당신은 선수를 쳐서 공격에 돌입한다.
+<br><br>
+
+<<link [[다음|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Island Sleep Slink
+<<effects>>
+
+당신은 그림자 속으로 살금살금 들어가, <<person1>><<person>>, <<person2>><<person>>, 그리고 <<person3>><<person>>【이가】 시야에 들어올 때까지 배를 깔고 기어간다.
+<<if $rng gte $island_roll>>
+	<span class="green">그들은 당신을 알아채지 못하고 바로 지나간다.</span> 그리고는 알 수 없는 곳으로 계속 나아간다.
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if $islander_language gte 100>>
+		그들이 서로 이야기한다.
+		"<<pshe>>【이가】 여기 있는 거 알아." <<person1>><<person>>【이가】 말한다.
+		<br>
+		"그럼 목소리 낮춰." <<person2>><<person>>【이가】 대답한다.
+		<br>
+		"그럴 필요 없어." <<person3>><<person>>【이가】 덧붙인다. "<<phim>> 봤어!" <span class="red"><<He>>【이가】 당신을 똑바로 가리킨다.</span>
+	<<elseif $islander_language gte 50>>
+		그들이 서로 속삭인다. <<person2>><<person>>【이가】 <span class="red">소리를 지르며 당신을 똑바로 가리키기</span> 전부터 그들이 당신을 찾고 있다는 것은 분명하다.
+	<<else>>
+		그들은 이해할 수 없는 언어로 서로 속삭이며 무언가를 찾는 듯 땅을 훑어본다. <<person2>><<person>>【이가】 <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<</if>>
+	<br><br>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+<</if>>
+<<unset $island_roll>>
+
+:: Island Sleep Slink 2
+<<effects>>
+
+당신은 그림자 속으로 살금살금 들어가, <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 시야에 들어올 때까지 배를 깔고 기어간다.
+<<if $rng gte $island_roll>>
+	<span class="green">그들은 당신을 알아채지 못하고 바로 지나간다.</span> 그리고는 알 수 없는 곳으로 계속 나아간다.
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if $islander_language gte 100>>
+		그들이 서로 이야기한다.
+		"잃어버린 그 아이가 여기 있을까?" <<person1>><<person>>【이가】 묻는다.
+		<br>
+		"그래." <<person2>><<person>>【이가】 대답한다. "바로 저기!" <span class="red"><<He>>【이가】 당신을 가리킨다.</span>
+	<<elseif $islander_language gte 50>>
+		그들이 서로 이야기한다. 당신은 그들을 이해할 수 없지만, 그들이 당신을 찾고 있다는 것은 분명하다. <<person2>><<person>>【이가】 땅을 훑어보다가, <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<<else>>
+		그들은 이해할 수 없는 언어로 서로 이야기하며 무언가를 찾는 듯 땅을 훑어본다. <<person2>><<person>>【이가】 <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<</if>>
+	<br><br>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+<</if>>
+<<unset $island_roll>>
+
+:: Island Sleep Hide 2
+<<effects>>
+
+당신은 배를 깔고 엎드려 다가오는 목소리로부터 멀리, 땅을 따라 꿈틀거리며 움직인다.
+<<if $islander_language gte 100>>
+	이제 그들의 목소리가 더 선명하게 들린다.
+	"잃어버린 그 아이인 것 같나?"
+	<br>
+	"그럴 수도. 야영하기엔 이상한 장소야."
+<<elseif $islander_language gte 50>>
+	이제 그들의 목소리가 더 선명하게 들리고, 그들이 당신을 찾고 있다는 것이 분명하다.
+<<else>>
+	이제 그들의 목소리가 더 선명하게 들리지만, 이해할 수 없는 언어로 말하고 있다.
+<</if>>
+<br><br>
+
+<<if $phase is 1>>
+	당신은 그림자 속에 누워, <<person>>【와과】 <<person2>><<person>>【이가】 시야에 들어오는 것을 지켜본다. 각자 이상한 사슴뿔 가면을 쓰고 있다.
+<<else>>
+	당신은 그림자 속에 누워, <<person>>, <<person2>><<person>>, 그리고 <<person3>><<person>>【이가】 시야에 들어오는 것을 지켜본다. 각자 이상한 사슴뿔 가면을 쓰고 있다.
+<</if>>
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	그들은 당신의 잠자리 앞에 멈춰 서더니, <span class="green">당신 쪽은 쳐다보지도 않고</span> 계속 나아간다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+
+<<else>>
+
+	그들은 당신의 은신처 앞에 멈춰 서서 서로를 쳐다본다. <span class="red">그러자 <<person>>【이가】 당신 위로 덮친다</span>, 그리고 당신을 땅에 꼼짝 못하게 눕힌다./*<<gcamp_concealment>>*/<<set $island.hide -= 3>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Island Sleep Confront
+<<effects>>
+
+당신은 벌떡 일어선다.
+<<if $speech_attitude is "meek">>
+	"해칠 생각은 없어요." 당신이 말한다. "하지만 당신들 때문에 무서워요."
+<<elseif $speech_attitude is "bratty">>
+	"당장 나와." 당신이 말한다. "아니면 내가 찾아내겠어."
+<<else>>
+	"나와." 당신이 말한다.
+<</if>>
+<br><br>
+잠시 침묵이 흐른 후, <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 그림자 속에서 걸어 나와 당신에게 다가온다.
+<br><br>
+
+<<link [[다음|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Island Sleep Confront Trapped
+<<effects>>
+
+당신은 벌떡 일어선다.
+<<if $speech_attitude is "meek">>
+	"해칠 생각은 없어요." 당신이 말한다. "하지만 당신들 때문에 무서워요."
+<<elseif $speech_attitude is "bratty">>
+	"당장 나와." 당신이 말한다. "아니면 내가 찾아내겠어."
+<<else>>
+	"나와." 당신이 말한다.
+<</if>>
+<br><br>
+
+잠시 침묵이 흐른 후, <<person1>><<person>>【이가】 그림자 속에서 나타나 당신에게 다가온다.
+<br><br>
+
+<<link [[다음|Island Sleep Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Island Sleep Motionless
+<<effects>>
+
+당신은 시체처럼 미동도 하지 않은 채, <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 시야에 들어오는 것을 지켜본다.
+<<if $rng gte $island_roll>>
+	<span class="green">그들은 당신을 알아채지 못하고 바로 지나간다.</span> 그리고는 알 수 없는 곳으로 계속 나아간다.
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if $islander_language gte 100>>
+		그들이 서로 속삭인다.
+		<br>
+		"만약 <<pshe>>【이가】 맞다면 드루이드가 우리에게 보상할 거야."
+		<br>
+		"그래, 그러니까 조용히 해."
+		<br>
+		"그럴 필요 없어. 저기 <<pshe>>【이가】 있잖아!" <span class="red"><<He>>【이가】 당신을 똑바로 가리킨다.</span>
+	<<elseif $islander_language gte 50>>
+		그들이 서로 속삭인다. 그들이 당신을 찾고 있다는 것은 분명하다. <<person2>><<person>>【이가】 땅을 훑어보다가, <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<<else>>
+		그들은 이해할 수 없는 언어로 서로 속삭이며 무언가를 찾는 듯 땅을 훑어본다. <<person2>><<person>>【이가】 <span class="red">소리를 지르며 당신을 똑바로 가리킨다.</span>
+	<</if>>
+	<br><br>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+<</if>>
+<<unset $island_roll>>
+
+:: Island Sleep Motionless Trapped
+<<effects>>
+
+당신은 시체처럼 미동도 하지 않은 채, <<person1>><<person>>【이가】 시야에 들어오는 것을 지켜본다.
+<<if $rng gte $island_roll>>
+	<span class="green"><<He>>【은는】 당신을 알아채지 못하고 바로 지나간다.</span> 그리고는 알 수 없는 곳으로 계속 나아간다.
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<He>>【은는】 무언가를 찾는 듯 땅을 훑어보다가, <span class="red"><<his>> 눈이 당신에게 똑바로 꽂힌다.</span>
+	<br><br>
+
+	<<link [[다음|Island Sleep Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+<<unset $island_roll>>
+
+:: Island Sleep Hide
+<<effects>>
+
+당신은 배를 깔고 엎드려 다가오는 목소리로부터 멀리, 땅을 따라 꿈틀거리며 움직인다. 이제 그들의 속삭임이 더 선명하게 들린다.
+<<if $islander_language gte 100>>
+	두 사람이 말하고 있다.
+	<br>
+	"여기 누가 있는 게 확실해."
+	<br>
+	"그럼 조용히 해, 들키겠어."
+<<elseif $islander_language gte 50>>
+	두 사람이 말하고 있다. 무슨 얘기를 하는지 정확히는 알 수 없지만, 그들이 당신을 찾고 있다는 것은 분명하다.
+<<else>>
+	두 사람이 말하고 있지만, 당신에게는 이해할 수 없는 언어다.
+<</if>>
+<br><br>
+
+당신은 그림자 속에 누워, <<person>>【와과】 <<person2>><<person>>【이가】 시야에 들어오는 것을 지켜본다. 각자 이상한 사슴뿔 가면을 쓰고 있다.
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	그들은 당신의 잠자리 앞에 멈춰 서더니, <span class="green">당신 쪽은 쳐다보지도 않고</span> 계속 나아간다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+
+<<else>>
+
+	그들은 당신의 은신처 앞에 멈춰 서서 서로를 쳐다본다. <span class="red">그러자 <<person>>【이가】 당신 위로 덮친다</span>, 그리고 당신을 땅에 꼼짝 못하게 눕힌다./*<<gcamp_concealment>>*/<<set $island.hide -= 3>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Island Sleep Hide Trapped
+<<effects>>
+
+당신은 배를 깔고 엎드려 다가오는 발소리로부터 멀리, 땅을 따라 꿈틀거리며 움직인다. 당신이 그림자 속에 누워 있자 <<person1>><<person>>【이가】 시야에 들어온다. <<His>> 움직임은 조심스럽다, 아마도 또 다른 함정을 두려워하는 것 같다.
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	<<He>>【은는】 근처에 멈춰 서더니, <span class="green">당신 쪽은 쳐다보지도 않고</span> 계속 나아간다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Island]]>><<endevent>><</link>>
+	<br>
+
+<<else>>
+
+	<<He>>【은는】 주위를 둘러보다가, <span class="red">당신을 발견한다.</span>/*<<gcamp_concealment>>*/<<set $island.hide -= 3>>
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<link [[다음|Island Sleep Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+
+<</if>>
+
+:: Island Sleep Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Island Sleep Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Island Sleep Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Island Sleep Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $islander_language gte 100>>
+		당신의 공격자들이 비틀거리며 물러난다.
+		<br>
+		"그 외국 <<girl>>【이가】 이렇게 매력적일 줄은 몰랐는데."
+		<br>
+		"그냥, <<phim>> 잘 지켜봐."
+		<br>
+	<<elseif $islander_language gte 50>>
+		당신의 공격자들이 당신의 기량에 감탄하며 비틀거리며 물러나, 당신에게 도망칠 기회를 준다.
+	<<else>>
+		당신의 공격자들이 이해할 수 없는 언어로 중얼거리며 비틀거리며 물러나, 당신에게 도망칠 기회를 준다.
+	<</if>>
+	당신은 쓰러진 나무의 울퉁불퉁한 덩어리 뒤에 몸을 낮춰 숨는다. 멍한 상태에서 그들은 당신을 놓치고 만다.
+	<br><br>
+	<<tearful>> 당신은 은신처를 떠난다. 일단은 위기를 벗어났다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Island]]>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	<<if $islander_language gte 100>>
+		당신의 공격자들이 물러선다. "<<pshe>>【이가】 이렇게 강할 줄은 몰랐는데."
+		<br>
+		"난 가겠어. 다른 기회도 있겠지."
+	<<elseif $islander_language gte 50>>
+		당신의 공격자들이 당신의 힘에 놀라 물러서며, 당신에게 도망칠 기회를 준다.
+	<<else>>
+		당신의 공격자들이 이해할 수 없는 언어로 중얼거리며 물러서며, 당신에게 도망칠 기회를 준다.
+	<</if>>
+	<br><br>
+	<<tearful>> 당신은 숨을 고른다. 일단은 위기를 벗어났다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Island]]>><</link>>
+	<br>
+
+<<else>>
+	당신은 땅에 쓰러져, 너무 다쳐서 더 이상 싸울 수 없다.
+	<br><br>
+	<<if $islander_language gte 100>>
+		두 사람이 당신의 양옆에 선다. "이걸로 드루이드에게 보상을 받겠군."
+		<br>
+		"돌아갈 수 있다면 말이지. 밧줄 준비해, 난 막대기를 찾아올게."
+	<<elseif $islander_language gte 50>>
+		두 사람이 당신의 양옆에 선다. <<tearful>> 당신은 그들이 당신을 어딘가로 데려가겠다고 이야기하는 것을 듣는다.
+	<<else>>
+		두 사람이 당신의 양옆에 선다. <<tearful>> 당신은 그들이 이해할 수 없는 언어로 당신 위에서 이야기하는 것을 듣는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Island Defeat]]>><</link>>
+	<br>
+<</if>>
+
+:: Island Sleep Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Island Sleep Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Island Sleep Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Island Sleep Rape Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<person>>【은는】 <<he>>【이가】 나무들 사이로 사라질 때 뒤돌아보지 않는다.
+	<br><br>
+	<<tearful>> 당신은 일어선다.
+	<br><br>
+
+<<elseif $enemyhealth lte 0>>
+	<<person>>【은는】 미친 듯이 도망치려다 발이 걸려 넘어진다.
+	<br><br>
+	<<tearful>> 당신은 숨을 고른다.
+	<br><br>
+
+<</if>>
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Island]]>><</link>>
+
+:: Island Sleep Submit
+<<effects>>
+당신은 항복의 의미로 무릎을 꿇는다. 두 사람은 당신을 지켜보다가 서로를 쳐다본 후, 조심스러운 발걸음으로 다가온다.
+<br><br>
+
+<<if $islander_language gte 100>>
+	그들이 당신의 양옆에 선다. "쉽네."
+	<br>
+	"<<phim>>【을를】 성으로 데려가면 그런 말 할 수 있겠지. 속임수에 대비해. 난 막대기를 찾아올게."
+<<elseif $islander_language gte 50>>
+	그들이 당신의 양옆에 선다. 당신은 그들이 당신을 어딘가로 데려가겠다고 이야기하는 것을 듣는다.
+<<else>>
+	그들이 당신의 양옆에 선다. 당신은 그들이 이해할 수 없는 언어로 이야기하는 것을 듣는다.
+<</if>>
+<br><br>
+
+<<link [[다음|Island Defeat]]>><</link>>
+<br>
+
+:: Island Defeat
+<<effects>>
+
+<<if $enemyno is 6>>
+	<<clearsinglenpc 5>>
+<</if>>
+<<if $enemyno is 5>>
+	<<clearsinglenpc 4>>
+<</if>>
+<<if $enemyno is 4>>
+	<<clearsinglenpc 3>>
+<</if>>
+<<if $enemyno is 3>>
+	<<clearsinglenpc 2>>
+<</if>>
+
+<<person1>><<person>>【은는】 나뭇가지를 꺾어 작은 잔가지들을 제거하기 시작하고, <<person2>><<person>>【은는】 밧줄을 푼다.
+<<if $worn.upper.name isnot "naked" or $worn.under_upper.name isnot "naked" or $worn.lower.name isnot "naked" or $worn.under_lower.name isnot "naked">>
+	그들은 맨손으로 당신의 옷을 벗기고, 팔과 다리를 등 뒤로 꺾어 막대기에 묶는다.
+	<<clothesruined>>
+<<else>>
+	그들은 당신의 팔과 다리를 등 뒤로 꺾어 맨손으로 막대기에 묶는다.
+<</if>>
+<br><br>
+
+<<island_pass 30>>
+그들은 각각 나뭇가지의 한쪽 끝을 어깨에 메고, 당신을 그들 사이에 매달아 무력하게 만든다. 그들은 당신을 데리고 행진을 시작한다. <<if $worn.handheld.name isnot "naked">>당신의 $worn.handheld.name【은는】 버려진다.<</if>><<bind>><<legbind>> <<set $island.hide to Math.clamp($island.hide, 0, 30)>>
+<br><br>
+<<if $island.defeat_intro is undefined>>
+
+	그들은 섬 깊숙이 걸어 들어가, 이상한 길을 따라간다. 때로는 빽빽한 덤불을 헤치고 더 열린 길을 피하며, 마침내 강에 다다른다. 통나무가 그 위에 놓여 얇은 다리를 만들고 있다.
+	<br><br>
+
+	<<link [[다음|Island Defeat 2]]>><<set $island.defeat_intro to 1>><</link>>
+	<br>
+<<else>>
+	그들은 섬 깊숙이 걸어 들어가, 이상한 길을 따라 폐허가 된 성으로 향한다. 당신이 기억하는 것과 거의 같다. 군중이 다시 한번 당신을 따라 들어오고, 당신은 다시 한번 똑바로 세워져 모인 관중 앞에 노출된다.<<gtrauma>><<trauma 6>><<gstress>><<stress 6>><<garousal>><<arousal 600>>
+	<br><br>
+
+	<<link [[다음|Island Defeat 5]]>><</link>>
+	<br>
+<</if>>
+
+:: Island Defeat 2
+<<effects>>
+
+두 사람은 급류 옆에 멈춰 서서 잠시 상의한 후, 통나무 위로 뛰어오른다. 그들은 너무 빨리 움직여서 당신은 그들이 미끄러져 당신과 함께 떨어질까 봐 반쯤 걱정하지만, 그들은 무사히 건넌다. <<person2>><<person>>【이가】 당신의 <<bottom>>【을를】 가볍게 때린다.
+<br><br>
+이곳의 나무들은 그다지 빽빽하지 않고, 그 사이의 땅에는 작은 식물들이 없다. 두 사람은 당신을 경사로 위로 옮긴다. 언덕 너머로 이끼로 뒤덮인 폐허가 된 성이 나타난다.
+
+<br><br>
+
+<<link [[다음|Island Defeat 3]]>><</link>>
+<br>
+
+:: Island Defeat 3
+<<effects>>
+
+성의 기단이 시야에 들어온다. 저 아래에 움직이는 인물들이 있다. 그들은 당신의 납치범들처럼 옷을 입었지만, 가면은 쓰지 않았다.
+<br><br>
+그들은 당신을 보자 활동을 멈추고, 두 사람 뒤에 줄을 선다. 가면 아래의 그들은 특이해 보이지 않는다. 아마도 마을 사람들보다 조금 더 마른 정도다.
+<br><br>
+<<generateRole 2 0 "islander">><<person3>>
+그들은 당신을 돌 아치 아래로 옮겨, 돌 복도의 미로 속으로 들어간다. 폐허처럼 보이지만, 복도의 일부를 나누기 위해 새 벽처럼 보이는 것을 쌓고 있는 석공 <<person>>【을를】 지나친다.
+<br><br>
+
+<<link [[다음|Island Defeat 4]]>><</link>>
+<br>
+
+:: Island Defeat 4
+<<effects>>
+
+복도는 네 개의 돌벽으로 둘러싸인 안뜰로 이어진다. 땅 자체도 돌이지만, 초목은 없다.
+<br><br>
+
+<<person1>><<person>>【와과】 <<person2>><<person>>【이가】 막대기를 똑바로 세워, 당신을 따라온 많은 군중에게 당신을 노출시킨다. 그렇게 묶여 무력한 상태에서, 당신은 나체를 가릴 아무것도 할 수 없다.<<gtrauma>><<trauma 6>><<gstress>><<stress 6>><<garousal>><<arousal 600>>
+<br><br>
+
+<<link [[다음|Island Defeat 5]]>><</link>>
+<br>
+
+:: Island Defeat 5
+<<effects>>
+
+<<generateRole 3 0 "islander">><<person4>>
+보이지 않는 북소리가 안뜰에 울려 퍼진다. 섬 주민들은 소리에 맞춰 허벅지와 가슴을 두드리고, <<person>>【이가】 당신에게 다가온다. <<He>>【은는】 둥근 가면을 쓰고 있는데, <<his>> 눈과 입 위에는 세 개의 작은 원이 그려져 있다. <<his>> 오른손에는 꽃다발처럼 얇은 잎사귀 묶음을 쥐고 있다. <<his>> 왼손에는 흉악해 보이는 상아 칼이 들려 있다.
+<br><br>
+
+<<if $island.defeat gte 11>>
+	<<He>>【은는】 당신의 머리부터 발끝까지 훑어보며, 온몸을 뒤덮은 표식들을 칼로 덧그린다. 피부를 베지는 않았지만 따끔거린다. <<He>>【은는】 하늘을 향해 고개를 들고, 위에 있는 탑을 향해 고개를 끄덕인다.
+	<br><br>
+	<<if $islander_language gte 100>>
+		북소리가 멎고 섬 주민들이 잠잠해지자, <<person>>【이가】 주문을 외우기 시작한다.
+		<br><br>
+		"길 잃은 자들의 군주시여, 우리에게 빛을 내려주소서!"
+		<br>
+		"길 잃은 자들의 군주시여, 우리에게 빛을 내려주소서!"
+		<br>
+		"길 잃은 자들의 군주시여, 우리에게 빛을 내려주소서!"
+		<br><br>
+		<<His>> 목소리는 바람을 타고 높아졌다 낮아지기를 반복하고, 바람은 더욱 거세게 울부짖는 듯하다. <span class="red">그때 땅이 흔들린다.</span>
+		<br><br>
+	<<elseif $islander_language gte 50>>
+		북소리가 멎고 섬 주민들이 잠잠해지자, <<person>>【이가】 주문을 외우기 시작한다. 자세한 내용은 알 수 없지만, <<he>>【이가】 잃어버린 무언가에 대해 말하고 있는 것 같다. <<His>> 목소리는 바람을 타고 높아졌다 낮아지기를 반복하고, 바람은 더욱 거세게 울부짖는 듯하다. <span class="red">그때 땅이 흔들린다.</span>
+		<br><br>
+	<<else>>
+		북소리가 멎고 섬 주민들이 잠잠해지자, <<person>>【이가】 이해할 수 없는 언어로 주문을 외우기 시작한다. <<His>> 목소리는 바람을 타고 높아졌다 낮아지기를 반복하고, 바람은 더욱 거세게 울부짖는 듯하다. <span class="red">그때 땅이 흔들린다.</span>
+		<br><br>
+	<</if>>
+
+	<<link [[다음|Island Defeat End]]>><</link>>
+	<br>
+<<else>>
+	<<if $settings.bodyWritingLevel gte 3>>
+		<<He>>【은는】 군중을 향해 돌아서서 불길한 외침을 내지른다. 그 외침은 메아리치며 안뜰 주위로 울려 퍼지고, <<person>>【은는】 다시 당신을 마주 본다. <<He>>【은는】 잎사귀 묶음에서 잎 하나를 떼어내 냄새를 맡더니, 나머지는 버린다. 조심스럽고 정확하게, <<he>>【은는】 섬유질의 얇은 조각을 잘라내어 당신의
+		<<if $skin.right_bottom.special isnot "island" and $skin.right_bottom.pen isnot "brand" and $skin.right_bottom.pen isnot "tattoo" and $skin.right_bottom.pen isnot "magic">>
+			<<set _bodypart to "right_bottom">>
+			<<island_tattoo>>
+			<<bottom>>에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 <<bottom>>에는 <<tattoo right_bottom>>【이가】 새겨진다.
+		<<elseif $skin.left_bottom.special isnot "island" and $skin.left_bottom.pen isnot "brand" and $skin.left_bottom.pen isnot "tattoo" and $skin.left_bottom.pen isnot "magic">>
+			<<set _bodypart to "left_bottom">>
+			<<island_tattoo>>
+			<<bottom>>에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 <<bottom>>에는 <<tattoo left_bottom>>【이가】 새겨진다.
+		<<elseif $skin.left_thigh.special isnot "island" and $skin.left_thigh.pen isnot "brand" and $skin.left_thigh.pen isnot "tattoo" and $skin.left_thigh.pen isnot "magic">>
+			<<set _bodypart to "left_thigh">>
+			<<island_tattoo>>
+			왼쪽 허벅지에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo left_thigh>>【이가】 새겨진다.
+		<<elseif $skin.right_thigh.special isnot "island" and $skin.right_thigh.pen isnot "brand" and $skin.right_thigh.pen isnot "tattoo" and $skin.right_thigh.pen isnot "magic">>
+			<<set _bodypart to "right_thigh">>
+			<<island_tattoo>>
+			오른쪽 허벅지에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo right_thigh>>【이가】 새겨진다.
+		<<elseif $skin.pubic.special isnot "island" and $skin.pubic.pen isnot "brand" and $skin.pubic.pen isnot "tattoo" and $skin.pubic.pen isnot "magic">>
+			<<set _bodypart to "pubic">>
+			<<island_tattoo>>
+			치골에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo pubic>>【이가】 새겨진다.
+		<<elseif $skin.back.special isnot "island" and $skin.back.pen isnot "brand" and $skin.back.pen isnot "tattoo" and $skin.back.pen isnot "magic">>
+			<<set _bodypart to "back">>
+			<<island_tattoo>>
+			등에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo back>>【이가】 새겨진다.
+		<<elseif $skin.breasts.special isnot "island" and $skin.breasts.pen isnot "brand" and $skin.breasts.pen isnot "tattoo" and $skin.breasts.pen isnot "magic">>
+			<<set _bodypart to "breasts">>
+			<<island_tattoo>>
+			<<breasts>>에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo breasts>>【이가】 새겨진다.
+		<<elseif $skin.left_shoulder.special isnot "island" and $skin.left_shoulder.pen isnot "brand" and $skin.left_shoulder.pen isnot "tattoo" and $skin.left_shoulder.pen isnot "magic">>
+			<<set _bodypart to "left_shoulder">>
+			<<island_tattoo>>
+			왼쪽 어깨에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo left_shoulder>>【이가】 새겨진다.
+		<<elseif $skin.right_shoulder.special isnot "island" and $skin.right_shoulder.pen isnot "brand" and $skin.right_shoulder.pen isnot "tattoo" and $skin.right_shoulder.pen isnot "magic">>
+			<<set _bodypart to "right_shoulder">>
+			<<island_tattoo>>
+			오른쪽 어깨에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo right_shoulder>>【이가】 새겨진다.
+		<<elseif $skin.left_cheek.special isnot "island" and $skin.left_cheek.pen isnot "brand" and $skin.left_cheek.pen isnot "tattoo" and $skin.left_cheek.pen isnot "magic">>
+			<<set _bodypart to "left_cheek">>
+			<<island_tattoo>>
+			왼쪽 뺨에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo left_cheek>>【이가】 새겨진다.
+		<<elseif $skin.right_cheek.special isnot "island" and $skin.right_cheek.pen isnot "brand" and $skin.right_cheek.pen isnot "tattoo" and $skin.right_cheek.pen isnot "magic">>
+			<<set _bodypart to "right_cheek">>
+			<<island_tattoo>>
+			오른쪽 뺨에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo right_cheek>>【이가】 새겨진다.
+		<<elseif $skin.forehead.special isnot "island" and $skin.forehead.pen isnot "brand" and $skin.forehead.pen isnot "tattoo" and $skin.forehead.pen isnot "magic">>
+			<<set _bodypart to "forehead">>
+			<<island_tattoo>>
+			이마에 댄다.
+			<br><br>
+			<<He>>【은는】 칼의 무딘 날과 당신의 피부 사이에 식물을 놓고 짓이긴다. 세게. 엄청난 양의 검은 액체가 흘러나온다. 거의 피처럼 보인다.
+			<br><br>
+			<<He>>【은는】 남은 섬유질을 들고 돌아서고, 당신의 피부에는 <<tattoo forehead>>【이가】 새겨진다.
+		<<else>>
+			이마에 댄다. <<He>>【은는】 잠시 멈추더니, 당신을 일으켜 세우고 몸을 뒤덮은 무수한 문신들을 살핀다. <<if $uncomfortable.nude is true>><<covered>><</if>>
+		<</if>>
+		<br><br>
+		<<link [[다음|Island Defeat Tattoo End]]>><</link>>
+		<br>
+	<<else>>
+		<<He>>【은는】 잎사귀 묶음에서 잎 하나를 뽑아내고 나머지는 버린다. <<He>>【은는】 그것을 당신의 이마에 대고 <<his>> 칼의 무딘 날로 짓이긴다. 검은 액체가 당신의 얼굴을 타고 흘러내린다. 거의 피처럼 보이고, 냄새도 똑같다.<<ggtrauma>><<trauma 12>>
+		<br><br>
+
+		<<link [[다음|Island Defeat Tattoo End]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+<<if $island.defeat is undefined>>
+	<<set $island.defeat to 1>>
+<<else>>
+	<<set $island.defeat += 1>>
+<</if>>
+
+:: Island Defeat Tattoo End
+<<effects>>
+
+<<person1>><<person>>【와과】 <<person2>><<person>>【이가】 막대기를 들어 올리자 당신의 몸이 들썩인다. 다른 섬 주민들이 다가와 당신의 몸을 지탱하며, 그 과정에서 당신의 <<bottom>>【을를】 한 움큼 쥔다.
+<br><br>
+
+<<if $islander_language gte 100>>
+	그들은 자기들끼리 이야기한다. 몇 마디를 알아들을 수 있다.
+	<br>
+	<<if random(1, 2) is 2>>
+		"주문을 외우니 항상 배가 고파져."
+	<<else>>
+		"다음엔 내가 <<phim>>【을를】 잡았으면 좋겠네."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"<<pShe>> 배가 예쁘네."
+	<<else>>
+		"길 잃은 자가 이렇게 귀여울 줄은 몰랐는데."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"<<phim>>【을를】 보내야 한다니 아쉽군."
+	<<else>>
+		"맛 좀 봐도 될까?"
+	<</if>>
+	<br>
+	"<<phim>>【을를】 강으로 데려가자." <<person1>><<person>>【이가】 말한다. "그래야 의식이 끝나."
+<<elseif $islander_language gte 50>>
+	그들은 의식이 끝나자 한결 편안해진 모습으로 자기들끼리 이야기한다. <<person1>><<person>>【이가】 강에 대해 무언가 언급한다.
+<<else>>
+	그들은 알아들을 수 없는 언어로 이야기한다. 마치 어떤 의식이 끝나고 뒷정리를 하는 것처럼, 이전보다 편안해 보인다.
+<</if>>
+<br><br>
+<<unbind>><<leg_unbind>>
+섬 주민들은 당신을 폐허에서 꺼내 통나무 다리가 놓인 급류 강가로 다시 데려간다. 그들은 막대기를 다시 수직으로 세워 당신이 강가를 마주 보게 한다.
+<br><br>
+<<person1>><<person>>【이가】 단 한 번의 움직임으로 당신을 밧줄에 묶고 있던 모든 결박을 끊어낸다. 당신은 강으로 떨어진다.
+<br><br>
+
+<<water>>
+<<waterbr 2>>
+
+<<link [[다음|Island Defeat Tattoo End 2]]>><<endcombat>><</link>>
+<br>
+
+:: Island Defeat Tattoo End 2
+<<effects>>
+
+수면 위로 머리를 내밀고 숨을 헐떡이는 동안, 주변의 물이 끓어오르며 당신을 언덕 아래로 휩쓴다. 강둑으로 헤엄쳐 가려 하지만, 격렬한 물살이 이리저리 당신을 끌어당겨 계속해서 방향을 다시 잡아야 한다.
+<br><br>
+
+마침내, 변덕스러운 물살이 당신을 해안가에 밀어 올린다. 머리 위로 나무들이 솟아 있다.
+<br><br>
+<<if !$island.home>>
+	<<link [[다음|Island Treeline Search]]>><</link>>
+<<else>>
+	<<link [[다음|Island]]>><</link>>
+<</if>>
+<br>
+
+:: Island Defeat End
+<<effects>>
+섬 주민들이 도망치며 당신을 둘러싼 그림자진 폐허 속으로 사라진다. 위쪽 벽에서 흔들려 떨어진 돌들이 비처럼 쏟아진다. <<persons>> 주문이 열광적인 절정에 달했다가, <<he>> 역시 달아난다. 땅의 이음새가 진동하는가 싶더니 이내 열린다. 세 개의 삼각형이 안뜰 중앙에서 분리되며 점점 더 넓은 틈을 남긴다.
+<br><br>
+
+바닥이 당신을 벽에 밀어붙일 때까지 함께 움직인다. 바닥은 계속해서 뒤로 물러나 보이지 않는 곳으로 사라지더니, 마침내 당신은 아래의 심연으로 추락한다.<<ggstress>><<stress 6>>
+<br><br>
+
+<<link [[다음|Islander]]>><<if $combat is 1>><<endcombat>><<else>><<endevent>><</if>><<island_pass 60>><</link>>
+<br>
+
+:: Islander
+<<set $outside to 0>><<effects>>
+<<if $spear_vessel is "held">>
+	<<loadNPC 0 "old_islander">>
+	<<loadNPC 1 "sleeper">>
+	<<ragup>>
+	<<unbind>>
+	<<leg_unbind>>
+	<<person1>>
+	<<wearProp "tea">>
+	당신은 흔들리는 불빛에 비친 돌 천장 아래에서 깨어납니다. "아," 노인의 목소리가 들립니다. "이렇게 빨리 돌아올 줄은 몰랐는데." <<person>>【이가】 당신에게 묽은 차 한 잔을 건넵니다. "준비되면, 내 보트로 안내하지."
+	<br><br>
+
+	<<link [[다음|Islander Return Held]]>><</link>>
+	<br>
+<<elseif $spear_vessel is "sea">>
+	<<loadNPC 0 "old_islander">>
+	<<loadNPC 1 "sleeper">>
+	<<ragup>>
+	<<unbind>>
+	<<leg_unbind>>
+	<<person1>>
+	<<wearProp "tea">>
+	당신은 흔들리는 불빛에 비친 돌 천장 아래에서 깨어납니다. "아," 노인의 목소리가 들립니다. "이렇게 빨리 돌아올 줄은 몰랐는데." <<person>>【이가】 당신에게 묽은 차 한 잔을 건넵니다. "준비되면, 내 보트로 안내하지."
+	<br><br>
+
+	<<link [[창이 어디 있는지 말해준다|Islander Return Sea]]>><</link>>
+	<br>
+	<<link [[말하지 않는다|Islander Return Refrain]]>><</link>>
+	<br>
+
+<<elseif $spear_vessel is "Zephyr">>
+	<<loadNPC 0 "old_islander">>
+	<<loadNPC 1 "sleeper">>
+	<<ragup>>
+	<<unbind>>
+	<<leg_unbind>>
+	<<person1>>
+	<<wearProp "tea">>
+	당신은 흔들리는 불빛에 비친 돌 천장 아래에서 깨어납니다. "아," 노인의 목소리가 들립니다. "이렇게 빨리 돌아올 줄은 몰랐는데." <<person>>【이가】 당신에게 묽은 차 한 잔을 건넵니다. "준비되면, 내 보트로 안내하지."
+	<br><br>
+
+	<<link [[창이 어디 있는지 말해준다|Islander Return Zephyr]]>><</link>>
+	<br>
+	<<link [[말하지 않는다|Islander Return Refrain]]>><</link>>
+	<br>
+<<elseif $spear_vessel is "temple">>
+	<<loadNPC 0 "old_islander">>
+	<<loadNPC 1 "sleeper">>
+	<<ragup>>
+	<<unbind>>
+	<<leg_unbind>>
+	<<person1>>
+	<<wearProp "tea">>
+	당신은 흔들리는 불빛에 비친 돌 천장 아래에서 깨어납니다. "아," 노인의 목소리가 들립니다. "이렇게 빨리 돌아올 줄은 몰랐는데." <<person>>【이가】 당신에게 묽은 차 한 잔을 건넵니다. "준비되면, 내 보트로 안내하지."
+	<br><br>
+
+	<<link [[창이 어디 있는지 말해준다|Islander Return Temple]]>><</link>>
+	<br>
+	<<link [[말하지 않는다|Islander Return Refrain]]>><</link>>
+	<br>
+<<elseif $spear_vessel>>
+	<<loadNPC 0 "old_islander">>
+	<<loadNPC 1 "sleeper">>
+	<<ragup>>
+	<<unbind>>
+	<<leg_unbind>>
+	<<person1>>
+	<<wearProp "tea">>
+	당신은 흔들리는 불빛에 비친 돌 천장 아래에서 깨어납니다. "아," 노인의 목소리가 들립니다. "이렇게 빨리 돌아올 줄은 몰랐는데." <<person>>【이가】 당신에게 묽은 차 한 잔을 건넵니다. "준비되면, 내 보트로 안내하지."
+	<br><br>
+
+	<<link [[다음|Islander Return Refrain]]>><</link>>
+	<br>
+<<else>>
+	<<generateRole 0 0 "old islander">><<person1>>
+	<<set _generate_victim to 1>>
+	<<generateRole 1 0 "sleeper">>
+	<<saveNPC 0 "old_islander">>
+	<<saveNPC 1 "sleeper">>
+	<<ragup>>
+	<<unbind>>
+	<<leg_unbind>>
+	당신은 흔들리는 불빛에 비친 돌 천장 아래에서 깨어납니다. "아," 노인의 목소리가 들립니다. "차는 금방 끓여주지." 오른쪽으로 고개를 돌리자, 불을 돌보고 있는 <<personsimple>> 한 명이 보입니다. <<He>>【은는】 섬 주민들과는 다른 옷차림으로, 갈색 바지 위에 긴 흰 셔츠를 입고 그 위에 벨트를 매고 있습니다. 치마를 입은 듯한 인상을 줍니다.
+	<br><br>
+
+	<<He>>【은는】 동굴을 가로질러 걸어가 선반에서 병을 들어 올리자 먼지가 일어납니다. "조금 묵은 것일지도 모르겠군." <<he>>【이가】 말합니다. "없는 것보단 낫지." <<He>>【은는】 불로 돌아가 병에서 검은 찻잎을 꺼내 불 위에 매달린 주전자에 넣습니다.
+	<br><br>
+
+	<<link [[누구인지 묻는다|Islander 2]]>><<set $phase to 1>><</link>>
+	<br>
+	<<link [[여기가 어디인지 묻는다|Islander 2]]>><<set $phase to 2>><</link>>
+	<br>
+	<<link [[침묵을 지킨다|Islander 2]]>><<set $phase to 3>><</link>>
+	<br>
+<</if>>
+
+:: Islander 2
+<<effects>><<wearProp "tea">>
+
+<<if $phase is 1>>
+	"사람들은 저를 섬 주민이라고 부릅니다." <<personsimple>>【이가】 액체를 걸러내며 말한다. "아니면 적어도 그렇게 부르는 것 같아요. 그들은 잡담을 별로 좋아하지 않거든요." <<He>>【이가】 당신에게 따뜻한 컵을 건넨다.
+	<br><br>
+	"하지만 이건 제 얘기가 아니죠." <<he>>【이가】 말한다. "당신이 왜 여기 있는지 압니다. 성 아래에서 기다리고 있었어요. 지금쯤은 폐허가 되었을 테지만요."
+	<br><br>
+<<elseif $phase is 2>>
+	"당신은 성 아래에 있습니다." <<personsimple>>【이가】 액체를 걸러내며 말한다. "지금쯤은 폐허가 되었을 테지만요." <<He>>【이가】 당신에게 따뜻한 컵을 건넨다.
+	<br><br>
+	"사람들은 저를 섬 주민이라고 부릅니다." <<he>>【이가】 말한다. "아마도요. 그들은 잡담을 별로 좋아하지 않거든요. 하지만 이건 제 얘기가 아니죠. 당신이 왜 여기 있는지 압니다. 기다리고 있었어요."
+	<br><br>
+<<else>>
+	"사람들은 저를 섬 주민이라고 부릅니다." <<personsimple>>【이가】 액체를 걸러내며 말한다. "아니면 적어도 그렇게 부르는 것 같아요. 그들은 잡담을 별로 좋아하지 않거든요." <<He>>【이가】 당신에게 따뜻한 컵을 건넨다.
+	<br><br>
+	"하지만 이건 제 얘기가 아니죠." <<he>>【이가】 말한다. "당신이 왜 여기 있는지 압니다. 성 아래에서 기다리고 있었어요. 지금쯤은 폐허가 되었을 테지만요."
+	<br><br>
+<</if>>
+
+"마시세요, 그러면 <<person2>><<him>>에게 데려다주겠습니다."
+<br><br>
+
+<<link [[장단 맞춰준다|Islander Play]]>><</link>>
+<br>
+<<link [[이해하지 못했다고 말한다|Islander Understand]]>><</link>>
+<br>
+
+:: Islander Play
+<<effects>><<wearProp "tea">>
+
+당신은 고개를 끄덕이고, 차의 김을 불어낸 뒤 한 모금 마신다. <<person1>><<person>>【이가】 경고했듯이, 꽤 눅눅하고 맛이 없다. <<He>>【이가】 멋쩍게 웃는다. "다시 한번, 품질에 대해 죄송합니다. 여기 아래에서는 보급품을 구하기가 어려워서요."
+<br><br>
+
+<<link [[다음|Islander 3]]>><</link>>
+<br>
+
+:: Islander Understand
+<<effects>><<wearProp "tea">>
+
+<<if $speech_attitude is "meek">>
+	"죄송하지만," 당신이 말한다. "무슨 뜻인지 모르겠습니다."
+<<elseif $speech_attitude is "bratty">>
+	"무슨 말을 하는지 모르겠어요." 당신이 말한다.
+<<else>>
+	"제가 당신이 기다리는 사람이 아닌 것 같군요." 당신이 말한다.
+<</if>>
+<br><br>
+
+<<person1>><<person>>【이가】 미간을 찌푸린다. "장난하는 겁니까? 아니, 그런 것 같진 않군요. 당신은 자신도 모르게 이곳으로 인도된 것 같습니다." <<He>>【이가】 당신을 머리부터 발끝까지 훑어본다. "결국 당신은 위에 있는 수호자들을 용감하게 헤쳐왔으니까요. 단순한 우연이 아닙니다."
+<br><br>
+
+<<link [[다음|Islander 3]]>><</link>>
+<br>
+
+:: Islander 3
+<<effects>>
+
+<<person1>><<person>>【이가】 불로 다가가 근처 선반에서 구식 횃불을 꺼내 불을 붙인다. "오세요." <<He>>【이가】 어둠 속으로 걸어 들어가자, 깜박이는 불빛이 길을 이끈다.
+<br><br>
+
+길은 다른 통로들 옆을 지나간다. 침대가 있는 방, 탁자가 있는 방, 그리고 쿠션 옆에 고풍스러운 악기로 보이는 것이 놓인 방을 엿볼 수 있다. 동굴 벽은 자연스러워 보이지만, 긁히고 긁힌 자국들은 한동안 거주자가 있었음을 암시한다.
+<br><br>
+
+양옆이 깎아지른 듯한 좁은 계단에 도착한다. "발 조심하세요." <<person>>【이가】 말한다. "멀지 않습니다."
+<br><br>
+
+<<link [[다음|Islander 4]]>><</link>>
+<br>
+
+:: Islander 4
+<<effects>>
+
+마침내, 평지에 도착한다. 어둠이 짓누르는 듯하여 <<persons>> 횃불 빛이 어느 방향으로든 십여 피트 이상 닿지 못하지만, <<his>> 발걸음은 확신에 차 있다.
+<br><br>
+
+"주군," <<he>>【이가】 화로 옆에 멈춰 서며 말한다. <<he>>【이가】 누구에게 말하는지 볼 수 없다가, <<he>>【이가】 옆에 있는 그릇에 횃불을 꽂아 넣는다. 불빛이 거대하고 금박을 입힌 창의 자루 위로 <<his>> 가슴에 손을 모은 채 조각상처럼 고요히 누워 있는 <<person2>><<personsimple>>【을를】 비춘다.
+<br><br>
+
+자세히 보니, 그 인물의 가슴이 마치 잠든 것처럼 오르내리는 것이 보인다. "다시 때가 왔습니다." <<person1>><<person>>【이가】 말한다. "당신의 용사에게 당신의 창이 필요합니다. 이 침입을 용서하소서." <<He>>【이가】 당신에게 고개를 끄덕이고 기다린다.
+<br><br>
+
+<<link [[잠자는 인물에게 걸어간다|Islander Walk]]>><<set $island.walk to 1>><</link>>
+<br>
+<<link [[무릎 꿇는다|Islander Kneel]]>><<set $island.kneel to 1>><</link>>
+<br>
+<<link [[창을 집는다|Islander Spear]]>><</link>>
+<br>
+
+:: Islander Walk
+<<effects>>
+<<person2>>
+당신은 잠자는 인물에게 걸어간다. 금빛 곱슬머리가 <<his>> 얼굴을 감싸고 있다. <<His>> 복장은 금박을 입힌 창을 제외하고는 평범하다.
+<br><br>
+
+<<person1>><<person>>【이가】 당신을 지켜보며 기다린다.
+<br><br>
+
+<<if $island.kneel isnot 1>>
+	<<link [[무릎 꿇는다|Islander Kneel]]>><<set $island.kneel to 1>><</link>>
+	<br>
+<</if>>
+<<link [[창을 집는다|Islander Spear]]>><</link>>
+<br>
+
+:: Islander Kneel
+<<effects>>
+
+당신은 잠자는 인물 앞에 무릎을 꿇는다. 아무런 반응이 없다. <<person1>><<person>>【이가】 당신을 지켜보며 기다린다.
+<br><br>
+
+<<if $island.walk isnot 1>>
+	<<link [[잠자는 인물에게 걸어간다|Islander Walk]]>><<set $island.walk to 1>><</link>>
+	<br>
+<</if>>
+<<link [[창을 집는다|Islander Spear]]>><</link>>
+<br>
+
+:: Islander Spear
+<<effects>><<wearProp "tarnished spear">>
+
+<<set $spear_vessel to "held">>
+<<earnFeat "Gilded Spear">>
+<<if $angel gte 6>>
+	손잡이를 쥐자 압도적인 존재감이 당신을 짓누른다. 그 존재감은 위에서, 잠자는 형상에게서, 섬 주민에게서, 그리고 당신에게서 흘러나온다.
+	<br><br>
+
+	당신은 이제 양손으로 더 꽉 움켜쥔다. 그리고 또 한 번. 또 한 번. 폐허 전체가 당신 주위에서 빛나는 것 같고, 모든 것이 보인다. 모든 것이 들린다. 당신이 모든 것이다. 길은 어디로도 이어지지 않고, 부서지는 파도는 소리 없는 환희의 주문을 드러낸다. 찰나의 명료함 속에서, 당신은 위의 존재가 되고, 잠자는 형상이 되고, 섬 주민이 된다.
+	<br><br>
+
+	당신은 당신이다. 그리고 당신은 이 횃불을 들기 위해 태어났다. 당신이 눈을 뜨자 모든 것이 정상으로 돌아오고, 달콤한 공허함만 남는다.
+<<elseif $fallenangel gte 2>>
+	손잡이를 쥐자 죄책감의 파도가 당신을 덮친다. 당신이 품었던 모든 의심이 영원으로 뻗어 나가는 순간 동안 고통스럽게 모습을 드러낸다.
+	<br><br>
+
+	당신은 마치 조각상이 된 것 같다. 찢어진 무의 영겁 속에서 부서져 내리는 자신의 석화된 몸을 되돌아보는 조각상. 하지만 천천히, 이질적인 온기가 당신에게 퍼져나간다. 누군가 당신이 모르는 언어로 말하지만, 어쩐지 이해할 수 있다.
+	<br><br>
+
+	"스스로를 용서해라."
+	<br><br>
+
+	손잡이가 당신을 들어 올리는 것을 느낀다. 무게가 없지만, 당신의 모든 의심보다 무거워, 마치 그것들을 당신 아래에서 짓뭉개려는 듯하다. 황홀한 한순간, 당신은 다시 온전해진 기분을 느낀다. 그 순간은 너무나 짧지만, 창은 더 많은 것을 약속하는 듯하다. 당신은 탐욕스럽게 창을 가슴에 품는다.
+<<elseif $demon gte 6>>
+	손잡이에 닿는 순간, 손바닥이 타들어 간다. 당신의 마음은 움츠러들고 물러나라고 말하지만, 몸은 따르지 않는다. 당신은 그것에 매달리고, 그것은 당신에게 매달린다. 고통은 견딜 수 없다.
+	<br><br>
+
+	당신 안의 불순함이 무결점의 유물과 충돌한다. 그것은 당신의 마음속으로 소용돌이치는 형상들을 보내고, 이내 비정형이지만 인간과 비슷한 실루엣으로 합쳐진다. 당신이 알아볼 수 있는 유일한 특징은 사슴뿔이 있다는 것인데, 각 가지는 무한한 수의 가지로 갈라지는 것처럼 보이고, 그 가지들은 각각 다시 갈라지며 영원히 밑동에서 자라나고 사라진다. 세상이 전차 바퀴처럼 빙빙 돈다. 타는 듯한 고통은 점점 더 심해지지만, 그만큼 빠르게 사라진다. 빛은 더 이상 당신을 태우지 않고, 오히려 편안하게 따뜻하다.
+	<br><br>
+
+	당신은 잠자는 형상의 손아귀에서 창을 빼앗았는지, 언제 무릎을 꿇었는지 기억나지 않지만, 마치 목숨이 달린 것처럼 창을 쥐고 있다. 너무나 상반되고, 너무나 다르지만, 당신은 그것이 필요한 것처럼 느낀다. 그리고 그것도 당신을 필요로 한다. 당신들은 서로의 잃어버린 조각이며, 완벽한 균형이다.
+<<else>>
+	손잡이를 쥐자마자 칼날에서 온기가 흘러나와, 황홀한 전율로 몸을 떨게 한다. 당신이 그것을 들어 올리는 건지, 그것이 당신을 들어 올리는 건지. 무게가 느껴지지 않는다.
+<</if>>
+<br><br>
+
+<<person1>><<person>>【이가】 안도한 듯 한숨을 쉰다. "이리 와," <<he>>【이가】 말한다. "이제 시간이 별로 없어. <span class="gold">창을 신전으로 가져가.</span> 그들이 뭘 해야 할지 알 거야."
+<br><br>
+
+<<He>>【은는】 입구에서 멀어지며 뛰기 시작한다. 당신은 뒤처지지 않으려 서두른다.
+<br><br>
+
+<<link [[다음|Islander End]]>><</link>>
+<br>
+
+:: Islander End
+<<effects>>
+
+땅속을 구불구불 파고드는 터널은 점점 좁아진다. <<person>>【은는】 반짝이는 벽을 따라 당신을 이끌고, 마침내 짭짤한 공기 냄새가 나고 앞쪽에 빛이 보인다.
+<br><br>
+"제 보트를 타세요." <<he>>【이가】 말한다. "근사하진 않지만, 바람을 등지면 본토까지 갈 수 있을 겁니다."
+<br><br>
+당신은 대부분 높은 바위로 둘러싸인 석호 위로 나온다. 거인이 계단처럼 깎아 만든 듯한 계단 아래 물가에 작은 범선이 기다리고 있다.
+<br><br>
+
+<<link [[다음|Islander End 2]]>><</link>>
+<br>
+
+:: Islander End 2
+<<effects>>
+
+"저는 섬을 떠날 수 없어요." <<person>>【이가】 말한다. "아니었으면 제가 배를 조종해드렸을 텐데요. 혼자서도 괜찮을 겁니다. 긴 여정도 아니고, 바람이 길을 알고 있으니까요." 당신이 배에 오르자, <<he>>【은는】 발로 보트를 밀어낸다. <<He>>【은는】 당신이 떠내려가는 것을 지켜보다가, 바위 뒤로 사라지면서 마지막으로 손을 흔들어준다.
+<br><br>
+
+<<link [[다음|Islander End 3]]>><<pass 30>><<island_end>><<endevent>><</link>>
+<br>
+
+:: Islander End 3
+<<set $location to "pirate_ship">><<effects>><<wearProp "tarnished spear">>
+
+배는 당신을 태우고 고요한 바다 위를 나아간다.
+<<if Time.dayState is "night">>
+	수평선 너머로 마을의 불빛이 보인다.
+<<else>>
+	수평선 너머로 마을이 보인다.
+<</if>>
+돛이 팽팽하게 부풀어 올라, 당신을 올바른 방향으로 이끈다.
+<br><br>
+<span class="red">그림자가 당신 위를 지나간다.</span> 뒤에서 큰 배 한 척이 미끄러지듯 다가와 당신의 배를 손쉽게 추월한다.
+<<npc "Zephyr">><<person1>>
+
+<<if $pirate_rank is undefined>>
+	<<if $pronoun is "m">>
+		풍성한 검은 수염 위로, 길게 땋은 머리카락에 둘러싸인 녹색 눈이 당신을 내려다본다.
+	<<else>>
+		길게 땋은 머리카락에 둘러싸인 녹색 눈이 당신을 내려다본다.
+	<</if>>
+	<br><br>
+
+	"찾았다!" 녹색 눈의 인물이 허리에 손을 얹고 선언한다. 환호성이 터져 나오고, <<he>>【은는】 당신에게 말을 건다. "나는 제퍼 선장, 일종의 감정사지. 그리고 자네, <<lass>> 아주 귀중한 걸 가지고 있군."
+	<br><br>
+<<else>>
+	제퍼 선장이 위에서 당신을 지켜본다. <<his>> 망원경을 통해 호기심 어린 눈으로.
+	<br><br>
+<</if>>
+
+<<link [[창을 숨긴다|Islander End Hide]]>><</link>>
+<br>
+<<link [[자신감 있게 창을 든다|Islander End Confident]]>><</link>>
+<br>
+<<if $angel gte 6>>
+	<<link [[강제한다|Islander Enforce]]>><<angelTransform 10>><</link>><<angel>>
+	<br>
+<</if>>
+
+:: Islander Enforce
+<<effects>>
+
+하나의 공리적인 생각이 당신의 존재 자체를 가득 채운다. 당신은 이 창을 포기하지 않을 것이다. 그것은 그저 그렇게 될 일이며, 아무것도 그것을 바꿀 수 없다.
+<br><br>
+
+당신은 창을 휘두르며 높이 쳐든다.
+<<switch Weather.name>>
+	<<case "lightPrecipitation" "heavyPrecipitation" "storm" "thunderstorm">>폭풍이 잦아들고, 구름이 순식간에 갈라진다.
+	<<case "heavyClouds">>구름이 잠시 갈라진다.
+	<<default>>
+<</switch>>
+<<if Weather.dayState is "night">>
+	<<if Weather.bloodMoon>>
+		붉은 달빛이 칼날에 반사되고, 날카로운 비명이 허공을 가득 채운다.
+	<<else>>
+		달빛이 칼날에 반사되어, 이제는 새것처럼 빛난다.
+	<</if>>
+<<else>>
+	햇빛이 칼날에 반사되어, 이제는 새것처럼 빛난다.
+<</if>>
+
+선원들은 물론 제퍼 선장까지도 그것에 넋을 잃는다. 그들 중 몇몇은 발을 헛디디고, 한 명은 배 밖으로 떨어진다.
+<br><br>
+
+주어진 순간을 낭비하지 않고, 당신은 제퍼의 배 선체에 창을 찔러 넣는다. 사다리는 바다에 삼켜진다. 그러고 나서 당신은 창으로 배를 밀어내, 상당한 크기의 상처를 남기고 필요한 거리를 확보한다.
+<br><br>
+
+제퍼가 마침내 주문에서 깨어난다. "<<phim>>【을를】 쫓아라!" 선장이 소리친다. "창을 가져와! 지금 놓칠 순 없어!"
+<br><br>
+
+돌풍이 몰아쳐 <<if Weather.dayState is "night">>달<<else>>해<</if>>【을를】 가린다 다시 한번. 바람과 비가 잦아들 때까지 사방 몇 피트 이상을 볼 수 없다. <span class="green">그들은 사라졌다.</span>
+<br><br>
+
+바다가 다시 잔잔해지자, 당신은 남은 길을 헤엄쳐 해안으로 간다.
+<br><br>
+
+<<link [[다음|Sea Beach]]>><<pass 30>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Islander End Hide
+<<effects>>
+
+당신은 창 위에 앉아 <<bottom>>【으로로】 그것을 가린다.
+<br><br>
+"숨겨도 소용없어, <<lass>>." 제퍼가 말한다. "하지만 이리 와서 배에 올라타, 그리고 그걸 넘겨. 두둑한 보상이 있을 테니." <<His>> 선원들이 밧줄 사다리를 가장자리 너머로 던진다. 사다리는 굴러떨어져 당신 옆에 놓인다. "그리고 자네에게 선택권이 있는 것도 아니지."
+<br><br>
+<<His>> 선원들은 사다리를 타고 내려와 당신의 작은 배에 오를 준비가 된 것처럼 보인다.
+<br><br>
+<<link [[창을 넘겨준다|Islander End Hand]]>><</link>>
+<br>
+<<link [[사다리를 베고 헤엄쳐 달아난다|Islander End Swim]]>><</link>><<swimmingdifficulty 700 1000>>
+<br>
+<<link [[바다에 던져버린다|Islander End Throw]]>><</link>>
+<br>
+
+:: Islander End Confident
+<<effects>>
+
+당신은 창을 휘두르며 높이 쳐든다. 빛의 고리가 손잡이에서부터 끝까지 맥동하는 것처럼 보인다. 잠시 동안 선원들과 제퍼 선장까지도 그것에 넋을 잃는다.
+<br><br>
+선장이 가장 먼저 주문에서 깨어난다. "그래, 저 예쁜 물건 말이야. 이리 와서 배에 올라타, 그리고 그걸 넘겨. 두둑한 보상이 있을 테니." <<His>> 선원들이 밧줄 사다리를 가장자리 너머로 던진다. 사다리는 굴러떨어져 당신 옆에 놓인다. "그리고 자네에게 선택권이 있는 것도 아니지."
+<br><br>
+<<His>> 선원들은 사다리를 타고 내려와 당신의 작은 배에 오를 준비가 된 것처럼 보인다.
+<br><br>
+<<link [[창을 넘겨준다|Islander End Hand]]>><</link>>
+<br>
+<<link [[사다리를 베고 헤엄쳐 달아난다|Islander End Swim]]>><</link>><<swimmingdifficulty 700 1000>>
+<br>
+<<link [[바다에 던져버린다|Islander End Throw]]>><</link>>
+<br>
+
+:: Islander End Hand
+<<effects>>
+<<set $spear_vessel to "Zephyr">>
+<<world_corruption "hard" 1>>
+<<endevent "phaseless">>
+<<npc "Zephyr">><<person1>>
+당신은 밧줄 사다리를 오른다. 제퍼가 꼭대기에서 간절히 기다리고 있다. <<He>>【은는】 창이 <<his>> 손에 들어가자마자, 마치 당신은 이미 잊었다는 듯이 등을 돌린다. "마침내. 레미가 질투로 토하겠군." <<He>>【은는】 웃으며 <<his>> 선실로 사라진다.
+<br><br>
+<<generateRole 1 0 "pirate">><<person2>>
+
+<<if $pirate_rank is 0>>
+	사무장은 당신을 잊지 않았다. "여기 그 물건을 찾은 보상이다." <<he>>【이가】 플라스틱 지폐 몇 장을 건네며 말한다. "위조지폐는 하나도 없어. 승진도 시켜주지."
+	<<if $phase is 1>>
+		<<He>>【은는】 바다를 흘끗 보며, 당신이 탈출을 시도했던 것을 상기시킨다. "우리는 약속을 지켜. 네가 성가시게 굴었어도 말이야."
+	<</if>>
+	<br><br>
+	당신은 <<moneyGain 20000>>【을를】 번다.
+	<br>
+	<<set $pirate_rank to 1>>
+	<span class="gold">당신은 이제 <i>항해사</i>가 되어 해적선에 탑승합니다.</span>
+	<br><br>
+	<<link [[다음|Pirate Deck]]>><<endevent>><</link>>
+	<br>
+<<elseif $pirate_rank is undefined>>
+	사무장은 당신을 잊지 않았다. "여기 그 물건을 찾은 보상이다." <<He>>【이가】 플라스틱 지폐 몇 장을 건네준다. "위조지폐는 하나도 없어."
+	<<if $phase is 1>>
+		<<He>>【은는】 바다를 흘끗 보며, 당신이 탈출을 시도했던 것을 상기시킨다. "우리는 약속을 지켜. 네가 성가시게 굴었어도 말이야."
+	<</if>>
+	<br><br>
+	당신은 <<moneyGain 20000>>【을를】 번다.
+	<br><br>
+	<<link [[다음|Islander Pirate Return]]>><</link>>
+	<br>
+<<else>>
+	사무장은 당신을 잊지 않았다. "여기 그 물건을 찾은 보상이다." <<He>>【이가】 플라스틱 지폐 몇 장을 건네준다. "위조지폐는 하나도 없어."
+	<<if $phase is 1>>
+		<<He>>【은는】 바다를 흘끗 보며, 당신이 탈출을 시도했던 것을 상기시킨다. "우리는 약속을 지켜. 네가 성가시게 굴었어도 말이야."
+	<</if>>
+	<br><br>
+	당신은 <<moneyGain 20000>>【을를】 번다.
+	<br><br>
+	<<link [[다음|Pirate Deck]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Islander Pirate Return
+<<effects>>
+
+선원들은 당신을 주시하지만, 해안에 도착할 때까지 손을 대지는 않는다. 배는 절벽에 바싹 붙어 이상한 각도로 부두에 접근한다. "꽉 잡아." 사무장이 경고하고, 바로 그 순간 배는 속이 울렁거릴 정도로 민첩하게 방향을 틀어 두 창고 사이에 숨겨진 넓은 운하로 들어선다.
+<br><br>
+
+<<person1>>
+"여기서 내리게." 제퍼가 당신의 등을 두드리며 말한다. "만나서 즐거웠네." 배는 보도 옆에 멈추고, <<he>>【은는】 당신에게 내리라고 손짓한다.
+<br><br>
+
+배는 가장자리에 긁히며 운하를 따라 계속 나아가다가 굽이진 곳에서 사라진다. 당신은 보도를 따라가 메르 가 근처로 나온다.
+<br><br>
+
+<<link [[다음|Mer Street]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Islander End Swim
+<<effects>>
+<<generateRole 1 0 "pirate">>
+<<generateRole 2 0 "pirate">>당신은 창과 함께 물속으로 뛰어든다. "<<phim>>【을를】 쫓아라!" 선장이 소리친다. "창을 가져와! 지금 놓칠 순 없어!"
+<br><br>
+
+당신 뒤에서 두 번의 물 튀는 소리가 들린다. <<person2>><<person>>【와과】 <<person3>><<person>>【이가】 당신을 뒤쫓아 헤엄쳐 오는데, 그들의 스트로크는 잘 훈련되고 확신에 차 있다.
+<br><br>
+<<silently>><<water>><</silently>>
+<<if $swimmingSuccess>>
+	잘 훈련된 것은 그들뿐만이 아니다. 당신은 그들과 거리를 유지하며 배에서 점점 더 멀리 헤엄쳐 갈 수 있다. 그들은 계속 따라오다가 돌풍이 몰아친다. 당신은 계속 헤엄치지만, 사방 몇 피트 이상을 볼 수 없다가 바람과 비가 잦아든다. <span class="green">그들은 사라졌다.</span>
+	<br><br>
+
+	바다가 다시 잔잔해지자, 당신은 남은 길을 헤엄쳐 해안으로 간다.
+	<br><br>
+
+	<<link [[다음|Sea Beach]]>><<pass 30>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+	당신은 있는 힘껏 헤엄치지만, <span class="red">두 사람이 당신을 따라잡고,</span> 그들의 팔다리로 당신의 팔다리를 붙잡는다.
+	<br><br>
+
+	<<link [[그들이 배로 끌고 가게 둔다|Islander End Hand]]>><<set $phase to 1>><</link>>
+	<br>
+	<<link [[창을 바다에 던진다|Islander End Throw 2]]>><</link>>
+	<br>
+<</if>>
+
+:: Islander End Throw
+<<effects>>
+<<set $spear_vessel to "sea">>
+
+크게 휘둘러, 당신은 창을 바다에 던진다. "안 돼!" 제퍼 선장이 소리친다. 칼날이 깊은 곳으로 사라지자, 마치 어떤 의지에 붙잡힌 듯 작은 파도가 일어난다.
+<br><br>
+"모두 뛰어들어! 지금 놓칠 순 없어!" 해적들이 바다로 뛰어들면서 당신의 배 갑판 위로 물이 튄다. 그들 중 몇몇이 당신 옆에 떨어져 배를 뒤집고 당신을 물속으로 던져버린다.
+<br><br>
+<<silently>><<water>><</silently>>
+당신은 선원들과 선장 모두에게 무시당한 채 헤엄쳐 달아난다. 제퍼의 절박한 외침은 포효하는 파도 뒤로 사라진다.
+<br><br>
+
+조류가 당신에게 유리하게 작용하여, 당신은 해변에 도착하는 데 성공한다.
+<br><br>
+
+<<link [[다음|Sea Beach]]>><<pass 30>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Islander End Throw 2
+<<effects>>
+
+<<set $spear_vessel to "sea">>
+
+크게 휘둘러, 당신은 창을 바다에 던진다. "안 돼!" 제퍼 선장이 소리친다. 칼날이 깊은 곳으로 사라지자, 마치 어떤 의지에 붙잡힌 듯 작은 파도가 일어난다.
+<br><br>
+"모두 뛰어들어! 지금 놓칠 순 없어!" 두 사람은 당신을 놓아주고 다른 해적들이 바다로 뛰어들면서 물속으로 사라진다.
+<br><br>
+<<silently>><<water>><</silently>>
+당신은 선원들과 선장 모두에게 무시당한 채 헤엄쳐 달아난다. 제퍼의 절박한 외침은 포효하는 파도 뒤로 사라진다.
+<br><br>
+
+조류가 당신에게 유리하게 작용하여, 당신은 해변에 도착하는 데 성공한다.
+<br><br>
+
+<<link [[다음|Sea Beach]]>><<pass 30>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Islander Return Refrain
+<<effects>>
+
+<<person>>【은는】 <<his>> 터널을 통해, <<person2>><<person>>【을를】 지나, 바다를 향해 당신을 이끈다.<<person1>> 마지막과 같은 장소에 또 다른 보트가 있다. 어쩌면 같은 배가 되돌아온 것일지도 모른다.
+<br><br>
+
+"안전한 항해 되세요." <<he>>【이가】 말하며 당신의 배를 밀어준다. <<person>>【은는】 <<he>>【이가】 시야에서 사라질 때까지 손을 흔든다.
+<br><br>
+
+<<link [[다음|Island Return Voyage]]>><</link>>
+<br>
+
+:: Islander Return Held
+<<effects>><<wearProp "tarnished spear">>
+
+<<person>>【은는】 <<his>> 터널을 통해, <<person2>><<person>>【을를】 지나, 바다를 향해 당신을 이끈다.<<person1>> "창이 안전해서 다행입니다." <<person>>【이가】 말한다. "<span class="gold">신전으로 가져가세요.</span> 그들이 어떻게 해야 할지 알 겁니다."
+<br><br>
+마지막과 같은 장소에 또 다른 보트가 있다. 어쩌면 같은 배가 되돌아온 것일지도 모른다. "안전한 항해 되세요." <<he>>【이가】 말하며 당신의 배를 밀어준다. <<person>>【은는】 <<he>>【이가】 시야에서 사라질 때까지 손을 흔든다.
+<br><br>
+
+<<link [[다음|Island Return Voyage]]>><</link>>
+<br>
+
+:: Islander Return Sea
+<<effects>>
+
+<<person>>【은는】 <<his>> 터널을 통해, <<person2>><<person>>【을를】 지나, 바다를 향해 당신을 이끈다.<<person1>> 당신은 가는 동안 <<person>>에게 창이 어디 있는지 말해준다. "바다요? 최악의 장소는 아니군요." <<he>>【이가】 말한다. "인어들이 상황을 이용하려 들겠지만, 창이 잘못된 손에 들어가면 어떻게 될지 그들도 알고 있을 겁니다."
+<br><br>
+마지막과 같은 장소에 또 다른 보트가 있다. 어쩌면 같은 배가 되돌아온 것일지도 모른다. "안전한 항해 되세요." <<he>>【이가】 말하며 당신의 배를 밀어준다. <<person>>【은는】 <<he>>【이가】 시야에서 사라질 때까지 손을 흔든다.
+<br><br>
+
+<<link [[다음|Island Return Voyage]]>><</link>>
+<br>
+
+:: Islander Return Zephyr
+<<effects>>
+
+<<person>>【은는】 <<his>> 터널을 통해, <<person2>><<person>>【을를】 지나, 바다를 향해 당신을 이끈다.<<person1>> 당신은 가는 동안 <<person>>에게 창이 어디 있는지 말해준다. "해적이라고요? 그렇게 나쁘게 들리진 않네요." <<he>>【이가】 말한다. "어떤 단순한 산적도 <<person2>><<his>><<person1>> 폐하의 성기사들에게 맞설 수 없을 겁니다. 상황을 잘 통제하고 있을 거라고 확신해요."
+<br><br>
+마지막과 같은 장소에 또 다른 보트가 있다. 어쩌면 같은 배가 되돌아온 것일지도 모른다. "안전한 항해 되세요." <<he>>【이가】 말하며 당신의 배를 밀어준다. <<person>>【은는】 <<he>>【이가】 시야에서 사라질 때까지 손을 흔든다.
+<br><br>
+
+<<link [[다음|Island Return Voyage]]>><</link>>
+<br>
+
+:: Islander Return Temple
+<<effects>>
+
+<<person>>【은는】 <<his>> 터널을 통해, <<person2>><<person>>【을를】 지나, 바다를 향해 당신을 이끈다.<<person1>> 당신은 <<person>>에게 창이 신전에 있다고 말한다. "마음이 따뜻해지는 소식이군요." <<he>>【이가】 말한다. "주교님께 필요한 도움을 꼭 드리세요. 그분들은 당신 같은 전사가 필요할 겁니다."
+<br><br>
+마지막과 같은 장소에 또 다른 보트가 있다. 어쩌면 같은 배가 되돌아온 것일지도 모른다. "안전한 항해 되세요." <<he>>【이가】 말하며 당신의 배를 밀어준다. <<person>>【은는】 <<he>>【이가】 시야에서 사라질 때까지 손을 흔든다.
+<br><br>
+
+<<link [[다음|Island Return Voyage]]>><</link>>
+<br>
+
+:: Island Return Voyage
+<<effects>>
+
+물이 당신을 안개 속으로 이끌고, 먼 수평선 너머로 마을이 드러난다. 조류가 당신에게 유리하게 작용하여, 당신은 곧 메르 가 근처의 부두에 도착한다.
+<br><br>
+
+당신은 배에서 내린다. 신기하게도, 당신이 육지에 발을 딛자마자 보트가 돌아가는 방향으로 떠다니기 시작한다.
+<br><br>
+
+<<link [[다음|Mer Street]]>><<endevent>><<set $eventskip to 1>><<island_end>><</link>>
+<br>
+
+:: Island Explore
+<<set $outside to 1>><<effects>>
+
+<<if $island.explore is "shore">>
+	당신은 해안을 따라 걷는다. 섬의 대부분은 절벽으로 둘러싸여 있는 것 같다. 바람이 당신 위로 휩쓸고 지나가며, 어느 방향으로도 육지가 보이지 않는다.
+	<br><br>
+	간간이 보이는 해변에는 괴물 같은 유기체들이 숨어 있어, 당신은 거리를 둔다.
+	<br><br>
+<<elseif $island.explore is "wood">>
+	당신은 무성한 삼림의 빽빽하고 낮게 드리워진 나뭇가지들 사이를 걷는다. 나뭇가지들은 산들바람에 꿈틀거리며 뒤틀린다. 어떤 부분은 너무 빽빽하게 자라 터널을 이루고, 나무로 된 미궁 전체를 형성한다.
+	<br><br>
+<<elseif $island.explore is "battleground">>
+	당신은 전쟁터를 가로질러 걸으며, 부러진 화살들을 넘어간다. 멀리서 간간이 들려오는 비명 소리에 잠시 멈춘다.
+	<br><br>
+<<elseif $island.explore is "plain">>
+	당신은 평원을 가로질러 걸으며, 여러 작은 언덕을 오르고 그 사이의 골짜기로 내려간다. 마치 다른 세계나 다른 시간 속에 있는 것 같은 느낌이 든다.
+	<br><br>
+<</if>>
+
+<<if $island.explore_count gte 100 and !$island.explore_locations.includes("plain")>>
+	<<island_events_plain>>
+<<elseif $island.explore_count gte 55 and !$island.explore_locations.includes("bay")>>
+	<<island_events_bay>>
+<<elseif $island.explore_count gte 40 and !$island.explore_locations.includes("castle")>>
+	<<island_events_castle>>
+<<elseif $island.explore_count gte 25 and !$island.explore_locations.includes("battleground")>>
+	<<island_events_battleground>>
+<<elseif $island.explore_count gte 10 and !$island.explore_locations.includes("wood")>>
+	<<island_events_wood>>
+<<elseif !$island.explore_locations.includes("shore")>>
+	<<island_events_shore>>
+<<elseif random(1, 2) is 2 and dangerEvent()>>
+	<<cleareventpool>>
+
+	<<addevent "island_events_snake" 1>>
+	<<addevent "island_events_trap" 1>>
+	<<addevent "island_events_mosquitoes" 1>>
+	<<addevent "island_events_hunted" 1>>
+	<<addevent "island_events_cat" 1>>
+	<<addevent "island_events_cat_2" 1>>
+	<<addevent "island_events_tear" 1>>
+	<<addevent "island_events_flower" 1>>
+	<<addevent "island_events_rope" 0.5>>
+	<<if $settings.bestialityEnabled and $settings.slugsEnabled>>
+		<<addevent "island_events_slugs" 0.5>>
+	<</if>>
+
+	<<if $island.explore is "battleground">>
+		<<addevent "island_events_duel" 1>>
+	<</if>>
+
+	<<runeventpool>>
+<<else>>
+	/*
+	광범위한 이벤트 카테고리를 설정합니다.
+	이를 통해 각 장소별 카테고리의 확률을 파악한 다음, 각 이벤트 풀 내에서 가중치를 조정할 수 있습니다.
+	*/
+	<<cleareventpool>>
+	<<switch $island.home>> /* Weight adds up to 100. Food and antique pools shift weight for risk-reward */
+		<<case "rocky_hillock">>
+			<<set _weightWalnuts to $island.explore is "shore" ? 35 : 15>>
+			<<set _weightAntiques to $island.explore is "plain" ? 30 : 10>>
+		<<case "waterfall">>
+			<<set _weightWalnuts to $island.explore is "shore" ? 30 : 10>>
+			<<set _weightAntiques to $island.explore is "plain" ? 35 : 15>>
+		<<case "gulch">>
+			<<set _weightWalnuts to $island.explore is "shore" ? 25 : 5>>
+			<<set _weightAntiques to $island.explore is "plain" ? 40 : 20>>
+		<<default>>
+			<<error {
+				message	: `${$passage}에서 확인했을 때 섬의 집이 설정되지 않았습니다. Vrelnir에게 제보해 주세요.`,
+				source	: `Previous passage: ${$passagePrev}.`
+			}>>
+			<br><br>
+	<</switch>>
+	<<set _weightMiscellaneous to $island.explore is "none" ? 35 : 15>>
+	<<set _weightWood to $island.explore is "wood" ? 40 : 20>>
+	<<set _weightIslanders to $island.explore is "battleground" ? 40 : 20>>
+
+	<<addevent "island_events_category_miscellaneous" _weightMiscellaneous>>
+	<<addevent "island_events_category_walnuts" _weightWalnuts>>
+	<<addevent "island_events_category_wood" _weightWood>>
+	<<addevent "island_events_category_islanders" _weightIslanders>>
+	<<addevent "island_events_category_antiques" _weightAntiques>>
+
+	<<runeventpool>>
+<</if>>
+
+:: Island Passout
+<<effects>>
+<<generateRole 0 0 "islander">><<generateRole 1 0 "islander">>
+<<person1>>팔이 짓눌리는 감각에 잠에서 깬다. <<person1>><<person>>【와과】 <<person2>><<person>>【이가】 사슴뿔 가면 뒤에서 당신을 내려다보고 있다. 당신이 힘을 회복하기도 전에 그들이 덮쳐온다.
+<br><br>
+
+<<link [[다음|Island Defeat]]>><</link>>
+<br>
+
+:: Island Clothes
+<<effects>>당신은 임시 옷을 만들기에 충분히 길고 튼튼한 식물을 찾습니다. 적당한 것들을 찾아 당신의
+<<if $phase is 1>>
+	가슴에 둘러 묶습니다.
+	<<plantupper>>
+<<elseif $phase is 2>>
+	허리에 둘러 묶습니다.
+	<<plantlower>>
+<</if>>
+엉성하고 몸이 비치며, 망가뜨리지 않고는 벗을 수 없을 것 같지만, 없는 것보다는 낫습니다.
+<br><br>
+
+<<link [[다음|Island]]>><<endevent>><</link>>
+<br>
+
+:: Island Masturbation
+<<effects>>
+<<if $masturbationstart is 1>>
+	<<set $masturbationstart to 0>>
+	<<set $masturbationstat += 1>>
+	<<masturbationstart>>
+<</if>>
+<<masturbationeffects>>
+<<masturbationactions>>
+
+<<if $corruptionMasturbation>>
+	<span class="red">귀 안의 슬라임이 멈추는 것을 허락하지 않는다.</span>
+<</if>>
+
+<<if $drugged lte 0 and $arousal lte 3000>>
+	만족한 당신은 나뭇잎 바닥에 등을 대고 누워 헐떡인다.
+	<br><br>
+	<div id="masturbationButtons">
+		<div id="next"><<link [[다음|Island Masturbation Finish]]>><<set $finish to 1>><</link>><<nexttext>></div>
+	</div>
+<<else>>
+	<div id="masturbationButtons">
+		<div id="next"><<link [[계속한다|Island Masturbation]]>><</link>><<nexttext>></div>
+		<<masturbationStopControls>>
+	</div>
+<</if>>
+<br>
+
+:: Island Masturbation Finish
+<<effects>>
+
+<<if $masturbationorgasm gte random(1, 10)>>
+	<<endmasturbation>>
+	<<endcombat>>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<generateRole 2 0 "islander">>
+	<<person1>>
+	일어나기도 전에, 여러 방향에서 발소리가 들려온다. <<person>>, <<person2>><<person>>, 그리고 <<person3>><<person>>【이가】 나무들 사이에서 나타난다!
+	<br><br>
+
+	<<link [[싸운다|Island Sleep Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[굴복한다 (0:30)|Island Sleep Submit]]>><</link>>
+	<br>
+<<else>>
+
+	<<endmasturbation>>
+	<<endcombat>>
+
+	<<tearful>> 당신은 자리에서 일어선다.
+	<br><br>
+
+	<<link [[다음|Island]]>><<clotheson>><</link>>
+	<br>
+<</if>>
+
+:: Island Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Island Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Island Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Island Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<if $islander_language gte 100>>
+		당신의 공격자들이 비틀거리며 물러난다.
+		<br>
+		"정말 애태우는군!"
+		<br>
+		"난 모르겠지만, 난 저거 하고 나서 좀 회복해야겠어."
+		<br>
+		"나도. 안전하게 가자."
+		<br>
+	<<elseif $islander_language gte 50>>
+		당신을 공격한 자들이 그게 얼마나 피곤했는지에 대해 외치며 비틀거리며 물러난다.
+	<<else>>
+		당신을 공격한 자들이 이해할 수 없는 언어로 소리치며 비틀거리며 물러난다.
+	<</if>>
+	그들은 뒤로 물러서다가, 망설이더니, 돌아서서 도망친다.
+	<br><br>
+	<<tearful>> 당신은 숨을 고른다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	<<if $islander_language gte 100>>
+		당신을 공격한 자들이 비틀거리며 물러난다.
+		<br>
+		"길 잃은 자가 이렇게 약할 줄이야."
+		<br>
+		"여기서 혼자 힘을 유지하지는 못할 거야."
+		<br>
+		"네 말이 맞아. 안전하게 가자."
+		<br>
+	<<elseif $islander_language gte 50>>
+		당신을 공격한 자들이 당신의 힘에 놀라 비틀거리며 물러난다.
+	<<else>>
+		당신을 공격한 자들이 이해할 수 없는 언어로 소리치며 비틀거리며 물러난다.
+	<</if>>
+	그들은 뒤로 물러서다가, 망설이더니, 돌아서서 도망친다.
+	<br><br>
+	<<tearful>> 당신은 숨을 고른다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+
+<<else>>
+	당신은 너무 다쳐서 계속 싸울 수 없어 땅에 쓰러진다.
+	<br><br>
+	<<if $islander_language gte 100>>
+		두 사람이 당신 양옆에 선다. "결국 별로 강하지도 않잖아."
+		<br>
+		"아직 안 끝났어. 밧줄 준비해, 난 막대기 찾아올게."
+	<<elseif $islander_language gte 50>>
+		두 사람이 당신 양옆에 선다. <<tearful>> 당신은 그들이 당신을 어딘가로 데려가겠다고 이야기하는 것을 듣는다.
+	<<else>>
+		두 사람이 당신 양옆에 선다. <<tearful>> 당신은 그들이 이해할 수 없는 언어로 당신 위에서 이야기하는 것을 듣는다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Island Defeat]]>><</link>>
+	<br>
+<</if>>
+
+:: Island Castle
+<<effects>>
+
+당신은 산등성이를 넘어 성으로 간다. 아래쪽은 매우 분주하다. 두 명의 섬 주민이 여전히 작은 입구 밖에서 경비를 서고 있다.
+<br><br>
+
+<<getinicon>><<link [[접근한다|Island Castle Approach]]>><</link>>
+<br>
+<<getouticon>><<link [[떠난다|Island]]>><</link>>
+<br>
+
+:: Island Castle Approach
+<<effects>>
+
+<<generateRole 0 0 "islander">>
+<<generateRole 1 0 "islander">>
+<<person1>>당신은 경비병들, <<person>>【와과】 <<person2>><<person>>에게 다가간다.
+<<if $worn.face.name is "islander mask">>
+	<span class="green">당신의 가면이 얼굴을 가려준다.</span> 당신이 다리 중간쯤 건널 때까지 그들은 미동도 하지 않는다.
+	<br><br>
+	<<if $islander_language gte 100>>
+		"멈춰라." <<person1>><<person>>【이가】 말한다. "무슨 권리로 여기에 들어오려는 거지?" <span class="green">당신은 그들의 언어로 대답할 수 있을 것이다.</span>
+		<br><br>
+		<<link [[위엄 있게 행동한다|Island Castle Dignified]]>><</link>>
+		<br>
+		<<link [[귀엽게 행동한다|Island Castle Cute]]>><</link>>
+		<br>
+	<<elseif $islander_language gte 50>>
+		<<person1>><<person>>【이가】 당신에게 질문을 하지만, <span class="red">당신은 <<him>>의 말을 이해할 수 없다.</span>
+		<br><br>
+		<<getinicon>><<link [[들어가려고 시도한다|Island Castle Try]]>><<pain 4>><<stress 6>><</link>><<gpain>><<gstress>>
+		<br>
+		<<getouticon>><<link [[떠난다|Island]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<person1>><<person>>【이가】 <<his>> <span class="red">이해할 수 없는 언어로</span> 무언가 말한다.
+		<br><br>
+		<<getinicon>><<link [[들어가려고 시도한다|Island Castle Try]]>><<pain 4>><<stress 6>><</link>><<gpain>><<gstress>>
+		<br>
+		<<getouticon>><<link [[떠난다|Island]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">그들이 당신에게 창을 겨눈다.</span>
+	<<if $islander_language gte 100>>
+		"외부인!" <<person1>><<person>>【이가】 소리친다. "꺼져!" <span class="green">적어도 당신은 <<him>>의 말을 이해할 수 있다.</span> 더 많은 섬 주민들이 다가오는 소리가 들린다. 억지로 뚫고 들어갈 수는 없을 것이다.
+		<br><br>
+
+		<i>지나가려면 가면을 만들어야 할 것이다.</i>
+		<br><br>
+
+		<<getouticon>><<link [[떠난다|Island]]>><<endevent>><</link>>
+		<br>
+	<<elseif $islander_language gte 50>>
+		<<person1>><<person>>【이가】 당신에게 소리치지만, <span class="red">당신은 <<him>>의 말을 이해할 수 없다.</span> 더 많은 섬 주민들이 다가오는 소리가 들린다. 억지로 뚫고 들어갈 수는 없을 것이다.
+		<br><br>
+
+		<i>지나가려면 가면을 만들어야 할 것이다.</i>
+		<br><br>
+
+		<<getouticon>><<link [[떠난다|Island]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<person1>><<person>>【이가】 <<his>> <span class="red">이해할 수 없는 언어로</span> 소리친다. 더 많은 섬 주민들이 다가오는 소리가 들린다. 억지로 뚫고 들어갈 수는 없을 것이다.
+		<br><br>
+
+		<i>지나가려면 가면을 만들어야 할 것이다.</i>
+		<br><br>
+		<<getouticon>><<link [[떠난다|Island]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Island Castle Try
+<<effects>>
+
+당신은 경비병들 사이로 걸어가려 하지만, <<person2>><<person>>【이가】 당신을 뒤로 밀치며 소리친다. 더 많은 섬 주민들이 다가오는 소리가 들린다. 힘으로 뚫고 지나갈 수는 없을 것이다.
+<br><br>
+
+<i>지나가고 싶다면 섬 주민의 언어를 이해해야 합니다.</i>
+<br><br>
+
+<<link [[다음|Island]]>><<endevent>><</link>>
+<br>
+
+:: Island Castle Dignified
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"실례합니다." 당신은 섬 주민의 언어로 말한다. "창을 깜빡했네요."
+	<br><br>
+	<<person2>><<person>>【이가】 웃는다. "<<girl>>【이가】 <<pher>> 창을 잊어버렸군! 어서 들어가게."
+	<br><br>
+<<elseif $speech_attitude is "bratty">>
+	"노예에게나 권리가 필요하죠." 당신은 섬 주민의 언어로 말한다. "들어가도 되는 건가요, 아닌가요?"
+	<br><br>
+	<<person2>><<person>>【이가】 웃는다. "기분 나쁘게 할 뜻은 없었네, <<girl>>. 어서 들어가게."
+	<br><br>
+<<else>>
+	"문제가 된다면 정문으로 가겠습니다." 당신은 섬 주민의 언어로 말한다. "그냥 피곤해서요."
+	<br><br>
+	"들어가게." <<person2>><<person>>【이가】 말한다. "자네와 자네 집 사이에 내가 서 있을 순 없지."
+	<br><br>
+<</if>>
+
+당신은 경비병들 사이를 지나 성 안으로 들어간다.
+<br><br>
+
+<<link [[다음|Island Castle Enter]]>><<endevent>><</link>>
+<br>
+
+:: Island Castle Cute
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"이런." 당신은 섬 주민의 언어로 말한다. "정문으로 가려던 참이었어요. 저 멀리까지 걸어가야 하는 수고를 덜어주시겠어요?"
+	<br><br>
+	"오, 알겠네." <<person2>><<person>>【이가】 말한다. "지나가게."
+	<br><br>
+<<elseif $speech_attitude is "bratty">>
+	"정문까지 쭉 걸어가게 할 건 아니죠?" 당신은 섬 주민의 언어로 묻는다.
+	<br><br>
+	"알았네." <<person2>><<person>>【이가】 한숨을 쉰다. "지나가게."
+	<br><br>
+<<else>>
+	"죄송해요." 당신은 섬 주민의 언어로 말한다. "하지만 발이 피곤한데 정문은 너무 멀리 있네요."
+	<br><br>
+	"오, 알겠네." <<person2>><<person>>【이가】 말한다. "지나가게."
+	<br><br>
+<</if>>
+
+당신은 경비병들 사이를 지나 성 안으로 들어간다.
+<br><br>
+
+<<link [[다음|Island Castle Enter]]>><<endevent>><</link>>
+<br>
+
+:: Island Castle Enter
+<<effects>>
+
+<<earnFeat "Naturalised">>
+나선형 계단을 내려간다. 섬 주민들이 당신을 지나치지만, 쳐다보지도 않는다. 마을 사람들과 특별히 달라 보이지는 않지만, 몇몇은 기하학적인 모양의 문신을 하고 있다.
+<br><br>
+
+성벽 꼭대기에 다다른다. 아래에는 성의 안전한 담장 안에 지어진 나무집들로 이루어진 일종의 마을이 있다. 중앙에는 복잡한 비계가 세워져 있다. 어린 섬 주민들이 근처에서 공과 두꺼운 막대기를 가지고 노는 중이다.
+<br><br>
+
+<<link [[다음|Island Castle 2]]>><</link>>
+<br>
+
+:: Island Castle 2
+<<effects>>
+
+성벽을 떠나 탑으로 들어가, 또 다른 나선형 계단을 내려가니 긴 복도가 나온다. 양쪽의 가느다란 창문으로 약간의 빛이 들어온다. 반대편에는 나무로 된 이중문이 있다.
+<br><br>
+
+<<link [[연다|Island Castle 3]]>><</link>>
+<br>
+
+:: Island Castle 3
+<<effects>>
+
+<<generateRole 0 0 "islander">><<person1>>
+<<generateRole 1 0 "islander">>
+<<generateRole 2 0 "islander">>
+<<generateRole 3 0 "islander">>
+<<generateRole 4 0 "islander">>
+문을 밀어 열자 넓은 실내가 드러난다. 네 명의 <<people>>, <<person>>, <<person2>><<person>>, <<person3>><<person>>, <<person4>><<person>>【이가】 양탄자가 덮인 발판에 앉아 테이블 주위에 둘러앉아 있다. 당신이 들어서자 그들은 대화를 멈추지 않고 당신을 힐끗 쳐다본다. 당신의 등장에 별로 신경 쓰지 않는 것 같다.
+<br><br>
+
+"우리는 이걸 제대로 해야 해." <<person1>><<person>>【이가】 말한다. "지름길은 없어." <<him>> 아래에서 손이 나와 <<his>> 다리를 두 번 두드린다. 그 <<person>>【이가】 일어서자, "발판"도 함께 일어선다. 그 손이 양탄자를 걷어내자 <<person5>><<person>>【이가】 드러난다. <<He>>【은는】 당신을 향해 돌아선다.
+<br><br>
+"드디어." <<he>>【이가】 속삭인다. "등이 아프군." <<He>>【은는】 당신에게 양탄자를 건네주고, 방을 나가면서 당신의 어깨를 두드린다.
+<br><br>
+<<person1>><<person>>【은는】 초조한 듯 당신을 쳐다본다.
+<br><br>
+
+<<link [[발판이 된다|Island Castle Stool]]>><</link>><<physiquedifficulty 1 5000>>
+<br>
+<<link [[도망친다|Island Castle Run]]>><</link>>
+<br>
+
+:: Island Castle Stool
+<<effects>>
+
+당신은 무릎을 꿇고 등을 양탄자로 덮는다. 섬유 틈새로 방 안을 볼 수 있다. <<person1>><<person>>【이가】 당신의 등 위로 <<his>> 엉덩이를 내려놓는다.
+<<if $physiqueSuccess>>
+	<span class="green">당신은 <<his>> 무게를 버텨내는 데 성공한다.</span>
+	<br><br>
+<<else>>
+	<span class="red"><<He>>【은는】 너무 무겁다.</span> 당신의 팔이 떨리고, 간신히 버티고 있자 <<he>>【은는】 <<his>> 다리로 <<his>> 무게의 일부를 지탱한다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+	<br><br>
+<</if>>
+
+"어디까지 얘기했지?" <<he>>【이가】 말한다. "아, 그래. 드루이드들은 우리가 모든 의식을 차례로 수행하는 것을 고집하고 있어."
+<br>
+"한 번에 하나 이상의 의식을 치르자는 말은 아니야." <<person2>><<person>>【이가】 이 사이에 낀 음식을 빼내며 말한다. "하지만 한 번에 그들의 온몸에 문신을 새기는 걸 막을 건 없지."
+<br>
+"그럼 미쳐버릴 거야." <<person3>><<person>>【이가】 말한다. <<He>>【은는】 한 손으로 뒤틀린 지팡이를 쥔다. "그건 안 돼. 섬 주민이 그들과 대화하고 싶어 하니까."
+<br>
+"대화라." <<person4>><<person>>【이가】 킥킥 웃는다. "내 생각엔 의식은 다 건너뛰고 웅덩이에 던져버리는 게 낫겠어."
+<br><br>
+
+<<link [[다음|Island Castle Stool 2]]>><</link>>
+<br>
+
+:: Island Castle Stool 2
+<<effects>>
+
+네 사람은 서로 자기주장을 내세우며 말다툼을 벌인다. <<person3>><<person>>【이가】 <<his>> 지팡이를 땅에 내리쳐 싸움을 중단시킨다.
+<br><br>
+
+"우리가 우리 자신을 잊은 것 같군." <<he>>【이가】 말한다. "웅덩이에 가보자. 룬이 우리가 누구인지 상기시켜 줄 거야."
+<br><br>
+
+즉시 다른 "발판"들이 반대편 문을 향해 움직이기 시작한다. 당신도 그 뒤를 따른다.
+<<if $physique lt 5000>>
+	<<person1>><<person>>【이가】 <<his>> 무게를 지탱하는 것을 돕기 위해 발을 내딛는다.
+<<else>>
+	<<person1>><<person>>【은는】 한쪽 다리를 다른 쪽 다리 위로 꼬고 올라타 있다.
+<</if>>
+<br><br>
+
+당신이 다른 발판들과 함께 복도를 기어가는 동안 그들은 계속해서 토론한다.
+<br><br>
+
+"잃어버린 자가 예언대로 도착했어." <<person1>><<person>>【이가】 말한다. "다른 룬들도 믿어보자고."
+<br>
+"해안으로 밀려온 게 그들이 처음은 아니잖아." <<person2>><<person>>【이가】 대답한다.
+<br><br>
+
+경사로를 기어 내려가자, 자갈길이 더 매끄러운 돌로 바뀐다. 거기에 무늬가 있지만, 희미한 빛 속에서는 알아볼 수 없다.
+<br><br>
+
+<<link [[다음|Island Castle Stool 3]]>><</link>>
+<br>
+
+:: Island Castle Stool 3
+<<effects>>
+
+앞에서 문이 삐걱거리며 열리는 소리와 함께 물이 쏟아지는 소리가 들린다. 행렬은 높은 방으로 들어선다. 벽은 살아있는 나무뿌리처럼 보이는 것으로 덮여 있다. 하지만 자세히 보니, 그런 인상을 주도록 조각된 것이고, 어떤 비전의 방법으로 융합된 것 같다.
+<br><br>
+
+<<person3>><<person>>【이가】 <<his>> 뒤틀린 지팡이를 땅에 두드린다. 다른 세 개의 발판은 일렬로 늘어서 있고, 당신은 그 끝에 합류하여 물웅덩이에서 몇 인치 떨어진 곳에 무릎을 꿇는다. 수면은 고요하지만, 근처 어딘가에서 물이 쏟아지는 소리가 들린다.
+<br><br>
+
+<<link [[다음|Island Castle Stool 4]]>><</link>>
+<br>
+
+:: Island Castle Stool 4
+<<effects>>
+
+"자, 저길 보게." <<person>>【이가】 맞은편에 서 있는 높은 조각상을 가리키며 말한다. 웅덩이 주위로 반원형으로 배열된 다섯 개의 조각상이 있다. 가슴에는 룬 문자가 새겨져 있지만, 당신은 섬 주민의 말을 할 수 있을 뿐, 읽지는 못한다.
+<br><br>
+
+<<person1>>"더 가까이 가봐." <<person>>【이가】 당신의 <<bottom>>【을를】 두드리며 말한다. 당신은 앞으로 기어간다. 당신의 손이 웅덩이 가장자리에 닿자마자, 수면이 포효하며 살아난다. 중앙에 소용돌이가 나타난다.
+<br><br>
+
+"발판"들이 똑바로 서서 위에 탄 사람들을 떨어뜨린다. "이건 불가능해." <<person3>><<person>>【이가】 <<his>> 지팡이에 기댄 채 소리친다. 물이 솟아올라 조각상들 위로 치솟는다. 섬 주민들이 서로 발에 걸려 넘어지며 탈출하려 애쓰는 사이, 물이 다시 덮쳐 당신을 삼킨다.
+<br><br>
+
+당신은 어둠 속으로 빠져든다.
+<br><br>
+
+<<link [[다음|Islander]]>><<island_pass 60>><<endevent>><</link>>
+<br>
+
+:: Island Castle Run
+<<effects>>
+
+당신은 돌아서서 달린다. "경비병! 불량배다!"
+<br><br>
+<<person5>><<person>>【이가】 당신을 덮치려다 실패하지만, 복도 다른 쪽 끝에서 성벽에서 막 돌아온 더 많은 섬 주민들이 나타난다. 당신은 포위되었다.
+<br><br>
+
+당신은 일어서려는 <<persons>> 등을 밟고, 그 높이를 이용해 높은 창문으로 뛰어내려 바깥 잔디밭으로 굴러떨어진다. 어린 섬 주민들은 게임에 너무 집중한 나머지 눈치채지 못한다. 당신은 그들과 비계 다리 사이를 헤치고, 나무집들을 돌아, 다시 성 안으로 뛰어 들어간다.
+<br><br>
+
+왼쪽으로 돌지만, 더 많은 섬 주민들이 이중문을 통해 행진해 온다. 한 명이 창을 던져 당신의 다리에 거의 맞을 뻔한다. 당신은 또 다른 문을 통해, 그리고 또 다른 문을 통해, 그리고 매끄러운 경사로를 내려가 이상한 방으로 탈출한다.
+<br><br>
+
+<<link [[다음|Island Castle Run 2]]>><</link>>
+<br>
+
+:: Island Castle Run 2
+<<effects>>
+
+중앙 웅덩이를 둘러싼 다섯 개의 높은 조각상이 당신을 맞이한다. 수면은 고요하지만, 근처 어딘가에서 물이 쏟아지는 소리가 들린다. 벽은 살아있는 나무뿌리 같은 인상을 주도록 조각된 나무 장식으로 덮여 있으며, 어떤 비전의 방법으로 융합되어 있다.
+<br><br>
+
+"저 안에 있다!" 외침이 들린다. "서둘러! <<pshe>>【이가】 군주를 방해하기 전에!"
+<br><br>
+
+당신은 다른 출구를 찾으며 문에서 멀어진다. 당신의 발이 웅덩이 가장자리에 닿자, 수면이 포효하며 살아난다. 소용돌이가 나타나더니 위로 솟구친다. 회전하는 꼭대기가 넓어지더니, 아래로 덮치며 당신을 삼킨다. 무력하게, 당신은 어둠 속으로 빠져든다.
+<br><br>
+
+<<link [[다음|Islander]]>><<island_pass 60>><<endevent>><</link>>
+<br>
+
+:: Island Sail
+<<effects>>
+
+영차하고 뗏목을 해변 아래로 밀어 물 위로 띄운 뒤 올라탄다. 당신은 만의 입구를 향해 노를 젓는다. 조수가 당신 편인 것 같고, 당신은 곧 섬에서 멀리 항해한다.
+<br><br>
+
+뗏목이 당신을 안개 벽 속으로 밀어 넣자, 등 뒤의 섬이 사라진다. 당신은 눈이 먼 채로 노를 젓다가, 마침내 먼 해안과 마을이 드러난다.
+<br><br>
+
+물살은 좋았지만, 뗏목은 힘겨워한다. 나무를 묶은 섬유가 닳고 느슨해져, 더 많은 나무가 조수에 휩쓸려가면서 배가 작아진다. 해안에 도착할 때쯤에는, 당신은 남은 부분을 팔로 붙들고 있다.
+<br><br>
+
+당신은 배에서 메르 가 근처의 부두로 뛰어내린다. 화물을 배달하자, 뗏목은 등 뒤에서 산산조각 난다.
+<br><br>
+
+당신은 마을로 돌아왔다. 주위에는 아무도 없다. <<covered>>
+<br><br>
+
+<<link [[다음|Mer Street]]>><<island_end>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Island Hunger
+<<effects>><<wearProp "soup bowl">>
+
+<<generateRole 0 0 "islander">>
+<<generateRole 1 0 "islander">>
+음식 냄새가 당신의 주의를 사로잡는다. 당신은 덤불을 헤치고 나와 <<person1>><<person>>【와과】 <<person2>><<person>> 앞에 나타난다. 그들 사이에는 나무 냄비가 놓여 있고, 불 위에서 끓고 있다. 안에는 먹을 만한 것이 들어 있다.
+<br><br>
+
+<<person1>><<person>>【은는】 망설이지 않는다. <<He>>【은는】 당신의 얼굴을 한 번 보더니, 국자와 그릇을 들어 올린다. <<He>>【은는】 그것을 가득 채워 당신에게 내민다.
+<br><br>
+
+당신은 그릇에서 바로 따뜻한 수프를 마신다. 그리고 찌꺼기를 핥는다. 당신은 그 <<person>>【이가】 당신에게 숟가락을 내밀고 있는 것을 알아차린다. <<person2>><<person>>【이가】 웃는다.
+<br><br>
+
+<<link [[다음|Island Hunger 2]]>><</link>>
+<br>
+
+:: Island Hunger 2
+<<effects>><<wearProp "soup bowl">>
+
+당신은 또 한 그릇, 그리고 또 한 그릇을 먹고, 마침내 만족스럽고 움직일 수 없는 상태로 풀밭에 눕는다.<<set $hunger -= 2000>><<stress -24>><<lllhunger>><<lllstress>>
+<br><br>
+
+두 사람은 당신 위에 서서 당신을 내려다본 다음, 서로를 쳐다본다. <<person2>><<person>>【이가】 <<his>> 손 사이에서 밧줄 한 가닥을 팽팽하게 당긴다.
+<br><br>
+
+<<link [[다음|Island Defeat]]>><</link>>
+<br>
+
+:: Pregnancy Island
+<<effects>>
+
+당신은 가면을 쓴 인물들에게 둘러싸여 깨어난다. 이 가면들은 당신이 섬에서 본 다른 것들과는 다르다. 더 높고, 조각을 통해 보존된 야생의 성장이 있다. 각 인물은 횃불을 들고 있고, 불꽃이 바람에 흔들린다. 그들은 부자연스러운 안정감으로 움직인다. 당신은 하늘을 바라보고, 물이 튀는 소리를 듣고, 다시 정신을 잃는다.
+<br><br>
+
+<<set _time to 60>>
+<<set _hours to Math.floor(_time / 60)>>
+<<set _minutes to _time % 60>>
+<<link [["다음 ("+_hours+":"+(_minutes lt 10 ? "0": "")+_minutes+")"| Pregnancy Birth Hospital]]>><<island_end>><<pass _time>><<set $phase to 1>><</link>>

@@ -1,0 +1,149 @@
+:: Barb Street
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "barb">><<getTarget true>>
+
+당신은 바브 가에 있다. 은색 아파트 단지가 사방에 우뚝 솟아 있고, 대부분은 텅 빈 운하로 도로와 분리되어 있다. 바다 소리가 들린다. 경찰서와 댄스 스튜디오가 이곳에 있다.
+<<if Time.dayState is "day">>
+	<<if Weather.precipitation is "rain">>
+		빗속을 용감하게 걷는 몇몇 사람들의 발걸음이 빠르다.
+	<<elseif Weather.isFreezing>>
+		보행자들이 보도를 가득 메우고, 추위를 피해 빠르게 걷고 있다.
+	<<else>>
+		보행자들이 보도를 가득 메웠지만, 차량 소음이 더 크게 들린다.
+	<</if>>
+<<elseif Time.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		건물 위로 쏟아지는 비가 서둘러 가는 사람들의 몸 위로 떨어진다.
+	<<elseif Weather.isSnow>>
+		밤사이 쌓인 눈은 이미 잦은 발걸음에 짓밟혀 사라졌다.
+	<<else>>
+		이른 시간임에도 거리는 이미 붐빈다.
+	<</if>>
+<<elseif Time.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		사람들은 실내로 들어가고 싶어 하며 빗속을 서둘러 지나간다.
+	<<elseif Weather.isFreezing>>
+		사람들은 실내로 들어가고 싶어 하며 추위 속을 서둘러 지나간다.
+	<<else>>
+		해는 건물 뒤로 사라진 지 오래지만, 거리는 여전히 붐빈다.
+	<</if>>
+<<elseif Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		높은 창문에서 새어 나오는 불빛이 어두운 빗줄기를 꿰뚫는다.
+	<<elseif Weather.isSnow>>
+		높은 창문에서 새어 나오는 불빛이 눈을 비춘다.
+	<<else>>
+		늦은 시간임에도 불구하고 근처 건물에서 목소리와 간간이 외치는 소리가 들려온다.
+	<</if>>
+<</if>>
+<<if $police_access_card is 1>>
+	당신의 <span class="teal">경찰서 출입 카드</span>로 경찰서 옆에 있는 문을 열 수 있다.
+	<<set $phase to 10>>
+<<elseif currentSkillValue('skulduggery') gte 600 and ((Time.dayState isnot "night" and $rng lte 25) or (Time.dayState is "night" and $rng lte 20))>>
+	<<set $phase to 10>>
+	<br>
+	<span class="teal">도둑의 눈으로 당신은 다른 사람들이 놓치는 것을 본다.</span> 경찰 두어 명이
+	<<print either("수갑 찬","의식 없는","몸부림치는","젊고 매력적인","벌거벗은","심하게 진정된","재갈 물린","추파를 던지는")>> 죄수를
+	옆문으로 끌고 나와 <<print either("한적한 골목으로 데려가는 것을 목격한다.","경찰차 뒷좌석으로 태우는 것을 목격한다.","한적한 지하 감옥으로 내려가는 계단으로 데려가는 것을 목격한다.")>>
+	옆문은 제대로 닫히지 않았다. 살짝 열려 있다.
+	<br>
+	<<set $eventskip to 1>>
+<</if>>
+<<if $halloween is 1>>
+	잭오랜턴과 다른 핼러윈 장식들이 창문 너머로 으스스하게 보인다.
+<</if>>
+<<streeteffects>>
+<br><br>
+<<if $exposed gte 1>>
+	<<exhibitionism "street">>
+<</if>>
+<<if $arousal gte $arousalmax>>
+	<<orgasmstreet>>
+<</if>>
+<<if $stress gte $stressmax and !$possessed>>
+	<<passoutstreet>>
+<<elseif $town_projects.bridge is 1>>
+	<<set $town_projects.bridge to 2>>
+	한때 운하를 가로질렀던 다리의 잔해를 발견한다. 물담배 꿈에서 봤던 바로 그 폐허다. 운하의 물이 빠진 후에 철거된 것이 틀림없다.
+	<br><br>
+	고아원에서 본 적 있는 <<generatey1>><<person1>><<person>>【이가】 운하로 허둥지둥 들어가 반대편으로 안도하며 나오는 것을 본다. <span class="teal">좋은 생각이 떠오른다.</span> 다리가 복원된다면, 불량배들이 사람들을 괴롭히기 더 어려워질 것이다.
+	<br><br>
+	<i>시청에서 다리에 대해 문의할 수 있을 것이다.</i>
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Barb Street]]>><<set $eventskip to 1>><</link>>
+<<elseif $town_projects.bridge is 3>>
+	<<set $town_projects.bridge to 4>>
+	시장실은 신속하게 움직였고, <span class="green">새로 건설된 다리가 운하를 가로지른다.</span> 건너는 것이 더 안전해질 것이다. 이곳에서 일자리를 구하는 고아들도 더 안전해질 것이다.
+	<br><br>
+	<<earnFeat "Bridging the Past">>
+	<<link [[다음|Barb Street]]>><<set $eventskip to 1>><</link>>
+	<br>
+<<else>>
+
+	<<if (dangerEvent() or $eventforced) and $eventskip is 0>>
+		<<eventsstreet>>
+	<<else>>
+		<<if $options.mapTop is true>>
+			<<map "barb">>
+			<br>
+		<</if>>
+		주요 장소
+		<br>
+		<<if Time.openingHours(1)>>
+			<<dancestudioicon>><<link [[댄스 스튜디오 (0:01)|Dance Studio]]>><<pass 1>><</link>>
+			<br>
+		<<elseif Time.hour is $closinghour>>
+			<<dancestudioicon>><span class="blue">사람들이 댄스 스튜디오에서 나오고 있다.</span> 문 닫을 시간인 것 같다.
+			<br>
+		<<else>>
+			<<dancestudioicon>><<link [[댄스 스튜디오 (0:01)|Dance Studio Lock]]>><<pass 1>><</link>>
+			<br>
+		<</if>>
+		<<if $exposed lte 0>>
+			<<policeicon>><<link [[경찰서 (0:02)|Police Station]]>><<endevent>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if $phase is 10>>
+			<<set $phase to 0>>
+			<<policeicon>><<link [[경찰서 옆문으로 몰래 들어가기 (0:05)|Police Back Office]]>><<pass 5>><</link>>
+			<br>
+		<</if>>
+		<<if $town_projects.bridge gte 4>>
+			<<flatsicon>><<link [[다리를 건너 아파트로 가기 (0:01)|Flats]]>><<pass 1>><</link>>
+			<br>
+		<</if>>
+		<<if $exposed lte 0>>
+			<<flatsicon>><<link [[운하를 건너 아파트로 가기 (0:01)|Flats Canal]]>><<pass 1>><</link>>
+			<br>
+		<</if>>
+		<<if $dorenintro gte 1 and $exposed lte 0>>
+			<<dooricon "doren">><<link [[도렌의 아파트 (0:02)|Doren Entrance]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if $whitney_home_stage gte 3 and (C.npc.Whitney.state is "active" or C.npc.Whitney.state is "rescued")>>
+			<<dooricon "whitney">><<link [[휘트니의 아파트 (0:02)|Whitney Home Knock]]>><<set $daily.whitney.home_dawn to 1>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if $exposed gte 1 and Time.dayState isnot "night">>
+		<<else>>
+			<<add_link "이동<br>">><<hideDisplay>>
+			<<domus>>
+			<<cliff>>
+			<<connudatus>>
+			<<if $exposed lte 0>>
+				<<buswait>>
+			<</if>>
+			<<loiter>>
+		<</if>>
+		<<add_link "<br>우회로<br>">><<hideDisplay>>
+		<<residential>>
+		<<stormdrain>>
+		<br>
+		<<displayLinks>>
+		<<if $options.mapTop isnot true>>
+			<br>
+			<<map "barb">>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>

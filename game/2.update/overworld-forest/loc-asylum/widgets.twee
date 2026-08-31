@@ -1,0 +1,789 @@
+:: Asylum Widgets [widget]
+
+<<widget "asylumeffects">>
+	<<if Time.hour lte 5>>
+		<<set $asylumstate to "sleep">>
+	<<elseif Time.hour lte 8>>
+		<<set $asylumstate to "free">>
+	<<elseif Time.hour is 9>>
+		<<set $asylumstate to "exercise">>
+	<<elseif Time.hour is 10>>
+		<<set $asylumstate to "firsttreatment">>
+	<<elseif Time.hour lte 14>>
+		<<set $asylumstate to "free">>
+	<<elseif Time.hour is 15>>
+		<<set $asylumstate to "secondtreatment">>
+	<<elseif Time.hour lte 19>>
+		<<set $asylumstate to "free">>
+	<<elseif Time.hour is 20>>
+		<<set $asylumstate to "assessment">>
+	<<elseif Time.hour is 21>>
+		<<set $asylumstate to "free">>
+	<<else>>
+		<<set $asylumstate to "sleep">>
+	<</if>>
+	<<set $suspicion = Math.clamp($suspicion, 0, 100)>>
+	<<set $asylumstatus = Math.clamp($asylumstatus, 0, 100)>>
+<</widget>>
+
+<<widget "asylumstats">>
+	<<if $suspicion gte 80>>
+		<span class="red">경비원들이 대놓고 당신을 감시한다. 간호사들조차 경계하는 눈치다.</span>
+	<<elseif $suspicion gte 20>>
+		<span class="blue">이따금 경비원들이 당신을 주시하는 것이 느껴진다.</span>
+	<<else>>
+		<span class="green">직원들은 당신을 무시한다.</span>
+	<</if>>
+	<br>
+	<<if $asylumstatus gte 80>>
+		<span class="green">다른 환자들이 당신을 보면 미소를 지어 보인다.</span>
+	<<elseif $asylumstatus gte 20>>
+		<span class="blue">다른 환자들은 당신을 무시한다.</span>
+	<<else>>
+		<span class="red">다른 환자들이 당신을 피한다.</span>
+	<</if>>
+	<br><br>
+<</widget>>
+
+<<widget "asylumtreatments">>
+<<if isPregnancyEnding()>>
+	<<pregnancyPassout "asylumHarper">>
+<<else>>
+	<<cleareventpool>>
+
+	<<addinlineevent "asylum_treatment_1" 1>>
+		<<asylumUnbindGown>>
+
+		<<if $o_long_and_beautiful is 8 and $rng % 2 and maleChance() lt 100>>
+			<<set $phase to 0>><<set $o_long_and_beautiful to 9>>
+			<<npc Harper>><<person1>>
+			<<loadNPC 1 "long_haired">>
+
+			You enter a thin room. Curtains line one side.
+			<br><br>
+
+			"Hello," Doctor Harper says. "I'm glad you could make it. Please stand just there." <<He>> pushes a button on the wall by the door and the curtain pulls back, revealing the other half of the room. A patient lies on the floor. The long, matted hair covering most of <<person2>><<his>> face hides any visible reaction.
+			<br><br>
+
+			<<person1>>"This treatment isn't for you," the doctor says. "It's for your fellow patient. I just need an assistant." <<He>> gestures at a button on a table beside you. "You'll need to press that button when I say. I'll be busy helping this patient. Press it now."
+			<br><br>
+
+			<<link [[Press|Asylum Button Long Hair Press]]>><</link>>
+			<br>
+			<<link [[Refuse|Asylum Button Long Hair Refuse]]>><<suspicion 1>><<def 1>><</link>><<gsuspicion>>
+		<<else>>
+			<<set $phase to 0>>
+			<<npc Harper>><<person1>><<generate2>>
+
+			You enter a thin room. Shutters line one side.
+			<br><br>
+
+			"Hello," Doctor Harper says. "I'm glad you could make it. Please take a seat." <<He>> pushes a button on the counter beside <<him>>. The shutters open, revealing a glass window. Another patient sits in the room beyond. <<person2>><<He>> looks nervous, but doesn't react to the reveal.
+			<br><br>
+
+			<<person1>>"This treatment isn't for you," the doctor says. "It's for your fellow patient. I just need an assistant." <<He>> gestures at a button in front of you. "You'll need to press this button when I say. I'll be busy taking notes. Press it now."
+			<br><br>
+
+			<<link [[Press|Asylum Button Press]]>><</link>>
+			<br>
+			<<link [[Refuse|Asylum Button Refuse]]>><<suspicion 1>><<def 1>><</link>><<gsuspicion>>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "asylum_treatment_2" 1>>
+		<<npc Harper>><<person1>>
+
+		You enter Doctor Harper's office. <<He>> waits for you behind <<his>> desk.
+		<br><br>
+
+		"Please take a seat," <<he>> says. There are no other chairs.
+		<br><br>
+
+		<<link [[Sit on desk|Asylum Sit Desk]]>><</link>>
+		<br>
+		<<link [[Sit on lap|Asylum Sit Lap]]>><<suspicion -1>><<awareness -1>><</link>><<promiscuous1>><<lsuspicion>><<lawareness>>
+		<br>
+		<<link [[Stay stood|Asylum Sit Stand]]>><<suspicion 1>><</link>><<gsuspicion>>
+	<</addinlineevent>>
+
+	<<addinlineevent "asylum_treatment_3" 1>>
+		<<asylumUnbindGown>>
+		<<npc Harper>><<person1>><<generate2>>
+
+		You enter a room with a large window facing the grounds, and the forest beyond. Doctor Harper waits for you, stood beside a <<person2>><<person>>. Another patient. Several orderlies wait by the wall.
+		<br><br>
+
+		"Thank you both for coming," the doctor says. "Today I want to talk about modesty. It shouldn't feel bad to be exposed. It should feel good. I want one of you to strip." The <<person>> looks horrified at the thought. "And stand in front of the window there."
+		<br><br>
+
+		You can see many patients exercising outside, as well as staff watching over them. The <<persons>> horror becomes panic. "P-please," <<he>> says. "Don't make me."
+		<br><br>
+
+		<<person1>>Harper looks at you. "You get to decide which of you strips," <<he>> says. The <<person2>><<person>> looks at you, near tears.
+		<br><br>
+
+		<<if hasSexStat("exhibitionism", 5)>>
+			<<link [[Strip and flaunt|Asylum You Flaunt]]>><<suspicion -5>><<asylumstatus 5>><<awareness -10>><<fameexhibitionism 10>><</link>><<exhibitionist5>><<llawareness>><<llsuspicion>><<ggcool>>
+		<<else>>
+			<<link [[Strip reluctantly|Asylum You Strip]]>><<suspicion -5>><<asylumstatus 5>><<awareness -10>><<stress 3>><<fameexhibitionism 10>><</link>><<llawareness>><<llsuspicion>><<ggcool>><<gstress>>
+		<</if>>
+		<br>
+		<<link [[Make <<him>> strip|Asylum They Strip]]>><<suspicion 5>><<asylumstatus -5>><</link>><<ggsuspicion>><<llcool>>
+	<</addinlineevent>>
+
+	<<if $settings.hypnosisEnabled>>
+		<<addinlineevent "asylum_treatment_4" 1>>
+			<<AsylumHypnosisCommon "Oral" $hypnosis_traits.suggestion>>
+		<</addinlineevent>>
+
+		<<addinlineevent "asylum_treatment_5" 2>>
+			<<asylumUnbindGown>>
+			<<AsylumHypnosisCommon "Exhibitionism" $hypnosis_traits.cover>>
+		<</addinlineevent>>
+
+		<<if isBeastSceneAllowed()>>
+			<<addinlineevent "asylum_treatment_6" 1.5>>
+				<<AsylumHypnosisCommon "Dog" $hypnosis_traits.deviancy>>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+
+	<<addinlineevent "asylum_treatment_7" 1.5>>
+		<<npc Harper>><<person1>>
+		You enter a windowless room. Doctor Harper waits beside a large machine. "Thank you for coming," <<he>> says. <<He>> presses a button. A compartment opens, large enough for you to fit. "Please lie down inside."
+		<br><br>
+
+		<<getinicon>><<link [[Get in|Asylum Machine]]>><<awareness -10>><<suspicion -5>><</link>><<llsuspicion>><<llawareness>>
+		<br>
+		<<refuseicon>><<link [[Refuse|Asylum Machine Refuse]]>><<suspicion 5>><</link>><<athleticsdifficulty 1 1000>><<ggsuspicion>><<ggstress>>
+	<</addinlineevent>>
+
+	<<addinlineevent "asylum_treatment_8" 1>>
+		<<npc Harper>><<generate2>><<generate3>>
+
+		You enter Harper's office. <<person1>><<He>> sits behind <<his>> desk. A <<person2>><<person>> and <<person3>><<person>> sit in front of <<person1>><<him>>, both in white coats. They turn to regard you.
+		<br><br>
+
+		"Thank you for coming," Harper says. "I have something special for you today. A new drug. My colleagues here would like to observe its effects. Here." <<person1>><<He>> stands and removes a sheet from a nearby chair. There are straps on the arms and legs. "Please sit."
+		<<person3>>
+		<br><br>
+
+		<<link [[Sit|Asylum Pill Sit]]>><<awareness -10>><<suspicion -5>><<hallucinogen 80>><</link>><<llsuspicion>><<llawareness>>
+		<br>
+		<<link [[Refuse|Asylum Pill Refuse]]>><<suspicion 5>><</link>><<ggsuspicion>><<ggstress>>
+	<</addinlineevent>>
+
+	<<addinlineevent "asylum_treatment_9" 1>>
+		<<npc Harper>><<person1>>
+
+		You enter Harper's office. <<He>> waits for you inside, sat at <<his>> desk. "Thank you for coming," <<he>> says. "Please, take a seat."
+		<br><br>
+
+		You sit down in a chair in front of <<his>> desk. Harper pulls something out from a drawer. It's a folded piece of paper. Dark splotches bleed through it from within.
+		<br><br>
+
+		"This is something called an inkblot test," <<he>> explains. "I want you to tell me what this shape reminds you of."
+		<br><br>
+
+		<<He>> unfolds the paper. The two sides stick together, but come undone with a crackle. A symmetrical black blob is painted on the inside.
+
+		<<if $awareness gte 400>>
+			The strokes twist together across the page, tangling over one another. They converge into total darkness, like a hole punched through the paper, or the mouth of a terrible creature. You stare at it, unable to tear your eyes away. <<gstress>><<stress 6>><<gtrauma>><<trauma 6>>
+		<<elseif $awareness gte 200>>
+			You stare at the paper, trying to discern the shape. The blob looks suspiciously <<if $NPCList[0].penis isnot "none">>phallic.<<else>>yonic.<</if>>
+			<<if $purity gte 1000 or $angel gte 6>>
+				You wonder if you're just being dirty-minded.<<gstress>><<stress 1>>
+			<<else>>
+				The longer you stare at it, the more certain you are that it looks like a <<if $NPCList[0].penis isnot "none">>penis.<<else>>pussy.<</if>>
+			<</if>>
+		<<else>>
+			You tilt your head, looking at the paper. The shape looks like a <<if $NPCList[0].penis isnot "none">>rocket taking off.<<else>>beautiful butterfly.<</if>>
+		<</if>>
+		<br><br>
+
+		<<link [[Answer honestly|Asylum Inkblot Answer Honestly]]>><<suspicion -5>><<awareness -10>><<trauma -6>><</link>><<llsuspicion>><<llawareness>><<lltrauma>>
+		<br>
+		<<link [[Refuse to answer|Asylum Inkblot Answer Evasively]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+	<</addinlineevent>>
+
+	<<addinlineevent "asylum_treatment_10" 1.5>>
+		<<asylumUnbindGown>>
+		<<npc Harper>><<person1>>
+
+		You enter a room with pastel-coloured wallpaper and warm lighting. You immediately feel at ease. Doctor Harper sits on a chair opposite a cushioned lounge chair.
+		<br><br>
+
+		"Thank you for coming," <<he>> says. "Please, take a seat."
+		<br><br>
+
+		Once you're situated on the lounge chair, <<he>> looks up from <<his>> clipboard. "You've been seducing innocent people and calling it rape out of shame. This comes from your poor inhibitions," <<he>> says. "We're going to work on controlling that indecent behaviour. Please, take off your clothes."
+		<br><br>
+
+		<<if hasSexStat("exhibitionism", 4)>>
+			<<link [[Strip and flaunt|Asylum Masturbation]]>><<suspicion -2>><<set $phase to "flaunt">><</link>><<exhibitionist4>><<lsuspicion>>
+			<br>
+		<</if>>
+		<<link [[Strip reluctantly|Asylum Masturbation]]>><<suspicion -2>><<stress 2>><<set $phase to "strip">><</link>><<lsuspicion>><<gstress>>
+		<br>
+		<<link [[Refuse|Asylum Masturbation]]>><<suspicion 5>><<set $phase to "refuse">><</link>><<ggsuspicion>>
+	<</addinlineevent>>
+
+	<<runeventpool>>
+<</if>>
+<</widget>>
+
+<<widget "asylumassessment">>
+	<<npc Harper>><<person1>>
+
+	You enter Harper's office.
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "asylumHarper">>
+	<<elseif $innocencestate is 1 and $asylumbound lte 0>>
+		<<npcincr Harper love 5>><<npcincr Harper dom 5>><<set $asyluminnocence to 1>>
+
+		<<He>> puts down <<his>> clipboard and smiles. "Your treatment is finished," <<he>> says. "You're ready to be a functioning member of society. I'll have special pills sent to your home."
+		<<set $sexStats.pills["pills"]["asylum\'s prescription"].owned to 14>><<set $asylummedicated to 0>>
+		<<He>> rises to <<his>> feet and pulls the curtains at the window closed. "Stand up."
+		<br><br>
+
+		Once stood, <<he>> pushes you back over the desk.
+		<<if $NPCList[0].penis isnot "none">>
+			<<He>> steps between your legs and leans forward,
+		<<else>>
+			<<He>> climbs atop and straddles you,
+		<</if>>
+
+		groping at your clothes with shaking fingers, trying to take them off. The professional air <<he>> carried is gone. <<He>> laughs, giggles really. "I-I should be the first to experience my handiwork. It's only fair."
+		<br><br>
+
+		<<link [[Next|Asylum Harper Sex]]>><<set $molestationstart to 1>><</link>>
+		<br>
+
+	<<elseif $trauma lte $traumamax / 10 and $asylumbound lte 0>>
+		<<set $asylumtrauma to 1>> /* unused */
+
+		<<He>> puts down <<his>> clipboard and frowns. "Your treatment isn't finished," <<he>> says. "But you seem to have recovered regardless. I can't justify keeping you here." <<He>> rises to <<his>> feet and pulls the curtains at the window closed.
+		<br><br>
+
+		"Now that you're better..." <<He>> steps around the desk. "This might be the last time we see each other." <<He>> gropes your clothing. The professional air <<he>> carried is gone. <<He>> laughs as <<he>> tries to kiss you.
+		<br><br>
+
+		<<link [[Let it happen|Asylum Harper Sex]]>><<npcincr Harper love 5>><<set $sexstart to 1>><</link>><<promiscuous1>>
+		<br>
+		<<link [[Shove away|Asylum Harper Shove]]>><<npcincr Harper love -1>><</link>>
+		<br>
+
+	<<elseif $asylumassessmentprogress lte 0>>
+		<<set $asylumassessmentprogress += 1>>
+		Harper stares at you across the desk. "Let's talk about your exposure fetish," <<he>> says. "You've been displaying your body in inappropriate ways, then claiming others stripped you. You're ashamed of your feelings."
+		<br><br>
+
+		<<if $asylumdistracted is 1 and !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Fight]]>><<suspicion 15>><<trauma -6>><<stress -6>><<set $fightstart to 1>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<<elseif !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Punish]]>><<suspicion 15>><<trauma -6>><<stress -6>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<</if>>
+		<<if $asylumkeycard isnot 1 and !pcAreArmsBound("any")>>
+			<<set $skulduggerydifficulty to 900 + (20 * $suspicion)>>
+			<<link [[Steal keycard|Asylum Keycard]]>><</link>><<skulduggerydifficulty>> <<note "This will be easier with low suspicion" "italic">>
+			<br>
+		<</if>>
+		<<link [[Insist that isn't true|Asylum Exhibit Meek]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+		<br>
+		<<link [[Say you aren't sure|Asylum Exhibit Sub]]>><<trauma -6>><<suspicion -5>><<awareness -10>><</link>><<llsuspicion>><<llawareness>><<ltrauma>>
+		<br>
+
+	<<elseif $asylumassessmentprogress lte 1 and $tentaclerapestat gte 1>>
+		<<set $asylumassessmentprogress += 1>>
+		Harper stares at you across the desk. "In your sleep you talk about being attacked by monsters with tentacles," <<he>> says. "Creatures like that don't exist. If someone claimed to have been molested by a creature no one else can see, would you believe them?"
+		<br><br>
+
+		<<if $asylumdistracted is 1 and !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Fight]]>><<suspicion 15>><<trauma -6>><<stress -6>><<set $fightstart to 1>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<<elseif !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Punish]]>><<suspicion 15>><<trauma -6>><<stress -6>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<</if>>
+		<<if $asylumkeycard isnot 1 and !pcAreArmsBound("any")>>
+			<<set $skulduggerydifficulty to 900 + (20 * $suspicion)>>
+			<<link [[Steal keycard|Asylum Keycard]]>><</link>><<skulduggerydifficulty>> <<note "This will be easier with low suspicion" "italic">>
+			<br>
+		<</if>>
+		<<link [[Insist they are real|Asylum Tentacles Meek]]>><<awareness 1>><<stress 3>><</link>><<gawareness>><<gstress>>
+		<br>
+		<<link [[Say you aren't sure|Asylum Tentacles Sub]]>><<trauma -6>><<suspicion -5>><<awareness -10>><</link>><<llsuspicion>><<llawareness>><<ltrauma>>
+		<br>
+
+	<<elseif $asylumassessmentprogress lte 2 and $beastrapestat gte 1>>
+		<<set $asylumassessmentprogress += 1>>
+		<!-- Modified for monster people -->
+		Harper stares at you across the desk.
+		<<if $settings.bestialityEnabled>>
+			"In your sleep you talk about being attacked by animals," <<he>> says. "Sexually attacked. Animals don't behave like that. You've been abusing innocent creatures, haven't you?"
+		<<else>>
+			"In your sleep you talk about being attacked by monster-people," <<he>> says. "Sexually attacked. These types of beings do not exist. You made yourself believe they possess human-like features. In reality, you've been abusing innocent animals for your own pleasure. Am I wrong?"
+		<</if>>
+		<br><br>
+
+		<<if $asylumdistracted is 1 and !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Fight]]>><<suspicion 15>><<trauma -6>><<stress -6>><<set $fightstart to 1>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<<elseif !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Punish]]>><<suspicion 15>><<trauma -6>><<stress -6>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<</if>>
+		<<if $asylumkeycard isnot 1 and !pcAreArmsBound("any")>>
+			<<set $skulduggerydifficulty to 900 + (20 * $suspicion)>>
+			<<link [[Steal keycard|Asylum Keycard]]>><</link>><<skulduggerydifficulty>> <<note "This will be easier with low suspicion" "italic">>
+			<br>
+		<</if>>
+		<<link [[Insist that isn't true|Asylum Beast Meek]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+		<br>
+		<<link [[Say you aren't sure|Asylum Beast Sub]]>><<trauma -6>><<suspicion -5>><<awareness -10>><</link>><<llsuspicion>><<llawareness>><<ltrauma>>
+		<br>
+
+	<<elseif $asylumassessmentprogress lte 3>>
+		<<set $asylumassessmentprogress += 1>>
+		Harper stares at you across the desk. "There are marks on your body," <<he>> says. "You did this to yourself, didn't you."
+		<br><br>
+
+		<<if $asylumdistracted is 1 and !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Fight]]>><<suspicion 15>><<trauma -6>><<stress -6>><<set $fightstart to 1>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<<elseif !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Punish]]>><<suspicion 15>><<trauma -6>><<stress -6>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<</if>>
+		<<if $asylumkeycard isnot 1 and !pcAreArmsBound("any")>>
+			<<set $skulduggerydifficulty to 900 + (20 * $suspicion)>>
+			<<link [[Steal keycard|Asylum Keycard]]>><</link>><<skulduggerydifficulty>> <<note "This will be easier with low suspicion" "italic">>
+			<br>
+		<</if>>
+		<<link [[Insist that isn't true|Asylum Hurt Meek]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+		<br>
+		<<link [[Say you aren't sure|Asylum Hurt Sub]]>><<trauma -6>><<suspicion -5>><<awareness -10>><</link>><<llsuspicion>><<llawareness>><<ltrauma>>
+		<br>
+	<<elseif $asylumassessmentprogress lte 4 and $asylum_mirror gte 5>>
+		<<set $asylumassessmentprogress += 1>>
+		Harper stares at you across the deck. "Your behaviour in the forbidden section has been investigated," <<he>> says. "You obsessively gathered mirrors, and danced in front of them, so you could pretend to have an audience."
+		<br><br>
+		<<if $asylumdistracted is 1 and !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Fight]]>><<suspicion 15>><<trauma -6>><<stress -6>><<set $fightstart to 1>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<<elseif !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Punish]]>><<suspicion 15>><<trauma -6>><<stress -6>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<</if>>
+		<<if $asylumkeycard isnot 1 and !pcAreArmsBound("any")>>
+			<<set $skulduggerydifficulty to 900 + (20 * $suspicion)>>
+			<<link [[Steal keycard|Asylum Keycard]]>><</link>><<skulduggerydifficulty>><<note "This will be easier with low suspicion" "italic">>
+			<br>
+		<</if>>
+		<<link [[Insist that isn't true|Asylum Mirror Meek]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+		<br>
+		<<link [[Say you aren't sure|Asylum Mirror Sub]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+		<br>
+		<<link [[Nod|Asylum Mirror Nod]]>><<trauma -6>><<suspicion -5>><<awareness -10>><</link>><<llsuspicion>><<llawareness>><<ltrauma>>
+		<br>
+	<<else>>
+		<<set $asylumassessmentprogress to 0>>
+		Harper stares at you across the desk. "In your sleep you talk about being raped and molested. But that isn't what happens, is it?" <<he>> says. "You approach and seduce people willingly. You call it rape because you're ashamed."
+		<br><br>
+
+		<<if $asylumdistracted is 1 and !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Fight]]>><<suspicion 15>><<trauma -6>><<stress -6>><<set $fightstart to 1>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<<elseif !pcAreArmsBound("any")>>
+			<<link [[Attack|Asylum Punish]]>><<suspicion 15>><<trauma -6>><<stress -6>><</link>><<gggsuspicion>><<ltrauma>><<lstress>>
+			<br>
+		<</if>>
+		<<if $asylumkeycard isnot 1 and !pcAreArmsBound("any")>>
+			<<set $skulduggerydifficulty to 900 + (20 * $suspicion)>>
+			<<link [[Steal keycard|Asylum Keycard]]>><</link>><<skulduggerydifficulty>><<note "This will be easier with low suspicion" "italic">>
+			<br>
+		<</if>>
+		<<link [[Insist that isn't true|Asylum Rape Meek]]>><<awareness -1>><<stress 3>><</link>><<lawareness>><<gstress>>
+		<br>
+		<<link [[Say you aren't sure|Asylum Rape Sub]]>><<trauma -6>><<suspicion -5>><<awareness -10>><</link>><<llsuspicion>><<llawareness>><<ltrauma>>
+		<br>
+
+	<</if>>
+<</widget>>
+
+<<widget "AsylumHypnosisCommon">>
+	<<set $phase to _args[0]>>
+	<<set _traitValue to _args[1]>>
+	<<set $outside to 0>><<set $location to "asylum">><<asylumeffects>><<effects>>
+	<<npc Harper>><<person1>>
+
+	당신은 하퍼의 진료실로 들어간다. <<He>>【은는】 책상에 앉아 당신을 기다리고 있다.
+	<<if $phase is "Oral">>
+		<<generate2>> 건너편에 <<person2>><<person>>【이가】 앉아 있다. 또 다른 환자다. "함께해주어 고맙습니다," 의사가
+	<<else>>
+		"와주셔서 감사합니다," <<person1>><<he>>【이가】 
+	<</if>>
+	말한다. "앉으시죠."
+	<br><br>
+
+	<<if $phase is "Oral">>
+		당신은 <<person2>><<person>> 옆에 앉는다.
+	<<else>>
+		자리에 앉자,
+	<</if>>
+	하퍼는 <<person1>><<his>> 책상 위의 펜을 집어 든다. "<<if $phase is "Oral">>두 분 다 <</if>>【이가】 펜에 집중하고, 깊게 숨을 들이마시길 바랍니다. 이 세상엔 이 펜과 제 목소리, 그리고 당신의 숨소리 외엔 아무것도 존재하지 않습니다."
+	<br><br>
+
+	<<pass 5>>
+	수 분 동안 계속된다. 당신의 정신이 다른 데로 쏠리려 할 때마다, 하퍼는 신기하게도 그것을 눈치채고 당신을 다시 집중하게 한다. 마치 최면 상태에 빠져들듯, 의식 속에서 무언가 변화하는 것이 느껴진다.
+	<br><br>
+
+	<<link [[이 느낌이 꽤 좋다 (0:10)|Asylum Hypnosis Trance]]>><<npcincr Harper dom 5>><<control 25>><<trauma -6>><<stress -12>><<awareness -10>><</link>><<ggcontrol>><<llawareness>><<ltrauma>><<lstress>>
+	<br>
+	<<link [[저항한다|Asylum Hypnosis Trance Resist]]>><</link>><<willpowerdifficulty 1 `300 * (_traitValue || 3)`>>
+<</widget>>
+
+<<widget "asylumend">>
+	<<set $asylum to 0>>
+
+	<<if $badEndStats.some(badEnd => ["asylumTentacle", "asylumBlackWolf", "asylumTentacleAngel", "asylumEden", "asylumSabotage"].includes(badEnd.reasonEnd))>>
+		<<specialClothesUnlock "set" "asylum">>
+	<</if>>
+<</widget>>
+
+<<widget "asylumpunish">>
+	<<endevent>><<npc Harper>><<person1>><<set $asylumbound to 2>>
+	"이 <<phim>> 독방으로 데려가," 하퍼가 말한다. "<<pher>> 팔을 단단히 묶어두고."
+	<br><br>
+
+	<<if !pcAreArmsBound("both")>>
+		<<asylumBind "punish">>
+		그들은 당신의 옷을 찢어발기고 억지로 구속복을 입힌다.
+	<</if>>
+	그들은 "직원 전용"이라고 적힌 문을 지나, 당신을 정신병원의 텅 빈 동으로 밀어 넣는다. 이곳의 조명 대부분은 고장 났으며, 멀쩡한 것조차 기묘한 리듬으로 깜빡거린다.
+	<br><br>
+
+	높다란 금속 문에 다다랐다. 문을 열자 칠흑 같은 암흑뿐인 방이 드러난다. 그들은 당신을 거칠게 밀어 넣고는 쾅 하고 문을 닫는다.
+	<br><br>
+
+	방은 몹시 비좁다. 그저 앉아 있을 만한 공간뿐이다. 당신은 완벽한 정적 속에서 기다린다.
+	<br><br>
+
+	<<link [[기다린다 (1:00)|Asylum Room]]>><<pass 60>><</link>>
+	<br>
+<</widget>>
+
+<<widget "asylumoptions">>
+	<<if pcAreArmsBound("any") and $asylumbound lte 0>>
+		<<He>>【은는】 당신의 결박을 쳐다본다. "풀어줄 때가 된 것 같군요," 몸을 숙인 <<he>>【이가】 매듭을 풀고 그것을 완전히 벗겨내며 말한다.<<unbind>><<exposure>> <<He>>【은는】 환자복으로 당신의 몸을 덮어준다.
+		<<unbind>><<upperwear "patient gown">><<exposure>>
+		<br><br>
+	<<elseif $asylumbound gt 0 and ($worn.upper.name isnot "straightjacket" or $worn.lower.name isnot "straightjacket bottom")>>
+		<<if $worn.upper.name is "straightjacket">>
+			<<set _nurseJacket to "broken">>
+			<<He>>【은는】 미간을 찌푸린 채 당신의 찢어진 구속복을 바라본다. "제대로 된 옷으로 갈아입혀 드리지요," <<he>>【이가】 말한다.
+		<<else>>
+			<<set _anyclothing to getVisibleClothesList().some(item => item.name !== "naked")>>
+			"당신은 아직 구속복을 벗을 단계가 아닙니다," <<he>>【이가】 단호하게 말한다.
+		<</if>>
+
+		<<if _nurseJacket is "broken">>
+			<<He>>【은는】 당신의 구속복 잔해를 벗겨낸다<<if pcAreArmsBound("both")>>. 그 과정에서 당신의 두 팔이 양옆으로 늘어진다<</if>>.
+		<</if>>
+
+		<<asylumBind>>
+		<<if _anyclothing and (!_asylumBindUnderwear or _asylumBindUnderwear is "given")>>
+			<<He>>【은는】 당신이 가진 모든 개인 소지품을 내놓게 한다.
+		<<elseif _asylumBindUnderwear and _asylumBindUnderwear isnot "given">>
+			<<He>>【은는】 당신에게 속옷만 남기고 전부 벗게 한다.
+			<<if _nurseJacket is "broken">>
+				그런 다음 <<he>>【은는】 
+			<<else>>
+				<<He>>
+			<</if>>
+
+			당신의 _asylumBindUnderwear【을를】 끌어내려 발을 빼게 한다.
+		<</if>>
+		<<if _asylumBindUnderwear>> <<He>>【은는】 당신에게 새 $worn.under_lower.name_simple【을를】 입히고 위로 끌어 올려준다.
+		<</if>>
+		당신의 짧았던 자유의 시간은 <<he>>【이가】 새 구속복으로 당신을 단단히 묶으면서 끝이 난다.
+		<<fameexhibitionism 1>>
+		<br><br>
+	<<elseif $exposed gte 1>>
+		<<He>>【은는】 뒤로 물러서서 당신을 유심히 살핀다. <<covered>> "그런 꼴로는 선생님을 뵐 수 없습니다," <<he>>【이가】 말한다. <<He>>【은는】 환자복으로 당신을 덮어준다. <<unbind>><<upperwear "patient gown">><<exposure>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+/* _args[0] should be punish, fake, or session */
+<<widget "asylumBind">>
+	<<unbind>><<exposure>><<strip>>
+
+	<<if _args[0] is "punish">>
+		<<ruined false true "carried">>
+	<<elseif _args[0] is "fake">>
+	<<else>>
+		<<if $player.gender_appearance is "f">>
+			<<set _underwearIndex to 1>>
+		<<else>>
+			<<set _underwearIndex to 4>>
+		<</if>>
+
+		<<if $carried.under_lower.index isnot _underwearIndex or $carried.under_lower.colour isnot "pale white">>
+			<<if $carried.under_lower.name is "naked">>
+				<<set _asylumBindUnderwear to "given">>
+			<<else>>
+				<<set _asylumBindUnderwear to $carried.under_lower.name>>
+			<</if>>
+
+			<<underlowerwear _underwearIndex "pale white">>
+		<<else>>
+			<<underloweron>>
+		<</if>>
+	<</if>>
+
+	<<if _args[0] is "session">>
+		<<generalRuined "upper" true "carried">>
+	<<else>>
+		<<returnCarried>>
+	<</if>>
+
+	<<bind>><<upperwear "straightjacket">><<exposure>>
+<</widget>>
+
+<<widget "asylumUnbind">>
+	<<if pcAreArmsBound("any")>>
+		<<endevent>>
+		<<generate1>><<person1>>
+		어느 문 앞에 다다르기 직전, 다른 간호사가 당신을 멈춰 세운다. "의사 선생님께서 이번 치료에는 당신 두 손을 자유롭게 해두라고 하셨습니다," <<he>>【이가】 말하며 당신의 결박을 풀어준다.
+		<<if $worn.upper.name is "straightjacket" or $worn.lower.name is "straightjacket bottom">>
+			그런 다음 <<he>>【은는】 당신이<<if $worn.lower.name isnot "straightjacket bottom" or $worn.upper.name isnot "straightjacket">> 찢어진<</if>> 구속복을 벗도록 도와준다<<if _args[0]>>. 그리고 환자복으로 당신의 몸을 덮어준다.<<unbind>><<exposure>><<upperwear "patient gown">><<else>>.<</if>>
+		<<else>>
+			<<unbind>><<exposure>>
+		<</if>>
+
+		<<He>>【은는】 근처의 문을 열고 당신을 안으로 안내한다.
+		<br><br>
+
+		<<endevent>>
+	<</if>>
+<</widget>>
+
+<<widget "asylumUnbindGown">>
+	<<asylumUnbind true>>
+<</widget>>
+
+<<widget "asylumRebind">>
+	<<if $asylumbound gt 0 and ($worn.upper.name isnot "straightjacket" or $worn.lower.name isnot "straightjacket bottom")>>
+		<<clearsinglenpc 0>>
+		<<generate1>><<person1>>
+		<<if V.carried.upper.name is "patient gown" or V.worn.upper.name is "patient gown">>
+			<<set _gown to true>>
+		<</if>>
+
+		<<if $worn.upper.name is "straightjacket" and $worn.lower.name isnot "straightjacket bottom">>
+			<<set _ruined to true>>
+		<</if>>
+
+		<<asylumBind "session">>
+
+		방 밖에서 간호사가 당신을 기다리고 있다.
+		<<if _gown>>
+			<<He>>【은는】 당신이 입고 있던 환자복을 반납하게 한다. 그런 다음 <<he>>【은는】 
+		<<elseif _ruined>>
+			<<He>>【은는】 당신이 찢어진 구속복에서 빠져나오도록 돕는다. 그런 다음 <<he>>【은는】 
+		<<else>>
+			<<He>>
+		<</if>>
+
+		<<if _asylumBindUnderwear>>
+			당신에게 $worn.under_lower.name_simple【을를】 입힌 뒤,
+		<<else>>
+			곧장
+		<</if>>
+
+		당신을 다시 한번 <<if _ruined>>새 <</if>>구속복으로 구속한다.
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "asylumClothesOn">>
+	<<clotheson>>
+	<<if $asylumbound gt 0>>
+		<<asylumBind>>
+	<</if>>
+<</widget>>
+
+<<widget "asylumevents">>
+	<<if dangerEvent()>>
+		<<cleareventpool>>
+
+		<<addinlineevent "asylum_exposure" 1>>
+			<<generate1>><<person1>>
+			"저기요," 당신의 곁에서 누군가 부른다. 환자복을 입은 <<person>>【이】네. "하퍼 선생님이 제게 과제를 주셨어요. 저는—" <<He>>【은는】 시선을 돌린다. "다음 평가 전까지 열두 명의 사람들에게 절 노출해야 해요. ㅈ-제 몸을요. ㄷ-당신한테 보여줘도 될까요?" <<He>>【은는】 행복해 보이지 않는다.
+			<br><br>
+
+			<<link [[승낙한다|Asylum Exposure Accept]]>><<handheldon>><<arousal 600>><</link>><<garousal>>
+			<br>
+			<<link [[눈을 감은 채로 승낙한다|Asylum Exposure Shut]]>><<famegood 1>><<handheldon>><</link>>
+			<br>
+			<<link [[눈을 감은 척하며 승낙한다|Asylum Exposure Peek]]>><<arousal 600>><<famegood 1>><<handheldon>><</link>><<garousal>>
+			<br>
+			<<link [[거절한다|Asylum Exposure Refuse]]>><<handheldon>><</link>>
+			<br>
+		<</addinlineevent>>
+
+		<<if random(1,100) lte $suspicion>>
+			<<addinlineevent "asylum_fake_treatment" 1>>
+				<<generateDoctor 1>><<generate2>><<person1>>
+				간호조무사 복장을 한 <<person>>【이가】 당신에게 다가온다. "안녕하세요. 의사 선생님께서 오늘 여유 시간이 생겨 환자분께 추가 치료를 하고 싶어 하십니다," <<he>>【이가】 말한다. "저를 따라오시죠."
+				<br><br>
+
+				<<person2>><<person>>【이가】 당신 뒤에 서 있다.
+				<br><br>
+
+				<<link [[그들을 따라간다|Asylum Fake Treatment Accept]]>><<handheldon>><</link>>
+				<br>
+				<<link [[가기를 거부한다|Asylum Fake Treatment Refuse]]>><<handheldon>><</link>><<physiquedifficulty 1 $physiquemax>>
+				<br>
+			<</addinlineevent>>
+		<</if>>
+
+		<<addinlineevent "asylum_flirt" 2>>
+			<<generate1>><<person1>><<npcClothesType $NPCList[0] "patient">>다른 환자 중 하나인 <<person>>【이가】 당신을 보고 있는 것을 눈치챈다. <<He>>【은는】 미소 짓는다.
+			<br><br>
+
+			<<link [[추파를 던진다 (0:02)|Asylum Flirt]]>><<handheldon>><<asylumstatus 1>><<pass 2>><</link>><<promiscuous1>><<gcool>>
+			<br>
+			<<link [[무시한다|Asylum]]>><<endevent>><</link>>
+			<br>
+		<</addinlineevent>>
+
+		<<addinlineevent "asylum_nurse_grope" 4>>
+			<<generate1>><<generatev2>><<person1>>환자 중 한 명인 <<person>>【이가】 간호사인 <<person2>><<person>>의 몸을 더듬는다. 간호사는 저항하지 않는다. <<He>>【은는】 체념한 듯 보인다.
+			<br><br>
+
+			<<link [[개입한다 (0:02)|Asylum Intervene]]>><<handheldon>><<pass 2>><<suspicion -5>><<asylumstatus -5>><</link>><<llsuspicion>><<llcool>>
+			<br>
+			<<link [[무시한다|Asylum]]>><<endevent>><</link>>
+			<br>
+		<</addinlineevent>>
+
+		<<addinlineevent "asylum_answer" 2>>
+			<<generate1>><<person1>><<generate2>>환자인 <<person>>【이가】 당신을 지나쳐 숨자마자, 간호사인 <<person2>><<person>>【이가】 모퉁이를 돈다. 주위를 둘러보던 <<He>>【은는】 당신을 본다. "혹시 <<person1>><<person>> 못 봤습니까?"
+			<br><br>
+
+			<<link [[진실을 말한다|Asylum Truth]]>><<handheldon>><<suspicion -5>><<asylumstatus -5>><</link>><<llsuspicion>><<llcool>>
+			<br>
+			<<link [[거짓을 말한다|Asylum Lie]]>><<handheldon>><<suspicion 5>><<asylumstatus 5>><</link>><<ggsuspicion>><<ggcool>>
+			<br>
+		<</addinlineevent>>
+
+		<<addinlineevent "asylum_flower_patch" 1>>
+			결국 다른 환자들에게 지친 당신은 신선한 공기를 쐬러 정신병원 마당으로 나간다. 마당을 거닐며 그나마 즐길 만한 것을 찾아본다.
+			<br><br>
+			산책하던 중 야생화가 피어 있는 곳을 발견한다.
+			<br><br>
+			<<if !pcAreArmsBound("any")>>
+				<<link [[화관을 만든다|Asylum Flower Patch Crown]]>><</link>><<tendingdifficulty 1 200>>
+				<br>
+			<<else>>
+				<span class="blue">당신의 두 팔이 묶여 있는 동안에는 꽃으로 아무것도 할 수 없다.</span>
+				<br>
+			<</if>>
+			<<link [[앉아서 감상한다|Asylum Flower Patch Observe]]>><<stress -6>><</link>><<lstress>>
+			<br>
+			<<link [[무시한다|Asylum]]>><<endevent>><</link>>
+			<br>
+		<</addinlineevent>>
+
+
+		<<if $daily.asylumPuzzle isnot 1>>
+			<<addinlineevent "asylum_puzzle" 1>>
+
+				<<set $daily.asylumPuzzle to 1>>
+				당신은 한쪽 구석의 탁자에 둘러앉은 환자 무리를 발견한다.
+				<<if $asylumPuzzleProgress gte 1>>
+					<<loadNPC 0 "asylum_puzzle_group">>
+					<span class="blue">지난번에 당신이 도왔던 바로 그 무리가</span> 다시 퍼즐에 몰두하고 있다.
+				<<else>>
+					<<generate1>>
+					그들은 눈앞에 펼쳐진 커다란 퍼즐을 맞추고 있다.
+				<</if>>
+				<br><br>
+
+				<<= $asylumPuzzleProgress >= 1 ? "그" : "한">> <<person1>><<person>>【이가】 고개를 들고 당신과 눈이 마주치자,
+				<<if pcAreArmsBound("both")>>
+					비웃음을 터뜨리고는 고개를 돌린다.<<asylumstatus -1>><<lcool>>
+					<br><br>
+
+					<span class="blue">두 팔이 묶여 있는 동안에는 참가할 수 없다.</span>
+					<br><br>
+
+					<<link [[다음|Asylum]]>><<handheldon>><<endevent>><</link>>
+					<br>
+				<<elseif $asylumstatus gte 60>>
+					당신에게 이리 오라고 손짓한다.
+					<br><br>
+
+					<<link [[그들과 합류한다|Asylum Puzzle]]>><<asylumstatus 1>><</link>><<gcool>>
+					<br>
+					<<link [[고개를 돌린다|Asylum]]>><<handheldon>><<endevent>><</link>>
+					<br>
+				<<else>>
+					경멸하는 듯한 시선으로 당신을 쏘아본다. 당신은 서둘러 고개를 돌리고 다른 할 일을 찾는다.
+					<br><br>
+
+					<<link [[다음|Asylum]]>><<handheldon>><<endevent>><</link>>
+					<br>
+				<</if>>
+			<</addinlineevent>>
+		<</if>>
+
+		<<runeventpool>>
+	<<else>>
+		<<link [[다음|Asylum]]>><<handheldon>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "passoutasylum">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "asylum">>
+	<<else>>
+		<<passout>>
+		<<link [[모든 것이 어둠에 잠긴다...|Passout Asylum]]>><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "asylumescape">>
+	<<set $asylumescaped to 1>>
+	<<specialClothesUnlock "set" "asylum">>
+	<<if $location is "tentworld">>
+		<<set $asylumtentacleescape to 1>> /* unused */
+	<</if>>
+
+	<<if C.npc.Robin.init is 1>>
+		<<set $robinReunionScene to "asylum">>
+	<</if>>
+<</widget>>
+<<widget "asylum_mirror_assess">>
+	<<set _asylum_mirror_count to ($asylum_mirror_large * 3) + ($asylum_mirror_medium * 2) + $asylum_mirror_small>>
+<</widget>>
+
+<<widget "asylum_depths_mirror_links">>
+	<<if $asylum_mirror_small_carried gte 1>>
+		<<link [[Add a small mirror|Asylum Depths Mirror Small]]>><<awareness -6>><<trauma -6>><<set $asylum_mirror_small_carried -= 1>><<set $asylum_mirror_small += 1>><<endevent>><<generate1>><<generate2>><<person1>><</link>><<lawareness>><<ltrauma>>
+		<br>
+	<</if>>
+	<<if $asylum_mirror_medium_carried gte 1>>
+		<<link [[Add a medium-sized mirror|Asylum Depths Mirror Medium]]>><<awareness -6>><<trauma -6>><<set $asylum_mirror_medium_carried -= 1>><<set $asylum_mirror_medium += 1>><<endevent>><<generate1>><<generate2>><<person1>><</link>><<lawareness>><<ltrauma>>
+		<br>
+	<</if>>
+	<<if $asylum_mirror_large_carried gte 1>>
+		<<link [[Add a large mirror|Asylum Depths Mirror Large]]>><<awareness -6>><<trauma -6>><<set $asylum_mirror_large_carried -= 1>><<set $asylum_mirror_large += 1>><<endevent>><<generate1>><<generate2>><<person1>><</link>><<lawareness>><<ltrauma>>
+		<br>
+	<</if>>
+<</widget>>

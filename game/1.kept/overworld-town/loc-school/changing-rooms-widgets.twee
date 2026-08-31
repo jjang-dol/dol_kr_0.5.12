@@ -1,0 +1,577 @@
+:: Widgets Changing Room [widget]
+
+<<widget "changingRoomSetup">>
+	<<unset $lastChangingRoom>>
+	<<outfitChecks>>
+	<<set _changingRoomGenderType to _args[0]>>
+
+	<<if ["School Boy Changing Room", "School Girl Changing Room"].includes($passage)>>
+		<<if $previousClothes is undefined>><<set $previousClothes to clone($worn)>><</if>>
+		<<run Object.entries($worn).forEach(([slot, item]) => {
+			const previousItem = $previousClothes[slot];
+			if (item.name isnot previousItem.name or item.colour isnot previousItem.colour or item.accessory_colour isnot previousItem.accessory_colour) {
+				if (["upper", "under_upper"].includes(slot)) _justChangedUpperClothes to true;
+				if (["lower", "under_lower"].includes(slot)) _justChangedLowerClothes to true;
+				_justChangedClothes to true;
+			}
+		})>>
+		<<set $previousClothes to clone($worn)>>
+	<</if>>
+
+	<<set _stayedInLocker to ["School Boy Changing Room", "School Girl Changing Room", "School Pool Wardrobe"].includes($passagePrev)>>
+
+	<<set _studentsKnow to ($schoolrep.crossdress gte 5 or $schoolrep.herm gte 5) and $changingroomstate isnot "empty">>
+	/* Base setup, may have unique overrides later */
+	<<set _allowedToChange to [_args[0], "h"].includes(_studentsKnow ? $player.sex : $player.gender_appearance)>>
+
+	/* Specific changing room overrides */
+	<<if _args[0] is "f">>
+		<<set _genderChance to 100 - maleChance()>>
+
+		<<if !$daily.school.changingRoomPregnancyFame>><<set $daily.school.changingRoomPregnancyFame to $player.gender_appearience is "m" ? random(500, 1500) : random(200, 1000)>><</if>>
+		<<if $fame.pregnancy gte $daily.school.changingRoomPregnancyFame or
+			playerBellyVisible() or
+			($settings.forcedCrossdressingEnabled and $whitneyCrossdressSwimwear gte 1 and $player.gender_appearance is "f")>>
+			<<set _allowedToChange to true>>
+		<</if>>
+		<<if $daily.school.changingRoomGirlAllowed and $changingroomstate isnot "empty">>
+			<<set _studentsKnow to true>>
+			<<set _allowedToChange to true>>
+		<</if>>
+	<<else>>
+		<<set _genderChance to maleChance()>>
+	<</if>>
+	<<set _seenGender to (_studentsKnow ? $player.gender : $player.gender_appearance)>> <!-- If they know you crossdress, then they won't judge you by appearance -->
+	<<set _uncomfortable to ($backgroundTraits.includes("crossdresser") and $player.sex is _args[0])>>
+	<<set _notStartedLesson to Time.hour is 14 and Time.minute lte 5>>
+	<<set _finishedLesson to Time.hour is 15 or (Time.hour is 14 and Time.minute gte 58)>>
+<</widget>>
+
+<<widget "schoolChangingRoomEmpty">>
+	<<if $changingroomstate is "empty" and $poolroomstate isnot "empty">>
+		현재는 텅 비어 있지만, 수영장 쪽에서 활동하는 소리가 들린다. <<if $poolroomstate is "own">>수업이 진행 중이다.<</if>>
+		<<changingRoomFeelings 1>>
+		<br><br>
+		<<schoolPoolSwap>>
+		<<raidLockers>>
+		<<schoolChangingRoomLinks>>
+	<<elseif $changingroomstate is "empty">>
+		텅 비어 있다.
+		<<changingRoomFeelings 2>>
+		<br><br>
+		<<if ["changingRoom", "party", "rape"].includes($weekly.schoolNightPoolParty) and Time.dayState is "night">>
+			<span class="blue">수영장에서 사람들이 대화하는 소리와 물장구치는 소리가 들린다.</span>
+			<<if $weekly.schoolNightPoolParty is "changingRoom">>
+				<br>
+				<<ind>><<link [[안을 훔쳐본다|School Night Pool Party Peek]]>><</link>>
+			<</if>>
+			<br><br>
+		<</if>>
+		<<schoolChangingRoomLinks>>
+	<</if>>
+<</widget>>
+
+<<widget "schoolChangingRoomLinks">>
+	<<if $exposed gte 2 and hasSexStat("exhibitionism", 5) and $poolroomstate isnot "empty">>
+		<<swimmingicon>><<link [[수영장으로 들어간다|School Pool]]>><<set $lastChangingRoom to $passage>><<set $justEntered to true>><<unset $previousClothes>><</link>><<if $swimall isnot 1>><<gdelinquency>><</if>>
+	<<elseif $exposed gte 2 and $swimall isnot 1 and $poolroomstate isnot "empty">>
+		<span class="pink">이런 차림으로는 수영장에 들어갈 수 없다!</span>
+	<<elseif $weekly.schoolNightPoolParty is "rape" and Time.dayState is "night">>
+		<span class="purple">더 자극하지 않는 편이 좋다.</span>
+	<<else>>
+		<<swimmingicon>><<link [[수영장으로 들어간다|School Pool]]>><<set $lastChangingRoom to $passage>><<set $justEntered to true>><<unset $previousClothes>><</link>>
+	<</if>>
+	<br>
+	<<if $earSlime.forcedCommando isnot undefined and !$worn.under_lower.type.includes("naked") and !$hypnosis_traits?.silence>>
+		<span class="red">귓속의 슬라임이 <<underwearTypeText>>【을를】 입은 채로 나가는 것을 허락하지 않는다.</span>
+	<<elseif $exhibitionism lte 75 and $exposed gte 1>>
+		<span class="pink">이런 차림으로는 나갈 수 없다!</span>
+	<<elseif $exposed gte 1>>
+		<<getouticon>><<link [[나간다|School Pool Entrance Exhibitionism]]>><<unset $previousClothes>><</link>>
+	<<else>>
+		<<getouticon>><<link [[나간다|School Pool Entrance]]>>
+			<<if $daily.whitney.whitneyCrossdressSwimwear>><<run $daily.whitney.whitneyCrossdressSwimwear.push(`${$changingRoomGender} exit`)>><</if>><<unset $previousClothes>>
+		<</link>>
+	<</if>>
+	<<schoolpoolclothes _store_location>>
+	<<lockericon>><<link [[사물함|School Pool Wardrobe]]>><</link>>
+	<<exitAll>>
+<</widget>>
+
+<<widget "destination_pool">>
+	<<if $changingRoomGender is "boys">>
+		<<link [[다음|School Boy Changing Room]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|School Girl Changing Room]]>><<endevent>><</link>>
+	<</if>>
+<</widget>>
+
+<<widget "changingRoomFeelings">>
+	<<if $schoolrep.crossdress lt 3 and _args[0] is undefined>>
+		<<if $backgroundTraits.includes("crossdresser") and $player.sex isnot _changingRoomGenderType>>
+			<<if !$daily.school.changingRoomStressRelief>>
+				<span class="green">그 사실이 기분 좋게 느껴진다.</span><<lstress>><<stress -3>><<set $daily.school.changingRoomStressRelief to true>>
+			<<else>>
+			그 사실이 기분 좋게 느껴진다.
+			<</if>>
+		<<elseif isCrossdressing() and !_uncomfortable>>
+			왠지 엉뚱한 짓을 하는 것 같은 기분이 든다.
+		<</if>>
+	<<elseif _uncomfortable>>
+		<br><br>
+		<<switch _args[0]>>
+			<<case 1>>혼자 있는데도, <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>> 탈의실에 있는 것은 <span class="red">불편하다.</span>
+			<<case 2>>그럼에도 불구하고, <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>> 탈의실에 있는 것은 <span class="red">불편하다.</span>
+			<<default>><<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>> 탈의실에 있는 것은 <span class="red">불편하다.</span>
+		<</switch>><<gstress>><<stress 1>>
+	<<elseif isCrossdressing()>>
+		/* Intentional lack of br */
+		<<switch _args[0]>>
+			<<case 1>>혼자 있는데도 여기에 있으니 왠지 짓궂은 짓을 하는 기분이 드는 한편, 들키지 않을까 걱정된다.
+			<<case 2>>그럼에도 불구하고 여기에 있으니 왠지 짓궂은 기분이 든다.
+			<<default>> /* Intentional blank, this one is handled outside the widget */
+		<</switch>>
+	<</if>>
+<</widget>>
+
+<<widget "eventsSchoolChangingRoomsBoys">>
+	<<if $daily.school.changingRoomBoyEvent is Time.date.timeStamp or random(0, 100) gte 25>><<exit>><</if>>
+	/* These events make use non-widget usages of "he", "his", etc. These are intentional and should not be changed */
+	<<cleareventpool>>
+	<<if $poolroomstate is "own" and $worn.under_lower.name is "naked" and ($worn.lower.name is "naked" or $worn.lower.name.includes("towel"))>>
+		<<if $worn.lower.name.includes("towel")>>
+			<<if _genderChance gt 0 and $player.penisExist and !playerChastity("hidden")>>
+				<<addinlineevent "schoolChangingRoomBoysEvent">>
+					<<if $worn.genitals.name is "chastity parasite" or (!playerChastity("penis") and $parasite.penis.name)>>
+						<<set _chastity to "parasite covered">>
+					<<elseif playerChastity("cage")>>
+						<<set _chastity to "caged">>
+					<<else>>
+						<<set _chastity to "">>
+					<</if>>
+					급우 중 한 명이 손이 닿지 않는 틈을 타 당신의 허리에서 수건을 낚아채어, 급우들 앞에서 당신의 <<genitals>>【을를】 노출시킨다.
+					<<lowerruined true>>
+					<<if $player.penissize is 6>>
+						탈의실이 폭소로 터져 나오고, 몇몇 학생들은 황급히 몸을 가리는 당신의 <<EZbig>><<if _chastity>> but _chastity<</if>> <<EZpenis>>【을를】 보며 저속한 농담을 던진다.
+					<<elseif $player.penissize lte 3>>
+						새로 드러난 당신의 <<EZsmall>><<if _chastity>> and _chastity<</if>> <<genitals>>【을를】 보고 탈의실이 폭소로 가득 찬다. 수치심에 두 손으로 <<EZsmall>> <<EZpenis>>【을를】 움켜쥐자, 남학생 중 하나가 <<Penisremarkquote>> 하고 외친다.
+						<<status -5>><<lcool>>
+					<<else>>
+						탈의실이 폭소로 터져 나오고, 몇몇 학생들은 황급히 몸을 가리는 당신의<<if _chastity>> _chastity<</if>> <<EZpenis>>【을를】 보며 저속한 농담을 던진다.
+					<</if>>
+					<<incgpenisinsecurity>><<trauma 5>><<gtrauma>>
+				<</addinlineevent>>
+			<</if>>
+		<<else>> /* $worn.lower.name is "naked" */
+			<<addinlineevent "schoolChangingRoomBoysEvent">>
+				<<if _genderChance gt 0 and random(0, 100) gte 75 and $player.penisExist and !playerChastity("hidden")>>
+					<<if $worn.genitals.name is "chastity parasite" or (!playerChastity("penis") and $parasite.penis.name)>>
+						<<set _chastity to "parasite covered">>
+					<<elseif playerChastity("cage")>>
+						<<set _chastity to "caged">>
+					<<else>>
+						<<set _chastity to "">>
+					<</if>>
+					급우 중 한 명이 당신의 양팔을 붙잡고 등 뒤로 꺾은 뒤, 모두에게 보라고 소리친다.
+					<<if $player.penissize is 6>>
+						탈의실이 폭소로 터져 나오고, 몇몇 학생들은 당신의 <<EZbig>><<if _chastity>> but _chastity<</if>> <<genitals>>【을를】 보며 저속한 농담을 던진다.
+						<br><br>
+
+						장난을 마친 그 소년이 당신을 놓아주자 탈의실은 다시 평온을 찾는다. 학생들의 일반적인 수군거림 속에서도 당신의 유난히 큰 크기에 대한 묘한 소문이 여전히 들려온다.
+					<<elseif $player.penissize lte 3>>
+						새로 드러난 당신의 <<EZsmall>> <<genitals>>【을를】 보고 탈의실이 폭소로 가득 찬다.
+						<br><br>
+
+						팔이 풀려나자마자 당신은 수치심에 두 손으로 <<EZsmall>><<if _chastity>> and _chastity<</if>> <<EZpenis>>【을를】 황급히 움켜쥔다. 그러자 소년 중 하나가 <<Penisremarkquote>> 하고 외친다.
+						<<status -5>><<lcool>>
+					<<else>>
+						탈의실이 폭소로 터져 나오고, 몇몇 학생들은 당신의 <<genitals>>【을를】 보며 저속한 농담을 던진다.
+						<br><br>
+
+						장난을 마친 그 소년이 당신을 놓아주자 탈의실은 다시 평온을 찾는다.
+					<</if>>
+					<<trauma 5>><<gtrauma>><<incgpenisinsecurity>>
+				<<else>>
+					소년들 중 하나가 수건으로 당신의 알몸 엉덩이를 찰싹 때리자 탈의실이 폭소로 터져 나온다. "우리가 네 엉덩이를 과녁 삼아 놀게 하고 싶지 않다면 <<print ["cover it", "get dressed", "put something over it", "put something on", "put your clothes on"].pluck()>>【은는】 게 좋을 걸," 그 소년이 말한다.
+					<<pain 2>><<gpain>>
+				<</if>>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+	<<addinlineevent "schoolChangingRoomBoysEvent">>
+		조금 더 대담한 소년들 몇 명이 서로의 성기 크기를 비교하고 있다. 아무도 당신에게는 신경 쓰지 않는다.
+		<br><br>
+		"야, 고추 쩌는데!" 방 건너편에서 한 소년이 친구를 칭찬하는 소리가 들린다. "누가 더 크다고 보냐?" 그와 그의 친구는 <<= either("서로의 성기를 나란히 대고 길이를 비교하고", "누가 더 크다고 으스대고", "어떻게 파트너를 만족시키는지 자랑스럽게 떠벌린다")>>. 잠시 후 그들은 <<if Time.minute gte 45>>옷을 입고 탈의실을 떠난다<<else>>수영복으로 갈아입고 수영장 쪽으로 향한다<</if>>.
+	<</addinlineevent>>
+	<<if $settings.maleVictimChance gt 0>>
+		<<if _finishedLesson>>
+			<<addinlineevent "schoolChangingRoomBoysEvent">>
+				학생들 중 한 명이 혹시 여분의 속옷이 있는 사람치고 남는 게 없는지 방 안을 둘러보며 묻는다. 누군가 자신의 사물함에 침입해 속옷을 훔쳐갔다고 주장한다. 아무도 도와주려 하지 않고, 결국 그는 초조하게 반바지를 껴입고 탈의실을 떠난다.
+			<</addinlineevent>>
+		<</if>>
+		<<addinlineevent "schoolChangingRoomBoysEvent">>
+			덩치가 더 큰 소년 중 하나가 왜소한 급우의 수건을 홱 빼앗아 간다. 그 불량배는 <<= either("수건을 쥐락펴락 꼬아서 그 소년의 알몸에 채찍질을 해대고", "수건을 머리 위에 치켜들며 소년의 크기를 놀려댄다")>>. 그 작은 녀석은 수건을 돌려받을 때쯤이면 거의 울기 직전이 된다. 다행히도 당신이 옷을 갈아입는 동안에는 아무도 방해하지 않는다.
+		<</addinlineevent>>
+		<<if _notStartedLesson>>
+			<<addinlineevent "schoolChangingRoomBoysEvent">>
+				방 반대편에서는 인기 많은 소년 무리가 샌드위치 같은 너드 소년 한 명을 괴롭히기 시작한다. 그들은 속옷을 붙잡고 위로 확 잡아당겨 그를 공중에 띄운다. 결국 천이 찢어지고, 다른 이들이 탈의실을 빠져나가는 동안 그 너드 소년은 수치심에 질린 채 차가운 바닥에 알몸으로 남겨진다. 다행히 그들은 당신을 내버려 둔다.
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+	<<if $player.perceived_breastsize gte 3>>
+		<<addinlineevent "schoolChangingRoomBoysEvent">>
+			근처에서 옷을 갈아입던 소년 중 하나가 당신을 훑어보더니 놀리듯 말한다. "네 가슴살이 더 불어나면 여자 탈의실을 쓰게 해야 할지도 모르겠는걸." 다른 아이들이 낄낄거리며 픽 웃는다.
+			<<if $player.sex is "f" and $player.gender is "f" and isCrossdressing() and !_studentsKnow>>
+				그들은 당신이 실제로는 여자라는 사실을 모른다. <<if _uncomfortable>><<gstress>><<stress 1>><</if>>
+			<<else>>
+				<<stress 5>><<gstress>>
+			<</if>>
+		<</addinlineevent>>
+		<<if _genderChance gt 0>>
+			<<addinlineevent "schoolChangingRoomBoysEvent">>
+				<<generatesm1>><<person1>>
+				뒤에서 누군가 당신의 <<breasts>>【을를】 주무르는 손길이 느껴진다. 제자리에 홱 돌아서자, 얼굴에 짓궂은 미소를 띤 <<person>>【이가】 보인다.
+				<<endevent>>
+				<<if $player.breastsize gte 9>>
+					"젠장, 엄청나네! 언젠가 그 슴가를 출렁거리게 만들고 싶단 말이지."
+				<<elseif $player.breastsize gte 6>>
+					"와우, 가슴이 커다랗네! 언젠가 어떻게 다뤄야 할지 구경하고 싶어."
+				<<else>>
+					"예쁜 가슴이네. 언젠가 한번 맛보고 싶어!"
+				<</if>>
+				그가 윙크를 날린다.
+				<<arousal 300 "bottom">>
+				<<if $arousal gte $arousalmax>>
+					마침내 당신을 절정 직전까지 밀어붙인다.
+					<<garousal>>
+					<br><br>
+					<<orgasm>>
+					<<set $orgasmcurrent to 0>>
+					"누가 봐도 잔뜩 쌓였나 보네," 그가 킥킥거린다.
+					<<if $adultshopunlocked and random(1)>>
+						"성인 용품점에서 마사지기라도 하나 사보라고, 그거 꽤 재밌거든."
+					<<else>>
+						"네가 풀 수 있도록 도와줄 다른 사람을 찾아보는 게 좋을걸."
+					<</if>>
+				<<elseif $arousal gte $arousalmax / 2>>
+					그리고는 몸을 돌려 가버리며, 당신에게 야릇한 흥분을 남긴다. <<garousal>>
+				<<else>>
+					그리고는 가버리며, 당신을 당황스럽게 만든다. <<garousal>>
+				<</if>>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+	<<if $player.penisExist>>
+		<<addinlineevent "schoolChangingRoomBoysEvent">>
+			근처에서 옷을 갈아입던 급우 중 하나가 <<if _bottomless>>당신의 성기<<else>>당신의 <<exposedlower>> 속에 불룩하게 솟아오른 부위<</if>>【을를】 턱짓으로 가리킨다.
+
+			<<if $player.penissize gte 5>>
+				"시선은 혼자 다 독차지하겠는데!"
+			<<elseif $player.penissize gte 3>>
+				"제법 묵직한 물건을 가졌네. 재미 좀 보나?"
+			<<else>>
+				"그 조그마한 걸로 누굴 만족시키기나 하겠어."
+			<</if>>
+			<br><br>
+			<<if _uncomfortable>>
+				당신은 대충 얼버무리며 최대한 빨리 대화를 끝내려고 애쓴다. <<stress 5>><<gstress>>
+			<<else>>
+				당신은 정중하게 대답하며 옷을 갈아입는 동안 가벼운 농담을 건넨다.
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+	<<if _genderChance gt 0>>
+		<<addinlineevent "schoolChangingRoomBoysEvent">>
+			<<generatesm1>><<person1>>
+			<<set _infront to random(1)>>
+			<<if _infront>>
+				탈의실 안을 돌아다니고 있는데, 바로 앞을 걷던 <<person>>【이가】 갑자기 멈춰 서서 허리를 숙이는 바람에 당신이 그의 엉덩이에 쿵 부딪힌다.
+			<<else>>
+				사물함 쪽으로 허리를 숙이고 있는데, 뒤에서 <<person>>【이가】 다가와 당신의 허리를 움켜쥔다. 그가 잠시 자기 사타구니를 당신의 엉덩이에 문지르다가 손을 뗀다.
+			<</if>>
+			<<endevent>>
+			<<arousal 300 "genitals">>
+			<<if $arousal gte $arousalmax>>
+				그가 뭐라 말하기도 전에 당신은 절정에 달해버린다. <<garousal>>
+				<br><br>
+				<<orgasm>>
+				<<set $orgasmcurrent to 0>>
+				그는 잠시 당신을 멍하니 쳐다보다가 가버린다.
+			<<elseif _infront and (!$player.penisExist or playerChastity("penis") or $player.penissize lte 2)>>
+				"어라, 미안!" 그가 멈춰 서서 자신의 엉덩이를 당신의 사타구니에 문지른다. "야, <<print either("거기 다 잠겨있기라도 한 거야", "고추가 그렇게 쪼만해서 어쩌냐")>>?" 그가 장난스럽게 말한다. 그는 윙크를 날리고는 걸어간다. <<garousal>>
+			<<else>>
+				"어우 미안, 거기 있는 줄 몰랐네. 내가 워낙 덜렁대서 말이야," 그가 짓궂게 말한다. 실수인 것 같지 않다. <<garousal>>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<if _eventpool.length>>
+		<br><br>
+		<<set $daily.school.changingRoomBoyEvent to Time.date.timeStamp>>
+		<<runeventpool>>
+		<<set _eventOccured to true>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "eventsSchoolChangingRoomsGirls">>
+	<<if $daily.school.changingRoomGirlEvent is Time.date.timeStamp or random(0, 100) gte 25>><<exit>><</if>>
+	/* These events make use non-widget usages of "she", "her", etc. These are intentional and should not be changed */
+	<<cleareventpool>>
+	<<addinlineevent "schoolChangingRoomGirlsEvent">>
+		조금 더 대담한 여학생들 몇 명이 서로의 가슴 크기를 비교하고 있다. 아무도 당신에게는 신경 쓰지 않는다.
+
+		"크, 장난 아니네!" 방 건너편에서 한 여학생이 친구를 칭찬하는 소리가 들린다. "내 거랑 비교하면 어떨 것 같아?" 그녀는 자신의 가슴을 손으로 감싸 위로 밀어 올린다. 그녀와 친구는 <<= either("서로의 가슴을 맞대고 낄낄거리고", "누가 더 큰지 가볍게 티격태격 다투고", "서로의 가슴을 감탄하며 바라본다")>>. 잠시 후 그들은 <<if Time.minute gte 45>>옷을 입고 탈의실을 떠난다<<else>>수영복으로 갈아입고 수영장 쪽으로 향한다<</if>>.
+	<</addinlineevent>>
+	<<if $settings.maleVictimChance lt 100>>
+		<<if _finishedLesson>>
+			<<addinlineevent "schoolChangingRoomGirlsEvent">>
+				학생들 중 한 명이 혹시 여분의 팬티가 있는 사람치고 남는 게 없는지 방 안을 둘러보며 묻는다. 누군가 자신의 사물함에 침입해 속옷을 훔쳐갔다고 주장한다. 아무도 도와주려 하지 않고, 결국 그녀는 초조하게 스커트를 챙겨 입고 탈의실을 떠난다.
+			<</addinlineevent>>
+		<</if>>
+		<<if _notStartedLesson>>
+			<<addinlineevent "schoolChangingRoomGirlsEvent">>
+				방 반대편에서는 인기 많은 여학생 무리가 너드 여학생의 수영복에 구멍을 내며 낄낄거린다. 아무것도 모르는 피해 학생이 수영복을 입어보다가 유두가 노출된 것을 깨닫고는 당황해서 삑 소리를 낸다. 인기녀들은 폭소를 터뜨리며 탈의실을 빠져나가고, 수치심에 질린 그 여학생은 가슴을 가린 채 남겨진다. 다행히 그들은 당신을 내버려 둔다.
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+	<<if $worn.over_lower.name is "naked" and $worn.lower.name is "naked" and $worn.under_lower.name isnot "naked" and $worn.under_lower.reveal gte 500>>
+		<<addinlineevent "schoolChangingRoomGirlsEvent">>
+			<<outfitChecks>>
+			<<set _one to _underOutfit ? "one" : "some">>
+			<<set _theyd to _underOutfit ? "it'd" : "they'd">>
+			"어머, <<= _underOutfit ? "이거" : "저거">> 예쁘다," 급우 중 한 명이 당신의 <<underbottoms>> <<= _underOutfit ? "넥라인" : "허리밴드">>【을를】 따라 손가락을 스윽 쓸어내리며 말한다. "<<= either("나도 하나 장만해야겠네", "내 방 바닥에 떨어져 있으면 훨씬 더 잘 어울릴 것 같은데", "그 아래는 안 봐도 더 끝내주겠네")>>." 그녀는 은근한 눈길을 보내지만, 옷을 갈아입도록 당신을 내버려 둔다. <<arousal 100>><<garousal>><<if _uncomfortable>><<stress 5>><</if>>
+		<</addinlineevent>>
+	<</if>>
+	<<if $player.breastsize lte 2>>
+		<<addinlineevent "schoolChangingRoomGirlsEvent">>
+			근처에서 옷을 갈아입던 여학생 중 하나가 당신을 훑어보더니 놀리듯 말한다. "네 가슴이 더 작아지면 남자 탈의실을 쓰게 해야 할지도 모르겠는걸." 다른 아이들이 낄낄거리며 픽 웃는다.
+			<<if $player.sex is "m" and $player.gender is "m" and isCrossdressing() and !_studentsKnow>>
+				그들은 당신이 실제로는 남자라는 사실을 모른다. <<if _uncomfortable>><<gstress>><<stress 1>><</if>>
+			<<else>>
+				<<gstress>><<stress 5>>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+	<<if $player.breastsize lte 2 and $worn.over_upper.name is "naked" and $worn.upper.name is "naked" and $worn.under_upper.name.includes("bra")>>
+		<<addinlineevent "schoolChangingRoomGirlsEvent">>
+			근처에서 옷을 갈아입던 여학생 중 하나가 당신의 브래지어 끈을 잡아당겼다  놓는다. "그렇게 작은 슴가에 이런 게 정말 필요하긴 해?" 그녀는 킥킥거리며 옷을 갈아입으러 자리를 뜬다.
+			<<if $player.sex is "m" and $player.gender is "m" and isCrossdressing() and !_studentsKnow>>
+				그들은 당신이 실제로는 남자라는 사실을 모른다. <<if _uncomfortable>><<gstress>><<stress 1>><</if>>
+			<<else>>
+				<<gstress>><<stress 5>>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+	<<if _genderChance gt 0>>
+		<<addinlineevent "schoolChangingRoomGirlsEvent">>
+			<<generatesf1>><<person1>>
+			뒤에서 누군가 당신의 <<bottom>>【을를】 주무르는 손길이 느껴진다. 제자리에 홱 돌아서자, 얼굴에 짓궂은 미소를 띤 <<person>>【이가】 보인다.
+			<<endevent>>
+			<<if $player.bottomsize gte 6>>
+				"젠장, 엄청 빵빵하네! 언젠가 저 엉덩이를 출렁거리게 만들고 싶단 말이지."
+			<<elseif $player.bottomsize gte 4>>
+				"와우, 탄탄한 엉덩이네! 언젠가 어떻게 다뤄야 할지 구경하고 싶어."
+			<<else>>
+				"예쁜 엉덩이네. 언젠가 한번 맛보고 싶어!"
+			<</if>>
+			그녀가 윙크를 날린다.
+			<<arousal 300 "bottom">>
+			<<if $arousal gte $arousalmax>>
+				마침내 당신을 절정 직전까지 밀어붙인다.
+				<<garousal>>
+				<br><br>
+				<<orgasm>>
+				<<set $orgasmcurrent to 0>>
+				"누가 봐도 잔뜩 쌓였나 보네," 그녀가 킥킥거린다.
+				<<if $adultshopunlocked and random(1)>>
+					"성인 용품점에서 딜도라도 하나 사보라고, 그거 꽤 재밌거든."
+				<<else>>
+					"네가 풀 수 있도록 도와줄 다른 사람을 찾아보는 게 좋을걸."
+				<</if>>
+			<<elseif $arousal gte $arousalmax / 2>>
+				그리고는 몸을 돌려 가버리며, 당신에게 야릇한 흥분을 남긴다. <<garousal>>
+			<<else>>
+				그리고는 가버리며, 당신을 당황스럽게 만든다. <<garousal>>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+	<<if _genderChance gt 0>>
+		<<addinlineevent "schoolChangingRoomGirlsEvent">>
+			<<generatesf1>><<person1>>
+			탈의실 안을 돌아다니고 있는데, 불과 몇 발자국 앞에서 걷던 <<person>>【이가】 갑자기 멈춰 서서 허리를 숙이는 바람에 당신이 그녀의 엉덩이에 쿵 부딪힌다.
+			<<endevent>>
+			<<arousal 300 "genitals">>
+			<<if $arousal gte $arousalmax>>
+				그녀가 뭐라 말하기도 전에 당신은 절정에 달해버린다. <<garousal>>
+				<br><br>
+				<<orgasm>>
+				<<set $orgasmcurrent to 0>>
+				그녀는 잠시 당신을 멍하니 쳐다보다가 가버린다.
+			<<elseif ($player.penisExist and !playerChastity("penis") and $player.penissize gte 4) or playerHasStrapon()>>
+				"어라, 미안!" 그녀가 멈춰 서서 자신의 엉덩이를 당신의 사타구니에 문지른다. "야, 거기 밑에 뭘 그렇게 숨기고 있어?" 그녀가 장난스럽게 말한다. 그녀는 윙크를 날리고는 걸어간다. <<garousal>>
+			<<else>>
+				"어우 미안, 거기 있는 줄 몰랐네. 내가 워낙 덜렁대서 말이야," 그녀가 짓궂게 말한다. 실수인 것 같지 않다. <<garousal>>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+	<<if _eventpool.length>>
+		<br><br>
+		<<set $daily.school.changingRoomGirlEvent to Time.date.timeStamp>>
+		<<runeventpool>>
+		<<set _eventOccured to true>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "schoolPoolSwap">>
+	<<if $schoolrep.crossdress gte 1 and !$weekly.schoolPoolSwap and currentSkillValue('skulduggery') gte 400>>
+		<<if Time.minute lte 40>>
+			<span class="lblue">번뜩이는 아이디어가 떠오른다.</span> 여장쟁이라는 평판으로부터 시선을 분산시킬 수 있을지도 모른다.
+			<br>
+			<<lockericon>><<link [[남학생용과 여학생용 옷을 서로 바꿔놓는다 (0:20)|School Changing Swap]]>><<schoolrep crossdress -1>><<pass 20>><<detention 12>><<set $weekly.schoolPoolSwap to true>><</link>><<ggdelinquency>>
+			<br>
+		<<else>>
+			<span class="lblue">번뜩이는 아이디어가 떠오른다.</span> 여장쟁이라는 평판으로부터 시선을 분산시킬 수 있을지도 모른다.
+			<br>
+			수영장 안을 살짝 훔쳐본다. 수업이 곧 끝날 것이다. 준비하려면 더 많은 시간이 필요하다.
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "raidLockers">>
+	<<if $panty_thief gte 1>>
+		<<if $daily.lockerMason is 2>>
+			<span class="blue">메이슨이 자꾸 <<nnpc_his Mason>> 머리를 들이밀고 있다. 오늘은 더 이상 사물함을 털 수 없을 것이다.</span>
+			<br>
+		<<elseif Time.minute lte 47>>
+			<span class="clothes-white"><<icon "clothes/thong.png">></span><<link [[사물함을 턴다 (0:10)|School Changing Room Locker]]>><<pass 10>><<arousal 600>><</link>><<garousal>>
+			<br>
+		<<else>>
+			<span class="blue">수업이 곧 끝난다. 사물함을 털 시간이 없다.</span>
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "schoolpoolclothesreset">>
+	<<storereturn _args[0]>>
+	<<wardrobeSelection true>>
+	<<wearoutfit>>
+<</widget>>
+
+<<widget "schoolpoolclothes">>
+	<<if $wearoutfittext isnot undefined>>
+		<br><br>
+		<span class="purple">
+		<<switch $wearoutfittext>>
+			<<case 1>>
+				벤치에서 옷을 챙겨 조심스럽게 입는다.
+			<<case 2>>
+				옷을 사물함에 집어넣는다.
+			<<default>>
+				<<print $wearoutfittext.toLowerCase()>>【으로로】 갈아입는다.
+		<</switch>>
+		</span>
+		<<unset $wearoutfittext>>
+	<</if>>
+	<<storeon _args[0] "check">>
+	<<if _store_check is 1>>
+		<<set _clothes to clothingInStorage(_args[0])>>
+		<<if _clothes.length gt 0>>
+			<br><br>
+			<<if _clothes.length gt 2>>
+				사물함 옆 벤치 위에 옷가지들이 깔끔하게 더미로 쌓여 있다.
+				<br>
+			<<elseif _clothes.length is 2>>
+				사물함 옆 벤치 위에 _clothes[0].name와 _clothes[1].name【이가】 놓여 있다.
+				<br>
+			<<else>>
+				사물함 옆 벤치 위에 _clothes[0].name【이가】 놓여 있다.
+				<br>
+			<</if>>
+			<<clothingicon _clothes[0] _clothes[0].slot>><<link [[입는다|$passage]]>><<storeload _args[0]>><<set $eventskip to 1>><<set $wearoutfittext to 1>><</link>>
+			<br>
+			<<lockericon "put in">><<link [[사물함에 넣는다|$passage]]>><<storeon _args[0] "return">><<set $eventskip to 1>><<set $wearoutfittext to 2>><</link>>
+		<</if>>
+	<</if>>
+	<br><br>
+	//수영복 세트://
+	<br>
+	<<listswimoutfits $wardrobe_location _args[0] true>>
+	<br>
+	//일반 옷 세트://
+	<br>
+	<<listoutfitsPassage $wardrobe_location _args[0] true>>
+	<br>
+<</widget>>
+
+<<widget "schoolpoolundress">>
+	<<set _store_location to "school pool">>
+	<<if $player.gender_appearance is "m">>
+		<<set _store_location += " boys">>
+		<<set $schoolpoolundress to "boys">>
+	<<else>>
+		<<set _store_location += " girls">>
+		<<set $schoolpoolundress to "girls">>
+	<</if>>
+	<<if clothingInStorage(_store_location).length is 0>>
+		<<storesave _store_location>>
+	<<else>>
+		<<strip>>
+		<<returnCarried>>
+		<<set $schoolpoolundress to "wardrobe">>
+	<</if>>
+<</widget>>
+
+<<widget "schoolclothesreset">>
+	<<storeon "school pool boys" "return">>
+	<<storeon "school pool girls" "return">>
+<</widget>>
+
+<<widget "schoolPoolEntranceExposed">>
+	모퉁이를 살짝 훔쳐본다. <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>>들이 제각각 옷을 벗은 채 있는 모습이 보인다. 들어가려고 하면 들키고 말 것이다.
+	<br><br>
+	<<ind>><<link [[구경한다 (0:05)|School Changing Room Watch]]>><<pass 5>><</link>><<promiscuous1>>
+	<br>
+	<<if hasSexStat("exhibitionism", 3)>>
+		<<skinicon "masturbate">><<link [[자위한다 (0:01)|School Changing Room Masturbation]]>><<pass 1>><<set $masturbationstart to 1>><</link>><<exhibitionist3>>
+		<br>
+	<</if>>
+	<<if hasSexStat("exhibitionism", 5)>>
+		<<ind>><<link [[들어간다 (0:05)|School Changing Room Exhibitionism]]>><<pass 5>><<detention 3>><</link>><<gdelinquency>><<exhibitionist5>>
+		<br>
+	<</if>>
+	<<getouticon>><<link [[떠난다|School Pool Entrance]]>><</link>>
+<</widget>>
+
+<<widget "schoolPoolEntranceMistake">>
+	<<set $daily.school.changingRoomEntered to Time.hour>>
+	<<if $player.gender_appearance isnot _changingRoomGenderType and isHermOrCrossdresser()>>
+		안에는 제각각 옷을 벗고 있던 <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>>들이 가득하다. 그들은 당신을 <<girl>>【으로로】 생각했는지, 당신이 들어오자 황급히 몸을 가린다.
+	<<else>>
+		안에는 제각각 옷을 벗고 있던 <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>>들이 가득하며, 당신이 들어오자 황급히 몸을 가린다.
+	<</if>>
+	다들 부끄러워 죽으려는 표정이지만, 일부는 화를 내며 당신을 쫓아낸다.
+	<<detention 3>><<gdelinquency>>
+	<br><br>
+	<<link [[다음|School Pool Entrance]]>><</link>>
+<</widget>>
+
+<<widget "schoolPoolEntranceCaught">>
+	<<if $changingRoomGender is "boys">><<generatesm1>><<else>><<generatesf1>><</if>><<person1>>
+	<<if $player.gender_appearance isnot _changingRoomGenderType and isHermOrCrossdresser()>>
+		안에는 제각각 옷을 벗고 있던 <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>>들이 가득하다. 그들은 당신을 <<girl>>【으로로】 생각했는지, 당신이 들어오자 황급히 몸을 가린다.
+	<<else>>
+		안에는 제각각 옷을 벗고 있던 <<if $changingRoomGender is "girls">>여학생<<else>>남학생<</if>>들이 가득하며, 당신이 들어오자 황급히 몸을 가린다.
+	<</if>>
+	많은 이들이 화난 표정을 짓는다. 한 <<person>>【이가】 가방을 내던지며 앞으로 성큼성큼 걸어 나온다. "이 변태 자식," <<he>>【이가】 말한다. "여기에 자꾸 기어들어 오면 안 되지." <<He>>【이가】 당신의 팔을 붙잡는다.
+	<<detention 3>><<gdelinquency>>
+	<br><br>
+	<<link [[빠져나가려 애쓴다|School Changing Room Escape]]>><</link>><<physiquedifficulty 4000 14000>>
+	<br>
+	<<link [[유혹한다|School Changing Room Flirt]]>><</link>><<promiscuous1>>
+	<br>
+	<<link [[사과한다|School Changing Room Apologise]]>><</link>>
+<</widget>>

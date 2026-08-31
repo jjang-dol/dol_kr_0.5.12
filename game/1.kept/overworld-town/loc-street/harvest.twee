@@ -1,0 +1,135 @@
+:: Harvest Street
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "harvest">><<getTarget true>>
+당신은 하베스트 가에 있다. 이 거리는 부두와 해운 산업이 주를 이룬다. 마을 밖으로 이어지는 길이 있고, 이곳의 많은 건물은 인근 농장에서 온 농산물을 취급한다. 이 지역은 범죄 활동으로 악명이 높다.
+<<if Time.dayState is "day">>
+	<<if Weather.precipitation is "rain">>
+		대형 차량이 지나가면서 포장도로에 물이 튄다.
+	<<elseif Weather.precipitation is "snow">>
+		끊임없는 차량 통행으로 도로에 눈이 쌓이지 않는다.
+	<<else>>
+		도로에는 항상 최소 한 대 이상의 대형 차량이 움직이고 있다.
+	<</if>>
+<<elseif Time.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		마을 밖에서 온 대형 차량들이 물웅덩이를 첨벙거리며 지나간다.
+	<<elseif Weather.isSnow>>
+		마을 밖에서 도착하는 일부 대형 차량들은 눈으로 뒤덮여 있다.
+	<<else>>
+		마을 밖에서 온 차량들이 벌써 도착하고 있다.
+	<</if>>
+<<elseif Time.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		빗물이 거대한 커튼처럼 홈통에서 쏟아져 내린다.
+	<<elseif Weather.isFreezing>>
+		노동자들이 추위를 막기 위해 옷을 껴입고 있다.
+	<<else>>
+		해가 지고 있지만, 이곳의 노동자들이 하루 일을 마치려면 아직 시간이 좀 더 걸릴 것이다.
+	<</if>>
+<<elseif Time.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		도로 가장자리에 웅덩이가 생기고, 차량이 지나갈 때마다 그 내용물이 포장도로 위로 튄다.
+	<<elseif Weather.isSnow>>
+		밤에도 차량 통행으로 인해 도로에 눈이 쌓이지 않는다.
+	<<else>>
+		밤에도 거리는 분주하다.
+	<</if>>
+<</if>>
+<<streeteffects>>
+<br><br>
+<<if $exposed gte 1>>
+	<<exhibitionism "street">>
+<</if>>
+<<if $arousal gte $arousalmax>>
+	<<orgasmstreet>>
+<</if>>
+<<if $stress gte $stressmax and !$possessed>>
+	<<passoutstreet>>
+<<elseif $pubfame and $pubfame.task is "bailey" and $pubfame.bailey.fight is "ready">>
+	<<generateRole 0 0 "thug">><<generateRole 1 0 "thug">><<generateRole 2 0 "thug">><<generateRole 3 0 "thug">>
+	한 무리의 <<group>>【이가】 골목에서 당신에게 다가온다. 몇몇 행인들이 그들을 피하며 시선을 돌리는 것이 보인다. 무리의 우두머리인 <<person1>><<person>>【이가】 음흉하게 웃는다. "<span class="red">저 녀석이군.</span> 우리 밥값은 하겠어."
+	<br><br>
+
+	그들이 주먹을 으득거리며 당신을 향해 걸어온다.
+	<br><br>
+
+	<<link [[다음|Bailey Sheet Fight]]>><<set $fightstart to 1>><</link>>
+<<else>>
+
+	<<if (dangerEvent() or $eventforced) and $eventskip is 0>>
+		<<eventsstreet>>
+	<<else>>
+		<<if $options.mapTop is true>>
+			<<map "harvest">>
+			<br>
+		<</if>>
+		<<if $averyPub is 1 and (Time.dayState is "day" or Time.dayState is "dusk")>>
+			<span class="blue">술집 길 건너편에 에이버리의 차가 주차되어 있는 것이 보인다.</span>
+			<br><br>
+		<</if>>
+
+		<<if $brothel_escortjob isnot undefined>>
+			<<set _date to new DateTime($brothel_escortjob.date)>>
+			<<if Time.hour is _date.hour and Time.date.day is _date.day and $brothel_escortjob.escape is undefined>>
+				다뉴브 가에서의 일을 위해 고급 리무진 한 대가 창관 앞에 주차되어 있다. 당신은 그 차에 타야 한다.
+				<br>
+				<<icon "limousine.png">><<link [[리무진에 탄다 (1:00)|Brothel Escort Job Ride]]>><</link>>
+				<br><br>
+			<</if>>
+		<</if>>
+
+		주요 장소
+		<br>
+		<<if $brothelintro is 1>>
+			<<if $exposed gte 1>>
+				<<brothelicon>><<link [[창관 (0:01)|Brothel Exposed]]>><<pass 1>><</link>>
+				<br>
+			<<else>>
+				<<brothelicon>><<link [[창관 (0:01)|Brothel]]>><<pass 1>><</link>>
+				<br>
+			<</if>>
+		<<elseif $brothelknown is 1 and $exposed lte 0>>
+			<<brothelicon>><<link [[수상한 건물에 들어간다 (0:03)|Brothel Intro]]>><<set $brothelintro to 1>><<set $phase to 1>><<pass 3>><</link>>
+			<br>
+		<</if>>
+		<<if $pubintro is 1 and $exposed lte 0>>
+			<<pubicon>><<link [[술집 (0:02)|Pub]]>><<pass 2>><</link>>
+			<br>
+		<<elseif $exposed lte 0>>
+			<<pubicon>><<link [[술집 (0:02)|Pub Intro]]>><<pass 2>><</link>>
+			<br>
+		<</if>>
+		<<if Time.dayState is "night">>
+			<<busstationicon>><<link [[버스 정류장 (0:02)|Bus Station Entrance]]>><<pass 2>><</link>>
+		<<else>>
+			<<busstationicon>><<link [[버스 정류장 (0:02)|Bus Station]]>><<pass 2>><</link>>
+		<</if>>
+		<br>
+		<<if Time.dayState isnot "night" and $exposed lt 1>>
+			<<factoryicon>><<link [[공장 (0:05)|Farmers Centre]]>><<pass 5>><</link>>
+			<br>
+		<</if>>
+		<br>
+		도로<br>
+		<<roadicon>><<link [[마을을 떠난다 (0:05)|Farm Road 1]]>><<set $phase to 1>><</link>>
+		<br><br>
+		<<if $exposed gte 1 and Time.dayState isnot "night">>
+		<<else>>
+			<<add_link "이동<br>">><<hideDisplay>>
+			<<mer>>
+			<<elk>>
+			<<if $exposed lte 0>>
+				<<buswait>>
+			<</if>>
+			<<loiter>>
+		<</if>>
+		<<add_link "<br>다른 경로<br>">><<hideDisplay>>
+		<<industrial>>
+		<<stormdrain>>
+		<<displayLinks>>
+		<<if $options.mapTop isnot true>>
+			<br>
+			<<map "harvest">>
+		<</if>>
+	<</if>>
+<</if>>
+<<set $eventskip to 0>>

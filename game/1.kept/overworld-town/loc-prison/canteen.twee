@@ -1,0 +1,709 @@
+:: Prison Canteen
+<<set $bus to "canteen">><<set $outside to 0>><<effects>><<effects_prison>>
+
+당신은 식당에 있다. 넓은 방 안은 식탁들이 줄지어 채우고 있다. 천장이 너무 낮아 키가 큰 수감자들은 똑바로 설 수 없으며, 길이와 너비에 비해 답답한 느낌을 준다.
+<<if $prison.schedule is "wake" or $prison.schedule is "lunch" or $prison.schedule is "dinner">>
+수감자들이 밥을 타기 위해 줄을 선다. <<generate_methodical_guard 0>><<methodical_guard 0 cap>>【은는】 구석에 서서 책장을 넘기고 있다.
+<<elseif $prison.schedule is "work">>
+주방에서 덜그럭거리는 소리가 들린다.
+<<else>>
+지금은 비어 있다.
+<</if>>
+<<endevent>>
+<br><br>
+<<if Time.hour is 20>>
+종소리가 울린다. "통제 시간이다," <<generate_methodical_guard 0>><<methodical_guard 0>>【이가】 외친다. "다들 감옥으로 돌아가."
+	<br><br>
+당신은 다른 수감자들과 함께 밀려난다.
+	<br><br>
+	<<link [[다음|Prison Cell]]>><<endevent>><</link>>
+	<br>
+<<elseif $stress gte $stressmax>>
+	<<passout_prison>>
+<<else>>
+
+	<<if $prison.schedule isnot "lockdown" and $prison.attention gte 100>>
+		<<events_prison_attention>>
+	<<else>>
+		<<if $prison.schedule isnot "lockdown" and $eventskip isnot 1>>
+			<<events_prison>>
+		<</if>>
+		<<if $prison_event_trigger>>
+			<<events_prison_triggered>>
+		<<else>>
+			<<if random(1, 5) is 5 and $eventskip isnot 1 and ($prison.schedule is "wake" or $prison.schedule is "lunch" or $prison.schedule is "dinner")>>
+				<<prison_guard_watch methodical>>
+			<<else>>
+				<<if $prison.schedule is "wake">>
+					<<foodicon "eat">><<link [[아침 식사 (최대 1시간)|Prison Breakfast]]>><<pass 1>><<advancetohour>><<stress -6>><</link>><<lstress>>
+					<br><br>
+				<<elseif $prison.schedule is "lunch">>
+					<<foodicon "eat">><<link [[점심 식사 (최대 1시간)|Prison Lunch]]>><<pass 1>><<advancetohour>><<stress -6>><</link>><<lstress>>
+					<br><br>
+				<<elseif $prison.schedule is "dinner">>
+					<<foodicon "eat">><<link [[저녁 식사 (최대 1시간)|Prison Dinner]]>><<pass 1>><<advancetohour>><<stress -6>><</link>><<lstress>>
+					<br><br>
+				<</if>>
+				<<getouticon>><<link [[떠난다|Prison Yard]]>><</link>>
+				<br>
+				<<prison_map canteen>>
+			<</if>>
+		<</if>>
+		<<set $eventskip to 0>>
+	<</if>>
+<</if>>
+
+
+:: Prison Breakfast
+<<effects>>
+
+<<if pcAreArmsBound("both")>>
+	<<generate1>><<person1>>
+	당신은 다른 죄수들과 함께 줄을 선다. 카운터 뒤의 <<person>>【이가】 멀건 죽이 가득 담긴 그릇을 당신의 머리 위에 올려놓는다.
+	<<if $worn.face.type.includes("gag")>>
+	빨대가 포함되어 있어, 재갈 너머로 간신히 밀어 넣을 수 있을지도 모른다.
+	<</if>>
+	<br><br>
+	<<endevent>>
+	<<if $worn.face.type.includes("gag")>>
+		<span class="blue">재갈만 아니었다면 도움을 요청할 수 있었을 것이다.</span>
+		<br>
+	<<else>>
+		<<link [[누군가에게 도움을 요청한다|Prison Breakfast Help]]>><<prison_inmates -1>><</link>><<lrespect>>
+		<br>
+	<</if>>
+	<<link [[조심스럽게 자리를 찾는다|Prison Breakfast Careful]]>><</link>><<dancedifficulty 1 600>>
+	<br>
+<<else>>
+	<<wearProp "lunch tray">>
+	당신은 다른 죄수들과 함께 줄을 서서 멀건 죽이 가득 담긴 그릇을 받는다.
+	<<if $worn.face.type.includes("gag")>>
+		빨대가 포함되어 있어, 재갈 너머로 간신히 밀어 넣을 수 있을지도 모른다.
+	<</if>>
+	<br><br>
+
+	당신은 빈자리를 찾는다.
+	<<if $prison.protection is "scarred">>
+		<<generate_scarred_inmate 0>><<scarred_inmate 0 cap>><<person1>>【이가】 <<his>> 무릎에 앉으라고 한다.
+		<br><br>
+
+		<<link [[무릎에 앉는다|Prison Breakfast Scarred]]>><<prison_rep scarred 1>><<prison_attention 1>><</link>><<gperlove>><<gattention prison>>
+		<br>
+		<<link [[거절한다|Prison Breakfast Scarred Refuse]]>><<prison_inmates 1>><</link>><<grespect>>
+	<<else>>
+		<br><br>
+
+		<<link [[다음|Prison Breakfast Prayer]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Prison Breakfast Help
+<<effects>>
+
+<<generate1>><<person1>>
+<<if $speech_attitude is "meek">>
+	"누-누가 좀 도와주실래요?" 당신이 묻는다. "제발요?"
+<<elseif $speech_attitude is "bratty">>
+	"누가 손 좀 빌려줘." 당신이 말한다.
+<<else>>
+	"누가 좀 도와줄 수 있을까." 당신이 말한다.
+<</if>>
+<br><br>
+
+한 <<person>>【이가】 당신의 머리에서 그릇을 가져간다. "물론이지, 자기." <<He>>【이가】 당신의 <<bottom>>【을를】 때린다. "움직여."
+<br><br>
+
+다른 죄수들이 지켜보는 가운데 <<He>>【이가】 손으로 당신에게 먹여준다. 그들은 재미있어하는 것 같다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Careful
+<<effects>>
+
+<<if $danceSuccess>>
+	당신은 빈자리로 걸어간다. 두어 명의 죄수가 다리를 내밀지만, <span class="green">당신은 균형을 잃지 않고 그 위를 넘어간다.</span>
+	<br><br>
+
+	<<link [[다음|Prison Breakfast Prayer]]>><</link>>
+	<br>
+<<else>>
+	당신은 빈자리를 향해 걸어간다. 한 죄수가 다리를 내밀어 <span class="red">당신을 넘어뜨린다.</span> 당신의 그릇이 땅에 부딪히며 음식이 사방에 쏟아진다.
+	<br><br>
+
+	<<if $worn.face.type.includes("gag")>>
+		<<generate_veteran_guard 0>><<person1>>
+		장화 소리가 들린다. 당신이 일어서기도 전에, <<veteran_guard 0>>【이가】 당신의 등에 발을 올린다. "우리의 깨끗한 바닥을 더럽혀?" <<he>>【이가】 말한다. "용납 못 해."
+		<br><br>
+
+		<<link [[다음|Prison Breakfast Lick Refuse]]>><<set $phase to 1>><</link>>
+		<br>
+	<<else>>
+		<<generate_veteran_guard 0>><<person1>>
+		장화 소리가 들린다. 당신이 일어서기도 전에, <<veteran_guard 0>>【이가】 당신의 등에 발을 올린다. "우리의 깨끗한 바닥을 더럽혀?" <<he>>【이가】 말한다. "용납 못 해. 핥아. 전부 다."
+		<br><br>
+
+		<<link [[핥는다|Prison Breakfast Lick]]>><<prison_inmates -3>><<trauma 6>><</link>><<llrespect>><<gtrauma>>
+		<br>
+		<<link [[거절한다|Prison Breakfast Lick Refuse]]>><<prison_inmates 3>><<pain 8>><<trauma 12>><<stress 12>><<prison_guards -1>><</link>><<ggpain>><<ggtrauma>><<ggstress>><<gsuspicion>><<ggrespect>>
+		<br><br>
+	<</if>>
+<</if>>
+
+:: Prison Breakfast Lick
+<<effects>>
+
+다른 죄수들이 지켜보는 것이 느껴진다. <<veteran_guard 0 cap>>【은는】 당신이 쏟아진 것을 전부 핥을 때까지 <<his>> 장화를 치우지 않는다. "좋아." <<he>>【이가】 말한다. "이제 앉아."
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Lick Refuse
+<<effects>>
+
+<<generate_methodical_guard 1>>
+
+<<veteran_guard 0 cap>>【은는】 장화를 치우더니, <<his>> 곤봉으로 당신을 다시 바닥에 내리친다. 당신은 팔이 묶인 채로 최대한 몸을 웅크리고, <<he>>【은는】 계속해서 매질을 가한다.<<if $phase is 1>><<prison_inmates 3>><<pain 8>><<trauma 12>><<stress 12>><<prison_guards -1>><<ggpain>><<ggtrauma>><<ggstress>><<gsuspicion>><<ggrespect>><</if>>
+<br><br>
+
+"그만하면 됐어." <<methodical_guard 1>>【이가】 끼어든다. "이것 때문에 기도를 늦출 순 없어."
+<br><br>
+
+<<veteran_guard 0 cap>>【은는】 당신에게서 물러난다. <<tearful>> 당신은 자리에서 일어나 자리를 찾는다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Scarred
+<<effects>>
+
+당신은 <<scarred_inmate 0 apo>> 무릎에 앉는다.
+
+<<if $prison.scarred gte 80>>
+	<<He>>【이가】 당신의 그릇과 숟가락을 가져가 <<himself>> 먹여준다. <<his>> 패거리가 이를 이상하게 생각하더라도, 아무런 내색도 하지 않는다.
+<<elseif $prison.scarred gte 20>>
+	<<He>>【이가】 당신의 그릇을 가져가, 당신이 먹는 동안 들고 있어 준다.
+<<else>>
+	<<wearProp "soup bowl">>
+	당신은 테이블에서 너무 높고 멀리 떨어져 있어 사용할 수 없다. 당신은 먹는 동안 자신의 허벅지에 그릇을 올려놓는다.
+<</if>>
+<br><br>
+<<if random(1, 2) is 2>>
+	당신은 가끔 꼬집히는 것을 견뎌낸다.<<gstress>><<gpain>><<stress 6>><<pain 4>>
+	<br><br>
+<</if>>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Scarred Refuse
+<<effects>>
+
+당신은 <<scarred_inmate 0>>【을를】 거절하고 다른 곳에 앉는다.
+<<if $prison.scarred gte 80>>
+	<<He>>【은는】 상처받은 표정이다.
+<<else>>
+	<<he>>【이가】 으르렁거리는 소리가 들린다.
+<</if>>
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Prayer
+<<effects>>
+
+<<generate_methodical_guard 0>><<methodical_guard 0 cap>><<person1>>【이가】 목을 가다듬는다. 여전히 손에 책을 들고 있으며, 읽을 구절을 정한 듯하다. "고개 숙여." <<he>>【이가】 말한다. "기도 시간이다." 대부분의 죄수들은 이미 고개를 숙이고 있다.
+<br><br>
+
+<<link [[고개를 숙인다|Prison Breakfast Prayer Bow]]>><<sub 1>><<purity 2>><</link>><<gpurity>>
+<br>
+<<link [[고개를 숙이고 공상에 잠긴다|Prison Breakfast Prayer Daydream]]>><<stress -6>><</link>><<lstress>>
+<br>
+<<link [[거절한다|Prison Breakfast Prayer Refuse]]>><<def 1>><<prison_inmates 1>><<suspicion 1>><</link>><<gsuspicion>><<grespect>>
+<br>
+<<if $angel gte 6 and !$worn.face.type.includes("gag")>>
+	<<link [[설교를 하겠다고 제안한다|Prison Breakfast Prayer Angel]]>><<prison_hope 1>><</link>><<angel>><<ghope>>
+	<br>
+<</if>>
+<<if $fallenangel gte 2 and !$worn.face.type.includes("gag")>>
+	<<link [[설교를 하겠다고 제안한다|Prison Breakfast Prayer Fallen]]>><<prison_reb 3>><<prison_hope -1>><</link>><<fallenangel>><<lhope>><<ggreb>>
+	<br>
+<</if>>
+<<if $demon gte 6 and !$worn.face.type.includes("gag")>>
+	<<link [[설교를 하겠다고 제안한다|Prison Breakfast Prayer Demon]]>><<prison_reb 1>><</link>><<demon>><<greb>>
+	<br>
+<</if>>
+
+:: Prison Breakfast Prayer Angel
+<<effects>>
+
+당신은 일어나 <<methodical_guard 0>>에게 걸어간다. <<He>>【은는】 당신의 무례함에 화가 난 듯 보이지만, 당신의 눈빛에서 무언가를 보고 <<him>>의 태도가 부드러워진다.
+
+<<if pcAreArmsBound("both")>>
+	팔이 묶여 있어 기도서를 들 수는 없지만, 그럴 필요는 없다. 당신은 기억에 의존해 설교를 읊는다.
+<<else>>
+	<<He>>【이가】 기도서를 내밀지만, 당신은 그럴 필요가 없다. 당신은 가슴에 손을 얹고 기억에 의존해 설교를 읊는다.
+<</if>>
+<br><br>
+
+죄수들은 넋을 잃고 귀를 기울인다. 몇몇은 숙인 고개 아래로 눈물을 숨기는 것 같다.
+<<methodical_guard 0 cap>>【은는】 멍한 표정을 짓다가, 일정이 떠오르자 정신을 차린다. "일어나." <<He>>【이가】 깊은 숨을 내쉰다. "모두 밖으로."
+<br><br>
+
+<<link [[다음|Prison Yard]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Prayer Fallen
+<<effects>>
+
+당신은 일어나 <<methodical_guard 0>>에게 걸어간다. <<He>>【은는】 당신의 무례함에 화가 난 듯 보이지만, 당신의 눈빛에서 무언가를 보고 <<him>>【이가】 겁을 먹는다.
+<<if pcAreArmsBound("both")>>
+	팔이 묶여 있어 기도서를 들 수는 없지만, 그럴 필요는 없다. 당신은 기억에 의존해 설교를 읊는다.
+<<else>>
+	<<He>>【이가】 기도서를 내밀지만, 당신은 그럴 필요가 없다. 당신은 가슴에 손을 얹고 기억에 의존해 설교를 읊는다.
+<</if>>
+<br><br>
+
+이것은 신전에서 할 만한 설교가 아니다. 공개적으로는 절대. 하지만 이곳에는 어울린다. 당신은 공허와 상실, 저주와 절망에 대해 말한다. 방 안에 구름이 내려앉고, <<methodical_guard 0>>조차 영향을 받는다. "그만." <<he>>【이가】 마침내 말한다. "일어나. 모두 밖으로."
+<br><br>
+
+<<link [[다음|Prison Yard]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Prayer Demon
+<<effects>>
+
+당신은 일어나 <<methodical_guard 0>>에게 걸어간다. <<He>>【은는】 당신의 무례함에 화가 난 듯 보이지만, 당신의 눈빛에서 무언가를 보고 <<him>>【이가】 매혹된다.
+
+<<if pcAreArmsBound("both")>>
+	팔이 묶여 있어 기도서를 들 수는 없지만, 그럴 필요는 없다. 당신은 기억에 의존해 설교를 읊는다.
+<<else>>
+	<<He>>【이가】 기도서를 내밀지만, 당신은 그럴 필요가 없다. 당신은 가슴에 손을 얹고 기억에 의존해 설교를 읊는다.
+<</if>>
+<br><br>
+
+당신은 여기저기 세부 사항을 바꾸고, 암시와 신성모독을 슬쩍 끼워 넣는다. 좀 더 학식 있는 죄수 몇몇이 웃음을 참는다. <<methodical_guard 0 cap>>【은는】 범인을 찾으려 방을 훑어본다. "그만하면 됐어." <<he>>【이가】 말한다. "일어나. 모두 밖으로."
+<br><br>
+
+<<link [[다음|Prison Yard]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Prayer Bow
+<<effects>>
+
+당신은 고개를 숙인다. <<methodical_guard 0 cap>>【은는】 처벌에 대한 기도문을 읊고는 책을 탁 덮는다. "일어나. 모두 밖으로."
+<br><br>
+
+당신은 다른 죄수들과 함께 밖으로 나간다.
+<br><br>
+
+<<link [[다음|Prison Yard]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Prayer Daydream
+<<effects>>
+
+당신은 고개를 숙이지만, <<methodical_guard 0 apo>> 말에는 주의를 기울이지 않는다.
+
+<<if random(1,3) is 3>>
+	<<if isLoveInterest("Robin")>>
+		당신은 로빈을 생각한다. 당신 없이 <<nnpc_he "Robin">>【이가】 잘 지내고 있기를 바란다.
+	<<elseif isLoveInterest("Whitney")>>
+		당신은 휘트니를 생각한다. <<nnpc_he Whitney>>【이가】 인정하든 안 하든, <<nnpc_he Whitney>>【이가】 당신을 그리워할 거라고 확신한다.
+	<<elseif isLoveInterest("Eden")>>
+		당신은 이든을 생각한다. <<nnpc_he Eden>>【이가】 너무 걱정하지 않기를 바란다. <<nnpc_he Eden>>조차도 여기까지 올 수는 없을 거라고 생각한다.
+	<<elseif isLoveInterest("Kylar") and C.npc.Kylar.state is "prison">>
+		당신은 카일라를 생각한다. <<nnpc_he "Kylar">>【이가】 탈출할 수 있을지 궁금하지만, 그럴 수 없을 거라고 생각한다.
+	<<elseif isLoveInterest("Avery")>>
+		당신은 에이버리를 생각하며 <<nnpc_he Avery>>【이가】 당신의 자유를 사줄 수 있을지 궁금해한다.
+	<<elseif isLoveInterest("Sydney")>>
+		당신은 시드니를 생각한다. 당신도 <<nnpc_his Sydney>> 생각 속에 있다는 것을 안다.
+	<<elseif isLoveInterest("Alex")>>
+		당신은 알렉스를 생각하며 농장이 어떻게 지내는지 궁금해한다.
+	<<elseif isLoveInterest("Black Wolf")>>
+		당신은 검은 늑대와 무리를 생각한다. 그들이 배고프지 않기를 바란다.
+	<<elseif isLoveInterest("Great Hawk")>>
+		당신은 거대 매를 생각한다. <<nnpc_He "Great Hawk">>【이가】 당신을 찾고 있을 테지만, <<nnpc_he "Great Hawk">>【이가】 이렇게 멀리까지 찾을지는 의심스럽다.
+	<<else>>
+		당신은 마을을 생각하며 얼마나 많은 것을 당연하게 여겼는지 깨닫는다.
+	<</if>>
+<<else>>
+	<<if $rng gte 81>>
+		고아들이 괜찮기를 바란다.
+	<<elseif $rng gte 61>>
+		당신은 학교를 생각하며 당신의 결석이 무단결석으로 처리되지 않기를 바란다.
+	<<elseif $rng gte 41>>
+		당신의 생각은 온갖 곳을 떠돈다.
+	<<elseif $rng gte 21>>
+		다른 죄수들 중 얼마나 많은 이들이 주의를 기울이고 있는지 궁금하다.
+	<<else>>
+		하지만 <<his>> 목소리가 들린다. 메아리치는 것 같지만, 뭔가 잘못되었다. 마치 다른 목소리가 <<hers>> 위에 겹쳐진 것 같다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<He>>【이가】 책을 탁 덮는다. "일어나. 모두 밖으로."
+<br><br>
+
+당신은 다른 죄수들과 함께 밖으로 나간다.
+<br><br>
+
+<<link [[다음|Prison Yard]]>><<endevent>><</link>>
+<br>
+
+:: Prison Breakfast Prayer Refuse
+<<effects>>
+
+<<if $prison.shock is 1>>
+	<<if $prison.guards gte 40>>
+		당신은 <<methodical_guard 0>>【을를】 쳐다본다. "죄수 144번," <<he>>【이가】 쏘아붙인다. "<span class="green">한 번 더 기회를 주지.</span> 당장 머리를 숙여."
+		<br><br>
+
+		<<link [[머리를 숙인다|Prison Breakfast Prayer Bow]]>><<sub 1>><<purity 2>><</link>><<gpurity>>
+		<br>
+		<<link [[다시 거부한다|Prison Breakfast Prayer Refuse 2]]>><<prison_inmates 1>><<prison_guards -1>><</link>><<gsuspicion>><<grespect>>
+		<br>
+	<<else>>
+		당신은 <<methodical_guard 0>>【을를】 쳐다본다. <<He>>【이가】 <<his>> 셔츠 주머니에 손을 넣는다. <span class="red">끔찍한 충격이 당신의 몸을 관통한다.</span> 당신의 목에서부터 시작된 충격이다. 잠시뿐이었지만, 땅에 쓰러져 경련을 일으키기엔 충분했다.<<gtrauma>><<ggstress>><<gggpain>><<trauma 4>><<stress 4>><<pain 4>>
+		<br><br>
+		당신은 너무 다쳐서 <<methodical_guard 0>>【이가】 수갑을 채우고 식당에서 끌어내는 것에 저항할 수 없다. 다른 죄수들은 당신이 지나갈 때 놀리지만, 악의가 있는 것 같지는 않다.
+		<<bind>>
+		<br><br>
+		<<link [[다음|Prison Punishment]]>><<endevent>><</link>>
+	<</if>>
+<<else>>
+	당신은 <<methodical_guard 0>>【을를】 쳐다본다. <<He>>【이가】 <<his>> 셔츠 주머니에 손을 넣다가, <span class="green">망설인다.</span> <<He>>【은는】 당신을 언급하지 않고 말을 시작한다.
+	<br><br>
+	<<He>>【은는】 징벌에 대한 긴 목록을 읊은 후, 책을 탁 소리 나게 덮는다. "일어서. 모두 밖으로."
+	<br><br>
+
+	당신은 다른 죄수들과 함께 밖으로 나간다.
+	<br><br>
+
+	<<link [[다음|Prison Yard]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Prison Breakfast Prayer Refuse 2
+<<effects>>
+
+당신은 <<methodical_guard 0>>【을를】 쳐다본다. <<He>>【이가】 <<his>> 셔츠 주머니에 손을 넣는다. <span class="red">끔찍한 충격이 당신의 몸을 관통하고,</span> 목에서부터 퍼져나간다. 잠시뿐이었지만, 땅에 쓰러져 경련을 일으키기엔 충분했다.<<gtrauma>><<ggstress>><<gggpain>><<trauma 4>><<stress 4>><<pain 4>>
+<br><br>
+당신은 너무 다쳐서 <<methodical_guard 0>>【이가】 수갑을 채우고 식당에서 끌어내는 것에 저항할 수 없다. 다른 죄수들은 당신이 지나갈 때 놀리지만, 악의가 있는 것 같지는 않다.
+<<bind>>
+<br><br>
+<<link [[다음|Prison Punishment]]>><<endevent>><</link>>
+
+:: Prison Lunch
+<<effects>>
+
+<<if pcAreArmsBound("both")>>
+	<<generate1>><<person1>>
+	당신은 다른 죄수들과 함께 줄을 선다. 카운터 뒤의 <<person>>【이가】 멀건 감자 수프를 그릇에 가득 담아 당신의 머리 위에 올려놓는다.
+	<<if $worn.face.type.includes("gag")>>
+	빨대가 포함되어 있어, 재갈 너머로 간신히 밀어 넣을 수 있을지도 모른다.
+	<</if>>
+	<br><br>
+	<<endevent>>
+	<<if $worn.face.type.includes("gag")>>
+		<span class="blue">재갈만 아니었다면 도움을 요청할 수 있었을 것이다.</span>
+		<br>
+	<<else>>
+		<<link [[누군가에게 도움을 요청한다|Prison Breakfast Help]]>><<prison_inmates -1>><</link>><<lrespect>>
+		<br>
+	<</if>>
+	<<link [[조심스럽게 자리를 찾는다|Prison Breakfast Careful]]>><</link>><<dancedifficulty 1 600>>
+	<br>
+<<else>>
+	<<wearProp "lunch tray">>
+	당신은 다른 죄수들과 함께 줄을 서서 감자 수프 한 그릇을 받는다.
+	<<if $worn.face.type.includes("gag")>>
+		빨대가 포함되어 있어, 재갈 너머로 어떻게든 밀어 넣을 수 있을지도 모른다.
+	<</if>>
+	<br><br>
+
+	당신은 빈자리를 찾는다.
+	<<if $prison.protection is "tattooed">>
+		<<generate_tattooed_inmate 0>><<tattooed_inmate 0 cap>><<person1>>【이가】 당신의 앞을 막아선다. "내 <<girl>>【은는】 혼자 앉지 않아." <<he>>【이가】 당신의 팔을 잡으며 말한다.
+		<br><br>
+
+		<<link [[따른다|Prison Lunch Tattooed]]>><<prison_rep tattooed 1>><<prison_attention 1>><</link>><<gperlove>><<gattention prison>>
+		<br>
+		<<link [[거부한다|Prison Lunch Tattooed Refuse]]>><<prison_inmates 1>><</link>><<grespect>>
+	<<else>>
+		<br><br>
+
+		<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Prison Lunch Tattooed
+<<effects>>
+
+당신은 <<tattooed_inmate 0>> 옆에 앉는다. 당신들 양옆은 <<his>> 패거리들이 지키고 있다.
+<<if $prison.tattooed gte 80>>
+	<<He>>【은는】 당신을 "가졌다"고 노골적으로 자랑하며, 지나가는 사람들을 멈춰 세워 당신을 제대로 보게 만든다.
+<<elseif $prison.tattooed gte 20>>
+	<<He>>【은는】 당신을 "가졌다"고 노골적으로 자랑한다.
+<<else>>
+	<<He>>【은는】 많은 관심을 끌며, 당신과 함께 있는 모습을 보여주고 싶어 하는 것 같다.
+<</if>>
+<br><br>
+
+<<if random(1, 2) is 2>>
+	당신은 이따금씩 더듬는 손길을 견뎌낸다.<<gstress>><<stress 6>><<garousal>><<arousal 3 "breasts">><<arousal 3 "bottom">>
+	<br><br>
+<</if>>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Lunch Tattooed Refuse
+<<effects>>
+
+당신은 <<tattooed_inmate 0 apo>> 손을 뿌리친다.
+<<if $prison.tattooed gte 80>>
+	"내가 뭘 어쨌다고?" <<he>>【이가】 묻는다. "좋아. 어떤 새끼가 널 강간하지 않게 조심해."
+<<else>>
+	<<He>>【이가】 당신을 다시 잡지만, <<him>> 옆에 있던 <<generate2>><<person2>><<person>>【이가】 이번에는 <<his>> 팔을 잡고 경비원을 힐끗 본다. <<tattooed_inmate 0 cap>>【은는】 당신을 놓아주고, 쏘아보며 자리를 뜬다.
+<</if>>
+<br><br>
+
+당신은 앉을 자리를 찾아 수프를 먹는다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner
+<<effects>>
+
+<<if pcAreArmsBound("both")>>
+	<<generate1>><<person1>>
+	당신은 다른 죄수들과 함께 줄을 선다. 카운터 뒤의 <<person>>【이가】 모듬 야채 수프와 깍둑썰기한 고기를 그릇에 가득 담는다. <<He>>【이가】 그것을 당신의 머리 위에 올려놓는다.
+	<<if $worn.face.type.includes("gag")>>
+		빨대가 포함되어 있어, 재갈 너머로 어떻게든 밀어 넣을 수 있을지도 모른다. 적어도 수프를 먹기에는 좋다.
+	<</if>>
+	<br><br>
+	<<endevent>>
+	<<if $worn.face.type.includes("gag")>>
+		<span class="blue">재갈만 아니었다면 도움을 요청할 수 있었을 것이다.</span>
+		<br>
+	<<else>>
+		<<link [[누군가에게 도움을 요청한다|Prison Breakfast Help]]>><<prison_inmates -1>><</link>><<lrespect>>
+		<br>
+	<</if>>
+	<<link [[조심스럽게 자리를 찾는다|Prison Breakfast Careful]]>><</link>><<dancedifficulty 1 600>>
+	<br>
+<<else>>
+	<<wearProp "lunch tray">>
+	당신은 다른 죄수들과 함께 줄을 서서 고기 한 덩이와 국자로 뜬 모듬 야채 수프를 받는다.
+	<<if $worn.face.type.includes("gag")>>
+		빨대가 포함되어 있어, 재갈 너머로 어떻게든 밀어 넣을 수 있을지도 모른다. 적어도 수프를 먹기에는 좋다.
+	<</if>>
+	<br><br>
+	<<if $prison.kylar is "active">>
+		카일라가 당신 뒤에 나타나 바싹 따라붙는다.
+		<br><br>
+		<<npc Kylar>><<person1>>
+		<<link [[`<<him>>【이가】 옆에 앉도록 허락한다`|Prison Dinner Kylar]]>><<npcincr Kylar love 1>><<npcincr Kylar rage -1>><<prison_inmates -1>><</link>><<lrespect>><<glove>><<lksuspicion>>
+		<br>
+		<<link [[혼자 앉겠다고 고집한다|Prison Dinner Kylar Refuse]]>><<npcincr Kylar love -1>><<npcincr Kylar rage 1>><<prison_inmates 1>><</link>><<llove>><<gksuspicion>><<grespect>>
+		<br>
+	<<elseif $rng gte 81>>
+		당신은 자리를 찾아 식사를 한다.
+		<br><br>
+		<<generate1>><<person1>>
+		"이봐, <<girl>>." 맞은편의 <<person>>【이가】 말한다. <<He>>【이가】 테이블에 <<his>> 팔꿈치를 올린다. "팔씨름할래?"
+		<br><br>
+
+		<<if pcAreArmsBound("both")>>
+			<span class="blue">팔이 묶인 상태에서는 팔씨름을 할 수 없습니다.</span>
+		<<else>>
+			<<link [[팔씨름한다|Prison Dinner Wrestle]]>><</link>><<physiquedifficulty 2000 15000>>
+		<</if>>
+		<br>
+		<<link [[거절한다|Prison Dinner Wrestle Decline]]>><<prison_inmates -1>><</link>><<lrespect>>
+		<br>
+	<<elseif $rng gte 61>>
+		<<generate1>><<person1>>
+		"어이," 한 <<person>>【이가】 당신 옆에 <<his>> 쟁반을 쾅 내려놓으며 말한다. "여긴 내 자리야."
+		<br><br>
+
+		<<link [[위협한다|Prison Dinner Threaten]]>><<prison_inmates 1>><</link>><<grespect>>
+		<br>
+		<<link [[자리를 옮긴다|Prison Dinner Move]]>><<prison_inmates -1>><</link>><<lrespect>>
+		<br>
+	<<else>>
+		아무도 당신에게 별 관심을 보이지 않는다.
+		<br><br>
+		<<link [[다음|Prison Breakfast Prayer]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Prison Dinner Kylar
+<<effects>>
+
+당신이 자리에 앉자, 카일라가 옆에 앉는다. <<him>>의 반대편에 있던 죄수는 당신에게 불쾌한 시선을 던지며 자리를 옮긴다.
+<br><br>
+
+카일라는 당신이 먹기 전에 당신의 음식을 맛보겠다고 고집한다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Kylar Refuse
+<<effects>>
+
+당신은 붐비는 곳에 자리를 잡는다. 카일라가 당신 옆에 비집고 앉으려 하지만, 옆에 있던 죄수가 <<him>>【을를】 밀어낸다. 카일라는 넘어지고, <<his>> 쟁반은 바닥에 흩어진다.
+<br><br>
+
+<<He>>【은는】 방에서 뛰쳐나가며 <<his>> 얼굴을 가린다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Wrestle
+<<effects>>
+
+당신은 <<his>> 손을 잡고 팔씨름을 한다.
+<<if $physiqueSuccess>>
+	<<He>>【은는】 처음에는 굳건히 버티지만, 일단 당신이 기세를 타자 <span class="green">당신은 <<him>>【을를】 완전히 밀어붙인다.</span> "보기보다 세네." <<he>>【이가】 <<his>> 손을 주무르며 말한다.<<grespect>><<prison_inmates 1>>
+	<br><br>
+<<else>>
+	당신은 온 힘을 다해 버티지만, <span class="red"><<he>>【이가】 기세를 탄다.</span> 그리고 당신의 손을 테이블에 고정시킨다. "잡았다." <<he>>【이가】 자랑스럽게 말한다.<<gpain>><<pain 4>>
+	<br><br>
+<</if>>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Wrestle Decline
+<<effects>>
+
+당신은 도전을 거절한다.
+<br><br>
+
+"겁쟁이." <<he>>【이가】 말하고는, <<him>> 옆에 있는 <<generate2>><<person2>><<person>>【을를】 귀찮게 한다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Threaten
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	당신은 주먹을 꽉 쥐고 일어서서 그 <<person>>【을를】 노려본다. <<gagged_speech "나-난 안 비켜,">> 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	당신은 일어서서 그 <<person>>【을를】 민다. <<gagged_speech "씨발, 어디 한번 해보든가,">> 당신이 말한다.
+<<else>>
+	당신은 일어서서 그 <<person>>【을를】 노려본다. <<gagged_speech "싫어,">> 당신이 말한다. <<gagged_speech "그래서 어쩔 건데?">>
+<</if>>
+<br><br>
+
+<<if $prison.inmates gte random(1, 100)>>
+	<<He>>【은는】 깊은 숨을 들이쉬더니, <span class="green">웃음을 터뜨린다.</span> "알고 보니 여기가 내 자리가 아니었네." <<he>>【이가】 말한다. "계속 앉아." <<He>>【은는】 멀찌감치 떨어진 곳에 앉는다.
+	<br><br>
+
+	<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<He>>【은는】 깊은 숨을 들이쉬더니, <span class="red">주먹을 날리기 위해 팔을 뒤로 뺀다.</span>
+	<br><br>
+
+	<<link [[피한다|Prison Dinner Dodge]]>><</link>><<dancedifficulty 1 500>>
+	<br>
+	<<link [[피하고 굴욕을 준다|Prison Dinner Humiliate]]>><</link>><<dancedifficulty 1 1000>>
+	<br>
+	<<link [[맞받아친다|Prison Dinner Punch]]>><</link>><<physiquedifficulty 1 15000>>
+	<br>
+<</if>>
+
+:: Prison Dinner Dodge
+<<effects>>
+
+<<generate_methodical_guard 1>>
+<<if $danceSuccess>>
+	<span class="green">당신은 몸을 숙여 <<persons>> 주먹 아래로 빙글 돌아 피한다.</span> 다른 죄수들이 환호하지만, 소란을 뚫고 휘파람 소리가 울려 퍼진다.<<grespect>><<prison_inmates 1>>
+	<br><br>
+	"질서!" <<methodical_guard 1>>【이가】 소리친다. "질서를 지켜라!" 당신은 다시 자리에 앉는다. 그 <<person>>【은는】 망설이다가 다른 곳에 자리를 찾는다.
+	<br><br>
+<<else>>
+	당신은 피하려고 하지만, <span class="red">그 <<persons>> 주먹이 당신의 뺨에 적중한다.</span> 당신은 등을 대고 바닥에 쓰러진다.<<gpain>><<gstress>><<lrespect>><<pain 4>><<stress 6>><<prison_inmates -1>>
+	<br><br>
+
+	"질서!" <<methodical_guard 1>>【이가】 소리친다. "질서를 지켜라!" 그 <<person>>【이가】 당신의 자리를 차지하고, 당신은 다른 곳에 앉는다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Humiliate
+<<effects>>
+
+<<generate_methodical_guard 1>>
+<<if $danceSuccess>>
+	<span class="green">당신은 몸을 숙여 <<persons>> 주먹 아래로 빙글 돌아 피하고,</span> <<his>> 바짓단을 잡아 <span class="lewd"><<his>> 무릎까지 끌어내린다.</span>
+	<br><br>
+	<<He>>【은는】 서둘러 <<his>>
+	<<if $NPCList[0].penis isnot "none">>
+		<<print window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【을를】 가린다.
+	<<else>>
+		보지를 서둘러 가린다.
+	<</if>>
+	죄수들이 폭소를 터뜨린다.
+	<<ggrespect>><<prison_inmates 3>>
+	<br><br>
+
+	"질서!" <<methodical_guard 1>>【이가】 소리친다. "질서를 지켜라!" 당신은 다시 자리에 앉는다. 얼굴이 빨개진 그 <<person>>【은는】 다른 곳에 자리를 찾는다.
+	<br><br>
+<<else>>
+	당신은 피하려고 하지만, <span class="red">그 <<persons>> 주먹이 당신의 뺨에 적중한다.</span> 당신은 등을 대고 바닥에 쓰러진다.<<gpain>><<gstress>><<lrespect>><<pain 4>><<stress 6>><<prison_inmates -1>>
+	<br><br>
+
+	"질서!" <<methodical_guard 1>>【이가】 소리친다. "질서를 지켜라!" 그 <<person>>【이가】 당신의 자리를 차지하고, 당신은 다른 곳에 앉는다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Punch
+<<effects>>
+
+<<generate_methodical_guard 1>>
+<<if $physiqueSuccess>>
+	<span class="green">당신이 더 빨랐다.</span> 당신은 <<him>>의 코를 정통으로 가격한다. <<He>>【은는】 소리를 지르며 <<his>> 얼굴을 감싸고 뒤로 비틀거린다. 죄수들이 환호한다.<<ggrespect>><<prison_inmates 3>>
+	<br><br>
+	"질서!" <<methodical_guard 1>>【이가】 소리친다. "질서를 지켜라!" 당신은 자리에 앉는다. 그 <<person>>【은는】 <<his>> 자리를 찾는다.
+	<br><br>
+<<else>>
+	당신은 반격하려 하지만, <span class="red">너무 느리다.</span> <<His>> 주먹이 당신의 얼굴과 충돌하고, 당신은 등을 대고 바닥에 쓰러진다.<<gpain>><<gstress>><<lrespect>><<pain 4>><<stress 6>><<prison_inmates -1>>
+	<br><br>
+
+	"질서!" <<methodical_guard 1>>【이가】 소리친다. "질서를 지켜라!" 그 <<person>>【이가】 당신의 자리를 차지하고, 당신은 다른 곳에 앉는다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Prison Breakfast Prayer]]>><<endevent>><</link>>
+<br>
+
+:: Prison Dinner Move
+<<effects>>
+
+당신은 다른 자리를 찾기로 결심한다. 죄수들은 소동을 기대했지만, 그건 당신의 알 바 아니다.
+<br><br>
+
+<<link [[다음|Prison Breakfast Prayer]]>><</link>>
+<br>

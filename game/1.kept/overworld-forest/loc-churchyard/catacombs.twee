@@ -1,0 +1,677 @@
+:: Catacombs
+<<location "catacombs">><<set $bus to "catacombs">><<set $outside to 0>><<effects>>
+
+숲 아래의 카타콤이다. 위쪽으로는 교회 묘지로 이어지는 계단이 있다. 여섯 팔을 가진 천사상이 가장 낮은 손으로 불붙은 화로를 안고, 당신을 내려다보며 미소 짓고 있다.
+<br><br>
+
+<<if $museumAntiques.antiques.antiqueivorystatuette isnot "found" and $museumAntiques.antiques.antiqueivorystatuette isnot "talk" and $museumAntiques.antiques.antiqueivorystatuette isnot "museum">>
+	작은 조각상이 천사상의 어깨 위에 놓여 있다. 손이 닿을 것 같다.
+	<br><br>
+<</if>>
+
+<<if $worn.face.type.includes("blindfold")>>
+	따뜻한 바람이 얼굴을 스치자 <span class="green">안대가 풀려 떨어지고,</span> 너덜너덜한 천 조각만 남는다. 조금 전까지만 해도 튼튼했다는 것이 믿기지 않는다.
+	<<set $worn.face.type.push("broken")>>
+	<<faceruined>>
+	<br><br>
+<</if>>
+
+<<if $worn.upper.name is "cocoon" or $worn.lower.name is "cocoon bottom">>
+	천사상의 눈이 깜빡인다. 당신을 덮고 있던 거미줄이 느슨해지고 풀리더니, <span class="green">산산조각 난다.</span>
+	<br><br>
+	<<if $worn.upper.name is "cocoon">>
+		<<upperruined>><<handheldruined>>
+	<</if>>
+	<<if $worn.lower.name is "cocoon bottom">>
+		<<lowerruined>>
+	<</if>>
+<</if>>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<i>횃불이 꺼져갈수록 함정과 다른 위험한 것들을 피하기 어려워집니다.</i>
+<br><br>
+
+<<set $eventskip to 1>>
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs normal>>
+<<else>>
+	<<if $museumAntiques.antiques.antiqueivorystatuette isnot "found" and $museumAntiques.antiques.antiqueivorystatuette isnot "talk" and $museumAntiques.antiques.antiqueivorystatuette isnot "museum">>
+		<<antiqueicon "ivory-statuette">><<link [[조각상 가져가기|Catacombs Statuette]]>><</link>><<crime "thievery">>
+		<br>
+	<</if>>
+	<<if pcAreArmsBound("any")>>
+		<<undobindingsicon>><<link [[결박을 태워 끊는다|Catacombs Unbind]]>><<pain 1>><</link>><<gpain>>
+		<br>
+	<</if>>
+	<<if $catacombs_torch lt 100>>
+		<<caveicon "torch">><<link [[횃불에 불 붙이기|Catacombs Light]]>><</link>><<gtorch>>
+		<br>
+	<</if>>
+	<<caveicon "east">><<link [[동쪽으로 걷기 (0:10)|Catacombs Sarcophagi]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷는다 (0:10)|Catacombs Prison]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br><br>
+
+	<<getouticon>><<link [[나간다|Churchyard]]>><<catacombs_end>><</link>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Unbind
+<<effects>>
+
+조각상에 등을 돌리고 결박을 불꽃 위로 가져간다. 열기가 차오르며 따끔한 통증이 느껴진다. 손을 빼려던 찰나, 결박이 불에 타 느슨해진다. 그대로 결박을 끊고 풀려난다.
+<<unbind>>
+<br><br>
+
+<<link [[다음|Catacombs]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Light
+<<effects>><<wearProp "torch">>
+
+<<catacombs_torch 100>>
+횃불을 화로 위로 든다. 횃불이 다시 활활 타오른다. 잠시 동안, 조각상의 눈이 반사된 불꽃으로 불타는 듯하다.
+<br><br>
+
+<<link [[다음|Catacombs]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Statuette
+<<effects>><<wearProp "antique ivory statuette">>
+
+여섯 팔 달린 조각상 위로 올라간다. 팔을 딛고 날개를 지지대 삼아 오르자, 조각상은 의외로 튼튼하다. 곧 작은 조각상과 마주한다. 더 큰 천사상의 축소판이지만, 팔과 머리를 애원하듯 들어 올리고 환하게 미소 짓고 있다는 점이 다르다.
+<br><br>
+
+더 큰 천사의 손에서 작은 천사상을 집어 들고 다시 내려온다. 박물관에나 있을 법한 물건이다.
+<br><br>
+
+<<set $antiquemoney += 500>><<museumAntiqueStatus "antiqueivorystatuette" "found">><<crimeUp 500 "thievery">>
+
+<<link [[다음|Catacombs]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Sarcophagi
+<<effects>><<set $bus to "sarcophagi">>
+
+숲 아래의 카타콤이다. 석관들이 엄청난 힘에 제자리에서 밀려난 듯, 거친 각도로 벽에서 튀어나와 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs normal>>
+<<else>>
+	<<catacombs_plunder "normal">>
+
+	<<caveicon "east">><<link [[동쪽으로 걷기 (0:10)|Catacombs Chasm]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷기 (0:10)|Catacombs]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Prison
+<<effects>><<set $bus to "prison">>
+
+숲 아래의 카타콤이다. 벽과 바닥에는 구멍이 가득하고, 그 구멍마다 쇠창살이 박혀 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs normal>>
+<<else>>
+	<<catacombs_plunder "normal">>
+
+	<<caveicon "east">><<link [[동쪽으로 걷기 (0:10)|Catacombs]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷기 (0:10)|Catacombs Ridge]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Chasm
+<<effects>><<set $bus to "chasm">>
+
+숲 아래의 카타콤이다. 거대한 짐승이 휩쓸고 지나간 듯 한쪽 벽이 무너져, 검고 입을 벌린 균열이 드러나 있다.
+천장에는 거대한 종유석들이 매달려 있다.
+<<if $settings.spidersEnabled>>
+	<span class="blue">그것들 사이의 어둠 속에서 움직임이 보인다.</span> 저 위에 무언가가 있다. 지켜보고 있다.
+<<else>>
+	<span class="blue">그것들 사이에서 희미한 빛이 보인다.</span> 저 위에 무언가가 있다.
+<</if>>
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs normal>>
+<<else>>
+	<<catacombs_plunder "normal">>
+
+	<<if currentSkillValue('tending') gte 500>>
+		<<mysteryicon>><<link [[달래기|Catacombs Chasm Coax]]>><</link>><<note "관리" "green">>
+		<br>
+	<<else>>
+		<<mysteryicon>><span class="blue">저 위의 무언가를 달래서 나오게 하기에는 관리 스킬이 부족합니다.</span>
+		<br>
+	<</if>>
+	<<caveicon "west">><<link [[서쪽으로 걷기 (0:10)|Catacombs Sarcophagi]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Chasm Coax
+<<effects>><<wearProp "torch">>
+
+종유석 위쪽을 향해 부드럽게 달래는 소리를 낸다. 처음에는 희미한 메아리만 돌아올 뿐이다,
+
+<<beastNEWinit 1 spider>>
+<<if !$settings.spidersEnabled>>
+	하지만 이내 빛의 구체가 내려온다. 그것은 당신 앞에 잠시 머물렀다가, 균열의 가장자리를 따라 떠다닌다.
+	<br><br>
+
+	벽에 다다른 빛은 좁은 통로를 비추고, 마치 손짓하듯 잠시 그곳에 머무른다. 그러고는 안으로 떠 들어간다. 균열을 우회하는 숨겨진 통로인 것 같다.
+<<elseif $monster is 1>>
+	하지만 이내 머리 하나가 불쑥 나타나고, 여덟 개의 다리가 뒤따른다. <<beasttype>>【이】지만, <<bhis>> 태도에는 위협적인 기색이 없다. <<bHe>>【은는】 종유석을 기어 내려오다가, 남은 거리는 비단실을 타고 내려와 당신 앞에 착지한다.
+	<br><br>
+
+	"당신에게는 위험한 곳이야," <<bhe>>【이가】 말한다. "원한다면 내가 균열을 건너게 해줄 수 있어. 보기보다 힘이 세거든. 훨씬 더."
+<<else>>
+	하지만 이내 여덟 개의 다리가 기어 나온다. 거대한 <<beasttype>>【이】지만, <<bhis>> 태도에는 위협적인 기색이 없다. <<bHe>>【은는】 종유석을 기어 내려오다가, 남은 거리는 비단실을 타고 내려와 당신 앞에 착지한다.
+	<br><br>
+	<<bHe>>【은는】 몸을 돌려 균열 쪽으로 다가가 <<bhis>> 복부를 낮춘다. <<bHe>>【은는】 당신을 태워 건너가려는 것 같다.
+<</if>>
+<br><br>
+
+<<link [[균열 건너가기 (0:10)|Catacombs Chasm Coax 2]]>><<pass 10>><</link>>
+<br>
+<<link [[머무르기|Catacombs Chasm]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Chasm Coax 2
+<<effects>><<wearProp "torch">>
+
+<<if !$settings.spidersEnabled>>
+	빛을 따라간다. 빛은 돌 속의 비좁은 미로 같은 복도로 당신을 이끌고, 마침내 균열 반대편, 카타콤의 다른 구역으로 나오게 한다. 벽과 바닥에는 이상한 구멍들이 뚫려 있다. 등 뒤의 통로는 어둠 속으로 사라졌다.
+	<br><br>
+
+	장난스럽게 반짝이며, 빛은 천장을 향해 쏘아 올라가 구멍 속에 몸을 숨긴다.
+<<elseif $monster is 1>>
+	<<beasttype>>【이가】 당신 주위를 빙빙 맴돌며 달려든다. 반응하기도 전에, <<bhes>> 당신의 허리에 여러 가닥의 실을 감았다. <<bHe>>【은는】 자신이 내려왔던 실을 타고 올라가, 당신의 발을 땅에서 떼어 공중으로 들어 올린다. "당신을 옮기는 가장 좋은 방법이야," <<bhe>>【이가】 미안한 듯 웃으며 말한다.
+	<br><br>
+
+	<<bHe>>【은는】 천장까지 기어 올라가 균열 위를 쏜살같이 가로지른다. 당신은 <<bhim>> 아래에 매달린 채 발밑의 심연을 의식하며 반대편에 도착한다. <<bHe>>【은는】 당신을 부드럽게 내려준 다음, <<bhimself>> 내려와 허리에 감긴 실을 찢어낸다.
+	<br><br>
+
+	"봤지?" <<bHe>>【이가】 씨익 웃는다. "강하지!" <<bhe>>【은는】 도약하여 벽을 타고 올라가 다시 한번 어둠 속으로 사라진다. 카타콤의 다른 구역에 와 있다. 벽과 바닥에는 이상한 구멍들이 가득하다.
+<<else>>
+	<<beasttype>>의 복부 위로 올라가고, <<bhe>>【이가】 덜컹거리며 움직이기 시작하자 <<bhis>> 자루마디를 팔로 감싼다. <<bHe>>【은는】 비단실 가닥을 타고 재빨리 올라가, 아래에서는 보이지 않던 수평 거미줄 위로 올라선다. <<bHe>>【은는】 균열 위에 걸려 있는 거의 보이지 않는 그물망을 가로질러 달린다. 발밑의 심연을 의식하며 꽉 매달린다.
+	<br><br>
+
+	<<bHe>>【은는】 반대편에 도착하여 다른 가닥을 타고 재빨리 내려온다. 당신이 내려오자마자 거미는 매달린 실 위로 몸을 날려 어둠 속으로 사라진다. 카타콤의 다른 구역에 와 있다. 벽과 바닥에는 이상한 구멍들이 가득하다.
+<</if>>
+<br><br>
+
+<<link [[다음|Catacombs Bores]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Ridge
+<<effects>><<set $bus to "ridge">>
+
+숲 아래의 카타콤이다. 거대한 짐승이 휩쓸고 지나간 듯 한쪽 벽이 무너져 어두운 심연을 드러내고 있다. 낭떠러지는 가파르지만 수직은 아니다. 조심하면 기어 내려갈 수 있을 것이다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs normal>>
+<<else>>
+	<<catacombs_plunder "normal">>
+
+	<<caveicon "east">><<link [[동쪽으로 걷는다 (0:10)|Catacombs Prison]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+	<<caveicon "south">><<link [[내려간다 (0:01)|Catacombs Mud Climb]]>><<pass 1>><</link>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Mud Climb
+<<effects>><<wearProp "torch">>
+
+한 걸음 내딛을 때마다 발 디딜 곳을 확인하며 심연으로 몸을 낮춘다. 부서진 석조물과 자연석은 튼튼해서, 바닥에 닿는 것은 어렵지 않다.
+<br><br>
+
+어둠이 당신을 감싼다. 멀리서 물이 흐르는 소리가 들린다.
+<br><br>
+
+<<link [[다음|Catacombs Mud]]>><</link>>
+<br>
+
+:: Catacombs Mud
+<<effects>><<set $bus to "mud">>
+
+숲 아래의 카타콤이다. 돌 사이로 거대한 고랑이 파여 있고, 그 너머로 광활한 진흙탕이 어둠 속까지 뻗어 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs barrow>>
+<<else>>
+	<<catacombs_plunder "barrow">>
+
+	<<caveicon "north">><<link [[올라간다 (0:01)|Catacombs Ridge Climb]]>><<pass 1>><</link>><<catacombs_exit_indicator>>
+	<br>
+	<<caveicon "east">><<link [[동쪽으로 걷는다 (0:10)|Catacombs Masonry]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Ridge Climb
+<<effects>><<wearProp "torch">>
+
+경사면을 가로지른다. 오르기보다는 기어가는 것에 가깝게, 몸무게를 지탱해 줄 단단한 바위를 더듬으며 나아간다. 꼭대기에 도달하자, 제대로 된 카타콤이 나타난다.
+<br><br>
+
+<<link [[다음|Catacombs Ridge]]>><</link>>
+<br>
+
+:: Catacombs Masonry
+<<effects>><<set $bus to "masonry">>
+
+숲 아래의 카타콤이다. 돌 사이로 거대한 고랑이 파여 있고, 그중 다수는 무너져 내린 거대한 석조물 덩어리에 막혀 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs barrow>>
+<<else>>
+	<<catacombs_plunder "barrow">>
+
+	<<caveicon "east">><<link [[동쪽으로 걷는다 (0:10)|Catacombs Barrow]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷는다 (0:10)|Catacombs Mud]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Barrow
+<<effects>><<set $bus to "barrow">>
+
+숲 아래의 카타콤이다. 돌 사이로 거대한 고랑이 파여 있다. 그 위로 거대한 둔덕이 솟아 있다.
+<br><br>
+
+<<if $museumAntiques.antiques.antiquesilvercrown isnot "found" and $museumAntiques.antiques.antiquesilvercrown isnot "talk" and $museumAntiques.antiques.antiquesilvercrown isnot "museum">>
+	둔덕 안으로 이어지는 작은 터널이 있다.
+	<br><br>
+<</if>>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs barrow>>
+<<else>>
+	<<catacombs_plunder "barrow">>
+
+	<<caveicon "east">><<link [[동쪽으로 걷는다 (0:10)|Catacombs Stream]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷는다 (0:10)|Catacombs Masonry]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+	<<if $museumAntiques.antiques.antiquesilvercrown isnot "found" and $museumAntiques.antiques.antiquesilvercrown isnot "talk" and $museumAntiques.antiques.antiquesilvercrown isnot "museum">>
+		<<getouticon "hole">><<link [[둔덕으로 들어간다|Catacombs Crown]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Crown
+<<effects>><<wearProp "torch">>
+
+터널로 들어간다. 천장이 너무 낮아 몸을 웅크려야 했지만, 곧 둥근 방으로 나온다. 가운데 솟아오른 땅 위에는 돌무덤이 있다. 그 앞에는 땅에서 솟아오른 석판이 있고, 그 위에는 은 왕관이 놓여 있다.
+<br><br>
+
+<<antiqueicon "silver-crown">><<link [[가져간다|Catacombs Crown 2]]>><</link>><<crime "thievery">>
+<br>
+<<getouticon>><<link [[나간다|Catacombs Barrow]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Crown 2
+<<effects>><<wearProp "antique silver crown">>
+
+왕관을 집어 든다. 땅이 흔들려 하마터면 넘어질 뻔하고, 천장에서 흙덩이가 떨어져 내린다. 서둘러 터널로 달려가, 흙더미에 파묻히기 전에 간신히 탈출한다.
+<br><br>
+
+왕관을 살펴본다. 앞면에는 한때 무언가 채워져 있었을 홈이 파여 있고, 금속은 세월에 부식되었지만 그 외에는 온전하다. 박물관에나 있을 법한 물건이다.
+<br><br>
+
+<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquesilvercrown" "found">><<crimeUp 1200 "thievery">>
+
+<<link [[다음|Catacombs Barrow]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Stream
+<<effects>><<set $bus to "stream">>
+
+숲 아래의 카타콤이다. 돌에 파인 커다란 고랑을 따라 시냇물이 흐른다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs barrow>>
+<<else>>
+	<<catacombs_plunder "barrow">>
+
+	<<caveicon "east">><<link [[동쪽으로 걷는다 (0:10)|Catacombs Stalagmites]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷는다 (0:10)|Catacombs Barrow]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Stalagmites
+<<effects>><<set $bus to "stalagmites">>
+
+숲 아래의 카타콤이다. 바위 이빨 같은 뾰족한 돌들이 바다처럼 펼쳐져 동쪽 통로를 막고 있지만, 북쪽으로는 가파른 경사면이 솟아 있다. 기어 올라갈 수 있을지도 모른다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs barrow>>
+<<else>>
+	<<catacombs_plunder "barrow">>
+
+	<<caveicon "north">><<link [[올라간다 (0:01)|Catacombs Bores Climb]]>><<pass 1>><</link>>
+	<br>
+	<<caveicon "west">><<link [[서쪽으로 걷는다 (0:10)|Catacombs Stream]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Bores Climb
+<<effects>><<wearProp "torch">>
+
+돌 경사면을 오른다. 이상한 구멍들이 있어 잡기 좋으며, 특히 꼭대기 근처에 많다.
+<br><br>
+
+화려한 홀의 폐허로 나온다. 깨진 석기 그릇과 도자기들이 땅에 널려 있어 발밑에서 바삭거리는 소리를 낸다.
+<br><br>
+
+<<link [[다음|Catacombs Bores]]>><</link>>
+<br>
+
+:: Catacombs Bores
+<<effects>><<set $bus to "bores">>
+
+숲 아래의 카타콤이다. 머리 위로 파이프와 케이블이 이상한 구멍들을 통해 어지럽게 얽혀 있다.
+<<if $settings.spidersEnabled>>
+	<span class="blue">그것들 사이의 어둠 속에서 움직임이 보인다.</span> 저 위에 무언가가 있다. 지켜보고 있다.
+<<else>>
+	<span class="blue">그것들 사이에서 희미한 빛이 보인다.</span> 저 위에 무언가가 있다.
+<</if>>
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs compound>>
+<<else>>
+	<<catacombs_plunder "compound">>
+
+	<<if currentSkillValue('tending') gte 500>>
+		<<mysteryicon>><<link [[달래기|Catacombs Bores Coax]]>><</link>><<note "관리" "green">>
+		<br>
+	<<else>>
+		<<mysteryicon>><span class="blue">저 위의 무언가를 달래서 나오게 하기에는 관리 스킬이 부족합니다.</span>
+		<br>
+	<</if>>
+	<<caveicon "north">><<link [[북쪽으로 걷는다 (0:10)|Catacombs Engravings]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "south">><<link [[내려간다 (0:01)|Catacombs Stalagmites Climb]]>><<pass 1>><</link>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Bores Coax
+<<effects>><<wearProp "torch">>
+
+구멍 위쪽을 향해 부드럽게 달래는 소리를 낸다. 처음에는 희미한 메아리만 답할 뿐,
+
+<<beastNEWinit 1 spider>>
+<<if !$settings.spidersEnabled>>
+	이내 구멍에서 빛의 구체가 나타난다. 그것은 당신 앞에서 잠시 맴돌다가, 틈새의 가장자리를 따라 떠다닌다.
+	<br><br>
+
+	빛은 벽에 도착하여 좁은 통로를 비추고, 마치 손짓하듯 잠시 그곳에 머문다. 그러고는 안으로 떠 들어간다. 틈새를 우회하는 숨겨진 통로인 것 같다.
+<<elseif $monster is 1>>
+	이내 머리 하나가 불쑥 나타나고, 이어서 여덟 개의 팔다리가 보인다. <<beasttype>>【이】지만, <<bhis>> 태도에는 위협적인 기색이 없다. <<bHe>>【은는】 비단실에 의지해 구멍에서 기어 나와 벽을 타고 내려와 당신 앞에 착지한다.
+	<br><br>
+
+	"다른 인간들과는 친구가 아니군," <<bhe>>【이가】 묻는다. "괜찮다면 내가 틈새를 건너게 해줄 수 있어. 출구가 더 가까워. 보기보다 힘이 세거든. 훨씬 더."
+<<else>>
+	이내 여덟 개의 다리가 기어 나오는 것이 보인다. 거대한 <<beasttype>>【이】지만, <<bhis>> 태도에는 위협적인 기색이 없다. <<bHe>>【은는】 비단실에 의지해 구멍에서 기어 나와 벽을 타고 내려와 당신 앞에 착지한다.
+	<br><br>
+
+	<<bHe>>【은는】 몸을 돌려 틈새를 향해 걸어가며 <<bhis>> 복부를 낮춘다. <<bHe>>【은는】 당신을 건너편으로 옮겨주려는 것 같다.
+<</if>>
+<br><br>
+
+<<link [[틈새를 건너간다 (0:10)|Catacombs Bores Coax 2]]>><<pass 10>><</link>>
+<br>
+<<link [[머무른다|Catacombs Bores]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Bores Coax 2
+<<effects>><<wearProp "torch">>
+
+<<if !$settings.spidersEnabled>>
+	빛을 따라간다. 빛은 돌로 된 좁은 복도의 미로를 지나, 당신을 카타콤의 다른 구역, 거대한 틈의 반대편으로 이끈다. 어둠 속에서 종유석이 매달려 있다. 등 뒤의 통로는 그림자 속으로 사라졌다.
+	<br><br>
+
+	장난스럽게 반짝이며, 빛은 천장을 향해 쏘아 올라가 종유석들 사이에 숨는다.
+<<elseif $monster is 1>>
+	<<beasttype>>【이가】 당신 주위를 맴돈다. 반응하기도 전에, <<bhes>> 당신의 허리에 여러 가닥의 실을 감았다. <<bHe>>【은는】 내려왔던 실을 타고 올라가, 당신의 발을 땅에서 떼어 공중으로 끌어올린다. "당신을 옮기는 가장 좋은 방법이에요." <<bhe>>【은는】 미안한 듯 웃으며 말한다.
+	<br><br>
+
+	<<bHe>>【은는】 천장까지 기어 올라가 틈을 가로질러 돌진한다. 당신은 <<bhim>> 아래에 매달린 채 발밑의 심연을 의식하며 반대편에 도달한다. <<bHe>>【은는】 당신을 부드럽게 내려준 다음, 직접 내려와 허리에 감긴 실을 찢어낸다.
+	<br><br>
+
+	"봤죠?" <<bHe>>【이가】 씨익 웃는다. "강하죠!" <<bhe>>【은는】 도약하여 벽을 타고 올라가 다시 어둠 속으로 사라진다. 카타콤의 다른 구역에 있다. 어둠 속에서 종유석이 매달려 있다.
+<<else>>
+	<<beasttype>>의 복부 위로 올라가고, <<bhe>>【이가】 움직이기 시작하자 <<bhis>> 배자루에 팔을 감는다. <<bHe>>【은는】 비단실을 타고 재빨리 올라가, 아래에서는 보이지 않던 수평 거미줄 위로 올라선다. <<bHe>>【은는】 틈을 가로질러 걸려 있는, 거의 보이지 않는 그물망 위를 달린다. 당신은 발밑의 심연을 의식하며 꽉 매달린다.
+	<br><br>
+
+	<<bHe>>【은는】 반대편에 도착하여 다른 실을 타고 재빨리 내려간다. 당신이 내려오자마자 거미는 매달린 실 위로 몸을 날려 어둠 속으로 사라진다. 카타콤의 다른 구역에 있다. 어둠 속에서 종유석이 매달려 있다.
+<</if>>
+<br><br>
+
+<<link [[다음|Catacombs Chasm]]>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Stalagmites Climb
+<<effects>><<wearProp "torch">>
+
+틈 아래로 몸을 내린다. 곳곳에 파인 구멍을 잡고 내려가니 바닥까지 닿는 것은 어렵지 않다.
+<br><br>
+
+어둠이 당신을 감싼다. 발치로 물이 세차게 흐른다.
+<br><br>
+
+<<link [[다음|Catacombs Stalagmites]]>><</link>>
+<br>
+
+:: Catacombs Engravings
+<<effects>><<set $bus to "engravings">>
+
+숲 아래의 카타콤이다. 머리 위로 파이프와 케이블이 이리저리 얽혀 있고, 벽은 해골 조각으로 장식되어 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs compound>>
+<<else>>
+	<<catacombs_plunder "compound">>
+
+	<<caveicon "north">><<link [[북쪽으로 걷는다 (0:10)|Catacombs Museum]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "south">><<link [[남쪽으로 걷는다 (0:10)|Catacombs Bores]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Museum
+<<effects>><<set $bus to "museum">>
+
+숲 아래의 카타콤이다. 머리 위로 파이프와 케이블이 이리저리 얽혀 있고, 바닥에는 깨진 유리가 흩어져 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs compound>>
+<<else>>
+	<<catacombs_plunder "compound">>
+
+	<<caveicon "north">><<link [[북쪽으로 걷는다 (0:10)|Catacombs Statues]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "south">><<link [[남쪽으로 걷는다 (0:10)|Catacombs Engravings]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Statues
+<<effects>><<set $bus to "statues">>
+
+숲 아래의 카타콤이다. 머리 위로 파이프와 케이블이 이리저리 얽혀 있고, 세월에 닳은 석상들이 부서진 관문을 지키고 있다.
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs compound>>
+<<else>>
+	<<catacombs_plunder "compound">>
+
+	<<caveicon "north">><<link [[북쪽으로 걷는다 (0:10)|Catacombs Compound]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>>
+	<br>
+	<<caveicon "south">><<link [[남쪽으로 걷는다 (0:10)|Catacombs Museum]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Compound
+<<effects>><<set $bus to "compound">>
+
+숲 아래의 카타콤이다. 머리 위에서 파이프와 케이블이 진동하며, 반쯤 부서진 기둥들을 뱀처럼 휘감고 있다.
+<<if $museumAntiques.antiques.antiquewhitecrystal isnot "found" and $museumAntiques.antiques.antiquewhitecrystal isnot "talk" and $museumAntiques.antiques.antiquewhitecrystal isnot "museum">>
+	그것들은 모두 같은 방향, 웅웅거리는 기계를 향해 뻗어 있다. 그 중심에는 빛나는 하얀 수정이 매달려 있다. 희미한 빛이 긴 그림자를 드리운다.
+<</if>>
+<br><br>
+
+<<catacombs_torch_text>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutcatacombs>>
+<<elseif $eventskip isnot 1>>
+	<<events_catacombs compound>>
+<<else>>
+	<<if $museumAntiques.antiques.antiquewhitecrystal isnot "found" and $museumAntiques.antiques.antiquewhitecrystal isnot "talk" and $museumAntiques.antiques.antiquewhitecrystal isnot "museum">>
+		<<antiqueicon "crystal">><<link [[수정에 접근한다|Catacombs Crystal]]>><</link>>
+		<br><br>
+	<</if>>
+
+	<<catacombs_plunder "compound">>
+
+	<<caveicon "south">><<link [[남쪽으로 걷는다 (0:10)|Catacombs Statues]]>><<pass 10>><<catacombs_torch -5>><</link>><<ltorch>><<catacombs_exit_indicator>>
+	<br>
+<</if>>
+
+<<set $eventskip to 0>>
+
+:: Catacombs Crystal
+<<effects>><<wearProp "torch">>
+
+기계에 접근한다. 가까이 다가갈수록 땅이 진동하고, 금속 갈퀴가 수정을 제자리에 고정하고 있는 것이 보인다. 무엇이든 간에, 중요해 보이고 꽤 값나가는 물건일지도 모른다.
+<br><br>
+
+<<antiqueicon "crystal">><<link [[가져간다|Catacombs Crystal 2]]>><</link>><<gcrime "thievery">>
+<br>
+<<getouticon>><<link [[물러난다|Catacombs Compound]]>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Catacombs Crystal 2
+<<effects>><<wearProp "antique crystal">>
+<<earnFeat "Dark Delvings">>
+수정을 꺼낸다. 갈래진 부분은 저항 없이 수정을 놓아준다. 안쪽에는 어떻게든 새겨 넣은 듯한 조각이 보인다.
+<br><br>
+
+더 자세히 살펴보기 전에, <span class="red">경보가 울린다.</span> 몸을 돌려 달린다. 기둥들을 지나 뱀처럼 뻗어 나간 통로 중 하나로 들어간다. 뒤에서 발소리가 들리지만, 이내 미로 속에서 따돌린다.
+<br><br>
+
+<<set $antiquemoney += 2000>><<museumAntiqueStatus "antiquewhitecrystal" "found">><<crimeUp 1000 "destruction">><<crimeUp 1000 "thievery">>
+
+<<link [[다음|Catacombs Compound]]>><<set $eventskip to 1>><</link>>
+<br>

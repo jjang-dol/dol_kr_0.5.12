@@ -1,0 +1,2153 @@
+:: Farmland Manors
+<<set $outside to 1>><<effects>><<location "farm_manors">>
+
+당신은 값비싼 시골 저택들이 숨겨진 곳에 있다.
+<<if Time.dayState is "night">>
+	주변의 덤불이 당신을 할퀸다.
+<<elseif Time.dayState is "dawn">>
+	주황빛이 머리 위 캐노피를 뚫고 들어온다.
+<<elseif Time.dayState is "dusk">>
+	당신은 깔따구 떼를 피한다.
+<<else>>
+	멀리서 바다 소리가 들린다.
+<</if>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	모든 것이 너무 벅차다. 당신은 기절한다.
+	<br><br>
+
+	<<link [[모든 것이 암전된다...|Farmland Dungeon Wake]]>><</link>>
+	<br>
+<<else>>
+	<<lockicon "pick">><<link [[저택에 침입한다 (0:05)|Farmland Manors Lock]]>><<pass 5>><</link>>
+	<br>
+	<<getouticon>><<link [[떠난다 (0:10)|Farmland]]>><<pass 10>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Lock
+<<set $outside to 0>><<effects>>
+
+당신은 저택 중 하나에 접근한다. 이곳의 많은 저택처럼, 예전에는 농장의 일부였다. 벽은 두껍고, 창문은 높으며, 자물쇠는 보기보다 더 정교하다. 카메라가 그것을 지켜보고 있고, 다른 것들도 있다. 많은 눈들이 잎사귀 속에서, 혹은 오래된 석조물 사이의 구석에 숨어서 관찰하고 있다.
+<br><br>
+
+인상적인 보안이다. 그에 비해 덜 인상적인 것은 식물과 철조망으로 가려진 문에 달린 자물쇠다.
+<br><br>
+
+<<set $lock to 600>>
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("any")>>
+		자물쇠를 딸 수 있을 것 같지만, <span class="blue">팔이 묶여있다.</span>
+		<br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+		<<lockicon "pick">><<link [[자물쇠를 딴다 (0:10)|Farmland Manors Sneak]]>><<endevent>><<pass 10>><<crimeUp 1 "trespassing">><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span><<skulduggeryrequired>>
+	<br><br>
+<</if>>
+<<getouticon>><<link [[떠난다|Farmland Manors]]>><<endevent>><</link>>
+<br>
+
+:: Farmland Manors Sneak
+<<effects>>
+
+당신은 성공적으로 자물쇠를 따고 거처로 들어간다.
+<br><br>
+
+<<skulduggeryuse 700 "locks">>
+
+당신은 저택으로 들어가 가치 있는 물건을 찾기 위해 몰래 돌아다닌다.
+<br><br>
+<<cleareventpool>>
+
+<<addinlineevent "farmland_manors_1">>
+	내부는 답답하고 습하다. 천장의 얼룩은 곰팡이를 암시하지만, 그 외에는 잘 관리된 것처럼 보인다.
+	<br><br>
+	저택을 탐색했지만 특이하거나 값비싼 물건은 찾지 못했다. 그러다 이국적인 식물로 가득한 거대한 방을 우연히 발견한다. 천장의 대부분이 창문으로 되어 있다. 온실 같은 느낌이다.
+	<br><br>
+	<<link [[다음|Farmland Manors Plants Explore]]>><</link>>
+	<br>
+
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_2">>
+	<<generate1>><<person1>>
+	벽은 야한 장식으로 두껍게 덮여 있다. 값나가거나 들고 가기 쉬워 보이는 것은 없다. 한 방을 엿보니, 마찬가지로 취향이 형편없다.
+	<br><br>
+
+	등 뒤의 방에서 코 고는 소리가 들린다. 모퉁이 너머로 엿본다. <<person>>【이가】 안락의자에 앉아 있다. <<his>> 목에는 값비싸 보이는 금목걸이가 걸려 있고, <span class="red">산탄총</span> 한 자루가 <<his>> 무릎에 기대어 있다.
+	<br><br>
+	<<set $skulduggerydifficulty to 900>>
+	<<link [[금목걸이를 훔친다|Farmland Manors Chain]]>><</link>><<skulduggerydifficulty>>
+	<br>
+	<<link [[더 쉬운 전리품을 찾는다 (0:10)|Farmland Manors Easier]]>><<pass 10>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_3">>
+	당신은 잘 장식된 복도를 걸으며 훔칠 만한 것을 찾는다. 몇몇 그림은 값비싸 보이지만, 들고 가기에는 너무 크다.
+	<br><br>
+	<<beastNEWinit 3 dog>>
+	문을 하나 열자, 활활 타오르는 불 옆에 <<beasttype>> 한 마리가 웅크리고 잠들어 있는 것이 보인다. 당신은 소리 없이 문을 닫고 다른 곳을 살핀다.
+	<br><br>
+   작업을 마치기 전에 <<beastsplural>> 두 마리를 더 발견했지만, 잡동사니들을 긁어모으는 데 성공했다. 브로커에게 넘기면 다 합쳐서 <<printmoney 7500>> 정도의 가치가 있을 것 같다.
+	<br><br>
+
+	등 뒤에서 작은 방울 소리가 들린다. 이어서 두 번째, 세 번째 소리가 들린다. <<beastsplural>> 세 마리가 각기 다른 방에서 나타나, 당신을 보며 이빨을 드러낸다.
+	<br><br>
+
+	<<if $monster is 1 or $settings.bestialityEnabled>>
+		<<link [[스스로를 방어한다|Farmland Manors Dog Sex]]>><<set $molestationstart to 1>><</link>>
+		<br>
+		<<if hasSexStat("deviancy", 3)>>
+				<<link [[네 발로 엎드린다|Farmland Manors Dog Fours]]>><</link>><<deviant3>>
+				<br>
+		<</if>>
+	<<else>>
+		당신은 몸을 돌려 저택에서 도망친다. 밖의 덤불 속에서 추격자들을 따돌리는 데 성공하지만, 부상을 피하지는 못했다. <<beastescape>>
+		<br><br>
+		<<link [[다음|Farmland Manors]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_4">>
+	방들은 비어 있다. 아무도 살지 않는 것 같다. 바닥에는 보라색 자국이 있다. 무언가 무거운 것이 끌린 자국이다. 지하실에서 낮은 진동음이 들려온다.
+	<br><br>
+	당신은 소리 없이 계단을 내려간다. 썩어가는 지하실 중앙에 딱정벌레 모양의 커다란 기계가 놓여 있다. 발밑으로 그 진동이 느껴진다. 그 옆 탁자 위에는 노트북이 열려 있다.
+	<br><br>
+   암시장에서 노트북 값으로 <<printmoney 5000>>【을를】 받을 수 있을 것이다. 귀중한 정보가 들어있다면 더 받을 수도 있다.
+	<br><br>
+
+	<<link [[노트북을 확인한다 (0:05)|Farmland Manors Laptop Check]]>><<pass 5>><</link>><<difficulty 50>>
+	<br>
+   <<link [[그냥 낚아채서 도망친다|Farmland Manors Laptop Snatch]]>><<crimeUp 50 "thievery">><<set $blackmoney += 50>><</link>><<crime "thievery">>
+	<br>
+	<<link [[빈손으로 떠난다|Farmland Manors]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_5">>
+	수상할 정도로 긴 방의 반대편 쿠션 위에 보석이 놓여 있는 것을 발견한다. 벽을 자세히 보니 기계들이 튀어나와 있다. 레이저 감지선이다.
+	<br><br>
+
+   <<link [[인계철선을 피한다|Farmland Manors Tripwires]]>><<crimeUp 100 "thievery">><<set $blackmoney += 100>><</link>><<dancedifficulty 1 1000>><<crime "thievery">>
+	<br>
+	<<link [[떠난다|Farmland Manors]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_6">>
+	<<generateyv1>><<person1>><<saveNPC 0 "farmland_manors_victim">>
+
+	앞쪽, 은식기와 술이 실린 카트 옆 문 너머에서 목소리가 들린다. 문틈으로 엿본다. <<person>>【이가】 테이블 위에 벌거벗은 채로 사지가 묶여 누워 있다. <<His>> 눈은 당신을 꿰뚫어 보는 듯 멍하다.
+	<<endevent>>
+	<<generate1>><<generate2>><<generate3>><<generate4>>
+	네 명의 <<people>>【이가】 테이블 주위에 앉아 샴페인을 마시며 허튼소리를 하고 있다.
+	<br><br>
+
+	식사하는 사람들은 꽤 취한 것 같다. <<person1>><<person>>【이가】 자리에서 일어나 당신 쪽으로 비틀거리며 다가온다. <<he>>【이가】 카트에서 와인 한 병을 꺼내는 동안 당신은 그림자 속에 숨는다. 만약 구출을 시도한다면, 약간의 노력으로 그들을 제압할 수 있을 것이다. 그들 모두와 싸우는 것은 어려울 것이다.
+	<br><br>
+
+	<<link [[정교한 구출 계획을 세운다 (1:30)|Farmland Manors Rescue Elaborate]]>><<famegood 5>><<pass 90>><</link>>
+	<br>
+	<<link [[돌격!|Farmland Manors Rescue Charge]]>><<famescrap 5>><</link>>
+	<br>
+   <<link [[은식기를 챙겨서 떠난다|Farmland Manors]]>><<crimeUp 40 "thievery">><<set $blackmoney += 40>><<endevent>><<clearNPC "farmland_manors_victim">><</link>><<crime "thievery">>
+	<br>
+	<<link [[그냥 떠난다|Farmland Manors]]>><<endevent>><<clearNPC "farmland_manors_victim">><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_7">>
+	벽은 낡아 보이고, 발걸음을 옮길 때마다 먼지층이 흩날린다. 방들은 간간이 놓인 덮개 씌운 가구 외에는 텅 비어 있다. 2층의 한 특별한 방에 도달하기 전까지는 들고 갈 만한 것을 찾지 못했다. 그 방은 다른 방들보다 길고, 반대편 벽에는 천이 덮여 있다. 그 아래로 그림이나 거울 같은 것의 윤곽이 보인다.
+	<br><br>
+
+	당신은 그곳으로 다가간다. 머리카락이 쭈뼛 서는 느낌이 든다. 당신은 천에 손을 대고 벽에서 끌어내린다.
+	<br><br>
+
+	기괴하고 인간이 아닌 얼굴의 초상화가 당신을 쳐다보고 있다. 턱은 벌어져 긴 송곳니를 드러내고 있지만, 눈이 가장 시선을 끈다. 한쪽 눈은 텅 빈 구덩이로, 뺨을 가로질러 어두운 얼룩이 뻗어 있다. 다른 쪽 눈에는 보석이 박혀 있다. 값비싸 보인다.
+	<br><br>
+
+
+   <<link [[보석을 떼어낸다 (0:20)|Farmland Manors Sheet]]>><<stress 6>><<pass 20>><<set $blackmoney += 120>><<crimeUp 120 "thievery">><</link>><<crime "thievery">>
+	<br>
+	<<link [[떠난다|Farmland Manors]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<if $farmland_maze_found isnot true>>
+	<<addinlineevent "farmland_manors_8">>
+		<<set $farmland_maze_found to true>>
+
+		당신은 노란 조명이 줄지어 매달려 있는 단조로운 나무 복도를 따라간다. 모퉁이를 돌자 부서진 아치 길 앞, 바깥으로 나온다. 길이 그 사이를 구불구불 지나 언덕 위로 이어져, 높은 돌담의 문으로 연결된다. 그 위 돌에는 뱀이 새겨져 있다. 저 너머로 구멍이 가득한 높은 천장이 보인다. 부서진 타일이 바닥을 덮고 있다. 당신은 자물쇠를 딴다.
+		<br><br>
+		<<generate1>><<person1>>
+		"이곳을 찾는 사람은 많지 않지." <<personssimple>> 목소리가 들린다. 돌아보니, 범인은 삽에 기댄 채 서 있다. "이게 뭔지 아나?"
+		<br><br>
+
+		<<if $historytrait gte 4>>
+			<span class="green">윈터가 그것에 대해 지루하게 설명하던 것을 기억하는 것 같다.</span>
+			<br><br>
+			<<link [[아는 것을 말한다|Maze Intro Explain]]>><</link>>
+			<br>
+		<<else>>
+			<<link [[추측한다|Maze Intro Guess]]>><</link>>
+			<br>
+		<</if>>
+		<<link [[고개를 젓는다|Maze Intro Shake]]>><</link>>
+		<br>
+	<</addinlineevent>>
+<</if>>
+
+<<addinlineevent "farmland_manors_9">>
+	내부는 품위 있게 장식되어 있다. 당신은 복도를 돌아다니며 값비싸고 들고 가기 쉬운 물건들을 챙기다가, 문 위에 보안 카메라가 달린 침실을 발견한다. 안에서 본 첫 번째 카메라이며, 눈에 띄지 않는 맨 벽을 향하고 있다.
+	<br><br>
+
+	<<link [[벽을 조사한다|Farmland Manors Wall Investigate]]>><</link>>
+	<br>
+   <<link [[부당하게 얻은 이득을 챙겨 떠난다|Farmland Manors]]>><<set $blackmoney += 40>><<crimeUp 40 "thievery">><</link>><<crime "thievery">>
+	<br>
+	<<link [[그냥 떠난다|Farmland Manors]]>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<addinlineevent "farmland_manors_10">>
+	<<generate1>><<generatev2>><<person1>>
+	위층에서 목소리가 들린다. <<personsimple>>【이가】 화난 어조로 무언가 말한다. <<person2>><<personsimple>>【은는】 희미한 비명으로 답한다.
+	<br><br>
+	당신은 목소리가 들리는 방을 향해 계단을 살금살금 올라가 문틈으로 엿본다. <<person2>><<person>>【이가】 두 개의 높은 침대 기둥 사이에 묶여 있고, 입에는 천 재갈이 물려 있으며 허리 위로는 벌거벗고 있다. <<person1>><<person>>【이가】 <<person2>><<him>> 뒤에 서서, <<person1>><<his>> 손에 채찍을 팽팽하게 쥐고 있다.
+	<br><br>
+
+	"물건이 이유 없이 사라지진 않지." 그 <<person>>【은는】 채찍질을 준비하며 말한다. "네가 도둑이 아니더라도, 넌 날 섬겨야 해. 내 재산을 지키지 못한 책임을 네게 묻겠다." <<He>>【이가】 내리친다. 재갈이 <<person2>><<persons>> 비명을 희미하게 만든다.
+	<br><br>
+
+	<<link [[개입한다|Farmland Manors Bound Intervene]]>><</link>>
+	<br>
+   <<link [[챙길 수 있는 것만 챙겨서 떠난다|Farmland Manors Bound Snatch]]>><<moneyGain 30 true true>><<endevent>><</link>><<crime "thievery">>
+	<br>
+	<<link [[그냥 떠난다|Farmland Manors]]>><<endevent>><</link>>
+	<br>
+<</addinlineevent>>
+
+<<runeventpool>>
+
+
+:: Farmland Dungeon Hood
+<<effects>>
+눈이 가려진 채로, <<person>>【은는】 당신을 걷게 한다. 당신은 몇 번이나 발을 헛디딘다. 당신을 붙잡은 자는 그때마다 웃으며, 거친 손으로 당신을 일으켜 세운다.
+<<pass 10>>
+<br><br>
+몇 분 동안 계속 실내를 걷는 것 같더니, 갑자기 뒤에서 무언가 단단한 것이 발목을 후려쳐 당신을 바닥에 넘어뜨린다.
+<br><br>
+
+"또 보자고." <<person>>【이가】 말한다. <<he>>【이가】 멀어지는 발소리가 들린다.
+<br><br>
+<<endcombat>>
+<<link [[다음|Farmland Dungeon Intro]]>><</link>>
+<br>
+
+:: Farmland Dungeon Wake
+<<effects>>
+
+<<facewear "blindfold">>
+<<pass 60>>
+<<passout>>
+
+정신을 차린다. 여기가 어딘지 알 수 없다. 아무것도 보이지 않는다. 머리에 무언가 둘러져 있다. 안대 같다.
+<br><br>
+
+<<tearful>> 당신은 간신히 일어선다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Intro]]>><</link>>
+<br>
+
+:: Farmland Dungeon Intro
+<<effects>>
+<<farmland_dungeon_init>>
+<<generate1>><<person1>>
+"정말 근사한걸." 낯선 <<personssimple>> 목소리가 들린다. 마치 사방에서 들려오는 것처럼 목소리가 울린다.
+<br><br>
+
+"우린 지금 땅속 깊은 곳에 있어." <<he>>【이가】 말을 잇는다. "너와 나, 단둘이. 뭐, 여기 토박이들도 있긴 하지만. 걔네들을 사람으로 친다면 말이지."
+<<if $wolfgirl gte 4>>
+	<span class="green">당신의 예민한 늑대 귀가 <<him>>의 위치를 알아챈다.</span> <<He>>【은는】 당신의 오른쪽에 서 있다.
+<<elseif $cat gte 4>>
+	<span class="green">당신의 예민한 고양이 귀가 <<him>>의 위치를 알아챈다.</span> <<He>>【은는】 당신의 오른쪽에 서 있다.
+<<elseif $fox gte 4>>
+	<span class="green">당신의 예민한 여우 귀가 <<him>>의 위치를 알아챈다.</span> <<He>>【은는】 당신의 오른쪽에 서 있다.
+<</if>>
+<br><br>
+"거래는 이래. 내가 출구를 알려주지. 물론, <span class="red">네 팔은 묶을 거야.</span> 네가 다치지 않게 말이야. 여기 가구들은 날카롭거든."
+<br><br>
+
+"거절하면, 혼자서 길을 찾아 나가야 할 거야. 한 번만 잘못 움직여도 토박이들과 마주치게 될걸. 그놈들은 나보다 말이 안 통하거든."
+<br><br>
+
+<<link [[도움을 수락한다|Farmland Dungeon Accept]]>><</link>>
+<br>
+<<link [[도움을 거절한다|Farmland Dungeon Refuse]]>><</link>>
+<br>
+<<if $wolfgirl gte 4>>
+	<<link [[공격한다|Farmland Dungeon Attack]]>><<trauma -6>><<stress -6>><</link>><<wolfgirl>>
+<<elseif $cat gte 4>>
+	<<link [[공격한다|Farmland Dungeon Attack]]>><<trauma -6>><<stress -6>><</link>><<cat>>
+<<elseif $fox gte 4>>
+	<<link [[공격한다|Farmland Dungeon Attack]]>><<trauma -6>><<stress -6>><</link>><<fox>>
+<</if>>
+<br>
+
+:: Farmland Dungeon Accept
+<<effects>>
+<<set $farmland_dungeon.escort to true>>
+<<bind>>
+"잘했어." <<he>>【이가】 말하며 당신의 손목을 잡아 등 뒤로 묶는다. <<He>>【은는】 당신의 결박을 손에 쥐고 앞으로 민다. "이쪽이야."
+<br><br>
+
+당신은 <<personsimple>>【이가】 미는 방향으로 걷는다. 당신 자신과 <<personssimple>> 발소리를 제외하고는, 처음에는 아무 소리도 들리지 않는다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Accept 2]]>><</link>>
+<br>
+
+:: Farmland Dungeon Accept 2
+<<effects>>
+
+<span class="pink">앞쪽에서 으르렁거리는 소리가 들려,</span> 당신은 얼어붙는다. 가까운 곳이다.
+<<if $settings.maleChance gte 100>>
+	거의 사람 소리 같았고, 남성적인 느낌이 있었다.
+<<elseif $settings.maleChance lte 0>>
+	거의 사람 소리 같았고, 여성적인 느낌이 있었다.
+<<else>>
+	거의 사람 소리 같았다.
+<</if>>
+<<personsimple>>【은는】 당신의 <<bottom>>【을를】 재빨리 한 대 때리는 것으로 응수한다.<<gpain>><<gstress>><<pain 1>><<stress 6>>
+<br><br>
+
+"멈추라고 한 적 없어." <<he>>【이가】 말한다. 또다시 으르렁거리는 소리와 함께 쇠사슬이 짤랑이는 소리가 들린다. 당신은 <<his>> 손이 <<his>> 가슴으로 가 주먹을 꽉 쥐는 것을 느낀다. <<his>> 목에는 무언가 걸려 있다. "계속 걸어."
+<br><br>
+
+<<link [[시키는 대로 한다|Farmland Dungeon Bid]]>><<sub 1>><</link>>
+<br>
+<<link [[무슨 소리인지 묻는다|Farmland Dungeon Ask]]>><</link>>
+<br>
+
+:: Farmland Dungeon Bid
+<<effects>>
+
+당신은 한 걸음 더 내디딘다. 빠른 발소리, 으르렁거리는 소리. <<personsimple>> 아닌 다른 누군가, 무언가의 손이 <span class="red">당신의 머리채를 잡고 앞으로 당기려 한다.</span><<gstress>>
+<br><br>
+
+"저리 가!" <<personsimple>>【이가】 당신을 뒤로 잡아당기며 소리친다. "토박이들이야. 창살 뒤에 있으니 걱정할 거 없어. 손은 뻗을 수 있지만 그게 다야. 빨리 움직일수록 더 빨리 나갈 수 있어. 움직여." <<He>>【은는】 당신의 <<bottom>>【을를】 다시 한 번 때린다.<<gpain>><<gstress>><<pain 1>><<stress 4>>
+<br><br>
+
+<<link [[다음|Farmland Dungeon Gauntlet]]>><</link>>
+<br>
+
+:: Farmland Dungeon Ask
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저 무서운 소리는 뭐예요?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"저건 대체 뭐야?" 당신이 묻는다.
+<<else>>
+	"저 소리들은 뭐죠?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+"토박이들이야." <<personsimple>>【이가】 한숨을 쉰다. "걱정 마. 갇혀 있으니까. 우린 그냥 놈들의 감옥을 통과하기만 하면 돼. 그럼 끝이야."
+<br><br>
+
+당신은 <<he>>【이가】 어깨 너머로 몸을 기울이는 것을 느낀다. "창살 뒤에 있어, 들어봐." 쇠붙이가 덜컹거리는 소리, 빠른 발소리, 그리고 으르렁거리는 소리가 들린다. <<personsimple>> 아닌 다른 누군가, 무언가의 손이 <span class="red">당신의 머리채를 잡고 앞으로 당기려 한다.</span><<gstress>>
+<br><br>
+
+"저리 가!" <<personsimple>>【이가】 당신을 뒤로 잡아당기며 소리친다. "손은 뻗을 수 있는 모양이지만, 그게 다야. 빨리 움직일수록 더 빨리 나갈 수 있어. 움직여." <<He>>【은는】 당신의 <<bottom>>【을를】 다시 한 번 때린다.<<gpain>><<gstress>><<pain 1>><<stress 4>>
+<br><br>
+
+<<link [[다음|Farmland Dungeon Gauntlet]]>><</link>>
+<br>
+
+:: Farmland Dungeon Gauntlet
+<<effects>>
+
+<<if $farmland_dungeon.escort is true>>
+	<<if $phase is 1>>
+		<<person>>【은는】 당신의 <<bottom>>【을를】 날카롭게 한 대 때린다. "뭘 기다리는 거야? 어서 움직여."<<gpain>><<gstress>><<stress 6>>
+		<br><br>
+	<<elseif $phase is 2>>
+		<<person>>【은는】 당신을 한 대 더 때린다. "움직이라고 했잖아."<<ggpain>><<gstress>><<pain 2>><<stress 6>>
+		<br><br>
+	<<elseif $phase gte 3>>
+		<<person>>【은는】 당신을 한 대 더 때린다. "움직여!"<<gggpain>><<gstress>><<pain 3>><<stress 6>>
+		<br><br>
+	<</if>>
+<</if>>
+
+<<farmland_dungeon_gauntlet>>
+<<if $farmland_dungeon.escort is true>>
+	<<person>>【은는】 당신을 앞으로 밀려고 한다.
+<</if>>
+
+<<if $farmland_dungeon.gauntlet gte 100>>
+	발에 계단이 걸려 거의 넘어질 뻔한다. 계단이다.
+	<<if $farmland_dungeon.escort is true>>
+		"도착했군." <<person1>><<personsimple>>【이가】 말한다. "여행은 즐거웠길 바라." <<He>>【은는】 마지막으로 당신의 <<bottom>>【을를】 한 대 찰싹 때려 보낸다.
+		<br><br>
+
+		<<link [[다음|Farmland Dungeon Escape]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		한 걸음 한 걸음 올라 꼭대기에 다다른다. 상쾌한 바람이 피부를 스친다.
+		<br><br>
+
+		<<link [[다음|Farmland Dungeon Escape]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<if $farmland_dungeon.gauntlet_left is "calm">>
+		왼쪽에서는 <span class="green">아무 소리도</span> 들리지 않고,
+	<<elseif $farmland_dungeon.gauntlet_left is "snarl">>
+		왼쪽에서는 <span class="purple">으르렁거리는 소리</span>가 들리고,
+	<<elseif $farmland_dungeon.gauntlet_left is "rattle">>
+		왼쪽에서는 <span class="pink">짤랑거리는 소리</span>가 들리고,
+	<</if>>
+
+	<<if $farmland_dungeon.gauntlet_right is "calm">>
+		오른쪽에서는 <span class="green">아무 소리도</span> 들리지 않는다.
+	<<elseif $farmland_dungeon.gauntlet_right is "snarl">>
+		오른쪽에서는 <span class="purple">으르렁거리는 소리</span>가 들린다.
+	<<elseif $farmland_dungeon.gauntlet_right is "rattle">>
+		오른쪽에서는 <span class="pink">짤랑거리는 소리</span>가 들린다.
+	<</if>>
+	<br><br>
+
+	<<if $farmland_dungeon.gauntlet gte 80>>
+		바람에서 꽃가루 냄새가 난다. <span class="teal">출구가 가깝다.</span>
+	<<elseif $farmland_dungeon.gauntlet gte 60>>
+		바람이 더 상쾌해졌다. <span class="lblue">출구에 가까워지고 있다.</span>
+	<<elseif $farmland_dungeon.gauntlet gte 40>>
+		바람이 머리카락을 들어 올린다. <span class="blue">절반쯤 온 것 같다.</span>
+	<<elseif $farmland_dungeon.gauntlet gte 20>>
+		바람에 섞인 퀴퀴한 냄새가 옅어지고 있다. <span class="purple">나아가고 있다.</span>
+	<<else>>
+		바람에서 퀴퀴한 냄새가 난다. <span class="pink">출구에서 멀리 떨어져 있다.</span>
+	<</if>>
+	<br><br>
+
+	<<link [[계속한다|Farmland Dungeon Gauntlet Continue]]>><<set $phase to 0>><</link>>
+	<br>
+	<<if $farmland_dungeon.escort is true>>
+		<<link [[기다린다|Farmland Dungeon Gauntlet]]>><<pain 1>><<stress 6>><<set $phase += 1>><</link>><<gpain>><<gstress>>
+		<br>
+		<<link [[발로 찬다|Farmland Dungeon Gauntlet Continue]]>><<set $phase to 1>><<pain 2>><<set $farmland_dungeon.npc_pain += 1>><</link>><<gpain>> | <span class="blue"> + ? ? ? </span>
+		<br>
+	<<else>>
+		<<link [[기다린다|Farmland Dungeon Gauntlet]]>><<stress 6>><<set $phase += 1>><</link>><<gstress>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Farmland Dungeon Gauntlet Continue
+<<effects>>
+
+<<if $phase is 1>>
+	<<set $phase to 0>>
+	<<if $farmland_dungeon.npc_pain gte 7>>
+		당신은 발로 <<persons>> 발목을 걸어, <span class="green">비튼다.</span>
+	<<elseif $farmland_dungeon.npc_pain is 6>>
+		당신은 발밑으로 <<persons>> 발가락을 <span class="teal">으스러뜨린다.</span>
+	<<elseif $farmland_dungeon.npc_pain is 5>>
+		당신은 <<persons>> 발을 <span class="lblue">짓밟는다.</span>
+	<<elseif $farmland_dungeon.npc_pain is 4>>
+		당신은 <<persons>> 정강이에 발을 <span class="blue">세게 내리꽂는다.</span>
+	<<elseif $farmland_dungeon.npc_pain is 3>>
+		당신은 <<person>>의 정강이에 발을 <span class="purple">찔러 넣는다.</span>
+	<<elseif $farmland_dungeon.npc_pain is 2>>
+		당신은 자신의 발로 <<persons>> 발을 <span class="pink">가격한다.</span>
+	<<else>>
+		당신은 <<person>>【을를】 향해 <span class="red">발길질</span>하고, 당신의 발뒤꿈치가 <<his>> 정강이에 부딪힌다.
+	<</if>>
+	<<He>>【은는】 비명을 지르며 당신을 앞으로 밀어붙이고,
+<<else>>
+	당신은 앞으로 나아가고,
+<</if>>
+
+<<if $farmland_dungeon.gauntlet_left is "calm">>
+	<<if $farmland_dungeon.gauntlet_right is "calm">>
+		아무런 희롱도 당하지 않는다.
+	<<elseif $farmland_dungeon.gauntlet_right is "snarl">>
+		그러자 오른쪽에서 손 하나가 나타나 당신의 <<breasts>>【을를】 더듬고 주무른다.<<gstress>><<garousal>><<stress 6>><<arousal 6>>
+	<<elseif $farmland_dungeon.gauntlet_right is "rattle">>
+		그러자 오른쪽에서 손 하나가 나타나,
+		<<if !$worn.upper.type.includes("naked")>>
+			당신의 <<print $worn.upper.name>>【을를】 잡아당기고 찢는다.<<set $worn.upper.integrity -= 10>><<integritycheck>>
+		<<elseif !$worn.under_upper.type.includes("naked")>>
+			당신의 <<print $worn.under_upper.name>>【을를】 잡아당기고 찢는다.<<set $worn.under_upper.integrity -= 10>><<integritycheck>>
+		<<else>>
+			당신의 유두를 더듬고 꼬집는다.<<gstress>><<stress 6>><<garousal>><<arousal 6>>
+		<</if>>
+	<</if>>
+<<elseif $farmland_dungeon.gauntlet_left is "snarl">>
+	<<if $farmland_dungeon.gauntlet_right is "calm">>
+		그러자 왼쪽에서 손 하나가 나타나,
+		<<if !$worn.genitals.type.includes("naked")>>
+			당신의 <<print $worn.genitals.name>>【을를】 찢어 벗기려 한다.<<set $worn.genitals.integrity -= 100>><<integritycheck>>
+		<<else>>
+			당신의 <<genitals 1>>【을를】 더듬고 주무른다.<<gstress>><<garousal>><<stress 6>><<arousal 600>>
+		<</if>>
+	<<elseif $farmland_dungeon.gauntlet_right is "snarl">>
+		그러자 오른쪽에서 한 쌍의 손이 나타나 당신의 어깨를 잡고 반대편 창살로 밀어붙인다. 그들은 당신을 그곳에 붙잡아 둔다,
+		<<if $player.breastsize gte 8>>
+			당신의 <<breasts>>【이가】 창살에 눌린 채로.
+		<<elseif $player.breastsize gte 3>>
+			당신의 <<breasts>>【이가】 창살 사이로 밀려나온 채로.
+		<<else>>
+			당신의 <<breasts>>【이가】 창살에 눌린 채로.
+		<</if>>
+		<br><br>
+		<<if $farmland_dungeon.escort is true>>
+		"곤경에 처한 것 같군." <<personsimple>>【이가】 <<his>> 목소리에 긴급함 하나 없이 말한다.
+		<</if>>
+       뜨거운 숨결이 가슴팍에 빠르게 뿜어지는 것이 느껴지고, 이어서 길고 축축한 혀가 느껴진다.<<ggstress>><<ggarousal>><<stress 12>><<arousal 1200>>
+           <br><br>
+		<<if $worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked")>>
+			한 쌍의 입술이 당신의 유두에 눌러 붙어 빨아들인다.<<gstress>><<ggarousal>><<stress 6>><<arousal 1200>>
+		<</if>>
+	<<elseif $farmland_dungeon.gauntlet_right is "rattle">>
+		왼쪽에서 한 쌍의 손이 나타나 당신의 엉덩이를 잡고 창살 쪽으로 끌어당긴다. 당신 앞의 창살에서 또 다른 한 쌍의 손이 나타나 당신의 손목을 붙잡고 단단히 고정한다.
+		<br><br>
+
+		<<if !$worn.lower.type.includes("naked")>>
+			날카로운 손톱이 당신의 <<print $worn.lower.name>>【을를】 가른다.<<set $worn.lower.integrity -= 30>><<integritycheck>>
+		<<elseif !$worn.under_lower.type.includes("naked")>>
+			날카로운 손톱이 당신의 <<print $worn.under_lower.name>>【을를】 가른다.<<set $worn.under_lower.integrity -= 30>><<integritycheck>>
+		<<else>>
+			날카로운 손톱이 당신의 맨 <<bottom>>【을를】 훑고 지나가자, 당신은 몸을 꿈틀거린다.<<ggstress>><<stress 12>><<ggarousal>><<arousal 1200>>
+		<</if>>
+	<</if>>
+<<elseif $farmland_dungeon.gauntlet_left is "rattle">>
+	<<if $farmland_dungeon.gauntlet_right is "calm">>
+		그러자 왼쪽에서 손 하나가 나타나,
+		<<if !$worn.upper.type.includes("naked")>>
+			당신의 <<print $worn.lower.name>>【을를】 잡아당기고 찢는다.<<set $worn.lower.integrity -= 10>><<integritycheck>>
+		<<elseif !$worn.under_upper.type.includes("naked")>>
+			당신의 <<print $worn.under_lower.name>>【을를】 잡아당기고 찢는다.<<set $worn.under_lower.integrity -= 10>><<integritycheck>>
+		<<else>>
+			당신의 <<bottom>>【을를】 더듬고 꼬집는다.<<gstress>><<stress 6>><<garousal>><<arousal 6>>
+		<</if>>
+	<<elseif $farmland_dungeon.gauntlet_right is "snarl">>
+		그러자 왼쪽에서 한 쌍의 손이 나타나 당신의 <<breasts>>【을를】 움켜쥐고 창살 쪽으로 끌어당긴다. 앞에서 또 다른 한 쌍의 손이 나타나, 당신을 만지려는 필사적인 시도로 허공을 더듬는다.
+		<<if !$worn.upper.type.includes("naked")>>
+			날카로운 손톱이 당신의 <<print $worn.upper.name>>【을를】 베어 가른다.<<set $worn.upper.integrity -= 30>><<integritycheck>>
+		<<elseif !$worn.under_upper.type.includes("naked")>>
+			날카로운 손톱이 당신의 <<print $worn.under_upper.name>>【을를】 베어 가른다.<<set $worn.under_upper.integrity -= 30>><<integritycheck>>
+		<<else>>
+			날카로운 손톱이 당신의 맨 <<breasts>>【을를】 훑고 지나가자, 당신은 몸을 꿈틀거린다.<<ggstress>><<stress 12>><<ggarousal>><<arousal 1200>>
+		<</if>>
+	<<elseif $farmland_dungeon.gauntlet_right is "rattle">>
+		왼쪽과 오른쪽에서 수많은 손들이 나타난다.
+		<<if $farmland_dungeon.escort is true>>
+			<<personsimple>>【은는】 붙잡고 있던 손을 놓아, 당신을 그들의 자비에 맡긴다.
+		<</if>>
+		<br><br>
+		<<if !$worn.upper.type.includes("naked") or !$worn.lower.type.includes("naked") or !$worn.under_lower.type.includes("naked") or !$worn.under_upper.type.includes("naked")>>
+			그 생물들은 당신의 옷을 더듬고 찢는다.
+		<<else>>
+			그 생물들은 당신의 드러난 피부를 더듬는다.
+		<</if>>
+		당신은 한 놈에게서 몸을 떼어내지만, 결국 다른 놈의 손에 잡히고 만다.
+		<<if $farmland_dungeon.escort is true>>
+			마침내, <<personsimple>>【이가】 당신의 결박을 잡고 올바른 방향으로 거칠게 떠민다.
+		<<else>>
+			마침내, 당신은 방향을 잡고 몸을 비틀어 빠져나온다.
+		<</if>>
+		<<ggstress>><<garousal>><<stress 12>><<arousal 600>>
+		<<set $worn.upper.integrity -= 10>>
+		<<set $worn.lower.integrity -= 10>>
+		<<set $worn.under_upper.integrity -= 10>>
+		<<set $worn.under_lower.integrity -= 10>>
+		<<integritycheck>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $farmland_dungeon.npc_pain gte 7>>
+	<<set $farmland_dungeon.antique to true>>
+	사악한 비명이 사방에서 터져 나온다. <<person>>【은는】 당신의 결박을 잡고 있던 손을 놓는다. "물러서! 물러서—" <<His>> 목소리는 또 다른 비명 합창에 끊긴다. 그것이 사라졌을 때, <<his>> 목소리도 사라졌다. 끈에 연결된 무거운 물체가 당신의 발 위로 떨어진다. 당신은 그것을 발목에 감고 출구를 향해 걷는다.
+	<br><br>
+	비명은 계속되지만, 아무것도 당신을 희롱하지 않는다. 당신은 계단을 찾아 한 걸음 한 걸음 올라, 마침내 꼭대기에 도달한다. 신선한 바람이 당신의 피부를 핥는다.
+	<br><br>
+
+	<<link [[다음|Farmland Dungeon Escape]]>><<endevent>><</link>>
+	<br>
+<<elseif $arousal gte $arousalmax>>
+	<<orgasm>>
+	사악한 비명이 사방에서 터져 나온다.
+	<br><br>
+
+	<<link [[다음|Farmland Dungeon Gauntlet Orgasm]]>><</link>>
+	<br>
+<<else>>
+	당신은 계속 나아간다.
+	<br><br>
+	<<link [[다음|Farmland Dungeon Gauntlet]]>><<set $farmland_dungeon.gauntlet += 10>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Dungeon Gauntlet Orgasm
+<<effects>>
+
+복도를 따라 늘어선 감옥에서 당신에게 닿으려는 듯 필사적으로 창살을 흔드는 소리가 금속성의 쿵쿵거림으로 들려온다. 그중 한 쌍이 충분히 가까이 있다. 그들은 당신의 손목을 창살에 대고 잡아당겨, 당신을 무방비 상태로 만든다.
+<br><br>
+<<if !$worn.lower.type.includes("naked")>>
+	당신의 <<print $worn.lower.name>>에 격렬한 손톱질이 느껴진다. 간신히 몸부림쳐 벗어났을 때, <span class="pink">옷감은 흔적도 없이 사라져 있었다.</span><<lowerruined>>
+	<br><br>
+	<<link [[다음|Farmland Dungeon Gauntlet]]>><<set $farmland_dungeon.gauntlet += 10>><</link>>
+	<br>
+<<elseif !$worn.upper.type.includes("naked")>>
+	당신의 <<print $worn.upper.name>>에 격렬한 손톱질이 느껴진다. 간신히 몸부림쳐 벗어났을 때, <span class="pink">옷감은 흔적도 없이 사라져 있었다.</span><<upperruined>>
+	<br><br>
+	<<link [[다음|Farmland Dungeon Gauntlet]]>><<set $farmland_dungeon.gauntlet += 10>><</link>>
+	<br>
+<<elseif !$worn.under_lower.type.includes("naked")>>
+	당신의 <<print $worn.under_lower.name>>에 격렬한 손톱질이 느껴진다. 간신히 몸부림쳐 벗어났을 때, <span class="pink">옷감은 흔적도 없이 사라져 있었다.</span><<underlowerruined>>
+	<br><br>
+	<<link [[다음|Farmland Dungeon Gauntlet]]>><<set $farmland_dungeon.gauntlet += 10>><</link>>
+	<br>
+<<elseif !$worn.under_upper.type.includes("naked")>>
+	당신의 <<print $worn.under_upper.name>>에 격렬한 손톱질이 느껴진다. 간신히 몸부림쳐 벗어났을 때, <span class="pink">옷감은 흔적도 없이 사라져 있었다.</span><<underupperruined>>
+	<br><br>
+	<<link [[다음|Farmland Dungeon Gauntlet]]>><<set $farmland_dungeon.gauntlet += 10>><</link>>
+	<br>
+<<else>>
+	<<if $farmland_dungeon.escort is true>>
+		"이런 모습은 처음 보는군." <<personsimple>>【이가】 <<his>> 목소리에 약간의 두려움을 담아 말한다. "마치—" <<His>> 말은 쿵, 하는 소리에 끊기고, 또 다른 소리가 이어진다.
+		<br><br>
+	<</if>>
+	<<endevent>>
+	<<generateRole 0 "punished" "creature">><<generateRole 1 "imprisoned" "abomination">><<person1>>
+	<<link [[다음|Farmland Dungeon Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Dungeon Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $speechdisable to 1>>
+	<<set $noBodyWriting to 1>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farmland Dungeon Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Dungeon Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Dungeon Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	괴물들이 당신을 놓아준다. <<tearful>> 당신은 복도를 따라 계속 걸어간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyhealth lte 0>>
+	괴물들이 당신을 놓아준다. <<tearful>> 당신은 복도를 따라 계속 걸어간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<</if>>
+
+<<link [[다음|Farmland Dungeon Rape Escape]]>><</link>>
+<br>
+
+:: Farmland Dungeon Rape Escape
+<<effects>>
+
+복도를 따라 계속 걸어간다. 비인간적인 비명이 사방에서 울려 퍼지지만, 당신은 계단까지 간신히 도착한다. 비틀거리며 계단을 오르자, 마침내 꼭대기에 다다른다. 시원한 공기가 피부에 와 닿는다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Escape]]>><<pass 5>><</link>>
+<br>
+
+:: Farmland Dungeon Escape
+<<effects>>
+발밑에 풀이 느껴진다. 길을 찾아 계속 나아간다.
+<br><br>
+
+<<generate1>><<person1>>
+"어쩌다 그런 꼴이 된 거야?" <<personssimple>> 목소리가 묻는다. <<covered>>
+<br><br>
+"자." 당신의 안대에 손가락이 느껴지더니, 이내 안대가 벗겨지고 <<person>>【이가】 드러난다. 당신은 농장의 길 위에 있다.
+<<if pcAreArmsBound("any")>>
+	<<He>>【이가】 다음으로 당신의 팔 결박을 풀어준다.
+<</if>>
+<br><br>
+
+<<set $worn.face.type.push("broken")>>
+<<faceruined>>
+<<unbind>>
+
+<<link [[감사한다|Farmland Dungeon Rape Thank]]>><</link>>
+<br>
+<<link [["던전에 대해 " + KR.getPronounKr("him", $NPCList[0].pronouns.him) + "에게 말한다"|Farmland Dungeon Rape Tell]]>><</link>>
+<br>
+
+:: Farmland Dungeon Rape Thank
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"도와주셔서 감사합니다." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"정말 고마워요." 당신이 말한다.
+<<else>>
+	"도와줘서 고마워요." 당신이 말한다.
+<</if>>
+<br><br>
+
+<<person>>【이가】 고개를 끄덕인다.
+<<if $exposed gte 1>>
+	"몸을 가리는 게 좋겠어." <<he>>【이가】 수건 몇 장을 건네며 말한다. "이상한 사람들이 돌아다니거든." <<towelup>>
+<<else>>
+	"신경 쓰지 마." <<he>>【이가】 말한다. "앞으로는 조심하고."
+<</if>>
+<br><br>
+
+<<if $farmland_dungeon.antique is true>>
+	발에 걸린 물건을 살펴본다. 부적이다. 규칙적인 패턴으로 배열된 여러 개의 날카로운 끝이 있다. 금속은 군데군데 부식되어 있다. 박물관에 있어야 할 물건이라는 인상을 받는다.
+	<br><br>
+
+	<<set $antiquemoney += 200>><<museumAntiqueStatus "antiquesilveramulet" "found">>
+<</if>>
+
+<<link [[다음|Farmland]]>><<farmland_dungeon_end>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Farmland Dungeon Rape Tell
+<<person>>【은는】 <<his>> 턱을 쓰다듬는다. "사람들은 참 별난 짓에 빠져있군." <<he>>【이가】 당신의 말이 와닿지 않은 듯 말한다. "하지만 내가 판단할 일은 아니지.
+
+<<if $exposed gte 1>>
+	그래도 몸은 가리는 게 좋겠어." <<He>>【이가】 수건 몇 장을 건네주고는 걸어간다.
+	<<towelup>>
+<<else>>
+	그냥 조심해. 주변에 이상한 사람들이 많거든, 너보다 더 이상한 사람도." <<He>>【이가】 걸어간다.
+<</if>>
+<br><br>
+
+<<if $farmland_dungeon.antique is true>>
+	발에 걸린 물건을 살펴본다. 부적이다. 규칙적인 패턴으로 배열된 여러 개의 날카로운 끝이 있다. 금속은 군데군데 부식되어 있다. 박물관에 있어야 할 물건이라는 인상을 받는다.
+	<br><br>
+
+	<<set $antiquemoney += 200>><<museumAntiqueStatus "antiquesilveramulet" "found">>
+<</if>>
+
+<<link [[다음|Farmland]]>><<farmland_dungeon_end>><<endevent>><<set $eventskip to 1>><</link>>
+<br>
+
+:: Farmland Dungeon Refuse
+<<effects>>
+
+"마음대로 해." <<person>>【이가】 말한다. 그리고 침묵이 흐른다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Middle]]>><<endevent>><</link>>
+<br>
+
+:: Farmland Dungeon Attack
+<<effects>>
+
+당신은 <<person>>의 방향으로 몸을 날린다. <<he>>【이가】 도망치려 허둥대는 발소리가 들린다. 당신에게 유리한 상황이다. "어떻게—" <<he>>【이가】 말을 마치기도 전에 당신은 <<his>> 옷의 단단한 부분을 잡고 <<his>> 배에 강한 일격을 날린다.
+<br><br>
+
+일격에 <<he>>【이가】 비틀거리자, 당신이 쥐고 있던 물건이 빠져나온다. 그게 무엇이든, <<he>>【은는】 제 한 몸 챙기는 것을 우선하기로 한 모양이다. <<his>> 발소리가 멀어진다.
+<br><br>
+
+당신은 그 물건을 더 자세히 살펴본다. 부적 같다. 규칙적인 패턴으로 배열된 여러 개의 날카로운 끝이 있다. 금속은 군데군데 부식된 느낌이다. 박물관에 있어야 할 물건이라는 인상을 받는다.
+<br><br>
+
+<<set $antiquemoney += 200>><<museumAntiqueStatus "antiquesilveramulet" "found">>
+
+<<link [[다음|Farmland Dungeon Middle]]>><<endevent>><</link>>
+<br>
+
+:: Farmland Dungeon Middle
+<<effects>>
+
+당신은 돌로 된 실내에 홀로 있다. 방의 가장자리를 더듬어 본다. 여섯 개의 문이 있고, 각각 어디로 이어지는지 알 방법이 없다.
+<br><br>
+
+어느 문으로 들어가시겠습니까?
+<br><br>
+
+<<if !$farmland_dungeon.doorways.includes("forward_left")>>
+	<<link [[앞쪽 왼쪽으로 간다|Farmland Dungeon FL]]>><<pass 2>><<set $farmland_dungeon.doorways.push("forward_left")>><</link>>
+	<br>
+<</if>>
+
+<<link [[앞으로 간다|Farmland Dungeon F]]>><<pass 2>><</link>>
+<br>
+
+<<if !$farmland_dungeon.doorways.includes("forward_right")>>
+	<<link [[앞쪽 오른쪽으로 간다|Farmland Dungeon FR]]>><<pass 2>><<set $farmland_dungeon.doorways.push("forward_right")>><</link>>
+	<br>
+<</if>>
+
+<<if !$farmland_dungeon.doorways.includes("left")>>
+	<<link [[왼쪽으로 간다|Farmland Dungeon L]]>><<pass 2>><<set $farmland_dungeon.doorways.push("left")>><</link>>
+	<br>
+<</if>>
+
+<<if !$farmland_dungeon.doorways.includes("right")>>
+	<<link [[오른쪽으로 간다|Farmland Dungeon R]]>><<pass 2>><<set $farmland_dungeon.doorways.push("right")>><</link>>
+	<br>
+<</if>>
+
+<<if !$farmland_dungeon.doorways.includes("behind")>>
+	<<link [[뒤로 간다|Farmland Dungeon B]]>><<pass 2>><<set $farmland_dungeon.doorways.push("behind")>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Dungeon FL
+<<effects>>
+
+문을 통과한다. 복도는 양팔을 뻗으면 양쪽 벽에 닿을 만큼 좁다.
+<br><br>
+<<generateRole 0 "strange" "creature">><<person1>>
+벽이 당신에게서 멀어지며 휘어지는 가운데, 앞에서 갑자기 물방울 떨어지는 소리가 들린다. 수많은 물방울이 연달아 떨어지더니, 이내 조용해진다. 그러다 으르렁거리는 소리와 함께 발소리가 점점 커진다.
+<br><br>
+
+<<link [[달린다|Farmland Dungeon FL Run]]>><</link>>
+<br>
+<<link [[가만히 있는다|Farmland Dungeon FL Still]]>><</link>>
+<br>
+
+:: Farmland Dungeon FL Still
+<<effects>>
+
+최대한 가만히 있는다. 얼굴에 따뜻한 숨결이 느껴지고, 축축하게 질척이는 소리가 들린다. 그리고 아무것도 없다. <span class="green">괴물이 지나갔다.</span>
+<br><br>
+
+중앙 방으로 돌아간다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+
+:: Farmland Dungeon FL Run
+<<effects>>
+
+몸을 돌려 달리다가, <span class="red">벽에 정면으로 부딪힌다.</span><<gpain>><<gstress>><<pain 4>><<stress 6>>
+<br><br>
+
+끔찍한 비명이 주위에 울려 퍼지고, 비인간적인 팔이 당신을 덮친다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon FL Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Farmland Dungeon FL Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $speechdisable to 1>>
+	<<set $noBodyWriting to 1>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farmland Dungeon FL Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Dungeon FL Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Dungeon FL Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<person>>【은는】 당신을 지치고 떨게 만든 채 떠난다.
+	<br><br>
+	<<tearful>> 당신은 몸을 일으켜 중앙 방으로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<<elseif $enemyhealth lte 0>>
+	고통스러운 비명과 함께, 괴물이 공격을 멈춘다. 빠르게 멀어지는 발소리가 들린다.
+	<br><br>
+	<<tearful>> 당신은 중앙 방으로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+<</if>>
+
+<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+<br>
+
+:: Farmland Dungeon F
+<<effects>>
+
+앞에 있는 문은 다른 문들보다 넓고, 희미한 바람이 느껴진다. 하지만 곧 금속 창살로 된 또 다른 문에 다다른다. 잠겨 있다. 큰 열쇠 구멍이 있다.
+<br><br>
+
+<<if !$farmland_dungeon.doorways.includes("left")>>
+	왔던 길로 돌아간다. <span class="lblue">열쇠를 찾을 수 있을지도 모른다.</span>
+	<br><br>
+	<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+	<br>
+<<else>>
+	아까 찾은 큰 열쇠를 사용해 본다. <span class="green">딱 맞는다.</span>
+	<br><br>
+
+	<<link [[지나간다|Farmland Dungeon F 2]]>><</link>>
+	<br>
+	<<link [[나중에 다시 온다|Farmland Dungeon Middle]]>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Dungeon F 2
+<<effects>>
+
+<span class="pink">앞쪽에서 으르렁거리는 소리가 들려,</span> 당신은 얼어붙는다. 가까운 곳이다.
+<<if $settings.maleChance gte 100>>
+	거의 사람 소리 같았고, 남성적인 느낌이 있었다.
+<<elseif $settings.maleChance lte 0>>
+	거의 사람 소리 같았고, 여성적인 느낌이 있었다.
+<<else>>
+	거의 사람 소리 같았다.
+<</if>>
+바람이 더 강해지고, 좁은 복도는 다른 길로 돌아갈 수 없음을 분명히 보여준다.
+<br><br>
+
+한 걸음 더 앞으로 나아간다. 즉시, 빠른 발소리와 으르렁거리는 소리가 들린다. 손 하나가 <span class="red">당신의 머리카락을 움켜쥐고 앞으로 끌어당기려 한다.</span><<gstress>>
+<br><br>
+
+당신은 뒤로 몸을 홱 젖혀 괴물의 손아귀에서 벗어난다. 금속이 덜컹거리는 소리가 들린다. 괴물은 아마도 창살 뒤에 갇혀 당신에게 닿을 수 없는 모양이지만, 탈출하려면 그 괴물과 다른 것들 옆을 가까이 지나가야 할 것이다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Gauntlet]]>><</link>>
+<br>
+
+:: Farmland Dungeon FR
+<<effects>>
+
+문 너머에는 열린 공간이 있다. 공기는 고요하다. 당신은 천천히, 팔을 뻗은 채로 움직인다.
+<br><br>
+
+<span class="red">발밑의 땅이 무너져 내린다.</span> 발이 미끄러지며 물속으로 빠진다. 얕은 물이지만, 추락의 충격을 완화해주었고 당신을 흠뻑 젖게 만들었다.<<water>>
+<br><br>
+
+물가를 더듬어 찾아가 조금 더 탐색해 보지만, 여기에는 다른 것이 아무것도 없다. 중앙 방으로 돌아간다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+<br>
+
+:: Farmland Dungeon L
+<<effects>>
+
+팔을 뻗은 채 문을 통과하자, 앞에 천이 느껴진다. 커튼 같다. 옆으로 젖힌다. 그 뒤로 금속이 느껴진다. <span class="green">큰 열쇠가</span> 가는 실에 매달려 있다. 실은 쉽게 끊어진다.
+<br><br>
+
+중앙 방으로 돌아간다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+<br>
+
+:: Farmland Dungeon R
+<<effects>>
+
+문은 처음에는 잠긴 것처럼 보이지만, 장치가 녹슬었을 뿐이라 약간의 힘을 주니 열린다. 먼지를 들이마셔 기침이 터져 나온다. 그 방향으로 계속 가는 것은 현명하지 않다고 판단한다.<<ggstress>><<stress 12>>
+<br><br>
+
+중앙 방으로 돌아간다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+<br>
+
+:: Farmland Dungeon B
+<<effects>>
+
+땅이 위쪽으로 경사져 있어 희망적이었지만, 무릎이 단단한 돌에 쿵 부딪힌다.<<gpain>><<pain 4>>
+<br><br>
+앞길이 바위 잔해로 막혀 있다. 중앙 방으로 돌아간다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Middle]]>><</link>>
+<br>
+
+:: Farmland Manors Chain
+<<effects>>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess>>
+	코를 고는 <<person>>에게 살금살금 다가간다. <<he>>【이가】 몸을 움직이며 알아들을 수 없는 말을 중얼거리자 그 자리에 얼어붙지만, 이내 <<he>>【은는】 다시 잠에 빠져든다.
+	<br><br>
+	<<skulduggeryuse>><<wearProp "necklace" "gold">>
+
+	당신은 <<his>> 목에서 금목걸이를 슬쩍 빼낸다. 금속만으로도 꽤 값어치가 나갈 것이다.
+	<br><br>
+	<<link [[가져가서 떠난다|Farmland Manors]]>><<set $blackmoney += 300>><<crimeUp 300 "thievery">><<endevent>><</link>><<crime "thievery">>
+	<br>
+	<<link [[그냥 떠난다|Farmland Manors]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	코를 고는 <<person>>에게 살금살금 다가간다. <<he>>【이가】 몸을 움직이며 알아들을 수 없는 말을 중얼거리자 그 자리에 얼어붙지만, 이내 <<he>>【은는】 다시 잠에 빠져든다.
+	<br><br>
+	<<skulduggeryuse>>
+
+	금목걸이에 손을 대자, <span class="red"><<person>>【이가】 당신의 배에 <<his>> 샷건을 들이댄다.</span>
+	<br><br>
+	"내 물건을 훔치려는 거냐?!" <<he>>【이가】 포효하며 일어나 당신을 벽으로 밀어붙인다.<<llcontrol>><<control -25>><<gggtrauma>><<trauma 18>><<gggstress>><<stress 18>><<gpain>><<pain 1>>
+	<br><br>
+
+	<<if $panicattacks gte 2 and $controlled is 0>>
+		<span class="purple">공황이 당신을 덮친다.</span> 당신은 샷건을 너무 세게 비틀어 빼앗는 바람에 <<persons>> 머리에 부딪히게 만들고, <<him>>【을를】 쓰러뜨려 자유로워진다.
+		<br><br>
+
+		당신은 저택에서 도망쳐 나와, 넘어질 때까지 계속 달린다. 몸을 웅크리고 운다.
+		<br><br>
+		<<pass 15>>
+		<<link [[다음|Farm Road 6]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+
+		<<if $stat_shoot gte 1000>>
+			<span class="gold">당신은 총을 다루는 데 많은 시간을 보냈다.</span> 가까이서 보니, 이제 샷건이 장전되어 있지 않다는 것을 알 수 있다.<<lstress>><<stress -6>>
+			<br><br>
+		<</if>>
+
+		<<link [[주먹을 날린다|Farmland Manors Punch]]>><<def 1>><</link>>
+		<br>
+		<<link [[사과한다|Farmland Manors Apologise]]>><<sub 1>><</link>>
+		<br>
+
+	<</if>>
+<</if>>
+
+:: Farmland Manors Punch
+<<effects>>
+
+당신은 <<person>>의 얼굴을 후려친다. <<He>>【은는】 충격에 샷건을 떨어뜨리고, 으르렁거리며 당신에게 다가온다.
+<br><br>
+
+<<link [[다음|Farmland Manors Rape]]>><<set $molestationstart to 1>><<set $phase to 1>><</link>>
+<br>
+
+:: Farmland Manors Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<if $phase is 1>>
+		<<set $enemyanger += 200>>
+		<<set $enemytrust -= 100>>
+		<<set $enemyhealth -= 20>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farmland Manors Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"아직 셈이 끝나지 않았어." <<he>>【이가】 근처 찬장에서 천 조각을 꺼내며 말한다. 안대다. "가만히 있어." <<He>>【이가】 그것을 당신의 머리에 감아 눈을 가린다. "이제 움직여."
+	<br><br>
+	<<clotheson>>
+	<<facewear "blindfold">>
+
+	<<link [[다음|Farmland Dungeon Hood]]>><</link>>
+	<br>
+
+<<else>>
+	<<person>>【이가】 뒤로 물러서다 <<his>> 샷건에 걸려 넘어진다. <<tearful>> 당신은 <<he>>【이가】 넘어지는 동안 금목걸이를 움켜쥔다. 그것은 당신의 손아귀에 남는다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	당신은 몸을 돌려 달린다.
+	<br><br>
+
+	<<link [[목걸이를 가지고 간다|Farmland Manors]]>><<set $blackmoney += 400>><<crimeUp 400 "thievery">><<endevent>><</link>><<crime "thievery">>
+	<br>
+	<<link [[두고 간다|Farmland Manors]]>><</link>>
+	<br>
+<</if>>
+
+
+:: Farmland Manors Apologise
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제-제발요." 당신이 애원한다. "죄송해요!"
+<<elseif $speech_attitude is "bratty">>
+	"미안." 당신이 말한다. "단잠을 방해할 생각은 없었어."
+<<else>>
+	"정말 죄송합니다." 당신이 말한다. "방해할 생각은 없었어요."
+<</if>>
+<br><br>
+
+<<person>>【이가】 당신의 몸을 훑어본다. "어떻게 갚을 수 있을지 딱 알겠군."
+<br><br>
+
+<<link [[다음|Farmland Manors Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Farmland Manors Easier
+<<effects>>
+
+당신은 저택의 나머지 부분을 수색하며 값나가는 물건을 찾는다. <<printmoney 4000>> 상당의 전리품을 긁어모은다.
+<br><br>
+
+<<link [[가져가서 떠난다|Farmland Manors]]>><<set $blackmoney += 40>><<crimeUp 40 "thievery">><<endevent>><</link>><<crime "thievery">>
+<br>
+<<link [[그냥 떠난다|Farmland Manors]]>><<endevent>><</link>>
+<br>
+
+:: Farmland Manors Plants
+<<effects>>
+
+당신은 뿌리와 전선에서 기계를 비틀어 빼낸다. 즉시, 달콤한 안개가 공중에 퍼진다. 피부가 따끔거린다. 전리품을 손에 들고, 왔던 길로 돌아간다.
+<br><br>
+출구 쪽 길을 따라가려 하지만, 기억에 없는 갈림길에 다다른다. 분홍색 구근 중 하나가 열려 있다.
+<br><br>
+
+어느 길로 가시겠습니까?
+<br><br>
+
+<<farmland_manors_maze>>
+
+:: Farmland Manors Plants Lost
+<<effects>>
+
+<<if $rng gte 81>>
+	장미 덮개 아래를 달린다. 가시 돋친 가지들은 녹색 철사로 고정되어 있다.
+<<elseif $rng gte 61>>
+	인공 강 위에 놓인 다리를 발견한다. 물이 휘몰아치며 발을 적신다.
+<<elseif $rng gte 41>>
+	켄타우로스 동상을 지나 달린다. 한 손에는 창을 들고 수평선을 가리키고 있다.
+<<elseif $rng gte 21>>
+	깨진 유리를 밟지 않도록 피한다. 위쪽 창문이 산산조각 나 있다.
+<<else>>
+	정원의 가장자리를 찾았지만, 튼튼한 회색 벽만이 당신을 맞이한다.
+<</if>>
+출구에 더 가까워지지 않았다.
+<<gdrugged>><<garousal>><<set $drugged += 60>><<arousal 600>>
+<br><br>
+
+<<if $arousal gte $arousalmax>>
+	피부의 따끔거림이 점점 강해지더니, 마침내 당신을 압도한다.
+	<<orgasm>>
+	당신은 무릎을 꿇고 떨며 쓰러진다.
+	<br><br>
+
+	<<link [[모든 것이 암전된다|Farmland Dungeon Wake]]>><</link>>
+	<br>
+<<else>>
+	<<farmland_manors_maze>>
+<</if>>
+
+:: Farmland Manors Plants Escape
+<<effects>>
+
+길을 따라가자 빽빽한 정원에서 빠져나온다. <span class="green">입구가 바로 앞에 있다.</span>
+<br><br>
+
+저택의 나머지는 기억하던 그대로다. 밖으로 탈출한다.
+<br><br>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Dog Fours
+<<effects>>
+
+네 발로 엎드려 <<bottom>>【을를】 흔든다. 의도한 효과가 있다. <<beastsplural>>【이가】 다가오지만, 그들의 악의는 사라졌다.
+<br><br>
+
+<<link [[다음|Farmland Manors Dog Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Farmland Manors Dog Sex
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<beastTrainGenerate>>
+<<elseif $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+	<<beastTrainGenerate>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farmland Manors Dog Sex End]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Dog Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Dog Sex End
+<<effects>>
+<<if $enemyhealth lte 0>>
+	<<beastwound>>
+	<<if $combatTrain.length gt 0>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러들지만, 다른 놈이 차례를 기다리고 있다.
+
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farmland Manors Dog Sex]]>><</link>>
+	<<else>>
+		<<beasttype>>【은는】 고통과 공포에 움츠러든다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farmland Manors Dog Sex End]]>><<set $finish to 1>><</link>>
+	<</if>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<if $combatTrain.length gt 0>>
+		만족한 <<beasttype>>【이가】 물러나고 다른 놈이 차례를 차지한다.
+
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farmland Manors Dog Sex]]>><</link>>
+	<<else>>
+		만족한 <<beasttype>>【이가】 당신에게서 멀어진다.
+		<<combatTrainAdvance>>
+		<br><br>
+		<<link [[다음|Farmland Manors Dog Sex End]]>><<set $finish to 1>><</link>>
+	<</if>>
+<<elseif $finish is 1>>
+	<<if $enemywounded is 1 and $enemyejaculated is 0>>
+		<<beasttype>>【이가】 낑낑거리며 달아난다.
+	<<elseif $enemywounded is 0 and $enemyejaculated is 1>>
+		만족한 <<beasttype>>【이가】 떠난다.
+	<<elseif $enemywounded gte 2 and $enemyejaculated is 0>>
+		당신이 가치보다 더 귀찮다고 느낀 짐승들이 달아난다.
+	<<elseif $enemywounded is 0 and $enemyejaculated gte 2>>
+		짐승들은 당신을 지치고 떨게 한 채 떠난다.
+	<<elseif $enemywounded gte 1 and $enemyejaculated gte 1>>
+		짐승들은 당신을 지치고 떨게 한 채 떠난다.
+	<</if>>
+	<br><br>
+
+	<<tearful>> 당신은 몸을 추스르고 입구로 비틀거리며 걸어간다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[물건을 챙겨 떠난다|Farmland Manors]]>><<set $blackmoney += 150>><<crimeUp 150 "thievery">><</link>><<crime "thievery">>
+	<br>
+	<<link [[그냥 떠난다|Farmland Manors]]>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Laptop Snatch
+<<effects>>
+
+<<if $phase isnot 1>>
+	노트북 주인이 곧 돌아올지도 모른다. 당신은 그것을 낚아채고, 그들이 오기 전에 건물에서 탈출한다.
+	<br><br>
+<</if>>
+
+밖으로 나온 당신은 길이나 농장에서 보이지 않는 나무 가지 아래에 몸을 숨긴다. 노트북을 열고, 흥미로운 것이 있는지 파일을 훑어본다.
+<br><br>
+
+<<if $rng gte 81>>
+	최근에 작성된, 보내지 않은 이메일을 발견한다. 내용이 흥미롭다.
+	<br><br>
+	<i>
+	"현장을 계속 주시하고 있습니다. 레미와 어울리는 것으로 보이는 모든 주요 인물들의 목록을 첨부합니다. 일부 직원들에 대한 신원 조사도 진행했습니다.
+	<br><br>
+	여담이지만, 전근을 요청하고 싶습니다. 제가 변한 것 같습니다. 몸이 좋지 않습니다. 여기서 벗어나야겠습니다."
+	</i>
+	<br><br>
+	파일이 첨부되어 있다. 이름 목록이 들어있다. 퀸 시장을 포함한 많은 중요 인물들을 알아볼 수 있다.
+	<br><br>
+	이 정보는 꽤 값어치가 나갈 것이다.<<crimeUp 100 "thievery">><<set $blackmoney += 100>>
+<<elseif $rng gte 61>>
+	음악. 포르노. 주변 시골을 찍은 아마추어 사진이 좀 있지만, 가치 있는 것은 아무것도 없다. 적어도 노트북 자체는 값어치가 있다.
+<<elseif $rng gte 41>>
+	하나의 파일이 비밀번호로 보호되어 있다. 직접 열 수는 없지만, 암시장에서 약간의 가치가 있을지도 모른다.<<crimeUp 20 "thievery">><<set $blackmoney += 20>>
+<<elseif $rng gte 21>>
+	오래된 항공권. 연도별 세금 신고서. 누군가에게는 유용할 수 있다. 예상보다 조금 더 받을 수 있을 것이다.<<crimeUp 50 "thievery">><<set $blackmoney += 50>>
+<<else>>
+	여기에는 가치 있는 것이 아무것도 없다. 하나의 은밀한 폴더가 많은 공간을 차지하지만, 포르노로 가득 차 있을 뿐이다. 적어도 노트북 자체는 값어치가 있다.
+<</if>>
+<br><br>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Laptop Check
+<<effects>>
+
+<<if $rng gte 51>>
+	당신은 노트북 앞에 앉아 계단을 힐끗 쳐다본 후, 가치 있을 만한 정보가 있는지 파일을 검색한다.
+	<br><br>
+
+	<<rng 100>>
+	<<if $rng gte 81 and $farm_manors_usb is undefined>>
+		최근에 작성된, 보내지 않은 이메일을 발견했다. 내용이 흥미롭다.
+		<br><br>
+		<i>
+		"현장을 계속 주시하고 있습니다. 레미와 어울리는 것으로 확인된 모든 주요 인물 목록을 첨부합니다. 저택 직원들에 대한 신원 조회도 마쳤습니다.
+		<br><br>
+		여담이지만, 전출을 요청하고 싶습니다. 제가 변한 것 같습니다. 몸이 좋지 않습니다. 이 마을에서 벗어나야겠습니다."
+		</i>
+		<br><br>
+		파일이 첨부되어 있다. 이름 목록이 들어있다. 퀸 시장을 포함한 많은 중요 인물들의 이름을 알아볼 수 있다.
+		<br><br>
+		이 정보는 노트북보다 더 가치가 있을지도 모른다.
+		<br><br>
+		<<link [[USB에 다운로드하고 도망친다|Farmland Manors]]>><<crimeUp 500 "thievery">><<set $farm_manors_usb to 1>><</link>><<crime "thievery">>
+		<br>
+		<<link [[그냥 떠난다|Farmland Manors]]>><</link>>
+		<br>
+	<<elseif $rng gte 61>>
+		음악. 포르노. 주변 시골을 찍은 아마추어 사진 몇 장이 있지만, 가치 있는 것은 없다. 적어도 노트북 자체는 가치가 있다.
+		<br><br>
+		<<link [[훔쳐서 도망친다|Farmland Manors Laptop Snatch]]>><<crimeUp 100 "thievery">><<set $blackmoney += 100>><</link>><<crime "thievery">>
+		<br>
+	<<elseif $rng gte 41>>
+		파일 하나가 비밀번호로 보호되어 있다. 직접 열 수는 없지만, 암시장에서 약간의 가치가 있을지도 모른다.
+		<br><br>
+		<<link [[훔쳐서 도망친다|Farmland Manors Laptop Snatch]]>><<crimeUp 120 "thievery">><<set $blackmoney += 120>><</link>><<crime "thievery">>
+		<br>
+	<<elseif $rng gte 21>>
+		오래된 비행기 표. 연도별 세금 환급 서류. 누군가에게는 유용할 수 있다. 예상보다 조금 더 값을 받을 수 있을 것이다.
+		<br><br>
+		<<link [[훔쳐서 도망친다|Farmland Manors Laptop Snatch]]>><<crimeUp 150 "thievery">><<set $blackmoney += 150>><</link>><<crime "thievery">>
+		<br>
+	<<else>>
+		여기에는 가치 있는 것이 없다. 숨겨진 폴더 하나가 공간을 많이 차지하지만, 포르노로 가득 차 있을 뿐이다. 적어도 노트북 자체는 가치가 있다.
+		<br><br>
+		<<link [[훔쳐서 도망친다|Farmland Manors Laptop Snatch]]>><<crimeUp 100 "thievery">><<set $blackmoney += 100>><</link>><<crime "thievery">>
+		<br>
+	<</if>>
+	<br><br>
+<<else>>
+	<<generate1>><<generate2>><<person1>>
+	계단을 오르는 발소리에 당신의 검색이 중단된다. 당신이 숨기도 전에 <<person>>【와과】 <<person2>><<person>>【이가】 모습을 드러낸다. 그들은 서로를 쳐다보더니, 폭력적인 의도를 품고 다가온다.
+	<br><br>
+	"있으면 안 될 곳에 있군." <<person1>><<person>>【이가】 말한다. "이러고 싶진 않은데. 정말이야." <<His>> 목소리 톤은 전혀 후회하는 것 같지 않다. <<person2>><<person>>【은는】 한 손을 주먹으로 만들고 다른 손으로 그 주먹을 감싼다.
+	<br><br>
+	<<link [[다음|Farmland Manors Laptop Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Laptop Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farmland Manors Laptop Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Laptop Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Laptop Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	두 사람이 당신에게서 떨어진다. <<tearful>> 당신은 노트북을 낚아채 계단을 뛰어 올라간다. "저 <<phim>> 잡아." <<person>>【이가】 힘없는 목소리로 말하지만, 둘 다 추격할 수 없다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farmland Manors Laptop Snatch]]>><<set $phase to 1>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	두 사람이 당신에게서 떨어진다. <<tearful>> 당신은 노트북을 낚아채 계단을 뛰어 올라간다. "저 <<phim>> 잡아." <<person>>【이가】 힘없는 목소리로 말하지만, 둘 다 추격할 수 없다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<link [[다음|Farmland Manors Laptop Snatch]]>><<set $phase to 1>><</link>>
+	<br>
+
+<<else>>
+	<<tearful>> 당신은 바닥에 쓰러진다.
+	<br><br>
+	<<person2>>"저 <<phim>> 어떻게 할까?" <<person>>【이가】 묻는다. <<person1>><<person>>【은는】 <<person2>><<person>>【을를】 쳐다본다. "아니. 그건 너무 심해."
+	<br><br>
+	"다른 방법이 없어." <<person1>><<person>>【이가】 말한다. "미안하다, 꼬마야." <<He>>【은는】 당신의 머리에 두건을 씌우고, 당신을 일으켜 세워 걷도록 민다.
+	<br><br>
+
+	<<clotheson>>
+
+	<<link [[다음|Farmland Dungeon Hood]]>><</link>>
+
+<</if>>
+
+:: Farmland Manors Plants Explore
+<<effects>>
+
+정글로 들어가 식물 미로를 탐험한다. 정성껏 가꾼 것처럼 보인다. 닫힌 분홍색 구근을 지탱하는 키 큰 곧은 줄기를 가진 같은 종류의 꽃이 곳곳에 점점이 피어 있다.
+<br><br>
+화려한 인도교를 건너자 공터가 나온다. 맥동하는 녹색 빛이 눈길을 끈다. 전선과 뿌리가 모두 연결된 받침대 위에 유리 실린더가 놓여 있다.
+<br><br>
+중요한 것 같다. 무엇이든 간에 암시장에서 가치가 있을지도 모른다.
+<br><br>
+
+<<link [[가져간다|Farmland Manors Plants]]>><<set $blackmoney += 200>><<crimeUp 200 "thievery">><</link>><<crime "thievery">>
+<br>
+<<link [[내버려 둔다|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Tripwires
+<<effects>>
+
+<<if $danceSuccess>>
+	다양한 곡예 동작, 도약, 심지어 옆돌기를 조합하여 방 반대편까지 <span class="green">안전하게</span> 도착한다. 당신은 보석을 낚아채고, 그만큼 우아하게 탈출한다.
+	<br><br>
+	<<link [[다음|Farmland Manors]]>><</link>>
+	<br>
+<<else>>
+	당신은 인계철선을 통과하며, 어떤 것은 아래로 숙이고 다른 것은 필요에 따라 넘어간다. 보석에 거의 다다랐지만, 하나를 놓친 것 같다. <span class="red">경보가 울린다.</span>
+	<br><br>
+
+	당신은 보석을 낚아채고 왔던 길로 되돌아간다. 금속 셔터가 입구를 막아 당신을 안에 가둔다.
+	<br><br>
+
+	"침입자 감지." 사방에서 목소리가 울려 퍼진다. "보안 시스템 가동." 금속 팔이 발밑의 카펫을 찢고 나온다.
+	<br><br>
+
+	<<link [[다음|Farmland Manors Machine]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Machine
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+
+	<<set $machine_health to 10>><<set $machine_ammo to 3>>
+	<<if $player.vaginaExist and $settings.analEnabled>>
+		<<machine_init vaginal anal leg_chains>>
+		<<set $machine.vaginal.armed to 1>>
+		<<set $machine.anal.armed to 1>>
+	<<elseif $player.vaginaExist>>
+		<<machine_init vaginal leg_chains>>
+		<<set $machine.vaginal.armed to 1>>
+	<<else>>
+		<<machine_init anal leg_chains>>
+		<<set $machine.anal.armed to 1>>
+	<</if>>
+	<<prop rails>>
+<</if>>
+
+<<effects>>
+
+<<machine_effects>><<machine_combat>>
+<<machine_state>>
+
+<br><br>
+<<machine_actions>>
+
+<<if $machine.number lte 0 or $finish is 1>>
+	<<link [[다음|Farmland Manors Machine End]]>><</link>>
+<<else>>
+	<<link [[다음|Farmland Manors Machine]]>><</link>>
+<</if>>
+
+:: Farmland Manors Machine End
+<<effects>>
+
+"보안 조치 완료. 해제합니다." 기계가 작동을 멈추고 셔터가 열린다.
+<br><br>
+<<machine_end>>
+<<clotheson>>
+
+<<tearful>> 당신은 전리품을 손에 들고 건물에서 탈출한다.
+<br><br>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Elaborate
+<<effects>>
+
+당신은 도움이 될 만한 것을 찾으며, 눈에 띄지 않고 만일의 사태에 대비한다. 부엌을 탐색하던 중 숨겨진 좁은 공간을 발견한다. 안에는 화학 기호가 표시된 두 개의 병이 있다. 하나는 빨간색, 다른 하나는 분홍색이다.
+<br><br>
+
+<<if $sciencetrait gte 4>>
+	이것들은 과학 시간에 배우는 종류의 화학 물질은 아니지만, <span class="green">상관없이 당신의 지식을 활용할 수 있다.</span> 빨간 병은 몇 시간 동안 그들을 완전히 기절시킬 것이다. 분홍색 병은 현지에서 생산된 강력한 최음제다.
+	<br><br>
+
+	<<link [[빨간 병을 가져간다|Farmland Manors Rescue Red]]>><</link>>
+	<br>
+	<<link [[분홍색 병을 가져간다|Farmland Manors Rescue Pink]]>><</link>>
+	<br>
+<<else>>
+	<span class="red">불행히도, 당신은 그것들을 구별할 수 없다.</span> 이것들이 과학 시간에 다루는 종류의 화학 물질이라고는 생각하지 않는다.
+	<br><br>
+
+	<<if $rng gte 51>>
+		<<link [[무작위로 하나를 고른다|Farmland Manors Rescue Pink]]>><</link>>
+		<br>
+	<<else>>
+		<<link [[무작위로 하나를 고른다|Farmland Manors Rescue Red]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Farmland Manors Rescue Pink
+<<effects>><<wearProp "science flask" "pink">>
+
+분홍색 병을 집어 들고 술수레로 돌아간다. 마개를 열자 내용물에 어지러움을 느낀다. 충분히 강할 것이다.
+<br><br>
+각 와인 병의 코르크를 열고 훔친 용액을 각각 붓는다. 희생자들이 너무 취해서 조작을 눈치채지 못할 것이라고 생각한다.
+<br><br>
+몇 분 후 <<person1>><<person>>【이가】 비틀거리며 다가와 병 중 하나를 집어든다. <<He>>【와과】 <<his>> 동료 식객들은 오염된 액체를 간절히 마신다. 액체가 그들의 턱을 타고 흘러내린다.
+<br><br>
+
+<<link [[다음|Farmland Manors Rescue Pink 2]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Pink 2
+<<effects>>
+
+효과는 즉각적이었다. 친목 저녁 식사였고, 그들의 관심은 식탁 중앙의 희생자에게 집중되어 있었다. 이제 식객들은 서로에게 더 관심이 많다. 잠시의 싸움 끝에 <<person2>><<person>>【와과】 <<person3>><<person>>【은는】 바닥에 의식을 잃고 쓰러져 있고, <<person1>><<person>>【은는】 <<person4>><<person>>【을를】 방에서 쫓아낸다.
+<br><br>
+<<endevent>>
+<<loadNPC 0 "farmland_manors_victim">><<person1>>
+아직 돼지처럼 묶여 있는 <<person>>【은는】 두려운 눈으로 당신을 바라본다.
+<br><br>
+
+<<link [[안심시키고 구출한다|Farmland Manors Rescue Reassure]]>><</link>>
+<br>
+<<link [[구출에만 집중한다|Farmland Manors Rescue Focus]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Red
+<<effects>><<wearProp "science flask" "red">>
+
+빨간 병을 집어 들고 술수레로 돌아간다. 손에 타는 듯한 느낌이 들지만, 새는 것 같지는 않다. 충분히 강할 것이다.
+<br><br>
+
+각 와인 병의 코르크를 열고 훔친 용액을 각각 붓는다. 희생자들이 너무 취해서 조작을 눈치채지 못할 것이라고 생각한다.
+<br><br>
+몇 분 후 <<person1>><<person>>【이가】 비틀거리며 다가와 병 중 하나를 집어든다. <<He>>【와과】 <<his>> 동료 식객들은 오염된 액체를 게걸스럽게 마신다. 액체가 그들의 턱을 타고 흘러내린다.
+<br><br>
+
+<<link [[다음|Farmland Manors Rescue Red 2]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Red 2
+<<effects>>
+
+효과는 즉각적이다. 식객들은 축 늘어진다. <<person>>【은는】 <<his>> 의자에서 떨어지고, 다른 한 명은 식탁 위로 쓰러진다.
+<br><br>
+
+당신은 다가간다. 희생자들은 잠든 것처럼 숨을 쉰다.
+<<endevent>>
+<<loadNPC 0 "farmland_manors_victim">><<person1>>
+아직 돼지처럼 묶여 있는 <<person>>【은는】 두려운 눈으로 당신을 바라본다.
+<br><br>
+
+<<link [[안심시키고 구출한다|Farmland Manors Rescue Reassure]]>><</link>>
+<br>
+<<link [[구출에만 집중한다|Farmland Manors Rescue Focus]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Reassure
+<<effects>><<wearProp "knife">>
+
+<<if $speech_attitude is "meek">>
+	"괜찮아요." 당신이 말한다. "도와주러 왔어요."
+<<elseif $speech_attitude is "bratty">>
+	"구원군이 도착했다." 당신이 말한다.
+<<else>>
+	"두려워하지 마세요." 당신이 말한다. "구해줄게요."
+<</if>>
+<br><br>
+
+당신의 말이 <<person>>【을를】 안심시켰는지는 불분명하지만, 당신이 가까이 다가가자 <<he>>【은는】 더 두려워하는 것 같지는 않다. 당신은 <<him>> 뒤로 가서 부엌 칼을 잡고 <<him>>【을를】 묶고 있는 밧줄을 자른다. 밧줄은 매우 팽팽했고, 즉시 풀어진다.
+<br><br>
+
+<<link [[다음|Farmland Manors Rescue]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Focus
+<<effects>><<wearProp "knife">>
+
+<<person>>【이가】 몸부림치자, 당신은 식탁에서 부엌 칼을 집는다. 당신은 <<him>>【을를】 묶고 있는 밧줄을 자른다. 밧줄은 매우 팽팽했고, 즉시 풀어진다.
+<br><br>
+
+<<link [[다음|Farmland Manors Rescue]]>><</link>>
+<br>
+
+:: Farmland Manors Rescue Charge
+<<effects>>
+
+당신은 숨어 있던 곳에서 뛰쳐나온다. 식객들은 불안할 정도로 일제히 당신을 향해 돌아선 후 자리에서 일어선다.
+<br><br>
+
+"또 다른 한 입 거리군." <<person>>【이가】 말한다. "맛있겠어."
+<br><br>
+
+<<link [[다음|Farmland Manors Rescue Fight]]>><<set $fightstart to 1>><</link>>
+<br>
+
+:: Farmland Manors Rescue Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farmland Manors Rescue Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Rescue Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Rescue Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	와인과 당신의 봉사 덕분에, 식객들은 이제 기력이 다했다.
+	<br><br>
+	<<tearful>> 당신은 그들의 희생자에게로 돌아선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<loadNPC 0 "farmland_manors_victim">><<person1>>
+	아직 돼지처럼 묶여 있는 <<person>>【은는】 두려운 눈으로 당신을 바라본다.
+	<br><br>
+
+	<<link [[안심시키고 구출한다|Farmland Manors Rescue Reassure]]>><</link>>
+	<br>
+	<<link [[구출에만 집중한다|Farmland Manors Rescue Focus]]>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	식객들은 당신의 잔혹함에, 그리고 취기에 힘입어 의식을 잃고 당신 앞에 쓰러진다.
+	<br><br>
+	<<tearful>> 당신은 몸을 턴다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<loadNPC 0 "farmland_manors_victim">><<person1>>
+	아직 돼지처럼 묶여 있는 <<person>>【은는】 두려운 눈으로 당신을 바라본다.
+	<br><br>
+
+	<<link [[안심시키고 구출한다|Farmland Manors Rescue Reassure]]>><</link>>
+	<br>
+	<<link [[구출에만 집중한다|Farmland Manors Rescue Focus]]>><</link>>
+	<br>
+
+<<else>>
+	<<tearful>> 당신은 바닥에 쓰러진다.
+	<br><br>
+	식객들이 당신 주위로 모여들어 위에서 쳐다본다.
+	<br>
+	"대단한 상품이군."
+	<br>
+	"저 <<phim>> 우리가 가질까?"
+	<br>
+	"더 좋은 생각이 있어."
+	<br><br>
+	잠시 침묵. 그리고 웃음소리.
+	<br><br>
+	"정말 악마 같은 생각이군!"
+	<br>
+	"보상받을 수 있을 거야."
+	<br>
+	"진심이야?"
+	<br>
+	"왜 안 되겠어?"
+	<br><br>
+
+	<<person1>><<person>>【이가】 당신의 머리에 두건을 씌우고, 억지로 일으켜 세워 걷도록 민다.
+	<br><br>
+
+	<<clotheson>>
+
+	<<link [[다음|Farmland Dungeon Hood]]>><<clearNPC "farmland_manors_victim">><</link>>
+
+<</if>>
+
+:: Farmland Manors Rescue
+<<effects>>
+
+<<person>>【이가】 힘겹게 일어선다. <<He>>【은는】 잠시 주위를 둘러보더니, 자신이 어디에 있는지 확신하지 못하는 것 같다. <<He>>【은는】 당신 손에 들린 칼을 쳐다본 후, 바닥에 무력하게 누워 있는 식객들을 본다. <<He>>【은는】 잠시 생각하더니, 결심한 듯 말한다. "옷이 필요해."
+<br><br>
+
+당신은 근처 방에서 <<him>>【을를】 위한 옷을 찾아주고, 함께 저택을 탈출한다.
+<br><br>
+
+"고마워." 밖으로 나오자 <<he>>【이가】 말한다. <<He>>【은는】 마치 부끄러운 듯 눈을 마주치지 않는다. "여기서부터 집으로 가는 길은 알아." <<He>>【은는】 당신을 놀라게 하며 껴안은 후, 걸어간다.
+<br><br>
+
+<<link [[훔친 은식기를 가지고 떠난다|Farmland Manors]]>><<endevent>><<crimeUp 80 "thievery">><<set $blackmoney += 80>><<clearNPC "farmland_manors_victim">><</link>><<crime "thievery">>
+<br>
+<<link [[그냥 떠난다|Farmland Manors]]>><<endevent>><<clearNPC "farmland_manors_victim">><</link>>
+<br>
+
+:: Farmland Manors Sheet
+<<effects>>
+
+당신은 손가락으로 보석을 잡고 당긴다. 끼어 있다. 당신은 그것을 고정하고 있는 것을 풀기 위해 비틀면서 당긴다.
+<br><br>
+
+<<if $hallucinations gte 2>>
+	<<if $settings.tentaclesEnabled and $rng gte 50>>
+		보석이 갑자기 다른 힘에 의해 튕겨져 나온다. 초상화의 눈에서 굵은 촉수가 튀어나온다. 죽은 눈구멍에서 또 다른 촉수가 나오고, 그림의 다른 어두운 부분에서도 더 많은 촉수가 나온다.
+		<br><br>
+
+		<<link [[다음|Farmland Manors Sheet Tentacles]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		<<generate1>><<generate2>>
+		보석이 갑자기 빠져나와 당신의 손아귀에서 튀어나간다. 그것은 부자연스럽게 바닥을 가로질러 튕겨나가, <<person1>><<person>>【와과】 <<person2>><<person>>의 발치에 멈춘다. 당신은 둘 중 누구도 들어오는 소리를 듣지 못했다.
+		<br><br>
+		하지만 그들은 보석에 관심이 없다. 그들은 당신을 똑바로 쳐다보더니, 다가온다.
+		<br><br>
+
+		<<link [[다음|Farmland Manors Sheet Rape]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	약간의 노력 끝에, 보석이 초상화의 눈에서 튀어나온다. 그것은 공중으로 날아가지만, 당신은 떨어지는 것을 잡아채고, 전리품을 안전하게 확보한 채 방을 나선다.
+	<br><br>
+
+	<<link [[다음|Farmland Manors]]>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Sheet Tentacles
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<set $combat to 1>>
+	<<set $enemytype to "tentacles">>
+	<<molested>>
+	<<controlloss>>
+
+	<<tentaclestart 8 15>>
+
+<</if>>
+
+<<statetentacles>>
+
+<<effects>>
+<<effectstentacles>>
+<<tentacles>>
+<<actionstentacles>>
+
+<<if $tentacles.active lte ($tentacles.max / 2)>>
+	<span id="next"><<link [[다음|Farmland Manors Sheet Tentacles Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Sheet Tentacles]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Sheet Tentacles Finish
+<<effects>>
+
+촉수들이 그림 속으로 움츠러들고, 이제 두 눈 모두 생기가 없다.
+<br><br>
+
+<<tearful>> 당신은 저택에서 탈출한다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Sheet Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Farmland Manors Sheet Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Sheet Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Sheet Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	두 사람은 당신을 떠나 방에서 걸어 나가며, 여전히 보석에는 전혀 관심을 보이지 않는다.
+	<br><br>
+	<<tearful>> 당신은 일어선다. 당신은 저택에서 탈출한다.
+	<br><br>
+
+<<elseif $enemyhealth lte 0>>
+	두 사람은 당신에게서 물러나 방의 문턱을 넘어서자, 마치 처음부터 없었던 것처럼 사라진다.
+	<br><br>
+	<<tearful>> 당신은 일어선다. 당신은 저택에서 탈출한다.
+
+<</if>>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Wall Investigate
+<<effects>>
+
+카메라의 시선 아래에 있는 벽으로 다가간다. 가까이서 보니 직사각형 모양의 얇은 홈이 보인다. 그것을 밀자, 약간의 현금이 든 비밀 칸이 드러난다.
+<br><br>
+
+<<link [[카메라를 조롱하고 돈을 훔친다|Farmland Manors Wall Mock]]>><<crimeUp 40>><<set $blackmoney += 40>><<moneyGain 70 false true>><</link>><<crime "thievery">>
+<br>
+<<if hasSexStat("exhibitionism", 4)>>
+   <<link [[카메라에 몸을 노출하고 돈을 훔친다|Farmland Manors Wall Flash]]>><<crimeUp 40>><<set $blackmoney += 40>><<moneyGain 70 false true>><</link>><<crime "thievery">><<exhibitionist5>>
+	<br>
+<</if>>
+<<link [[그냥 돈만 훔친다|Farmland Manors Wall Steal]]>><<crimeUp 40>><<set $blackmoney += 40>><<moneyGain 70 false true>><</link>><<crime "thievery">>
+<br>
+<<link [[이전에 부당하게 얻은 이득만 챙겨서 떠난다|Farmland Manors]]>><<crimeUp 40>><<set $blackmoney += 40>><</link>><<crime "thievery">>
+<br>
+<<link [[그냥 떠난다|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Wall Mock
+<<effects>>
+
+당신은 한 손으로 무례한 손짓을 하면서 다른 손으로는 현금을 흔든 후, 카메라의 시야에서 벗어난다.
+<br><br>
+
+당신은 부당하게 얻은 이득을 손에 들고 저택을 떠난다.
+<br><br>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Wall Flash
+<<effects>>
+
+<<pulldownall>> 당신은 잠시 카메라에 혀를 내민 후, 몸을 가리고 부당하게 얻은 이득을 손에 들고 저택을 비운다.
+<<exhibitionism5>>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Wall Steal
+<<effects>>
+
+당신은 현금을 낚아채고 부당하게 얻은 이득을 손에 들고 건물을 비운다.
+<br><br>
+
+<<link [[다음|Farmland Manors]]>><</link>>
+<br>
+
+:: Farmland Manors Bound Snatch
+<<effects>>
+
+당신은 목소리가 들리는 방을 피해 저택을 몰래 돌아다니며, 찾을 수 있는 가치 있는 물건들을 챙긴다. 들어왔을 때처럼 조용히 떠난다.
+<br><br>
+
+<<link [[다음|Farmland Manors]]>><<endevent>><</link>>
+<br>
+
+:: Farmland Manors Bound Intervene
+<<effects>>
+
+당신은 방으로 들어선다.<<person2>>
+<<if $speech_attitude is "meek">>
+	"ㄱ-<<him>>【을를】 놔줘." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"<<him>>【을를】 놔줘." 당신이 말한다. "안 그러면 다음엔 네가 채찍질 당할 거야."
+<<else>>
+	"<<him>>【을를】 놔줘." 당신이 말한다.
+<</if>>
+<br><br>
+
+<<person1>><<person>>【이가】 당신에게 돌아선다. "침입자로군." <<he>>【이가】 말한다. "네가 감히 나에게 명령할 수 있다고 생각하나? 내 소유지에서?" <<He>>【은는】 앞으로 나서며 채찍을 들어 올린다.
+<br><br>
+
+<<link [[싸운다|Farmland Manors Bound Fight]]>><<saveNPC 0 "farmland_manors_bound_villain">><<saveNPC 1 "farmland_manors_bound_victim">><<endevent>><<loadNPC 0 "farmland_manors_bound_villain">><<set $fightstart to 1>><</link>>
+<br>
+<<link [[채찍을 빼앗는다|Farmland Manors Bound Wrestle]]>><</link>><<physiquedifficulty 1 15000>>
+<br>
+<<link [[피한다|Farmland Manors Bound Dodge]]>><</link>><<dancedifficulty 1 1000>>
+
+:: Farmland Manors Bound Wrestle
+<<effects>>
+
+<<if $physiqueSuccess>>
+	당신은 <<person>>의 팔을 잡고 채찍을 빼앗기 위해 몸싸움을 벌인다. 당신은 <<his>> 팔을 고통스러운 각도로 꺾어, <span class="green">그가 무기를 떨어뜨리게 만든다.</span> 당신은 그를 옷장 쪽으로 걷어차고, 직접 채찍을 휘두른 다음, 그의 손목을 침대 기둥에 묶는다. 만약을 위해 그에게 재갈을 물린다.
+	<br><br>
+
+	<<link [[다음|Farmland Manors Bound Rescue]]>><<saveNPC 0 "farmland_manors_bound_villain">><<saveNPC 1 "farmland_manors_bound_victim">><<endevent>><</link>>
+	<br>
+<<else>>
+	당신은 <<person>>의 손아귀에서 채찍을 빼앗으려 하지만, 그의 팔 하나를 붙잡는 것만으로도 온 힘을 다해야 한다. <<He>>【은는】 당신의 배를 때리고, 당신의 다리에 다리를 걸어 <span class="red">넘어뜨린다.</span><<gpain>><<pain 4>>
+	<br><br>
+
+	<<link [[스스로를 방어한다|Farmland Manors Bound Fight]]>><<saveNPC 0 "farmland_manors_bound_villain">><<saveNPC 1 "farmland_manors_bound_victim">><<endevent>><<loadNPC 0 "farmland_manors_bound_villain">><<set $fightstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Bound Dodge
+<<effects>>
+
+<<if $danceSuccess>>
+	<<He>>【은는】 채찍으로 당신을 후려치지만, 당신은 옆으로 피한다. 채찍이 허공을 가른다. <<he>>【이가】 채찍을 회수하기 전에 당신은 채찍을 낚아채 팔뚝에 감고, <span class="green">그를 땅으로 끌어당긴다.</span>
+	<br><br>
+
+	당신은 그의 손목을 침대 기둥에 묶고, 만약을 위해 재갈을 물린다.
+	<br><br>
+
+	<<link [[다음|Farmland Manors Bound Rescue]]>><<saveNPC 0 "farmland_manors_bound_villain">><<saveNPC 1 "farmland_manors_bound_victim">><<endevent>><</link>>
+	<br>
+<<else>>
+	<<He>>【은는】 채찍으로 당신을 후려치고, <span class="red">채찍이 당신의 어깨를 때린다.</span> 고통이 즉시 느껴진다. 당신은 얼굴을 위로 한 채 바닥에 누워 있는 자신을 발견한다.<<ggpain>><<pain 8>>
+	<br><br>
+
+	<<link [[스스로를 방어한다|Farmland Manors Bound Fight]]>><<saveNPC 0 "farmland_manors_bound_villain">><<saveNPC 1 "farmland_manors_bound_victim">><<endevent>><<loadNPC 0 "farmland_manors_bound_villain">><<set $fightstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Bound Fight
+<<if $fightstart is 1>>
+	<<person1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Farmland Manors Bound Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Farmland Manors Bound Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Farmland Manors Bound Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<He>>【은는】 채찍을 떨어뜨린다. 당신은 이 기회를 놓치지 않고, <<he>>【이가】 약하게 저항하는 동안 채찍으로 <<his>> 손목을 침대 기둥에 묶는다. 만약을 위해 <<him>>에게 재갈을 물린다.
+	<br><br>
+	<<tearful>> 당신은 <<his>> 희생자에게 돌아선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farmland Manors Bound Rescue]]>><</link>>
+
+<<elseif $enemyhealth lte 0>>
+	당신은 정신 못 차리는 <<persons>> 손에서 채찍을 빼앗아, <<his>> 손목을 침대 기둥에 묶는다. "감히 어딜..." 당신은 만약을 위해 <<him>>에게 재갈을 물린다.
+	<br><br>
+	<<tearful>> 당신은 <<his>> 희생자에게 돌아선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Farmland Manors Bound Rescue]]>><</link>>
+
+<<else>>
+	당신은 땅에 쓰러진다. 너무 다쳐서 더는 싸울 수 없다.
+	<br><br>
+	<<clotheson>>
+	<<link [[다음|Farmland Manors Bound Loss]]>><</link>>
+	<br>
+<</if>>
+
+:: Farmland Manors Bound Loss
+<<effects>>
+
+<<person>>【이가】 당신 양옆으로 발을 딛고 선다. "자," <<he>>【이가】 말한다. "너를 어떻게 해줄까? 알겠다." <<He>>【은는】 근처 서랍장에서 두건을 꺼내 당신 머리에 씌우고는, 당신을 일으켜 세운다. <<He>>【은는】 당신을 밀어 움직이게 한다.
+<br><br>
+
+<<link [[다음|Farmland Dungeon Hood]]>><<set $phase to 1>><</link>>
+
+:: Farmland Manors Bound Rescue
+<<effects>>
+<<endevent>>
+<<loadNPC 0 "farmland_manors_bound_victim">><<person1>>
+
+당신은 침대 기둥에서 <<persons>> 팔을 풀어준다. <<He>>【은는】 <<his>> 입에서 재갈을 뜯어낸다.
+<br><br>
+"지금 뭐 하는 짓이야?" <<he>>【이가】 묻는다. <<He>>【은는】 <<his>> 가해자를 걱정스럽게 쳐다본다. "나 이제 큰일 났어."
+<br><br>
+
+<<link [[사과한다|Farmland Manors Bound Apologise]]>><</link>>
+<br>
+<<link [[화를 낸다|Farmland Manors Bound Angry]]>><</link>>
+<br>
+<<link [[침묵을 지킨다|Farmland Manors Bound Silent]]>><</link>>
+<br>
+
+:: Farmland Manors Bound Apologise
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"용서해 주세요." 당신이 말한다. "이걸 원하실 줄 알았어요."
+<<elseif $speech_attitude is "bratty">>
+	"고마운 줄도 모르네." 당신이 말한다. "좋아. 미안해, 됐어?"
+<<else>>
+	"용서해 주세요." 당신이 말한다. "이걸 원하실 줄 알았어요."
+<</if>>
+<br><br>
+
+<<person>>【은는】 <<his>> 머리카락을 손으로 쓸어 넘긴다. "아니." <<he>>【이가】 한숨을 쉰다. "내가 불공평했어. 당신이 날 구해줬는데."
+<br><br>
+<<his>> 가해자는 쳐다보지도 않고, <<he>>【은는】 침대 밑으로 기어 들어가 조합 자물쇠로 잠긴 서류 가방을 들고 나온다. <<He>>【은는】 가방을 열자 서류와 현금이 보인다.
+<br><br>
+"난 이 마을을 떠날 거라, 이 돈 대부분이 필요해. 자." <<He>>【은는】 현금 뭉치를 내민다.
+<br><br>
+
+<<link [[돈을 받고 떠난다|Farmland Manors]]>><<clearNPC "farmland_manors_bound_villain">><<clearNPC "farmland_manors_bound_victim">><<moneyGain 280 true true>><<endevent>><</link>><<crime "thievery">>
+<br>
+<<link [[그냥 떠난다|Farmland Manors]]>><<clearNPC "farmland_manors_bound_villain">><<clearNPC "farmland_manors_bound_victim">><<endevent>><</link>>
+<br>
+
+:: Farmland Manors Bound Angry
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"무례하게 굴지 마." 당신이 말한다. "내가 널 구해줬잖아."
+<<elseif $speech_attitude is "bratty">>
+	"묶여서 채찍질당하는 게 좋았어?" 당신이 묻는다. "벌레처럼 굴지 마."
+<<else>>
+	"고마운 줄도 모르네." 당신이 말한다. "내가 널 구해줬잖아."
+<</if>>
+<br><br>
+
+<<person>>【은는】 반박하려 입을 열었다가, 다시 닫고는 시선을 돌린다. "용서해 줘." <<he>>【이가】 말한다. "당신 말이 맞아. 정신 차려야지."
+<br><br>
+
+<<his>> 가해자는 쳐다보지도 않고, <<he>>【은는】 침대 밑으로 기어 들어가 조합 자물쇠로 잠긴 서류 가방을 들고 나온다. <<He>>【은는】 가방을 열자 서류와 현금이 보인다.
+<br><br>
+"난 이 마을을 떠날 거라, 이 돈 대부분이 필요해. 자." <<He>>【은는】 현금 뭉치를 내민다.
+<br><br>
+
+<<link [[돈을 받고 떠난다|Farmland Manors]]>><<clearNPC "farmland_manors_bound_villain">><<clearNPC "farmland_manors_bound_victim">><<moneyGain 280 true true>><<endevent>><</link>><<crime "thievery">>
+<br>
+<<link [[그냥 떠난다|Farmland Manors]]>><<clearNPC "farmland_manors_bound_villain">><<clearNPC "farmland_manors_bound_victim">><<endevent>><</link>>
+<br>
+
+:: Farmland Manors Bound Silent
+<<effects>>
+
+당신은 침묵을 지킨다. <<person>>【은는】 잠시 당신을 쳐다보다가, <<his>> 시선을 피한다. "나 바보 같지, 안 그래?" 질문이 아니다.
+<br><br>
+
+<<his>> 가해자는 쳐다보지도 않고, <<he>>【은는】 침대 밑으로 기어 들어가 조합 자물쇠로 잠긴 서류 가방을 들고 나온다. <<He>>【은는】 가방을 열자 서류와 현금이 보인다.
+<br><br>
+"난 이 마을을 떠날 거라, 이 돈 대부분이 필요해. 자." <<He>>【은는】 현금 뭉치를 내민다.
+<br><br>
+
+<<link [[돈을 받고 떠난다|Farmland Manors]]>><<clearNPC "farmland_manors_bound_villain">><<clearNPC "farmland_manors_bound_victim">><<moneyGain 280 true true>><<endevent>><</link>><<crime "thievery">>
+<br>
+<<link [[그냥 떠난다|Farmland Manors]]>><<clearNPC "farmland_manors_bound_villain">><<clearNPC "farmland_manors_bound_victim">><<endevent>><</link>>
+<br>

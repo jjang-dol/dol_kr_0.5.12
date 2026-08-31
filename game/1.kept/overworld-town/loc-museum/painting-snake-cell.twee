@@ -1,0 +1,3730 @@
+/* Witch's Cell */
+:: Hopeless Cycle Cell
+<<set _thermoDisable to true>><<effects>><<set $bus to "cell">>
+<<hopelessCycleEffects>>
+당신은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>>의 감옥에 있다.
+<<if $hcChallenge.torchDarker>>
+	천장의 창살 달린 구멍이 막혀 있어 어둡다. 빛 한 줄기 들어오지 않는다.
+<<elseif Time.dayState is "dawn">>
+	아침 햇살이 천장 근처의 작은 창살 틈으로 힘겹게 비집고 들어온다.
+<<elseif Time.dayState is "day">>
+	창살 달린 창문에서 아주 적은 양의 자연광이 들어온다.
+<<elseif Time.dayState is "dusk">>
+	햇빛이 더는 신전의 이쪽 편에 닿지 않아 어둡다.
+<<else>>
+	어둡다. 창살 사이로 <<if Time.isBloodMoon()>>붉은 <</if>>달빛 한 조각만 간신히 엿보인다.
+<</if>>
+<<set _cellTorch to $hcItems.find(item => item.type is "torch" and item.location is $bus and item.inSconce)>>
+<<set _heldTorch to $hcItems.find(item => item.type is "torch" and item.location is "held")>>
+
+<<if (["dusk","night"].includes(Time.dayState) or $hcChallenge.torchDarker) and !hcItemLitTorch() and _heldTorch?.state isnot "lit" and _cellTorch?.state isnot "lit">>
+	<br>
+	<<if (_heldTorch and _heldTorch?.state isnot "lit" or _cellTorch and _cellTorch?.state isnot "lit")>>
+		<span class="red">횃불이 꺼져서 잘 보이지 않는다.</span>
+	<<elseif $hcChallenge.torchDarker>>
+		<span class="red">창문이 막혀 있어 그녀를 선명하게 보기에는 너무 어둡다.</span> 횃불이 필요할 것이다.
+	<<else>>
+		<span class="red">해 질 녘 이후에는 그녀를 선명하게 보기에는 너무 어둡다.</span> 횃불이 필요할 것이다.
+	<</if>>
+	<br><br>
+<<else>>
+	<br>
+	<<if _heldTorch?.state is "lit" or hcItemLitTorch()>>
+		<span class="orange">당신의 횃불이 어둠을 밝힌다.</span>
+	<<elseif _cellTorch?.state is "lit">>
+		<span class="orange">감옥의 촛대에 횃불이 꽂혀 어둠을 밝히고 있다.</span>
+		<<if ["dusk","night"].includes(Time.dayState)>>
+			밤에 떠나기 전에 횃불을 빼거나 꺼야 한다.
+		<</if>>
+	<<else>>
+		녹슬고 방치된 횃불 촛대가 먼 벽에 사용되지 않은 채 놓여 있다.
+	<</if>>
+	<br>
+
+	<<set _canSee to true>>
+	<<hopelessCycleStatus>>
+	<br>
+<</if>>
+<<unset $hcAction>>
+
+<<if $hcIncoming>>
+	<<set _hcEvent to $hcIncoming>>
+	<<unset $hcIncoming>>
+<<elseif $hc.daysPassed gt 0 and !$hc.daily.dailyPunishment and (Time.hour gte 12 and $rng gte 51 or Time.hour gte 13) and $hc.handLocation is "guardhouse" and Time.hour lte 19>>
+	<<set $hcIncoming to "dailyPunishment">>
+	<span class="red">무거운 발소리가 다가오는 것이 들린다.</span>
+	<br>
+<<elseif $hc.handLocation is "guardhouse">>
+	<<if !$hc.daily.handWarning>>
+		<<set $hc.daily.handWarning to true>>
+		<span class="red">지하 감옥으로 내려오는 무거운 장화 소리가 들린다.</span>
+	<<else>>
+		주교의 손이 지하 감옥 어딘가에 있다.
+	<</if>>
+	<br>
+<<elseif (Time.hour gte 23 or Time.hour lte 4) and ($hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard" or !$hc.daily.patrol and ($rng gte 96 or $rng gte 71 and $hc.dungeonTorchState is "lit"))>>
+	<<set $hcIncoming to "night">><<set $hc.daily.patrol to true>>
+	<span class="red">
+		발소리가 다가오는 것이 들린다.
+		<<if $hc.nightBreakIn is "heard">>
+			당신은 그들이 왜 여기 있는지 알고 있다.
+		<<elseif $hc.dungeonTorchState is "lit">>
+			누군가 횃불이 왜 아직도 켜져 있는지 조사하러 왔다!
+		<</if>>
+	</span>
+	<br>
+<</if>>
+
+<<if _hcEvent is "blood">>
+	무거운 발소리가 지하 감옥 계단을 내려온다. 잠시 후, 감옥 문이 열린다. "<span class="red">시간이 됐다, 형제여.</span> 마녀를 즉시 정원으로 데려와라."
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Blood Cell]]>><<endevent>><<set $phase to 1>><</link>>
+	<br>
+<<elseif $stress gte $stressmax>>
+	<<hopelessCyclePassout>>
+<<elseif _hcEvent>>
+	<<hopelessCycleItemEffects>>
+	<<if _hcEvent is "dailyPunishment">>
+		감옥 문이 삐걱거리며 열린다. 주교의 손이 고해 사제와 함께 들어온다.
+
+		<<if $worn.upper.name isnot "chain tunic">>
+			"좋아, 이미... 형제여, 갑옷은 어디 있나? 상관없다. 저 여자의 참회 시간이다."
+			<<hcSuspicion 10>><<hopelessCycleSus 2>>
+		<<else>>
+			"좋아, 이미 여기 있었군, 형제여. 저 여자의 참회 시간이다."
+		<</if>>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Prisoner Inspection]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<span class="red">감옥 문이 삐걱거리며 열린다.</span>
+		<<if $hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard">>
+			<<loadNPC 0 "hc_abuser">>
+		<<else>>
+			<<generateConfessor 1>>
+		<</if>>
+		<<person1>>
+		<<if $hc.dungeonTorchState is "lit">>
+			검은 예복을 입은 <<personsimple>>【이가】 감옥으로 들어온다. <<He>>【은는】 당신을 보고 얼어붙는다.
+			"페인 형제? 시간이 가는 줄도 몰랐나? 이리 와, 밤을 위해 횃불 끄는 걸 도와주지." <<hcSuspicion 5>><<hopelessCycleSus 1>>
+			<br><br>
+
+			<<set $hc.dungeonTorchState to "snuffed">>
+			당신에게는 선택의 여지가 별로 없다. 그래도 도움은 고맙게 생각한다. 당신은 순식간에 횃불을 끄고, <<him>>【와과】 함께 지하 감옥을 떠난다.
+			<br><br>
+
+			<<if $hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard">>
+				계단 꼭대기에 다다르자, <<he>>【은는】 불편하게 몸을 이리저리 뒤척인다. "지하 감옥은 내가 마무리하지. 성화 의식을 건너뛴 건 우리끼리 비밀로 하자고." <<He>>【은는】 당신의 대답을 기다리지 않고 계단을 다시 내려간다.
+				<<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>>
+				<br><br>
+
+				<<link [[다음|Hopeless Cycle Cloister]]>><<endevent>><</link>>
+				<br>
+			<<else>>
+				"우리를 성화시켜 줄 <<priest>>【을를】 깨우러 가겠다. 여기서 기다려라." <<He>>【은는】 옆 통로로 사라진다. <<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>>
+				<br><br>
+
+				<<link [[기다린다 <<hcTimeDungeonDisplay 35>>|Hopeless Cycle Cloister]]>><<endevent>><<hcTimeDungeonPass 35>><</link>>
+				<br>
+				<<link [[떠난다 (0:05)|Hopeless Cycle Cloister]]>><<endevent>><<pass 5>><<hcSuspicion 10>><</link>><<hopelessCycleSus 2>>
+				<br>
+			<</if>>
+		<<elseif _heldTorch?.state is "lit" or _cellTorch?.state is "lit">>
+			검은 예복을 입은 <<personsimple>>【이가】 감옥으로 들어온다. <span class="red">켜진 횃불 때문에, <<he>>【은는】 당신을 즉시 발견한다.</span>
+			<br><br>
+
+			"페인 형제," <<he>>【이가】 쉿 소리를 낸다. "마녀와 함께 몰래 숨어있다니. 그녀가 당신을 유혹했구나!" <<He>>【은는】 곤봉을 휘두른다. "정화되어야 한다."
+			<br><br>
+
+			<<link [[싸운다|Hopeless Cycle Cell Caught Fight]]>><<set $phase to 1>><<set $skillChallenge to random(700, 1000)>><</link>>
+			<br>
+			<<link [[저항하지 않는다|Hopeless Cycle Cell Caught Fight]]>><<set $phase to 2>><</link>>
+			<br>
+		<<else>>
+			<<if $hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard">>
+				검은 예복을 입은 <<personsimple>>【이가】 감옥으로 들어온다. <<He>>【은는】 주위를 둘러보고, <<his>> 눈은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>>【이가】 앉아 있는 곳에 멈춘다. 당신은 그림자 속에 몸을 숨긴다. <<He>>【은는】 당신을 보지 못하는 게 틀림없다.
+				<br><br>
+
+				"사악한 유혹자 같으니," <<he>>【이가】 내뱉는다. "어째서 페인 형제가 너를 독차지해야 하지?" <<he>>【이가】 다가오자 그녀는 <<him>>【을를】 쏘아본다. "내 서약은 이미 깨졌다. 해가 될 건 없을 거다. 적어도 나에게는 말이지."
+				<<if $hcChallenge.faithBlooms>>
+					<<His>> 손가락이 움찔거린다. "이 손 기억하나? <span @class="$prisonerEvents.includes('washHair') ? 'red' : ''">네 머리카락을 아주 쉽게 가져갔지.</span> 이번에는 머리카락 한 줌보다 더 많은 걸 <i>가져갈</i> 거다."
+				<</if>>
+				<br><br>
+
+				<<link [[미동도 않고 가만히 있는다|Hopeless Cycle Cell Caught Still]]>><<pass 1 hour>><<set $prisoner.love -= 15>><</link>><<hopelessCycleLove -3>>
+				<br>
+				<<link [[개입한다|Hopeless Cycle Cell Caught Intervene]]>><<set $prisoner.love += 5>><</link>><<hopelessCycleLove 2>>
+				<br>
+			<<else>>
+				검은 예복을 입은 <<personsimple>>【이가】 감옥으로 들어온다. <<He>>【은는】 주위를 둘러보고, <<his>> 눈은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>>【이가】 앉아 있는 곳에 멈춘다. 당신은 그림자 속에 몸을 숨긴다. <<He>>【은는】 당신을 보지 못하는 게 틀림없다.
+				<br><br>
+
+				<<He>>【은는】 코웃음을 치고 감옥을 떠나며 창살 문을 쾅 닫는다. 당신은 <<hes>> 완전히 지하 감옥을 나갔는지 확인하기 위해 몇 분을 기다린다. <<hcSuspicion 5>><<hopelessCycleSus 1>>
+				<br><br>
+
+				<<link [[다음 (0:05)|Hopeless Cycle Cell]]>><<endevent>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+<<elseif Time.dayState is "day" and $hc.dogs?.includes("loud") and !$hc.daily.prisonerDogs>>
+	<<set $hc.daily.prisonerDogs to true>>
+	<<if $prisoner.state isnot "dogs">>
+		밖에서 개 짖는 소리가 들리기 시작한다. <span class="red">그녀는 몸이 굳더니, 귀를 막으려고 한다.</span>
+		수갑 때문에 귀에 손이 닿지 않는다. 그녀는 땅바닥에서 경련을 일으키기 시작하고, 당신이 다가가려 하자 몸부림친다.
+	<<else>>
+		<span class="red">그녀는 개 짖는 소리가 들릴 때마다 몸부림친다. 이 상태로는 그녀에게 다가갈 수조차 없다.</span>
+	<</if>>
+	소음에 대해 조치를 취하거나, 개들이 낮 동안 신전 부지를 떠날 때까지 기다려야 한다.
+	<<set $prisoner.state to "dogs">>
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Cell]]>><</link>>
+	<br>
+<<elseif $prisoner.state is "dogs" and (!$hc.dogs?.includes("loud") or Time.dayState isnot "day")>>
+	<<set $prisoner.state to "lucid">>
+	그녀가 거친 숨을 내쉰다. 당신은 그녀의 어깨를 흔든다.
+	<br><br>
+
+	그녀는 몸을 굳혔다가, 이내 긴장을 푸는 것 같다. 그녀는 주위를 둘러본다. <span class="green">이제 개들이 조용해지자, 그녀는 다시 괜찮아진 것 같다.</span>
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Cell]]>><</link>>
+	<br>
+<<else>>
+	/* Actions that don't require sight */
+	<<set _clothesCurrent to $hcItems.find(clothes => clothes.type is "clothes" and clothes.location is "prisoner")>>
+	<<set _sheetsHere to hcItemCanReach("sheets")>>
+	<<set _sheetsCurrent to $hcItems.find(sheet => sheet.type is "sheets" and sheet.location is "prisoner")>>
+
+	<<if $hc.nightBreakIn is "heard" and Time.dayState is "night" and (!(_heldtorch?.state is "lit" || _celltorch?.state is "lit") || hcItemCanReach("snuffer"))>>
+		<<crimeicon "mark">><<link [[침입자를 기다린다|Hopeless Cycle Cell Spend Night]]>><<endevent>><<set $phase to 2>><<pass 30>><</link>>
+		<br>
+	<<elseif Time.dayState is "night" and (Time.hour gte 22 or Time.hour lte 3) and ($prisonerEvents.includes("spendNight") or ($prisoner.love gte 60 and $prisonerEvents.includesAll("talkMagic", "talkHair", "talkName"))) and !$hc.daily.cellSleep and !$hcIncoming and !(Time.lastDayOfMonth is $hc.day)>>
+		<<hcicon "prisoner">><<link [[`오늘 밤 ${window.KR.gatPersonNameDictKR($prisoner.name)}【와과】 함께 감옥에서 잠자기 (6:00)`|Hopeless Cycle Cell Spend Night]]>>
+			<<endevent>><<set $phase to 3>><<pass 1 hour>>
+			<<hcPrisonerHealth 1>><<set $prisoner.love += 3>>
+			<<purity -30>><<stress -60>><<trauma 50>><<tiredness -12>>
+		<</link>>
+		<<lllpurity>><<lllstress>><<gggtrauma>><<lltiredness>><<hopelessCycleLove 3>>
+		<br>
+	<</if>>
+	<<if $prisoner.state is "asleep">>
+		<<if !_canSee>>
+			<span class="blue">부드러운 코골이 소리가 들린다.</span>
+			<br>
+		<</if>>
+		<<if _sheetsHere and !$hcItems.some(sheet => sheet.type is "sheets" and sheet.location is "prisoner")>>
+			<<capture _sheetsHere>>
+				<<hcicon "sheets">><<link [[부드럽게 침대 시트를 덮어준다|Hopeless Cycle Cell Sheet]]>><<set _sheetsHere.location to "prisoner">><</link>><<if !$hc.daily.cellSheet>><<hopelessCycleLove 1>><</if>>
+				<br>
+			<</capture>>
+		<</if>>
+		<<bedicon "zzz">><<link [[그녀를 깨운다|Hopeless Cycle Cell Awaken]]>><</link>>
+		<br>
+	<<elseif $prisoner.state is "awake" and $prisonerEvents.includes("fed")>>
+		<<if $prisoner.love gte 60 or $prisonerEvents.includes("comfort")>>
+			<<loveicon>><<link [[그녀에게 말을 건다 (0:20)|Hopeless Cycle Cell Talk]]>>
+				<<pass 20>><<set $prisoner.love++>><<if $hc.handLocation is "guardhouse">><<hcSuspicion 10>><</if>><<stress -6>>
+				<<if !_clothesCurrent and !_sheetsCurrent and _canSee>><<trauma 12>><<arousal 300>><<else>><<trauma 6>><</if>>
+			<</link>>
+			<<hopelessCycleLove 1>><<if $hc.handLocation is "guardhouse">><<hopelessCycleSus 2>><</if>><<lstress>>
+		<<else>>
+			<<if $prisonerEvents.includes("speech")>><<set _talkLinkText to "그녀에게 말을 건다 (0:20)">><<else>><<set _talkLinkText to "그녀에게 말을 걸어 본다 (0:20)">><</if>>
+			<<socialiseicon>><<link [[`_talkLinkText`|Hopeless Cycle Cell Talk]]>>
+				<<pass 20>><<set $prisoner.love++>><<if $hc.handLocation is "guardhouse">><<hcSuspicion 10>><</if>><<stress 12>>
+				<<if !_clothesCurrent and !_sheetsCurrent and _canSee>><<trauma 24>><<arousal 300>><<else>><<trauma 12>><</if>>
+			<</link>>
+			<<hopelessCycleLove 1>><<if $hc.handLocation is "guardhouse">><<hopelessCycleSus 2>><</if>><<gstress>>
+		<</if>>
+		<<if !_clothesCurrent and !_sheetsCurrent and _canSee>>
+			<<ggtrauma>><<garousal>>
+		<<else>>
+			<<gtrauma>>
+		<</if>>
+		<br>
+	<</if>>
+
+	<<if _sheetsCurrent and $prisoner.state isnot "asleep">>
+		<<capture _sheetsCurrent>>
+			<<hcicon "sheets">><<link [[침대 시트를 가져간다|Hopeless Cycle Cell]]>><<set _sheetsCurrent.location to hcItemHasFreeHand() ? "held" : "cell">><</link>>
+			<br>
+		<</capture>>
+	<</if>>
+
+	/* Actions that require sight */
+	<<if _canSee and $prisoner.state isnot "dogs">>
+		<<if !$prisonerEvents.includes("health")>>
+			<<investigateicon>><<link [[그녀를 살핀다 (0:30)|Hopeless Cycle Cell Intro]]>><<pass 30>><<set $prisonerEvents.pushUnique("health")>><</link>>
+			<br>
+		<<else>>
+			<<set _food to hcItemsOnScreen(f => f.type is "food" and !f.used and !f.dirty)>>
+			<<set _water to hcItemCanReach("water", (water => water.dirty lt 2))>>
+			<<set _bandagesFresh to hcItemCanReach("bandages", (bandage => bandage.dirty is 0 and !bandage.used))>>
+			<<set _bandagesUsed to hcItemCanReach("bandages", (bandage => bandage.dirty is 0 and bandage.used))>>
+			<<set _herbs to hcItemCanReach("herbs")>>
+
+			<<if _clothesCurrent>>
+				<<if !$prisonerEvents.includes("undress")>>
+					<<skinicon "strip">><<link [[그녀의 옷을 벗긴다|Hopeless Cycle Cell Undress Intro]]>><</link>>
+				<<else>>
+					<<capture _clothesCurrent>>
+						<<skinicon "strip">><<link [[그녀의 옷을 벗긴다 (0:02)|Hopeless Cycle Cell]]>>
+							<<set _clothesCurrent.location to "cell">><<trauma 3>><<arousal 300>><<pass 2>>
+							<<if $prisoner.state is "asleep">>
+								<<set $prisoner.state to "awake">><<set $itemAction to "undressPrisonerAsleep">>
+							<<else>>
+								<<set $itemAction to "undressPrisoner">>
+							<</if>>
+						<</link>><<gtrauma>><<garousal>>
+					<</capture>>
+				<</if>>
+				<br>
+			<<elseif $prisoner.bandagesOn>>
+				<<if !$prisonerEvents.includes("bandages")>>
+					<<hcicon "bandages">><<link [[그녀의 붕대를 제거한다|Hopeless Cycle Cell Bandages Intro]]>><</link>>
+				<<else>>
+					<<hcicon "bandages">><<link [[그녀의 붕대를 제거한다 (0:05)|Hopeless Cycle Cell]]>>
+						<<set $itemAction to "bandagesRemove">><<set $prisoner.bandagesOn to false>>
+						<<pass 5>><<trauma 6>><<arousal 500>>
+						<<if $prisoner.cleanBandages gte 3>>
+							<<set _dirt to 0>>
+						<<elseif $prisoner.cleanBandages lte 1>>
+							<<set _dirt to 2>>
+						<<else>>
+							<<set _dirt to 1>>
+						<</if>>
+						<<set _bandagesLoc to hcItemHasFreeHand() ? "held" : "cell">>
+						<<run hcItemAdd({ type: "bandages", name: "bandages", location: _bandagesLoc, origin: "prisoner", dirty: _dirt, dirtyOnDrop: true, used: true })>>
+					<</link>><<gtrauma>><<garousal>>
+				<</if>>
+				<br>
+			<<else>>
+				<<if _water and (!$hc.daily.washed or $hcChallenge.prisonerClean and $prisoner.cleanBody lt 4)>>
+					<<capture _water>>
+						<<if !$prisonerEvents.includes("wash")>>
+							<<skinicon "wash">><<link [[그녀를 씻긴다|Hopeless Cycle Cell Wash Intro]]>><<set $hc.daily.washed to true>><<hcWash _water>><<set $prisoner.love += 1>><</link>>
+						<<else>>
+							<<skinicon "wash">><<link [[그녀를 씻긴다|Hopeless Cycle Cell Wash]]>><<set $hc.daily.washed to true>><<hcWash _water>><<if !$hc.daily.washed>><<set $prisoner.love += 1>><</if>><</link>><<gtrauma>><<ggarousal>><<lpurity>><<if !$hc.daily.washed>><<hopelessCycleLove 1>><</if>>
+						<</if>>
+						<br>
+					<</capture>>
+				<</if>>
+				<<if _herbs and $prisonerEvents.includes("brand")>>
+					<<set _waterCleanOnly to hcItemCanReach("water", water => water.dirty is 0)>>
+					<<if _waterCleanOnly>>
+						<<capture _herbs>>
+							<<if !$hc.daily.treated>>
+								<<hcicon "herbs">><<link [[그녀의 화상을 치료한다|Hopeless Cycle Cell Burns]]>><<set $hc.daily.treated to true>><<hcPrisonerHealth 3>><<set $prisoner.harmed-->><<set $prisoner.love += 2>><<run hcItemRemove(_herbs)>><<stress 12>><<trauma 24>><</link>><<gstress>><<ggtrauma>><<hopelessCycleLove 1>>
+								<br>
+							<</if>>
+						<</capture>>
+					<</if>>
+				<</if>>
+				<<if _bandagesFresh>>
+					<<capture _bandagesFresh>>
+						<<hcicon "bandages">><<link [[새 붕대를 감아준다 (0:05)|Hopeless Cycle Cell]]>>
+							<<pass 5>><<stress 3>><<trauma 3>>
+							<<set $itemAction to "bandagesApply">><<set $itemActionObject to _bandagesFresh>>
+							<<set $prisoner.bandagesOn to true>><<run hcItemRemove(_bandagesFresh)>>
+							<<set $prisoner.cleanBandages to 4>>
+						<</link>>
+						<<gstress>><<gtrauma>>
+					<</capture>>
+					<br>
+				<</if>>
+				<<if _bandagesUsed>>
+					<<capture _bandagesUsed>>
+						<<hcicon "bandages">><<link [[사용한 붕대를 감아준다 (0:05)|Hopeless Cycle Cell]]>>
+							<<pass 5>><<stress 3>><<trauma 3>>
+							<<set $itemAction to "bandagesApply">><<set $itemActionObject to _bandagesUsed>>
+							<<set $prisoner.bandagesOn to true>><<run hcItemRemove(_bandagesUsed)>>
+							<<set $prisoner.cleanBandages to 3>>
+						<</link>>
+						<<gstress>><<gtrauma>>
+					<</capture>>
+					<br>
+				<</if>>
+			<</if>>
+			<<if _herbs and $prisonerEvents.includes("brand") and $hc.daily.treated and $prisonerEvents.includes("talkHerbsMouth") and !$prisonerEvents.includes("herbsMouth")>>
+				<<capture _herbs>>
+					<<hcicon "herbs">><<link [[그녀에게 씹을 약초를 준다|Hopeless Cycle Cell Burns Mouth]]>><<run hcItemRemove(_herbs)>><</link>><<hopelessCycleLove 1>>
+					<br>
+				<</capture>>
+			<</if>>
+			<<if _food.length>>
+				<<for _labelFood, _valueFood range _food>>
+					<<capture _valueFood>>
+						<<if !$prisonerEvents.includes("fed")>>
+							<<hcicon _valueFood>><<link [[`그녀에게 ${hcTranslateName(_valueFood.name)}【을를】 준다 (0:10)`|Hopeless Cycle Cell Food Intro]]>>
+								<<pass 10>><<set $hcFood to _valueFood.name>>
+								<<if _valueFood.name is "stolen fruit">>
+									<<hcPrisonerHealth 1>>
+									<<run hcItemRemove(_valueFood)>>
+								<<else>>
+									<<if _valueFood.name isnot "prison gruel">><<hcPrisonerHealth 3>><</if>>
+									<<set _valueFood.used to true>><<set _valueFood.dirty to 1>>
+								<</if>>
+							<</link>>
+							<br>
+						<<elseif $prisoner.harmed gte Math.floor($prisoner.love / 8) and $prisoner.state isnot "catatonic">>
+							<<hcicon _valueFood>><<link [[`그녀에게 ${hcTranslateName(_valueFood.name)}【을를】 준다 (0:10)`|Hopeless Cycle Cell Food Refused]]>><</link>>
+							<br>
+						<<elseif $hcChallenge.prisonerFood and $hc.daily.fed>>
+							<<hcicon _valueFood>><<link [[`그녀에게 ${hcTranslateName(_valueFood.name)}【을를】 준다 (0:10)`|Hopeless Cycle Cell Food Restricted]]>><<set $hcFood to _valueFood.name>><</link>>
+							<br>
+						<<else>>
+							<<hcicon _valueFood>><<link [[`그녀에게 ${hcTranslateName(_valueFood.name)}【을를】 준다 (0:10)`|Hopeless Cycle Cell Food]]>>
+								<<pass 10>><<set $prisoner.love++>><<set $hcFood to _valueFood.name>>
+								<<if _valueFood.name is "stolen fruit">>
+									<<hcPrisonerHealth 1>>
+									<<run hcItemRemove(_valueFood)>>
+								<<else>>
+									<<if _valueFood.name isnot "prison gruel">><<hcPrisonerHealth 3>><</if>>
+									<<set _valueFood.used to true>><<set _valueFood.dirty to 1>>
+								<</if>>
+							<</link>>
+							<<hopelessCycleLove 1>>
+							<br>
+						<</if>>
+					<</capture>>
+				<</for>>
+				<<if _food.length gte 2 and !$hcIncoming and $prisoner.love gte 30 and !($hc.daily.fed and $hcChallenge.prisonerFood)>>
+					<<hcicon "prisoner">><<link [[그녀와 함께 앉아서 먹는다 (0:20)|Hopeless Cycle Cell Food Together]]>><<pass 20>><<set $prisoner.love += 3>><<stress -12>><<trauma -24>><<tiredness -6>><</link>><<ltiredness>><<if $prisonerEvents.includes("eatTogether")>><<lstress>><<lltrauma>><</if>><<hopelessCycleLove 2>>
+					<br>
+				<</if>>
+			<</if>>
+			<<if $prisonerEvents.includes("talkHair") and !$prisonerEvents.includes("talkHairBlooms")>>
+				<<set _witchblooms to hcItemCanReach("clutter", w => w.name === "purified witchblooms")>>
+				<<if _witchblooms>>
+					<<capture _witchblooms>>
+						<<hcicon _witchblooms>><<link [[정화된 마녀꽃을 그녀의 머리에 땋아준다 (0:10)|Hopeless Cycle Cell Witchblooms]]>><<pass 10>><<set _witchblooms.location to "prisoner">><<set $prisoner.love += 5>><</link>><<gglove>>
+						<br>
+					<</capture>>
+				<</if>>
+			<</if>>
+			<<if _water and (!$hc.daily.washed or $hcChallenge.prisonerClean and $prisoner.cleanBody gt 0)>>
+				<<capture _water, _clothesCurrent>>
+					<<hcicon "bucket">><<link [[그녀에게 물통의 물을 붓는다 (0:01)|Hopeless Cycle Cell Dump Water]]>>
+						<<set $prisoner.harmed += 1>><<set $prisoner.love -= 3>><<sadism 5>>
+						<<set $prisoner.cleanBody += 1>>
+						<<if $prisoner.bandagesOn>>
+							<<set $prisoner.cleanBandages++>>
+						<</if>>
+						<<if _clothesCurrent?.dirty gte 2>>
+							<<set _clothesCurrent.dirty-->>
+						<</if>>
+						<<set $hc.daily.washed to true>>
+						<<run hcItemRemove(_water)>>
+					<</link>>
+					<<hopelessCycleLove -2>>
+					<br>
+				<</capture>>
+			<</if>>
+			<<if $prisonerEvents.includes("punishmentIntro")>>
+				<<if $prisoner.love gte 45>>
+					<<templeicon $temple_weapon>><<link [[그녀를 채찍질한다 (0:02)|Hopeless Cycle Cell Whip]]>>
+						<<pass 2>><<if $sadism_level gte 2>><<arousal 800>><</if>>
+						<<set $prisoner.harmed += 1>><<hcPrisonerHealth -1>>
+						<<stress 6>><<control 25>><<sadism 30>>
+						<<if $hc.handLocation is "guardhouse">><<hcSuspicion -3>><</if>>
+					<</link>><<gstress>><<gcontrol>><<if $hc.handLocation is "guardhouse">><<hopelessCycleSus -1>><</if>>
+				<<else>>
+					<<templeicon $temple_weapon>><<link [[그녀를 채찍질한다 (0:02)|Hopeless Cycle Cell Whip]]>>
+						<<pass 2>><<if $sadism_level gte 2>><<arousal 800>><</if>>
+						<<set $prisoner.harmed += 1>><<hcPrisonerHealth -1>>
+						<<stress -24>><<trauma -12>><<control 25>><<sadism 30>>
+						<<if $hc.handLocation is "guardhouse">><<hcSuspicion -3>><</if>>
+					<</link>><<llstress>><<ltrauma>><<gcontrol>><<if $hc.handLocation is "guardhouse">><<hopelessCycleSus -1>><</if>>
+				<</if>>
+				<<if $sadism_level gte 2>><<garousal>><</if>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+	<br>
+	<div id="hcItems" class="no-numberify"><<hopelessCycleItemLinks>></div>
+	<br>
+
+	<<if $hcIncoming is "dailyPunishment" or $hcIncoming is "night" or (["dawn","day"].includes(Time.dayState) and ($hc.neverLeftDungeon or $hc.snuckInDungeon) and $hc.daysPassed gte 1)>>
+		<<getouticon>><<link [[감옥에서 나간다 (0:01)|Hopeless Cycle Cell Leave]]>><<pass 1>><</link>>
+		<br>
+	<<else>>
+		<<getouticon>><<link [[감옥에서 나간다 (0:01)|Hopeless Cycle Dungeon]]>><<pass 1>><</link>>
+		<br>
+	<</if>>
+
+<</if>>
+
+:: Hopeless Cycle Cell Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<if $hcItems.some(torch => torch.type is "torch" and torch.location is "held")>>
+	<span class="narration">간수는 횃불을 꽉 쥐고, 앞으로 자신이 감시하게 될 자를 바라보았다.</span>
+<<else>>
+	<span class="narration">간수는 조심스럽게 다가가, 흔들리는 횃불 빛 속에서 앞으로 자신이 감시하게 될 자를 바라보았다.</span>
+<</if>>
+<br><br>
+
+당신은 무릎을 꿇는다. 그녀는 더럽고 피 묻은 자루를 몸 대부분에 걸치고 있다. 머리와 팔을 위한 조잡한 구멍이 뚫려 있고, 다리는 원래 위쪽이었을 부분을 통과하고 있다.
+<br><br>
+
+몸이 떨린다. 그녀는 항상 이런 오물 속에서 존재했을까? 당신이 다가가자 그녀는 몸을 웅크린다. 당신은 움찔한다. 그녀가 움직인 것은 처음이다.
+<br><br>
+
+잠시 후, 당신은 다시 나아간다. 그녀의 머리가 천천히 당신을 향해 돌아간다. <span class="red">횃불 빛을 받은 한쪽 잿빛 눈이 당신을 쳐다본다. 그 눈은 공포와 증오로 불타고 있다.</span> <<stress 40>><<gggstress>>
+<br><br>
+
+다른 쪽 눈과 입은 더러운 붕대로 가려져 있다. 당신은 꼼짝 않고 서 있는다. 그녀는 다시 몸을 웅크린다. 당신은 다시, 최대한 조용히 다가간다. 그녀는 움직이지 않고, 눈은 다시 흐릿해진다. 당신은 그녀를 더 자세히 살핀다. 그녀는 병약해 보이고, 보이는 얼마 안 되는 피부는 매우 창백하다.
+<br><br>
+
+당신은 그녀를 살려두라는 명령을 받았다. 붕대를 갈아주지 않으면, 그녀는 아마 오늘 밤도 넘기지 못할 것이다. <span class="blue">붕대는 회랑의 훈련 구역에서 찾을 수 있다.</span>
+<br><br>
+
+그녀를 씻겨주는 것도 도움이 될 것이다.
+<<if $hcChallenge.waterEarly>>
+	<span class="red">정원의 우물물은 더럽지만,</span> <span class="blue">숲의 호수에서 물통을 채울 수는 있다.</span> 조금 걸어야 하지만, 필요하다면 해야 한다.
+<<else>>
+	<span class="blue">정원에서 물통에 물을 채울 수 있다.</span>
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Undress Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("undress")>>
+<span class="narration">정숙함은 사치였다. 불경한 자에게는 허락되지 않는 사치.</span>
+<br><br>
+
+그녀는 여전히 거의 반응이 없다. 저 더러운 자루를 벗겨낼 더 좋은 기회는 없을 것이다.
+<br><br>
+
+그녀의 은색 족쇄는 그녀의 손을 앞으로 묶고 있으며, 그 사이의 사슬은 또 다른 사슬에 연결되어 있고, 그 사슬 자체는 벽에 느슨하게 묶여 있다.
+이것들이 일을 어렵게 만들겠지만, 잠시라도 그녀를 풀어주는 것은 위험할 수 있다.
+<br><br>
+
+<<link [[그냥 그녀의 '옷'을 잘라낸다 (0:01)|Hopeless Cycle Cell Undress Intro 2]]>><<pass 1>><<set $phase to 1>><</link>>
+<br>
+<<link [[족쇄를 풀고 머리 위로 벗긴다 (0:04)|Hopeless Cycle Cell Undress Intro 2]]>><<pass 4>><<set $prisoner.love++>><<set $phase to 2>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Undress Intro 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">그녀가 만진 모든 것은 마치 살아나서 그것을 보는 모든 이를 더럽힐 것처럼 취급되었다.</span>
+<br><br>
+
+<<if $phase is 1>>
+	<<wearProp "antique silver dagger">>
+	<<run Object.assign($hcItems.find(clothes => clothes.name is "bloodstained sack" && clothes.location is "prisoner"), { type: "clutter", name: "ruined fabric scraps", location: "cell", dirty: 2})>>
+	의식용 단검을 뽑아들고, 빠른 동작으로 거친 천 아래로 찔러 넣는다. 그녀는 거의 반응할 시간이 없다. 위로 당기자, 천이 떨어진다.
+	<br><br>
+
+	그녀는 다음에 당신이 무엇을 할지 두려워하는 듯 몸을 떤다. 노출된 몸을 가리려 하지만, 족쇄 때문에 상체만 가릴 수 있을 뿐이다.
+<<else>>
+	<<run $hcItems.find(clothes => clothes.name is "bloodstained sack" && clothes.location is "prisoner").location to "cell">>
+	재빨리 각 족쇄를 푼다. 그녀의 팔이 옆으로 힘없이 떨어진다.
+	<br><br>
+
+	자루 밑단을 잡고 위로 당기기 시작한다. 그녀의 팔은 저항하지 않지만, 숨이 가빠진다.
+	그녀는 당신을 밀어내려 하지만, 힘이 세지는 않다. 그래도 그녀의 손길에 더럽혀지고 싶지 않아 물러선다.
+	그녀 주위를 돌아, 벽의 홈에 그녀의 족쇄를 다시 고정한다.
+<</if>>
+<br><br>
+
+이제 그녀를 덮고 있는 것은 더러운 붕대뿐이다.
+<<if $phase is 1>>
+	자루의 남은 부분을 옆으로 던진다. <span class="blue">오늘 저녁 장작더미에서 태워버리는 것이 좋겠다.</span>
+<<else>>
+	자루를 옆으로 던진다. <span class="blue">오늘 저녁 장작더미에서 태워버리는 것이 좋겠다.</span>
+<</if>>
+<br>
+<span class="red">더럽혀진 물건을 감옥에 남겨두면 그녀의 건강이 악화될 것이다.</span>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Bandages Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">
+	간수는 망설였다. 그토록 더럽혀진 자를 만지는 것은 의심할 여지 없이 위험했다.
+	하지만 그에게는 지켜야 할 의무가 있었고, 그의 형제자매들은 그를 믿고 있었다. 그가 아니면 다른 누군가가 해야 할 일이었다.
+</span>
+<br><br>
+
+그녀가 몸을 뒤척이며 거친 숨을 내쉰다.
+<br><br>
+
+공허하면서도 증오에 찬 그 잿빛 눈이 당신을 꿰뚫자 심장이 뛰기 시작한다.
+당신은 그녀의 몸을 향해 손을 뻗는다. 그녀는 당신에게서 멀어지려고 뒤로 몸을 밀어내려 하지만, 거의 움직이지 못한다.
+<br><br>
+
+당신은 주먹을 꽉 쥔다. 만약 주교의 손이 믿는 것처럼 그녀가 위험하다면, 그녀의 타락이 당신에게 매우 빠르게 퍼질 수 있다.
+<br><br>
+
+<<link [[붕대를 빨리 제거한다 (0:03)|Hopeless Cycle Cell Bandages Intro 2]]>><<pass 3>><<set $phase to 1>><<set $prisoner.love -= 1>><</link>>
+<br>
+<<link [[붕대를 부드럽게 제거한다 (0:10)|Hopeless Cycle Cell Bandages Intro 2]]>><<pass 10>><<set $phase to 2>><<trauma 12>><</link>><<ggtrauma>>
+<br>
+<<link [[그녀를 가만히 있도록 족쇄를 조인다 (0:02)|Hopeless Cycle Cell Bandages Intro Shackles]]>><<pass 2>><<set $phase2 to 1>><<set $prisoner.love -= 2>><<trauma -6>><<control 25>><<sadism 5>><</link>><<ltrauma>><<gcontrol>>
+<br>
+<<link [[도와주려는 것이라고 말한다|Hopeless Cycle Cell Bandages Intro Talk]]>><<stress 24>><<set $phase2 to 2>><<set $prisoner.love += 1>><<set $prisoner.talked += 1>><</link>><<ggstress>><<if $hc.handLocation is "guardhouse">><<hopelessCycleSus 2>><</if>>
+<br>
+<<link [[일단 나간다|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Bandages Intro Talk
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<if $hc.handLocation is "guardhouse">><<hcSuspicion 5>><</if>>
+<span class="narration">간수는 접촉을 최소화하고 싶었고, 마녀를 가만히 있게 하는 것이 최선의 방법이었다. 어떻게 했을까? 글쎄...</span>
+<br><br>
+
+당신은 심호흡을 한다. 죄수와 대화하는 것은 보통 금지되어 있다. 게다가 그녀는 마녀다. 당신의 목소리를 목구멍에서 바로 낚아챌 수도 있다!
+<br><br>
+
+당신은 그래도 그녀를 협조하게 할 가장 좋은 기회라고 결정한다. 당신은 그녀를 도우려는 것이며, 그러기 위해 붕대를 제거해야 한다고 말한다.
+<br><br>
+
+그녀는 꿈틀거리는 것을 멈추고, 머리를 움직여 다시 당신을 본다. "흐... 흐..." 그녀는 무언가 말하려 하는 것 같지만, 신음 소리만 낼 뿐이다.
+그녀는 당신을 이해하지 못하는 것 같다. 단지 당신의 목소리 톤에 반응할 뿐이다. 마치 사냥개처럼.
+<br><br>
+
+그녀를 더 취약하게 보이게 하려는 속임수일 것이다, 의심의 여지 없이. 그래도, 그녀가 그렇게 움츠리는 것을 멈추게는 했다.
+<br><br>
+
+<<link [[붕대를 빨리 제거한다 (0:03)|Hopeless Cycle Cell Bandages Intro 2]]>><<pass 3>><<set $phase to 1>><<set $prisoner.love -= 1>><</link>>
+<br>
+<<link [[붕대를 부드럽게 제거한다 (0:10)|Hopeless Cycle Cell Bandages Intro 2]]>><<pass 10>><<set $phase to 2>><<trauma 6>><</link>><<gtrauma>>
+<br>
+
+:: Hopeless Cycle Cell Bandages Intro Shackles
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">간수는 접촉을 최소화하고 싶었고, 마녀를 가만히 있게 하는 것이 최선의 방법이었다. 어떻게 했을까? 글쎄...</span>
+<br><br>
+
+당신은 벽으로 다가가 그녀의 족쇄에 달린 사슬을 잡는다. 당신은 천천히 그녀를 벽에 기대어 들어 올린다. 그녀는 긴장된 숨을 내쉰다.
+당신은 사슬을 평형추에 고정하여 그녀를 제자리에 고정시킨다.
+<br><br>
+
+이제 그녀는 몸부림칠 수 없다. 당신은 많은 직접적인 접촉 없이 시간을 들일 수 있을 것이다.
+<br><br>
+
+<<link [[붕대를 빨리 제거한다 (0:03)|Hopeless Cycle Cell Bandages Intro 2]]>><<pass 3>><<set $phase to 1>><<set $prisoner.love -= 1>><</link>>
+<br>
+<<link [[붕대를 부드럽게 제거한다 (0:10)|Hopeless Cycle Cell Bandages Intro 2]]>><<pass 10>><<set $phase to 2>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Bandages Intro 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("bandages")>><<set $prisoner.bandagesOn to false>>
+
+<<if $phase is 1>>
+	<<run hcItemAdd({ type: "clutter", name: "torn bandages", location: "cell", origin: "prisoner", dirty: 2, used: true})>>
+	당신은 그녀의 붕대 끝을 잡고 세게 당긴다. 붕대를 온전하게 유지하려는 노력 없이 찢어낸다.
+	당신은 가능한 한 빨리 그녀의 다른 팔다리도 계속한다.
+<<else>>
+	<<run hcItemAdd({ type: "bandages", name: "bandages", location: "cell", origin: "prisoner", dirty: 2, dirtyOnDrop: true, used: true}, $hcItems)>>
+	당신은 그녀의 붕대 끝을 찾아 들어 올린다. 부드럽게 당겨 그녀의 팔과 다리에서 풀어내기 시작한다. 그녀의 긴장된 호흡이 아주 약간 진정되는 것 같다.
+<</if>>
+<br><br>
+
+그녀의 왼팔과 손은 다치지 않은 것처럼 보이며, 다시 붕대를 감을 필요가 없을 것 같다. 당신은 애초에 왜 감겨 있었는지 궁금해한다.
+생각하는 동안, <span class="lewd">당신은 눈에 들어오는 부드럽고 창백한 피부 조각 하나하나가 당신의 몸 전체에 충동을 보낸다는 것을 깨닫는다</span>. <<arousal 600>><<garousal>>
+<br><br>
+
+당신은 고개를 흔들고 집중한다. 그녀가 당신을 홀리려 하고 있다! 주교의 손이 옳았다, 그녀는 위험하다.
+그녀의 피부를 보는 것만으로도 사람의 마음이 그녀의 매력에 취약해지기에 충분하다.
+<br><br>
+
+그녀의 오른팔은 깊은 물린 자국으로 덮여 있다. 인간과 짐승 모두의 것이다.
+그녀의 다리, 특히 허벅지는 지금까지 중 최악이다. 매우 신선한 상처와 멍으로 덮여 있다.
+당신은 그녀의 팔과 달리 다리는 매우 쉽게 움직일 수 있다는 것을 알아차린다.
+그 창녀는 당신이 자신을 더럽히고 그녀의 속임수에 굴복하려 한다고 생각했을 것이다.
+<br><br>
+
+그녀의 복부와 풍만한 가슴은 찢어지고 화상을 입었지만, 배 주위는 대체로 무사하다.
+그녀의 목은 더 많은 물린 자국으로 덮여 있다. 남은 것은 머리 주위의 붕대뿐이다.
+당신이 그것에 손을 뻗자, 그녀는 격렬하게 고개를 흔들기 시작한다.
+<br><br>
+
+<<link [[제거한다|Hopeless Cycle Cell Bandages Intro 3]]>><<set $phase to 1>><</link>>
+<br>
+<<link [[그대로 둔다|Hopeless Cycle Cell Bandages Intro 3]]>><<set $phase to 2>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Bandages Intro 3
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+붕대에서 머리카락 다발이 삐져나와 있다. 원래 갈색과 붉은색인지, 아니면 단순히 흙과 피로 굳어 있는지 확실하지 않다.
+<br><br>
+
+당신은 더 가까이 본다. 붕대 전체에 작고 희미한 기호들이 새겨져 있다. 일부는 알아보겠지만, 전부는 아니다. 그것들은 무언가에 갓 젖어 있는데, 당신이 아는 바로는 성수일 것이다.
+<br><br>
+
+<<if $phase is 1>>
+	<<set $prisonerEvents.pushUnique("faceAttempt")>>
+	<<if $phase2 is 1>>
+		그녀의 손이 벽에 단단히 묶여 있어, 당신을 막을 수 없다.
+	<<elseif $phase2 is 2>>
+		당신은 그녀의 팔을 쉽게 밀어낸다.
+	<<else>>
+		묶여 있는 그녀는 당신을 막을 수 없다.
+	<</if>>
+	당신은 그녀의 머리에 있는 붕대를 잡고 당긴다. 그녀는 고통의 신음을 내뱉고 멀어지려 하지만, 소용없다.
+	<br><br>
+
+	붕대를 간신히 떼어내자마자, 그것들은 다시 제자리로 돌아간다. 다시 시도한다. 그것들은 그녀의 머리에, 특히 가려진 눈 위의 이마 왼쪽에 단단히 달라붙는다.
+	<br><br>
+
+	다시 한 번 시도한다. <span class="red">갑자기 손이 차가워진다.</span> 또 마법인가? 그녀의 눈에서 몇 방울의 눈물이 흐른다. 소용없다. 붕대는 그녀에게 단단히 달라붙어 있다. 그녀의 얼굴 상처가 정말 그렇게 끔찍한가?
+	당신은 그녀의 얼굴이 얼마나 끔찍할지 생각하며 몸을 떤다. 어쩌면 이게 더 나을지도 모른다.
+<<else>>
+	당신은 그녀의 얼굴이 얼마나 끔찍할지 생각하며 손을 내린다. 그녀의 호흡이 다시 안정된다.
+<</if>>
+<br><br>
+
+이 정도로 만족해야 할 것이다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Wash Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("wash")>>
+<span class="narration">간수는 마녀의 죄를 씻어내고 있는 것이라고 스스로에게 되뇌었다. 그것은 장시간의 접촉을 견디기 쉽게 만들 것이다.</span>
+<br><br>
+
+당신은 물통을 내려놓자, 내용물이 출렁인다. 그 소리에 그녀가 다시 몸을 뒤척인다.
+<br><br>
+
+당신은 감옥 문이 뒤에서 잠겼는지 확인하고, 벽에서 그녀의 족쇄를 푼다. 그녀의 눈이 당신을 따라온다.
+<br><br>
+
+<<link [[벽에서 그녀를 끌어낸다|Hopeless Cycle Cell Wash Intro 2]]>><<trauma 12>><<set $phase to 1>><</link>><<ggtrauma>>
+<br>
+<<link [[벽에서 떨어지라고 말한다|Hopeless Cycle Cell Wash Intro 2]]>><<set $prisoner.love++>><<stress 12>><<set $phase to 2>><</link>><<ggstress>>
+<br>
+
+:: Hopeless Cycle Cell Wash Intro 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">마녀는 이것에 감사해야 할 것이다, 간수는 속으로 생각했다. 하나가 깨끗해지려면 다른 하나가 더러워져야만 했다.</span>
+<br><br>
+
+<<if $phase is 1>>
+	당신은 그녀의 팔 아래에 손을 넣고 감옥 중앙으로 그녀를 끌어당긴다. 그녀는 잠시만 저항한다.
+<<else>>
+	당신은 감옥 중앙을 가리킨다. 그녀는 그곳을 보고, 다시 당신을 보며 한 번 눈을 깜빡인다. 잠시 후, 그녀는 게으르게 그곳으로 몸을 끌기 시작한다.
+<</if>>
+<br><br>
+
+그녀는 똑바로 앉고, 당신은 그녀를 씻기는 긴 과정을 시작한다. 당신이 상처를 만질 때마다 그녀는 몸을 긴장시킨다.
+<br><br>
+
+그녀를 만지는 것 자체가 불쾌하다. 당신은 그녀의 타락이 당신에게 스며드는 것을 느낄 수 있다. 그러나, 같은 손길이 그녀에게는 활력을 주는 것 같다. <<gtrauma>><<lpurity>>
+<br><br>
+
+<<link [[빨리 씻긴다 (0:10)|Hopeless Cycle Cell Wash Intro 3]]>><<pass 10>><<trauma 12>><<arousal 600>><<purity -10>><<set $phase2 to 1>><</link>><<gtrauma>><<garousal>><<lpurity>>
+<br>
+<<link [[꼼꼼히 씻긴다 (0:30)|Hopeless Cycle Cell Wash Intro 3]]>><<set $prisoner.love++>><<pass 30>><<trauma 24>><<arousal 1200>><<purity -20>><<set $phase2 to 2>><</link>><<ggtrauma>><<ggarousal>><<llpurity>>
+<br>
+
+:: Hopeless Cycle Cell Wash Intro 3
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<if $phase2 is 1>>
+	<<set $prisoner.cleanBody += 1>>
+	<span class="narration">간수는 재빨리 일했고, 그 과정은 그에게 불쾌했던 만큼 그녀에게도 고통스러웠다.</span>
+	<br><br>
+
+	당신은 그녀의 고통에 아랑곳하지 않고, 상처 위를 재빨리 씻어낸다. 하지만 그녀는 저항하지 않는다. 단지 고통에 신음할 뿐이다.
+	<br><br>
+
+	당신이 끝내자, 그녀는 조용한 안도의 한숨을 내쉰다.
+<<else>>
+	<<set $prisoner.cleanBody += 2>><<hcPrisonerHealth 3>>
+	<span class="narration">간수는 불편함에도 불구하고, 자신의 일을 철저히 해냈다.</span>
+	<br><br>
+
+	당신은 그녀의 상처 주위를 조심스럽게 다룬다. 당신이 걱정하는 것은 고통이 아니라, 오염이다. 당신은 그녀의 오물을 옮지 않도록 하면서도, 그녀가 병들지 않도록 해야 한다.
+	<br><br>
+
+	그녀의 몸의 긴장이 풀린다. 그녀는 심지어 그것을 즐기는 것 같다. 당신은 그것에 대해 생각하지 않으려 노력한다.
+<</if>>
+<br><br>
+
+당신은 그녀의 머리를 완전히 피한다. 당신은 마녀의 머리카락이 그들의 이단적인 힘의 가장 강력한 원천이라는 이야기를 들었고, 그것을 모두 잘라버릴까 생각한다. 하지만 그러려면 먼저 붕대를 풀어야 한다.
+<br><br>
+
+<<if $phase is 1>>
+	마침내 끝났을 때, 당신은 그녀를 다시 벽으로 끌어당겨 족쇄를 다시 고정한다.
+<<else>>
+	당신이 물통을 치우자, 그녀는 스스로 벽으로 기어가기 시작한다.
+<</if>>
+<br><br>
+
+그녀가 당신을 보자, 당신은 다시 한 번 몸을 떤다.
+<<if $prisoner.health gte 8>>
+	이제 그녀의 눈에 빛이 돌고, 아주 약간의 혈색이 돌아온다.
+<<else>>
+	이제 그녀의 눈에 빛이 돌고, 아주 약간의 혈색이 돌아온다. 하지만 그것은 오래가지 않고, 곧 다시 흐릿해진다.
+<</if>>
+<br><br>
+
+당신은 물통을 내려다본다. 내용물은 더 이상 깨끗하지 않다. <span class="blue">경비실 아래 처리 수로에 버릴 수 있다.</span>
+<br><br>
+
+<<if $hcChallenge.prisonerClean>>
+	그녀를 씻겼음에도 불구하고, 그녀는 여전히 깨끗해 보이지 않는다. <span class="pink">그녀의 상처가 얼마나 오염되었는지를 고려하면, 하루에 한 번 이상 씻겨야 할 수도 있다.</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Wash
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+당신은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 씻길 준비를 하며, 벽에서 그녀의 족쇄를 푼다.
+<<if $prisoner.state is "asleep">>
+	<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+	그 움직임에 그녀가 잠에서 깨어난다.
+<</if>>
+<br><br>
+
+<<if $prisonerEvents.includes("legs") and $prisoner.love gte 30 or $prisoner.state is "catatonic">>
+	당신은 그녀를 감옥 중앙으로 옮긴다.
+<<else>>
+	그녀는 감옥 중앙으로 기어간다.
+<</if>>
+당신은 그녀를 무릎 꿇은 자세로 세운다.
+<br><br>
+
+<<link [[빨리 씻긴다 (0:10)|Hopeless Cycle Cell Wash 2]]>><<pass 10>><<trauma 12>><<arousal 600>><<purity -10>><<set $phase to 1>><</link>><<gtrauma>><<garousal>><<lpurity>>
+<br>
+<<link [[꼼꼼히 씻긴다 (0:30)|Hopeless Cycle Cell Wash 2]]>><<pass 30>><<if !$hc.daily.washed>><<set $prisoner.love++>><</if>><<trauma 24>><<arousal 1200>><<purity -20>><<set $phase to 2>><</link>><<ggtrauma>><<ggarousal>><<llpurity>><<if !$hc.daily.washed>><<hopelessCycleLove 1>><</if>>
+<br>
+<<if $prisonerEvents.includes("face") and !$prisonerEvents.includes("washHair")>>
+	<<link [[머리를 감겨준다 (1:00)|Hopeless Cycle Cell Wash Hair]]>><<pass 60>><<set $prisoner.cleanBody += 3>><<hcPrisonerHealth 4>><<set $prisoner.harmed -= 1>><<set $prisoner.love += 3>><<trauma 24>><<arousal 1200>><<purity -30>><</link>><<ggtrauma>><<ggarousal>><<llpurity>><<hopelessCycleLove 2>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Wash 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if $phase is 1>>
+	<<set $prisoner.cleanBody += 1>><<hcPrisonerHealth 1>>
+	당신은 그녀의 고통에 아랑곳하지 않고, 상처<<if $prisonerBrands>>【와과】 낙인<</if>> 위를 재빨리 씻어낸다.
+	<br><br>
+
+	<<if $prisoner.state is "catatonic">>
+		그녀의 고통스러운 신음은 짧고 얕다. 당신이 끝나자마자 그녀는 다시 긴장증 상태에 빠진다.
+	<<else>>
+		당신이 끝내자, 그녀는 조용한 안도의 한숨을 내쉰다.
+	<</if>>
+<<else>>
+	<<set $prisoner.cleanBody += 2>><<hcPrisonerHealth 3>>
+	<<if $prisonerEvents.includes("brand") and $prisonerBrands>>
+		<<set _brands to $prisonerBrands.filter(brand => brand isnot "right cheek").map(brand => window.KR.getBodypartKr(brand))>>
+		당신은 그녀의 상처 주위를 조심스럽게 다루고, 각 낙인을 철저히 닦아낸다.
+		<br><br>
+
+		<<if $prisonerBrands.includes("right cheek")>>
+			당신은 그녀의 얼굴에 있는 것을 부드럽게 문지른다. 그녀는 고통에 얼굴을 찡그리고, 당신의 얼굴이 가까워지자 그녀의 시선이 강렬해진다.
+			<br><br>
+		<</if>>
+
+		당신은 그녀의 <<if _brands.length>><<print formatList(_brands, "【와과】 ", true)>><<else>>낙인<</if>>에서 죽고 탄 피부를 부지런히 닦아낸다.
+		<<if !$hc.daily.treated>>
+			그것들은 많은 고통을 유발하는 것 같다. <span class="blue">정원의 약초로 치료해야 한다.</span>
+		<<else>>
+			그것들은 그녀에게 많은 고통을 주는 것 같지만, <span class="green">당신이 치료한 후에는 덜하다.</span>
+		<</if>>
+	<<else>>
+		당신은 그녀의 상처 주위를 조심스럽게 다룬다.
+	<</if>>
+	<br><br>
+
+	<<if $prisoner.state is "catatonic">>
+		<<if $prisoner.health gte 8>>
+			<span class="gold">그녀는 잠시 명료한 의식의 징후를 보이기 시작한다. 그녀의 손이 쥐었다 폈다 한다.</span>
+			<<set $prisoner.state to "lucid">>
+		<<else>>
+			<span class="red">그녀는 당신의 손길에 거의 반응하지 않는다.</span>
+		<</if>>
+	<<else>>
+		<<if $prisoner.love gte 45>>
+			그녀는 분명히 즐기고 있다. 당신이 오물을 닦아낼 때 그녀의 모든 근육이 이완된다.
+		<<else>>
+			그녀의 몸의 긴장이 풀린다. 그녀는 심지어 그것을 즐기는 것 같다.
+		<</if>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if !$prisonerEvents.includes("hunger") and $hc.daysPassed gt 0>>
+	<<set $prisonerEvents.pushUnique("hunger")>>
+	당신이 그녀를 씻기는 동안, 낮은 꼬르륵 소리가 들린다. 그녀는 복부를 가린다.
+	<br><br>
+
+	물론이다. 아무도 그녀에게 먹이를 주지 않았다. 이제 그게 당신의 일이다. 그녀는 굶주리고 있을 것이다. <span class="blue">회랑의 식당에서 그녀를 위한 음식을 얻을 수 있다.</span>
+	<br><br>
+<</if>>
+
+당신은 마무리한다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Wash Hair
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.push("washHair")>>
+<span class="narration">간수는 마녀의 머리카락에 대한 이야기를 들은 적이 있었다. 그 아름다움을 되찾아주면 그녀에게 힘을 줄지도 모른다고.</span>
+<br><br>
+
+머리의 붕대가 더는 방해되지 않자, 당신은 그녀의 두피를 문지르기 시작한다. 그녀는 잠시 몸을 긴장시켰지만, 이내 편안하게 몸을 맡긴다. 머리카락 대부분이 말라붙은 피로 엉겨 있었다. 당신은 조심스럽게 문질러 닦아내지만, 몇 가닥이 끊어지는 것은 피할 수 없었다.
+<br><br>
+
+그녀의 머리카락은 매듭으로 가득했다. 당신은 손가락을 부드럽게 빗어 내리며, 가능한 한 머리카락을 적게 뽑으면서 엉킨 것을 풀기 위해 최선을 다한다.
+<<if $prisonerBrands and $prisonerBrands.includes("right cheek")>>
+	그녀는 물이 얼굴을 타고 흘러내려 얼굴의 낙인에 닿을 때마다 움찔했지만, 이내 만족스러운 한숨을 내쉰다.
+<<else>>
+	그녀는 만족스러운 한숨을 내쉰다.
+<</if>>
+<br><br>
+
+<<if $hcChallenge.faithBlooms>>
+	엉키고 피 묻은 머리카락이 줄어들자, <span class="red">머리카락이 한 움큼 뽑혀나간 그녀의 뒤통수에 있는 대머리 자국</span>이 보인다. 당신의 손가락이 그곳을 스치자 그녀는 눈을 질끈 감고 고개를 돌린다. 당신은 불안감을 느낀다. 이것은 속죄가 아니었다. 이것은 잔인함을 위한 잔인함이었다.
+	<br><br>
+<</if>>
+
+30분 동안 뿔과 닿지 않으려 애쓰며 엉킨 머리를 풀다가, 당신은 포기하고 단검을 꺼내 든다. 당신은 그녀에게 단검을 보여주며 계속해도 될지 허락을 구한다. 그녀는 고개를 끄덕인다.
+<br><br>
+
+아주 조심스럽게, 당신은 가장 심하게 엉킨 부분을 잘라낸다. 추가로 상한 끝부분도 잘라낸다. 마지막으로, 손에 물을 담아 그녀의 머리를 헹궈준다.
+<br><br>
+
+당신은 그녀를 돌려세운다. 이제 젖은 그녀의 머리카락은 곧게 아래로 늘어뜨려져 있다. 어깨까지 닿는 길이에, 본래 색이 짙은 갈색이라는 것을 알 수 있다. 아직 회색빛 줄무늬가 남아있지만, 손상으로 색이 바랜 것인지 재 때문인지 분간하기 어렵다.
+머리카락은 그녀의 얼굴을 감싸고 있고, 당신이 깨끗하게 씻어주자 얼굴은 거의 생기 있고 젊어 보인다.
+<br><br>
+
+당신은 그녀의 아름다움에 넋을 잃는다. 그녀의 피부는 빛나 보이고, 어깨의 부드러운 곡선은 당신의 시선을 그녀의 가슴으로 이끈다. 그녀의 상처와 멍은 그저 그 밑에 깔린 완벽함을 강조할 뿐이다.
+<<if $hcChallenge.faithBlooms>>
+	유일한 흠은 그녀의 머리에서 솟아난 유리처럼 텅 빈 뿔과, 나머지 머리카락으로 겨우 가려진 뒤통수의 휑한 부분뿐이다.
+<<else>>
+	유일한 흠은 그녀의 머리에서 솟아난 유리처럼 텅 빈 뿔뿐이다.
+<</if>>
+욕망이 스멀스멀 기어 들어오는 것을 느낀다. <<arousal 2000>><<garousal>>
+<br><br>
+
+당신이 계속 쳐다보자 그녀는 얼굴을 붉히기 시작한다. 당신은 고개를 저어 정신을 차린다. 당신은 그 생각들이 당신 자신의 것이 아니라는 것을 안다. 그녀가 아직도 당신을 홀리려 하는 걸까?
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Dump Water
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<if !$prisonerEvents.includes("bandages")>>
+	당신은 그녀를 만지는 것이 너무 큰 위험이라고 판단한다. 당신은 그저 그녀의 머리 위로 물통을 쏟아붓는다.
+<<else>>
+	당신은 그녀의 머리 위로 물통을 쏟아붓는다.
+<</if>>
+<br><br>
+
+<<if $prisoner.state is "catatonic">>
+	<span class="red">그녀는 거의 움직이지도 않고, 여전히 긴장증 상태에 가깝다.</span>
+<<elseif $prisoner.state is "asleep">>
+	<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+	그녀는 즉시 깨어나 잠시 쏟아지는 물줄기에 몸부림친다. 물이 멈추자, 그녀는 당신을 화난 듯이 쏘아본다.
+<<elseif $prisoner.harmed gte Math.floor($prisoner.love / 10)>>
+	그녀는 움찔하지만, 예상했던 것 같다. 그녀는 거의 움직이지 않고, 그저 젖은 채 비참하게 앉아 있을 뿐이다.
+<<else>>
+	그녀는 비명을 지르며 몸부림친다. 당신이 이만큼이라도 신경 써준 것이 그녀에게는 행운이다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Clean Clothes
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<set $prisonerEvents.pushUnique("newClothes")>>
+<span class="narration">그는 자선을 경계했다. 마녀에게 선물을 주는 것은 그녀가 당신의 마음을 훔치게 할 수 있었다.</span>
+<br><br>
+
+<<set _clothesCurrent to $hcItems.find(clothes => clothes.type is "clothes" and clothes.location is "prisoner")>>
+
+당신은 그녀의 벌거벗은 무릎 위에 <<print hcTranslateName(_clothesCurrent.name)>>【을를】 던져준다.
+<<if $prisoner.state is "asleep">>
+	<<set $prisoner.state to "awake">>
+	그녀는 깜짝 놀라 깨어난 뒤, 혼란스러운 표정으로 그것을 내려다본다.
+<<else>>
+	그녀는 혼란스러운 표정으로 그것을 내려다본다.
+<</if>>
+당신은 그녀가 옷을 입을 수 있도록 잠시 족쇄를 풀어준다.
+<br><br>
+
+이것이 좋은 생각이었는지 확신이 서지 않는다. 새 옷을 입고 있으면 의심스러워 보일 것이다. 하지만 그녀가 건강을 유지하는 데는 도움이 될 것이다.
+<br><br>
+
+<<if $prisoner.loveRevealed>>
+	그녀의 시선이 부드러워진다. <<gglove>>
+<<else>>
+	그녀는 불확실함으로 가득 찬 눈으로 당신을 쏘아본다.
+	<<if _clothesCurrent.name is "torn vegetable sack">>
+		당신은 쓸모없는 피 묻은 자루를 그녀를 위해 일부러 세탁해 주었다. 그녀는 그것이 아직 축축한 것은 신경 쓰지 않는 것 같다.
+	<<else>>
+		그녀는 아마 당신이 친절을 베풀 마지막 사람이라고 생각했을 것이다.
+	<</if>>
+<</if>>
+<<set $prisoner.love += 5>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Food Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">마녀라도 먹어야 살 수 있었다.</span>
+<br><br>
+
+<<set $prisonerEvents.pushUnique("fed")>><<set $prisonerEvents.pushUnique("hunger")>>
+<<if $prisoner.state is "catatonic">>
+	<<set $prisoner.love += 2>>
+	음식을 내려놓았지만, 그녀는 움직이지 않는다. 제정신이 아니다.
+	<br><br>
+
+	당신은 한숨을 쉬고 그녀의 입에서 붕대를 끌어내린다. 손으로 직접 음식을 먹여주기 시작한다. 그녀는 순순히 따른다. <<trauma 12>><<gtrauma>>
+<<else>>
+	<<if $hcFood is "prison gruel">>
+		당신은 그녀 앞에 멀건 죽 한 그릇을 놓아준 뒤, 수갑을 풀어준다.
+		<br><br>
+
+		아주 천천히, 그녀는 그릇을 집어 들고 내용물을 살핀다. 그녀는 입 주변의 붕대를 끌어내린다.
+	<<elseif $hcFood is "stolen fruit">>
+		<<set $prisoner.love += 1>>
+		당신은 그녀의 손에 과일을 쥐여준 뒤, 수갑을 풀어준다.
+		<br><br>
+
+		그녀는 과일을 코에 가져가 냄새를 맡는다. 그녀는 입 주변의 붕대를 끌어내린다.
+	<<else>>
+		<<set $prisoner.love += 3>>
+		당신은 그녀 앞에 <<print hcTranslateName($hcFood)>>【을를】 놓아준 뒤, 수갑을 풀어준다.
+		<br><br>
+
+		아주 천천히, 그녀는 그것을 집어 들고 살핀다. 그녀는 입 주변의 붕대를 끌어내린다.
+	<</if>>
+	<br><br>
+
+	그녀의 입꼬리부터 턱 오른편까지 심한 화상 자국이 있다. 먹는 것이 고통스러워 보이지만, 그녀는 아랑곳하지 않고 계속 먹는다. 그녀는 먹는 내내 당신과 눈을 마주친다.
+<</if>>
+<br><br>
+
+<<set $prisoner.hasEaten to []>>
+<<if $hcFood is "prison gruel">>
+	<span class="blue">죄수들에게 주어지는 멀건 죽은 아무 맛도 없다. 영양을 공급해 주긴 하겠지만, 그녀의 건강을 개선하는 데는 큰 도움이 되지 않을 것이다.</span>
+<<elseif $hcFood is "stolen fruit">>
+	<span class="teal">정원의 과일은 활력을 되찾아주는 것으로 알려져 있다. 보통 죄수들에게 배급되는 멀건 죽보다는 그녀에게 더 좋을 것이다.</span>
+<<else>>
+	<span class="green">당신과 같은 신전의 전사들을 위해 준비되는 음식은 꽤 영양가가 높다. 그녀에게 이 음식을 먹이면 분명 건강이 좋아질 것이다.</span>
+<</if>>
+<<if $hcFood is "stolen food">>
+	<span class="pink">의심을 사지 않으려면 훔친 그릇을 씻어서 제자리에 돌려놓아야 한다.</span>
+<</if>>
+<<set $prisoner.hasEaten.pushUnique($hcFood)>>
+<br><br>
+
+<<if $prisoner.state is "catatonic">>
+	식사가 끝나자, 당신은 그녀의 붕대를 다시 올려주려 하지만, 더는 고정되지 않는다. 붕대는 그녀의 목 주변에 느슨하게 걸쳐져 있다.
+	<br><br>
+
+	붕대 아래에 재갈이 물려 있을 것이라 생각했었다. 그녀가 제정신으로 돌아오면 말을 걸어올지 궁금해진다.
+	<br><br>
+
+	화상 자국에도 불구하고, 주근깨가 있는 그녀의 얼굴을 보니 꽤 아름답다는 사실을 부정할 수 없다. 이제 머리 윗부분과 왼쪽 눈을 감싼 붕대만 남아있다.
+	<br><br>
+
+	그녀의 눈이 당신에게 초점을 맞추고, 당신이 쳐다보고 있었다는 것을 알아챈다. 당신은 재빨리 시선을 피한다. <<stress 3>><<arousal 300>><<gstress>><<garousal>>
+<<else>>
+	식사를 마친 그녀는 고개를 숙여 붕대를 다시 올리려 하지만, 더는 고정되지 않는다. 붕대는 그녀의 목 주변에 느슨하게 걸쳐져 있다.
+	<br><br>
+
+	붕대 아래에 재갈이 물려 있을 것이라 생각했었다. 그녀가 왜 아직까지 한마디도 하지 않는지 궁금하다. 두려워서일까, 아니면 자신의 처지를 아는 것일까?
+	<br><br>
+
+	화상 자국에도 불구하고, 주근깨가 있는 그녀의 얼굴을 보니 꽤 아름답다는 사실을 부정할 수 없다. 이제 머리 윗부분과 왼쪽 눈을 감싼 붕대만 남아있다.
+	<br><br>
+
+	그녀는 당신이 쳐다보고 있었다는 것을 알아챈다. 당신은 재빨리 시선을 피한다. <<stress 3>><<arousal 300>><<gstress>><<garousal>>
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<unset $hcFood>><<set $hc.daily.fed to true>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Food
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if $prisoner.state is "catatonic">>
+	<<set $prisoner.love += 2>>
+	음식을 내려놓았지만, 그녀는 움직이지 않는다. 제정신이 아니다.
+	<br><br>
+
+	당신은 한숨을 쉬고 손으로 직접 먹여주기 시작한다. 그녀는 순순히 따른다. <<trauma 12>><<gtrauma>>
+<<else>>
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+		당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 부드럽게 흔들어 깨운다. 그녀는 눈을 비비며 몸을 일으킨다.
+		<br><br>
+	<</if>>
+
+	<<if $prisoner.love gte 30>>
+		당신은 <<print hcTranslateName($hcFood)>>【을를】 그녀의 손에 쥐여준다.
+	<<else>>
+		당신은 <<print hcTranslateName($hcFood)>>【을를】 그녀 앞에 내려놓는다.
+	<</if>>
+	<<if $hc.daily.fed and $hcFood isnot "stolen fruit">>
+		그녀는 음식을 또 받자 놀란 듯했지만, 고맙게 받아들인다.
+	<</if>>
+	<<if $hcFood is "prison gruel">>
+		<<if $prisonerEvents.includes("tongue")>>
+			그녀는 불평하지 않는다. 어차피 맛을 느끼지 못할 거라고 당신은 생각한다.
+		<<else>>
+			그녀가 불평하지 않는 것이 감탄스럽다. 당신이라면 절대 먹지 않을 것이다.
+		<</if>>
+	<<elseif $hcFood is "stolen fruit">>
+		<<set $prisoner.love += 1>>
+		<<set $hc.daily.fruit ||= 0>>
+		<<switch $hc.daily.fruit>>
+			<<case 0>>
+				그녀는 과일을 한 입 베어 물고는 만족스러운 표정을 짓는다.
+				<<if $prisonerEvents.includes("tongue")>>
+					혀가 없는데도 맛을 느낄 수 있을지 궁금해진다.
+				<</if>>
+			<<case 1>>
+				그녀는 재빨리 과일을 베어 물고 입가를 닦는다. 이걸 정말 좋아하는 것 같다.
+			<<case 2>>
+				그녀는 과일을 게걸스럽게 먹어치운다. 오늘 당신이 준 과일들 때문에 턱 아래로 과즙이 흐르기 시작했다.
+				<<if $prisoner.love gte 45>>
+					당신은 웃음을 참을 수 없다. 당신이 닦아주자, 그녀는 당신을 향해 입을 삐죽 내민다.
+				<</if>>
+			<<case 3>>
+				그녀는 또 하나의 과일을 지저분하게 먹어치운다. 당신은 아무도 사라진 수확물을 눈치채지 못하길 바란다.
+			<<case 4>>
+				그녀는 또 다른 과일을 먹으면서 당신과 눈을 마주친다. 그녀는 기대에 찬 눈으로 당신을 바라본다.
+			<<case 5>>
+				이건 좀 우스꽝스러워지고 있다. 어떻게 이렇게 많이 먹을 수 있는 거지? 그녀는 숨을 깊게 들이쉬더니, 입에서 과일 씨앗을 당신에게 쏜다. 씨앗이 당신 얼굴에 달라붙는다.
+				그녀는 킥킥 웃으며 당신을 위해 씨앗을 떼어준다. <<stress -12>><<lstress>>
+			<<default>>
+				그녀는 조용히 그것을 먹는다.
+		<</switch>>
+		<<set $hc.daily.fruit++>>
+	<<elseif $hcFood is "stolen food">>
+		<<set $prisoner.love += 3>>
+		제대로 된 식사를 받고 기뻐하는 마음을 숨기려 애쓰는 게 보인다.
+		<<if $prisoner.love gte 45>>
+			그녀는 당신을 끌어안고 조용히 먹는다. <<stress -24>><<purity -1>><<llstress>><<lpurity>>
+		<<else>>
+			그녀는 고개를 끄덕여 감사를 표하고, 조용히 먹는다.
+		<</if>>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $hcFood is "prison gruel" and !$prisoner.hasEaten.includes("prison gruel")>>
+	<span class="blue">죄수들에게 주어지는 멀건 죽은 아무 맛도 없다. 영양을 보충해 주긴 하지만, 그녀의 건강을 개선하는 데는 큰 도움이 되지 않을 것이다.</span>
+	<br><br>
+<<elseif $hcFood is "stolen fruit" and !$prisoner.hasEaten.includes("stolen fruit")>>
+	<span class="teal">정원의 과일은 활력을 되찾아주는 것으로 알려져 있다. 보통 죄수들을 위해 남겨두는 멀건 죽보다 그녀에게 더 좋을 것이다.</span>
+	<br><br>
+<<elseif $hcFood is "stolen food" and !$prisoner.hasEaten.includes("stolen food")>>
+	<span class="green">당신과 같은 신전의 전사들을 위해 남겨두는 음식은 꽤 영양가가 높다. 그녀에게 먹이면 분명 건강이 좋아질 것이다.</span>
+	<br><br>
+<</if>>
+<<set $prisoner.hasEaten.pushUnique($hcFood)>>
+<<if $hcFood is "stolen food">>
+	<span class="pink">의심을 사지 않으려면 훔친 그릇을 씻어서 제자리에 돌려놓아야 한다.</span>
+	<br><br>
+<</if>>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<unset $hcFood>><<set $hc.daily.fed to true>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Food Refused
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+당신은 그녀 앞에 음식을 놓는다. <span class="red">그녀는 음식을 밀쳐내며, 당신을 악의에 차 노려본다.</span>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Food Restricted
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if $prisoner.state is "catatonic">>
+	음식을 내려놓았지만, 그녀는 움직이지 않는다. 제정신이 아니다.
+	<br><br>
+
+	당신은 한숨을 쉬고, 손으로 먹여주려 시도한다. <span class="red">그녀의 입술은 굳게 닫혀 있다.</span> 당신은 그것을 다시 가져온다.
+<<else>>
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+		당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 부드럽게 흔들어 깨운다. 그녀는 눈을 비비며 몸을 일으킨다.
+		<br><br>
+	<</if>>
+
+	<<if $prisoner.love gte 30>>
+		당신은 <<print hcTranslateName($hcFood)>>【을를】 그녀의 손에 쥐여준다.
+	<<else>>
+		당신은 <<print hcTranslateName($hcFood)>>【을를】 그녀 앞에 내려놓는다.
+	<</if>>
+	그녀는 마지못해 그것을 보더니, <span class="red">고개를 젓는다.</span> 당신은 그것을 다시 가져온다.
+<</if>>
+<br><br>
+
+<span class="narration">기억하라, 이 이야기의 판본에서 마녀의 위장은 허약했다. 그녀는 한 끼를 겨우 넘겼고, 다른 끼니는 말할 것도 없었다.</span>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<unset $hcFood>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Food Together
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<set _food to hcItemsOnScreen(f => f.type is "food" and !f.used)>>
+
+당신은 그녀에게 줄 선물을 고른다.
+<br>
+<<for _labelFood, _valueFood range _food>>
+	<<capture _valueFood>>
+		<<link [[`${hcTranslateName(_valueFood.name)}`|Hopeless Cycle Cell Food Together 2]]>>
+			<<set $hcFood to _valueFood.name>>
+			<<if _valueFood.name is "stolen fruit">>
+				<<run hcItemRemove(_valueFood)>>
+				<<hcPrisonerHealth 1>>
+			<<else>>
+				<<if _valueFood.name isnot "prison gruel">><<hcPrisonerHealth 3>><</if>>
+				<<set _valueFood.used to true>><<set _valueFood.dirty to 1>>
+			<</if>>
+		<</link>>
+		<br>
+	<</capture>>
+<</for>>
+
+:: Hopeless Cycle Cell Food Together 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<set _food to hcItemsOnScreen(f => f.type is "food" and !f.used)>>
+
+당신은 먹을 음식을 고른다.
+<br>
+<<for _labelFood, _valueFood range _food>>
+	<<capture _valueFood>>
+		<<link [[`${hcTranslateName(_valueFood.name)}`|Hopeless Cycle Cell Food Together 3]]>>
+			<<if _valueFood.name is "stolen fruit">>
+				<<run hcItemRemove(_valueFood)>>
+				<<stress -6>>
+			<<else>>
+				<<if _valueFood.name isnot "prison gruel">>
+					<<tiredness -6>><<stress -24>>
+				<<else>>
+					<<stress 3>>
+				<</if>>
+				<<set _valueFood.used to true>><<set _valueFood.dirty to 1>>
+			<</if>>
+		<</link>>
+		<<if _valueFood.name is "stolen fruit">>
+			<<lstress>>
+		<<elseif _valueFood.name isnot "prison gruel">>
+			<<llstress>><<ltiredness>>
+		<<else>>
+			<<gstress>>
+		<</if>>
+		<br>
+	<</capture>>
+<</for>>
+
+
+:: Hopeless Cycle Cell Food Together 3
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<if !$prisonerEvents.includes("eatTogether")>>
+	<span class="narration">누군가와 그저 식사를 함께하는 것이 얼마나 인간적인 일인지 결코 과소평가해서는 안 된다.</span>
+	<br><br>
+
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+		당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 부드럽게 흔들어 깨운다. 그녀는 눈을 비비며 몸을 일으킨다.
+		<br><br>
+	<</if>>
+
+	당신은 그녀 앞에 <<print hcTranslateName($hcFood)>>【을를】 내려놓고, 그녀의 맞은편에 앉는다.
+	<br><br>
+
+	그녀는 당신을 향해 눈을 깜빡인다.
+	<br><br>
+
+	당신은 그녀에게 먼저 먹으라고 손짓한다.
+
+	<<if $hc.daily.fed and $hcFood isnot "stolen fruit">>
+		그녀는 음식을 또 받은 것에 놀란 듯하지만, 고맙게 받아들인다.
+	<</if>>
+
+	그녀는 망설이며 첫입을 뗀다. 이런 상호 존중은 그녀에게 익숙하지 않은 것이 분명하다.
+	<br><br>
+
+	<<if $hcFood is "prison gruel">>
+		<<set $prisoner.love += 1>>
+		<<if $prisonerEvents.includes("tongue")>>
+			그녀는 불평하지 않는다. 어차피 맛을 느끼지 못할 테니 그럴 만도 하다고 생각한다.
+		<<else>>
+			그녀는 불평하지 않는데, 당신은 그 점이 감탄스럽다고 생각한다. 당신이라면 절대 먹지 않을 것이다.
+		<</if>>
+	<<elseif $hcFood is "stolen fruit">>
+		<<set $prisoner.love += 2>>
+		<<set $hc.daily.fruit ||= 0>>
+		<<switch $hc.daily.fruit>>
+			<<case 0>>
+				그녀는 과일을 한 입 베어 물고는 만족스러운 표정을 짓는다.
+				<<if $prisonerEvents.includes("tongue")>>
+					혀가 없는데도 맛을 느낄 수 있을지 궁금해진다.
+				<</if>>
+			<<case 1>>
+				그녀는 재빨리 과일을 베어 물고 입가를 닦는다. 이걸 정말 좋아하는 것 같다.
+			<<case 2>>
+				그녀는 과일을 게걸스럽게 먹어치운다. 오늘 당신이 준 과일들 때문에 턱 아래로 과즙이 흐르기 시작했다.
+				<<if $prisoner.love gte 45>>
+					당신은 웃음을 참을 수 없다. 당신이 닦아주자, 그녀는 당신을 향해 입을 삐죽 내민다.
+				<</if>>
+			<<case 3>>
+				그녀는 또 하나의 과일을 지저분하게 먹어치운다. 당신은 아무도 사라진 수확물을 눈치채지 못하길 바란다.
+			<<case 4>>
+				그녀는 또 다른 과일을 먹으면서 당신과 눈을 마주친다. 그녀는 기대에 찬 눈으로 당신을 바라본다.
+			<<case 5>>
+				이건 좀 우스꽝스러워지고 있다. 어떻게 이렇게 많이 먹을 수 있는 거지? 그녀는 숨을 깊게 들이쉬더니, 입에서 과일 씨앗을 당신에게 쏜다. 씨앗이 당신 얼굴에 달라붙는다.
+				그녀는 킥킥 웃으며 당신을 위해 씨앗을 떼어준다. <<stress -12>><<lstress>>
+			<<default>>
+				그녀는 조용히 그것을 먹는다.
+		<</switch>>
+		<<set $hc.daily.fruit++>>
+	<<elseif $hcFood is "stolen food">>
+		<<set $prisoner.love += 3>>
+		제대로 된 식사를 받고 기뻐하는 마음을 숨기려 애쓰는 게 보인다.
+		<<if $prisoner.love gte 45>>
+			그녀는 당신을 끌어안고 조용히 먹는다. <<stress -24>><<purity -1>><<llstress>><<lpurity>>
+		<<else>>
+			그녀는 고개를 끄덕여 감사를 표하고, 조용히 먹는다.
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<if $hcFood is "prison gruel" and !$prisoner.hasEaten.includes("prison gruel")>>
+		<span class="blue">죄수에게 주어지는 멀건 죽은 평범하다. 그녀의 영양을 유지시켜 주겠지만, 건강을 개선하는 데는 큰 도움이 되지 않을 것이다.</span>
+		<br><br>
+	<<elseif $hcFood is "stolen fruit" and !$prisoner.hasEaten.includes("stolen fruit")>>
+		<span class="teal">정원에서 가져온 과일은 활력을 되찾아주는 것으로 알려져 있다. 보통 죄수들을 위해 남겨두는 멀건 죽보다 그녀에게 더 좋을 것이다.</span>
+		<br><br>
+	<<elseif $hcFood is "stolen food" and !$prisoner.hasEaten.includes("stolen food")>>
+		<span class="green">당신과 같은 신전의 전사들을 위해 남겨두는 음식은 꽤 영양가가 높다. 그녀에게 먹이면 분명 건강이 좋아질 것이다.</span>
+		<br><br>
+	<</if>>
+	<<set $prisoner.hasEaten.pushUnique($hcFood)>>
+	<<if $hcFood is "stolen food">>
+		<span class="pink">의심을 사지 않으려면 훔친 그릇을 닦아서 돌려놓아야 한다.</span>
+		<br><br>
+	<</if>>
+
+	즐거운 시간이다. 말 한마디 없어도 그녀를 조금 더 이해하게 된 것 같다. 이걸 또 해야겠다. <<lltrauma>>
+	<br><br>
+
+	<<set $prisonerEvents.pushUnique("eatTogether")>>
+	<<link [[다음|Hopeless Cycle Cell]]>><<set $hc.daily.fed to true>><<unset $hcFood>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+		당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 부드럽게 흔들어 깨운다. 그녀는 눈을 비비며 몸을 일으킨다.
+		<br><br>
+	<</if>>
+
+	<<if $prisoner.love gte 30>>
+		당신은 <<print hcTranslateName($hcFood)>>【을를】 그녀의 손에 쥐여준다.
+	<<else>>
+		당신은 <<print hcTranslateName($hcFood)>>【을를】 그녀 앞에 내려놓는다.
+	<</if>>
+	<<if $hc.daily.fed and $hcFood isnot "stolen fruit">>
+		그녀는 음식을 또 받자 놀란 듯했지만, 고맙게 받아들인다.
+	<</if>>
+	<<if $hcFood is "prison gruel">>
+		<<set $prisoner.love += 1>>
+		<<if $prisonerEvents.includes("tongue")>>
+			그녀는 불평하지 않는다. 어차피 맛을 느끼지 못할 거라고 당신은 생각한다.
+		<<else>>
+			그녀가 불평하지 않는 것이 감탄스럽다. 당신이라면 절대 먹지 않을 것이다.
+		<</if>>
+	<<elseif $hcFood is "stolen fruit">>
+		<<set $prisoner.love += 2>>
+		<<set $hc.daily.fruit ||= 0>>
+		<<switch $hc.daily.fruit>>
+			<<case 0>>
+				그녀는 과일을 한 입 베어 물고는 만족스러운 표정을 짓는다.
+				<<if $prisonerEvents.includes("tongue")>>
+					혀가 없는데도 맛을 느낄 수 있을지 궁금해진다.
+				<</if>>
+			<<case 1>>
+				그녀는 재빨리 과일을 베어 물고 입가를 닦는다. 이걸 정말 좋아하는 것 같다.
+			<<case 2>>
+				그녀는 과일을 게걸스럽게 먹어치운다. 오늘 당신이 준 과일들 때문에 턱 아래로 과즙이 흐르기 시작했다.
+				<<if $prisoner.love gte 45>>
+					당신은 웃음을 참을 수 없다. 당신이 닦아주자, 그녀는 당신을 향해 입을 삐죽 내민다.
+				<</if>>
+			<<case 3>>
+				그녀는 또 하나의 과일을 지저분하게 먹어치운다. 당신은 아무도 사라진 수확물을 눈치채지 못하길 바란다.
+			<<case 4>>
+				그녀는 또 다른 과일을 먹으면서 당신과 눈을 마주친다. 그녀는 기대에 찬 눈으로 당신을 바라본다.
+			<<case 5>>
+				이건 좀 우스꽝스러워지고 있다. 어떻게 이렇게 많이 먹을 수 있는 거지? 그녀는 숨을 깊게 들이쉬더니, 입에서 과일 씨앗을 당신에게 쏜다. 씨앗이 당신 얼굴에 달라붙는다.
+				그녀는 킥킥 웃으며 당신을 위해 씨앗을 떼어준다. <<stress -12>><<lstress>>
+			<<default>>
+				그녀는 조용히 그것을 먹는다.
+		<</switch>>
+		<<set $hc.daily.fruit++>>
+	<<elseif $hcFood is "stolen food">>
+		<<set $prisoner.love += 3>>
+		제대로 된 식사를 받고 기뻐하는 마음을 숨기려 애쓰는 게 보인다.
+		<<if $prisoner.love gte 45>>
+			그녀는 당신을 끌어안고 조용히 먹는다. <<stress -24>><<purity -1>><<llstress>><<lpurity>>
+		<<else>>
+			그녀는 고개를 끄덕여 감사를 표하고, 조용히 먹는다.
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<set $hc.daily.fed to true>>
+
+	<<if $prisoner.love gte 30 and (Time.hour gte 18 or Time.hour lte 3)>>
+		당신은 그녀 옆에 앉아 함께 식사를 나눈다. 그녀는 당신에게 따뜻하게 미소 짓는다.
+		<br><br>
+
+		식사를 마친 후, 당신은 그저 그곳에 앉아 서로의 존재를 즐긴다.
+		<br><br>
+
+		그녀 쪽에서 날카로운 충격이 느껴지고, 이내 익숙한 무력감이 뒤따를 때까지. 당신은 움찔하며 돌아본다. 그녀는 당신의 어깨에 머리를 기댄 채 졸고 있는 것 같다. <<lpurity>><<gtrauma>><<arousal 200>><<garousal>>
+		<br><br>
+
+		<<link [[그녀를 흔들어 떼어낸다|Hopeless Cycle Cell Food Together Shake Off]]>><</link>>
+		<br>
+		<<link [[그대로 둔다 (0:30)|Hopeless Cycle Cell Food Together Let]]>><<pass 30>><<set $prisoner.love += 3>><<purity -10>><<stress -24>><<trauma 24>><<tiredness -12>><</link>><<lpurity>><<llstress>><<gtrauma>><<hopelessCycleLove 1>>
+		<br>
+		<<if $prisoner.love gte 45 and !(Time.lastDayOfMonth is $hc.day)>>
+			<<link [[오늘 밤 여기서 잔다 (6:00)|Hopeless Cycle Cell Spend Night]]>>
+				<<endevent>><<set $phase to 1>><<pass 1 hour>>
+				<<hcPrisonerHealth 1>><<set $prisoner.love += 3>>
+				<<purity -30>><<stress -60>><<trauma 50>><<tiredness -12>>
+			<</link>>
+			<<lllpurity>><<lllstress>><<gggtrauma>><<lltiredness>><<hopelessCycleLove 3>>
+			<br>
+		<</if>>
+	<<else>>
+		당신은 그녀의 맞은편에 앉아 함께 식사를 나눈다. 그녀는 당신에게 따뜻하게 미소 짓는다.
+		<br><br>
+
+		<<set $prisonerEvents.pushUnique("eatTogether")>>
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Hopeless Cycle Cell Food Together Shake Off
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+당신은 그녀를 뿌리친다. 그녀는 약간 속상해 보인다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Food Together Let
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+당신은 그녀가 잠들 때까지 그대로 둔다. 그녀의 부드러운 숨소리가 고르게 변하고, 곧 잠이 든다.
+<br><br>
+
+당신은 잠시 그곳에 머물다가, 그녀를 부드럽게 눕힌다. <<set $prisoner.state to "asleep">>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Spend Night
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<set _cellTorch to $hcItems.find(item => item.type is "torch" and item.location is $bus and item.inSconce)>>
+<<set _heldTorch to $hcItems.find(item => item.type is "torch" and item.location is "held")>>
+
+<<if ($phase is 2 or hcItemCanReach("snuffer")) and (_heldTorch?.state is "lit" or _cellTorch?.state is "lit")>>
+	<<if _heldTorch>><<set _heldTorch.state to "snuffed">><</if>>
+	<<if _cellTorch>><<set _cellTorch.state to "snuffed">><</if>>
+	횃불을 끈다.
+<</if>>
+
+<<if $phase is 1>>
+	<<set $prisonerEvents.pushUnique("spendNight")>>
+	당신도 그녀의 머리에 머리를 기댄다. 그녀의 얕은 숨결이 점점 규칙적으로 변하더니, 이내 잠이 든다.
+	<br><br>
+
+	여기 오래 앉아 있을수록 그녀의 기운을 빨아들이는 손길을 견디기가 쉬워진다. 당신 역시 얼마 지나지 않아 잠이 든다.
+<<elseif $hc.nightBreakIn is "heard" and $phase is 2>>
+	당신은 식당에서 들었던 말을 기억한다. 누군가 당신의 죄수를 해치려 한다. 당신은 그들을 여기서 기다리기로 결심한다.
+	<br><br>
+
+	당신은 그림자가 진 구석에 편안하게 자리를 잡는다.
+	<<if $prisoner.state is "catatonic">>
+		<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 감옥 건너편에서 멍하니 당신을 쳐다본다. 그녀는 스스로를 방어할 기회조차 없을 것이다.
+	<<elseif $prisoner.state is "asleep">>
+		<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 이미 잠들어 있어서, 당신은 그녀를 방해하지 않기로 한다.
+	<<else>>
+		<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 호기심 어린 눈으로 당신을 쏘아본다.
+	<</if>>
+	오래 기다릴 필요는 없었다.
+<<else>>
+	당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>> 옆에 앉는다.
+	<<if !$prisonerEvents.includes("spendNight")>>
+		<<set $prisonerEvents.pushUnique("spendNight")>>
+		당신이 팔을 둘러 그녀를 거친 짚 침대로 끌어당기기 전까지, 그녀는 당신이 무엇을 하는지 모르는 것 같다.
+		접촉하자 익숙한 무력감이 당신을 덮친다. <<lpurity>><<gtrauma>><<arousal 200>><<garousal>>
+		<br><br>
+
+		그녀가 당신을 올려다본다. 눈동자가 떨리고 얼굴이 붉어진다. 그녀는 조심스럽게 당신의 포옹에 화답한다.
+	<<else>>
+		그녀는 당신에게 미소 지으며 당신을 껴안는다. 접촉하자 익숙한 무력감이 당신을 덮친다. <<lpurity>><<gtrauma>><<arousal 200>><<garousal>>
+	<</if>>
+	<br><br>
+
+	<<if $hcItems.some(sheet => sheet.type is "sheets" and sheet.location is "prisoner")>>
+		당신은 그녀의 시트를 조정하여 두 사람 모두를 덮도록 한다.
+	<<elseif hcItemCanReach("sheets")>>
+		당신은 감옥에 있는 침대 시트에 손을 뻗어 두 사람 위로 끌어당긴다.
+	<</if>>
+
+	그녀의 숨소리가 부드럽고 규칙적으로 변하고, 시간이 지남에 따라 그녀의 기운을 빨아들이는 손길을 견디기 쉬워진다.
+	당신 안의 순수함과 그녀 안의 타락이 충돌함에도 불구하고, 당신은 온전함을 느낀다.
+	<br><br>
+
+	당신은 밤 기도를 드리고 곧 잠이 든다.
+<</if>>
+<br><br>
+
+...
+<br><br>
+
+<<if ($hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard" or $phase is 2) or !$hc.daily.patrol and ($rng gte 96 or $rng gte 71 and $hc.dungeonTorchState is "lit")>>
+	<<set $hc.daily.patrol to true>>
+	<span class="red">
+		발소리가 다가오는 것이 들린다.
+		<<if $hc.nightBreakIn is "heard">>
+			당신은 그들이 왜 여기 있는지 안다.
+		<<elseif $hc.dungeonTorchState is "lit">>
+			누군가 횃불이 왜 아직도 켜져 있는지 조사하러 왔다!
+		<</if>>
+	</span>
+	당신이 벌떡 일어나자, <<= window.KR.gatPersonNameDictKR($prisoner.name)>>도 잠에서 깬다. <<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+	<br><br>
+
+	<<if $hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard" or $phase is 2>>
+		<<loadNPC 0 "hc_abuser">>
+	<<else>>
+		<<generateConfessor 1>>
+	<</if>>
+	<<person1>>
+	감옥 문이 삐걱거리며 열린다. 검은 로브를 입은 <<personsimple>>【이가】 들어온다.
+	<<if _heldTorch?.state is "lit" or _cellTorch?.state is "lit">>
+		<span class="red">켜진 횃불 때문에, <<he>>【은는】 즉시 당신을 발견한다.</span>
+		<br><br>
+
+		"페인 형제," <<he>>【이가】 쉿 소리를 낸다. "마녀와 함께 몰래 숨어 있다니. 그녀가 당신을 유혹했군!" <<He>>【은는】 곤봉을 휘두른다. "정화되어야만 하오."
+		<br><br>
+
+		<<link [[싸운다|Hopeless Cycle Cell Caught Fight]]>><<set $phase to 1>><<set $skillChallenge to random(700, 1000)>><</link>>
+		<br>
+		<<link [[저항하지 않는다|Hopeless Cycle Cell Caught Fight]]>><<set $phase to 2>><</link>>
+		<br>
+	<<elseif $hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard">>
+		<<He>>【은는】 주위를 둘러보다가, <<his>> 눈은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>>【이가】 앉아 있는 곳에 멈춘다. 당신은 그림자 속에 몸을 숨긴다. <<He>>【은는】 당신을 보지 못해야 한다.
+		<br><br>
+
+		"사악한 유혹자 같으니," <<he>>【이가】 내뱉는다. "어찌 페인 형제만이 너를 독차지할 수 있겠는가?" <<he>>【이가】 다가오자 그녀는 <<him>>【을를】 쏘아본다. "나의 서약은 이미 깨졌다. 해가 되지는 않을 것이다. 적어도 나에게는 말이지."
+		<<if $hcChallenge.faithBlooms>>
+			<<His>> 손가락이 움찔거린다. "이 손을 기억하는가? <span @class="$prisonerEvents.includes('washHair') ? 'red' : ''">네 머리카락을 너무나 쉽게 가져갔지.</span> 이번에는 머리카락 한 줌보다 더 많은 걸 <i>가져갈</i> 거다."
+		<</if>>
+		<br><br>
+
+		<<link [[미동도 없이 가만히 있는다|Hopeless Cycle Cell Caught Still]]>><<pass 1 hour>><<set $prisoner.love -= 10>><</link>><<hopelessCycleLove -3>>
+		<br>
+		<<link [[개입한다|Hopeless Cycle Cell Caught Intervene]]>><<set $prisoner.love += 5>><</link>><<hopelessCycleLove 2>>
+		<br>
+	<<else>>
+		<<He>>【은는】 주위를 둘러보다가, <<his>> 눈은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>>【이가】 앉아 있는 곳에 멈춘다. 당신은 그림자 속에 몸을 숨긴다. <<He>>【은는】 당신을 보지 못해야 한다.
+		<br><br>
+
+		<<He>>【은는】 코웃음을 치며 감옥을 떠나, 쇠창살 문을 쾅 닫는다. 당신은 <<hes>> 완전히 지하 감옥에서 나갔는지 확인하기 위해 몇 분을 기다린다. <<hcSuspicion 5>><<hopelessCycleSus 1>>
+		<br><br>
+
+		하마터면 큰일 날 뻔했다. <<stress 24>><<ggstress>>
+		<br><br>
+
+		<<link [[다시 잠자리에 든다|Hopeless Cycle Cell Spend Night 2]]>><<set $hc.daily.cellSleep to true>><<hcPrisonerHealth 3>><<endevent>><<pass 5 hours>><<tiredness -60>><</link>>
+		<br>
+		<<link [[일어난다|Hopeless Cycle Cell]]>><<set $hc.daily.cellSleep to true>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<link [[잠자기|Hopeless Cycle Cell Spend Night 2]]>><<set $hc.daily.cellSleep to true>><<hcPrisonerHealth 3>><<endevent>><<pass 5 hours>><<tiredness -60>><</link>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Spend Night 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisoner.harmed -= 2>>
+당신은 깊이 잠든다.
+<br><br>
+
+당신은 짚 침대에서 깨어난다. <<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【이가】 당신 위에 올라타, 꼭 껴안고 있다.
+<br><br>
+
+그녀가 뒤척이며 당신의 목덜미에 머리를 파묻는다.
+<br><br>
+
+몇 분 후, 그녀는 깨어나 기지개를 켠다. <span class="green">그녀는 훨씬 건강해 보인다.</span>
+<br><br>
+
+<<if $prisoner.love gte 65 and !$prisonerEvents.includes("kissAttempt") and $prisonerEvents.includesAll("legs", "face", "talkMagic", "talkName", "washHair", "newClothes") and $prisonerEvents.includesAny("spendNight", "talkHairBlooms")>>
+	<<set $prisonerEvents.pushUnique("kissAttempt")>>
+	그녀의 얼굴은 새빨갛고, 무언가 생각에 잠긴 듯하다. 갑자기, 그녀가 당신의 가슴에 손을 얹는다.
+	<br><br>
+
+	그녀의 얼굴이 당신에게 가까이 다가온다.
+	<br><br>
+
+	<<link [[키스한다|Hopeless Cycle Cell Kiss]]>><<set $phase to 1>><<purity -20>><<trauma 24>><<set $prisoner.love += 10>><</link>><<llpurity>><<ggtrauma>><<hopelessCycleLove 3>><<kissvirginitywarning>>
+	<br>
+	<<link [[밀어낸다|Hopeless Cycle Cell Kiss]]>><<set $phase to 2>><<set $prisoner.love -= 25>><<set $prisoner.harmed += 10>><</link>><<hopelessCycleLove -3>>
+	<br>
+<<else>>
+	<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Burns
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<set _brands to $prisonerBrands.filter(brand => !["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot", "right cheek"].includes(brand)).map(brand => window.KR.getBodypartKr(brand))>>
+<<set _brandsLegs to $prisonerBrands.filter(brand => ["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot"].includes(brand)).map(brand => window.KR.getBodypartKr(brand))>>
+당신은 약초에서 마른 잎을 조심스럽게 떼어내 깨끗한 물에 하나씩 담근다. 잎사귀는 금세 끈적해지며 향긋한 냄새를 풍긴다.
+<br><br>
+
+<<if $prisonerBrands.includes("right cheek")>>
+	<<set _moveOn to true>>
+	당신은 그녀의 얼굴에 찍힌 낙인 위에 천천히 잎사귀 하나를 붙인다. 그녀는 움찔했지만, 화상 부위에 잎이 내려앉자 안도의 한숨을 내쉰다.
+	<<if $prisoner.love gte 60 and $prisoner.state isnot "catatonic">>
+		잠시 동안 당신들의 얼굴은 가까운 거리를 유지했고, 이윽고 그녀가 갑자기 당신의 이마에 입을 맞추고 미소 짓는다.
+	<</if>>
+	<br><br>
+<</if>>
+
+<<if _brandsLegs.length>>
+	그녀의 <<print formatList(_brandsLegs, "【와과】 ", true)>>에 있는 화상에
+	<<if _moveOn>>
+		<<set _finally to true>>
+		계속해서 잎사귀를 붙인다.
+	<<else>>
+		<<set _moveOn to true>>
+		잎사귀를 붙인다.
+	<</if>>
+	그녀는 감각을 느끼지 못할 수도 있지만, 여전히 해야 할 중요한 일이다.
+<</if>>
+
+<<if _brands.length>>
+	그녀의 <<print formatList(_brands, "【와과】 ", true)>>에 있는 화상에
+	<<if _finally>>
+		남은 잎사귀를 붙여 마무리한다.
+	<<elseif _moveOn>>
+		계속해서 남은 잎사귀를 붙인다.
+	<<else>>
+		잎사귀를 붙인다.
+	<</if>>
+	하나씩 붙일 때마다 그녀는 안도의 한숨을 내쉰다.
+<</if>>
+<<if $prisoner.health gte 8 and $prisoner.state is "catatonic">>
+	<<set $prisoner.state to "awake">>
+	<span class="green">고통이 가라앉기 시작하자, 그녀는 정신을 차린다.</span> 그녀의 눈에 초점이 돌아온다.
+	당신은 그녀가 가장 먼저 본 사람이다. 그녀는 마침내 긴장을 푸는 것 같다. <<set $prisoner.harmed-->><<set $prisoner.love++>><<hopelessCycleLove 1>>
+<</if>>
+<br><br>
+
+<<if $prisoner.harmed gte Math.floor($prisoner.love / 6)>>
+	당신이 일을 마치자마자 그녀는 당신을 밀어낸다.
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+	<br>
+<<elseif !$prisonerEvents.includes("talkHerbs") and $prisoner.state isnot "catatonic">>
+	<<set $prisonerEvents.pushUnique("talkHerbs")>>
+	당신은 약초에 대한 이야기를 늘어놓아 그녀의 고통을 잊게 한다.
+	수도원에서는 이 약초를 '성자의 왕관'이라 부르며, 근처 섬에서 발견되었다. 지금은 정원의 돋운 구역에서 경사진 나무 덮개 아래에서 재배되고 있다.
+	동쪽이 트여 있고 정원 자체보다 더 뻗어 있어, 비를 피하면서 아침 햇살을 받을 수 있다.
+	<br><br>
+
+	생장 주기 내내 잎에 물이 닿아서는 절대 안 된다. 흙 속 뿌리에 직접 물을 주어야 한다.
+	'익으면' 한 달 동안 매달아 말린다. 마침내 물에 담그면, 잎사귀는 평생의 노력을 분비한다:
+	화상을 진정시키는 놀라운 능력을 지닌 끈적하고 무색의 진액이다. 야생에서는 비가 내릴 때 이 진액이 자연적으로, 그리고 지속적으로 얇고 감지할 수 없는 양으로 분비된다.
+	<br><br>
+
+	<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 진심으로 흥미를 보이는 듯 고개를 끄덕이며 듣는다. <span class="pink">사실, 그녀는 당신에게서 눈을 떼지 못한다.</span> 당신은 마녀에게 식물에 대해 새로운 것을 가르쳐 줄 수 있었다는 사실에 약간의 자부심을 느낀다.
+	당신은 이것이 철저히 지켜지는 비밀이며, 방금 당신이 그 비밀을 누설했을지도 모른다고 생각한다. 너무 깊게 생각하지는 않는다. 그녀가 누군가에게 말할 수 있는 상황은 아니니까.
+	당신은 동물에게서 자주 관찰되는 부작용에 대해 이야기하며 설명을 마친다. 진액과 섞인 물은 강력한... 작용을 하는 것으로 알려져 있다.
+	<br><br>
+
+	<span class="pink">그녀가 거친 숨을 내쉬고 있다. 얼굴은 새빨갛게 달아올랐고, 당신을 향해 기어오기 시작한다.</span>
+	<br><br>
+
+	...최음제. 당신은 방금 그녀 몸에 있는 여러 개의 벌어진 상처에 그것을 직접 주입한 셈이다.
+	<br><br>
+
+	<<if $prisoner.love gte 60>>
+		그녀는 당신의 가슴에 손을 얹으며 애원하는 눈빛으로 당신을 쳐다본다.
+		<br><br>
+
+		<<link [[그녀를 정화한다|Hopeless Cycle Cell Burns Purge]]>><</link>><<ggtrauma>><<gggarousal>><<llpurity>><<hopelessCycleLove 1>>
+		<br>
+		<<link [[진정될 때까지 붙잡는다 (0:30)|Hopeless Cycle Cell Burns Hold]]>><<pass 30>><<arousal 500>><<purity -10>><</link>><<garousal>><<lpurity>>
+		<br>
+	<<else>>
+		그녀는 정신을 차리려 머리를 흔들고는, 어리석은 짓을 하기 전에 당신을 무시하려 애쓰며 몸을 웅크린다.
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif !$prisonerEvents.includes("talkHerbsMouth") and $prisoner.state isnot "catatonic">>
+	<<set $prisonerEvents.pushUnique("talkHerbsMouth")>>
+	그녀는 무언가 생각하는 듯하더니, 당신에게 조금 더 가까이 기어온다. 그녀는 당신을 향해 입을 벌려 입안의 화상을 보여준다.
+	<br><br>
+
+	당신은 다음번에 그녀의 입을 위해 여분의 잎을 가져오겠다고 약속한다. 그녀가 당신에게 미소 짓는다.
+	<<if Time.lastDayOfMonth is $hc.day>>
+		하지만 그 미소는 잠시뿐, 이내 걱정스러운 표정으로 바뀐다. 당신도 오늘이 무슨 날인지 기억해내고 깨닫는다. 다음은 없을지도 모른다.
+	<</if>>
+	<br><br>
+
+	부작용이 나타나자 그녀는 거친 숨을 내쉬기 시작한다.
+	<<if $prisoner.love gte 60 and Time.lastDayOfMonth is $hc.day and !$prisonerEvents.includesAny("sex", "elkspawnEmbrace")>>
+		그녀는 애원하는 눈빛으로 당신을 쳐다본다.
+		<br><br>
+
+		<<link [[그녀를 정화한다|Hopeless Cycle Cell Burns Purge]]>><</link>><<ggtrauma>><<gggarousal>><<llpurity>><<hopelessCycleLove 1>>
+		<br>
+		<<link [[진정될 때까지 붙잡는다 (0:30)|Hopeless Cycle Cell Burns Hold]]>><<pass 30>><<arousal 500>><<purity -10>><</link>><<garousal>><<lpurity>>
+		<br>
+	<<else>>
+		그녀는 몸을 웅크리고, 또다시 어리석은 짓을 하기 전에 당신을 무시하려고 애쓴다.
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<if $prisoner.state is "catatonic">>
+		그녀는 몸을 뒤척이고 꿈틀거리지만, 다소 진정된 것 같다.
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		당신은 수다를 떨어 그녀의 고통을 잊게 한다. 그녀는 고개를 끄덕이며 매우 고마워한다.
+		약속대로, 당신은 그녀의 입을 위해 잎사귀 하나를 남겨두었다. 그녀가 입을 크게 벌리자, 당신은 부드럽게 그 안에 넣어준다.
+		<br><br>
+
+		그녀의 온몸에 힘이 풀린다.
+		<<if !$prisonerEvents.includes("herbsMouth")>>
+			<<set $prisonerEvents.pushUnique("herbsMouth")>>
+			오랫동안 시달렸던 고통이 마침내 억제되었다. 잠시 후 그녀의 얼굴이 일그러진다. 당신은 맛에 대해 경고하는 것을 잊었다.
+			당신은 그녀의 상태를 고려할 때 맛을 전혀 느끼지 못할 것이라고 생각했다.
+			<<set $prisoner.love += 5>><<hcPrisonerHealth 5>><<set $prisoner.harmed -= 3>><<hopelessCycleLove 2>>
+		<</if>>
+		<br><br>
+
+		부작용이 나타나자 그녀는 거친 숨을 내쉬기 시작한다.
+		<<if $prisoner.love gte 60 and !$prisonerEvents.includesAny("sex", "elkspawnEmbrace")>>
+			그녀는 애원하는 눈빛으로 당신을 쳐다본다.
+			<br><br>
+
+			<<link [[그녀를 정화한다|Hopeless Cycle Cell Burns Purge]]>><</link>><<ggtrauma>><<gggarousal>><<llpurity>><<hopelessCycleLove 1>>
+			<br>
+			<<link [[진정될 때까지 붙잡는다 (0:30)|Hopeless Cycle Cell Burns Hold]]>><<pass 30>><<arousal 500>><<purity -10>><</link>><<garousal>><<lpurity>>
+			<br>
+		<<else>>
+			그녀는 몸을 웅크리고, 또다시 어리석은 짓을 하기 전에 당신을 무시하려고 애쓴다.
+			<br><br>
+
+			<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Hopeless Cycle Cell Burns Mouth
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+당신은 약초를 물에 담갔다가 그녀에게 입을 벌리라는 손짓을 한다. 그녀가 입을 크게 벌리자, 당신은 부드럽게 약초를 그 안에 넣어준다.
+<br><br>
+
+오랫동안 시달리던 고통이 마침내 억제된다. 잠시 후 그녀의 얼굴이 일그러진다. 당신은 맛에 대해 경고하는 것을 잊었다.
+그녀의 상태를 고려하면 맛을 전혀 느끼지 못할 것이라고 생각했다.
+<<set $prisoner.love += 5>><<hcPrisonerHealth 5>><<set $prisoner.harmed -= 3>><<hopelessCycleLove 2>>
+<<set $prisonerEvents.pushUnique("herbsMouth")>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Burns Purge
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if Time.lastDayOfMonth is $hc.day>>
+	당신은 그녀의 뒤로 움직이기 시작한다. 그녀는 기다리라는 손짓을 한다. 그녀는 손을 골반으로 내리고, 큰 노력을 기울여 다리를 벌린다.
+	<br><br>
+
+	그녀는 당신을 다시 올려다본다. 당신이 이해하는 데 그녀의 말이 필요하지는 않다. 그녀의 눈에는 두려움과 불확실성이 담겨 있다.
+	그녀는 혹시라도 오늘이 마지막 밤이 될 경우를 대비해, 마지막 필멸의 위안을 바라고 있다.
+	<br><br>
+
+	엘크의 종으로서, 당신은 이것이 그녀에게 어울리는 마지막 위안이라고 생각한다. 하지만 그녀의 눈에는 다른 무언가도 있다.
+	단순한 욕정을 넘어선 무언가가.
+	<br><br>
+
+	<<link [[하나가 되어 눕는다 (0:30)|Hopeless Cycle Cell Burns Sex]]>>
+		<<pass 30>><<set $prisoner.love += 5>><<trauma 50>><<purity -100>>
+		<<if $hc.handLocation is "guardhouse">><<hcSuspicion 20>><</if>>
+	<</link>>
+	<<gggtrauma>><<gggarousal>><<lllpurity>><<hopelessCycleLove 2>><<penilevirginitywarning>>
+	<<if $hc.handLocation is "guardhouse">><<hopelessCycleSus 3>><</if>>
+	<br>
+	<<link [[거절한다|Hopeless Cycle Cell Burns Refuse]]>><<set $prisoner.love -= 5>><</link>><<hopelessCycleLove -2>>
+	<br>
+<<else>>
+	당신은 움직이려 하지만, 그녀가 온 체중을 실어 당신을 짓누른다. 그녀는 당신의 <<penis>>【을를】 잡기 시작한다.
+	<br><br>
+
+	<<link [[허락한다 (0:30)|Hopeless Cycle Cell Burns Sex]]>>
+		<<pass 30>><<set $prisoner.love += 5>><<trauma 50>><<purity -100>>
+		<<if $hc.handLocation is "guardhouse">><<hcSuspicion 20>><</if>>
+	<</link>>
+	<<gggtrauma>><<gggarousal>><<lllpurity>><<hopelessCycleLove 2>><<penilevirginitywarning>>
+	<<if $hc.handLocation is "guardhouse">><<hopelessCycleSus 3>><</if>>
+	<br>
+	<<link [[통제력을 유지한다 (0:10)|Hopeless Cycle Cell Burns Purge 2]]>><<pass 10>><<set $prisoner.love++>><<trauma 24>><<arousal 3000>><<purity -30>><</link>><<ggtrauma>><<ggarousal>><<llpurity>><<hopelessCycleLove 1>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Burns Purge 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<hcPrisonerHealth 2>><<set $prisoner.harmed-->>
+당신은 쉽게 그녀를 막아서고, 아래로 밀어붙인다. 그녀는 고통스러운 신음을 내뱉지만, 여전히 눈에 엄청난 갈망을 담은 채 당신을 올려다본다.
+<br><br>
+
+모든 것에도 불구하고, 당신의 마음은 그녀를 더럽히라고 부추긴다. 당신은 저항하며 서약을 굳게 지킨다. 하지만 욕망을 완전히 무시할 수는 없다.
+<br><br>
+
+당신은 그녀의 다리 사이로 이동하여, 기다리고 있는 보지에 입을 가져간다. 그녀의 손이 당신의 머리를 붙잡고, 아주 작은 접촉에도 신음한다.
+당신은 허리 아래로는 아무것도 느끼지 못한다면 어떻게 그렇게 민감할 수 있는지 잠시 궁금해한다.
+<br><br>
+
+하지만 그녀가 연기하는 것은 분명 아니다. <span class="pink">그녀는 절정에 이르러 몸을 떤다. 그녀의 애액이 당신의 입을 뒤덮는다.</span> 당신은 조금이라도 삼키면 자신을 망칠 수 있다는 것을 알기에 재빨리 닦아낸다.
+<br><br>
+
+그녀는 이제 당신의 머리카락을 잡아당기며 더 꽉 붙잡고, 당신을 다시 아래로 억지로 끌어내린다. 당신은 한동안 여기 있어야 할지도 모른다...
+<br><br>
+
+<<link [[다음 (0:30)|Hopeless Cycle Cell Burns Purge 3]]>><<pass 30>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Burns Purge 3
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+그녀는 숨을 헐떡이며, 마침내 팔의 힘이 다 빠졌다. 그녀는 몸을 일으켜 당신을 내려다본다.
+<br><br>
+
+당신은 거기에 누워, 그녀의 타락이 당신 안에 뿌리내리면서 거의 움직일 수 없다. 방 전체가 빙빙 돌지만, 그녀의 미안한 미소는 알아볼 수 있다.
+<br><br>
+
+그녀는 당신에게 기어온다. 큰 노력을 기울여, 그녀는 당신의 축 늘어진 팔을 들어 올리고 포옹 속으로 파고든다. 바닥은 편안하지 않지만, 적어도 그녀는 따뜻하다. 막 정화된 그녀의 손길은 이제 그리 불쾌하지 않다.
+<br><br>
+
+그녀는 당신의 뺨에 키스하고, 두 사람은 잠시 휴식을 취한다.
+<br><br>
+
+<<link [[다음 (0:30)|Hopeless Cycle Cell]]>><<pass 30>><<tiredness -16>><</link>><<ltiredness>>
+<br>
+
+:: Hopeless Cycle Cell Burns Refuse
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+당신은 고개를 젓는다.
+<<if $player.virginity.penile is true>>
+	당신은 지켜야 할 서약이 있다.
+<<else>>
+	당신의 서약은 깨졌을지 모르지만, 당신은 여전히 원칙적으로 그 정신을 따른다.
+<</if>>
+<br><br>
+
+그녀는 잠시 멈추더니, 슬프게 미소 짓는다. 그녀는 당신에게서 몸을 밀어낸다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Burns Sex
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("sex")>><<hcPrisonerHealth 6>>
+
+당신은 그녀를 짚 침대로 끌어당긴다. 당신이 그녀를 눕히자 그녀의 호흡이 더욱 거칠어진다.
+<<if $worn.upper.name is "chain tunic">>
+	갑옷을 벗는 것은 정말 고통스러운 일이지만, 당신은 약간의 고투 끝에 해낸다. 그것은 특별히 이런 일을 막기 위해 설계되었다.
+<<else>>
+	당신은 로브를 벗는다.
+<</if>>
+<br><br>
+
+그녀의 팔이 당신을 감싼다. 그녀는 이미 흠뻑 젖어있다.
+당신의 귀두가 그녀에게 눌린다.
+<<if $player.virginity.penile is true>>
+	당신은 망설인다. 평생의 헌신을 통해, 당신은 몸을 순결하게 지키고 사랑에 의해 강요당하지 말라고 배웠다.
+	하지만 여기 당신은, 둘이서 하나가 되어, 영원히 더러워지기까지 단 한 번의 삽입만을 남겨두고 누워 있다.
+	<br><br>
+
+	그녀의 미소가 당신의 차가운 의심을 녹여버린다. 당신은 그녀가 그럴 가치가 있다고 결정한다.
+<<else>>
+	당신은 서약이 이미 깨진 상태에서, 이 정도는 별 해가 되지 않을 것이라고 생각한다.
+<</if>>
+당신은 둘 사이의 마지막 거리를 좁히고, 그녀 안으로 파고든다.
+<<if $player.virginity.penile is true>>
+	<span class="red">포피가 귀두에서 분리되는 것을 느낀다, <<virginitylosttext $prisoner.name>></span>
+	<<takeVirginity $prisoner.name "penile">><<set $prisonerEvents.pushUnique("virginity")>>
+<</if>>
+<br><br>
+
+그녀의 손이 당신을 꽉 잡으며 신음한다. 그녀의 포옹은 사랑스럽다. 당신은 엘크의 숭배자에게서 그런 부드러움을 기대하지 않았다.
+그것은 그녀의 기를 빨아들이는 손길을 견디기 쉽게 만든다.
+당신은 그녀의 상처를 건드리지 않도록 조심하며 사랑을 나눈다.
+<br><br>
+
+<span class="pink">그녀는 절정에 이르러 몸을 떤다.</span> 그녀의 타락을 받아들이자 숲과 바다의 환영이 당신의 마음을 채운다.
+너무나 많은 타락이다. 그것은 당신 안으로 흘러들어와 공허함으로 당신을 채운다. 그녀는 활기를 되찾은 것 같다. <<lllpurity>>
+<br><br>
+
+<span class="red">그녀가 당신의 어깨를 문다.</span> 당신은 고통에 움찔하지만, 계속해서 허리를 움직인다. <<gpain>><<pain 3>>
+<br><br>
+
+<span class="pink">그녀가 다시 절정에 이르러 몸을 떨며, 당신을 자신의 절정으로 더 가까이 이끈다.</span> 연결은 이미 형성되었다.
+타락은 들어왔던 것과 같은 방식으로 다시 새어 나갈 수 없다.
+그 감각은 당신이 전에 느껴본 어떤 것과도 다르다. 당신은 속에서 불타오르고 있다. 마지막 추삽질과 함께, 당신은 절정에 도달한다. <<orgasm>>
+
+당신은 서로를 꽉 껴안는다. 당신이 몸을 떼자, 그녀는 진심으로 행복해 보인다.
+<br><br>
+
+당신 둘 다 숨을 헐떡인다. 당신은 그녀에게서 굴러 내려와 옆에 눕는다. 그녀는 당신의 뺨에 키스하고, 당신의 가슴에 파고든다.
+두 사람은 잠시 휴식을 취한다.
+<br><br>
+
+<<link [[다음 (0:30)|Hopeless Cycle Cell]]>><<pass 30>><<tiredness -16>><</link>><<ltiredness>>
+<br>
+
+:: Hopeless Cycle Cell Burns Hold
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+당신은 그녀의 뒤로 가서 그녀를 꽉 껴안는다. 지금 힘을 쓰는 것은 좋지 않은 결정일 것이다, 약초가 효과를 발휘하도록 해야 한다. 그녀도 아마 이것을 깨달았을 것이다. 그녀는 당신의 팔을 잡고, 호흡을 안정시키려 애쓴다.
+<br><br>
+
+그녀는 당신에게 기댄다. 다른 건 몰라도, 그녀는 당신의 품에서 편안해 보인다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Talk
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if $prisoner.harmed gte Math.floor($prisoner.love / 6)>>
+	<<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 말을 걸어본다. <span class="red">그녀가 당신을 경멸적으로 쏘아본다.</span> <<stress 6>><<gstress>>
+<<else>>
+	<<if $prisoner.talked lte 4 or !$prisonerEvents.includes("speech")>>
+		<<switch $prisoner.talked>>
+			<<case 0>><<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 인사를 건네본다. 그녀가 고개를 갸웃거린다. "흐... 흐..." 그녀는 무언가 말하려 애쓰는 듯하지만, 나지막한 떨림만을 내뱉을 뿐이다.
+			<<case 1>>그녀에게 이름이 무엇인지 묻는다. 그녀는 그저 당신을 쳐다볼 뿐이다. 당신은 그녀가 침묵하는 이유가 입을 감싼 붕대 때문이라고 생각했었다. 붕대는 사라졌지만, 그녀는 여전히 말이 없다.
+			<<case 2>>그녀에게 어둠의 엘크와 어울린 것을 후회하는지 묻는다. 그녀는 눈을 깜빡일 뿐, 아무 말도 하지 않는다.
+			<<case 3>>그녀에게 회개할 것인지 묻는다. 그녀는 당신을 쳐다본다.
+			<<case 4>>왜 말을 하지 않는지 묻는다. 그녀는 아무 말도 하지 않는다. <<set _noOptions to true>>
+			<<default>>그녀에게 말을 걸어본다. 그녀는 그저 당신을 쳐다볼 뿐이다. <<set _noOptions to true>>
+		<</switch>>
+		<<set $prisoner.talked++>>
+		<<if _noOptions>>
+			<br><br>
+
+			<<link [[그녀를 위협한다|Hopeless Cycle Cell Talk Intro Threaten]]>><<set $prisoner.love -= 5>><<set $prisoner.harmed++>><</link>>
+			<br>
+			<<link [[다른 언어로 말을 걸어본다|Hopeless Cycle Cell Talk Intro]]>><<set $prisoner.love += 2>><</link>>
+			<br>
+		<</if>>
+	<<elseif !$prisonerEvents.includes("tongue")>>
+		<<set _noOptions to true>>
+		다시 그녀에게 말을 걸어본다. 그녀는 듣고 있지만, 당신의 어떤 질문에도 대답하지 않는다.
+		<br><br>
+
+		당신은 그녀에게 왜 말을 하지 않는지 묻는다. 그녀는 마치 당신이 모르는 무언가를 알고 있을 거라 생각했다는 듯 놀란 표정을 짓는다.
+		<br><br>
+
+		그녀가 더 가까이 오라고 손짓한다. 당신은 주저하며 다가간다.
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell Tongue]]>><</link>>
+		<br>
+	<<elseif !$prisonerEvents.includes("tongueAfter")>>
+		<<set $prisonerEvents.pushUnique("tongueAfter")>>
+		그녀에게 무슨 말을 할지 생각해본다. 몇 가지 간단한 질문을 하기로 한다.
+		<br><br>
+
+		당신은 그녀가 정말 마녀인지 묻는다.<br>
+		그녀는 망설이다가, <span class="red">고개를 끄덕인다.</span><br><br>
+
+		당신은 그녀가 마을 사람들을 유혹했는지 묻는다.<br>
+		그녀는 고개를 젓는다.<br><br>
+
+		당신은 당신의 형제자매들이 그녀의 현재 상태에 책임이 있는지 묻는다.<br>
+		그녀는 고개를 갸웃거리더니, 좌우로 흔든다. '그렇기도 하고 아니기도 하다'는 뜻인 것 같다.<br><br>
+
+		당신은 그녀가 죄를 회개할 것인지 묻는다.<br>
+		그녀는 그저 당신을 쳐다볼 뿐이다.<br><br>
+
+		이만하면 충분하다고 생각한다.
+	<<elseif $prisonerEvents.includes("brand") and !$prisonerEvents.includes("talkBrand")>>
+		<<set $prisonerEvents.pushUnique("talkBrand")>>
+		당신은 앉아서 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 당신 팔을 따라 쭉 이어진 십자가 낙인을 보여준다.
+		<<if $prisonerBrands.includesAny("upper back", "lower back") and $prisonerBrands.includesAll("left arm", "right arm")>>
+			당신은 등에 있는 것까지 언급하며, 심지어 같은 위치에 낙인이 있다고 말한다.
+		<</if>>
+
+		당신은 이제 우리 둘 다 할 이야기가 생겼다고 그녀에게 말한다.
+		<br><br>
+
+		그녀가 당신에게 힘없이 미소 짓는다. <<set $prisoner.love++>><<hopelessCycleLove 1>>
+		<br><br>
+
+		당신은 방금 한 말의 무게에 대해 생각한다. 그 말은 그녀가 언젠가 자유로워질 것이고, 두 사람이 우호적인 관계가 될 것이라는 의미를 내포하고 있다.
+		<br><br>
+
+		마음이 복잡해진다. 그녀에게 미래가 있을까?
+		<br><br>
+
+		두 사람 모두에게 미래가 있을까?
+	<<elseif $prisoner.love gte 80 and !$prisonerEvents.includes("kissAttempt") and $prisonerEvents.includesAll("legs", "face", "talkMagic", "talkName", "washHair", "newClothes") and $prisonerEvents.includesAny("spendNight", "talkHairBlooms")>>
+		<<set _noOptions to true>><<set $prisonerEvents.pushUnique("kissAttempt")>>
+		당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>> 앞에 앉아, 더 많은 질문을 하려고 한다.
+		<br><br>
+
+		그녀가 앞으로 몸을 기울여 당신과의 짧은 거리를 기어온다. 당신은 본능적으로 몸을 약간 뒤로 뺀다.
+		<br><br>
+
+		그녀가 당신의 가슴에 손을 얹는다.
+		<br><br>
+
+		그녀의 얼굴이 당신에게 가까워진다.
+		<br><br>
+
+		<<link [[그녀에게 키스한다|Hopeless Cycle Cell Kiss]]>><<set $phase to 1>><<purity -10>><<trauma 24>><<set $prisoner.love += 10>><</link>><<llpurity>><<ggtrauma>><<hopelessCycleLove 3>><<kissvirginitywarning>>
+		<br>
+		<<link [[밀어낸다|Hopeless Cycle Cell Kiss]]>><<set $phase to 2>><<set $prisoner.love -= 25>><<set $prisoner.harmed += 10>><</link>><<hopelessCycleLove -3>>
+		<br>
+	<<else>>
+		<<set _noOptions to true>>
+		당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>> 앞에 앉는다.
+		<br><br>
+		<<if Time.lastDayOfMonth is $hc.day and Time.hour gte 12 and $prisoner.love gte 60>>
+			두 사람 사이에 두려운 기운이 감돈다. 둘 다 무슨 일이 닥칠지 알고 있다. 이제 기껏해야 몇 시간 남았을 것이다.
+			<br>
+			<<link [[그녀를 안아준다 (1:00)|Hopeless Cycle Cell Hold]]>><<pass 1 hour>><<set $prisoner.love++>><<stress -6>><<purity -2>><</link>><<lstress>><<lpurity>><<hopelessCycleLove 1>>
+			<br><br>
+		<</if>>
+		<<if !$prisonerEvents.includes("talkName") and $prisoner.love gte 45>>
+			<<link [[그녀의 이름을 묻는다|Hopeless Cycle Cell Name]]>><</link>>
+			<br>
+		<</if>>
+		<<if !$prisonerEvents.includes("talkMagic")>>
+			<<link [[마법을 아는지 묻는다|Hopeless Cycle Cell Trick]]>><<set $prisoner.love += 1>><</link>><<hopelessCycleLove 1>>
+			<br>
+		<</if>>
+		<<if $prisonerEvents.includes("face")>>
+			<<if $prisonerEvents.includes("washHair") and !$prisonerEvents.includes("talkHair")>>
+				<<link [[그녀의 머리를 손질해 준다 (0:10)|Hopeless Cycle Cell Hair]]>><<pass 10>><<set $prisoner.love += 3>><</link>><<hopelessCycleLove 2>>
+				<br>
+			<</if>>
+		<</if>>
+		<<link [[자신에 대해 이야기한다|Hopeless Cycle Cell Yap]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+<br><br>
+
+<<if !_noOptions>>
+	<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Talk Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("speech")>>
+<span class="narration">교도관은 가장 어두운 곳에서도 익숙함이 숨어 있을 수 있다는 것을 배웠다.</span>
+<br><br>
+
+당신은 고향의 언어로 그녀에게 인사한다.
+<br><br>
+
+<span class="green">그녀의 눈이 커진다.</span>
+<br><br>
+
+잠시 망설이던 그녀는, <span class="green">인사하는 몸짓으로 팔을 들어 올린다</span>.
+<br><br>
+
+<<if $prisoner.love gte 25>>
+	당신은 그녀가 당신의 고향 출신일 거라고는 전혀 짐작하지 못했다. 어떤 기분인지 확신할 수 없다.
+<<else>>
+	이런 사람과 고향을 공유한다는 사실이 더럽고 부끄럽게 느껴지지만, 당신은 그 감정을 숨긴다. 어쨌든 이건 그녀를 협조하게 만들기 위한 것일 뿐이다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Talk Intro Threaten
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<wearProp "whip" "khaki">>
+당신은 능숙하고 우아한 몸짓으로 채찍을 잡아 그녀를 향해 휘두른다. 채찍은 그녀의 귀 바로 옆 벽을 때린다.
+<br><br>
+
+<span class="red">그녀는 꿈쩍도 하지 않는다.</span> 그녀는 이제 훨씬 더 차가운 눈으로 당신을 계속 쏘아본다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Tongue
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("tongue")>>
+<span class="narration">책의 내용이 사실이라면, 오늘날 신전의 형벌은 이 시대보다 훨씬 더... '우아'하다.</span>
+<br><br>
+
+당신이 가까이 다가가자, 그녀가 천천히 입을 연다.
+<br><br>
+
+<span class="red">그녀의 혀가 없다.</span>
+<br><br>
+
+그녀의 뺨 안쪽에는 바깥쪽 화상과 일치하는 화상 자국이 있다. 목구멍도 타버렸다. <<gggtrauma>><<trauma 50>>
+<br><br>
+
+그녀가 입을 닫자 당신은 뒤로 물러선다. 한기가 느껴진다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Name
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">이런 곳에서 이름은 나눌 수 있는 가장 내밀한 것 중 하나였다. 둘 다 이 사실을 잘 알고 있었다.</span>
+<br><br>
+
+당신은 그녀의 이름을 묻는다.
+<br><br>
+
+그녀가 당신을 향해 눈을 깜빡인다.
+<br><br>
+
+당신은 말을 고쳐, 그녀의 이름을 알아도 될지 묻는다.
+<br><br>
+
+그녀는 잠시 생각하더니, 당신을 가리킨다. 그러고는 손목을 들어 올려 손가락으로 위를 가리킨다. '당신 먼저.'
+<br><br>
+
+<<link [[이름을 알려준다|Hopeless Cycle Cell Name 2]]>><</link>>
+<br>
+<<link [[거절한다|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Name 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("talkName")>>
+<span class="narration">교도관의 성만 알려져 있지만, 우리는 마녀가 무엇이라 불렸는지는 확실히 알고 있다. 마을 사람들은 모두 그녀를...</span>
+<br><br>
+
+당신은 그녀에게 당신의 이름을 말해준다. 그녀는 미소를 지으며 손을 컵 모양으로 모아 앞으로 내밀고, 당신에게도 똑같이 하라는 손짓을 한다.
+<br><br>
+
+당신은 그녀를 따라 한다. 그녀는 부드럽게 당신의 손을 잡고, 손가락 하나로 당신 이름의 철자를 그린다. 철자를 제대로 쓰는 데 몇 번의 시도가 필요했다. <<purity -1>><<lpurity>>
+<br><br>
+
+그녀는 당신이 자신을 믿어준 것이 기쁜 듯, 당신을 향해 밝게 미소 짓는다. 그녀는 당신의 손을 꽉 쥐고는, 당신의 손바닥에 새로운 글자를 그리기 시작한다.
+<br><br>
+
+아치 하나, 고리 하나, 또 다른 아치 하나...
+<br><br>
+
+<span class="green">'노나.'</span>
+<br><br>
+
+<<set $prisoner.name to "Nona">>
+<<if $player.virginity.penile is "the witch">>
+	<<set $player.virginity.penile to "Nona">>
+<</if>>
+<<if $player.virginity.handholding is "the witch">>
+	<<set $player.virginity.handholding to "Nona">>
+<</if>>
+<<if $player.virginity.kiss is "the witch">>
+	<<set $player.virginity.kiss to "Nona">>
+<</if>>
+
+당신은 미소로 화답하고, 처음으로 그녀의 이름을 부르며 인사한다. 그녀는 다시 한번 당신의 손을 꽉 쥔다. <<set $prisoner.loveRevealed to true>><<set $prisoner.love += 3>><<hopelessCycleLove 2>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Trick
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("talkMagic")>>
+
+당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 마법을 아는지 묻는다. 그녀는 당신을 향해 눈을 깜빡이더니, 손을 컵 모양으로 모아 앞으로 내민다. 그녀는 당신에게 손을 잡으라는 손짓을 한다.
+<br><br>
+
+당신은 그렇게 한다. 손이 저릿하다. <<purity -3>><<lpurity>>
+<br><br>
+
+그녀는 잠시 당신의 손을 잡고 있는다. 당신은 그녀의 손이 얼마나 귀부인 같은지 알아차리지 않을 수 없다. 당신은 마녀라면 길고 거친 손가락에 발톱 같은 손톱을 가졌을 거라 생각했다.
+<br><br>
+
+그녀는 천천히 당신의 손을 들어 올려, 그녀의 입을 덮게 한다. 당신의 온몸이 잠시 저릿하다. 갑자기 그녀가 기침을 하자, 저릿한 느낌이 멈춘다.
+<br><br>
+
+그녀는 미안한 듯 당신을 쳐다보고는 다시 시도한다. 그 느낌이 돌아온다. 그녀는 천천히 당신의 손을 떼어낸다. 그녀의 입이 열려 있다. <span class="green">그 안에서 한 쌍의 꽃이 피어난다.</span>
+<br><br>
+
+<<run hcItemAdd({ type: "clutter", name: "witchblooms", location: "cell", origin: "prisoner", dirty: 2})>>
+꽃은 옅은 분홍빛이 도는 보라색이다. 당신은 이 종을 알지 못한다. 꽃은 약간 타서 시든 것처럼 보인다. 그녀는 당신에게 슬픈 미소를 짓는다.
+<br><br>
+
+이것 때문에 그녀를 마녀라고 낙인찍었을 리는 없다. 그녀는 더 많은 것을 할 수 있어야 한다. 당신은 더 대단한 것은 말을 해야만 가능할 것이라고 재빨리 추측하지만, 왜 그녀가 당신의 손을 잡아야 했는지는 여전히 궁금하다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Hair
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("talkHair")>>
+
+그녀의 머리카락은 마침내 깨끗해졌지만, 뿔 주변이 불편한 듯하다.
+<br><br>
+
+당신이 수련생이었을 때 수녀들이 당신의 머리를 손질하는 것을 도와주었고, 관리하는 법을 가르쳐 주었다. 이제 당신은 자주 자매들의 머리를 손질해 준다. 당신은 그녀를 돌려세우고 일을 시작한다. 그녀의 머리카락은 몸의 다른 부분과 마찬가지로 만지기 불쾌하다. <<purity -5>><<trauma 6>><<llpurity>><<gtrauma>>
+<br><br>
+
+당신은 그녀의 머리카락을 뿔에서 멀리하고, 땋아서 떨어뜨려 놓는다. 그녀는 당신의 손길에 긴장을 푼다.
+<br><br>
+
+당신이 끝내자, 그녀는 당신에게 돌아서서 당신의 머리에 손을 얹는다. 그러고는 손목을 돌리는 동작을 한다. '돌아봐요.'
+<br><br>
+
+당신은 이해한다. 그녀도 당신의 머리를 손질해 주고 싶어 한다.
+<br><br>
+
+<<link [[허락한다 (0:15)|Hopeless Cycle Cell Hair 2]]>><<pass 15>><<purity -5>><<set $prisoner.love += 3>><</link>><<lpurity>><<hopelessCycleLove 2>>
+<br>
+<<link [[거절한다|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Hair 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("talkHairLet")>><<set $hairtype to "braid right">><<set $hairposition to "front">>
+
+당신은 그녀를 벽에 기대게 하고 돌아선다.
+<br><br>
+
+그녀가 당신의 머리카락을 만지기 시작하자 머리가 저릿한 느낌이 든다. 그녀는 머리카락 사이로 손가락을 움직이며, 그 질감과 느낌을 즐기는 듯하다. 그녀의 손길이 주는 효과에도 불구하고, 당신은 그 손길에 긴장이 풀리는 것을 느낀다.
+<br><br>
+
+그녀는 부드럽게 머리를 뒤로 넘기고, 다른 스타일이지만 당신에게도 옆으로 땋은 머리를 해주기 시작한다. 그녀는 경험이 많은지, 빠르게 작업한다.
+<br><br>
+
+그녀는 끝났을 때 당신의 어깨를 두드린다. 당신이 돌아보자 그녀는 당신에게 밝게 미소 짓는다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Witchblooms
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("talkHairBlooms")>><<hcPrisonerHealth 1>>
+
+당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 되살아난 꽃들을 보여준다. 그녀의 눈이 커진다.
+<br><br>
+
+당신은 그녀 뒤에 앉아, 그녀의 땋은 머리 아랫부분을 푼다. 그녀는 물어볼 수 없지만, 당신은 그녀가 어떻게 꽃을 정화했는지 궁금해한다는 것을 안다.
+당신은 잠자는 동안 당신의 순결도를 먹게 했다고 그녀에게 말해준다.
+<br><br>
+
+당신은 쌍둥이 꽃 주위로 그녀의 머리를 부드럽게 땋는다. 그녀는 미소 지으며 꽃에 손을 댄다.
+<<if $hcChallenge.faithBlooms>>
+	그녀의 손가락이 머리 뒤쪽의 대머리 부분을 스친다. 처음으로, <span class="green">그것을 떠올리는 것이 그녀를 화나게 하지 않는다</span>. 더 이상은.
+<</if>>
+<br><br>
+
+모든 것에도 불구하고, 당신은 그녀를 예쁘게 보이게 하고 기분 좋게 만들었다. 그녀는 당신을 껴안으며 거의 넘어뜨릴 뻔한다.
+<br><br>
+
+당신은 다시 꽃을 내려다본다. 빛이 거의 없음에도 불구하고, 꽃은 찬란하게 빛난다. <span class="gold">만약 꽃이 당신의 순결도를 흡수할 수 있다면, 아마도 그녀의 타락도 흡수하고 완화시킬 수 있을 것이다.</span>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Kiss
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if $phase is 1>>
+	<<set $prisonerEvents.pushUnique("kiss")>><<set $prisoner.harmed -= 5>>
+	그녀의 손이 당신의 어깨를 잡는다. 당신은 앞으로 몸을 숙인다.
+	<br><br>
+
+	그녀의 입술이 당신의 입술에 닿는다. <<takeKissVirginity $prisoner.name "romantic">>
+	<br><br>
+
+	두 사람 모두 긴장한다. 화상 때문에 그녀에게는 육체적으로 고통스러운 것 같다. 한편, 짧은 행복의 순간은 설명할 수 없는 상실감으로 끊어진다.
+	<br><br>
+
+	그녀의 눈이 유혹적이고 만족스럽게 뜨인다. 그 눈 속에는 너무나 많은 것이 담겨 있다. 고통, 그러나 안도. 증오, 그러나 사랑. 그녀는 당신의 입술을 맞댄 채 더 가까이 다가온다. <<stress -24>><<purity -10>><<llstress>><<llpurity>>
+	<br><br>
+
+	<span class="red">세상이 갑자기 변한다.</span> 당신의 시야는 다른 장소로 깜빡이며 드나들지만, 그녀는 당신 앞에 그대로 있다. 그녀도 달라져 있다.
+	<br><br>
+
+	당신이 그녀 위에 올라탄 모습으로, 계속해서 장면이 스쳐 지나간다. 당신은 돌 제단 위에서 그녀를 더럽히고 있다. 이제 한 쌍의 우아한 뿔로 장식된 그녀의 얼굴은 황홀경에 빠져 있다. 당신은 고개를 든다.
+	당신은 숲속의 작은 공터에 있다. 밤이지만, 붉은 달빛 속에서 모든 것이 완벽하게 보인다.
+	당신의 형제자매들이 당신 주위에 무반응 상태로 황홀경에 빠져 누워 있다. <<trauma 500>><<gggtrauma>>
+	<br><br>
+
+	당신은 다시 감옥으로 돌아온다. 차가운 부재감을 느낀다. 그녀는 순수하고 사랑스러운 미소로 당신을 바라보고 있다. 그 미소가 당신의 온기를 되찾아준다.
+<<else>>
+	당신은 그녀의 어깨를 잡고 더 가까이 다가오지 못하게 막는다. 그녀는 당신에게 몸을 밀치지만, 당신은 그녀를 굳게 잡는다.
+	<br><br>
+
+	배신감에 찬 표정이 그녀의 얼굴에 떠오르자 그녀의 눈이 떨린다.
+	<br><br>
+
+	그녀는 당신을 밀어내고, 벽 근처의 제자리로 돌아간다. 당신이 그녀에게 손을 뻗지만, 그녀는 당신의 팔을 쳐낸다.
+	<br><br>
+
+	그녀는 눈에서 눈물을 닦아내고, <span class="red">증오</span>에 찬 눈으로 당신을 다시 쳐다본다..
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Yap
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<print either(
+	"당신은 " + window.KR.gatPersonNameDictKR($prisoner.name) + "에게 수도원에서 봉사했던 시절에 대해 이야기한다.",
+	"당신은 " + window.KR.gatPersonNameDictKR($prisoner.name) + "에게 당신이 사냥하고 퇴치하는 것을 도왔던 괴물들에 대해 이야기한다.",
+	"당신은 " + window.KR.gatPersonNameDictKR($prisoner.name) + "에게 당신이 수련생이었을 때의 부끄러운 이야기들을 들려준다.",
+	"당신은 " + window.KR.gatPersonNameDictKR($prisoner.name) + "에게 신전에 오기 전의 삶에 대해 이야기한다.",
+	"당신은 " + window.KR.gatPersonNameDictKR($prisoner.name) + "에게 신전의 경전 일부를 가르쳐준다.",
+)>>
+<<print either(
+	"그녀는 열심히 듣는다.",
+	"그녀는 부드럽게 킥킥거린다.",
+	"그녀는 말을 잘 들어준다.",
+	"그녀는 고개를 끄덕이며 듣는다."
+)>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Hold
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if !$prisonerEvents.includes("holdMe")>>
+	<<set $prisonerEvents.pushUnique("holdMe")>>
+	당신은 그녀를 가까이 껴안는다. 그녀도 당신의 포옹에 화답한다.
+	<br><br>
+
+	당신은 달리 뭘 해야 할지 모른다.
+<<elseif !$prisonerEvents.includes("holdMeAgain")>>
+	<<set $prisonerEvents.pushUnique("holdMeAgain")>>
+	당신은 그녀를 다시 껴안는다. 그녀는 당신의 어깨에 기대어 흐느낀다.
+	<br><br>
+
+	아마도 이 위안이 지금 당신이 그녀에게 줄 수 있는 전부일 것이다.
+<<elseif !$prisonerEvents.includes("untilDeath")>>
+	<<set $prisonerEvents.pushUnique("untilDeath")>>
+	당신들은 서로를 계속 껴안고 있다. 그녀는 두려워하고 있다. 어찌 두렵지 않겠는가?
+	<br><br>
+
+	아마도 당신은 그녀의 마지막 시간까지 그녀를 껴안고 있을 것이다.
+<<else>>
+	당신들은 운명의 시간을 기다리며 서로를 계속 껴안고 있다.
+<</if>>
+<br><br>
+
+<<if _hcEvent is "blood">>
+	무거운 발걸음 소리가 지하 감옥 계단을 내려온다. 잠시 후, 감옥 문이 열린다. "<span class="red">시간이다, 형제여.</span> 당장 마녀를 정원으로 데려와라."
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Blood Cell]]>><<endevent>><<set $phase to 2>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Awaken
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+<<if $prisoner.love gte 30>>
+	당신은 부드럽게 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 흔들어 깨운다.
+	<<if $prisoner.love gte 60>>
+		그녀는 눈을 비비고는, 미소 지으며 당신을 껴안는다.
+	<<else>>
+		그녀는 눈을 비비고는, 호기심 어린 눈으로 당신을 쳐다본다.
+	<</if>>
+<<else>>
+	당신은 가볍게 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 걷어찬다. 그녀는 깜짝 놀라 잠에서 깬다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Sheet
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<if !$hc.daily.cellSheet>><<set $prisoner.love += 1>><</if>>
+<<set $hc.daily.cellSheet to true>>
+
+당신은 부드럽게 그녀 위에 시트를 덮어준다. 그녀는 잠시 뒤척이다가, 시트를 몸 쪽으로 더 가까이 끌어당긴다. <<hopelessCycleLove 1>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Caught Fight
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if $phase is 1>>
+	<span class="narration">그는 조용히 물러나지 않을 것이다.</span>
+	<br><br>
+	<<if $temple_weapon is "whip">>
+		<<wearProp "whip" "khaki">>
+		<<if $prof.whip gte $skillChallenge>>
+			<<set _success to true>>
+			<span class="green">다가오는 <<him>>의 모습이 쉽게 보인다.</span> 당신은 전문가다운 기세로 채찍을 휘둘러 <<him>>의 가슴을 두 번 후려친다.
+			<br><br>
+
+			세 번째 공격으로 <<him>>【을를】 무장 해제시키고, 네 번째 공격으로 <<his>> 목을 감싼다. <<He>>【이가】 발버둥치지만, 당신은 <<him>>【을를】 끌어당겨 목을 조른다.
+			<br><br>
+
+			<<He>>【이가】 당신의 손아귀에서 몸부림치며 팔을 떼어내려 한다. <<He>>【이가】 당신의 얼굴을 할퀸다. 당신은 놓아주지 않는다. 마침내 <<his>> 움직임이 멈추자, 당신은 <<him>>【을를】 풀어준다.
+		<<else>>
+			<<Hes>> 너무 빨라서 당신이 따라잡을 수 없다. 당신은 채찍을 휘둘러 몇 번 유효타를 날리지만, <span class="red">그것만으로는 부족하다.</span>.
+			<br><br>
+
+			<<His>> 곤봉이 당신의 머리 옆을 강타한다. 모든 것이 암전된다.
+		<</if>>
+	<<else>>
+		<<wearProp "baton">>
+		<<if $prof.baton gte $skillChallenge>>
+			<<set _success to true>>
+			곤봉은 당신이 선호하는 무기가 아니다. 하지만 상관없다. <span class="green">당신은 자신의 곤봉을 휘둘러 <<his>> 첫 번째 공격을 막아낸다.</span>
+			<br><br>
+
+			<<He>>【이가】 분노에 차 소리치며 당신을 힘으로 제압하려 한다. 엉성한 움직임이다. 당신은 옆으로 체중을 이동시켜 <<him>>의 발을 걸어 넘어뜨린 후, <<his>> 등과 머리를 곤봉으로 내리친다.
+			<br><br>
+
+			당신은 <<him>>의 옆구리를 걷어찬다. <<Hes>> 확실히 의식을 잃었다. 더 세게 휘두르지 않은 게 다행이라고 생각한다.
+		<<else>>
+			곤봉은 당신이 선호하는 무기가 아니고, 그 점이 드러난다. <span class="red"><<He>>【이가】 당신이 한 대도 치기 전에 손쉽게 당신을 기절시킨다.</span>
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<if _success>>
+		<<if $hc.nightBreakIn is "heard" or $hc.nightBreakIn is "tonight">>
+			<<set $prisoner.love += 5>>
+			<<if $hc.nightBreakIn is "tonight">>
+				당신은 <<him>>【을를】 살펴본다. 잠시 후, 당신은 충격과 혐오감에 뒷걸음질 친다. <<Hes>> 로브 아래에 완전히 알몸이다. <<he>>【이가】 당신의 죄수를 범할 계획이었을까?
+				<br><br>
+			<</if>>
+		<</if>>
+
+		<<print window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【이가】 당신을 형용할 수 없는 감정으로 바라본다. 그 시선에 당신은... 따뜻함을 느낀다. <<set $prisoner.loveRevealed to true>><<gglove>>
+		<br><br>
+
+		당신은 침입자를 어떻게 처리할지 생각한다. <<He>>【이가】 이 죄수에게 손을 댈 수 있는 것은 오직 당신뿐이라는 직접적인 명령을 어겼기 때문에, <<he>>【이가】 당신을 교단에 직접 보고할 수는 없다.
+		당신은 몸을 숙여 <<him>>【을를】 어깨에 둘러메고 막사로 돌아간다.
+		<<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>><<set $hc.enteredDungeon to false>>
+		<<run $hcItems.filter(item => item.location is "held").forEach(item => {item.location = "cell"})>>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Quarters]]>><<pass 30>><<endevent>><<set $hc.nightBreakIn to "passed">><<hcSuspicion 10>><</link>><<hopelessCycleSus 2>>
+		<br>
+	<<else>>
+		<<if $prisoner.love gte 40 and !$hc.secondChance>>
+			<<link [[다음|Hopeless Cycle Caught Second Chance]]>><<set $hc.nightBreakIn to "end">><<pass 2 hours>><<endevent>><</link>>
+		<<else>>
+			<<link [[다음|Hopeless Cycle Ending E]]>><<pass 4 hours>><<endevent>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+<<else>>
+	<span class="narration">그는 자신의 실패를 받아들이고, 처벌을 감수했다.</span>
+	<br><br>
+
+	<<His>> 곤봉이 당신의 머리 옆을 강타한다. 모든 것이 암전된다.
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Ending E]]>><<pass 4 hours>><<endevent>><</link>>
+	<br>
+<</if>>
+<<unset $skillChallenge>>
+
+:: Hopeless Cycle Caught Second Chance
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $hc.secondChance to true>>
+
+<<set $pain to 40>><<set $prisoner.cleanBody to 0>><<set $prisoner.cleanBandages to 0>>
+일어서려 하자 당신은 머리를 감싸 쥔다.
+<br><br>
+
+그럴 수 없다. 무거운 무언가가 당신 위에 있고, 당신이 밀어내려 할수록 몸을 조여 온다. 시야가 서서히 또렷해진다. 떨리는 회색 눈 하나가 당신을 바라보고 있다. <<stress 6>><<gstress>>
+<br><br>
+
+<span class="red"><<print window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>의 손은 피에 젖어 있고, 당신의 목을 감싸고 있다.</span> 그녀의 얼굴에는 고통스러운 미소가 걸려 있다. 힘은 거의 주고 있지 않다.
+<br><br>
+
+"형제님!" <<generate1>><<person1>><<personsimple>> 하나가 외치는 소리가 들린다. 로브를 입은 무리가 감옥으로 들이닥쳐 그녀를 당신에게서 떼어내고 당신을 밖으로 끌어낸다.
+<br><br>
+
+이제 그녀가 뭘 하려 했는지 알겠다. 그녀는 곤봉으로 얼굴을 얻어맞기 직전, 당신에게 한 번 더 미소를 지어 보인다. "괜찮으십니까, 형제여?" <<monk>> 한 명이 당신과 눈높이를 맞추고 쪼그려 앉아 당신을 살핀다. 당신은 힘없이 고개를 끄덕여 긍정한다.
+<br><br>
+
+이제 분명 당신에게 시선이 쏠려 있다. 하지만 그녀는 당신에게 두 번째 기회를 주었다. <span class="red">아마 다음은 없을 것이다.</span>
+<<set $hc.suspicion to 80>><<hopelessCycleSus 3>><<set $prisoner.health to 8>><<set $hc.daily.secondChance to true>>
+<br><br>
+
+당신의 형제들이 당신을 막사로 다시 데려간다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Quarters]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Caught Still
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">불경한 자에 대한 형제들의 정의로운 심판에 간수가 개입할 자리는 없었다. 그는 그저 자신이 그 결과에 직면하지 않도록 해야 할 뿐이었다. 적어도 그는 자신에게 그렇게 말했다.</span>
+<br><br>
+
+<<hcPrisonerHealth -10>>
+<<set $prisoner.harmed += 2>>
+<<set $prisoner.cleanBody -= 2>>
+<<set $prisoner.cleanBandages -= 2>>
+<<set $prisoner.harmedRecently to 24>>
+
+당신은 최대한 가만히 앉아 있는다. 그녀에게 무슨 일이 일어나고 있는지 볼 수 없다.
+<br><br>
+
+하지만 모든 소리가 들린다. <<His>> 웃음소리와 만족스러운 신음. <<print window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>의 고통스러운 비명. 고통스러울 정도로 오랜 시간 동안 이어진다. <<trauma 24>><<ggtrauma>><<arousal 1000>><<garousal>>
+<br><br>
+
+"하... 정화가 좀 필요했거든. 최소한 넌 쓸모가 있군." 마침내 <<he>>【이가】 말한다. <<He>>【은는】 <<his>> 로브를 정돈하고 감옥을 나선다.
+<br><br>
+
+<<print window.KR.gatPersonNameDictKR($prisoner.name)>>【이가】 거칠게 숨 쉬는 소리가 들린다. 어둠 속에서, 그녀의 끔찍한 한쪽 눈이 당신에게 고정된 것을 본다.
+<br><br>
+
+그 증오가 당신의 영혼을 파고든다. 하지만, 그것이 당신을 향한 것은 아니라고 느껴진다. 약간의 이해심이 엿보인다.
+<br><br>
+
+그녀의 표정이 모든 것을 말해준다. 그녀는 복수를 원한다. <span class="red">서약을 어긴 자가 있으니, 당신은 그가 누구였든 간에 증거를 확보한 셈이다. 주교의 손이 누군가를 괴롭히느라 바쁘지 않을 때, 그에게 말할 수 있을 것이다.</span>
+<br><br>
+
+<<set $prisonerEvents.pushUnique("raped")>>
+<<endevent>><<set $hc.nightBreakIn to "end">>
+
+<<link [[나간다|Hopeless Cycle Cell]]>><</link>>
+<br>
+<<link [[그녀를 위로해 본다 (0:10)|Hopeless Cycle Comfort]]>><<pass 10>><<set $prisoner.love += 3>><</link>><<hopelessCycleLove 2>><<lpurity>><<gtrauma>>
+<br>
+
+:: Hopeless Cycle Cell Caught Sneak
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">불경한 자에 대한 형제들의 정의로운 심판에 간수가 개입할 자리는 없었다. 그는 그저 자신이 그 결과에 직면하지 않도록 해야 할 뿐이었다.</span>
+<br><br>
+<<set $hc.nightBreakIn to "failed">>
+<<hcPrisonerHealth -10>>
+<<set $prisoner.harmed += 2>>
+<<set $prisoner.cleanBody -= 2>>
+<<set $prisoner.cleanBandages -= 2>>
+<<set $prisoner.harmedRecently to 24>>
+<<endevent>>
+
+당신은 최대한 조용히 지하 감옥을 빠져나온다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cloister]]>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Caught Intervene
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">그는 명확한 지시를 받았다. 오직 그만이 이 죄수에게 손을 댈 수 있었다.</span>
+<br><br>
+
+당신은 조용히 <<him>>에게 다가가 <<his>> 어깨에 손을 얹는다.
+<br><br>
+
+<<He>>【은는】 얼어붙더니, 천천히 돌아본다.
+<br><br>
+
+"아, 아! 페인 형제님! 마침 잘 오셨습니다, 이 마녀가 제게 사악한 마법을 걸려고 해서, 제가—"
+<br><br>
+
+당신은 <<he>>【이가】 주교의 말씀을 정면으로 거역하고 있다고 차분하게 알린다.
+<br><br>
+
+"전, 저는 그런 짓 안 했습니다, 저는—"
+<br><br>
+
+당신은 또한 <<he>>【이가】 <<his>> 깨진 서약에 대해 언급하는 것을 들었다고 알린다. 당신은 <<him>>【을를】 위해 참회의 종을 울려주겠다고 제안한다.
+<br><br>
+
+"안 됩니다, 형제여, 제발—"
+<br><br>
+
+당신은 당신이 직접 징벌을 내리기로 결정하기 전에 정화를 받으라고 <<him>>에게 조언한다. <<He>>【은는】 빠르게 고개를 끄덕이고 감옥에서 달아난다.
+<br><br>
+
+<<print window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【이가】 당신이 뭐라 형용할 수 없는 감정이 담긴 눈으로 당신을 바라본다. 그 시선에... 따뜻함이 느껴진다. <<if $prisoner.loveRevealed>><<gglove>><</if>>
+<br><br>
+
+<<set $hc.nightBreakIn to "passed">>
+
+<<link [[계속|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+<<link [[그녀를 위로해 본다 (0:10)|Hopeless Cycle Comfort]]>><<set $prisoner.love += 3>><<pass 10>><</link>><<gglove>><<lpurity>><<gtrauma>>
+<br>
+
+:: Hopeless Cycle Night Break In Aftermath
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">아무도 자제할 수 없는 것 같았다. 그 마녀에게는 신도들 사이에서 유독, 거의 초자연적일 정도로 미움을 받는 무언가가 있었다.</span>
+<br><br>
+
+<<set $hc.nightBreakIn to "end">>
+감옥에 들어선다. 뭔가 아주 잘못됐다. 문이 잠겨 있지 않았다.
+<br><br>
+
+<<print window.KR.gatPersonNameDictKR($prisoner.name)>>【이가】 아직 그곳에 있는 것을 보고 안도의 한숨을 내쉰다. 당신의 안도감은 아주 짧게 끝난다.
+<br><br>
+
+<span class="red">그녀가 다쳤다. 심하게. 누군가 감옥에 들어왔었다. 그녀는 새로운 멍과 상처로 뒤덮여 있고, 숨소리는 거칠고 힘겹다.
+가까이 다가가 본다. 그녀가 유린당했다는 것 또한 명백하다.</span>
+<br><br>
+
+주먹이 꽉 쥐어진다. 이런 일이 일어나지 않도록 막는 것이 당신의 임무였다. 깊은 죄책감이 느껴진다. 당신은 임무를 다하지 못했기 때문이라고 스스로에게 말한다.
+형제 중 한 명이 그런 타락에 빠지도록 내버려 뒀기 때문이라고.
+<br><br>
+
+당신은 그녀를 실망시켰다고도 느낀다. 그녀가 아무리 더럽혀졌어도, 용서받지 못할 사람은 없다. 구원을 구하는 것이 아니라면, 징벌이 왜 있겠는가?
+그렇지 않다면 당신이 왜 간수이겠는가?
+<br><br>
+
+<span class="red">누군가 책임이 있다. 즉, 누군가 서약을 어겼다는 뜻이다. 주교의 손이 누군가를 괴롭히느라 바쁘지 않을 때, 그에게 말해야 한다.</span>
+<br><br>
+
+<<set $prisonerEvents.pushUnique("raped")>><<set $hc.nightBreakIn to "end">>
+
+<<link [[나간다|Hopeless Cycle Cell]]>><</link>>
+<br>
+<<link [[그녀를 위로해 본다 (0:10)|Hopeless Cycle Comfort]]>><<pass 10>><<set $prisoner.love += 5>><</link>><<hopelessCycleLove 2>><<lpurity>><<gtrauma>>
+<br>
+
+:: Hopeless Cycle Comfort
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<<set $prisonerEvents.push("comfort")>>
+<span class="narration">간수는 자신이 세상으로부터 그녀를 보호하고 있는 것만이 아니라는 것을 깨달았다. 그는 세상으로부터 그녀를 보호하고 있기도 했다.</span>
+<br><br>
+
+당신은 <<print window.KR.gatPersonNameDictKR($prisoner.name)>> 앞에 앉는다.
+<<if $prisoner.state is "catatonic">>
+	<<hcPrisonerHealth 4>><<set $prisoner.state to "lucid">>
+	그녀의 눈은 텅 비어 빛이 없다.
+	<br><br>
+
+	손이 떨리지만, 천천히 그녀의 얼굴로 가져간다. 그녀의 뺨을 감싼다. 손가락이 차갑게 느껴지고, 그 상태로 있자 팔 위로 무감각이 퍼져나간다. <<purity -5>><<lpurity>><<trauma 6>><<gtrauma>>
+	<br><br>
+
+	그녀의 눈이 당신에게 초점을 맞추면서 서서히 빛이 돌아온다.
+<<elseif $prisoner.state is "asleep">>
+	그녀는 눈을 감고 있다.
+	<br><br>
+
+	손이 떨리지만, 천천히 그녀의 얼굴로 가져간다. 그녀의 뺨을 감싼다. 손가락이 차갑게 느껴지고, 그 상태로 있자 팔 위로 무감각이 퍼져나간다. <<purity -5>><<lpurity>><<trauma 6>><<gtrauma>>
+	<br><br>
+
+	그녀의 눈이 천천히 뜨이며 당신에게 초점을 맞춘다.
+<<else>>
+	그녀의 숨소리는 거칠고 무겁다.
+	<br><br>
+
+	손이 떨리지만, 천천히 그녀의 얼굴로 가져간다. 그녀가 움찔한다. 그녀의 뺨을 감싼다. 손가락이 차갑게 느껴지고, 그 상태로 있자 팔 위로 무감각이 퍼져나간다. <<purity -5>><<lpurity>><<trauma 6>><<gtrauma>>
+	<br><br>
+
+	그녀의 숨소리가 점차 느려진다.
+<</if>>
+그녀의 한 손이 당신의 팔을 감싼다.
+아주 잠깐, 그녀의 시선에서 모든 공포와 증오가 사라진다.
+<br><br>
+
+당신은 그녀를 더 가까이 끌어당긴다. 그녀는 열렬히 포옹에 화답한다. 그녀 안의 타락이 접촉을 통해 당신에게 퍼져나가지만, 당신은 신경 쓰지 않는다. <<purity -5>><<lpurity>><<trauma 12>><<gtrauma>>
+<br><br>
+
+당신은 그녀를 안아준다. 그녀는 떨고 있다. 당신은 누군가 그녀에게 진정한 애정을 보여준 지 얼마나 오래되었을지 궁금해한다. 그녀의 눈에서 검은 고름이 흘러나와 당신의 <<if $worn.upper.name is "chain tunic">>튜닉<<else>>로브<</if>> 위로 떨어진다. <<set $prisoner.loveRevealed to true>><<glove>>
+<br><br>
+
+그녀는 당신의 죄수다. 그것은 그녀를 안전하게 지키는 것 또한 당신의 책임이라는 뜻이다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Leave
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+당신은 감옥을 나와 문을 잠근다.
+<br><br>
+
+<<if $hcIncoming is "dailyPunishment">>
+	<<unset $hcIncoming>>
+	몸을 돌리자, 당신은 벽과도 같은 남자와 부딪힌다. 주교의 손이 당신을 내려다보며 씨익 웃고는, 감옥을 다시 가리킨다.
+	<br><br>
+
+	<<if $worn.upper.name isnot "chain tunic">>
+		"갑옷은 어디 있나, 형제여? 상관없다. 저 여자의 속죄 시간이다. 들어가라." 당신은 복종한다. 주교의 손이 고해 사제와 함께 당신을 따라 들어온다.
+		<<hcSuspicion 10>><<hopelessCycleSus 2>>
+	<<else>>
+		"저 여자의 속죄 시간이다. 들어가라." 당신은 복종한다. 주교의 손이 고해 사제와 함께 당신을 따라 들어온다.
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Prisoner Inspection]]>><<endevent>><</link>>
+	<br>
+<<elseif $hcIncoming is "night">>
+	<<unset $hcIncoming>>
+	<<if $hc.suspicion gte 80>>
+		<<generateConfessor 1>><<person1>>
+		당신은 검은 로브를 입은 <<personsimple>>【와과】 마주친다. 그는 당신을 때리려는 듯 곤봉을 치켜들고 있다.
+		잠시 망설이던 <<he>>【은는】 당신의 머리 옆을 후려친다.
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Ending E]]>><<pass 4 hours>><<endevent>><</link>>
+		<br>
+	<<elseif $hc.nightBreakIn is "tonight" or $hc.nightBreakIn is "heard">>
+		<<loadNPC 0 "hc_abuser">><<person1>>
+		당신은 검은 로브를 입은 <<personsimple>>【와과】 마주친다. 그는 당신을 때리려는 듯 곤봉을 치켜들고 있다.
+		<<He>>【은는】 멈칫한다. "페, 페인 형제님. 여기서 아직 뭘 하고 계십니까?" <<He>>【은는】 초조해 보인다.
+		<br><br>
+
+		"우리... 둘 다 떠나서, 서로 못 본 척하는 게 어떻겠습니까, 네?"
+		<br><br>
+
+		당신은 너무 의심스러워 보이고 싶지 않다. 당신은 <<him>>【을를】 따라 회랑으로 돌아간다.
+		<br><br>
+
+		계단 꼭대기에 다다르자, <<he>>【은는】 불편한 듯 몸을 이리저리 뒤튼다. "제가 형제님 대신 지하 감옥을 마무리하겠습니다. 정화 의식을 건너뛴 것에 대해서는 아무 말도 하지 맙시다." <<He>>【은는】 당신의 대답을 기다리지 않고 계단을 다시 내려간다.
+		<<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cloister]]>><<endevent>><</link>>
+		<br>
+	<<elseif $hc.dungeonTorchState is "lit">>
+		<<generateConfessor 1>><<person1>>
+		당신은 검은 로브를 입은 <<personsimple>>【와과】 마주친다. 그는 당신을 때리려는 듯 곤봉을 치켜들고 있다.
+		<<He>>【은는】 당신이 누구인지 알아보고 멈칫한다.
+		<br><br>
+
+		"페인 형제님? 시간이 가는 줄도 모르셨습니까? 이리 오십시오, 밤을 위해 횃불 끄는 것을 도와드리겠습니다." <<hcSuspicion 5>><<hopelessCycleSus 1>>
+		<br><br>
+
+		<<set $hc.dungeonTorchState to "snuffed">>
+		당신에게는 선택의 여지가 별로 없다. 그래도 도움은 고맙게 생각한다. 당신은 금세 횃불을 끄고 <<him>>【와과】 함께 지하 감옥을 떠난다.
+		<br><br>
+
+		"우리를 정화해 줄 <<priest>>【을를】 깨우겠습니다. 여기서 기다리십시오." <<He>>【은는】 옆 통로로 사라진다. <<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>>
+		<br><br>
+
+		<<link [[기다린다 (<<hcTimeDungeonDisplay 35>>)|Hopeless Cycle Cloister]]>><<endevent>><<hcTimeDungeonPass 35>><</link>>
+		<br>
+		<<link [[떠난다 (0:05)|Hopeless Cycle Cloister]]>><<endevent>><<pass 5>><<hcSuspicion 10>><</link>><<hopelessCycleSus 2>>
+		<br>
+	<<else>>
+		<<generateConfessor 1>><<person1>>
+		당신은 검은 로브를 입은 <<personsimple>>【와과】 마주친다. 그는 당신을 때리려는 듯 곤봉을 치켜들고 있다.
+		<<He>>【은는】 당신이 누구인지 알아보고 멈칫한다.
+		<br><br>
+
+		"페인 형제님? 이 시간에 교도소에서 무엇을 하고 계십니까?" <<He>>【은는】 당신이 방금 나온 감옥을 보며 걱정스러운 눈으로 당신을 쳐다본다. "이러시면 안 됩니다. 이리 오십시오, 휴식이 필요합니다." <<He>>【은는】 당신을 강제로 지하 감옥 밖으로 이끈다. <<hcSuspicion 10>><<hopelessCycleSus 2>>
+		<br><br>
+
+		"우리를 정화해 줄 <<priest>>【을를】 깨우겠습니다. 여기서 기다리십시오." <<He>>【은는】 옆 통로로 사라진다. <<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>>
+		<br><br>
+
+		<<link [[기다린다 (0:30)|Hopeless Cycle Cloister]]>><<endevent>><<pass 30>><</link>>
+		<br>
+		<<link [[떠난다|Hopeless Cycle Cloister]]>><<endevent>><<hcSuspicion 10>><</link>><<hopelessCycleSus 2>>
+		<br>
+	<</if>>
+<<elseif ["dawn","day"].includes(Time.dayState) and ($hc.neverLeftDungeon or $hc.snuckInDungeon) and $hc.daysPassed gte 1>>
+	<<generateConfessor 1>><<person1>>
+	몸을 돌리자, 바로 앞에 서 있는 검은 로브를 입은 <<personsimple>>【을를】 보고 당신은 깜짝 놀란다. 고해 사제다. "잠 못 이루셨습니까, 페인 형제님?
+	<<if $hc.snuckInDungeon>>
+		형제님께서 침대에 없는 것을 보고 모두가 충격을 받았습니다. 다시 돌아올 때 정화받은 기록이 없다는 사실에는 더욱더요."
+	<<else>>
+		어젯밤 형제님께서 지하 감옥을 떠나는 것을 본 사람이 아무도 없습니다. 형제들이 걱정했습니다."
+	<</if>>
+	<<set $hc.daily.enteredDungeon to true>><<set $hc.neverLeftDungeon to false>><<set $hc.snuckInDungeon to false>>
+	<br><br>
+
+	<<His>> 팔짱을 낀다.
+	<<if $hc.suspicionRevealed>>
+		"이 일을 주교님께 보고해야겠습니다. 형제님께서 임무에 실패할 경우를 대비해 예방 조치를 취해야 합니다." <<hcSuspicion 15>><<hopelessCycleSus 3>>
+		<br><br>
+
+		<<He>>【은는】 다른 말 없이 떠난다.
+	<<else>>
+		<<set $hc.suspicionRevealed to true>>
+		"형제님께서는 임무에 매우 헌신적이시거나, 아니면 엘크의 하인이 형제님의 머릿속으로 파고들었거나 둘 중 하나겠군요. 후자가 아니길 기도합니다. 우리를 실망시키지 마십시오." <<hcSuspicion 10>>
+		<br><br>
+
+		<<He>>【은는】 다른 말 없이 떠난다.
+		<br><br>
+
+		<span class="narration">주교의 손과 그의 고해 사제들은 간수를 지켜보고 있었다. 이제 이 사실을 알았으니, 그는 어떤 행동이 그들을 의심하게 만들지 더 잘 알게 될 것이다.</span>
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Dungeon]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Hopeless Cycle Dungeon]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Prisoner Inspection
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $hc.daily.dailyPunishment to true>>
+<<set $hc.daily.handWarning to true>><<set $hc.handLocation to "guardhouse">><<unset $hcIncoming>>
+
+'손'【이가】 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 훑어본다.
+<<if $prisoner.state is "asleep">>
+	그가 그녀를 발로 차서 깨운다.
+<</if>>
+<br>
+<<if $hcItems.some(clothing => clothing.type is "clothes" and clothing.dirty is 0 and clothing.location is "prisoner") and $prisonerEvents.includes("newClothes") and (!$prisonerEvents.includes("newClothesSeen") or $hcChallenge.handStrict)>>
+	<<set _somethingToSay to true>>
+	<<set $prisonerEvents.pushUnique("newClothesSeen")>>
+	<span class="red">그는 당신이 그녀에게 새 옷을 준 것을 눈치챈 것 같지만, 아무 말도 하지 않는다.</span> <<hcSuspicion 10>><<hopelessCycleSus 2>>
+	<br>
+<<elseif !$hcItems.some(clothing => clothing.type is "clothes" and clothing.location is "prisoner")>>
+	그는 잠시 그녀의 벗은 몸을 훑어보더니, 이내 고개를 젓는다.
+	<br>
+<</if>>
+<<if $prisoner.health gte 26>>
+	<<set _somethingToSay to true>>
+	"그녀를 잘 대해주고 있군." 그가 낮게 으르렁거리듯 웃으며 말한다. "특별히 더 먹이기라도 했나?" <<hcSuspicion 20>><<hopelessCycleSus 3>>
+	<br>
+<</if>>
+<<if $hcItems.some(sheet => sheet.type is "sheets" and sheet.location is "prisoner")>>
+	<<set _somethingToSay to true>>
+	"막사에서 시트가 도난당했다고 하더군." 그가 그녀의 침대 시트를 쳐다보며 말한다. <<hcSuspicion 5>><<hopelessCycleSus 1>>
+	<br>
+<</if>>
+<<if $prisoner.harmedRecently lte 0 and $prisonerEvents.includes("punishmentIntro")>>
+	<<set _somethingToSay to true>>
+	"새로운 상처는 없군. 자비를 베풀고 있었나, 형제여." <<hcSuspicion 10>><<hopelessCycleSus 2>>
+	<br>
+<</if>>
+<<if $prisonerEvents.includes("talkHair") and (!$prisonerEvents.includes("talkHairSeen") or $hcChallenge.handStrict)>>
+	<<set _somethingToSay to true>>
+	<<set $prisonerEvents.pushUnique("talkHairSeen")>>
+	그는 그녀의 땋은 머리를 알아챈다. "족쇄를 차고도 저렇게 하다니, 손재주가 좋은가 보군." <<hcSuspicion 5>><<hopelessCycleSus 1>>
+	<br>
+<</if>>
+<<if $prisonerEvents.includes("talkHairBlooms") and !$prisonerEvents.includes("talkHairBloomsSeen")>>
+	<<set $prisonerEvents.pushUnique("talkHairBloomsSeen")>>
+	그는 그녀의 땋은 머리에 꽂힌 꽃을 보고 눈썹을 치켜올린다. "순결한 손만이 저 꽃을 피울 수 있지. 잘했네, 형제여. 저 꽃이 그녀의 오물을 억제하는 데 도움이 될 걸세." <<hcSuspicion -5>><<hopelessCycleSus -2>>
+	<br>
+<</if>>
+<<if !_somethingToSay>>
+	<span class="green">그는 아무런 이상이 없자, 천천히 고개를 끄덕이며 만족감을 표한다.</span> <<hcSuspicion -5>><<hopelessCycleSus -2>>
+	<br>
+<</if>>
+<br>
+
+<<if _somethingToSay and $hc.suspicion gte 100>>
+	'손'【이가】 천천히 당신에게로 돌아선다. "더 이상 의심의 여지가 없군. 그녀가 자네를 홀렸어." 그의 손이 당신의 어깨에 얹히고, 얼굴에 넓은 미소가 번진다. "우리가 자네를 고쳐주겠네, 형제여."
+	<br><br>
+
+	그가 손을 들자, 당신의 시야가 어두워진다.
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Ending E]]>><<pass 4 hours>><<endevent>><</link>>
+	<br>
+<<elseif !$prisonerEvents.includes("punishmentIntro")>>
+	<<set $prisonerEvents.pushUnique("punishmentIntro")>>
+	그가 그녀의 족쇄를 푼다. 그녀는 순수한 증오가 담긴 눈으로 그를 올려다본다.
+	<br><br>
+
+	그는 비웃으며 그녀의 뺨을 때린 후 당신에게 돌아선다. "채찍질해라." 고해 사제가 조심스럽게 다가와 그녀를 들어 올려, 그녀의 등이 당신을 향하도록 강제로 돌려세운다. 그녀는 고개를 숙이고 몸을 웅크린다.
+	<br><br>
+
+	<<link [[세게 채찍질한다|Hopeless Cycle Punishment Intro]]>><<set $phase to 1>><<hcSuspicion -5>><<stress -6>><<trauma -6>><<control 25>><<sadism 40>><</link>><<lstress>><<ltrauma>><<gcontrol>><<hopelessCycleSus -2>>
+	<br>
+	<<link [[채찍질하되, 힘을 뺀다|Hopeless Cycle Punishment Intro]]>><<set $phase to 2>><<hcSuspicion 5>><<sadism 20>><</link>><<hopelessCycleSus 1>>
+	<br>
+	<<link [[거부한다|Hopeless Cycle Punishment Intro]]>><<set $phase to 3>><<hcSuspicion 10>><<set $prisoner.love += 3>><<trauma 12>><</link>><<gtrauma>><<hopelessCycleSus 2>><<hopelessCycleLove 1>>
+	<br>
+<<elseif !$prisonerEvents.includes("face") and $hc.daysPassed gte 3>>
+	/* Redundant day check is to make sure this always happens on day 3 if the player tried to delay a lower priority punishment */
+	<<set $prisonerEvents.pushUnique("face")>>
+	<<run hcItemAdd({ type: "clutter", name: "warded bandages", location: "cell", origin: "prisoner", dirty: 2})>>
+	'손'【이가】 작은 은그릇을 든 고해 사제에게 고갯짓한다. 그는 조심스럽게 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 다가간다. 그는 잠시 그녀를 살피더니, 그녀에게 손을 대자 얼굴이 창백해진다.
+	<br><br>
+
+	"존귀하신 분, 그녀의 내면의 그릇이..." '손'【이가】 그에게 계속 말하라는 손짓을 한다. "그것이... 금이 갔습니다. 파열 직전입니다."
+	<br><br>
+
+	'손'【이가】 으르렁거린다. "지금쯤이면 정화를 시작했어야 했는데." 그가 화를 내며 그녀에게 다가간다. "너는 신성하지 않다. 무엇이 그것을 네 안에 봉인하고 있는 거지? 네 몸에 오물이 둥지를 틀 정도로 추악한 것이냐?"
+	<br><br>
+
+	고해 사제가 다시 말한다. "존귀하신 분, 그녀의 머리 붕대가 오염되어 상황을 악화시키고 있습니다. 조치를 취하지 않으면, 구멍이..."
+	<br><br>
+
+	"닥쳐라! 내 눈앞에서 그런 일은 일어나지 않을 것이다." '손'【이가】 소리친다. 그는 한 손으로 그녀의 목을 잡아 들어 올리고, 다른 손으로는 은 단검을 뽑아든다. 그가 단검을 그녀의 얼굴로 가져가자, 그녀는 무력하게 저항한다.
+	<br><br>
+
+	<<link [[그냥 지켜본다|Hopeless Cycle Cell Face]]>><<set $phase to 1>><<stress 24>><</link>><<ggstress>>
+	<br>
+	<<link [[그를 막는다|Hopeless Cycle Cell Face]]>><<set $phase to 2>><<set $prisoner.love += 2>><<hcSuspicion 10>><</link>><<hopelessCycleSus 2>><<hopelessCycleLove 2>>
+	<br>
+<<elseif !$prisonerEvents.includes("brand") and $hc.daysPassed gte 4>>
+	<<set $prisonerEvents.pushUnique("brand")>>
+	<<run hcItemAdd({ type: "container", name: "bucket", location: "cell", origin: "garden", persists: true, containerID: "brandingBucket", capacity: 3 })>>
+	<<run hcItemAdd({ type: "water", name: "water", location: "brandingBucket", origin: "garden", dirty: 1 })>>
+	바퀴 굴러가는 소리가 들린다. <span class="red">다른 고해 사제가 뜨거운 석탄으로 가득 찬 작은 수레를 밀고 들어온다. 금속 막대가 튀어나와 있다.</span> 세 번째 사제는 물통을 들고 들어온다.
+	<br><br>
+
+	그녀의 눈이 걱정으로 커지지만, 태연함을 유지하려 애쓴다.
+	<br><br>
+
+	'손'【이가】 웃는다. "이번에는 입을 다물고 있어도 된다." 그 말이 왠지 그녀를 안심시키는 것 같다. <<stress 6>><<gstress>>
+	<br><br>
+
+	그가 금속 막대를 가리키며 고갯짓한다. 당신은 수레에서 그것을 꺼낸다. 끝부분은 십자가 모양이고, 새빨갛게 달아올라 있다. 고해 사제들이 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 앞으로 끌어내, 그녀의 등을 당신에게 보이게 한다.
+	<<if $prisoner.bandagesOn>>
+		<span class="pink">그들은 그녀의 붕대를 찢어내, 피부가 드러나게 한다.</span>
+		<<set $prisoner.bandagesOn to false>>
+		<<if $prisoner.cleanBandages gte 4>>
+			<<set _dirt to 0>>
+		<<elseif $prisoner.cleanBandages lte 1>>
+			<<set _dirt to 2>>
+		<<else>>
+			<<set _dirt to 1>>
+		<</if>>
+		<<run hcItemAdd({ type: "clutter", name: "torn bandages", location: "cell", origin: "prisoner", dirty: _dirt, used: true})>>
+	<</if>>
+	<br><br>
+
+	당신도 똑같은 방식으로 낙인찍혔다. 오른쪽 팔이 가렵다. 이제는 당신이 낙인을 찍는 자가 되었다.
+	<br><br>
+
+	그녀가 당신을 돌아본다,
+	<<if $prisoner.harmed gte Math.floor($prisoner.love / 8)>>
+		악의에 찬 눈으로 당신을 노려본다.
+	<<elseif $prisoner.love gte 45>>
+		그리고 깊은 숨을 들이쉰다. <span class="green">그녀가 당신에게 고개를 끄덕인다.</span>
+	<<else>>
+		거친 숨을 몰아쉰다. 그녀는 겁에 질린 듯 보인다.
+	<</if>>
+	<<set $prisonerBrands to []>>
+	<<set $prisonerBrandSpots to [
+		"left arm",
+		"right arm",
+		"left shoulder",
+		"right shoulder",
+		"upper back",
+		"lower back",
+		"chest",
+		"left thigh",
+		"right thigh",
+		"left leg",
+		"right leg",
+		"left foot",
+		"right foot"
+	]>>
+	<br><br>
+
+	<<for _labelBrand, _valueBrand range $prisonerBrandSpots>>
+		<<capture _valueBrand>>
+			<<if $prisonerBrands.includes(_valueBrand)>>
+				/* Already branded */
+			<<elseif ["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot"].includes(_valueBrand) and $prisonerEvents.includes("legs")>>
+				<<link [[`그녀의 ${window.KR.getBodypartKr(_valueBrand)}에 낙인을 찍는다`|Hopeless Cycle Cell Brand]]>><<pass 2>><<set $prisoner.love += 2>><<set $hcBrand to _valueBrand>><<hcPrisonerHealth -1 "penance">><</link>><<hopelessCycleLove 1>>
+				<br>
+			<<else>>
+				<<link [[`그녀의 ${window.KR.getBodypartKr(_valueBrand)}에 낙인을 찍는다`|Hopeless Cycle Cell Brand]]>><<pass 2>><<set $hcBrand to _valueBrand>><<hcPrisonerHealth -3 "penance">><<set $prisoner.harmed++>><<hcSuspicion -3>><<sadism 40>><</link>><<hopelessCycleSus -1>>
+				<br>
+			<</if>>
+		<</capture>>
+	<</for>>
+	<<link [[거부한다|Hopeless Cycle Cell Brand]]>><<set $hcBrand to "refuse">><<hcSuspicion 25>><<set $prisoner.love += 5>><</link>><<hopelessCycleSus 2>><<hopelessCycleLove 2>>
+	<br>
+
+<<elseif !$prisonerEvents.includes("silver")>>
+	<<set $prisonerEvents.pushUnique("silver")>><<hcPrisonerHealth -2 "penance">>
+	<<run hcItemAdd({ type: "clutter", name: "leather gloves", location: "cell", origin: "hand", dirty: 2})>>
+	그는 아주 크고 두꺼운 가죽 장갑을 낀다. "그녀를 꽉 잡아라." 그가 당신에게 말한다. "너는 우리 중 가장 깨끗한 자 중 하나다. 다른 이들보다 그녀의 접촉을 더 잘 견디고 회복할 수 있을 것이다."
+	<br><br>
+
+	당신은 복종하여 그녀의 족쇄를 풀고, 그녀 뒤로 가서 팔을 뒤로 잡고 몸을 고정시킨다. 이 정도의 접촉은 당신을 역겹게 만든다. <<llpurity>><<purity -10>><<ggtrauma>><<trauma 24>>
+	<br><br>
+
+	그는 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>의 뺨을 잡아 입을 강제로 벌린다. 그는 기대에 찬 눈으로 고해 사제에게 손을 내민다. 잠시 망설인 후, 고해 사제는 그에게 은 바늘을 건넨다.
+	<br><br>
+
+	그가 바늘을 그녀의 입으로 가져간다. 당신이 움찔하자, '손'【이가】 잠시 멈추고 당신을 본다. "그저 청소하는 것뿐이다."
+	<br><br>
+
+	그는 잠시 그녀의 입안을 살핀다. "잘 아물었군." 그는 작업을 시작한다. 당신은 차마 볼 수가 없다. 고개를 돌릴 수는 있지만, 귀를 막을 수는 없다.
+	<br><br>
+
+	그 과정에서 그녀는 몇 번의 고통스러운 비명을 지르고, 그때마다 '손'【은는】 가학적인 웃음을 터뜨린다. "나에게 감사해야 할 것이다. 괴물들이 기어 나오지 못하게 막아주는 것이니." <<stress 6>><<gstress>>
+	<br><br>
+
+	그녀가 당신에게 몸을 뒤로 밀기 시작한다. 접촉은 역겨움이 덜해지고, 더 매혹적으로 변한다. 당신은 그 생각이 당신의 것이 아님을 알기에 떨쳐버린다. <<arousal 1000>><<garousal>>
+	<br><br>
+
+	마침내, 그가 바늘을 뺀다. 바늘 끝은 검은 무언가로 덮여 있다. 그는 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게 미소 짓는다. "자, 이제 감사하다고 해라." 그에 대한 대답으로, <span class="red">그녀는 그의 얼굴에 피를 뱉는다</span>. 그는 비틀거리며 뒤로 물러나, 서둘러 그것을 닦아낸다.
+	<br><br>
+
+	그는 화가 난 듯 보이지만, 당황했다. "나... 내가 더러워졌어. 나는..." 그는 장갑을 벗어 던진다. "저것들을 태워라." 그가 감옥을 서둘러 떠나며 말한다. 고해 사제는 당신을 쳐다보더니, '손'을 따라간다.
+	<br><br>
+
+	<<= window.KR.gatPersonNameDictKR($prisoner.name)>>에게서 낮게 반복되는 숨소리가 들린다. 그녀는 웃고 있다. 당신이 그녀의 족쇄를 다시 채울 때 그녀는 저항하지 않는다. <<stress 12>><<ggstress>>
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<if $hc.suspicion lte 30 and !$hcChallenge.handCruel>>
+		<span class="green">'손'【은는】 물리적인 처벌이 필요 없다고 판단한다.</span> 당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>의 영혼을 위해 기도를 인도하게 된다. <<stress -12>><<trauma -12>><<purity 5>><<lstress>><<ltrauma>><<gpurity>>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<<elseif $prisoner.state is "catatonic">>
+		그가 그녀의 옆구리를 찬다. 그녀는 전혀 반응하지 않는다. "속죄의 의미가 없군. 느끼지도 못할 테니." 그가 당신에게 돌아선다. "그녀를 더 잘 돌봐라." <<hcSuspicion 10>><<hopelessCycleSus 2>>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<wearProp "whip" "khaki">>
+		<<set $prisoner.harmed++>><<hcPrisonerHealth -1 "penance">><<sadism 10>>
+		당신은 다시 그녀를 채찍질하게 된다.
+		<<if $prisoner.love gte 45>>
+			그것은 간단한 처벌이라, 당신과 그녀 모두 안도한다. 그녀는 각각의 타격에 대비하며 당신에게 미묘하게 고개를 끄덕인다. 그렇다고 해서 그녀의 고통스러운 비명을 듣는 것이 더 쉬워지는 것은 아니다.
+		<<else>>
+			당신은 기대에 부응하여 행동한다.
+		<</if>>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Hopeless Cycle Punishment Intro
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<wearProp "whip" "khaki">>
+<span class="narration">처벌과 가학적인 쾌락 사이의 경계는 대부분 깨닫지 못한 채 넘나들게 된다. 그 마녀에게는 앞으로 더 많은 고통이 기다리고 있었다.</span>
+<br><br>
+
+<<if $phase is 1>>
+	<<set $prisoner.harmed += 2>><<hcPrisonerHealth -3 "penance">><<set $prisoner.harmedRecently to 16>>
+	<<set $prisoner.cleanBody -= 1>><<set $prisoner.cleanBandages -= 1>>
+	당신은 사정없이 채찍을 휘둘러 허공을, 그리고 살갗을 갈랐다. 그녀의 등에 새로운 상처가 생기자 고통에 찬 비명을 질렀다.
+	<br><br>
+
+	당신은 다시 한번 채찍질했다. '손'이 미소지었다. "좋아." 그가 당신의 어깨를 두드렸다. "네가 이 일에 적임자일 줄 알았지."
+<<elseif $phase is 2>>
+	<<set $prisoner.harmed += 1>><<hcPrisonerHealth -1 "penance">><<set $prisoner.harmedRecently to 16>>
+	당신은 고통을 주는 법을 알지만, 힘을 조절하는 법도 알고 있다. 당신은 그녀의 등을 세 번 채찍질했지만, 어느 것도 피부를 찢을 만큼 강하지는 않았다. 하지만 각각의 채찍질은 그녀가 고통에 찬 비명을 지르기에는 충분히 강했다.
+	<br><br>
+
+	'손'의 표정은 읽기 어려웠지만, 이윽고 그는 고개를 끄덕였다. "충분하다."
+<<else>>
+	<<hcPrisonerHealth 4 "penance">><<set $prisoner.harmedRecently to 16>>
+	<<set $prisoner.cleanBody -= 1>><<set $prisoner.cleanBandages -= 1>>
+	당신이 채찍을 든 채 가만히 서 있자 '손'이 눈썹을 치켜올렸다.
+	<br><br>
+
+	그는 으르렁거리며 당신의 채찍을 빼앗았다. 그는 무서운 속도와 정확성으로 직접 그녀를 두 번 채찍질했다. <span class="red">그가 그녀의 등에 십자가 모양으로 두 개의 깊은 상처를 내자</span> 그녀는 고통에 찬 비명을 질렀다.
+	<br><br>
+
+	그는 당신이 균형을 잡기 위해 뒷걸음질 칠 정도로 세게 채찍을 당신 손에 다시 쥐여주었다.
+<</if>>
+<br><br>
+
+그는 경멸하며 내려다보았다. <span class="red">"매번 검사할 때마다 새로운 상처를 보고 싶군, 형제여."</span> 그는 고해 사제와 함께 감옥을 나갔다.
+<br><br>
+
+<<if $phase is 2>>
+	<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 벽에 기대어 주저앉아, 당신을 조심스럽게 쳐다본다. 당신이 힘을 조절했다는 걸 알아차린 걸까?
+<<else>>
+	<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 거친 숨을 내쉰다. 그녀는 벽에 기대어 주저앉았고, 새로운 상처가 벽에 닿자 고통스러운 신음을 흘렸다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Whip
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<wearProp "whip" "khaki">>
+
+당신은 채찍을 휘둘렀다.
+<br><br>
+
+<<if $prisoner.harmedRecently gte 4 and $prisoner.harmed gte Math.floor($prisoner.love / 4) or $prisoner.state is "catatonic">>
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+		첫 번째 채찍질에 그녀는 즉시 잠에서 깨어났다.
+	<</if>>
+	당신은 무자비하게 그녀를 몇 번이고 채찍질했다. 그녀는 이제 고통스러운 신음조차 거의 내지 못했다.
+<<elseif $prisoner.harmedRecently gte 4 and $prisoner.harmed gte Math.floor($prisoner.love / 8)>>
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+		첫 번째 채찍질에 그녀는 즉시 잠에서 깨어났다.
+	<</if>>
+	당신은 무자비하게 그녀를 채찍질했다. 그녀의 고통스러운 비명은 당신에게 듣는 만족감을 주지 않으려는 듯 체념으로 바뀌었다.
+<<else>>
+	<<if $prisoner.state is "asleep">>
+		<<set $prisoner.state to "awake">><<set $prisoner.awakeTimer to 3>>
+	<</if>>
+	<<if !$prisonerEvents.includes("legs")>>
+		<<set _otherOptions to true>>
+		<<set $prisonerEvents.pushUnique("legs")>>
+		그녀의 몸은 이미 상처로 뒤덮여 있다. 당신은 상처가 더 적은 곳을 노렸다. 그녀의 다리를 노렸다.
+		<br><br>
+
+		당신은 채찍을 내리쳐 그녀의 오른쪽 다리에 상처를 냈다. 그녀는 움찔했지만, 소리를 내지 않았다.
+		<br><br>
+
+		당신은 고개를 갸웃거리며 다시 한번 채찍질했다. 다시 한번, 그녀는 소리를 내지 않았다.
+		<br><br>
+
+		<<link [[다른 곳을 채찍질한다|Hopeless Cycle Cell Legs]]>><<set $prisoner.harmed++>><<set $phase to 1>><<sadism 20>><</link>>
+		<br>
+		<<link [[그녀의 다리를 살펴본다|Hopeless Cycle Cell Legs]]>><<set $prisoner.love += 2>><<set $phase to 2>><<trauma 12>><<purity -2>><<arousal 600>><</link>><<gtrauma>><<lpurity>><<garousal>>
+		<br>
+	<<elseif $prisoner.harmedRecently lte 4 and $prisoner.love gte 45>>
+		당신은 그녀를 보며 준비가 되었는지 확인했다. 그녀는 몸을 굳히고 고개를 끄덕였다.
+		<br><br>
+
+		당신은 자국만 남을 정도로만 채찍질했다. 그녀는 고통에 신음했지만, 예상했던 것보다 훨씬 약했기에 안도의 한숨을 내쉬었다.
+	<<else>>
+		당신은 그녀의 피부에 새로운 상처를 냈다. 그녀는 고통스러운 신음을 참으려 애썼고, 채찍질이 끝나자 당신을 화난 듯이 쏘아보았다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<set $prisoner.harmedRecently to 16>>
+
+<<if !_otherOptions>>
+	<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Hopeless Cycle Cell Legs
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<wearProp "whip" "khaki">>
+<span class="narration">생애 처음으로, 간수는 자신의 신앙에 의문을 품었다.</span>
+<br><br>
+
+<<if $phase is 1>>
+	당신은 대신 그녀의 가슴을 채찍질했다. 예상대로 그녀는 고통에 찬 비명을 질렀다.
+	<br><br>
+<</if>>
+
+당신은 채찍을 벨트의 고리에 다시 걸고, 그녀에게 다가가 웅크리고 앉아 다리를 살폈다.
+<br><br>
+
+천천히 그리고 조심스럽게, 당신은 한쪽 다리를 들어 올리려 했다. 아무런 저항이 없었다. 당신은 다리를 놓았다. 다리는 툭 떨어져, 그녀에게 결코 편할 리 없는 자세로 멈췄다. 하지만 그녀는 움직이지 않았다.
+<br><br>
+
+<span class="red">끔찍한 깨달음이 당신을 덮쳤다. 속이 메스꺼워졌다.</span>
+<br><br>
+
+당신은 균형을 잡기 위해 벽에 손을 짚으며 뒤로 물러섰다. 그녀는 선천적으로 이랬거나, 다른 불행으로 이렇게 되었을 것이다. 당신의 형제들이 이런 짓을 했을 리가 없다. 이것은 신도들이 벌을 주는 방식이 아니다. 그럼에도 불구하고, 마음을 갉아먹는 의심이 자라난다. <<trauma 36>><<gggtrauma>>
+<br><br>
+
+수치심과 죄책감이 가슴을 채웠다. 당신은 그것을 떨쳐냈다. 이것으로 달라지는 것은 없다. 불구이든 아니든, 그녀는 순수한 악과 어울린 마녀이자 죄인일 뿐이다. 분명 그녀 자신의 잘못된 행동으로 이렇게 되었을 것이다.
+<br><br>
+
+<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>의 잿빛 눈이 분노와 혐오로 불타오르며 당신을 쏘아본다. 그녀는 당신의 동정을 원하지 않는 것 같다.
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Face
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+<span class="narration">이 이야기의 일부 버전은 오늘날까지도 남아있는 오컬트 신화와 불안할 정도로 유사점을 가지고 있다.</span>
+<br><br>
+
+<<if $phase is 1>>
+	당신은 유심히 지켜본다.
+<<else>>
+	당신은 주교의 '손'에게 달려가 그의 팔을 잡으려 했다. 그는 경멸하며 당신을 내려다보고는 <span class="red">쉽게 옆으로 내던졌다.</span>
+<</if>>
+<br><br>
+
+그는 그녀의 얼굴에 감긴 붕대 아래로 단검을 밀어 넣었다. 그녀는 움직임을 멈췄다. 재빠른 동작으로, 그녀의 머리를 감싸고 있던 붕대가 모두 바닥으로 떨어졌다.
+<br><br>
+
+'손'은 즉시 그녀를 떨어뜨리고 뒤로 물러섰다. "성스러운 처녀시여," 그는 나지막이 중얼거렸다. "저건 마녀가 아니야. 악마다." 그녀가 천천히 몸을 일으키자 당신은 그녀의 얼굴을 보기 위해 다가갔다.
+<br><br>
+
+머리가 빙빙 돌기 시작하면서 속이 울렁거리는 것을 느꼈다. 당신은 성서를 읽었고, 한밤을 겪었던 나이 든 수도원 신도들이 속삭이는 이야기를 들었다. 하지만 직접 보게 될 줄은 몰랐다.
+<br><br>
+
+그녀의 이마 왼쪽에는 마치 금이 간 도자기처럼 검고 갈라진 자국이 있었다. 그것은 아래로 비스듬히 뻗어 그녀의 왼쪽 눈이 있어야 할 자리를 덮었지만, 거기서 멈추지 않았다. 그것은 그녀의 피부를 완전히 벗어나 허공으로 찢어져 나와, 세 갈래로 갈라진 균열, 즉 <span class="tentacle">구멍</span>을 남겼다., 바로 그녀의 머리 옆 세상 그 자체에. 그녀가 회복하는 동안 그것은 그녀와 함께 움직였고, 더 이상 붕대에 갇혀 있지 않았다. <<trauma 50>><<gggtrauma>><<awareness 50>><<ggawareness>>
+<br><br>
+
+<span class="purple">텅 빈 사슴뿔. 엘크의 자손의 표식.</span>
+<br><br>
+
+그 안의 공허가 일렁이며 끓어올라, 당신의 온전한 주의와 <span class="tentacle">숭배</span>를 요구했다. 한 쌍의 커다란 손이 당신의 어깨를 잡아채 정신을 차리게 했다.
+'손'이 당신 위로 우뚝 솟아 있었다. "정신을 잃지 마라. 고해와 정화를 위해 이 방을 봉쇄해야 한다." 그는 고해 사제를 돌아보았다. "그녀가 파열하기 전에 정화해라."
+<br><br>
+
+<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>【은는】 바닥에 쓰러져 머리를 감싸 쥔 채 몸부림치고 있었다. 고해 사제는 얼어붙어 은그릇을 떨어뜨렸다.
+그릇이 바닥에 요란한 소리를 내며 굴러갔다. "여, 영광스러운 분이시여, 그녀가 너무 많은 것을 품고 있어서, 저는 할 수 없—"
+<br><br>
+
+'손'이 당신을 돌아보며 어깨를 꽉 쥐었다. "페인 형제. 당신은 순수하다. 당신은 강하다. 이 일은 당신에게 맡기겠다." 그는 고해 사제를 붙잡고 당신을 지나쳐, <span class="red">감옥 문을 쾅 닫았다</span>.
+<br><br>
+
+그녀가 당신 뒤 어둠 속에서 꿈틀거렸다. 당신의 등에 그녀의 시선이 느껴졌다. 그녀는 <span class="tentacle">갈망하고</span> 있었다.
+<br><br>
+
+<<link [[돌아본다|Hopeless Cycle Cell Elkspawn]]>><<endevent>><</link>><<willpowerdifficulty 500 800>>
+<br>
+
+:: Hopeless Cycle Cell Elkspawn
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+역겨운 균열 소리와 함께 쿵 하는 소리와 긁히는 소리가 들려, 당신은 <<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 돌아보았다.
+<br><br>
+
+그녀는 이미 당신을 향해 기어오고 있었다. <span class="red">그녀의 족쇄 사슬이 끊어져 있었다. 그녀의 왼팔은 검고 길어졌으며, 각 손가락 끝은 날카로운 끝으로 변해 있었다.</span> 그녀가 앞으로 나아갈 때마다 돌을 파고들었다. 검게 변한 피부가 은색 족쇄에 닿는 곳에서 연기가 피어올랐다.
+<br><br>
+
+<<if $willpowerSuccess>>
+	신전의 종이 울렸다. 사슴뿔이 맥동하며 당신의 시선을 끌었다. <span class="green">당신은 일단 그 영향에서 벗어났다.</span>
+	<br><br>
+
+	당신은 그녀의 얼굴에 집중하려 애썼다. 검은 진물이 그녀의 뺨을 타고 흘러내렸다. 그녀의 눈에는 굶주림과 함께 다른 무언가가 있었다.
+	<<if $prisoner.harmed gte Math.floor($prisoner.love / 8)>>
+		자신이 받은 모든 고통을 되돌려주려는 가학적인 열망.
+		당신은 늙은 노파의 얼굴이나 흑마법으로 일그러진 얼굴을 예상했었다. 대신, 당신은 겁에 질린 소녀의 얼굴을 보았다. 그녀를 도와야 할 사람들에게 상처받고 불태워졌으며, 어떤 인간도 결코 건드려서는 안 될 무언가에 오염된 얼굴이었다.
+		<br><br>
+
+		그녀는 웃고 있었다.
+	<<else>>
+		다가오고 있음에도 불구하고, 그녀는 스스로를 멈추려는 듯 보였다. 그녀의 표정은 절망적이었다. 후회. 마치 당신에게 용서를 구하는 것 같았다.
+		당신은 늙은 노파의 얼굴이나 흑마법으로 일그러진 얼굴을 예상했었다. 대신, 당신은 겁에 질린 소녀의 얼굴을 보았다. 그녀를 도와야 할 사람들에게 상처받고 불태워졌으며, 어떤 인간도 결코 건드려서는 안 될 무언가에 오염된 얼굴이었다.
+		<br><br>
+
+		그녀는 당신에게 도움을 구걸하고 있었다.
+	<</if>>
+<<else>>
+	신전의 종이 울렸다. 사슴뿔이 맥동하며 당신의 시선을 끌었다. <span class="red">당신은 그 안의 광대한 공허 속에서 길을 잃었다. 공허하고, 차갑고, 뜨거운 감정이 동시에 느껴졌다.</span>
+	<br><br>
+
+	집중할 수 없었다. 검은 진물이 그녀의 뺨을 타고 흘러내렸다. 그녀의 눈에는 굶주림이 있었다.
+	그 굶주림이 당신에게 퍼져나가고 있었다. 당신 몸의 모든 것이 그녀를 더럽히고, 그 구멍을 찢어 열라고 비명을 질렀다.
+<</if>>
+<br><br>
+<<set $skillChallenge to random(700, 840)>>
+
+<<link [[정화한다|Hopeless Cycle Cell Elkspawn Purge]]>><</link>><<note "채찍 스킬" "green">><<if $angelBanish>><<angelBanishNote>><</if>><<lllpurity>>
+<br>
+<<link [[더럽힌다|Hopeless Cycle Cell Elkspawn Embrace]]>><<set $phase to 1>><<unset $skillChallenge>><</link>><<gggtrauma>><<lllpurity>><<penilevirginitywarning>>
+<br>
+
+:: Hopeless Cycle Cell Elkspawn Purge
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<wearProp "whip" "khaki">>
+
+당신은 채찍을 움켜쥐고, 그녀가 팔로 당신을 치려는 순간 그녀의 팔을 후려쳤다.
+<<if $prof.whip gte $skillChallenge and $angelBanish gte 1>>
+	<<angelBanishUse>>
+	<span class="green">당신은 그것을 묶는 데 성공했다.</span> 당신은 재빨리 그녀 주위를 돌며 타락한 팔다리를 제압하려 했다.
+	<br><br>
+
+	그녀는 발버둥 쳤지만, 유일하게 강한 팔다리가 움직이지 못하게 되자 무력해졌다. 당신은 그녀를 사슬 쪽으로 끌어당겨 더욱 단단히 묶었다.
+	<br><br>
+
+	<<if $prisoner.harmed gte Math.floor($prisoner.love / 6)>>
+		그녀는 극도의 증오심으로 당신을 돌아보았다.
+	<<elseif $prisoner.love gte 30>>
+		그녀는 몸부림을 멈추고 애원하듯 당신을 돌아보았다.
+	<<else>>
+		그녀는 당신을 돌아보며 쏘아보았고, 몸부림이 느려졌다.
+	<</if>>
+	사슴뿔이 다시 맥동하며 아주 약간 더 커졌다. 마치 유리가 깨지는 소리 같았다. 시간이 얼마 남지 않았다. 당신은 은그릇을 집어 더 가까이 끌어당겼다.
+	<br><br>
+
+	당신은 이전에도 고해를 집전한 적이 있지만, 이것은 마치 퇴마 의식처럼 느껴졌다. 당신의 형제들 모두가 당신을 믿고 있다. <<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>도 마찬가지다. 주교의 '손'이 밖에서 감옥 문 위로 천을 내렸다. 방 안은 향 냄새로 가득 찼고, 이어서 그의 무거운 발소리가 들리지 않는 곳으로 멀어져 갔다. <<hallucinogen 120>><<ghallucinogens>>
+	<br><br>
+
+	<<if $prisonerEvents.includes("tongue")>>
+		그녀는 말을 할 수 없으니,
+	<<else>>
+		당신은 그녀가 협조해서 말할 것 같지 않다고 생각했기에,
+	<</if>>
+	즉흥적으로 대처해야 할 것이다. 당신은 그녀 뒤에 앉아 당신의 튜닉에서 천 조각을 찢어냈다. 당신은 그녀를 팔로 감쌌다. 피부와 피부가 맞닿자 당신 안의 순수함과 그녀 안의 타락이 충돌했다. <<purity -5>><<lpurity>>
+	<<set $worn.lower.integrity to 250>>
+	<br><br>
+
+	당신은 그녀를 환영하며, 임시 안대로 찢어진 천으로 그녀의 눈을 가렸다. 당신은 그녀의 죄를 낱낱이 드러내어 용서받을 수 있도록 요구했다. <span class="gold">당신의 십자가 낙인이 살에 새겨진 그날처럼 뜨겁게 타올랐다.</span> 그녀도 그것을 느끼며 비명을 질렀다. 사슴뿔의 영향력이 희미해졌다. <<pain 6>><<ggpain>>
+	<br><br>
+
+	고해의 봉인이 맺어졌다. 그녀가 당신의 손아귀에서 발버둥 치는 동안 그녀의 죄가 당신 앞에 놓여 있다. 당신은 그녀를 <span class="red">타락했다</span>고 명명했다. 당신은 그녀의 타락을 자신에게 받아들이고, 그녀는 용서받을 것이다.
+	<br><br>
+
+	그것은 불타올랐다.
+	<br><br>
+
+	<<link [[정화한다|Hopeless Cycle Cell Elkspawn Purge 2]]>><</link>><<lllpurity>>
+	<br>
+<<else>>
+	<span class="red">그녀는 그저 휘두르는 채찍을 중간에 잡아채, 그것을 이용해 당신을 바닥으로 끌어내렸다.</span>
+	<br><br>
+
+	그녀는 이전에는 이렇게 강하지 않았다. 오염이 그녀의 몸에 활력을 불어넣고 있는 것이 틀림없다.
+	<br><br>
+
+	<<link [[다음|Hopeless Cycle Cell Elkspawn Embrace]]>><</link>><<gggtrauma>><<lllpurity>>
+	<br>
+<</if>>
+<<unset $skillChallenge>>
+
+:: Hopeless Cycle Cell Elkspawn Purge 2
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("elkspawnPurge")>><<set $prisoner.harmed -= 1>>
+
+당신의 피부가 그녀의 피부와 만나는 곳에서, 접촉의 경계가 불분명해졌다. 당신은 그녀가 느끼는 모든 것을 느끼기 시작했다. 머릿속의 공허함, 퍼져나가고 싶은 욕망, <span class="tentacle">하나</span>가 되고 싶은 욕망. <<lpurity>>
+<br><br>
+
+<span class="lewd">당신의 손이 그녀의 사타구니로 내려갔다. 당신은 그녀의 입구를 문지르기 시작했다.</span> 그녀는 등을 아치형으로 휘며 당신에게 몸을 밀착시켰다. 당신은 그녀를 단단히 붙잡고, 가능한 한 편안하게 해주려 애썼다. 그녀는 사슬에 저항하며 발버둥 쳤지만, 팔은 움직이지 않았다. <span class="red">물결치는 촉수 같은 팔다리가 사슬을 압박했다.</span>
+<br><br>
+
+당신은 기도하며 손가락 하나를 안으로 밀어 넣었다. 그녀는 신음과 비명 사이의 소리를 냈다. 촉수 하나가 사슬에서 빠져나와 당신의 허리를 감싸고 더 가까이 끌어당기려 했다. 사슴뿔은 동기화된 당신의 심장 박동에 맞춰 맥동했다. 그녀의 내벽은 해방을 갈망하며 당신의 손가락을 조여왔다. <<lpurity>>
+<br><br>
+
+오염이 점점 더 당신 안으로 스며드는 것을 느꼈다. 당신의 순수함이 그것에 맞서 불타올랐지만, <span class="tentacle">하나</span>는 다른 하나가 더러워지지 않고는 무언가를 깨끗하게 만들 수 없다.
+<<if $prisoner.harmed gte Math.floor($prisoner.love / 8)>>
+	그녀는 마침내 발버둥을 멈추고, 당신의 움직임에 맞춰 몸을 움직이기 시작했다.
+<<elseif $prisoner.love gte 30>>
+	그녀는 당신에게 몸을 기댔다. 당신은 그녀를 꽉 껴안았다.
+<<else>>
+	그녀는 발버둥을 멈추고 당신에게 몸을 기대며, 당신의 움직임에 맞춰 몸을 움직였다.
+<</if>>
+그녀의 온몸이 떨렸다. <span class="pink">그녀는 절정에 몸을 떨었다.</span> 은그릇이 빛나는 분홍색 액체로 채워지기 시작했다. <<lpurity>>
+<br><br>
+
+잠깐 동안, 당신은 그녀의 눈으로 보았다. 당신은 죽어가는 몸의 껍데기 안에 갇혀 자유와 해방을 외치고 있었다. <span class="tentacle">아우리가</span>가 당신이라는 존재의 마지막 조각을 삼키기 전에.
+<br><br>
+
+그녀를 정화하면서, 당신은 마침내 이해했다. 그녀는 희생자였다. <<set $prisoner.loveRevealed to true>><<set $prisoner.love += 3>><<glove>>
+<br><br>
+
+그녀의 경련은 계속되었고, 당신은 멈추지 않았다. 그릇은 더욱 채워졌다. 너무나 많았다. 그것은 당신 안에 있는 순수함의 마지막 불씨마저 꺼뜨릴 기세였다. 이토록 완전히 더럽혀진 사람을 느껴본 적이 없었다. 그녀의 팔이 사슬에서 풀렸지만, 그녀는 저항하지 않았다.
+<span class="green">그녀는 당신의 팔을 자신의 몸에 더 가까이 끌어당겼다.</span> <span class="pink">그녀는 다시 한번 환희에 몸을 떨었고,</span> 마침내 그녀의 내면 그릇에 가해지던 압박이 풀렸다.
+<br><br>
+
+그녀는 숨을 헐떡이며 몸에 힘을 뺐다. 당신은 부드럽게 그녀를 옆으로 눕혔다. 그릇은 거의 가득 찼다. 당신은 마음을 다잡고 그릇을 입술로 가져갔다. 당신은 그녀에게 용서를 베풀고, 기도를 마쳤다. <<purity -100>><<lllpurity>>
+<br><br>
+
+세상이 전차 바퀴처럼 돌고, 모든 것이 암흑 속으로 사라졌다.
+<br><br>
+
+<<link [[정화...|Hopeless Cycle Cell Elkspawn End]]>><<endevent>><<set $phase to 1>><<pass 2 hours>><<tiredness -36>><<hcSuspicion -30>><</link>><<hopelessCycleSus -3>>
+<br>
+
+:: Hopeless Cycle Cell Elkspawn Embrace
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerEvents.pushUnique("elkspawnEmbrace")>><<lowerruined>>
+
+<<if $phase is 1>>
+	당신은 환영의 의미로 두 팔을 벌린다. 그녀가 달려들어 당신을 덮치고, 당신은 그대로 넘어진다.
+<</if>>
+<br><br>
+
+<<if $worn.upper.name is "chain tunic">>
+	그녀의 뒤틀린 손이 당신의 튜닉 아랫부분을 파고들어 사슬 몇 개를 뜯어낸다. 그녀는 당신의 <<penis>>【이가】 드러날 때까지 몇 번이고 다시 공격한다.
+<<else>>
+	그녀의 뒤틀린 손이 당신의 로브 아랫부분을 그대로 찢어버리자, 당신의 <<penis>>【이가】 드러난다.
+<</if>>
+<br><br>
+
+<<if $player.virginity.penile is true>><<set $prisonerEvents.pushUnique("virginity")>><</if>>
+그녀가 당신 위로 기어 올라온다,
+<<if $prisoner.harmed gte Math.floor($prisoner.love / 8)>>
+	그녀의 손이 당신의 목을 움켜쥔다. 발톱 같은 손가락이 살을 파고든다. <<pain 6>><<gpain>>
+	<br><br>
+
+	그녀는 자신이 당했던 능욕을 되돌려주려는 듯, 간절한 미소를 짓는다. <span class="lewd">그녀가 몸을 들어 올려 당신을 받아들인다.</span>
+	<<if $player.virginity.penile is true>>
+		<span class="red">포피가 귀두에서 분리되는 것이 느껴진다, <<virginitylosttext $prisoner.name>></span>
+		<<takeVirginity $prisoner.name "penile">><<set $prisonerEvents.pushUnique("virginity")>>
+	<</if>>
+	온몸이 불타오르는 것 같다. 그녀와 피부가 맞닿은 곳은 감각의 경계가 모호해진다. 공허함이 당신 안으로 쏟아져 들어온다.
+	<br><br>
+
+	그녀의 발톱이 더 깊이 파고든다. 그녀는 자비 없이 거칠게 당신의 위에서 허리를 흔들기 시작한다. 등에서 촉수들이 솟아나 당신을 채찍질하며, 이 행위에서 당신이 어떤 쾌락도 얻지 못하게 한다. <<pain 10>><<arousal 4000>><<gggarousal>><<ggpain>>
+	<br><br>
+
+<<elseif $prisoner.love gte 30>>
+	그녀의 팔이 당신을 감싼다. 검게 변한 팔조차 놀라울 정도로 부드럽게 당신을 안는다. 그녀의 시선은 당신을 무장해제시킨다.
+	<br><br>
+
+	그녀가 슬프게 미소 짓는다. <span class="lewd">그녀가 몸을 들어 올려 당신을 받아들인다.</span>
+	<<if $player.virginity.penile is true>>
+		<span class="red">포피가 귀두에서 분리되는 것이 느껴진다, <<virginitylosttext $prisoner.name>></span>
+		<<takeVirginity $prisoner.name "penile">><<set $prisonerEvents.pushUnique("virginity")>>
+	<</if>>
+	온몸이 불타오르는 것 같다. 그녀와 피부가 맞닿은 곳은 감각의 경계가 모호해진다. 공허함이 당신 안으로 쏟아져 들어온다.
+	<br><br>
+
+	그녀가 당신을 꽉 껴안자, 당신도 그 포옹에 화답할 수밖에 없다. 그녀는 엄청나게 힘을 조절하고 있는 것이 틀림없다. 촉수들이 그녀의 다리를 감싸며 그녀를 지탱하고 균형을 잡아준다. <<arousal 4000>><<gggarousal>>
+	<br><br>
+<<else>>
+	그녀의 검은 팔이 당신을 짓누른다. 그녀의 시선은 텅 비어 거의 무표정하다.
+	<br><br>
+
+	<span class="lewd">그녀가 몸을 들어 올려 당신을 받아들인다.</span>
+	<<if $player.virginity.penile is true>>
+		<span class="red">포피가 귀두에서 분리되는 것이 느껴진다, <<virginitylosttext $prisoner.name>></span>
+		<<takeVirginity $prisoner.name "penile">><<set $prisonerEvents.pushUnique("virginity")>>
+	<</if>>
+	온몸이 불타오르는 것 같다. 그녀와 피부가 맞닿은 곳은 감각의 경계가 모호해진다. 공허함이 당신 안으로 쏟아져 들어온다.
+	<br><br>
+
+	그녀는 계속해서 당신의 몸을 이용하며 짓누른다. 촉수들이 그녀의 다리를 감싸며 그녀를 지탱하고 균형을 잡아준다. <<arousal 4000>><<gggarousal>>
+	<br><br>
+<</if>>
+<span class="pink">그녀가 절정에 이르러 몸을 떤다.</span>
+사슴뿔은 어느새 동기화된 당신의 심장 박동에 맞춰 맥동한다. 그녀의 내벽이 당신의 <<penis>>【을를】 조이며 사정을 갈망한다.
+당신은 그녀가 느끼는 모든 것을 느끼기 시작한다. 머릿속의 공허함, 퍼져나가고 싶은 욕망, <span class="tentacle">하나</span>가 되고 싶은 욕망.
+<<orgasm>>
+
+당신의 정액이 그녀의 자궁을 채우자, 빛의 문양이 그녀의 복부를 따라 그려지며 복잡한 패턴으로 천천히 위로 올라가는 것이 보인다.
+<span class="pink">정액이 자궁에 닿자마자 그녀가 다시 절정에 이르러 몸을 떤다.</span>
+오염이 점점 더 당신 안으로 스며드는 것이 느껴진다. 당신의 순결이 그것에 저항하며 불타지만, 다른 하나가 더러워지지 않고서는 <span class="tentacle">하나</span>가 깨끗해질 수 없다.
+<<if $prisoner.harmed gte Math.floor($prisoner.love / 6)>>
+	그녀는 당신의 고통을 즐기며 웃는다.
+<<elseif $prisoner.love gte 30>>
+	그녀는 당신의 어깨에 머리를 기댄 채, 더욱 세게 당신을 껴안는다.
+<<else>>
+	그녀는 여전히 거의 아무런 감정도 보이지 않는 표정으로 당신을 짓누를 뿐이다.
+<</if>>
+그녀의 온몸이 떨린다. <span class="pink">그녀가 다시 절정에 이르러 몸을 떤다.</span> 당신은 <span class="tentacle">하나가 된다</span>. <<llpurity>>
+<br><br>
+
+그녀의 경련은 계속되지만, 멈추지 않는다. 너무나 많은 것이 밀려온다. 그것은 당신 안에 남은 마지막 순결의 불씨마저 꺼뜨릴 기세다. 이토록 완전히 더럽혀진 존재는 느껴본 적이 없다.
+<br><br>
+
+세상이 전차 바퀴처럼 빙글빙글 돌고, 모든 것이 암흑 속으로 사라진다. <<purity -200>><<lllpurity>>
+<br><br>
+
+<<link [[더럽혀졌다...|Hopeless Cycle Cell Elkspawn End]]>><<endevent>><<set $phase to 2>><<pass 2 hours>><<tiredness -36>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Elkspawn End
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<hcPrisonerHealth 8>><<set $prisoner.harmed -= 1>><<stress -100>>
+
+얼굴에 쏟아지는 물 때문에 잠에서 깬다. 벌떡 일어나 보니, 여전히 감옥 안이다.
+<br><br>
+
+<<if $phase is 1>>
+	당신은 고해 사제들에게 둘러싸여 있고, 주교의 손이 한숨을 내쉰다. "잘했네, 형제여." 그는 진심으로 자랑스러워 보인다.
+<<else>>
+	<<hopelessCycleOutfit "robes">>
+	당신은 고해 사제들에게 둘러싸여 있고, 주교의 손이 안도의 한숨을 내쉰다. "잘했네, 형제여." 새 사제복 한 벌이 당신의 무릎 위로 던져진다. "깨진 서약에 대해서는 나중에 다루도록 하지."
+<</if>>
+<br><br>
+
+<<= window.KR.gatPersonNameDictKR($prisoner.name)>>【을를】 찾는다. 그녀는 저쪽 벽에 기대어 누워 있고, 족쇄는 새 사슬로 성급하게 수리되어 있다. 그녀의 왼쪽 팔은 정상으로 돌아왔고, 뿔은 더 작아졌다. 더는 물결치거나 균열이 가지 않고, 이제는 두꺼운 검은 유리처럼 단단해 보인다.
+<span class="green">그녀는 더 건강해 보인다.</span>
+<br><br>
+
+"자네가 일단은 그녀의 영혼을 구했네. 파열은 피했지만, 여전히 더럽혀져 있지." 그는 고개를 젓는다. "붉은 달이 뜨면 영원히 처리될 걸세. 그때까지 힘내게, 형제여."
+<br><br>
+
+고해 사제들이 하나둘씩 떠나고, 주교의 손이 그 뒤를 따른다. 감옥 건너편에서 <<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>의 잿빛 눈이 당신을 응시한다.
+<<if $prisoner.love gte 30>>
+	그녀의 시선은 따뜻하다.
+<<else>>
+	그녀의 시선은 조심스럽지만, 감사함이 담겨 있다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<endevent>><</link>>
+<br>
+
+:: Hopeless Cycle Cell Brand
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>>
+
+<<if !["stop", "refuse", "resume"].includes($hcBrand)>>
+	<<set $prisonerBrands.pushUnique($hcBrand)>>
+<</if>>
+<<set _brandCount to $prisonerBrands.length>>
+<<set _brandHurtCount to $prisonerBrands.filter(brand => !["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot"].includes(brand)).length>>
+
+<<if ["stop", "refuse"].includes($hcBrand)>>
+	당신은 낙인찍는 인두의 손잡이를 꽉 쥐었지만, 움직이지 않는다.
+	<br><br>
+
+	'손'이 당신을 쏘아보는 동안, 다른 고해 사제들은 서로 불안하게 쳐다본다.
+	<br><br>
+
+	"머리 잡아." 그가 당신 손에서 인두를 낚아채며 짖는다. 그들은 시키는 대로 그녀의 오른쪽 뺨에 접근할 수 있도록 한다.
+	<br><br>
+
+	<span class="red">그가 그녀의 얼굴에 낙인찍는 인두를 들어 올린다.</span>
+	<br><br>
+
+	그녀의 눈이 겁에 질린 채 당신에게 고정된다. 인두가 가까워지자 그녀는 훌쩍인다.
+	<br><br>
+
+	<<link [[인두를 다시 빼앗는다|Hopeless Cycle Cell Brand]]>><<set $hcBrand to "resume">><<set $hcBrandStop to true>><<set $prisoner.love += 2>><</link>><<hopelessCycleLove 1>>
+	<br>
+	<<link [[아무것도 하지 않는다|Hopeless Cycle Cell Brand Cheek]]>><<set $prisoner.love -= 5>><<set $prisoner.harmed += 3>><</link>><<hopelessCycleLove -1>>
+	<br>
+<<else>>
+	<<if $hcBrand is "resume">>
+		당신은 그에게서 인두를 다시 빼앗는다. 그는 당신을 때릴 뻔했지만, 당신이 이제 협조할 의사가 있다는 것을 보고 멈춘다.
+	<<elseif ["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot"].includes($hcBrand)>>
+		당신은 낙인찍는 인두를 그녀의 <<print window.KR.getBodypartKr($hcBrand)>>에 누른다. 그녀는 몸을 움찔하며 거친 숨을 내쉬지만, <span class="green">비명을 지르지는 않는다</span>.
+		<<if !$prisonerEvents.includes("legs")>>
+			<<set $prisonerEvents.pushUnique("legs")>>
+			<br><br>
+
+			<span class="red">그녀는 그것들을 느낄 수 없다.</span> 그래서 그녀는 항상 기어 다닌다. 그녀는 천천히 당신을 돌아본다, 얼굴은 분노로 가득 차 있다. 당신의 동정을 원하지 않는 것 같다.
+		<</if>>
+	<<else>>
+		<<if ["left arm"].includes($hcBrand)>>
+			당신은 그녀의 <<print window.KR.getBodypartKr($hcBrand)>>【을를】 가리킨다. 한 고해 사제가 그것을 들어 올리자, 당신은 낙인찍는 인두를 그녀의 살에 누른다.
+			<span class="red">그곳은 그녀의 몸에서 상처가 없는 마지막 부위였고, 당신은 이제 그것을 바로잡았다.</span>
+		<<elseif ["right arm"].includes($hcBrand)>>
+			당신은 그녀의 <<print window.KR.getBodypartKr($hcBrand)>>【을를】 가리킨다. 한 고해 사제가 그것을 들어 올리자, 당신은 낙인찍는 인두를 그녀의 살에 누른다.
+		<<elseif ["chest"].includes($hcBrand)>>
+			당신은 고해 사제들에게 그녀를 돌려세우라고 손짓한다. 그녀는 눈물이 얼굴을 타고 흐르는 채로 당신을 올려다본다. 당신은 낙인찍는 인두를 그녀의 가슴에 누른다.
+		<<else>>
+			당신은 낙인찍는 인두를 그녀의 <<print window.KR.getBodypartKr($hcBrand)>>에 누른다.
+		<</if>>
+		<<switch _brandHurtCount>>
+			<<case 1>><span class="red">그녀는 간신히 비명을 참아낸다.</span> 그녀는 고해 사제들의 손아귀에서 몸부림친다. <<stress 6>><<gstress>>
+			<<case 2>><span class="red">그녀는 다음 비명을 억누르지 못한다.</span> 그녀는 그들의 손아귀에 저항하며 몸부림친다. <<stress 12>><<ggstress>>
+			<<case 3>><span class="red">그녀는 비명을 지르며 울부짖고, 눈물이 얼굴을 타고 흘러내린다.</span> 그들은 무자비하게 그녀를 억누른다. <<stress 24>><<ggstress>>
+			<<default>><span class="red">그녀는 비명을 지르며 울지만, 갑자기 멈춘다. 고통으로 정신을 잃었다.</span> <<stress 36>><<gggstress>>
+		<</switch>>
+	<</if>>
+	<br><br>
+	<<unset $hcBrand>>
+
+	<<if _brandHurtCount gte 4>>
+		<<set $prisoner.state to "catatonic">><<set $prisoner.health to 5>>
+		<<set _prisonerClothes to $hcItems.find(clothes => clothes.type is "clothes" and clothes.location is "prisoner")>>
+		<<if _prisonerClothes>>
+			<<set _prisonerClothes.dirty++>>
+		<</if>>
+		고해 사제들이 그녀를 놓는다. 그녀는 땅바닥에 큰 대자로 뻗는다. 그들 중 한 명이 당신에게서 인두를 가져가 양동이에 담가 식힌다.
+		<br><br>
+
+		'손'이 당신의 어깨를 두드린다. "화상을 치료해줘." 그는 감옥을 떠나기 전에 말한다. 고해 사제들은 수레를 가지고 따라가지만, <span class="green">양동이는 남겨둔다.</span>
+		<br><br>
+
+		당신은 그녀를 다시 벽에 기대어 앉힌다. 그녀는 고통의 안개 속에서 흐느끼며, 더 이상 정신이 온전해 보이지 않는다. 끔찍한 상태다. 그녀를 빨리 치료해야 한다.
+		<br><br>
+
+		<span class="blue">정원에는 화상 치료에 사용할 수 있는 약초가 있다. 바르려면 <span class="teal">깨끗한 물</span>이 필요할 것이다.</span>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<unset $hcBrandLegs>><<unset $hcBrandStop>><<unset $prisonerBrandSpots>><<endevent>><</link>>
+		<br>
+	<<elseif _brandCount gte 5>>
+		<span class="green">"그만."</span> '손'이 마침내 말한다. 고해 사제들이 그녀를 놓자, 그녀는 앞으로 쓰러지며 떨리는 팔로 간신히 버틴다. 고해 사제 중 한 명이 당신에게서 낙인찍는 인두를 가져가 양동이에 담가 식힌다.
+		<br><br>
+
+		'손'이 당신의 어깨를 두드린다. "화상을 치료해줘." 그는 감옥을 떠나기 전에 말한다. 고해 사제들은 수레를 가지고 따라가지만, <span class="green">양동이는 남겨둔다.</span>
+		<br><br>
+
+		당신은 그녀를 다시 벽에 기대어 앉힌다.
+		<<if $prisoner.harmed gte Math.floor($prisoner.love / 6)>>
+			그녀는 내내 당신을 밀어내려고 한다.
+		<<elseif $prisoner.love gte 45>>
+			그녀는 당신에게 단단히 매달린다. 그녀가 당신의 어깨에 기대어 흐느끼는 동안 당신은 잠시 그녀를 안아준다.
+		<<else>>
+			그녀의 흐느낌은 계속된다.
+		<</if>>
+		당신은 그녀가 얼마나 큰 고통을 겪고 있는지 안다.
+		<br><br>
+
+		<span class="blue">정원에는 화상 치료에 사용할 수 있는 약초가 있다. 바르려면 <span class="teal">깨끗한 물</span>이 필요할 것이다.</span>
+		<br><br>
+
+		<<link [[다음|Hopeless Cycle Cell]]>><<unset $hcBrandLegs>><<unset $hcBrandStop>><<unset $prisonerBrandSpots>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<if !$hcBrandLegs and $prisonerBrands.filter(brand => ["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot"].includes(brand)).length gte 3>>
+			'손'이 투덜거린다. "그녀는 느끼지도 못하잖아. <span class="red">다른 곳에 낙인을 찍어.</span>"
+			<<set $hcBrandLegs to true>>
+			<br><br>
+		<<elseif _brandCount gte 1>>
+			<span class="red">"<<print either("다시.", "한 번 더.", "더.")>>"</span>
+			<br><br>
+		<</if>>
+
+		당신은 낙인찍는 인두를 뜨거운 석탄이 담긴 수레에 다시 꽂아, 다시 한번 달군다.
+		<br><br>
+
+		/*  Note for "A Cruel Hand" challenge: "penance" argument deliberately not applied to following hcPrisonerHealth calls.
+			Adding up to five extra damage to the branding would be unfair for anyone not getting S-rank.
+			And S-rank requires branding her face, which sets her health to 5, so it doesn't really matter anyway. */
+		<<for _labelBrand, _valueBrand range $prisonerBrandSpots>>
+			<<capture _valueBrand>>
+				<<if $prisonerBrands.includes(_valueBrand)>>
+					/* Already branded */
+				<<elseif ["left leg", "right leg", "left thigh", "right thigh", "left foot", "right foot"].includes(_valueBrand)>>
+					<<if $hcBrandLegs>>
+						/* Can't brand these parts anymore */
+					<<else>>
+						<<link [[`그녀의 ${window.KR.getBodypartKr(_valueBrand)}에 낙인을 찍는다`|Hopeless Cycle Cell Brand]]>><<pass 2>><<set $prisoner.love += 2>><<set $hcBrand to _valueBrand>><<hcPrisonerHealth -1>><</link>><<hopelessCycleLove 1>>
+						<br>
+					<</if>>
+				<<else>>
+					<<link [[`그녀의 ${window.KR.getBodypartKr(_valueBrand)}에 낙인을 찍는다`|Hopeless Cycle Cell Brand]]>><<pass 2>><<set $hcBrand to _valueBrand>><<hcPrisonerHealth -3>><<set $prisoner.harmed++>><<hcSuspicion -5>><<sadism 40>><</link>><<hopelessCycleSus -2>>
+					<br>
+				<</if>>
+			<</capture>>
+		<</for>>
+		<br>
+		<<if !$hcBrandStop>>
+			<<link [[멈춘다|Hopeless Cycle Cell Brand]]>><<set $hcBrand to "stop">><<hcSuspicion 25>><<set $prisoner.love += 5>><</link>><<hopelessCycleSus 2>><<hopelessCycleLove 2>>
+			<br>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Hopeless Cycle Cell Brand Cheek
+<<set _thermoDisable to true>><<effects>>
+<<hopelessCycleEffects>><<set $prisonerBrands.pushUnique("right cheek")>>
+
+<span class="red">그녀의 소름 끼치는 비명이 지하 감옥을 채웠다. 눈물이 얼굴을 타고 흘러내리다 십자가 문양에 닿아 끓어올랐다.</span>
+<br><br>
+
+'손'은 고통스러운 1분 동안 그것을 꾹 누르고 있다가 떼어냈다.
+<<= window.KR.gatPersonNameDictKR($prisoner.name).toUpperFirst()>>의 한때 아름다웠던 얼굴에 영구적인 낙인이 찍혔다. 그녀는 고해 사제들에게 붙들린 채 축 늘어졌다.
+<br><br>
+
+<<set $prisoner.state to "catatonic">><<set $prisoner.health to 5>>
+<<set _prisonerClothes to $hcItems.find(clothes => clothes.type is "clothes" and clothes.location is "prisoner")>>
+<<if _prisonerClothes>>
+	<<set _prisonerClothes.dirty++>>
+<</if>>
+그들은 그녀를 바닥에 떨어뜨렸다. 그중 한 명이 '손'에게서 인두를 건네받아 양동이에 담갔다.
+<br><br>
+
+'손'은 그녀에게 침을 뱉었다. "화상을 치료해라." 그가 감옥을 떠나며 말했다. 고해 사제들도 수레를 끌고 뒤따랐지만, <span class="green">양동이는 남겨두고 갔다.</span>
+<br><br>
+
+당신은 그녀를 다시 벽에 기대어 앉혔다. 그녀는 고통에 휩싸여 흐느끼고 있었고, 더 이상 제정신이 아닌 듯했다. 상태가 아주 심각하다. 빨리 그녀를 치료해야 한다.
+<br><br>
+
+<span class="blue">정원에는 화상 치료에 사용할 수 있는 약초가 있다. 바르려면 <span class="teal">깨끗한 물</span>이 필요할 것이다.</span>
+<br><br>
+
+<<link [[다음|Hopeless Cycle Cell]]>><<unset $hcBrandLegs>><<unset $hcBrandStop>><<unset $prisonerBrandSpots>><<endevent>><</link>>
+<br>

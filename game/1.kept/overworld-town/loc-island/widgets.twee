@@ -1,0 +1,1386 @@
+:: Widgets Island [widget]
+<<widget "island_tide_text">>
+<<switch $island.tide>>
+	<<case 0>>
+		<span class="teal">조수가 어느 정도 떨어져 있다.</span>
+	<<case 1>>
+		<span class="lblue">파도가 아직 닿지는 않는다.</span>
+	<<case 2>>
+		<span class="blue">물이 발끝을 적신다.</span>
+	<<case 3>>
+		<span class="purple">물이 발목까지 덮는다.</span>
+	<<case 4>>
+		<span class="pink">물이 무릎까지 차오르고, 파도가 당장이라도 당신을 넘어뜨릴 듯이 덮친다</span>
+	<<default>>
+		<span class="red">물이 허리춤까지 요동치며, 당장이라도 당신을 집어삼키려 든다!</span>
+<</switch>>
+<</widget>>
+
+<<widget "island_tide">>
+<<if _args[0]>>
+	<<set $island.tide += _args[0]>>
+	<<set $island.tide to Math.clamp($island.tide, 0, 5)>>
+<</if>>
+<</widget>>
+
+<<widget "gisland_tide">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">+ 조수</span>
+	<</if>>
+<</widget>>
+
+<<widget "lisland_tide">><<if !$settings.blindStatsEnabled>> |
+		<span class="green">- 조수</span>
+	<</if>>
+<</widget>>
+
+<<widget "gwalnut">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ 호두 한 줌</span>
+	<</if>>
+<</widget>>
+
+<<widget "ggwalnut">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + 한 줌의 호두</span>
+	<</if>>
+<</widget>>
+
+<<widget "lwalnut">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">- 한 줌의 호두</span>
+	<</if>>
+<</widget>>
+
+<<widget "gwood">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ 목재</span>
+	<</if>>
+<</widget>>
+
+<<widget "lwood">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">- 나무</span>
+	<</if>>
+<</widget>>
+
+<<widget "wood_required">> |
+	<<if _args[0]>>
+		필요한 목재: <<print _args[0]>>
+	<<else>>
+		목재 불필요
+	<</if>>
+<</widget>>
+
+<<widget "gcamp_concealment">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ 야영지 은폐</span>
+	<</if>>
+<</widget>>
+
+<<widget "lcamp_concealment">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="red">- 야영지 은폐도</span>
+	<</if>>
+<</widget>>
+
+<<widget "gcomprehension">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ 이해력</span>
+	<</if>>
+<</widget>>
+
+<<widget "ggcomprehension">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + 이해력</span>
+	<</if>>
+<</widget>>
+
+<<widget "gggcomprehension">>
+	<<if !$settings.blindStatsEnabled>> |
+		<span class="green">+ + + 이해력</span>
+	<</if>>
+<</widget>>
+
+<<widget "walnutStoreMessage">>
+	<<if !$settings.blindStatsEnabled>> |
+		<i>보관된 호두는 시간이 지나면 건조되어, 더욱 영양가가 높아집니다.</i>
+	<</if>>
+<</widget>>
+
+<<widget "campFurnitureMessage">>
+	<<if !$settings.blindStatsEnabled>> |
+		<i>이전 캠프에 있던 가구들은 모두 그 자리에 남겨두게 됩니다.</i>
+	<</if>>
+<</widget>>
+
+<<widget "islander_language">>
+	<<if _args[0]>>
+		<<set $islander_language += (_args[0] * 3)>>
+	<</if>>
+<</widget>>
+
+<<widget "island_tide_options">>
+	<<link [[나무 경계까지 기어간다 (0:05)|Island Beach Walk]]>><<set $phase to 1>><<island_tide 1>><<set $island.tide_distance += 1>><<island_pass 5>><</link>><<gisland_tide>><<lharass>>
+	<br>
+	<<link [[나무 경계까지 걸어간다 (0:02)|Island Beach Walk]]>><<set $phase to 2>><<island_pass 2>><<set $island.tide_distance += 1>><</link>>
+	<br>
+	<<link [[나무 경계까지 달려간다 (0:01)|Island Beach Walk]]>><<set $phase to 3>><<island_tide -1>><<set $island.tide_distance += 1>><<island_pass 1>><</link>><<lisland_tide>><<gharass>>
+	<br>
+<</widget>>
+
+<<widget "island_init">>
+	<<if $island is undefined>>
+		<<set $island to {}>>
+		<<set $island.rocky_hillock to {}>>
+		<<set $island.rocky_hillock.space to 1>>
+		<<set $island.rocky_hillock.space_used to 0>>
+		<<set $island.waterfall to {}>>
+		<<set $island.waterfall.space to 3>>
+		<<set $island.waterfall.space_used to 0>>
+		<<set $island.gulch to {}>>
+		<<set $island.gulch.space to 5>>
+		<<set $island.gulch.space_used to 0>>
+		<<set $island.walnut to 0>>
+		<<set $island.walnut_dried to 0>>
+		<<set $island.explore_count to 0>>
+		<<set $island.explore_locations to []>>
+		<<set $island.wood to 0>>
+	<</if>>
+	<<if $islander_language is undefined>>
+		<<set $islander_language to 0>>
+	<</if>>
+	<<set $island.tide to 0>>
+	<<set $island.tide_distance to 0>>
+	<<set $island.hide to 1>>
+	<<set $hunger to 0>>
+	<<set $island.explore to "none">>
+<</widget>>
+
+<<widget "island_var_list">>
+	바위 언덕 사용 공간: <<print $island.rocky_hillock.space_used>>
+	<br>
+	폭포 사용 공간: <<print $island.waterfall.space_used>>
+	<br>
+	협곡 사용 공간: <<print $island.gulch.space_used>>
+	<br>
+	호두: <<print $island.walnut>>
+	<br>
+	말린 호두: <<print $island.walnut_dried>>
+	<br>
+	탐색 횟수: <<print $island.explore_count>>
+	<br>
+	탐색 장소: <<print $island.explore_locations>>
+	<br>
+	언어: <<print $islander_language>>
+	<br>
+	조수: <<print $island.tide>>
+	<br>
+	조수 거리: <<print $island.tide_distance>>
+	<br>
+	가죽: <<print $island.hide>>
+	<br>
+	탐험: <<print $island.explore>>
+	<br>
+	허기: <<print $hunger>>
+	<br>
+	목재: <<print $island.wood>>
+	<br>
+	공간: <<print $island[$island.home].space>>
+	<br>
+<</widget>>
+
+<<widget "island_end">>
+	<<set $island.tide to undefined>>
+	<<set $island.tide_distance to undefined>>
+	<<set $island.hide to undefined>>
+	<<set $island.walk to undefined>>
+	<<set $island.kneel to undefined>>
+	<<set $hunger to 0>>
+<</widget>>
+
+<<widget "island_explore_end">>
+	<<if $island[$island.home].decor is "simple">>
+		<<set $island_simple_decor_message to 1>>
+	<<elseif $island[$island.home].decor is "basic">>
+		<<set $island_basic_decor_message to 1>>
+	<<elseif $island[$island.home].decor is "advanced">>
+		<<set $island_advanced_decor_message to 1>>
+	<</if>>
+	<<if $island[$island.home].bird_feeder is "simple" and random(1, 20) is 20>>
+		<<set $island_bird_message to 1>>
+	<<elseif $island[$island.home].bird_feeder is "basic" and random(1, 10) is 10>>
+		<<set $island_bird_message to 1>>
+	<<elseif $island[$island.home].bird_feeder is "advanced" and random(1, 5) is 5>>
+		<<set $island_bird_message to 1>>
+	<</if>>
+<</widget>>
+
+<<widget "island_tattoo_check">>
+	<<set _island_tattoo to 0>>
+	<<if $skin.right_bottom.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.left_bottom.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.left_thigh.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.right_thigh.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.pubic.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.back.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.breasts.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.left_shoulder.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.right_shoulder.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.left_cheek.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.right_cheek.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+
+	<<if $skin.forehead.special is "islander">>
+		<<set _island_tattoo += 1>>
+	<</if>>
+<</widget>>
+
+<<widget "island_tattoo">>
+	<<if $skin[_bodypart].writing>>
+		<<bodywriting_clear _bodypart>>
+	<</if>>
+	<<rng 3>>
+	<<switch $rng>>
+		<<case 1>>
+			<<add_bodywriting _bodypart square tattoo>>
+		<<case 2>>
+			<<add_bodywriting _bodypart triangle tattoo>>
+		<<case 3>>
+			<<add_bodywriting _bodypart circle tattoo>>
+		<<case 4>>
+			<<add_bodywriting _bodypart triquetra tattoo>>
+	<</switch>>
+<</widget>>
+
+<<widget "island_pass">>
+<<if _args[0]>>
+	<<pass _args[0]>>
+	<<hunger _args[0]>>
+<</if>>
+<</widget>>
+
+<<widget "island_rope_end">>
+	<<unset $island_rope_distance>>
+	<<unset $island_rope_orgasm>>
+	<<unset $island_rope_enemy_action>>
+	<<unset $island_rope_action>>
+<</widget>>
+
+<<widget "island_rope_options">>
+	<<if $rng gte 67>>
+		<<set $island_rope_enemy_action to "watch">>
+		섬 주민들은 일단 당신을 지켜보는 것에 만족하는 듯하다.
+		<br><br>
+	<<elseif $rng gte 33>>
+		<<set $island_rope_enemy_action to "shout">>
+		섬 주민들이 요동치는 물소리를 뚫고 당신에게 들릴 만큼 큰 소리로 외치기 시작한다.
+		<br><br>
+	<<else>>
+		<<set $island_rope_enemy_action to "bow">>
+		<span class="purple">섬 주민들은 활에 화살을 매기고, 시위를 당긴다.</span>
+		<br><br>
+	<</if>>
+
+	<<if $island_rope_distance gte 4>>
+		<span class="teal">강가에 가까워졌다!</span>
+	<<elseif $island_rope_distance is 3>>
+		<span class="lblue">강가가 점점 가까워지고 있다.</span>
+	<<elseif $island_rope_distance is 2>>
+		<span class="blue">반쯤 건넜다.</span>
+	<<elseif $island_rope_distance is 1>>
+		<span class="purple">아직 갈 길이 멀다.</span>
+	<<else>>
+		<span class="pink">거의 건너가지 못했다.</span>
+	<</if>>
+	<br><br>
+	<<link [[최대한 빨리 꿈틀대며 기어간다|Island Rope 3]]>><<set $island_rope_distance += 1>><<set $island_rope_action to "shuffle">><<arousal 600>><</link>><<garousal>>
+	<br>
+	<<link [[숨을 고른다|Island Rope 3]]>><<set $island_rope_action to "breath">><<arousal -600>><</link>><<larousal>>
+	<br>
+	<<link [[머리를 숙인다|Island Rope 3]]>><<set $island_rope_action to "duck">><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_rope_shout">>
+	<<if random(1, 2) is 2>>
+		"사람들 앞에서 밧줄로 자위나 하고 있다니!"
+	<<else>>
+		"저 녀석 아주 죽여주는 시간을 보내고 있네."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"이리로 다시 돌아와라, 우리가 제대로 상대해줄 테니."
+	<<else>>
+		"저 녀석을 내 손으로 만져보고 싶어 미치겠군."
+	<</if>>
+	<br>
+	<<if random(1, 2) is 2>>
+		"이 <<girl>>【이가】 저 밧줄을 더럽혀 놓겠어."
+	<<else>>
+		"수치심도 없는 <<girl>>【이】군."
+	<</if>>
+<</widget>>
+
+<<widget "island_rope_bow">>
+	<<if _args[0] is "duck">>
+		<<set _rng to random(-1, 3)>>
+	<<else>>
+		<<set _rng to random(0, 6)>>
+	<</if>>
+	<<if _rng is 6>>
+		<span class="red">여섯 발이 당신을 맞춘다.</span> 거의 아무것도 느껴지지 않지만, 피격된 부위에서 기이한 독소가 퍼져나간다.<<gdrugged>><<garousal>><<arousal 3600>><<drugs 60>>
+	<<elseif _rng is 5>>
+		<span class="pink">다섯 발이 당신을 맞춘다.</span> 거의 아무것도 느껴지지 않지만, 피격된 부위에서 기이한 독소가 퍼져나간다.<<gdrugged>><<garousal>><<arousal 3000>><<drugs 50>>
+	<<elseif _rng is 4>>
+		<span class="purple">네 발이 당신을 맞춘다.</span> 거의 아무것도 느껴지지 않지만, 피격된 부위에서 기이한 독소가 퍼져나간다.<<gdrugged>><<garousal>><<arousal 2400>><<drugs 40>>
+	<<elseif _rng is 3>>
+		<span class="blue">세 발이 당신을 맞춘다.</span> 거의 아무것도 느껴지지 않지만, 피격된 부위에서 기이한 독소가 퍼져나간다.<<gdrugged>><<garousal>><<arousal 1800>><<drugs 30>>
+	<<elseif _rng is 2>>
+		<span class="lblue">두 발이 당신을 맞춘다.</span> 거의 아무것도 느껴지지 않지만, 피격된 부위에서 기이한 독소가 퍼져나간다.<<gdrugged>><<garousal>><<arousal 1200>><<drugs 20>>
+	<<elseif _rng is 1>>
+		<span class="teal">한 발이 당신을 맞춘다.</span> 거의 아무것도 느껴지지 않지만, 피격된 부위에서 기이한 독소가 퍼져나간다.<<gdrugged>><<garousal>><<arousal 600>><<drugs 10>>
+	<<else>>
+		<span class="green">하지만 단 한 발도 맞지 않는다.</span> 그들이 실망하는 소리가 들린다.
+	<</if>>
+<</widget>>
+
+/* Categories of island events */
+
+<<widget "island_events_category_miscellaneous">>
+	<<cleareventpool>>
+
+	<<addevent "island_events_plumeria" 1>>
+	<<addevent "island_events_birds" 1>>
+	<<addevent "island_events_pleasant_flower" 1>>
+	<<addevent "island_events_squirrel" 1>>
+	<<if $island.home isnot "rocky_hillock">>
+		<<addevent "island_events_rocky" 1>>
+	<</if>>
+	<<if $island.home isnot "waterfall">>
+		<<addevent "island_events_waterfall" 1>>
+	<</if>>
+	<<if $island.home isnot "gulch">>
+		<<addevent "island_events_gulch" 1>>
+	<</if>>
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "island_events_category_walnuts">>
+	<<cleareventpool>>
+
+	<<addevent "island_events_walnut" 2>>
+	<<addevent "island_events_walnut_2" 2>>
+	<<if $island.explore is "shore">>
+		<<addevent "island_events_walnut_3" 1>>
+	<</if>>
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "island_events_category_wood">>
+	<<cleareventpool>>
+
+	<<if $island.explore is "wood">>
+		<<addevent "island_events_wood_1" 2.5>>
+		<<addevent "island_events_wood_2" 2>>
+		<<if $islander_language gte 100>>
+			<<addevent "island_events_wood_3" 3>>
+		<<elseif $islander_language gte 50>>
+			<<addevent "island_events_wood_3" 2>>
+		<<else>>
+			<<addevent "island_events_wood_3" 1>>
+		<</if>>
+		<<addevent "island_events_wood_4" 1>>
+	<<else>>
+		<<addevent "island_events_wood_1" 1>>
+		<<addevent "island_events_wood_2" 1>>
+		<<addevent "island_events_wood_3" 1>>
+	<</if>>
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "island_events_category_islanders">>
+	<<cleareventpool>>
+
+	<<addevent "island_events_overhear" 2>>
+	<<addevent "island_events_duel" 2>>
+	<<addevent "island_events_sing" 2>>
+	<<if $island.explore is "battleground">>
+		<<addevent "island_events_battle" 1>>
+	<</if>>
+
+	<<runeventpool>>
+<</widget>>
+
+<<widget "island_events_category_antiques">>
+	<<cleareventpool>>
+
+	<<addevent "island_events_arrow" 2>>
+	<<addevent "island_events_broken_mask" 2>>
+	<<addevent "island_events_trilobite" 1>>
+
+	<<runeventpool>>
+<</widget>>
+
+/* Individual events */
+
+<<widget "island_events_snake">>
+	<<generateRole 0 0 "islander">><<person1>>
+	깜짝 놀랄 만한 쉿쉿 소리가 당신의 주의를 끈다. 소리가 나는 방향으로 돌아서자, 한 쌍의 뱀 눈깔과 정면으로 마주치게 된다. <<person>>【이가】 뱀을 치켜들고 있는데, 그 짐승은 무기처럼 쓰이고 있다.
+	<br><br>
+	당신의 근육에서 모든 힘이 빠져나가고, 당신은 낙엽이 깔린 바닥 위로 쓰러진다. <<person>>【은는】 뱀을 근처 나뭇가지에 감아두고, 당신에게 다가온다.
+	<br><br>
+
+	<<link [[다음|Island Snake Rape]]>><<set $molestationstart to 1>><<set $trance to 1>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_trap">>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<person1>>
+	발자국이 나 있는 길을 따라 걷던 도중 발 밑에서 미세한 <i>틱</i> 하는 소리가 들린다.
+	<<dancedifficulty 1 1000 true>>
+	<<if $danceSuccess>>
+		당신은 무의식적으로 옆으로 뛰어 피하고, 함정이 작동하여 발목을 <span class="green">빗나간다</span>.
+		<br><br>
+		짜증 섞인 외침이 들리고 숲 속에서 <<person>>【와과】 <<person2>><<person>> 두 사람이 나타난다. 그들은 악의를 품고 당신에게 덮쳐온다.
+		<br><br>
+
+		<<link [[다음|Island Trap Fight]]>><<set $fightstart to 1>><</link>>
+		<br>
+	<<else>>
+		<span class="red">밧줄이 당신의 발목을 휘감아,</span> 당신을 공중으로 끌어올려 매달리게 한다. 의기양양한 외침이 들리더니 숲에서 <<person>>【와과】 <<person2>><<person>>【이가】 나타난다.
+		<br><br>
+		<<if $islander_language gte 100>>
+			그들이 당신의 양 옆에 선다. "이게 먹힐 거라고 말했잖아!"
+			<br>
+			"그저 운이 좋았을 뿐이지."
+			<br>
+			"그렇다고 쳐."
+		<<elseif $islander_language gte 50>>
+			그들이 당신의 양 옆에 서서, 말다툼을 하기 시작한다.
+		<<else>>
+			그들이 당신의 양 옆에 서서 그들만의 알아들을 수 없는 말로 이야기한다.
+		<</if>>
+		<br><br>
+
+		<<link [[발버둥친다|Island Trap Struggle]]>><</link>><<physiquedifficulty 1 15000>>
+		<br>
+		<<link [[체력을 아낀다|Island Defeat]]>><<stress -6>><</link>><<lstress>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_flower">>
+	당신은 기묘한 꽃들이 피어 있는 들판을 발견한다. 옅은 독기가 감각을 현혹한다.<<ghallucinogens>><<garousal>><<hallucinogen 120>><<drugs 120>><<arousal 600>>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_pleasant_flower">>
+	당신은 기분 좋은 꽃밭을 발견한다. 달콤한 향기가 당신의 감각을 자극한다.<<lstress>><<stress -6>>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_plumeria">>
+당신은 산들바람에 소용돌이 모양의 꽃잎을 살랑거리는 우아한 플루메리아로 가득한 공터를 발견한다.
+<br><br>
+<<if !$plants_known.includes("plumeria")>>
+	<<if $sciencetrait gte 3>>
+		<<foodstufficon "plumeria">> <<link [[씨앗을 찾는다 (0:30)|Island Plumeria]]>><<island_pass 30>><<tending 6>><<set $plants_known.push("plumeria")>><</link>><<gtending>>
+		<br>
+	<<else>>
+		<span class="blue">과학 스킬이 더 높다면 플루메리아 씨앗을 수확할 수 있었을 것이다.</span>
+		<br>
+	<</if>>
+<</if>>
+<<if currentSkillValue('tending') gte 300>>
+	<<foodstufficon "plumeria">> <<link [[플루메리아를 딴다 (0:20)|Island Plumeria Pick]]>><<island_pass 20>><</link>><<tendingdifficulty 300 600>>
+	<br>
+<<else>>
+	<span class="blue">판매 가능한 표본을 따려면 더 높은 관리 스킬이 필요하다.</span>
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[떠난다|Island]]>><<island_explore_end>><</link>>
+<</widget>>
+
+<<widget "island_events_mosquitoes">>
+	모기 떼로 둘러싸인 고인 웅덩이를 발견한다. 당신은 물리지 않기 위해 서둘러 발걸음을 재촉한다.<<gstress>><<stress 6>>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_walnut">>
+	호두나무를 하나 발견한다. 손이 닿지 않는 곳에 견과류가 매달려 있다.
+	<br><br>
+
+	<<if $cow gte 6>>
+		<<link [[나무를 들이받는다|Island Walnut Headbutt]]>><<set $island.walnut += 1>><</link>><<cow>>
+		<br>
+	<<else>>
+		<<link [[나무에 펀치를 날린다|Island Walnut Punch]]>><</link>><<physiquedifficulty 1 15000>>
+		<br>
+	<</if>>
+	<<if $cat gte 6>>
+		<<link [[나무를 오른다|Island Walnut Climb Cat]]>><<set $island.walnut += 1>><</link>><<cat>><<gwalnut>>
+		<br>
+	<<else>>
+		<<link [[나무를 오른다|Island Walnut Climb]]>><</link>><<athleticsdifficulty 1 1000>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_walnut_2">>
+당신은 밑동 근처에 신선한 열매가 흩어져 있는 호두나무를 발견한다.
+<br><br>
+
+<<link [[먹는다|Island]]>><<hunger -200>><<island_explore_end>><</link>><<lhunger>>
+<br>
+<<link [[나중을 위해 모아둔다|Island]]>><<set $island.walnut += 1>><</link>><<gwalnut>><<walnutStoreMessage>>
+<</widget>>
+
+<<widget "island_events_walnut_3">>
+	당신은 해안가를 따라 탐색하다가, 더 거대한 식물들에게 바람막이를 받아 숨겨진 호두나무를 발견한다. 열매들이 어찌나 잘 익었는지 흔들기만 해도 떨어질 것 같다.
+	<br><br>
+	나무 너머를 살펴보자, 또 다른 호두나무가, 그리고 또 다른 호두나무가 한 줄로 가지런히 정렬된 것이 보인다. 과수원처럼 누군가 관리하고 있는 듯한 모습이다.
+	<br><br>
+
+	<<link [[호두를 모은다 (0:05)|Island Walnut Gather]]>><<island_pass 5>><<set $island.walnut += 3>><</link>><<ggwalnut>>
+	<br>
+	<<link [[떠난다|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_rocky">>
+	당신은 섬에 처음 도착했을 때 캠프를 꾸렸던 바위 언덕을 발견한다. 방어하기 <span class="teal">유리해 보이고</span>, <span class="teal">높은 시야</span> 덕분에 식량을 찾기도 더 쉬울 테지만, 크고 많은 바위들 때문에 생활하기에는 단지 <span class="pink">비좁은</span> 공간만이 남을 뿐이다.
+	<br><br>
+
+	<<link [[경치를 감상하고, 떠난다|Island]]>><<island_explore_end>><<stress -6>><</link>><<lstress>>
+	<br>
+	<<link [[여기로 야영지를 옮긴다|Island]]>><<island_explore_end>><<set $island.home to "rocky_hillock">><</link>><<campFurnitureMessage>>
+	<br>
+<</widget>>
+
+<<widget "island_events_waterfall">>
+	당신은 위아래가 모두 나무로 둘러싸인 아름다운 폭포를 발견한다. 그곳은 캠프를 차리기에 적합해 보이며<<if $island.home is "rocky_hillock">>, 바위 언덕만큼 방어에 유리하진 않지만<</if>>, 폭포와 절벽이 한쪽에 <span class="blue">소리 차단막</span>을 형성해 준다. 또한 그 방향으로 <span class="blue">시야가 트여 있어</span>, <<if $island.home is "rocky_hillock">>비록 식량은 구하기 더 힘들지라도. 강가 옆에는<<else>>식량을 찾기 더 쉬울 뿐만 아니라, 강가 옆에는<</if>> <span class="blue">널찍한</span> 구역이 있다.
+	<br><br>
+
+	<<link [[경치를 감상하고, 떠난다|Island]]>><<island_explore_end>><<stress -6>><</link>><<lstress>>
+	<br>
+	<<link [[여기로 야영지를 옮긴다|Island]]>><<island_explore_end>><<set $island.home to "waterfall">><</link>><<campFurnitureMessage>>
+	<br>
+<</widget>>
+
+<<widget "island_events_gulch">>
+	사방이 숲으로 둘러싸인 깊은 협곡을 발견한다. 개울가 주변에 야영지를 꾸릴 수 있을 만큼 <span class="green">많은 공간</span>이 있다. 하지만 위험에 사방이 <span class="pink">노출</span>되어 있어, 나무를 뚫고 다가오는 위협에 쉽게 당할 수 있다. <span class="pink">전망이 좋지 않아</span> 식량을 구하기도 어려울 것이다.
+	<br><br>
+	이곳에 야영지를 세우는 것은 대담한 결정이겠지만, 그 대가로 <span class="teal">건설할 수 있는 막대한 양의 공간</span>을 얻게 될 것이다.
+	<br><br>
+	<<link [[경치를 감상하고 떠난다|Island]]>><<island_explore_end>><<stress -6>><</link>><<lstress>>
+	<br>
+	<<link [[야영지를 이곳으로 옮긴다|Island]]>><<island_explore_end>><<set $island.home to "gulch">><</link>><<campFurnitureMessage>>
+<</widget>>
+
+<<widget "island_events_wood_1">>
+	당신은 바람에 날려 수북이 쌓여 있는 낙엽 무더기를 발견한다. 가로질러 걷다가 숨겨져 있던 나뭇가지에 걸려 넘어지면서, 가지가 떨어져 나온다. 쓸 만해 보인다.<<gwood>><<set $island.wood += 1>>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_wood_2">>
+	당신은 강을 발견하고 그 길을 따라 걷는다. 강 한가운데로 마치 함께 여행을 떠나듯 두 개의 통나무가 둥둥 떠내려오는 것을 보게 된다. 쓸모가 있을 것 같다.
+	<br><br>
+	<<link [[헤엄쳐서 가지러 간다|Island Wood Swim]]>><</link>><<swimmingdifficulty 1 1000>>
+	<br>
+	<<link [[무시한다|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_wood_3">>
+	<<generateRole 0 0 "islander">><<person1>>
+	앞쪽에서 움직이는 소리가 들린다. 한 <<person>>【이가】 오솔길을 따라, 두 팔에 막대기 한 다발을 안고 걸어가고 있다.
+	<br><br>
+
+	<<if $islander_language gte 100>>
+		<<link [[나무를 달라고 부탁한다|Island Wood Ask]]>><</link>>
+		<br>
+	<<elseif $islander_language gte 50>>
+		<<link [[나무를 달라고 부탁한다|Island Wood Ask Try]]>><</link>><<difficulty 50>>
+		<br>
+	<<else>>
+		<span class="blue">당신은 의사소통할 수 없습니다.</span>
+		<br>
+	<</if>>
+	<<link [[무시한다|Island]]>><<endevent>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_wood_4">>
+	당신은 어딘가 알 수 없는 근원에서 흘러나오는 빛으로 은은하게 비춰진 굵은 나뭇가지들 아래를 수색한다. 침침하긴 하지만, 쓸 만한 막대기는 꽤 쉽게 찾을 수 있다. 당신은 품에 세 개를 안고 숲에서 빠져나온다.<<gwood>><<set $island.wood += 3>>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+<</widget>>
+
+<<widget "island_events_hunted">>
+	<<generateRole 0 0 "islander">><<person1>>
+	<<if $wolfgirl gte 6>>
+		당신의 개의 귀가 쫑긋 선다. 누군가 당신을 미행하고 있다. <<wolfgirl>>
+		<br><br>
+
+		<<link [[맞선다|Island Hunted Confront]]>><</link>>
+		<br>
+		<<link [[숨는다|Island Hunted Hide]]>><</link>>
+		<br>
+	<<elseif $cat gte 6>>
+		당신의 고양이의 귀가 쫑긋 선다. 누군가 당신을 미행하고 있다. <<cat>>
+		<br><br>
+
+		<<link [[맞선다|Island Hunted Confront]]>><</link>>
+		<br>
+		<<link [[숨는다|Island Hunted Hide]]>><</link>>
+		<br>
+	<<elseif $fox gte 6>>
+		당신의 여우의 귀가 쫑긋 선다. 누군가 당신을 미행하고 있다. <<fox>>
+		<br><br>
+
+		<<link [[맞선다|Island Hunted Confront]]>><</link>>
+		<br>
+		<<link [[숨는다|Island Hunted Hide]]>><</link>>
+		<br>
+	<<else>>
+		당신이 느낀 유일한 경고 신호는 나무 사이로 들린 휘파람 소리뿐이었고, <span class="red">그 직후 등 뒤에서 화살이 꽂힌다.</span> 따끔하지만 화살은 튕겨져 나간다. 화살촉이 뭉툭해서 피부를 뚫지는 않은 것 같지만, <span class="pink">온몸에 따스한 기운이 퍼지는 것이 느껴진다.</span><<garousal>><<gdrugged>><<drugs 120>>
+		<br><br>
+
+		<<link [[다음|Island]]>><<island_explore_end>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_runes">>
+	<<island_tattoo_check>>
+	당신은 룬 문자가 새겨진 평평한 바위를 발견한다. 당신은 그 의미를 해독할 수 없다.
+	<br><br>
+
+	<<if _island_tattoo gte 1>>
+		당신은 돌아서려 한다,
+		<<if _island_tattoo gte 2>>
+			<span class="red">하지만 섬 주민들이 당신에게 새겨준 문신에서 강력한 충격이 뿜어져 나온다.</span>
+		<<else>>
+			<span class="red">하지만 섬 주민들이 당신에게 새겨준 문신에서 충격이 뿜어져 나온다.</span>
+		<</if>>
+		에너지가 당신의 다리로 흘러들어, 걷는 동작처럼 다리를 씰룩이게 만든다. 마치 당신을 어딘가로 이끌어가는 것 같다.
+		<br><br>
+
+		<<link [[그냥 둔다 (0:20)|Island Runes Submit]]>><<island_pass 20>><</link>>
+		<br>
+		<<link [[발버둥친다|Island Runes Physique]]>><</link>><<physiquedifficulty 1 (_island_tattoo * 3000)>>
+		<br>
+		<<link [[이건 현실일 리 없어|Island Runes Willpower]]>><</link>><<willpowerdifficulty 1 (_island_tattoo * 200)>>
+		<br>
+	<<else>>
+		당신은 문양에서 돌아선다.
+		<br><br>
+
+		<<link [[다음|Island]]>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_shore">>
+	<<set $island.explore_locations.pushUnique("shore")>>
+	당신이 두 나무 사이에 있는 비탈을 오르자, 시원한 바닷바람이 맞이한다. 당신은 해안가를 따라 있는 절벽 꼭대기에 서 있다. 아래쪽 물속에서 기묘한 움직임이 있다.
+	<br><br>
+	<span class="gold">해안을 발견했습니다.</span>
+	<br><br>
+	당신은 양옆으로 우뚝 솟은 식물들이 호두나무라는 것을 알아챈다. 열매들이 땅에 널브러져 있다. 당신은 몇 줌 주워 담는다. 이곳에서는 식량을 쉽게 찾을 수 있을 것 같다.
+	<br><br>
+	<<link [[먹는다|Island]]>><<hunger -400>><<island_explore_end>><</link>><<lhunger>>
+	<br>
+	<<link [[나중을 위해 모아둔다|Island]]>><<set $island.walnut += 2>><<island_explore_end>><</link>><<gwalnut>><<walnutStoreMessage>>
+	<br>
+<</widget>>
+
+<<widget "island_events_wood">>
+	<<set $island.explore_locations.pushUnique("wood")>>
+	걸어갈수록 주변 나무들의 몸통이 두꺼워지고, 나뭇가지들도 굵어진다. 그것들이 형성한 수관은 너무 빽빽해서 뚫을 수 없는 나지막한 천장을 만들어낸다. 발치에는 어떤 식물도 자라지 않는다.
+	<br><br>
+
+	발 밑에 쓸 만한 막대기 몇 개가 떨어져 있는데, 이렇게 메마른 땅에서는 아주 쉽게 눈에 띈다. 나무를 구하기 좋은 장소다.<<gwood>><<set $island.wood += 2>>
+	<br><br>
+
+	<span class="gold">울창한 삼림을 발견했습니다.</span>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_battleground">>
+	<<set $island.explore_locations.pushUnique("battleground")>>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<generateRole 2 0 "islander">>
+	<<person1>>
+	나무에 박혀 있는 화살을 발견한다. 길을 가다 보니 바닥에 부러져 있거나 식물에 박혀 있는 다른 화살들도 눈에 띈다. 발자국들이 이리저리 교차해 있다. 이 근방은 꽤 사람들이 많이 다니는 곳이다.
+	<br><br>
+	앞에서 다급한 발소리가 들려오고, 상처 입은 팔을 움켜쥔 <<person>>【이가】 나무들 사이에서 튀어나오자 당신은 서둘러 덤불 뒤에 몸을 숨긴다. <<he>>【은는】 불안한 눈빛으로 어깨 너머를 힐끗거린다.
+	<br><br>
+	잠시 후 <<person2>><<person>>【와과】 <<person3>><<person>>【이가】 나무들 사이에서 나타난다. <<person2>><<person>>【이가】 <<person1>><<person>>【을를】 가리키자, 그들은 <<him>>【을를】 뒤쫓아 달린다.
+	<br><br>
+
+	<<if $islander_language gte 100>>
+		"도망치지 마, 살살 다뤄줄 테니까!" <<person2>><<person>>【이가】 외친다.
+		<br>
+		"그래," <<person3>><<person>>【이가】 덧붙인다. "인어들은 아니겠지만, 우리는 그럴 거라고."
+	<<elseif $islander_language gte 50>>
+		그들은 조롱하는 말투로 사냥감을 향해 소리친다.
+	<<else>>
+		그들은 알아들을 수 없는 언어로 소리친다.
+	<</if>>
+	<<gcomprehension>><<islander_language 1>>
+	<br><br>
+	이곳은 일종의 전장인 듯하다. 왜 이곳에서 싸우는지는 모르겠지만, 원주민을 찾을 일이 있다면 이곳이 적격일 것이다.
+	<br><br>
+
+	<span class="gold">전장을 발견했습니다.</span>
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_castle">>
+	<<set $island.explore_locations.pushUnique("castle")>>
+	능선을 넘자 반대편에 우뚝 솟은 폐허가 된 성이 보인다. 흉벽 위로 세 개의 탑이 솟아 있고, 성벽은 이끼로 덮여 있다.
+	<<generateRole 0 0 "islander">><<person1>>
+	<br><br>
+
+	아래쪽이 꽤 소란스럽다. 가면을 쓴 원주민들이 큰 문을 통해 드나들고 있다. 한 <<person>>【이가】 목줄이 매달린 길들여진 <<endevent>><<beastNEWinit 3 cat>><<beastsplural>>【와과】 함께 보초를 서고 있다. 부서진 석조물 틈으로 더 많은 원주민들을 엿본다. 이들은 가면을 쓰고 있지 않다.
+	<br><br>
+
+	근처에 탑 중 하나와 연결되는 다리가 있다. 가면을 쓴 두 원주민이 입구 양쪽에 서서 각각 창을 들고 있다.
+	<br><br>
+	<<set $islander_mask to 1>>
+	<span class="gold">성으로 가는 길을 발견했습니다. 건설 메뉴에 새로운 옵션이 생겼습니다.</span>
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_bay">>
+	<<set $island.explore_locations.pushUnique("bay")>>
+	<<set $island.raft to 1>>
+	외부로부터 보호되는 듯한 만을 발견한다. 다른 해변을 괴롭히는 괴물들의 흔적은 찾아볼 수 없다. 평화롭다.<<lstress>><<stress -6>>
+	<br><br>
+	숲 가장자리 근처에 목재 프레임이 놓여 있다. 미완성 뗏목처럼 보인다. 나무가 많이 필요하겠지만, 이를 완성하면 이 섬을 떠날 수 있을 것이다.
+	<br><br>
+
+	<span class="gold">만을 발견했습니다.</span>
+	<br><br>
+
+	<<link [[다음|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_plain">>
+	<<earnFeat "Prehistoric Landscape">>
+	<<set $island.explore_locations.pushUnique("plain")>>
+	나무들이 갈라지며, 광활하고 평탄치 않은 평원이 열린다. 당신의 키만큼이나 큰 들쭉날쭉한 바위들과 함께, 여기저기 나무들이 군데군데 모여 있다. 긴 풀이 당신의 무릎을 간지럽힌다.
+	<br><br>
+	<<set $antiquemoney += 500>><<museumAntiqueStatus "antiqueobsidiandisc" "found">><<wearProp "antique disc">>
+	당신의 발 근처에 있는 무언가에 빛이 반사된다. 반쯤 땅에 묻혀 있는 것은 흑요석 원반이다. 그것은 큰 동전의 크기와 모양을 하고 있다. 어떤 표식도 없지만, 그 완벽한 둥근 모양은 지성체가 만들었음을 시사한다. 이곳은 골동품을 찾기에 좋은 장소일지도 모른다.
+	<br><br>
+
+	<span class="gold">평원을 발견했습니다.</span>
+	<br><br>
+
+	<<link [[다음|Island]]>><<handheldon>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_arrow">>
+	<<wearProp "antique islander arrow">>
+	땅에 박혀 있는 화살을 하나 발견한다. 더럽지만 온전한 상태다. 이 기이한 수공예품은 수집가에게 꽤나 가치 있는 물건일지도 모른다.
+	<br><br>
+	<<set $antiquemoney += 20>><<museumAntiqueStatus "antiqueislandarrow" "found">>
+	<<link [[다음|Island]]>><<handheldon>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_broken_mask">>
+	나무에 기대어 놓인 각진 원주민 가면 하나를 발견한다. 끈은 끊어져 있고 가운데가 갈라져 부서져 있다. 그래도 수집가에게는 가치 있는 물건일지도 모른다.
+	<br><br>
+	<<wearProp "antique islander mask">>
+	<<set $antiquemoney += 40>><<museumAntiqueStatus "antiquewoodenmask" "found">>
+	<<link [[다음|Island]]>><<handheldon>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_trilobite">>
+	당신은 작은 언덕 꼭대기에 눈에 띄게 자리한 바위 하나를 발견한다. 그 표면에는 삼엽충 화석이 놓여 있는데, 마치 최근까지 파묻혀 있던 돌이, 오랜 기간 숨겨왔던 비밀을 드러내려는 듯한 압력에 밀려 올라온 것만 같다.
+	<br><br>
+	그 화석은 박물관에나 어울릴 법한 것이며, 쉽게 떼어낼 수 있다.
+	<br><br>
+	<<set $antiquemoney += 50>><<museumAntiqueStatus "antiquetrilobitefossil" "found">><<wearProp "antique trilobite">>
+	<<link [[다음|Island]]>><<handheldon>><<island_explore_end>><</link>>
+<</widget>>
+
+<<widget "island_events_overhear">>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<person1>>
+	두 사람의 목소리를 엿듣는다. 나뭇잎 사이로 뿔 달린 가면을 쓰고 활을 든 <<person>>【와과】 <<person2>><<person>>【이가】 보이지만, 그들은 다소 편안해 보인다.
+	<br><br>
+
+	<<if $islander_language gte 100>>
+		<<link [[대화한다|Island Chat]]>><<trauma -6>><<stress -6>><</link>><<ltrauma>><<lstress>>
+		<br>
+	<<else>>
+		<<link [[엿듣는다|Island Eavesdrop]]>><</link>><<gcomprehension>>
+		<br>
+	<</if>>
+	<<link [[떠난다|Island]]>><<endevent>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_battle">>
+	나무로 둘러싸인 공터를 발견하고 걸음을 멈춘다. 무언가 이상하다. 공기 중에 긴장감이 감돌고 있다.
+	<br><br>
+	일제히 발사된 화살이 공터를 가로지르며 포물선을 그리자 침묵이 깨지고, 곧이어 반대 방향에서 또 다른 화살들이 날아온다. 고통스러운 비명소리가 들려온다.
+	<br><br>
+	당신은 머리 위로 전투가 벌어지는 동안 작은 도랑에 몸을 숨긴다.
+	<br><br>
+
+	<<link [[싸움을 지켜본다|Island Observe]]>><<islander_language 2>><</link>><<if $islander_language lt 100>><<ggcomprehension>><</if>>
+	<br>
+	<<link [[떠난다|Island]]>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_birds">>
+	커다란 참나무를 발견한다. 그 가지들은 주변의 식물들을 보호하려는 듯 넓게 뻗어 있다. 가지에는 각기 다른 종의 새들이 앉아, 저마다 다른 노래를 부르며 묘한 조화를 이룬다.<<lstress>><<stress -6>>
+	<br><br>
+
+	<<if $harpy gte 6>>
+		<<link [[노래한다 (0:10)|Island Sing]]>><<island_pass 10>><<trauma -6>><<stress -6>><</link>><<harpy>><<ltrauma>><<lstress>>
+		<br>
+		<<link [[떠난다|Island]]>><<island_explore_end>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Island]]>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_cat">>
+	<<beastNEWinit 1 cat>>
+	등 뒤에서 적대적인 기척이 느껴진다. 홱 돌아보자, 가까이 어슬렁거리며 다가오는 <<beasttype>>【이가】 보인다.
+	<br><br>
+
+	<<if $monster is 1 or $settings.bestialityEnabled>>
+		<<if $monster is 1>>
+			"나는 지금 배가 더 고픈 걸까, 아니면 발정난 걸까?" <<bhe>>【이가】 말한다. "어디 한 번 확인해 보자고."
+			<br><br>
+		<</if>>
+		<<link [[다음|Island Cat]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		당신은 가능한 한 빨리 뒷걸음질 치다가, 돌아서서 나무 사이로 도망친다.
+		<br><br>
+
+		당신은 탈출하지만, 상처 하나 없이 빠져나오지는 못한다.<<beastescape>>
+		<br><br>
+
+		<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_cat_2">>
+	<<beastNEWinit 2 cat>>
+	머리 위 보이지 않는 나뭇가지에서 <<beasttype 0>>【이가】 당신의 눈앞에 떨어진다. <<bHe 0>>【은는】 입술을 핥으며 가까이 어슬렁거린다.
+	<br><br>
+
+	<<if $monster is 1 or $settings.bestialityEnabled>>
+		<<if $monster is 1>>
+			"음," <<bhe 0>>【이가】 말한다. "널 잡아먹어 주마!"
+			<br><br>
+		<</if>>
+		당신은 근처에 또 다른 위협이 있음을 감지한다.
+		<br><br>
+		<<link [[싸운다|Island Cats Fight]]>><</link>>
+		<br>
+		<<link [[달아난다|Island Cats Run]]>><</link>>
+		<br>
+		<<link [[그들이 먼저 움직이게 둔다|Island Cats Bide]]>><</link>>
+		<br>
+	<<else>>
+		당신은 가능한 한 빨리 뒷걸음질 치다가, 돌아서서 나무 사이로 도망친다.
+		<br><br>
+
+		당신은 탈출하지만, 상처 하나 없이 빠져나오지는 못한다.<<beastescape>>
+		<br><br>
+
+		<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_tear">>
+	당신은 빽빽한 덤불을 발견한다. 가시와 얇은 나뭇가지들이 피부를 찔러대어 통과하기가 어렵다.
+
+	<<if !$worn.lower.type.includes("naked")>>
+		당신의 <<print $worn.lower.name>>【이가】 그런 나뭇가지 중 하나에 걸린다, 바로 그 순간 앞쪽에서 목소리가 들린다. 세 명의 섬 주민들이 당신이 있는 쪽으로 오고 있는 것 같다.
+		<br><br>
+
+		<<link [[잡아뜯어서 빠져나온다|Island Tear]]>><</link>>
+		<br>
+		<<link [[조심스럽게 옷을 푼다|Island Careful]]>><</link>>
+		<br>
+	<<elseif !$worn.under_lower.type.includes("naked")>>
+		당신의 <<print $worn.under_lower.name>>【이가】 그런 나뭇가지 중 하나에 걸린다, 바로 그 순간 앞쪽에서 목소리가 들린다. 세 명의 섬 주민들이 당신이 있는 쪽으로 오고 있는 것 같다.
+		<br><br>
+
+		<<link [[잡아뜯어서 빠져나온다|Island Tear]]>><</link>>
+		<br>
+		<<link [[조심스럽게 옷을 푼다|Island Careful]]>><</link>>
+		<br>
+	<<elseif !$worn.upper.type.includes("naked")>>
+		당신의 <<print $worn.upper.name>>【이가】 그런 나뭇가지 중 하나에 걸린다, 바로 그 순간 앞쪽에서 목소리가 들린다. 세 명의 섬 주민들이 당신이 있는 쪽으로 오고 있는 것 같다.
+		<br><br>
+
+		<<link [[잡아뜯어서 빠져나온다|Island Tear]]>><</link>>
+		<br>
+		<<link [[조심스럽게 옷을 푼다|Island Careful]]>><</link>>
+		<br>
+	<<elseif !$worn.under_upper.type.includes("naked")>>
+		당신의 <<print $worn.under_upper.name>>【이가】 그런 나뭇가지 중 하나에 걸린다, 바로 그 순간 앞쪽에서 목소리가 들린다. 세 명의 섬 주민들이 당신이 있는 쪽으로 오고 있는 것 같다.
+		<br><br>
+
+		<<link [[잡아뜯어서 빠져나온다|Island Tear]]>><</link>>
+		<br>
+		<<link [[조심스럽게 옷을 푼다|Island Careful]]>><</link>>
+		<br>
+	<<else>>
+		나뭇가지 하나가 쉽게 비켜주지만, 당신이 지나가자 탄력 때문에 원래 위치로 튕겨지더니, 한술 더 떠서 당신의 <<bottom>>【을를】 철썩 때린다.<<gpain>><<gstress>><<pain 4>><<stress 6>>
+		<br><br>
+
+		<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_sing">>
+	<<generateRole 0 0 "islander">><<person1>>
+	노래 소리가 들린다. 한 <<person>>【이가】 손에 낚싯대를 쥔 채, 강가에 있는 통나무에 앉아 있다.
+
+	<<if $islander_language gte 100>>
+		<br><br>
+		<i>"일곱 마리 물고기가 산호 위를 헤엄치네, 오."</i>
+		<br>
+		<i>"심해의 눈동자가 아래에서 그들을 비추네, 오."</i>
+		<br>
+		<i>"손이 뻗어나오네, 굶주린 손가락들, 오."</i>
+		<br>
+		<i>"여섯 마리 겁먹은 물고기가 산호 위를 헤엄치네, 오..."</i>
+		<br><br>
+		음률이 기분 좋다.<<lstress>><<stress -6>>
+	<<elseif $islander_language gte 50>>
+		마치 물고기들을 유인하길 바라며 물고기에게 노래를 부르는 것 같다.<<gcomprehension>><<islander_language 1>>
+	<<else>>
+		무슨 가사인지 당신은 이해할 수 없지만, 듣기엔 기분 좋다.<<gcomprehension>><<islander_language 1>>
+	<</if>>
+	<br><br>
+
+	<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_slugs">>
+	당신 앞쪽으로 점액 실 가닥이 내려온다. 거대한 민달팽이가 그것을 타고 미끄러져 내려와 철퍼덕하고 떨어진다. 당신의 양옆에서도 비슷한 소리가 들린다.
+	<br><br>
+
+	<<link [[다음|Island Slugs]]>><<set $struggle_start to 1>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_rope">>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<generateRole 2 0 "islander">>
+	<<generateRole 3 0 "islander">>
+	<<generateRole 4 0 "islander">>
+	<<generateRole 5 0 "islander">>
+	<<person1>>
+	당신은 강을 발견하고, 그것을 따라 섬 깊숙한 곳으로 들어간다. 커다란 바위 둘레를 따라가다가, 가로질러 팽팽하게 묶여 있는 밧줄을 발견한다. 한쪽 끝에 양동이가 매달려 있다. 누군가 물을 건너 물건을 옮기는 데 사용하는 것 같다.
+	<br><br>
+	목소리가 들려 뒤를 돌아보니, 여섯 명의 섬 주민과 얼굴을 마주하게 된다. 거칠게 소용돌이치는 물소리 때문에 그들의 발소리가 묻혀버렸던 것이다.
+	<br><br>
+	그들도 멈칫하더니 무기를 잡으려 손을 뻗는다. 싸우는 것은 좋은 생각이 아닌 것 같다.
+	<br><br>
+
+	<<link [[싸운다|Island Fight]]>><<set $fightstart to 1>><</link>>
+	<br>
+	<<link [[밧줄을 이용해 도망친다|Island Rope]]>><</link>>
+	<br>
+	<<link [[항복한다|Island Defeat]]>><</link>>
+	<br>
+<</widget>>
+
+<<widget "island_events_squirrel">>
+	당신은 다람쥐 한 마리를 발견한다. 그것은 당신을 잠깐 보더니, 잽싸게 나무통을 타고 올라가 가지들 사이로 사라져버린다.<<lstress>><<stress -6>>
+	<br><br>
+
+	<<if $fox gte 6>>
+		본능이 신체를 지배한다. 당신은 네 발로 엎드려 바닥 냄새를 맡고, 허공에 <<bottom>>【을를】 치켜든 채 다람쥐의 자취를 역추적한다. 당신은 갓 파헤친 흙을 발견한다. 그 아래에 호두가 있다.<<fox>><<gwalnut>><<set $island.walnut += 1>>
+		<br><br>
+		<<link [[먹는다|Island]]>><<hunger -200>><<island_explore_end>><</link>><<lhunger>>
+		<br>
+		<<link [[나중을 위해 모아둔다|Island]]>><<set $island.walnut += 1>><</link>><<gwalnut>><<walnutStoreMessage>>
+	<<else>>
+		<<link [[다음|Island]]>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "island_events_duel">>
+	<<generateRole 0 0 "islander">>
+	<<generateRole 1 0 "islander">>
+	<<person1>>
+	<<if $islander_language gte 100>>
+		앞에서 누군가 외치는 소리가 들린다. 한 <<person>>【와과】 <<person2>><<person>>【이가】 창을 들고 싸우고 있다. 그들은 서로 조롱하고 찌르기를 주고받는다.
+		<br>
+		<<if $rng gte 81>>
+			"이거나 받아라, 생선이랑 떡이나 치는 괴물 자식아!"
+			<br>
+			"하하! 그것보단 좀 더 잘해야 할 거다!
+		<<elseif $rng gte 61>>
+			"내가 끝나면, 네 <<if $pronoun is "m">>애비<<else>>어미<</if>>【이】랑 떡을 쳐주마."
+			<br>
+			"하하! 재밌군. 난 이미 네 가족이랑 떡을 쳤는데 말이야."
+		<<elseif $rng gte 41>>
+			"네 피에 빠져 익사하게 될 거다!"
+			<br>
+			"진정해, 그저 호두 한 알일 뿐이라고."
+		<<elseif $rng gte 21>>
+			"넌 무가 염소랑 교미해서 낳은 놈처럼 생겼어."
+			<br>
+			"그래? 글쎄, 너는 딱 네 <<if $pronoun is "m">>애비<<else>>어미<</if>>【을를】 빼닮았는데."
+		<<else>>
+			"너 지금 이거 때문에 흥분했냐?"
+			<br>
+			"꿈도 크다, 변태 자식아."
+		<</if>>
+		<br><br>
+		당신은 눈에 띄기 전에 자리를 떠난다.
+		<br><br>
+		<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+		<br>
+	<<elseif $islander_language gte 50>>
+		앞에서 누군가 외치는 소리가 들린다. 한 <<person>>【와과】 <<person2>><<person>>【이가】 창을 들고 싸우고 있다. 그들은 서로 조롱하고 찌르기를 주고받지만, 어느 쪽도 효과가 있어 보이지는 않는다.<<gcomprehension>><<islander_language 1>>
+		<br><br>
+		당신은 눈에 띄기 전에 자리를 떠난다.
+		<br><br>
+		<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+		<br>
+
+	<<else>>
+		앞에서 알아들을 수 없는 고함 소리가 들린다. 한 <<person>>【와과】 <<person2>><<person>>【이가】 창을 들고 서로의 주위를 맴돌며 가끔씩 불시에, 그러나 아무 효과도 없는 찌르기를 하며 싸우고 있다.
+		<br><br>
+		무슨 말을 하는지는 알 수 없지만, 꽤 격앙된 것처럼 들린다.<<gcomprehension>><<islander_language 1>>
+		<br><br>
+		당신은 눈에 띄기 전에 자리를 떠난다.
+		<br><br>
+
+		<<link [[다음|Island]]>><<endevent>><<island_explore_end>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "islandBuildOption">>
+	<div>
+		<<if _islandUpgrades is undefined>><<set _islandUpgrades to {}>><</if>>
+		<<set _islandUpgrades[_args[0]] to {}>>
+		<<switch _args[0]>>
+			<<case "trap">>
+				<<set $_build to true>>
+				<<if !$island[$island.home].trap>>
+					<span class="red">함정 없음</span>: 공격자들이 쉽게 당신에게 접근할 수 있습니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Simple Trap">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 0>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 0>>
+				<<elseif $island[$island.home].trap is "simple">>
+					<span class="teal">간단한 함정</span>: 50%의 확률로 공격자를 덫에 걸리게 합니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Basic Trap">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 180>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 2>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 200>>
+				<<elseif $island[$island.home].trap is "basic">>
+					<span class="teal">기본 함정</span>: 75%의 확률로 공격자를 덫에 걸리게 합니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Advanced Trap">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 240>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 3>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 400>>
+				<<elseif $island[$island.home].trap is "advanced">>
+					<span class="green">고급 함정</span>: 100%의 확률로 공격자를 덫에 걸리게 합니다.
+				<</if>>
+			<<case "curtains">>
+				<<set $_build to true>>
+				<<if !$island[$island.home].curtains>>
+					<span class="red">사생활 보호 안됨</span>: 수면의 질이 낮습니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Simple Curtains">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 6>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 100>>
+				<<elseif $island[$island.home].curtains is "simple">>
+					<span class="teal">단순한 커튼</span>: 수면의 질을 약간 향상시킵니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Basic Curtains">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 0>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 300>>
+				<<elseif $island[$island.home].curtains is "basic">>
+					<span class="teal">기본 커튼</span>: 수면의 질을 향상시킵니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Advanced Curtains">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 2>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 500>>
+				<<elseif $island[$island.home].curtains is "advanced">>
+					<span class="green">고급 커튼</span>: 수면의 질을 많이 향상시킵니다.
+				<</if>>
+			<<case "bird_feeder">>
+				<<set $_build to true>>
+				<<if !$island[$island.home].bird_feeder>>
+					<span class="red">새 모이통 없음</span>: 스스로 음식을 구해야 합니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Simple Bird Feeder">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 8>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 100>>
+				<<elseif $island[$island.home].bird_feeder is "simple">>
+					<span class="teal">간단한 새 모이통</span>: 탐험하는 동안 새들이 아주 가끔 호두를 남겨줍니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Basic Bird Feeder">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 2>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 300>>
+				<<elseif $island[$island.home].bird_feeder is "basic">>
+					<span class="teal">기본 새 모이통</span>: 탐험하는 동안 새들이 가끔 호두를 남겨줍니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Advanced Bird Feeder">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 2>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 500>>
+				<<elseif $island[$island.home].bird_feeder is "advanced">>
+					<span class="green">고급 새 모이통</span>: 탐험하는 동안 새들이 종종 호두를 남겨줍니다.
+				<</if>>
+			<<case "camouflage">>
+				<<set $_build to true>>
+				<<if !$island[$island.home].camouflage>>
+					<span class="red">위장 안됨</span>: 적에게 쉽게 눈에 띕니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Simple Camouflage">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 0>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 100>>
+				<<elseif $island[$island.home].camouflage is "simple">>
+					<span class="teal">간단한 위장</span>: 수면 중 적대적인 이벤트가 일어날 확률이 소폭 감소합니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Basic Camouflage">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 0>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 400>>
+				<<elseif $island[$island.home].camouflage is "basic">>
+					<span class="teal">기본 위장</span>: 수면 중 적대적인 이벤트가 일어날 확률이 어느 정도 감소합니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Advanced Camouflage">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 120>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 0>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 700>>
+				<<elseif $island[$island.home].camouflage is "advanced">>
+					<span class="green">고급 위장</span>: 수면 중 적대적인 이벤트가 일어날 확률이 대폭 감소합니다.
+				<</if>>
+			<<case "decor">>
+				<<set $_build to true>>
+				<<if !$island[$island.home].decor>>
+					<span class="red">장식 없음</span>: 탐험 후 쉴 방법이 없습니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Simple Decor">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 240>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 2>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 200>>
+				<<elseif $island[$island.home].decor is "simple">>
+					<span class="teal">간단한 장식</span>: 탐험 후 캠프에 돌아올 때마다 스트레스를 약간 감소시켜줍니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Basic Decor">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 240>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 8>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 400>>
+				<<elseif $island[$island.home].decor is "basic">>
+					<span class="teal">기본 장식</span>: 탐험 후 캠프에 돌아올 때마다 스트레스를 어느 정도 감소시켜줍니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Advanced Decor">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 240>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 8>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 600>>
+				<<elseif $island[$island.home].decor is "advanced">>
+					<span class="green">고급 장식</span>: 탐험 후 캠프에 돌아올 때마다 스트레스를 대폭 감소시켜줍니다.
+				<</if>>
+			<<case "chair">>
+				<<set $_build to true>>
+				<<if !$island[$island.home].chair>>
+					<span class="red">좌석 없음</span>: 앉을 곳이 없습니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Stool">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 360>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 7>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 300>>
+				<<elseif $island[$island.home].chair is "simple">>
+					<span class="teal">의자</span>: 만드는 데 애를 먹었지만 유용하지는 않습니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Chair">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 360>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 5>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 700>>
+				<<elseif $island[$island.home].chair is "basic">>
+					<span class="teal">안락의자</span>: 만드는 데 훨씬 애를 먹었지만 유용하지는 않습니다.
+					<<set _islandUpgrades[_args[0]].passage to "Island Build Throne">>
+					<<set _islandUpgrades[_args[0]].timeTaken to 360>>
+					<<set _islandUpgrades[_args[0]].woodUsed to 12>>
+					<<set _islandUpgrades[_args[0]].housekeeping to 1000>>
+				<<elseif $island[$island.home].chair is "advanced">>
+					<span class="green">왕좌</span>: 야생의 왕에게 어울리는 자리입니다.
+				<</if>>
+			<<case "islanderMask">>
+				<<if $islander_mask gte 100>>
+					<span class="green">훌륭한 섬 주민 가면</span>:
+				<<elseif $islander_mask gte 80>>
+					<span class="teal">익숙한 섬 주민 가면</span>:
+				<<elseif $islander_mask gte 60>>
+					<span class="lblue">쓸만한 섬 주민 가면</span>:
+				<<elseif $islander_mask gte 40>>
+					<span class="blue">어설픈 섬 주민 가면</span>:
+				<<elseif $islander_mask gte 20>>
+					<span class="purple">나쁜 섬 주민 가면</span>:
+				<<else>>
+					<span class="pink">끔찍한 섬 주민 가면</span>:
+				<</if>>
+				<<if $islander_mask gte 100>>
+					성 경비병들을 속여 넘기기에 충분하다.
+				<<else>>
+					성 경비병들을 속여 넘기는 데에 도움이 될 수도 있다.
+				<</if>>
+				<br>
+				<<if $island.wood lt 1>>
+					<span class="black">나무가 더 필요하다.</span> <<wood_required 1>>
+					<br>
+				<<else>>
+					<<link [[만든다 (1:00)|Island Build Mask]]>><<island_pass 60>><<set $islander_mask += 10>><<set $islander_mask to Math.clamp($islander_mask, 0, 100)>><<set $island.wood -= 1>><</link>> <<wood_required 1>>
+					<br>
+				<</if>>
+			<<case "raft">>
+				<<if $island.raft gte 100>> <span class="green">뗏목</span><<else>><span class="red">뗏목 없음</span><</if>>: 섬에서 빠져나가게 해 줍니다.
+				<br>
+				<<if $island.raft gte 100>>
+					<<link [[뗏목을 타고 마을로 돌아간다 (1:00)|Island Sail]]>><<island_pass 60>><</link>>
+				<<else>>
+					<<if $island.wood gte 5>>
+						<<link [[만든다 (3:00)|Island Build Raft]]>><<island_pass 180>><<set $island.raft += 10>><<set $island.wood -= 5>><</link>> <<wood_required 5>>
+					<<else>>
+						<span class="black">나무가 더 필요하다.</span> <<wood_required 5>>
+					<</if>>
+				<</if>>
+			<<default>>
+				<span class="red">다음의 올바르지 않은 옵션: _args[0]</span>
+		<</switch>>
+		<<if $_build and _islandUpgrades[_args[0]].passage>>
+			<<if currentSkillValue('housekeeping') lt _islandUpgrades[_args[0]].housekeeping>>
+				<br>
+				<span class="black">
+					<<skilllettergrade _islandUpgrades[_args[0]].housekeeping>> 가사 스킬이 필요하다.
+				</span>
+				<<set $_disableBuild to true>>
+			<</if>>
+			<<if !$island[$island.home][_args[0]] and $island[$island.home].space lte 0>>
+				<br>
+				<span class="black">더 많은 공간이 필요하다.</span>
+				<<set $_disableBuild to true>>
+			<</if>>
+			<<if _islandUpgrades[_args[0]].woodUsed and _islandUpgrades[_args[0]].woodUsed gt $island.wood>>
+				<br>
+				<span class="black">나무가 더 필요하다.</span> <<wood_required _islandUpgrades[_args[0]].woodUsed>>
+				<<set $_disableBuild to true>>
+			<</if>>
+			<<if _islandUpgrades[_args[0]].timeTaken>>
+				<<set _hours to Math.floor(_islandUpgrades[_args[0]].timeTaken / 60)>>
+				<<set _minutes to _islandUpgrades[_args[0]].timeTaken % 60>>
+				<<set _timeString to " (" +_hours+":"+(_minutes lt 10 ? "0": "")+_minutes+")">>
+			<<else>>
+				<<set _timeString to "">>
+			<</if>>
+			<<if $_disableBuild>>
+			<<elseif !$island[$island.home][_args[0]]>>
+				<br>
+				<<link [["만든다" + _timeString|_islandUpgrades[_args[0]].passage]]>>
+					<<set $island[$island.home].space -= 1>>
+					<<set $island[$island.home][_args[0]] to "simple">>
+					<<if _islandUpgrades[_args[0]].timeTaken>><<island_pass `_islandUpgrades[_args[0]].timeTaken`>><</if>>
+					<<if _islandUpgrades[_args[0]].woodUsed>><<set $island.wood -= _islandUpgrades[_args[0]].woodUsed>><</if>>
+				<</link>>
+				<<if _islandUpgrades[_args[0]].woodUsed>><<wood_required _islandUpgrades[_args[0]].woodUsed>><</if>>
+				| 공간 필요함
+			<<else>>
+				<br>
+				<<link [["확장한다" + _timeString|_islandUpgrades[_args[0]].passage]]>>
+					<<switch $island[$island.home][_args[0]]>>
+						<<case "simple">><<set $island[$island.home][_args[0]] to "basic">>
+						<<case "basic">><<set $island[$island.home][_args[0]] to "advanced">>
+					<</switch>>
+					<<if _islandUpgrades[_args[0]].timeTaken>><<island_pass `_islandUpgrades[_args[0]].timeTaken`>><</if>>
+					<<if _islandUpgrades[_args[0]].woodUsed>><<set $island.wood -= _islandUpgrades[_args[0]].woodUsed>><</if>>
+				<</link>>
+				<<if _islandUpgrades[_args[0]].woodUsed>><<wood_required _islandUpgrades[_args[0]].woodUsed>><</if>>
+			<</if>>
+		<</if>>
+		<<if $island[$island.home][_args[0]]>>
+			<br>
+			<<link [[부순다 (1:00)|Island Build]]>><<island_pass 60>><<set $island[$island.home][_args[0]] to undefined>><<set $island[$island.home].space += 1>><</link>>
+		<</if>>
+	</div>
+<</widget>>

@@ -1,0 +1,215 @@
+:: Widgets Debug Event [widget]
+<!-- Any widget with the goal to bug-purge events goes here.
+	Since I didn't find an appropriate file to put this in, I decided to make my own.
+	Feel free to delete this comment at leisure. -->
+<<widget "checkEventNPC">>
+	<<if (EventSystem.isSlotTaken(_args[0]) and !EventSystem.Disable) or $enemynomax gte 6 or $enemyno gte 6>>
+		<<set $endeventerror to $lastgenerated>>
+		<<clearsinglenpc _args[0]>>
+		<!-- <<endevent phaseless>> -->
+	<</if>>
+	<<set $lastgenerated to $passage>>
+<</widget>>
+
+<<widget "eventExtraInfo">>
+	<!-- Setup useful variables -->
+	<<set $_passages = V.event is undefined
+		? []
+		: V.event.buffer.reduce((prev, cur) => {
+			prev.pushUnique(cur.area[0]);
+			return prev;
+		}, [])
+	>>
+
+	<h3>지역 정보</h3>
+
+	<br>
+	패시지: $_passages
+	<br>
+
+	<<if _eventAlertMajorArea is true>>
+		<span class="red">당신은 주요 지역에 있습니다. 즉 NPC가 탈출했습니다!</span>
+		<<if $cheatsEnabled is true>>
+			방금 치트를 사용했다면 이 메시지를 무시하세요. 그렇지 않다면, <span class="red">이것을 제보해 주세요!</span>
+		<<else>>
+			<span class="red">이것을 제보해 주세요!</span>
+		<</if>>
+		<<set _eventreason to true>>
+	<<elseif !_eventAlertMajorArea>>
+		<span class="green">이 NPC는 이 패시지에서 정의되었습니다.</span>
+		<<set _eventreason to true>>
+	<<else>>
+		<<if $passage.includes("Street Stalk")>>
+			<span class="green">당신은 스토킹당하고 있습니다. 대개 모든 것이 정상적으로 작동하고 있다는 뜻입니다.</span>
+			<<set _eventreason to true>>
+		<</if>>
+		<<if $event isnot undefined>>
+			<<if $_passages.includes($passage)>>
+				<span class="green">당신은 NPC가 생성된 패시지에 있습니다.</span>
+				<<set _eventreason to true>>
+			<<elseif $passage.includes($_passages)>>
+				<span class="green">당신은 NPC가 생성된 서브패시지에 있습니다. 대개 이들이 아직 사용 중이라는 뜻입니다.</span>
+				<<set _eventreason to true>>
+			<</if>>
+		<<else>>
+			<span class="yellow">당신은 이벤트 중이 아닙니다.</span>
+		<</if>>
+	<</if>>
+	<<if !_eventreason>>
+		<span class="yellow">어느 시점에서 생성된 NPC가 정리되지 않았을 수 있습니다. 해당 NPC는 여전히 사용 중일 수 있습니다. 활성화되지 않아야 한다고 생각된다면 제보해 주세요. 제보해야 할지 확신이 서지 않는다면 주요 지역(예: 거리/골목/야외)으로 가서 다시 확인하세요.</span>
+	<</if>>
+	<br><br>
+	<h3>NPC 정보</h3>
+	<br>
+	$enemyno 명의 NPC<<if $enemyno gt 1>>들이<<else>>【이가】<</if>> 현재 활성화되어 있습니다. 최대: $enemynomax. 해당 내역:<br><br>
+
+	<div class="debug-event-container">
+	<<for $_i to 0; $_i lt $NPCList.length; $_i++>>
+		<<set $_npc to $NPCList[$_i]>>
+		<<set $_eventNPC to EventSystem.get($_i)>>
+		<<if $_npc.type isnot undefined and $_eventNPC isnot undefined>>
+			<<set $_time to new DateTime($_eventNPC.time + V.startDate)>>
+			<div class="debug-event-item debug-event-success">
+				ID: $_i | $_npc.fullDescription<br>
+				생물학적 성: $_npc.gender | 젠더: <<print KR.getPronounKr("man", $_npc.pronouns.man)>><br>
+				설명: $_npc.description<<if $_npc.role>> | 역할: $_npc.role<</if>><br>
+				출처: <<print $_eventNPC.area[0]>>, 시각: <<ampm $_time.getHours() $_time.getMinutes()>>.<br>
+			</div>
+		<<else>>
+			<div class="debug-event-item debug-event-empty">
+				NPC 번호: $_i
+			</div>
+		<</if>>
+	<</for>>
+	</div>
+
+	<<if $event isnot undefined>>
+		<br>추가 디버깅:<br>
+		<<for $_i to 0; $_i lt $event.buffer.length; $_i++>>
+			<<set $_eventNPC to $event.buffer[$_i]>>
+			<<set $_time to new DateTime($_eventNPC.time + V.startDate)>>
+			<<print ($NPCList[$_eventNPC.slot] || {}).fullDescription || "설명 없음.">><br>
+			패시지 <<print $_eventNPC.area[0]>>에서 <<ampm $_time.getHours() $_time.getMinutes()>>에 정의됨.<br>
+			<<if $_eventNPC.area.length gt 1>>
+				위젯 스택:
+				<<set $_widgetStack to $_eventNPC.area.slice(1)>>
+				<<for $_iStack = 0; $_iStack lt $_widgetStack.length; $_iStack++>>
+					<<print "<<$_widgetStack[$_iStack]>>">><<if $_iStack isnot $_widgetStack.length - 1>>, <</if>>
+				<</for>>
+				<br>
+			<</if>>
+			<!-- Check other event NPCs for linked passages -->
+			<<for $_j to 0; $_j lt $event.buffer.length; $_j++>>
+				<<set $_eventNPC2 to $event.buffer[$_j]>>
+				<<if $_i isnot $_j and $_eventNPC.area[0] is $_eventNPC2.area[0]>>
+					<<if _eventnumberinpassage is undefined>>
+						<<set _eventnumberinpassage to 0>>
+					<</if>>
+					<<set _eventnumberinpassage += 1>>
+				<</if>>
+			<</for>>
+			<!-- Check other event NPCs for linked passages -->
+			<<if _eventnumberinpassage isnot undefined>>
+				<<print _eventnumberinpassage>> 명의 다른 NPC<<if _eventnumberinpassage isnot 1>>들<</if>>도 패시지 <<print $_eventNPC.area[0]>>에서 정의되었습니다.<br>
+				<<unset _eventnumberinpassage>>
+			<</if>>
+			$$NPCList의 슬롯 <<print $_eventNPC.slot>>에 설정됨.<br>
+			<<for $_j to 0; $_j lt $event.buffer.length; $_j++>>
+				<<if $_i isnot $_j and $_eventNPC.slot is $_eventNPC.slot[$_j]>>
+					<span class="red">이 NPC는 슬롯 <<print $event.slot[$_eventNPC.slot]>>에서 덮어씌워졌거나 다른 NPC를 덮어씌웠습니다!</span><br>
+					<<break>>
+				<</if>>
+			<</for>>
+			<br>
+		<</for>>
+		페이즈: $phase
+	<</if>>
+<</widget>>
+
+:: Foodstuff Prop Debug
+<div class="gold">Foodstuff prop tester</div>
+<<set _foodstuffKeys to Object.keys(setup.foodstuff)>>
+<<set _foodstuffKeys.sort()>>
+
+<table class="customisable_table">
+	<thead>
+		<tr>
+			<th>Icon</th>
+			<th>Foodstuff</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<<for _i to 0; _i lt _foodstuffKeys.length; _i++>>
+			<<set _foodstuffKey to _foodstuffKeys[_i]>>
+			<<set _foodstuff to setup.foodstuff[_foodstuffKey]>>
+			<tr>
+				<td>
+					<<foodstufficon _foodstuffKey>>
+				</td>
+				<td><<print _foodstuffKey>></td>
+				<td>
+					<<capture _foodstuffKey>>
+						<<button _foodstuffKey>>
+							<<wearProp _foodstuffKey>>
+							<<updatesidebarimg>>
+						<</button>>
+					<</capture>>
+				</td>
+			</tr>
+		<</for>>
+	</tbody>
+</table>
+
+:: Caught Fish Prop Debug
+<div class="gold">Caught fish prop tester</div>
+<<set _fishKeys to Object.keys(setup.fishing.lootTables.fish)>>
+<<set _fishKeys.sort()>>
+
+<table class="customisable_table">
+	<tbody>
+		<<for _i to 0; _i lt _fishKeys.length; _i++>>
+			<<set _fishKey to _fishKeys[_i]>>
+			<tr>
+				<td>
+					<<icon setup.fishing.lootTables.fish[_fishKey].icon>>
+				</td>
+				<td><<print _fishKey>></td>
+				<td>
+					<<capture _fishKey>>
+						<<button _fishKey>>
+							<<set _fishPropName to `caught_${_fishKey}`>>
+								<<wearProp _fishPropName>>
+							<<updatesidebarimg>>
+						<</button>>
+					<</capture>>
+				</td>
+			</tr>
+		<</for>>
+	</tbody>
+</table>
+
+<!-- <<widget "eventAlert">>
+<<if $event[0] is $passage>>
+	<span class="green" style="text-align: center">Event Active</span>
+	<<if $debug is 1>>
+		<<set _eventAlertMajorArea to false>>
+		<span class="rainbow"><<button "More Event Info">>
+			<<overlayReplace "eventExtraInfo">>
+		<</button>></span>
+	<</if>>
+<<elseif ["Orphanage", "Bedroom", "Barb Street", "Cliff Street", "Connudatus Street", "Danube Street", "Domus Street", "Elk Street", "Harvest Street", "High Street", "Mer Street", "Nightingale Street", "Oxford Street", "Starfish Street", "Wolf Street", "Residential Alleyways", "Commercial Alleyways", "Industrial Alleyways", "Park", "Hallways", "Brothel", "Strip Club", "Beach", "Ocean Breeze", "Docks Work", "Residential Drain", "Commercial Drain", "Industrial Drain", "Forest", "Farmland", "Livestock Field", "Forest Wolf Cave", "Wolf Cave", "Wolf Cave Clearing", "Asylum", "Asylum Cell", "Underground Cell"].includes($passage)>>
+	<span class="red" style="text-align: center">Event Active</span>
+	<<set _eventAlertMajorArea to true>>
+	<span class="rainbow"><<button "More Event Info">>
+		<<overlayReplace "eventExtraInfo">>
+	<</button>></span>
+<<elseif ["Forest Cabin", "Eden Cabin", "Eden Clearing"].includes($event[0]) and $event.length is 1>>
+	<span class="green" style="text-align: center">Eden Active</span>
+<<else>>
+	<span class="yellow" style="text-align: center">Event Active</span>
+	<span class="rainbow"><<button "More Event Info">>
+		<<overlayReplace "eventExtraInfo">>
+	<</button>></span>
+<</if>>
+<</widget>> -->

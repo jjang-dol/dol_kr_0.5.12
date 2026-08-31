@@ -1,0 +1,1853 @@
+:: Ambulance rescue
+<<set $outside to 0>><<effects>><<rngWraith 1>>
+
+누군가 당신을 들것에 실어 올리는 것이 느껴지고, 당신은 다시 의식을 잃는다.
+<<if _wraithEvent>>
+	누군가 당신 옆에 서 있는 것을 본 것 같다. 창백하고 아름다운 사람이었다.
+<</if>>
+<br><br>
+
+<<link [[잠자기|Hospital Bed]]>><</link>>
+<br>
+
+:: Widgets Ambulance [widget]
+<<widget "ambulance">>
+	<<if C.npc.Kylar.rage gte 96 and C.npc.Kylar.state is "active" and ["town", "park", "school"].includes($location)>>
+		<<link [[깨어난다|Kylar Basement]]>><<pass 1 hour>><</link>>
+	<<else>>
+		<<link [[깨어난다|Ambulance rescue]]>><<pass 1 hour>><</link>>
+	<</if>>
+<</widget>>
+
+:: Hospital front
+<<set $outside to 1>><<set $location to "hospital">><<effects>>
+
+당신은 병원 앞에 있다. 이곳은 24시간 내내 열려 있다.
+<<if $companion is "Robinrent">>
+	로빈이 당신을 꽉 껴안는다. "구해줘서 고마워." <<nnpc_he "Robin">> 말한다. "난 이제 집에 가야겠어. 좀 쉬어야겠거든."
+	로빈은 당신에게 작별 인사를 하고 집을 향해 걷기 시작한다.
+	<<unset $companion>>
+<</if>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passouthospital>>
+<<else>>
+	<<if $exposed gte 1>>
+		당신은 입구 바로 바깥쪽 덤불에 숨어 있다. 타이밍을 잘 맞추면 들키지 않고 들어갈 수 있을 것이다.
+		<br><br>
+	<</if>>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "hospital">>
+	<</if>>
+
+	<<getinicon>><<link [[병원 안으로 들어가기 (0:01)|Hospital Foyer]]>><<pass 1>><</link>>
+	<br>
+	<<entertownicon>><<link [[나이팅게일 가 (0:01)|Nightingale Street]]>><<pass 1>><</link>>
+	<br>
+<</if>>
+
+:: Hospital Foyer
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+You are inside the hospital foyer. <<if $harper_appointments.enabled>>You see a sign directing to Harper's office. <</if>>
+
+<<if Time.weekDay is 6 and $daily.harperVisit isnot 1 and $harper_appointments.enabled and $trauma gte ($traumamax / 10) * 9>>
+	<span class="red">You can't remember when your appointment was.</span>
+<<elseif Time.weekDay is 6 and $daily.harperVisit isnot 1 and $harper_appointments.enabled>>
+	<span class="blue">You're in time for your appointment.</span>
+<<else>>
+	You don't have an appointment right now.
+<</if>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passouthospital>>
+<<else>>
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "hospital">>
+	<</if>>
+	<<if $exposed gte 1>>
+		You are hiding under a hospital bed, hoping no one spots you in this state of undress. You see a cart full of sheets not far away that you could use to cover yourself. You could wait until the coast looks clear then make a break for it. Alternatively, you could inch the bed closer to the cart to try to remain concealed from view.
+		<br><br>
+
+		<<link [[Make a break for it (0:05)|Hospital Exhibition]]>><<set $phase to 0>><<pass 5>><</link>>
+		<br>
+		<<link [[Slide the bed closer (0:10)|Hospital Exhibition]]>><<set $phase to 1>><<pass 10>><</link>>
+		<br><br>
+	<<else>>
+		<<if isPubfameTaskAccepted("hospital")>>
+			Mickey asked you to steal a hospital keycard for them.
+			<<if Time.hour gte 6 and Time.hour lte 21>>
+				The hospital is open at all times, so it wouldn't be any less busy at night.
+			<<else>>
+				The hospital is open at all times, so it's not any less busy than the daytime.
+			<</if>>
+			<br><br>
+
+			<<icon "access-card.png">><<link [[Approach a receptionist (0:05)|Hospital Keycard Receptionist]]>><<pass 5>><</link>>
+			<br><br>
+		<</if>>
+
+		<<if $harper_appointments.enabled and $daily.harperVisit isnot 1>>
+			<<if $trauma gte ($traumamax / 10) * 9>>
+				<<socialiseicon "ask">><<link [[Ask for an emergency appointment with Doctor Harper|Doctor Harper Emergency]]>><<set $daily.harperVisit to 1>><</link>><<note "If Doctor Harper sees you like this, you fear <<nnpc_he 'Harper'>> may intervene" "red">>
+				<br>
+			<<elseif Time.weekDay is 6>>
+				<<officeicon>><<link [[Doctor Harper's office|Doctor Harper's Office]]>><<set $daily.harperVisit to 1>><</link>>
+				<br>
+			<</if>>
+		<<elseif $schoolPsych and $daily.harperVisit isnot 1>>
+			<<socialiseicon "ask">><<link [[Ask for Doctor Harper|Doctor Harper's Office School]]>><<set $daily.harperVisit to 1>><</link>>
+			<br>
+		<</if>>
+
+		<<pillicon>><<link [[Pharmacy (0:02)|Pharmacy]]>><<pass 2>><</link>>
+		<br><br>
+
+		<<if isPregnancyEnding()>>
+			<<pregnancyicon "player">><<link [[Say that your waters have broken|Pregnancy Birth Hospital]]>><</link>>
+			<br>
+		<</if>>
+		<<if $vaginalchastityparasite isnot 0>>
+			<span class="pink">You feel $vaginalchastityparasite squirming inside your vagina.</span>
+			<br>
+		<</if>>
+
+		<<if C.npc.Alex.pregnancy.sample is true and playerIsPregnant() and !isPregnancyEnding()>>
+			<<procedureicon "paternity">><<link [[Enquire about a paternity test (0:10)|Hospital Paternity Test]]>><<pass 10>><</link>>
+			<br><br>
+		<</if>>
+
+		<<if $penilechastityparasite is 0 and $vaginalchastityparasite is 0 and $analchastityparasite is 0 and $parasite.clit.name is undefined and $parasite.penis.name is undefined and $parasite.nipples.name is undefined and $parasite.tummy.name is undefined and $parasite.bottom.name is undefined and $parasite.left_ear.name is undefined and $parasite.right_ear.name is undefined>>
+		<<else>>
+			<<socialiseicon "ask">><<link [[Enquire about body parasite removal (0:10)|Hospital Parasite]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+		<<if $player.breastsize lt 12>>
+			<<procedureicon "breast enlarge">><<link [[Enquire about breast enlargement (0:10)|Hospital Breast Enlargement]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+		<<if $player.breastsize gt 0>>
+			<<procedureicon "breast reduce">><<link [[Enquire about breast reduction (0:10)|Hospital Breast Reduction]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+		<<if $player.penisExist and $player.penissize lt 6>>
+			<<procedureicon "penis enlarge">><<link [[Enquire about penis enlargement (0:10)|Hospital Penis Enlargement]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+		<<if $player.penisExist and $player.penissize gt 0>>
+			<<procedureicon "penis reduce">><<link [[Enquire about penis reduction (0:10)|Hospital Penis Reduction]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+		<<set _aPregnancy to $sexStats.anus.pregnancy>>
+		<<set _vPregnancy to $sexStats.vagina.pregnancy>>
+		<<if $pregnancyStats.parasiteDoctorEvents is 1>>
+			<<socialiseicon "ask">><<link [[Enquire about movement in your stomach (0:10)|Pregnancy Introduction]]>><<pass 10>><</link>>
+			<br>
+		<</if>>
+		<<if $pregnancyStats.parasiteDoctorEvents is 3 or ((_aPregnancy.motherStatus is 2 or (_vPregnancy.motherStatus is 2 and !$worn.genitals.type.includes("hidden"))) and $pregnancyStats.parasiteDoctorEvents gt 3) or ($pregnancyStats.parasiteBook is 1 and $pregnancyStats.parasiteDoctorEvents gte 2) or $container.portable.value gt 0>>
+			<<if hasSexStat("deviancy", 5)>><<set $pregnancyStats.namesParasitesChild to true>><<else>><<set $pregnancyStats.namesParasitesChild to false>><</if>>
+			<<if $pregnancyStats.namesParasitesChild is true>>
+				<<socialiseicon "ask">><<link [[Enquire about your pregnancy and children (0:10)|Pregnancy Discussion]]>><<pass 10>><</link>>
+				<br>
+			<<else>>
+				<<socialiseicon "ask">><<link [[Enquire about the parasites inside you (0:10)|Pregnancy Discussion]]>><<pass 10>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+		<<set _pregnancy to getPlayerPregnancy()>>
+		<<if playerAwareTheyArePregnant() and !$daily.ultrasoundDone and _pregnancy and between(pregnancyProgress(_pregnancy), 0.1, 1)>>
+			<<socialiseicon "ask">><<link [[Enquire about getting an ultrasound (0:10)|Pregnancy ultrasound]]>>
+				<<pass 10>><<set $daily.ultrasoundDone to true>>
+			<</link>>
+			<br>
+		<</if>>
+		<<for _active_bodypart range setup.bodyparts>>
+			<<if $skin[_active_bodypart].pen is "tattoo">>
+				<<shopicon "tattoo">><<link [[Enquire about tattoo removal (0:10)|Hospital Tattoo Removal]]>><<pass 10>><</link>>
+				<br>
+				<<break>>
+			<</if>>
+		<</for>>
+		<br>
+
+		<<getouticon>><<link [[Go outside (0:01)|Hospital front]]>><<pass 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Abduction Hospital
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<if $phase is 0>>
+	당신은 어두운 방 안, 차갑고 딱딱한 금속 표면 위에서 깨어난다.
+<</if>>
+벽을 따라 희미한 불빛이 켜지며 크고 더러운 방을 비춘다. 천장은 위쪽 어둠 속으로 사라져 보이지 않는다. 한쪽 벽에는 우리들이 줄지어 있고, 그 안에서 수많은 황금빛 눈동자들이 당신을 쳐다보고 있다. 우리 문이 살짝 움직이자, 타이머가 깜빡이며 작동하기 시작한다. "1:00, 0:59, 0:58..." 공포를 억누르며, 당신은 방 반대편에 있는 문으로 향한다. 유일한 출구인 듯하다.
+<br><br>
+
+문을 지나 왼쪽으로 가면 아찔한 낭떠러지가 있다. 아래를 내려다보니 어두운 물이 흐르고 있다. 바닥에서부터 뻗어 나가는 넓은 터널이 어렴풋이 보인다. 오른쪽에는 긴 복도가 있다. 복도 다른 쪽 끝에는 문이 굳게 닫혀 있다. 정면 벽에는 작은 구멍이 있는데, 비집고 들어갈 수 있을지도 모른다.
+<br><br>
+
+<<beastNEWinit 2 wolf>>
+<<if $monster is 1 or $settings.bestialityEnabled>>
+	<<link [[물가로 내려간다 (0:01)|Abduction Hospital Water]]>><<set $molestationstart to 1>><<pass 1>><</link>>
+	<br>
+<</if>>
+<<link [[복도를 따라간다 (0:01)|Abduction Hospital Corridor]]>><<pass 1>><<endevent>><</link>>
+<br>
+<<link [[구멍으로 비집고 들어간다 (0:01)|Abduction Hospital Hole]]>><<pass 1>><<endevent>><</link>>
+<br>
+
+:: Molestation Hospital
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<generate1>><<nurseinit>><<person1>>팔에 날카로운 통증이 느껴진다. 눈을 뜨자 간호사 복장에 의료용 마스크를 쓴 <<person>>【이가】 정체불명의 액체를 주사하고 있다. 거의 즉시 몽롱한 기운이 당신을 덮친다. 움직이기는커녕 생각조차 하기 어렵다. 배 속에서 도착적인 온기가 피어오르기 시작한다.
+	<br>
+<</if>>
+
+<<effects>><<set $outside to 0>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if $alarm is 1>>
+	<<if $rescue is 0>>
+		<<set $alarm to 0>>
+		<br><br>
+		<<if $enemyarousal gte $enemyarousalmax>>
+			<span id="next"><<link [[다음|Hospital Ejaculation]]>><</link>></span><<nexttext>>
+		<<elseif $enemyhealth lte 0>>
+			<span id="next"><<link [[다음|Hospital Escape]]>><</link>></span><<nexttext>>
+		<<else>>
+			<span id="next"><<link [[다음|Molestation Hospital]]>><</link>></span><<nexttext>>
+		<</if>>
+	<</if>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<span id="next"><<link [[다음|Hospital Ejaculation]]>><</link>></span><<nexttext>>
+<<elseif $enemyhealth lte 0>>
+	<span id="next"><<link [[다음|Hospital Escape]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Molestation Hospital]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Hospital Bed
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<set $hunger to 0>><<set $thirst to 0>><<set $tiredness to 0>><<set $hygiene to 0>>
+<<set $stress -= 2000>>
+
+당신은 시립 병원 침대에서 깨어난다.
+
+<<generate1>><<person1>>
+간호사는 당신이 <<= $passoutReason || "심각한 스트레스 반응">>【을를】 겪었지만, 신체적으로는 건강하다고 설명한다. <<He>>【은는】 의사를 데려올 테니 잠시만 기다려 달라고 한다.
+<br><br>
+<<endevent>>
+
+오래 기다릴 필요는 없었다.
+
+<<npc Harper>><<person1>>
+<<if !$harperSeen.includes("hospital")>>
+	흰색 의료용 코트를 입고 클립보드를 든 <<personsimple>>【이가】 들어온다.
+	<br><br>
+
+	<<if $harperSeen.includes("livestock")>>
+		농장에서 본 의사다. 당신에게 실험을 했던 그 사람. <<He>>【은는】 당신을 보고 미소 짓는다. "안녕하세요, 하퍼 의사입니다." <<he>>【이가】 말한다. <<his>> 얼굴에는 당신을 알아본 기색이 없다. <<He>>【은는】 당신의 침대 옆에 앉는다.
+	<<elseif $harperSeen.includes("party")>>
+		에이버리의 파티에서 본 의사다. 분홍색 가루를 가지고 있던 그 사람. <<He>>【은는】 당신을 보고 미소 짓는다. "안녕하세요, 하퍼 의사입니다." <<he>>【이가】 말한다. <<He>>【은는】 순진한 미소를 짓는다. <<He>>【은는】 당신의 침대 옆에 앉는다.
+	<<else>>
+		<<He>>【은는】 당신을 보고 미소 짓는다. "안녕하세요, 하퍼 의사입니다." <<He>>【은는】 당신의 침대 옆에 앉아 <<his>> 금발 앞머리를 눈가에서 치운다. <<He>>【은는】 의사치고는 젊어 보인다. 기껏해야 25살을 넘지 않았을 것이다.
+	<</if>>
+
+	<<set $harperSeen.pushUnique("hospital")>>
+<<else>>
+	하퍼 의사가 늘 들고 다니는 클립보드를 든 채 들어온다. <<He>>【은는】 당장 걱정할 것은 없지만, 당신을 좀 더 자세히 검사하고 싶다고 말한다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hospital Bed Examination]]>><</link>>
+<br><br>
+
+:: Hospital Ejaculation
+<<effects>>
+
+<<He>>【이가】 몸을 긴장시키더니, <<his>> 머리를 뒤로 젖히고 큰 신음을 내지르며 절정에 달한다.
+<br><br>
+
+<<ejaculation>>
+
+<<if $enemyanger gte ($enemyangermax / 5) * 3>>
+	<<He>>【은는】 제복을 바로잡고 방을 나가지만, 나가기 전에 마지막으로 당신의 뺨을 한 대 더 때린다.
+	<<violence 3>>
+	<br><br>
+<<elseif $enemyanger gte 1>>
+	아무 말 없이, <<he>>【은는】 제복을 바로잡고 방을 나간다.
+	<br><br>
+<<else>>
+	미소를 지으며, <<he>>【은는】 당신의 뺨에 키스한다. "이건 당신을 위한 겁니다." <<He>>【은는】 제복을 바로잡고 방을 나간다.
+	<br>
+	<<printmoney 500>>【을를】 얻었습니다.<<money 500 "prostitution">>
+	<br><br>
+<</if>>
+
+<<clotheson>>
+
+<<tearful>> 당신은 침대에서 내려와 비틀거리며 병동으로 나간다.
+<br><br>
+
+<<endcombat>>
+
+<span id="next"><<link [[다음|Recovery ward]]>><</link>></span><<nexttext>>
+
+:: Hospital Escape
+<<effects>>
+
+<<He>>【이가】 고통에 움찔한다. <<tearful>> 당신은 그 기회를 틈타 방 밖으로 뛰쳐나가, 관리용 벽장 안에 몸을 숨긴다.
+<br><br>
+
+<<clotheson>>
+
+<<endcombat>>
+
+<<link [[다음|Hospital cupboard]]>><</link>>
+
+:: Hospital cupboard
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+이 작은 관리용 벽장에는 다양한 청소 도구와 화학 약품이 있다. 문틈으로 엿보니 아무도 없다.
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passouthospital>>
+<<else>>
+	<<link [[벽장을 나간다 (0:01)|Recovery ward]]>><<pass 1>><</link>>
+	<br>
+<</if>>
+
+:: Recovery ward
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+당신은 병원의 회복 병동에 있다. 몇몇 간호사들이 각자 할 일을 하고 있다.
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passouthospital>>
+<<else>>
+	<<if $exposed gte 1>>
+		당신은 병원 침대 밑에 숨어, 이 헐벗은 상태를 아무도 보지 않기를 바라고 있다. 멀지 않은 곳에 시트가 가득 담긴 카트가 보인다. 저걸로 몸을 가릴 수 있을 것이다. 주변이 잠잠해질 때까지 기다렸다가 잽싸게 달려갈 수도 있다. 아니면, 시야에 띄지 않도록 침대를 카트 쪽으로 조금씩 움직일 수도 있다.
+		<br><br>
+
+		<<link [[잽싸게 달려간다 (0:05)|Hospital Exhibition]]>><<set $phase to 0>><<pass 5>><</link>>
+		<br>
+		<<link [[침대를 더 가까이 민다 (0:10)|Hospital Exhibition]]>><<set $phase to 1>><<pass 10>><</link>>
+		<br><br>
+	<<else>>
+		<<link [[병동을 나간다 (0:01)|Hospital Foyer]]>><<pass 1>><</link>>
+		<br>
+
+		<<link [[관리용 벽장 (0:01)|Hospital cupboard]]>><<pass 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Passout hospital
+스스로를 너무 몰아붙였습니다.
+<br><br>
+<<passout>>
+
+<<if dangerEvent()>>
+
+	<<if $rng gte 81>>
+		<<link [[깨어난다|Abduction Hospital]]>><<set $phase to 0>><</link>>
+	<<else>>
+		<<link [[깨어난다|Molestation Hospital]]>><<set $molestationstart to 1>><</link>>
+	<</if>>
+<<else>>
+	<<link [[깨어난다|Hospital Bed]]>><</link>>
+<</if>>
+
+<<pass 1 hour>>
+
+<<trauma 6>><<set $stress -= 2000>>
+
+:: Widgets Passout Hospital [widget]
+<<widget "passouthospital">>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "hospital">>
+	<<else>>
+		<<link [[모든 것이 어둠에 잠긴다...|Passout hospital]]>><</link>>
+	<</if>>
+<</widget>>
+
+:: Hospital Bed Examination
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<if pcAreArmsBound("both")>>
+	<<unbind>>
+<</if>>
+<<if $worn.face.type.includes("gag") or $worn.face.type.includes("blindfold")>>
+	<<set $worn.face.type.push("broken")>>
+	<<faceruined>>
+<</if>>
+<<if $exposed gte 1>>
+	<<if !$worn.upper.type.includes("naked") and !$worn.under_upper.type.includes("naked")>>
+		<<undressmid "wardrobe">>
+	<</if>>
+	<<if $player.sex is "m" and $backgroundTraits.includes("crossdresser")>>
+		<<set $clothingselector to "f">><!-- PCs with Crossdresser trait are only PC type with a specific known clothing preference and can presumably ask for it here -->
+	<<elseif $player.sex is "f" and $backgroundTraits.includes("crossdresser")>>
+		<<set $clothingselector to "m">>
+	<<else>>
+		<<set $clothingselector to $player.gender_appearance>>
+	<</if>>
+	<<if $clothingselector is "m">>
+		<<underlowerwear "briefs">>
+		<<upperwear "t-shirt">>
+		<<lowerwear "shorts">>
+	<<else>>
+		<<upperwear "sundress">>
+		<<underlowerwear "plain panties">>
+	<</if>>
+<</if>>
+
+<<if $passoutReason>>
+	<<He>>【은는】 당신이 $passoutReason【으로로】 쓰러진 이유에 대해 부드럽게 캐묻고, <<= $passoutReason is "hypothermia" ? "심각한 동상" : "열사병">>의 위험성에 대해 설교한다. <<He>>【은는】 자신이 아는 한 모든 것이 괜찮다고 알려주지만, 앞으로는 옷차림에 더 신경 써야 한다고 말한다.
+	<<unset $passoutReason>>
+	<<wash>>
+	간호사가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+	<br><br>
+
+	<<if Weather.dayState is "night">>
+		밖은 어둡다. 아침까지 기다리는 게 좋을지도 모른다.
+		<br><br>
+
+		<<link [[기다린다|Hospital Wait]]>><<pass 10>><<endevent>><</link>><<ltiredness>>
+		<br>
+		<<if $renttime lte 0>>
+			<<link [[지금 떠난다 (0:10)|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif crimeSumCurrent() gte 1000>>
+			<<link [[지금 떠난다 (0:10)|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif $baileyhospital lte 2>>
+			<<link [[지금 떠난다 (0:10)|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<link [[지금 떠난다 (0:10)|Hospital front]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if $renttime lte 0>>
+			<<link [[다음 (0:10)|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif crimeSumCurrent() gte 1000>>
+			<<link [[다음 (0:10)|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif $baileyhospital lte 2>>
+			<<link [[다음 (0:10)|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<link [[다음 (0:10)|Hospital front]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+
+<<elseif $trauma lte ($traumamax / 10) * 2>>
+	<<He>>【은는】 당신의 가정생활, 학교생활, 그리고 당신의 안녕에 관한 다양한 주제에 대해 부드럽게 캐묻는다. <<He>>【은는】 자신이 아는 한 모든 것이 괜찮다고 알려주지만, 앞으로는 조심해야 한다고 말한다.
+	<br><br>
+	<<wash>>
+	간호사가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+	<br><br>
+
+	<<if Weather.dayState is "night">>
+		밖은 어둡다. 아침까지 기다리는 게 좋을지도 모른다.
+		<br><br>
+
+		<<link [[기다린다|Hospital Wait]]>><<pass 10>><<endevent>><</link>><<ltiredness>>
+		<br>
+		<<if $renttime lte 0>>
+			<<link [[지금 떠난다 (0:10)|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif crimeSumCurrent() gte 1000>>
+			<<link [[지금 떠난다 (0:10)|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif $baileyhospital lte 2>>
+			<<link [[지금 떠난다 (0:10)|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<link [[지금 떠난다 (0:10)|Hospital front]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if $renttime lte 0>>
+			<<link [[다음 (0:10)|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif crimeSumCurrent() gte 1000>>
+			<<link [[다음 (0:10)|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif $baileyhospital lte 2>>
+			<<link [[다음 (0:10)|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<link [[다음 (0:10)|Hospital front]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<<elseif $trauma lt ($traumamax / 10) * 9>>
+	<<He>>【은는】 당신의 가정생활, 학교생활, 그리고 당신의 안녕에 관한 다양한 주제에 대해 부드럽게 캐묻는다. 잠시 후, <<he>>【은는】 간호사를 부르고 방구석에서 잠시 대화를 나눈다. 그들은 조용히 이야기하고, 잠시 후 간호사는 고개를 끄덕이고 방을 나간다.
+	<br><br>
+
+	<<if !$harper_appointments.enabled>>
+		<span class="gold">의사는 당신에게 <span class="gold">금요일</span>마다 여기 병원으로 <<him>>【을를】 찾아오라고 말한다 치료를 받으라고.</span>
+		<br><br>
+		<<set $harper_appointments.enabled to true>><<unset $schoolPsych>>
+		<<wash>>
+		간호사가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+		<br><br>
+	<<else>>
+		의사는 당신에게 <span class="gold">금요일</span>마다 여기 병원으로 <<him>>【을를】 찾아오라고 상기시킨다.
+		<br><br>
+		<<wash>>
+		간호사가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+		<br><br>
+	<</if>>
+
+	<<if Weather.dayState is "night">>
+		밖은 어둡다. 아침까지 기다리는 게 좋을지도 모른다.
+		<br><br>
+
+		<<link [[기다린다|Hospital Wait]]>><<pass 10>><<endevent>><</link>><<ltiredness>>
+		<br>
+
+		<<if $renttime lte 0>>
+			<<link [[지금 떠난다 (0:10)|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif crimeSumCurrent() gte 1000>>
+			<<link [[지금 떠난다 (0:10)|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif $baileyhospital lte 2>>
+			<<link [[지금 떠난다 (0:10)|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+		<br>
+		<<else>>
+			<<link [[지금 떠난다 (0:10)|Hospital front]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<if $renttime lte 0>>
+			<<link [[다음 (0:10)|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif crimeSumCurrent() gte 1000>>
+			<<link [[다음 (0:10)|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<elseif $baileyhospital lte 2>>
+			<<link [[다음 (0:10)|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<<else>>
+			<<link [[다음 (0:10)|Hospital front]]>><<pass 10>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+<<else>>
+	<<set $asylum to 1>><<set $harper_appointments.enabled to true>><<unset $schoolPsych>>
+	<<He>>【은는】 당신의 가정생활, 학교생활, 그리고 당신의 안녕에 관한 다양한 주제에 대해 부드럽게 캐묻는다. <<his>> 얼굴에 걱정스러운 표정이 떠오르지만, 당신은 이유를 알 수 없다. 잠시 후, <<he>>【은는】 간호사를 방으로 부르고 잠시 조용히 대화를 나눈다. 간호사는 걱정스러운 표정으로 당신을 계속 힐끗 쳐다본다.
+	<br><br>
+
+	간호사가 당신을 의사와 단둘이 남겨두고 떠나자, 의사가 당신의 얼굴에 천을 갖다 댄다. 당신은 안개에 휩싸인다. "다 괜찮아질 거야." 안개 속에서 <<his>> 목소리가 들린다. 흐릿한 두 형체가 방으로 들어온다. 그들은 당신이 일어서는 것을 돕고, 양쪽 어깨에 팔을 두른 채 침대에서 멀리 안내한다. 하퍼 의사가 바로 뒤따른다.
+	<br><br>
+
+	복도로 나오자 또 다른 형체가 당신을 향해 걸어온다. 하퍼가 그들의 길을 막는다. 그 형체는 베일리의 목소리로 알아들을 수 없는 무언가를 외친다. 당신 옆의 두 사람은 멈추지 않는다. 그들은 당신을 밖으로 이끌어 대기 중인 밴의 뒷좌석으로 데려간다. 안에는 간이침대가 있다. 마지막 의식이 사라질 때, 그들이 당신을 그 위로 밀어붙인다.
+	<br><br>
+	<<endevent>>
+	<<badEndTracking "Asylum" { reason: "asylumHospital" }>>
+	<<link [[다음|Asylum Intro]]>><<pass 120>><</link>>
+	<br>
+<</if>>
+
+:: Hospital Exhibition
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<if $phase is 0>>
+	주변 사람들의 수가 줄어들기를 기다린다. 곧 당신은 거의 혼자가 된다. 복도 저편 끝에 아직 사람들이 있지만, 당신에게서 등을 돌리고 있다. 이보다 더 좋은 기회는 없을 것이다. 마음을 다잡고, 침대 밑에서 나와 수건을 향해 달려간다.
+	<br><br>
+	<<if random(1, 3) is 3>>
+	침대의 안전한 공간을 채 벗어나기도 전에 복도 양쪽의 문이 동시에 열린다. 순식간에 텅 비었던 공간이 사람들로 가득 찬다. 그들은 즉시 당신을 발견하고 다양한 반응을 보인다. 어떤 이들은 불쾌한 표정을 짓고, 어떤 이들은 웃음을 터뜨리며, 또 다른 이들은 음탕한 눈으로 당신을 쳐다본다. 숨을 곳은 없다. 당신은 얼마 남지 않은 존엄성을 지키기 위해 웅크리는 것 외에는 할 수 있는 게 없다. 다른 선택지가 보이지 않아, 원래 계획을 계속 진행한다. 사람들이 휴대폰으로 이 광경을 촬영하기 시작하기 전에 간신히 몸을 가린다. 얼굴이 붉어지고 머리가 어질어질한 채로, 당신은 현장을 벗어난다.
+	<<garousal>><<arousal 600>><<gtrauma>><<trauma 6>><<gstress>><<stress 6>>
+	<br><br>
+
+		<<link [[다음|Hospital Foyer]]>><<endevent>><<towelup>><</link>>
+		<br>
+	<<else>>
+		아무 일 없이 카트에 도착한다. 그 옆에 웅크리고 앉아, 근처 문을 주시하며 수건을 챙긴다. 여전히 노출된 느낌이지만, 적어도 이제는 몸을 가렸다. 원치 않는 관심을 끌기 전에 가능한 한 빨리 더 적절한 것을 찾아야 한다.
+		<br><br>
+
+		<<link [[다음|Hospital Foyer]]>><<endevent>><<towelup>><</link>>
+		<br>
+	<</if>>
+<<elseif $phase is 1>>
+
+	당신은 천천히 침대를 앞으로 민다. 아무도 눈치채지 못할 만큼 충분히 느리게 움직이길 바란다. 침대 밑에서 엿보니 수건이 점점 가까워지는 것이 보인다.
+	<br><br>
+	<<if random(1, 5) is 5>>
+		거의 다다랐을 때 침대가 갑자기 덜컹거리며 움직인다. 당신은 침대 밑바닥에 매달린 채 수건에서 점점 더 멀리 밀려나, 문 한 세트를 지나고, 또 다른 문을 지나, 경사로 아래로 내려간다.
+		<br><br>
+
+		금속이 삐걱거리는 소리가 들리더니, 당신과 침대는 가파른 경사로 아래로 밀쳐진다. 잠시 후 당신은 세차게 흐르는 물속으로 떨어진다.
+		<br><br>
+
+		<<link [[다음|Drain Water]]>><<endevent>><<set $bus to "commercialdrain">><</link>>
+	<<else>>
+		팔이 닿는 거리에 이르자, 당신은 팔을 뻗어 수건 한 줌을 간신히 손에 넣는다. 침대 밑에 계속 머무른 채 어색하게 몸을 가린다. 여전히 노출된 느낌이지만, 적어도 이제는 몸을 가렸다. 원치 않는 관심을 끌기 전에 가능한 한 빨리 더 적절한 것을 찾아야 한다.
+		<br><br>
+
+		<<link [[다음|Hospital Foyer]]>><<endevent>><<towelup>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Hospital Rent
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<set $bus to "hospital">>
+
+텅 빈 복도를 걸어가는데 옆에 있는 문이 열리고 한 쌍의 팔이 당신을 안으로 끌어들인다. <span class="red">베일리다.</span>
+육중한 문이 쾅 닫힌다. 당신은 어둠 속으로 이어지는 계단 꼭대기에 서 있다.
+<br><br>
+<<run statusCheck("Robin")>>
+<<if $robinfirstrentfight and ($baileypaychain lt 2 or $renttime lte -1) and ["orphanage","bath","sleep"].includes(_robin_location)>>
+	<<rentduerobin 0>>
+<<else>>
+	<<rentdue 0>>
+<</if>>
+
+:: Rent Hospital Fight
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	"내가 두들겨 패서라도 알아낼 줄 알아?" 베일리가 말한다.
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Rent Hospital Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Rent Hospital Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Rent Hospital Fight Robin
+<<set _robin to statusCheck("Robin")>>
+<<if $fightstart is 1>>
+	<<if $baileydefeatedchain gte 3>>
+		<<set $enemyno to 3>>
+		<<set $enemynomax to 3>>
+	<<elseif $baileydefeatedchain gte 1>>
+		<<set $enemyno to 2>>
+		<<set $enemynomax to 2>>
+	<<else>>
+		<<set $enemyno to 1>>
+		<<set $enemynomax to 1>>
+	<</if>>
+	<<set $fightstart to 0>>
+
+	<<neutral 1>>
+
+	<<maninit>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	"너희 중 하나가 다른 놈 좀 붙잡아 놔." 베일리가 말한다.
+	<<personselect $enemynomax>><<person>>【이가】 고개를 끄덕이고 로빈을 붙잡는 동안, 베일리는 <<person1>><<his>> 시선을 다시 당신에게로 돌린다.
+	<br><br>
+
+	<<set $phase to 1>>
+	<<if _robin.dom gte 80>>
+		<<set $timer to 4>>
+	<<elseif _robin.dom gte 60>>
+		<<set $timer to 3>>
+	<<elseif _robin.dom gte 40>>
+		<<set $timer to 2>>
+	<<else>>
+		<<set $timer to 1>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+
+<<personselect $enemynomax>>
+<<if $timer gt 1>>
+	<span class="green">
+	<<if $rng gte 81>>
+		로빈이 <<nnpc_his "Robin">> 속박 속에서 몸부림친다.
+	<<elseif $rng gte 61>>
+		로빈이 포기하지 말라고 말한다.
+	<<elseif $rng gte 41>>
+		로빈이 <<persons>> 발뒤꿈치를 차고 있다.
+	<<elseif $rng gte 21>>
+		로빈이 <<nnpc_him "Robin">>에 대해 걱정하지 말라고 말한다.
+	<<else>>
+		로빈이 <<nnpc_him "Robin">>【을를】 잡고 있는 <<persons>> 손을 문다.
+	<</if>></span>
+<<elseif $timer is 1>>
+	<<person>>【이가】 로빈의 목에 <<his>> 팔을 감는다. <span class="red">로빈이 고통에 찬 비명을 지른다.</span>
+<<else>>
+	<span class="red">
+	<<if $rng gte 81>>
+		<<person>>【이가】 로빈의 목을 조르고 있다.
+	<<elseif $rng gte 61>>
+		로빈이 숨 막혀 하는 소리가 들린다.
+	<<elseif $rng gte 41>>
+		<<person>>【이가】 <<nnpc_him "Robin">> 목을 조르면서 로빈의 눈에 침을 뱉는다.
+	<<elseif $rng gte 21>>
+		로빈이 항복하려 하지만, <<person>>【은는】 힘을 풀지 않는다.
+	<<else>>
+		<<person>>【이가】 <<nnpc_him "Robin">> 목을 조르면서 로빈을 주먹으로 친다.
+	<</if>>
+	</span>
+	<<npcincr Robin trauma 2>><<grtrauma true>>
+<</if>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Rent Hospital Robin Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Rent Hospital Fight Robin]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Rent Hospital Fight Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">><<set $baileydefeatedlewd += 1>><<set $baileydefeatedchain += 1>><<earnFeat "Bailey's Trouble Maker">>
+
+	<<He>>【이가】 난간을 붙잡는다. 절정이 <<his>> 몸을 뒤흔든다. 병원 안으로 다시 도망칠 절호의 기회다. 이걸로 끝은 아니겠지만, 일단은 위기에서 벗어났다.
+	<<ltrauma>><<lstress>><<trauma -6>><<stress -12>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<if crimeSumCurrent() gte 1000>>
+		<<link [[다음|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Hospital front]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+	<<set $baileydefeated += 1>><<set $baileydefeatedchain += 1>>
+
+	<<He>>【이가】 발을 헛디뎌 계단 아래로 굴러떨어지며, 넘어지는 동안 욕설을 외친다. 당신은 지체 없이 병원 안으로 다시 도망친다. 이걸로 끝은 아니겠지만, 일단은 위기에서 벗어났다.
+	<<ltrauma>><<lstress>><<trauma -6>><<stress -12>>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<if crimeSumCurrent() gte 1000>>
+		<<link [[다음|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Hospital front]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<set $baileydefeatedchain to 0>>
+	<<set $baileyRefusedToPay to 0>>
+	<<unset $bailey_encroach>>
+
+	당신은 땅에 쓰러져, 너무 다쳐서 움직일 수 없다.
+	<br><br>
+
+	<<set $upperoff to 0>>
+	<<set $loweroff to 0>>
+	<<set $underloweroff to 0>>
+	<<set $underupperoff to 0>>
+	<<endcombat>>
+
+	<<link [[다음|Rent Intro]]>><</link>>
+<</if>>
+
+:: Rent Hospital Robin Fight Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">><<set $baileydefeatedlewd += 1>><<set $baileydefeatedchain += 1>><<earnFeat "Bailey's Trouble Maker">>
+
+	<<He>>【이가】 난간을 붙잡는다. 절정이 <<his>> 몸을 뒤흔든다. 로빈을 붙잡고 병원 안으로 다시 도망칠 절호의 기회다.
+	이걸로 끝은 아니겠지만, 일단은 위기에서 벗어났다.
+	<<ltrauma>><<lstress>><<trauma -6>><<stress -12>>
+	<<set $companion to "Robinrent">>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<if crimeSumCurrent() gte 1000>>
+		<<link [[다음|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Hospital front]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $enemyhealth lte 0>>
+	<<set $baileydefeated += 1>><<set $baileydefeatedchain += 1>>
+
+	<<He>>【이가】 발을 헛디뎌 계단 아래로 굴러떨어지며, 넘어지는 동안 욕설을 외친다. 당신은 지체 없이 로빈을 붙잡고 병원 안으로 다시 도망친다.
+	이걸로 끝은 아니겠지만, 일단은 위기에서 벗어났다.
+	<<ltrauma>><<lstress>><<trauma -6>><<stress -12>>
+	<<set $companion to "Robinrent">>
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+
+	<<if crimeSumCurrent() gte 1000>>
+		<<link [[다음|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Hospital front]]>><<pass 10>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<set $baileydefeatedchain to 0>>
+	<<set $baileyRefusedToPay to 0>>
+	<<unset $bailey_encroach>>
+
+	당신은 땅에 쓰러진다. 너무 다쳐서 움직일 수 없다.
+	로빈이 버둥거리는 소리가 들리더니, 베일리가 <<nnpc_him "Robin">> 머리를 세게 내리치자 <<nnpc_he "Robin">>【이】도 땅에 쓰러진다.
+	<br><br>
+
+	<<set $upperoff to 0>>
+	<<set $loweroff to 0>>
+	<<set $underloweroff to 0>>
+	<<set $underupperoff to 0>>
+	<<endcombat>>
+
+	<<link [[다음|Rent Intro]]>><<set $phase to 1>><</link>>
+<</if>>
+
+:: Hospital Journey Home
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<if $baileyhospital gte 2>>
+	<<set $baileyhospital += 1>>
+
+	<<npc Bailey>><<person1>>베일리가 <<his>> 차 옆에서 당신을 기다리고 있다. "이렇게 널 데리러 오는 건 이번이 마지막이야. 이미 시간 낭비를 충분히 했어." 집으로 가는 길은 별일 없었다.
+	<br><br>
+<<elseif $baileyhospital gte 1>>
+	<<set $baileyhospital += 1>>
+
+	<<npc Bailey>><<person1>>베일리가 <<his>> 차 옆에서 당신을 기다리고 있다. "더 조심해야 해. 다음번엔 이렇게 운이 좋지 않을 수도 있어." 집으로 가는 길은 별일 없었다.
+	<br><br>
+<<else>>
+	<<set $baileyhospital to 1>>
+
+	<<npc Bailey>><<person1>>베일리가 <<his>> 차 옆에서 당신을 기다리고 있다. "네가 무사해서 다행이야." <<he>>【이가】 말한다. "너희 같은 멍청이 하나가 실종되면 처리해야 할 서류 작업이 얼마나 많은지 모를 거야. 타." 집으로 가는 길은 별일 없었다.
+	<br><br>
+<</if>>
+
+<<link [[다음 (0:10)|Orphanage]]>><<endevent>><<pass 10>><</link>>
+<br>
+
+:: Hospital Wait
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<set _autosavehere to true>>
+<<set _hour to clone(Time.hour)>>
+<<for _i to 0; _i lt 12; _i++>>
+	<<set _hour++>>
+	<<if _hour % 24 gte 6 and _hour % 24 lte 9>>
+		<<set _multi to _hour - Time.hour>>
+		<<pass `1 * _multi` hour>><<tiredness `-12 * _multi`>><<effects>>
+		<<break>>
+	<</if>>
+<</for>>
+
+간호사는 해가 뜰 때까지 당신이 대기실에 머물도록 해준다.
+<br><br>
+
+<<if $renttime lte 0>>
+	<<link [[다음|Hospital Rent]]>><<pass 10>><<endevent>><</link>>
+	<br>
+<<elseif crimeSumCurrent() gte 1000>>
+	<<link [[다음|Hospital Arrest]]>><<pass 10>><<endevent>><</link>>
+	<br>
+<<elseif $baileyhospital lte 2>>
+	<<link [[다음|Hospital Journey Home]]>><<pass 10>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Hospital front]]>><<pass 10>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Hospital Paternity Test
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<generate1>><<person1>>
+접수원이 <<his>> 컴퓨터에 무언가를 입력하고는 대기실에 앉아 있으라고 지시한다.
+<br><br>
+<<endevent>>
+
+<<harper_intro>>
+
+"이건 아주 간단한 절차입니다. 당신과 가능한 아버지의 DNA 샘플만 있으면 됩니다. 다만 시간이 좀 걸릴 겁니다." <<he>>【이가】 말한다.
+<br><br>
+
+"비용은 <<printmoney 500000>>입니다."
+<br><br>
+
+<<if $money gte 5000>>
+
+	<<procedureicon "paternity">>
+
+	<<if C.npc.Alex.pregnancy.sample is true>>
+		<<link [[알렉스에 대해 검사 (1:00)|Hospital Paternity Test 2]]>><<money -500000 "hospitalPaternityTest">><<set $paternityTestNPC to "Alex">><</link>>
+		<br>
+
+	<</if>>
+
+<<else>>
+	<span class="blue">돈이 부족하다.</span>
+	<br>
+
+<</if>>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Paternity Test 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<upperstrip>>
+<<lowerstrip>>
+<<underlowerstrip>>
+<<underupperstrip>>
+
+하퍼는 돈과 알렉스의 머리카락 한 가닥을 받는다. "옷을 벗어주세요." <<he>>【이가】 방을 나가려고 일어서며 말한다.
+<br>
+
+당신은 옷을 벗고 기다린다. 약간 노출된 기분이다.
+<<if playerChastity()>>$worn.genitals.name【을를】 벗을 수 없다. 문제가 되지 않기를 바란다.<</if>>
+<<He>>【이가】 곧 의료용 가운을 들고 돌아온다.
+<br><br>
+
+"이걸 입으세요." <<He>>【이가】 지시한다. 당신은 가운을 입는다. "좋습니다, 저를 따라오시죠. 바로 근처입니다."
+<br><br>
+
+<<He>>【은는】 당신을 작은 침대가 있는 다른 방으로 안내한다. "누워주세요. 마취한 다음 수술실로 옮기겠습니다."
+<br><br>
+
+당신은 눕는다. <<He>>【이가】 당신의 얼굴에 마스크를 누르자, 의식이 흐려지기 시작한다. 당신이 정신을 잃는 동안 <<he>>【은는】 <<his>> 주머니에서 카메라를 꺼낸다.
+<br><br>
+
+<<fameexhibitionism 10 "pic">>
+
+<<link [[다음|Hospital Paternity Test Done]]>><</link>>
+
+:: Hospital Paternity Test Done
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<set _pregnancy to getPlayerPregnancy()>>
+
+You awaken in the same room you passed out in. You don't feel any different.
+<br><br>
+
+Harper enters the room. "The test was a success," <<he>> says as <<he>> hands you the results.
+<br><br>
+
+You look at the slip of paper. You are the mother,
+
+<<if $paternityTestNPC is "Alex">>
+	<<run delete C.npc.Alex.pregnancy.sample>>
+
+	<<if _pregnancy.donor is "Alex">>
+		<<set _pregnancy.possibleDonors to [{name: "Alex", species: _pregnancy.donorSpecies}]>><<run setKnowsDonor(_pregnancy.pregnancyId, "pc")>>
+		<<set C.npc.Alex.pregnancy.test to true>>
+		<span class="lewd">and Alex is the father.</span>
+
+	<<else>>
+		<<set _pregnancy.possibleDonors to _pregnancy.possibleDonors.filter(donor => donor.name isnot $paternityTestNPC)>><<run resolvePaternity(_pregnancy.pregnancyId)>>
+		<span class="red">but Alex is not the father</span>.
+
+	<</if>>
+
+<</if>>
+
+The rest of the document is incomprehensible to you.
+<br><br>
+
+<<He>> checks <<his>> clipboard. "You can leave straight away. Be well." <<He>> leaves you to dress.
+<br><br>
+
+<<endevent>>
+
+<<link [[Next|Hospital Foyer]]>><<clotheson>><<unset $paternityTestNPC>><</link>>
+<br>
+
+
+:: Hospital Breast Reduction
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<generate1>><<person1>>
+접수원이 <<his>> 컴퓨터에 무언가를 입력하고는 대기실에 앉아 있으라고 지시한다.
+<br><br>
+<<endevent>>
+
+<<harper_intro>>
+
+"이건 간단한 절차입니다." <<He>>【은는】 <<his>> 책상에서 가슴 크기 도표를 꺼낸다. "당신은 이 정도군요." <<He>>【은는】 라벨이 붙은 그림을 가리킨다.
+	<<if $player.breastsize is 0>>
+		"<span class="lewd">납작</span>".
+	<<else>>
+		"<span class="lewd"><<breastsizedesc>> 가슴</span>".
+	<</if>>
+<br><br>
+
+"가슴을 한 사이즈 줄이는 데 £2000가 들고, 그 이상부터는 사이즈당 £2000가 추가됩니다."
+<br><br>
+
+<<if $player.breastsize gte 12>>
+	<<set _breast12 to Math.round(($player.breastsize - 11) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 거대하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 11>><</link>> | <<printmoney _breast12>> <!-- Appears even with blind stats enabled. All are intentional -->
+	<br>
+<</if>>
+<<if $player.breastsize gte 11>>
+	<<set _breast11 to Math.round(($player.breastsize - 10) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 크게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 10>><</link>> | <<printmoney _breast11>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 10>>
+	<<set _breast10 to Math.round(($player.breastsize - 9) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 육중하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 9>><</link>> | <<printmoney _breast10>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 9>>
+	<<set _breast9 to Math.round(($player.breastsize - 8) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 풍만하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 8>><</link>> | <<printmoney _breast9>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 8>>
+	<<set _breast8 to Math.round(($player.breastsize - 7) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 크게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 7>><</link>> | <<printmoney _breast8>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 7>>
+	<<set _breast7 to Math.round(($player.breastsize - 6) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 풍만하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 6>><</link>> | <<printmoney _breast7>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 6>>
+	<<set _breast6 to Math.round(($player.breastsize - 5) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 적당하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 5>><</link>> | <<printmoney _breast6>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 5>>
+	<<set _breast5 to Math.round(($player.breastsize - 4) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 봉긋하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 4>><</link>> | <<printmoney _breast5>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 4>>
+	<<set _breast4 to Math.round(($player.breastsize - 3) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 작게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 3>><</link>> | <<printmoney _breast4>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 3>>
+	<<set _breast3 to Math.round(($player.breastsize - 2) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 아주 작게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 2>><</link>> | <<printmoney _breast3>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 2>>
+	<<set _breast2 to Math.round(($player.breastsize - 1) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 몽우리만 남기기|Hospital Breast Reduction 2]]>><<set $phase to 1>><</link>> | <<printmoney _breast2>>
+	<br>
+<</if>>
+<<if $player.breastsize gte 1>>
+	<<set _breast1 to Math.round(($player.breastsize - 0) * 200000)>>
+	<<procedureicon "breast reduce">><<link [[가슴을 납작하게 만들기|Hospital Breast Reduction 2]]>><<set $phase to 0>><</link>> | <<printmoney _breast1>>
+	<br>
+<</if>>
+<br>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Breast Reduction 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+"비용은 <span class="gold">£<<print (($player.breastsize - $phase) * 2000)>></span>이고," <<he>>【이가】 말한다. "네 시간이 걸릴 겁니다."
+<br><br>
+
+<<if $money gte (($player.breastsize - $phase) * 200000)>>
+	<<ind>><<link [[수락 (4:00)|Hospital Breast Reduction 3]]>><<pass 4 hours>><</link>>
+	<br>
+<<else>>
+	비용을 감당할 수 없다.
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Breast Reduction 3
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<money `-(($player.breastsize - $phase) * 200000)` "hospitalBreastReduction">>
+<<set $breastgrowthtimer to 700>>
+
+<<upperstrip>>
+<<lowerstrip>>
+<<underlowerstrip>>
+<<underupperstrip>>
+하퍼는 돈을 받는다. "옷을 벗어주세요." <<he>>【이가】 방을 나가려고 일어서며 말한다.
+당신은 옷을 벗고 기다린다. 약간 노출된 기분이다.
+<<if playerChastity()>>$worn.genitals.name【을를】 벗을 수 없다. 문제가 되지 않기를 바란다.<</if>>
+<<He>>【이가】 곧 의료용 가운을 들고 돌아온다.
+<br><br>
+
+"이걸 입으세요." <<He>>【이가】 지시한다. 당신은 가운을 입는다. "좋습니다, 저를 따라오시죠. 바로 근처입니다."
+<br><br>
+
+<<He>>【은는】 당신을 작은 침대가 있는 다른 방으로 안내한다. "누워주세요. 마취한 다음 수술실로 옮기겠습니다." 당신은 눕는다.
+<<He>>【이가】 당신의 얼굴에 마스크를 누르자, 의식이 흐려지기 시작한다. 당신이 정신을 잃는 동안 <<he>>【은는】 <<his>> 주머니에서 카메라를 꺼낸다.
+<br><br>
+
+<<fameexhibitionism 10 "pic">>
+
+<<link [[다음|Hospital Breast Done]]>><</link>>
+<br>
+
+:: Hospital Breast Done
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<set $player.breastsize to $phase>>
+<<set $breastsizeold to $player.breastsize>>
+
+당신은 정신을 잃었던 바로 그 방에서 깨어난다. 별다른 느낌은 없다가, 아래를 내려다보고 당신의 <<breasts>>【을를】 보고 나서야 달라진다. 하퍼가 방으로 들어온다.
+<br><br>
+
+"수술은 성공적이었습니다." <<he>>【이가】 말한다. <<He>>【은는】 당신의 가슴을 본다.
+
+<<if $player.breastsize gte 12>>
+	"그것들 때문에 허리 아프지 않기를 바랍니다."
+	<<insecurity "breasts_big" 2>><<ginsecurity "breasts_big">>
+<<elseif $player.breastsize gte 9>>
+	"그걸로 많은 주목을 받겠군요."
+	<<insecurity "breasts_big" 2>><<ginsecurity "breasts_big">>
+<<elseif $player.breastsize gte 6>>
+	"좋은 크기입니다."
+	<<insecurity "breasts_small" 1>><<ginsecurity "breasts_small">>
+<<elseif $player.breastsize gte 3>>
+	"그것들이 잘 어울리는군요."
+	<<insecurity "breasts_small" 1>><<ginsecurity "breasts_small">>
+<<elseif $player.breastsize gte 1>>
+	"그것들이 귀엽게 어울리는군요."
+	<<insecurity "breasts_small" 1>><<ginsecurity "breasts_small">>
+<<elseif $player.breastsize is 0>>
+	"가슴이 귀엽군요."
+	<<insecurity "breasts_small" 2>><<ginsecurity "breasts_small">>
+<</if>>
+<br><br>
+
+<<He>>【은는】 <<his>> 클립보드를 확인한다. "바로 떠나셔도 됩니다. 몸조리 잘하세요." <<He>>【은는】 당신이 옷을 입도록 자리를 비켜준다.
+<br><br>
+
+<<endevent>>
+
+<<link [[다음|Hospital Foyer]]>><<clotheson>><</link>>
+<br>
+
+:: Hospital Breast Enlargement
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<generate1>><<person1>>
+접수원이 <<his>> 컴퓨터에 무언가를 입력하고는 대기실에 앉아 있으라고 지시한다.
+<br><br>
+<<endevent>>
+
+<<harper_intro>>
+
+"이건 간단한 절차입니다." <<He>>【은는】 <<his>> 책상에서 가슴 크기 도표를 꺼낸다. "당신은 이 정도군요." <<He>>【은는】 라벨이 붙은 그림을 가리킨다.
+<<if $player.breastsize is 0>>
+	"<span class="lewd">납작</span>".
+<<else>>
+	"<span class="lewd"><<breastsizedesc>> 가슴</span>".
+<</if>>
+<br><br>
+
+"가슴을 한 사이즈 키우는 데 £5000가 들고, 그 이상부터는 사이즈당 £5000가 추가됩니다."
+<br><br>
+
+<<if $player.breastsize lt 12>>
+	<<set _breast12 to Math.round((12 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 엄청나게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 12>><</link>> | <<printmoney _breast12>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 11>>
+	<<set _breast11 to Math.round((11 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 거대하게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 11>><</link>> | <<printmoney _breast11>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 10>>
+	<<set _breast10 to Math.round((10 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 크게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 10>><</link>> | <<printmoney _breast10>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 9>>
+	<<set _breast9 to Math.round((9 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 육중하게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 9>><</link>> | <<printmoney _breast9>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 8>>
+	<<set _breast8 to Math.round((8 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 풍만하게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 8>><</link>> | <<printmoney _breast8>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 7>>
+	<<set _breast7 to Math.round((7 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 크게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 7>><</link>> | <<printmoney _breast7>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 6>>
+	<<set _breast6 to Math.round((6 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 풍만하게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 6>><</link>> | <<printmoney _breast6>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 5>>
+	<<set _breast5 to Math.round((5 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 적당하게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 5>><</link>> | <<printmoney _breast5>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 4>>
+	<<set _breast4 to Math.round((4 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 봉긋하게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 4>><</link>> | <<printmoney _breast4>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 3>>
+	<<set _breast3 to Math.round((3 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 작게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 3>><</link>> | <<printmoney _breast3>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 2>>
+	<<set _breast2 to Math.round((2 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 아주 작게 만들기|Hospital Breast Enlargement 2]]>><<set $phase to 2>><</link>> | <<printmoney _breast2>>
+	<br>
+<</if>>
+<<if $player.breastsize lt 1>>
+	<<set _breast1 to Math.round((1 - $player.breastsize) * 500000)>>
+	<<procedureicon "breast enlarge">><<link [[가슴을 몽우리만 남기기|Hospital Breast Enlargement 2]]>><<set $phase to 1>><</link>> | <<printmoney _breast1>>
+	<br>
+<</if>>
+<br>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Breast Enlargement 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+"비용은 <span class="gold">£<<print (($phase - $player.breastsize) * 5000)>></span>이고," <<he>>【이가】 말한다. "네 시간이 걸릴 겁니다."
+<br><br>
+
+<<if $money gte (($phase - $player.breastsize) * 500000)>>
+	<<ind>><<link [[수락 (4:00)|Hospital Breast Enlargement 3]]>><<pass 4 hours>><</link>>
+	<br>
+<<else>>
+	비용을 감당할 수 없다.
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Breast Enlargement 3
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<money `-(($phase - $player.breastsize) * 500000)` "hospitalBreastEnlargement">>
+<<set $breastgrowthtimer to 700>>
+
+<<upperstrip>>
+<<lowerstrip>>
+<<underlowerstrip>>
+<<underupperstrip>>
+하퍼는 돈을 받는다. "옷을 벗어주세요." <<he>>【이가】 방을 나가려고 일어서며 말한다.
+당신은 옷을 벗고 기다린다. 약간 노출된 기분이다.
+<<if playerChastity()>>$worn.genitals.name【을를】 벗을 수 없다. 문제가 되지 않기를 바란다.<</if>>
+<<He>>【이가】 곧 의료용 가운을 들고 돌아온다.
+<br><br>
+
+"이걸 입으세요." <<He>>【이가】 지시한다. 당신은 가운을 입는다. "좋습니다, 저를 따라오시죠. 바로 근처입니다."
+<br><br>
+
+<<He>>【은는】 당신을 작은 침대가 있는 다른 방으로 안내한다. "누워주세요. 마취한 다음 수술실로 옮기겠습니다." 당신은 눕는다.
+<<He>>【이가】 당신의 얼굴에 마스크를 누르자, 의식이 흐려지기 시작한다. 당신이 정신을 잃는 동안 <<he>>【은는】 <<his>> 주머니에서 카메라를 꺼낸다.
+<br><br>
+
+<<fameexhibitionism 10 "pic">>
+
+<<link [[다음|Hospital Breast Done]]>><</link>>
+<br>
+
+:: Hospital Penis Reduction
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<generate1>><<person1>>
+접수원이 <<his>> 컴퓨터에 무언가를 입력하고는 대기실에 앉아 있으라고 지시한다.
+<br><br>
+<<endevent>>
+
+<<harper_intro>>
+<<if $worn.genitals.type.includes("shrinking")>>
+	"원래는 간단한 시술입니다만..." <<He>>【이가】 책상 서랍에서 자지 크기 도표를 꺼낸다. "당신이 얼마나 큰지 제가 정확히 알 수가 없군요."
+	<br><br>
+	<<if $worn.genitals.name is "chastity parasite">>
+		더 자세히 살펴본 후, <<he>>【이가】 말을 잇는다. "우선 자지에 붙은 그 기생충부터 제거해야 합니다. 유감스럽게도 저희에겐 그렇게 작은 장치를 다룰 도구가 없습니다."
+	<<else>>
+		더 자세히 살펴본 후, <<he>>【이가】 말을 잇는다. "우선 그 <<print $worn.genitals.name>>【을를】 풀어서 제거해야 합니다. 유감스럽게도 저희에겐 그렇게 작은 장치를 다룰 도구가 없습니다."
+	<</if>>
+	<br>
+<<elseif $player.penissize is 1>>
+	"원래는 간단한 시술입니다만..." <<He>>【이가】 책상에서 자지 크기 도표를 꺼낸다. "당신은 이 정도군요." <<He>>【이가】 "<span class="lewd"><<penissize>> 자지</span>"이라고 표시된 맨 아래 그림을 가리킨다.
+	<br><br>
+	더 자세히 살펴보며 <<he>>【이가】 말을 잇는다. "이보다 더는 조절할 수 없습니다. 저희 약국에 가서 자지 축소 알약을 구매할 수는 있습니다. 개인적으로는 하루에 두 번 복용하는 것으로 시작하길 권장하지만, 그게 큰 효과가 있을지는 확실하지 않군요."
+	<br>
+<<else>>
+	"이건 아주 간단한 시술입니다." <<He>>【이가】 책상에서 자지 크기 도표를 꺼낸다. "당신은 이 정도군요." <<He>>【이가】 
+	<<switch $player.penissize>>
+		<<case 6>>맨 위
+		<<case 1>>맨 아래
+		<<default>>한
+	<</switch>> 그림을 가리킨다.
+	그림에는 "<span class="lewd"><<print ($player.penissize is 4 ? "평균" : "<<penissize>>")>> 자지</span>"이라고 적혀 있다.
+	<br><br>
+
+	"자지 크기를 한 단계 줄이는 데 £2000가 들고, 그 이상부터는 단계마다 £2000가 추가됩니다."
+	<br><br>
+
+	<<if $player.penissize gte 6>>
+		<<set _penis4 to Math.round(($player.penissize - 5) * 200000)>>
+		<<procedureicon "penis reduce">><<link [[자지를 큰 크기로 만든다|Hospital Penis Reduction 2]]>><<set $phase to 3>><</link>> | <<printmoney _penis4>>
+		<br>
+	<</if>>
+	<<if $player.penissize gte 5>>
+		<<set _penis3 to Math.round(($player.penissize - 4) * 200000)>>
+		<<procedureicon "penis reduce">><<link [[자지를 평균 크기로 만든다|Hospital Penis Reduction 2]]>><<set $phase to 2>><</link>> | <<printmoney _penis3>>
+		<br>
+	<</if>>
+	<<if $player.penissize gte 4>>
+		<<set _penis2 to Math.round(($player.penissize - 3) * 200000)>>
+		<<procedureicon "penis reduce">><<link [[자지를 작은 크기로 만든다|Hospital Penis Reduction 2]]>><<set $phase to 1>><</link>> | <<printmoney _penis2>>
+		<br>
+	<</if>>
+	<<if $player.penissize gte 3>>
+		<<set _penis1 to Math.round(($player.penissize - 2) * 200000)>>
+		<<procedureicon "penis reduce">><<link [[자지를 아주 작은 크기로 만든다|Hospital Penis Reduction 2]]>><<set $phase to 0>><</link>> | <<printmoney _penis1>>
+		<br>
+	<</if>>
+	<<if $player.penissize gte 2 and $penissizemin lt 0>>
+		<<set _penis0 to Math.round(($player.penissize - 1) * 200000)>>
+		<<procedureicon "penis reduce">><<link [[자지를 초소형 크기로 만든다|Hospital Penis Reduction 2]]>><<set $phase to -1>><</link>> | <<printmoney _penis0>>
+		<br>
+	<</if>>
+<</if>>
+<br>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Penis Reduction 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+"비용은 <span class="gold">£<<print ((($player.penissize - 2) - $phase) * 2000)>></span>입니다." <<he>>【이가】 말합니다. "그리고 4시간이 걸릴 겁니다."
+<br><br>
+
+<<if $money gte ((($player.penissize - 2) - $phase) * 200000)>>
+	<<ind>><<link [[수락한다 (4:00)|Hospital Penis Reduction 3]]>><<pass 4 hours>><</link>>
+	<br>
+<<else>>
+	비용을 감당할 수 없다.
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Penis Reduction 3
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<money `-((($player.penissize - 2) - $phase) * 200000)` "hospitalPenisReduction">>
+<<set $penisgrowthtimer to 700>>
+
+<<upperstrip>>
+<<lowerstrip>>
+<<underlowerstrip>>
+<<underupperstrip>>
+하퍼는 돈을 받는다. "옷을 벗어주세요." <<he>>【이가】 방을 나가려고 일어서며 말한다.
+당신은 옷을 벗고 기다린다. 약간 노출된 기분이다.
+<<if playerChastity()>>$worn.genitals.name【을를】 벗을 수 없다. 문제가 되지 않기를 바란다.<</if>>
+<<He>>【이가】 곧 의료용 가운을 들고 돌아온다.
+<br><br>
+
+"이걸 입으세요." <<he>>【이가】 지시한다. 당신은 가운을 입는다. "좋습니다, 저를 따라오시죠. 금방입니다."
+<br><br>
+
+<<He>>【은는】 당신을 작은 침대가 있는 다른 방으로 안내한다. "누우세요. 마취한 뒤 수술실로 옮기겠습니다." 당신은 눕는다.
+<<He>>【이가】 당신의 얼굴에 마스크를 누르자, 의식이 흐려지기 시작한다. 당신이 정신을 잃는 동안 <<he>>【은는】 주머니에서 카메라를 꺼낸다.
+<br><br>
+
+<<fameexhibitionism 10 "pic">>
+
+<<link [[다음|Hospital Penis Done]]>><</link>>
+<br>
+
+:: Hospital Penis Done
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<set $player.penissize to $phase + 2>>
+
+당신은 정신을 잃었던 바로 그 방에서 깨어난다. 별다른 느낌은 없었지만, 아래를 내려다보니 당신의 <<penissize>> 자지가 보인다. 하퍼가 방으로 들어온다.
+<br><br>
+
+"수술은 성공적이었습니다." <<he>>【이가】 말한다. <<He>>【은는】 당신의 사타구니를 쳐다본다.
+
+<<if $player.penissize gte 6>>
+	"와..." <<He>>【이가】 뚫어지게 쳐다보다가, 얼굴을 붉히며 시선을 돌린다.
+	<<insecurity "penis_big" 1>><<ginsecurity "penis_big">>
+<<elseif $player.penissize gte 5>>
+	"와..." <<He>>【이가】 뚫어지게 쳐다보다가, 얼굴을 붉히며 시선을 돌린다.
+	<<insecurity "penis_big" 1>><<ginsecurity "penis_big">>
+<<elseif $player.penissize is 4>>
+	"이제 아무도 두 번 다시 쳐다보지 않을 겁니다." <<He>>【이가】 얼굴을 붉힌다. "아, 안 좋아 보인다는 뜻은 아닙니다."
+<<elseif $player.penissize is 3>>
+	"정말 다루기 좋은 크기군요."
+	<<insecurity "penis_small" 1>><<ginsecurity "penis_small">>
+<<else>>
+	"정말 귀여워 보이네요."
+	<<insecurity "penis_small" 1>><<ginsecurity "penis_small">>
+<</if>>
+<br><br>
+
+<<He>>【은는】 <<his>> 클립보드를 확인한다. "바로 떠나셔도 됩니다. 몸조리 잘하세요." <<He>>【은는】 당신이 옷을 입도록 자리를 비켜준다.
+<br><br>
+
+<<endevent>>
+
+<<link [[다음|Hospital Foyer]]>><<clotheson>><</link>>
+<br>
+
+:: Hospital Penis Enlargement
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<generate1>><<person1>>
+접수원이 <<his>> 컴퓨터에 무언가를 입력하고는 대기실에 앉아 있으라고 지시한다.
+<br><br>
+<<endevent>>
+
+<<harper_intro>>
+<<if $worn.genitals.type.includes("shrinking")>>
+	"원래는 간단한 시술입니다만..." <<He>>【이가】 책상 서랍에서 자지 크기 도표를 꺼낸다. "당신이 얼마나 큰지 제가 정확히 알 수가 없군요."
+	<br><br>
+	<<if $worn.genitals.name is "chastity parasite">>
+		더 자세히 살펴본 후, <<he>>【이가】 말을 잇는다. "우선 자지에 붙은 그 기생충부터 제거해야 합니다. 유감스럽게도 저희에겐 그렇게 작은 장치를 다룰 도구가 없습니다."
+	<<else>>
+		더 자세히 살펴본 후, <<he>>【이가】 말을 잇는다. "우선 그 <<print $worn.genitals.name>>【을를】 풀어서 제거해야 합니다. 유감스럽게도 저희에겐 그렇게 작은 장치를 다룰 도구가 없습니다."
+	<</if>>
+	<br>
+<<elseif $player.penissize gte 1>>
+	"이건 간단한 시술입니다." <<He>>【이가】 책상에서 자지 크기 도표를 꺼낸다. "당신은 이 정도군요." <<He>>【이가】 
+	<<switch $player.penissize>>
+		<<case 6>>맨 위
+		<<case 1>>맨 아래
+		<<default>>한
+	<</switch>> 그림을 가리킨다.
+	그림에는 "<span class="lewd"><<print ($player.penissize is 4 ? "평균" : "<<penissize>>")>> 자지</span>"이라고 적혀 있다.
+	<br><br>
+
+	"자지 크기를 한 단계 늘리는 데 £5000가 들고, 그 이상부터는 단계마다 £5000가 추가됩니다."
+	<br><br>
+
+	<<if $player.penissize lt 6>>
+		<<set _penis4 to Math.round((4 - ($player.penissize - 2)) * 500000)>>
+		<<procedureicon "penis enlarge">><<link [[자지를 거대한 크기로 만든다|Hospital Penis Enlargement 2]]>><<set $phase to 4>><</link>> | <<printmoney _penis4>>
+		<br>
+	<</if>>
+	<<if $player.penissize lt 5>>
+		<<set _penis3 to Math.round((3 - ($player.penissize - 2)) * 500000)>>
+		<<procedureicon "penis enlarge">><<link [[자지를 큰 크기로 만든다|Hospital Penis Enlargement 2]]>><<set $phase to 3>><</link>> | <<printmoney _penis3>>
+		<br>
+	<</if>>
+	<<if $player.penissize lt 4>>
+		<<set _penis2 to Math.round((2 - ($player.penissize - 2)) * 500000)>>
+		<<procedureicon "penis enlarge">><<link [[자지를 평균 크기로 만든다|Hospital Penis Enlargement 2]]>><<set $phase to 2>><</link>> | <<printmoney _penis2>>
+		<br>
+	<</if>>
+	<<if $player.penissize lt 3>>
+		<<set _penis1 to Math.round((1 - ($player.penissize - 2)) * 500000)>>
+		<<procedureicon "penis enlarge">><<link [[자지를 작은 크기로 만든다|Hospital Penis Enlargement 2]]>><<set $phase to 1>><</link>> | <<printmoney _penis1>>
+		<br>
+	<</if>>
+	<<if $player.penissize lt 2>>
+		<<set _penis0 to Math.round((0 - ($player.penissize - 2)) * 500000)>>
+		<<procedureicon "penis enlarge">><<link [[자지를 아주 작은 크기로 만든다|Hospital Penis Enlargement 2]]>><<set $phase to 0>><</link>> | <<printmoney _penis0>>
+		<br>
+	<</if>>
+<<else>>
+	"원래는 간단한 시술입니다만..." <<He>>【이가】 책상에서 자지 크기 도표를 꺼낸다. "하지만 당신은 가장 작은 크기에도 미치지 못하는군요." <<He>>【이가】 "<span class="lewd">초소형 자지</span>"이라고 표시된 그림을 가리킨다.
+	<br><br>
+	더 자세히 살펴보며 <<he>>【이가】 말을 잇는다. "저희 약국에 가서 자지 성장 알약을 구매해야 합니다. 개인적으로는 하루에 두 번 복용하는 것으로 시작하길 권장하지만, 그걸로 되살리기에 충분할지는 확실하지 않군요."
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Penis Enlargement 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+"비용은 <span class="gold">£<<print (($phase - ($player.penissize -2)) * 5000)>></span>입니다." <<he>>【이가】 말합니다. "그리고 4시간이 걸릴 겁니다."
+<br><br>
+
+<<if $money gte (($phase - ($player.penissize - 2)) * 500000)>>
+	<<ind>><<link [[수락한다 (4:00)|Hospital Penis Enlargement 3]]>><<pass 4 hours>><</link>>
+	<br>
+<<else>>
+	비용을 감당할 수 없다.
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Penis Enlargement 3
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<money `-(($phase - ($player.penissize - 2)) * 500000)` "hospitalPenisEnlargement">>
+<<set $penisgrowthtimer to 300>>
+
+<<upperstrip>>
+<<lowerstrip>>
+<<underlowerstrip>>
+<<underupperstrip>>
+하퍼는 돈을 받는다. "옷을 벗어주세요." <<he>>【이가】 방을 나가려고 일어서며 말한다.
+당신은 옷을 벗고 기다린다. 약간 노출된 기분이다.
+<<if playerChastity()>>$worn.genitals.name【을를】 벗을 수 없다. 문제가 되지 않기를 바란다.<</if>>
+<<He>>【이가】 곧 의료용 가운을 들고 돌아온다.
+<br><br>
+
+"이걸 입으세요." <<he>>【이가】 지시한다. 당신은 가운을 입는다. "좋습니다, 저를 따라오시죠. 금방입니다."
+<br><br>
+
+<<He>>【은는】 당신을 작은 침대가 있는 다른 방으로 안내한다. "누우세요. 마취한 뒤 수술실로 옮기겠습니다." 당신은 눕는다.
+<<He>>【이가】 당신의 얼굴에 마스크를 누르자, 의식이 흐려지기 시작한다. 당신이 정신을 잃는 동안 <<he>>【은는】 주머니에서 카메라를 꺼낸다.
+<br><br>
+
+<<fameexhibitionism 10 "pic">>
+
+<<link [[다음|Hospital Penis Done]]>><</link>>
+<br>
+
+:: Hospital Tattoo Removal
+<<effects>>
+
+<<generate1>><<person1>>
+접수원이 <<his>> 컴퓨터에 무언가를 입력하고는 대기실에 앉아 있으라고 지시한다.
+<br><br>
+<<endevent>>
+
+<<harper_intro>>
+
+"지우고 싶은 문신이 있으시군요." <<he>>【이가】 말한다. "저희가 도와드릴 수 있습니다. 시술 비용은 £2000이고, 3시간이 걸립니다."
+<br><br>
+
+<<if $money gte 200000>>
+	<<for _active_bodypart range setup.bodyparts>>
+		<<if $skin[_active_bodypart].pen is "tattoo">>
+			<<capture _active_bodypart>><<link [[제거한다|Hospital Tattoo Removal 2]]>><<pass 2 hours>><<money -300000 "hospitalTattooRemoval">><<set $remove_tattoo to _active_bodypart>><</link>><</capture>> 당신의 <<bodypart _active_bodypart>>에 있는 <<tattoo _active_bodypart>> 문신.
+			<br>
+		<</if>>
+	<</for>>
+<br>
+<</if>>
+<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<endevent>><</link>>
+<br>
+
+:: Hospital Tattoo Removal 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+
+<<strip>>
+하퍼가 돈을 받는다. "옷을 벗어주세요." <<he>>【이가】 방을 나가려고 일어서며 말한다. "전부요. 옷이 있으면 섬세한 장비에 방해가 됩니다."
+당신은 옷을 벗고 기다린다. 알몸으로 서 있자니 조금 민망한 기분이 든다.
+<<if playerChastity()>>$worn.genitals.name【을를】 벗을 수 없다. 문제가 되지 않기를 바란다.<</if>>
+<<He>>【이가】 곧 의료용 가운을 들고 돌아온다.
+<br><br>
+
+"이걸 입으세요." <<he>>【이가】 지시한다. 당신은 가운을 입는다. "좋습니다, 저를 따라오시죠. 금방입니다."
+<br><br>
+
+<<He>>【은는】 당신을 작은 침대가 있는 다른 방으로 안내한다. "누우세요. 마취한 뒤 수술실로 옮기겠습니다." 당신은 눕는다.
+<<He>>【이가】 당신의 얼굴에 마스크를 누르자, 의식이 흐려지기 시작한다. 당신이 정신을 잃는 동안 <<he>>【은는】 주머니에서 카메라를 꺼낸다.
+<br><br>
+
+<<fameexhibitionism 10 "pic">>
+
+<<link [[다음|Hospital Tattoo Removal Done]]>><</link>>
+
+:: Hospital Tattoo Removal Done
+<<effects>>
+
+당신은 정신을 잃었던 바로 그 방에서 깨어난다.
+<<if $remove_tattoo is "forehead" or $remove_tattoo is "left_cheek" or $remove_tattoo is "right_cheek">>
+	거울을 본다. 당신의 <<bodypart $remove_tattoo>>에 있던 <<tattoo $remove_tattoo>> 문신이 사라졌다.
+<<else>>
+	당신의 <<bodypart $remove_tattoo>>【을를】 내려다본다. 당신의 <<tattoo $remove_tattoo>> 문신이 사라졌다.
+<</if>>
+하퍼가 방으로 들어온다.
+<br><br>
+
+<<bodywriting_clear $remove_tattoo>><<unset $remove_tattoo>>
+
+"제거는 성공적이었습니다." <<he>>【이가】 말한다. <<He>>【은는】 <<his>> 클립보드를 확인한다. "바로 퇴원하셔도 됩니다. 몸조리 잘하세요." <<He>>【은는】 당신이 옷을 입도록 자리를 비켜준다.
+<br><br>
+
+<<endevent>>
+
+<<link [[다음|Hospital Foyer]]>><<clotheson>><</link>>
+<br>
+
+:: Doctor Harper Emergency
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<generate1>><<person1>>
+당신은 접수원에게 다가가 하퍼를 찾는다. <<He>>【은는】 <<his>> 화면을 본다.
+<<if Time.weekDay is 6>>
+	"이미 오늘 예약되어 있으시네요—"
+<<else>>
+	"예약이 없는 것 같은데요—"
+<</if>>
+<<he>>【은는】 당신을 힐끗 본다. <<his>> 얼굴에 걱정이 퍼지고, <<he>>【은는】 컴퓨터에 무언가를 입력한다. "의사 선생님은 지금 환자를 보고 계십니다. 여기서 기다려주세요."
+<br><br>
+<<endevent>>
+당신은 대기실에 앉는다. 괴로운 생각에 잠기는 것 외에는 할 일이 없어, 당신은 자리에서 안절부절못한다. 기다림이 참을 수 없을 정도로 길게 느껴진다.
+마침내 접수원이 당신을 불러 하퍼의 사무실을 가리킨다. 이전 환자가 비뚤어진 미소를 지으며 나간다.
+<br><br>
+
+<<link [[다음|Doctor Harper Emergency 2]]>><</link>>
+<br>
+
+:: Doctor Harper Emergency 2
+<<set $asylum to 1>><<set $harper_appointments.enabled to true>><<unset $schoolPsych>><<npc Harper>><<person1>>
+당신은 하퍼의 사무실 문을 두드리고, 반대편에서 <<his>> 목소리를 듣는다. "들어오세요." 당신은 안으로 들어간다. <<He>>【은는】 컴퓨터 앞 책상에 앉아 있다.
+<<if Time.weekDay is 6>>
+	"예약된 시간이 아닌데. 심각한 일인가 보군요."
+<<else>>
+	"마지막 환자를 최대한 빨리 끝내고 왔습니다. 무엇을 도와드릴까요?"
+<</if>>
+<br><br>
+당신은 자리에 앉아 최근 사건들에 대한 불만을 털어놓기 시작한다. 하퍼는 대부분 당신이 말하도록 내버려 두고, 가끔 당신의 가정과 학교생활, 그리고 당신의 안녕에 대해 명확히 하기 위해 질문할 뿐이다. 언제부터 울기 시작했는지 기억하기 어렵다. <<He>>【은는】 <<his>> 책상 서랍에서 무언가를 꺼내 당신에게 다가온다. <<He>>【은는】 부드럽게 당신을 팔로 감싼다.
+<br><br>
+
+"자, 자." 하퍼가 말하며, 당신을 더 꽉 껴안으면서 천을 당신의 얼굴에 누른다. "다 괜찮아질 겁니다." <<he>>【이가】 빠르게 당신을 덮치는 안개 속에서 말한다. 흐릿한 두 형체가 사무실로 들어와 당신이 일어서는 것을 돕는다. 그들은 양쪽 어깨에 팔을 얹고 당신을 사무실 밖으로 안내한다. 하퍼 의사가 바로 뒤따른다.
+<br><br>
+
+당신은 조용히 복도를 따라 이끌려 간다. 몇몇 형체들이 당신 쪽을 힐끗 보는 것 같다. 당신 옆의 두 사람은 멈추지 않는다. 그들은 당신을 밖으로 이끌어 대기 중인 밴의 뒷좌석으로 안내한다. 안에는 간이침대가 있다. 그들은 당신의 마지막 의식이 사라질 때 당신을 그 위로 밀어 넣는다.
+<br><br>
+<<endevent>>
+
+<<badEndTracking "Asylum" { reason: "asylumHospital2" }>>
+<<link [[다음|Asylum Intro]]>><<pass 120>><</link>>
+<br>
+
+:: Ambulance Sydney
+<<set $outside to 0>><<effects>>
+<<if !$worn.neck.name.includes("familiar collar")>>
+	<<set $worn.neck.type.push("broken")>><<neckruined>>
+<</if>>
+<<set $worn.face.type.push("broken")>><<faceruined>><<remove_shackle>><<unbind>>
+<<storeon "duopunish">><<unset $punishmentCounter>><<unset $punishmentTimer>><<unset $sydneyPain>><<unset $sydneyArousal>>
+<<unset $sydneyHold>><<unset $sydneyStop>><<unset $sydneyHit>><<unset $sydneyPlead>><<unset $sydneyTouch>>
+<<set $daily.sydney.punish to 1>>
+
+들것 위로 몸이 들리는 것이 느껴진다. 당신은 무언가를 붙잡고 있다. 그것도 당신을 붙잡고 있다. 따뜻하고, 설명할 수 없는 방식으로 안전함을 느끼게 한다. 무언가가 그것을 당신에게서 떼어내려 해서, 당신은 더 꽉 붙잡는다. 당신은 다시 정신을 잃는다.
+<br><br>
+
+<<if $player.virginity.penile isnot true or $player.virginity.vaginal isnot true>>
+	<<if $templePromised is "Sydney">>
+		<span class="blue">약속의 의식: 시드니</span> 특성을 얻었습니다.
+		<br><br>
+	<<else>>
+		<span class="blue">순결의 서약</span> 특성을 얻었습니다.
+		<br><br>
+	<</if>>
+<</if>>
+<<set $player.virginity.temple to true>>
+<<set C.npc.Sydney.virginity.temple to true>>
+
+<<link [[잠든다|Hospital Bed Sydney]]>><</link>>
+<br>
+
+:: Hospital Bed Sydney
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<set $hunger to 0>><<set $thirst to 0>><<set $tiredness to 0>><<set $hygiene to 0>>
+<<set $stress -= 2000>>
+
+당신은 시립 병원 침대에서 깨어난다. 같은 침대에서 잠들어 있는 시드니가 보인다. 당신들은 여전히 서로를 껴안고 있다.
+<<generate1>><<person1>>
+"이제야 일어나셨네요." 간호사다. "의사 선생님이 두 분을 떼어놓으려고 했지만, 의식이 없는 와중에도 놓아주지 않으시더군요." <<He>>【이가】 시드니를 가리킨다. "결국 <<nnpc_he "Sydney">> 님께서 똑바로 앉더니... 잠결에 저를 향해 으르렁거리시더군요. 그러고는 아무 일 없었다는 듯이 다시 쓰러지셨어요. 그때부터 포기했습니다."
+
+간호사는 당신이 심각한 스트레스 반응을 겪었지만, 두 사람 모두 신체적으로는 건강하다고 설명한다. <<He>>【은는】 의사를 모셔올 테니 잠시만 기다려달라고 부탁한다.
+<br><br>
+<<endevent>>
+오래 기다릴 필요는 없었다.
+
+<<npc "Harper" 1>><<person1>><<npc "Sydney" 2>><<person2>>
+<<if !$harperSeen.includes("hospital")>>
+	흰색 의사 가운을 입고 클립보드를 든 <<person1>><<personsimple>>【이가】 들어온다.
+	<br><br>
+
+	<<if $harperSeen.includes("livestock")>>
+		농장에 있던 그 의사다. 당신에게 실험을 했던 그 사람. <<He>>【이가】 당신을 보며 미소 짓는다. "안녕하세요, 저는 하퍼 의사입니다." <<he>>【이가】 말한다. <<his>> 얼굴에는 당신을 알아보는 기색이 없다. <<He>>【은는】 당신의 침대 옆에 앉는다.
+	<<elseif $harperSeen.includes("party")>>
+		에이버리의 파티에 있던 그 의사다. 분홍색 가루를 가지고 있던 그 사람. <<He>>【이가】 당신을 보며 미소 짓는다. "안녕하세요, 저는 하퍼 의사입니다." <<he>>【이가】 말한다. <<He>>【은는】 순진한 미소를 짓는다. <<He>>【은는】 당신의 침대 옆에 앉는다.
+	<<else>>
+		<<He>>【이가】 당신을 보며 미소 짓는다. "안녕하세요, 저는 하퍼 의사입니다." <<He>>【은는】 당신의 침대 옆에 앉아 <<his>> 금발 앞머리를 눈에서 치운다. <<He>>【은는】 의사치고는 젊어 보인다. 25살을 넘지 않았을 것이다.
+	<</if>>
+
+	<<set $harperSeen.pushUnique("hospital")>>
+<<else>>
+	하퍼 의사가 <<person1>><<his>> 평소의 클립보드를 들고 들어온다. <<He>>【은는】 당장 걱정할 것은 없지만, 당신을 더 자세히 검사하고 싶다고 말한다.
+<</if>>
+<br><br>
+
+<<link [[다음|Hospital Bed Examination Sydney]]>><</link>>
+<br>
+
+:: Hospital Bed Examination Sydney
+<<effects>>
+시드니가 하품하는 소리가 들린다. <<person2>><<His>> 눈이 깜빡이며 열리고, <<he>>【은는】 미소 짓는다. "눈뜨자마자 처음 보는 게 너라서 기쁘네." <<His>> 표정은 하퍼 박사를 보자마자 즉시 바뀐다. 둘은 서로를 쏘아본다. 둘 중 누구의 감정도 읽기 어렵다.
+<br>
+"두 번째로 보는 게 저거라니 별로 기쁘진 않군."
+<br>
+<<if !$sydneySeen.includes("Harper")>>
+	<<set $sydneySeen.pushUnique("Harper")>>
+	"시드니. 오랜만이군."
+	<br>
+	"그리 오래되지도 않았는데." 당신이 여전히 서로를 붙잡고 있지 않았다면 시드니가 벌떡 일어나 공격했을 것 같은 느낌이 든다.
+<<else>>
+	"또 이러지 맙시다. 이건 전문가답게 끝낼 수 있어요."
+<</if>>
+<br><br>
+시드니가 당신을 지키려는 듯 당신 앞으로 나선다. "치료를 거부할 권리를 행사하겠습니다. 제 <<nnpc_mum "Sirris">>께서 서류를 처리해 주실 겁니다."
+<br><br>
+하퍼 박사가 한숨을 쉰다. "좋습니다. 하지만 <<phis>> 상태는 여전히 평가해야 합니다."
+<<person1>>
+<<if $trauma lte ($traumamax / 10) * 2>>
+	<<He>>【은는】 당신의 가정생활, 학교생활, 그리고 당신의 안녕이 어떠한지에 관한 다양한 주제에 대해 부드럽게 질문한다. <<He>>【은는】 당신에게 <<he>>【이가】 아는 한 모든 것이 괜찮지만, 앞으로는 조심해야 한다고 알려준다.
+	<br><br>
+	<<wash>>
+	시드니가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+	<br><br>
+
+	<<link [[떠난다 (0:10)|Hospital Journey Home Sydney]]>><<pass 10>><<endevent>><</link>>
+	<br>
+<<elseif $trauma lt ($traumamax / 10) * 9>>
+	<<He>>【은는】 당신의 가정생활, 학교생활, 그리고 당신의 안녕이 어떠한지에 관한 다양한 주제에 대해 부드럽게 질문한다. 잠시 후, <<he>>【은는】 간호사를 부르고 그들은 방구석에서 잠시 대화를 나눈다. 그들은 조용히 이야기하고, 잠시 후 간호사는 고개를 끄덕이고 방을 나간다.
+	<br><br>
+	<<if !$harper_appointments.enabled>>
+		<span class="gold">의사는 <span class="gold">금요일</span>마다 여기 병원으로 <<him>>【을를】 찾아와 치료를 받으라고 말한다.</span>
+		<br><br>
+		<<set $harper_appointments.enabled to true>><<unset $schoolPsych>>
+		<<wash>>
+		시드니가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+		<br><br>
+	<<else>>
+		의사는 <span class="gold">금요일</span>마다 여기 병원으로 <<him>>【을를】 찾아오라고 다시 한번 상기시킨다.
+		<br><br>
+		<<wash>>
+		시드니가 당신이 일어서는 것을 돕고, 당신은 곧 퇴원하게 된다.
+		<br><br>
+	<</if>>
+
+	<<link [[떠난다|Hospital Journey Home Sydney]]>><<pass 10>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<He>>【은는】 당신의 가정생활, 학교생활, 그리고 당신의 안녕이 어떠한지에 관한 다양한 주제에 대해 부드럽게 질문한다. <<his>> 얼굴에 걱정스러운 표정이 떠오르지만, 당신은 왜 그런지 전혀 알 수 없다. 잠시 후, <<he>>【은는】 방으로 간호사를 부르고 그들은 잠시 조용히 이야기한다. 간호사는 걱정스러운 표정으로 당신을 계속 힐끗 쳐다본다.
+	<br><br>
+
+	시드니는 불안해 보인다. "우린 떠나야 해." 당신은 대답할 수 없음을 깨닫는다. 간호사가 시드니에게 다가가자, 시드니는 당신을 끌어당긴다. "안 돼." 시드니가 쏘아보자 간호사는 그 자리에서 얼어붙는다.
+	<br><br>
+
+	"시드니, 내가 보장하는데—"
+	<br>
+	"모든 게 괜찮을 거라고? 아니, 그렇지 않을 거야. 우린 떠날 거고, 당신들은 우릴 막을 수 없어." 간호사가 시드니의 팔을 잡고 <<person2>><<him>>【을를】 뒤로 물린다. <<He>>【은는】 놀라운 힘으로 밀어내지만, 너무 느리다. 의사가 당신의 얼굴에 천을 대자, 당신은 안개에 휩싸인다. 시드니의 목소리로 외침이 들리고, 모든 것이 빙빙 돌기 시작한다. 당신은 끌려가고, 더 많은 외침이 들린다.
+	<br><br>
+	복도로 나오자 여러 형체들이 당신을 향해 행진한다. 누군가 그들의 길을 막는다. 당신을 붙잡고 있는 사람은 멈추지 않는다. 그들은 당신을 밖으로 이끌고 대기 중인 차 뒷좌석으로 데려가고, 당신의 의식은 희미해진다.
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Hospital Sydney Rescue]]>><<pass 1 hour>><</link>>
+	<br>
+<</if>>
+
+:: Hospital Sydney Rescue
+<<effects>>
+다시 깨어나자 머리가 빙빙 돈다. 앞 좌석에서 두 사람이 이야기하고 있다. 당신은 천천히 그들을 알아보기 시작한다. 시드니와 시리스다. <<npc "Sydney" 1>><<person1>><<npc "Sirris" 2>><<person2>>
+<br><br>
+"거봐, 괜찮을 거라고 했잖아, 시드." 당신은 더 이상 병원 앞이 아니라 엘크 가에 있다는 것을 알아차린다.
+<br><br>
+시드니는 차에서 거의 뛰쳐나오다시피 하더니, 뒷문을 열고 뛰어들어 당신을 좌석으로 밀어붙이며 태클하듯 껴안는다. "<<nnpc_he "Harper">>【이가】 당신한테 그 천을 댔을 때 얼마나 걱정했는지 몰라." 당신은 시드니에게 무슨 일이 있었는지 물어보려 하지만, 말이 제대로 나오지 않는다. 당신은 정신없이 포옹에 답한다.
+<br><br>
+"자, 둘 다 뒤에서 편하게 있어. 시드니, 안전벨트! 그러면서 면허를 못 따는 이유를 궁금해하다니.
+<<if !$sydneySeen.includes("ride")>>
+	<<set $sydneySeen.pushUnique("ride")>>
+	그래서, 어디 살아?" 시리스가 좌석 너머로 몸을 기울여 당신을 본다.
+	<br><br>
+	당신은 단조로운 목소리로 시리스에게 대답하며, 고아원으로 가는 길을 완벽하게 알려준다. 동정 어린 찡그림을 본 것 같지만, 확실하지는 않다.
+<<else>>
+	이제 어디로 가야 할지 아니까 오래 걸리진 않을 거야."
+<</if>>
+시리스는 백미러를 통해 계속해서 걱정스러운 눈빛으로 당신을 쳐다본다. 시드니는 당신이 고아원에 도착할 때까지 놓아주지 않다가, 그제야 둘 다 차에서 내린다.
+<br><br>
+시드니는 당신을 고아원 정문까지 바래다주고 <<if $sydneyromance is 1>>뺨에 키스한다<<else>>당신을 껴안는다<</if>>.
+"그 의사 조심해. <<nnpc_he "Harper">>【이가】 하는 말은 한마디도 믿지 마."
+<br><br>
+당신은 시드니가 차로 돌아가는 것을 지켜본다. 그들은 당신이 안으로 들어갈 때까지 기다렸다가 떠난다.
+<br><br>
+<<link [[다음|Orphanage]]>><<pass 10>><<endevent>><</link>>
+<br>
+
+:: Hospital Journey Home Sydney
+<<effects>>
+시드니가 당신을 이끌고 병원을 나와 대기 중인 차에 태운다. 운전석에는 시리스가 기다리고 있다. <<npc "Sydney" 1>><<person1>><<npc "Sirris" 2>><<person2>>
+"너희 둘은 정말 손이 많이 가는구나. 괜찮아?" <<He>>【이가】 당신을 본다. "시드니가 내내 네 곁을 떠나지 않으려 했어. 시간이 허락했다면 나도 머물렀을 텐데. 시드니, 안전벨트 매. 안 그러면 평생 면허 못 따." 시드니가 입을 삐죽 내민다.
+<<if !$sydneySeen.includes("ride")>>
+	<<set $sydneySeen.pushUnique("ride")>>
+	"그래서, 어디 살아?" 시리스가 좌석 너머로 몸을 기울여 당신을 본다.
+	<br><br>
+	당신은 시리스에게 고아원으로 가는 길을 알려준다. 동정 어린 찡그림을 본 것 같지만, 확실하지는 않다.
+<<else>>
+	"이제 어디로 가야 할지 아니까 오래 걸리진 않을 거야."
+<</if>>
+시리스는 백미러를 통해 계속해서 걱정스러운 눈빛으로 당신을 쳐다본다. 당신은 금방 고아원에 도착하고, 시드니는 차에서 내려 당신의 손을 잡는다.
+<br><br>
+<<person1>><<He>>【이가】 당신을 고아원 정문까지 바래다주고 <<if $sydneyromance is 1>>뺨에 키스한다<<else>>당신을 껴안는다<</if>>.
+"그 의사 조심해. <<nnpc_he "Harper">>【이가】 하는 말은 한마디도 믿지 마."
+<br><br>
+당신은 시드니가 차로 돌아가는 것을 지켜본다. 그들은 당신이 안으로 들어갈 때까지 기다렸다가 떠난다.
+<br><br>
+<<link [[다음|Orphanage]]>><<pass 10>><<endevent>><</link>>
+<br>

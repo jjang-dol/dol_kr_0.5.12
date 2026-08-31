@@ -1,0 +1,67 @@
+:: Supermarket Lock
+<<set $outside to 0>><<effects>><<set $lock to 200>>
+
+자물쇠만 없었다면 슈퍼마켓 창문을 보호하는 셔터를 들어 올릴 수 있었을 것이다.
+<br><br>
+
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔이 묶여 있지만 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+
+		<<lockicon "pick">><<link [[자물쇠를 딴다 (0:10)|Supermarket]]>><<pass 10>><<crimeUp 5 "trespassing">><</link>><<crime "trespassing">>
+	<</if>>
+	<br>
+<<else>>
+	<span class="red">자물쇠는 당신의 능력 밖인 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+<<getouticon>><<link [[떠난다|Shopping Centre]]>><<endevent>><</link>>
+
+:: Supermarket
+<<set $outside to 0>><<location "shopping_centre">><<effects>>
+<<wearProp "shopping basket">>
+당신은 슈퍼마켓에 있다. 온갖 신선한 식재료들이 선반에 늘어서 있거나 냉장고 안에 진열되어 있다.
+<br><br>
+
+<<if Time.dayState is "night" and Time.hour isnot $closinghour>>
+	어둠 속에 당신 혼자 있다.
+	<br><br>
+<<elseif $exposed gte 1>>
+	당신은 존엄성을 지키기 위해 진열대 뒤에 웅크린다.
+	<br><br>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	<<unset $shoppingBasket>>
+	<<passoutshop "shop">>
+<<else>>
+	<<if Time.hour is 21>>
+		폐점 시간이다. 경비원이 모든 사람을 밖으로 몰아내고 있다.
+		<<if $exposed gte 1>>
+			경비원이 이 옷차림을 본다면 얼마나 수치스러울지 깨닫고 공황 상태에 빠진다.
+		<</if>>
+		<br><br>
+		<<if $exposed lte 0>>
+			<<highicon>><<link [[밖으로 나간다|High Street]]>><<unset $shoppingBasket>><</link>>
+			<br>
+		<<else>>
+			<<ind>><<link [["끝날 때까지 숨는다 (1:00)"|Supermarket]]>><<pass 1 hour>><</link>>
+		<</if>>
+	<<else>>
+		<<if Time.dayState is "night" and Time.hour isnot 21>>
+			<<if !$weekly.theft.supermarket>>
+				<<shopicon "register">><<link [[계산대를 살펴본다|Supermarket Register]]>><</link>>
+				<br><br>
+			<</if>>
+		<</if>>
+		<<supermarketDisplay "supermarket">>
+		<br>
+		<<getouticon>><<link [[떠난다|Shopping Centre]]>><<unset $shoppingBasket>><</link>>
+		<br>
+	<</if>>
+<</if>>

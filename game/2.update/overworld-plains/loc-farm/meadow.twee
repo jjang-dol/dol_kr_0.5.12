@@ -1,0 +1,1066 @@
+:: Meadow
+<<set $location to "meadow">><<set $outside to 1>><<effects>>
+
+You are in a meadow ringed by tall trees. Long grass caresses your legs. A solitary oak stands in the middle.
+
+<<if Weather.dayState is "night">>
+	<<if Weather.precipitation is "rain">>
+		You can see little through the dark rain.
+	<<elseif Weather.precipitation is "snow">>
+		Snow settles between the blades.
+	<<else>>
+		The blades sway in a silent breeze.
+	<</if>>
+<<elseif Weather.dayState is "dawn">>
+	<<if Weather.precipitation is "rain">>
+		Dark clouds fill the sky.
+	<<elseif !Weather.isOvercast>>
+		The sun rises clear over the horizon.
+	<<elseif Weather.precipitation is "snow">>
+		Snowflakes fall in the morning light.
+	<<else>>
+		The trees sway with the wind.
+	<</if>>
+<<elseif Weather.dayState is "dusk">>
+	<<if Weather.precipitation is "rain">>
+		Darkling clouds fill the sky.
+	<<elseif !Weather.isOvercast>>
+		The sun disappears over the horizon.
+	<<elseif Weather.precipitation is "snow">>
+		Snow settles in the dwindling light.
+	<<else>>
+		The trees sway with the wind.
+	<</if>>
+<<else>>
+	<<if Weather.precipitation is "rain">>
+		The blades sway with the wind.
+	<<elseif !Weather.isOvercast>>
+		Bright flowers bloom in many colours.
+	<<elseif Weather.precipitation is "snow">>
+		Snow blankets the treetops, and settles between the blades.
+	<<else>>
+		The blades sway in the breeze.
+	<</if>>
+<</if>>
+<br><br>
+<<if $arousal gte $arousalmax>>
+	<<orgasmLocation "meadow">>
+<</if>>
+<<if !$daily.earSlimeMeadowRelax and numberOfEarSlime() and earSlimeMakingMundaneRequests() and random(0,100) gte 92>>
+	<<set $daily.earSlimeMeadowRelax to true>>
+	<span @class="$earSlime.startedThreats ? 'lewd' : 'lblue'">You feel the slime in your head command you to relax in the meadow.</span> It promises rewards if you comply<<if $earSlime.startedThreats>> and threatens consequences if you do not<</if>>.
+	<br><br>
+	/* Link decreases stress by both the ear slime and relaxing */
+	<<link [[Obey|Meadow Relax]]>><<set $phase to 1>><<corruption 1>><<pain -4>><<stress -12>><<trauma -12>><<sub 2>><</link>><<gcorruption>><<lpain>><<lltrauma>><<llstress>>
+	<br>
+	<<if $earSlime.startedThreats>>
+		<<link [[Defy|Meadow Relax Slime Defy]]>><<corruption -1>><<pain 8>><<stress 6>><<trauma 6>><<def 1>><</link>><<lcorruption>><<ggpain>><<ggtrauma>><<ggstress>>
+	<<else>>
+		<<link [[Ignore|Meadow]]>><</link>>
+	<</if>>
+<<else>>
+	<<relaxicon>><<link [[Relax (0:15)|Meadow Relax]]>><<stress -6>><<tiredness -2>><</link>><<lstress>><<ltiredness>>
+	<br>
+	<<if $worn.upper.exposed gte 1 and $worn.upper.name isnot "plant top" and !$worn.under_upper.type.includes("torso_covering") and !pcAreArmsBound("both")>>
+		<<foresticon "bush">><<link [[Make a top out of plants and twigs (0:10)|Meadow Plant]]>><<pass 10>><<set $phase to 1>><</link>>
+		<br>
+	<</if>>
+	<<if $worn.lower.exposed gte 1 and $worn.lower.name isnot "plant skirt" and !$worn.under_lower.type.includes("lower_covering") and !pcAreArmsBound("both")>>
+		<<foresticon "bush">><<link [[Make a skirt out of plants and twigs (0:10)|Meadow Plant]]>><<pass 10>><<set $phase to 2>><</link>>
+		<br>
+	<</if>>
+
+	<<if $historytrait gte 3>>
+		<<coastalpathicon>><<link [[Coastal path (0:30)|Coast Path Meadow]]>><<pass 30>><</link>>
+		<br>
+	<</if>>
+
+	<br>
+	<<farmicon>><<link [[Enter the farmlands (0:10)|Farmland]]>><<pass 10>><</link>>
+<</if>>
+<br>
+
+:: Meadow Plant
+<<effects>>
+
+<<if $phase is 1>>
+<<set $phase to 0>>
+임시 옷을 만들기에 충분히 길고 튼튼한 식물을 찾는다. 적당한 것들을 찾아 가슴에 묶는다. 부서지기 쉽고 노출이 심하며, 부수지 않고는 벗을 수 없을 것 같지만, 없는 것보다는 낫다.
+<<plantupper force>>
+<br><br>
+
+<<elseif $phase is 2>>
+<<set $phase to 0>>
+임시 옷을 만들기에 충분히 길고 튼튼한 식물을 찾는다. 적당한 것들을 찾아 허리에 묶는다. 부서지기 쉽고 노출이 심하며, 부수지 않고는 벗을 수 없을 것 같지만, 없는 것보다는 낫다.
+<<plantlower force>>
+<br><br>
+<</if>>
+
+<<link [[다음|Meadow]]>><</link>>
+<br>
+
+:: Meadow Relax Slime Defy
+<<effects>>
+<<if $earSlime.corruption gte (currentSkillValue('willpower') / 10)>>
+	<<set $earSlime.defyCooldown += 2>>
+	슬라임이 통제권을 주장하려 한다. <span class="red">그것이 당신의 의지를 압도하여,</span> 초원에서 쉴 곳을 찾게 만든다.
+	<<ggwillpower>><<willpower 1>>
+	<br><br>
+	<<link [[다음|Meadow Relax]]>><</link>>
+
+<<else>>
+	당신은 슬라임의 명령을 무시하고 계속 나아가려 한다. 그것은 당신을 초원에서 쉬게 하려 <span class="green">하지만 실패한다</span>.
+	<br><br>
+	<<link [[다음|Meadow]]>><</link>>
+<</if>>
+
+:: Meadow Relax
+<<effects>>
+
+<<if $phase is 1>>당신은 귀 슬라임이 옳다고 판단하고 잠시 쉴 곳을 찾는다.<</if>>
+<<if Weather.precipitation is "rain">><<set $outside to 0>>
+	떡갈나무 아래에 눕는다. 그 주변의 풀은 두꺼운 가지 덕분에 말라 있다.
+	<<if Time.dayState is "night">>
+		어둡고 평화로운 초원을 내다본다.
+	<<else>>
+		벌들이 꽃 사이를 날아다니는 것을 본다.
+	<</if>>
+<<elseif !Weather.isOvercast>><<set $outside to 1>>
+	<<if Time.dayState is "night">>
+		풀밭에 누워 밤하늘을 올려다본다.
+	<<else>>
+		풀밭에 누워 벌들이 꽃 사이를 날아다니는 것을 본다.
+	<</if>>
+<<else>><<set $outside to 1>>
+	풀밭에 누워 구름이 지나가는 것을 본다.
+<</if>>
+<<pass 15>>
+<br><br>
+
+<<if $rng gte 91>>
+	눈을 뜬다. 깜빡 잠이 들었나?<<ltiredness>><<tiredness -6>>
+	<br><br>
+	<<if $exposed lte 1>>
+		<<clothesstrip>><<beastNEWinit 1 fox>>
+		바람이 느껴진다. 아래를 내려다보니 옷이 사라진 것을 보고 경악한다!
+		<br><br>
+
+		<<covered>> 몸을 낮추고 초원을 살핀다.
+		<<if random(1, 2) is 2>>
+			무언가가 풀을 헤치며 낮게 움직이고 있다. 그것이 나무 경계선에 다다랐을 때 보인다.
+			<!-- 괴물 인간용으로 수정됨 -->
+			<<if $monster is 1>>
+				<<beasttype>> 한 마리가 <<bhis>> 입에 옷을 물고 있다. <<bHe>>【은는】 어깨 너머로 당신과 눈을 마주치고는 나무 속으로 사라진다.
+			<<else>>
+				여우 한 마리가 입에 옷을 물고 있다. 나무 속으로 사라진다.
+			<</if>>
+			<br><br>
+
+			<<link [[쫓아간다 (0:10)|Meadow Chase]]>><<pass 10>><</link>>
+			<br>
+			<<link [[무시한다|Meadow Ignore]]>><</link>>
+			<br>
+		<<else>>
+			작은 언덕 위로 어떤 형체가 재빨리 움직이는 것이 보인다.
+			<!-- 괴물 인간용으로 수정됨 -->
+			<<if $monster is 1>>
+				<<beasttype>> 한 마리가 <<bhis>> 입에 옷을 물고 있다. <<bHe>>【은는】 어깨 너머로 당신과 눈을 마주치고는 언덕 너머로 사라진다.
+			<<else>>
+				여우 한 마리가 입에 옷을 물고 있다. 언덕 너머로 사라진다.
+			<</if>>
+			<br><br>
+
+			<<link [[쫓아간다 (0:10)|Meadow Chase Hill]]>><<pass 10>><</link>><<athleticsdifficulty 1 500>>
+			<br>
+			<<link [[무시한다|Meadow Ignore]]>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<link [[다음|Meadow]]>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	세상이 조금 더 가벼워진 것 같다.
+	<br><br>
+
+	<<link [[다음|Meadow]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Meadow Chase
+<<effects>>
+
+당신은 <<beasttype>>【을를】 쫓아 달린다. 주변에 다른 사람이 없기를 바란다. 벌거벗은 <<girl>>【이가】 초원을 가로질러 달리는 것을 보면 사람들이 어떻게 생각할지 모른다.
+<br><br>
+
+주변의 나무들 속으로 들어간다. 어두운 빛에 눈이 익숙해지자, 당신의 사냥감이 저 앞의 구멍으로 재빨리 들어가는 것이 보인다.
+<br><br>
+
+당신은 쓰러진 나뭇가지를 뛰어넘으며 계속 달려서 구멍에 도착한다. 안을 들여다보지만, 멀리까지 보이지는 않는다.
+<br><br>
+
+<<saveNPC 0 "meadow_fox">>
+<<clearsinglenpc 0>>
+
+<<if $fox gte 4>>
+	<<link [[굴 파기|Meadow Squeeze]]>><<transform fox 1>><<endevent>><</link>><<fox>>
+	<br>
+<<elseif $physiquesize lte 9000>>
+	<<link [[비집고 들어가기|Meadow Squeeze]]>><<endevent>><</link>><<small_text>>
+	<br>
+<</if>>
+<<link [[기어 들어가기|Meadow Crawl]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Ignore
+<<effects>>
+
+옷을 버리기로 결심한다. 어쩌면 여기 있는 식물들로 대체품을 만들 수 있을지도 모른다.
+<br><br>
+<<clothesruined>>
+<<link [[다음|Meadow]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Squeeze
+<<effects>>
+
+<<if $fox gte 4>>
+	네 발로 엎드려 최소한의 땅파기만으로 구멍 속으로 쉽게 미끄러져 들어간다. 깊이 들어갈수록 터널이 넓어진다.
+<<else>>
+	무릎을 꿇고 구멍을 비집고 들어간다. 깊이 들어갈수록 터널이 넓어지지만, 앞은 거의 보이지 않는다.
+<</if>>
+<br><br>
+
+<<link [[다음|Meadow Tunnel]]>><</link>>
+<br>
+
+:: Meadow Crawl
+<<effects>>
+
+무릎을 꿇고 구멍으로 기어 들어간다. 허리가 낀다. 터널 자체는 입구보다 넓다. 그냥 몸을 밀어 넣기만 하면 된다.
+<br><br>
+<<generate1>><<person1>>
+"이게 누구야?" 뒤에서 목소리가 들린다. 손 하나가 당신의 <<bottom>>【을를】 더듬는다. "운 좋은 날이군."
+<br><br>
+
+<<link [[다음|Meadow Crawl Rape]]>><<set $molestationstart to 1>><</link>>
+
+:: Meadow Crawl Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<set $position to "wall">><<set $leftarm to "bound">><<set $rightarm to "bound">><<set $head to "bound">>
+
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Meadow Crawl Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Meadow Crawl Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Meadow Crawl Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"고마워, 정체불명의 암캐야." <<person>>【이가】 등 뒤에서 말한다. "내가 밀어줄까?" <<His>> 손이 다시 한번 당신의 <<bottom>>에 닿더니, 앞으로 밀쳐낸다.
+	<br><br>
+	<<tearful>> 당신은 터널 안쪽으로 더 깊이 기어 들어간다.
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음|Meadow Tunnel]]>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person>>【을를】 걷어차고, 그 힘으로 구멍을 완전히 빠져나간다.
+	<br><br>
+	<<tearful>> 당신은 터널 안쪽으로 더 깊이 기어 들어간다. 등 뒤에서 <<person>>【이가】 투덜거리는 소리가 들린다.
+	<br><br>
+
+	<<endcombat>>
+
+	<<link [[다음|Meadow Tunnel]]>><</link>>
+
+<</if>>
+
+:: Meadow Tunnel
+<<set $outside to 0>><<set $location to "underground">><<effects>>
+
+앞으로 기어가자 터널이 넓어져 완전히 똑바로 설 수 있게 된다. 천장에서 굵은 나무뿌리가 돋아나 벽을 따라 휘감겨 내려온다.
+<br><br>
+
+터널은 깎아지른 낭떠러지에서 끝난다. 아래에서 물이 쏟아지는 소리가 들리고, 이따금 빛이 깜박이는 것이 보인다.
+<br><br>
+
+<<swimicon "leave">><<link [[내려간다|Meadow Tunnel Climb]]>><</link>><<athleticsdifficulty 1 1000>>
+<br>
+<<if $harpy gte 6 or $angel gte 6 or $demon gte 6 or $fallenangel gte 2>>
+	<<glideicon>><<link [[활강해서 내려간다|Meadow Tunnel Glide]]>><</link>><<flight_text>>
+	<br>
+<</if>>
+<<swimicon "dive">><<link [[다이빙한다|Meadow Tunnel Dive]]>><</link>><<swimmingdifficulty 1 1000>>
+<br>
+
+:: Meadow Tunnel Glide
+<<effects>>
+
+당신은 절벽에서 뛰어내려, 공기의 흐름에 몸을 맡겨 <span class="green">부드럽게 착지한다.</span>
+<br><br>
+
+<<link [[다음|Meadow Cave]]>><</link>>
+<br>
+
+:: Meadow Tunnel Climb
+<<effects>>
+
+무릎을 꿇고 낭떠러지 위로 한 발을 내디딘다. 튀어나온 바위에 발을 딛는다. 안정적인 느낌이다. 다른 발도 따라 내딛는다.
+<<if $athleticsSuccess>>
+	<span class="green">바닥까지 무사히 내려왔다.</span>
+	<br><br>
+
+	<<link [[다음|Meadow Cave]]>><</link>>
+	<br>
+<<else>>
+	절반쯤 내려왔을 때 <span class="red">바위 하나가 무너져 내린다.</span> 당신은 아래의 어두운 물속으로 떨어진다.<<gtrauma>><<gstress>><<gpain>><<trauma 6>><<stress 6>><<pain 6>>
+	<br><br>
+
+	<<water>>
+	<<waterbr 2>>
+
+	물은 그리 차갑지 않지만, 물살이 강하다. 물살이 당신을 수면에서 낚아채 아래로, 그리고 옆으로 끌고 간다.
+	<br><br>
+
+	초원 옆을 흐르는 강에서 수면 위로 떠오른다. 당신은 몸을 끌어 강가로 나온다. 다시 구멍을 찾으려 하지만, 어디에서도 보이지 않는다.
+	<br><br>
+	<<link [[다음|Meadow]]>><<clothesruined>><<clearNPC "meadow_fox">><</link>>
+	<br>
+<</if>>
+<br><br>
+
+:: Meadow Tunnel Dive
+<<effects>>
+
+물이 충분히 깊기를 바라며, 팔을 머리 위로 올리고 절벽 끝에서 뛰어내린다.
+<<if $swimmingSuccess>>
+	<span class="green">당신은 우아하게 물속으로 들어간다.</span> 그리고 호를 그리며 수면으로 돌아온다. 물은 그리 차갑지 않다. 얼마나 깊을지 궁금해진다.<<water>>
+	<br><br>
+	<<link [[다음|Meadow Cave]]>><</link>>
+	<br>
+<<else>>
+	균형을 잃고, <span class="red">물에 부딪히며 허우적거린다.</span><<water>><<gtrauma>><<gstress>><<gpain>><<trauma 6>><<stress 6>><<pain 4>>
+	<br><br>
+
+	물은 그리 차갑지 않지만, 물살이 강하다. 물살이 당신을 수면에서 낚아채 아래로, 그리고 옆으로 끌고 간다.
+	<br><br>
+
+	초원 옆을 흐르는 강에서 수면 위로 떠오른다. 당신은 몸을 끌어 강가로 나온다. 다시 구멍을 찾으려 하지만, 어디에서도 보이지 않는다.
+	<br><br>
+	<<link [[다음|Meadow]]>><<clothesruined>><<clearNPC "meadow_fox">><</link>>
+	<br>
+<</if>>
+
+:: Meadow Cave
+<<effects>>
+
+어둠 속을 응시하자, 마침내 그것이 보인다. 하얀 섬광. 당신은 바닥에 흩어진 바위를 조심스럽게 피하며 그것을 쫓아 달린다.
+<br><br>
+
+저 앞에 보이지 않는 광원으로 밝혀진 터널의 끝이 보인다. 터널은 꺾여 더 큰 동굴로 이어진다. 또 다른 물웅덩이가 기슭에 철썩이지만, 이것은 다르다. 더 어둡고, 똑바로 쳐다보는 것만으로도 두려움에 휩싸인다. 마치 무언가가 되돌아보는 것처럼.<<gstress>>
+<br><br>
+
+<<link [[다음|Meadow Cave 2]]>><</link>>
+<br>
+
+:: Meadow Cave 2
+<<effects>>
+<<earnFeat "Cornered Rogue">>
+<<loadNPC 0 "meadow_fox">><<clearNPC "meadow_fox">>
+<<set $pronoun to $NPCList[0].pronoun>>
+물에 너무 정신이 팔려 <<beasttype>>【을를】 알아차리는 데 잠시 시간이 걸렸다. <<bHe>>【은는】 당신을 쳐다보고 있고, <<bhis>> 발치에는 당신의 옷이 있다. <<bHe>>【은는】 입구를 슬쩍 훔쳐본다.
+<br><br>
+
+<<if $monster is 1>>
+
+	<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+		"죄, 죄송해요." <<bhe>>【이가】 겁에 질려 말한다. "여기까지 따라올 줄은 몰랐어요." <<bHe>>【은는】 주위를 둘러보더니, <<bhis>> 귀를 쫑긋 세운다. "알겠다!" <<bhe>>【이가】 말을 잇는다. "안 해치면 선물을 줄게요." <<bHe>>【은는】 당신의 옷을 들어 올린다. 그 아래에는 또 다른 돌이 있지만, 이것은 조각이 새겨져 있다. 복잡해 보인다. 수집가에게는 가치가 있을지도 모른다.
+		<br><br>
+		"이 동굴에서 찾았어요. 어때요?"
+		<br><br>
+
+		<<link [[받아들인다|Meadow Cave Accept]]>><</link>>
+		<br>
+	<<else>>
+		"죄, 죄송해요." <<bhe>>【이가】 겁에 질려 말한다. "여기까지 따라올 줄은 몰랐어요." <<bHe>>【은는】 주위를 둘러본다. "제발 해치지 말아 주세요."
+		<br><br>
+		<<link [[용서한다|Meadow Cave Accept]]>><</link>>
+		<br>
+	<</if>>
+
+	<<if $fox gte 3>>
+		<<link [[몸을 내준다|Meadow Cave Sex]]>><<set $sexstart to 1>><</link>><<deviant1>><<fox>>
+		<br>
+	<<elseif hasSexStat("deviancy", 4)>>
+		<<link [[몸을 내준다|Meadow Cave Sex]]>><<set $sexstart to 1>><</link>><<deviant4>>
+		<br>
+	<</if>>
+	<<if (displayDefiantOption(500)) and hasSexStat("deviancy", 2)>>
+		<<link [[벌을 준다|Meadow Cave Punish]]>><<wolfDefiant 500>><<def 1>><<trauma -6>><<stress -6>><</link>><<deviant2>><<defianttext 500>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+<<else>>
+	미안한 듯, 당신의 옷을 당신 쪽으로 밀어준다.
+	<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+		그 위에 이상한 돌이 놓여 있다. 조각이 새겨져 있다. 수집가에게는 가치가 있을지도 모른다.
+	<</if>>
+	<br><br>
+
+	<<link [[용서한다|Meadow Cave Accept]]>><</link>>
+	<br>
+	<<if $settings.bestialityEnabled>>
+		<<if $fox gte 3>>
+			<<link [[몸을 내준다|Meadow Cave Sex]]>><<set $sexstart to 1>><</link>><<deviant1>><<fox>>
+			<br>
+		<<elseif hasSexStat("deviancy", 4)>>
+			<<link [[몸을 내준다|Meadow Cave Sex]]>><<set $sexstart to 1>><</link>><<deviant4>>
+			<br>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Meadow Cave Accept
+<<effects>><<clotheson>>
+
+<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+	<<wearProp "antique stone talisman">>
+	<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquestonetalisman" "found">>
+	<<if $monster is 1>>
+		"고마워요!" <<beasttype>>【이가】 말한다.
+	<</if>>
+	<<bHe>>【은는】 당신의 옷과 이상한 돌을 남겨두고 터널 쪽으로 서둘러 돌아간다.
+<<else>>
+	<<if $monster is 1>>
+		"고마워요!" <<beasttype>>【이가】 말한다.
+	<</if>>
+	<<bHe>>【은는】 당신의 옷을 남겨두고 터널 쪽으로 서둘러 돌아간다.
+<</if>>
+
+물에서 등을 돌려 터널을 걸어 내려간다.
+<br><br>
+
+<<link [[다음|Meadow Cave Exit]]>><<unset $foxGen>><</link>>
+<br>
+
+:: Meadow Cave Punish
+<<effects>>
+
+"그럴 순 없지." 당신은 말한다. 당신이 달려들자 <<beasttype>>【은는】 당황해서 뒤로 넘어진다. 당신은 <<bhim>> 위로 뛰어올라, 손으로 <<bhis>> 팔을 제압한다.
+<br><br>
+
+"자, 이제 널 어떻게 해줄까?" 당신이 묻는다. <<bHe>>【은는】 <<bhis>> 목을 보호하려는 듯 몸부림친다. 당신은 다른 생각을 하고 있다.
+<br><br>
+
+<<if $NPCList[0].penis is "none">>
+	당신은 <<bhis>> 팔 하나를 놓고, <<bhis>> 음순에 손가락을 댄다. <<bHe>>【은는】 놀라서 비명을 지른다.
+	<br><br>
+
+	"나를 거스른 대가가 이거야." 당신은 말한다. 당신은 <<bhis>> 입구에 손가락을 대고 안으로 찔러 넣는다.
+	<br><br>
+
+	<<bHe>>【은는】 몸부림을 멈추지만, 당신이 두 번째 손가락을 넣자 경계심을 늦추지 않는다. 당신은 <<bhis>> 다른 팔을 놓고 <<bhis>> 가슴을 손톱으로 긁는다. "다시 내 것을 훔치면," 당신은 속도를 높이며 말한다, "후회하게 될 거야." 당신은 세 번째 손가락을 넣는다. <<bHe>>【은는】 불쾌감만큼이나 쾌감에 몸부림치지만, <<bhe>>【이가】 <<bhis>> 절정에 가까워지자 몸을 떤다.
+	<br><br>
+
+	신음과 함께, <<bhis>> 온몸이 절정에 떨린다.
+	<br><br>
+<<else>>
+	당신은 <<bhis>> 팔 하나를 놓고, <<bhis>> 자지에 손을 댄다. <<bHe>>【은는】 놀라서 비명을 지른다.
+	<br><br>
+
+	"나를 거스른 대가가 이거야." 당신은 말한다. 당신은 <<bhis>> 자지를 손바닥에 쥐고 주무르기 시작한다. 곧 발기한다.
+	<br><br>
+
+	<<bHe>>【은는】 몸부림을 멈추지만, 당신이 <<bhis>> 기둥을 흔들자 경계심을 늦추지 않는다. 당신은 <<bhis>> 다른 팔을 놓고 <<bhis>> 가슴을 손톱으로 긁는다. "다시 내 것을 훔치면," 당신은 속도를 높이며 말한다, "후회하게 될 거야." 당신은 더 빠르게 흔든다. <<bHe>>【은는】 불쾌감만큼이나 쾌감에 몸부림치지만, <<bhe>>【이가】 <<bhis>> 절정에 가까워지자 몸을 떤다.
+	<br><br>
+
+	숨을 헐떡이며, <<bhe>>【은는】 <<bhis>> 배 위에 사정한다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Meadow Cave Punish 2]]>><</link>>
+<br>
+
+:: Meadow Cave Punish 2
+<<effects>>
+
+<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+	<<set $_stone to true>>
+	<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquestonetalisman" "found">>
+	<<wearProp "antique stone talisman">>
+<</if>>
+
+"내 뜻은 분명히 전해졌을 거야." 당신은 일어서며 말한다<<if $_stone>>, 그러면서 이상한 돌을 집어 든다<</if>>.
+<<clotheson>>
+
+당신은 바닥에서 헐떡이는 <<beasttype>>【을를】 남겨두고 터널로 돌아간다.
+<<deviancy2>>
+
+<<link [[다음|Meadow Cave Exit]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Cave Exit
+<<set $outside to 1>><<set $location to "farm">><<effects>>
+
+터널을 다시 걸어 내려간다. 깎아지른 벽이 위압적으로 보이지만, 옷도 있고 시간 여유도 있으니 이제는 더 쉽게 길을 찾을 수 있다.
+<br><br>
+
+꼭대기에 도착해 입구를 비집고 빠져나오니 초원 근처다.
+<br><br>
+
+<<link [[다음|Meadow]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Cave Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+	"그럴 순 없지." 당신은 말한다. 당신이 달려들자 <<beasttype>>【은는】 당황해서 뒤로 넘어진다. "네가 나한테 보상할 훨씬 더 좋은 방법이 있지." 당신은 네 발로 엎드린다.
+	<br><br>
+	<<if $monster is 1>>
+		<<bHe>>【은는】 조심스럽게 당신에게 다가온다. "정말요...?" 당신은 고개를 끄덕인다.
+	<<else>>
+		<<bHe>>【은는】 조심스럽게 당신에게 다가와 냄새를 맡는다.
+	<</if>>
+	<<set $NPCList[0].stance to "top">>
+	<<if $fox gte 3>>
+		<<deviancy1>>
+	<<else>>
+		<<deviancy4>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+
+<<beast $enemyno>>
+<br><br>
+
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Meadow Cave Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Meadow Cave Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Meadow Cave Sex Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+<</if>>
+
+<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+	<<set $_stone to true>>
+	<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquestonetalisman" "found">>
+	<<wearProp "antique stone talisman">>
+<</if>>
+
+"내 뜻은 분명히 전해졌을 거야." 당신은 일어서며 말한다<<if $_stone>>, 그러면서 이상한 돌을 집어 든다<</if>>.
+<<clotheson>>
+
+당신은 바닥에서 헐떡이는 <<beasttype>>【을를】 남겨두고 터널로 돌아간다.
+<br><br>
+
+<<endcombat>>
+
+<<link [[다음|Meadow Cave Exit]]>><</link>>
+<br>
+
+:: Meadow Chase Hill
+<<effects>>
+
+주변에 아무도 보이지 않지만, 당신은 몸을 낮추고 움직인다.
+<<if $athleticsSuccess>>
+	작은 언덕 꼭대기에 오르자, <span class="green">주변 숲으로 달려가는 <<beasttype>>【이가】 보인다.</span> 당신은 추격을 계속하며, 거리를 좁히면서 울타리를 뛰어넘는다.
+	<br><br>
+
+	<<beasttype>>【은는】 나무 근처에서 갑자기 방향을 틀고, 또다시 방향을 튼다.
+	<<if currentSkillValue('skulduggery') gte random(1, 1050)>>
+		당신은 매달린 밧줄 고리를 제때 알아차리고, <span class="green">그 <<beasttype>>처럼 피한다.</span>
+		<br><br>
+
+		당신은 사냥감을 앞질러 나무 속으로 조금 들어간 곳에서 <<bhim>>【을를】 잡는다.
+		<<if $monster is 1>>
+			<<earnFeat "Cornered Rogue">>
+			<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+				<<set $phase to "monster">>
+				"죄, 죄송해요." <<bhe>>【이가】 당신의 팔이 <<bhis>> 목을 감싸자 말한다. "해칠 생각은 없었어요. 여기요." <<bHe>>【은는】 당신의 옷을 떨어뜨린다. "안 해치면 선물도 줄게요. 동굴에서 찾은 거예요."
+				<br><br>
+
+				<<link [[받아들인다|Meadow Chase Hill Accept]]>><</link>>
+				<br>
+			<<else>>
+				"죄, 죄송해요." <<bhe>>【이가】 당신의 팔이 <<bhis>> 목을 감싸자 말한다. "해칠 생각은 없었어요. 여기요." <<bHe>>【은는】 당신의 옷을 떨어뜨린다. "제발 보내주세요."
+				<br><br>
+				<<link [[용서한다|Meadow Chase Hill Accept]]>><</link>>
+				<br>
+			<</if>>
+
+			<<if $fox gte 3>>
+				<<link [[몸을 내준다|Meadow Chase Hill Sex]]>><<set $sexstart to 1>><</link>><<deviant1>><<fox>>
+				<br>
+			<<elseif hasSexStat("deviancy", 4)>>
+				<<link [[몸을 내준다|Meadow Chase Hill Sex]]>><<set $sexstart to 1>><</link>><<deviant4>>
+				<br>
+			<</if>>
+			<<if (displayDefiantOption(500)) and hasSexStat("deviancy", 2)>>
+				<<link [[벌을 준다|Meadow Chase Hill Punish]]>><<wolfDefiant 500>><<def 1>><<trauma -6>><<stress -6>><</link>><<deviant2>><<defianttext 500>><<ltrauma>><<lstress>>
+				<br>
+			<</if>>
+		<<else>>
+			미안한 듯, 당신의 옷을 당신 쪽으로 밀어준다.
+			<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+				그 위에 이상한 돌이 놓여 있다. 조각이 새겨져 있다. 수집가에게는 가치가 있을지도 모른다.
+			<</if>>
+			<br><br>
+
+			<<link [[용서한다|Meadow Chase Hill Accept]]>><</link>>
+			<br>
+			<<if $settings.bestialityEnabled>>
+				<<if $fox gte 3>>
+					<<link [[몸을 내준다|Meadow Chase Hill Sex]]>><<set $sexstart to 1>><</link>><<deviant1>><<fox>>
+					<br>
+				<<elseif hasSexStat("deviancy", 4)>>
+					<<link [[몸을 내준다|Meadow Chase Hill Sex]]>><<set $sexstart to 1>><</link>><<deviant4>>
+					<br>
+				<</if>>
+			<</if>>
+		<</if>>
+	<<else>>
+		당신은 <<bhim>>【을를】 따라잡아, 이제 한 번만 뛰어오르면 닿을 거리까지 다가간다.
+		<br><br>
+
+		<span class="red">당신의 발목이 공중으로 확 채인다.</span> 당신은 초원 가장자리에서 벌거벗은 채 밧줄에 매달리게 된다. <<beasttype>>【은는】 또 다른 덫을 피하고는 나무 사이로 사라진다.
+		<br><br>
+
+		<<link [[다음|Meadow Chase Hill Trap]]>><<clothesruined>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	작은 언덕 꼭대기에 오르지만, <span class="red"><<beasttype>>【은는】 어디에도 보이지 않는다.</span> <<bHe>>【은는】 이미 주변 숲으로 들어간 게 틀림없다.
+	<br><br>
+
+	당신은 살금살금 다시 내려온다. 이 식물들로 임시 옷을 만들 수 있을지도 모른다.
+	<br><br>
+
+	<<link [[다음|Meadow]]>><<clothesruined>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Meadow Chase Hill Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<beastCombatInit>>
+	"그럴 순 없지." 당신은 꽉 잡으며 말한다. "네가 나한테 보상할 훨씬 더 좋은 방법이 있지." 당신은 <<bhim>>에게 몸을 밀착시킨다.
+	<br><br>
+	<<if $monster is 1>>
+		<<bHe>>【은는】 조심스럽게 당신을 쳐다본다. "정말요...?" 당신은 고개를 끄덕인다.
+	<<else>>
+		<<bHe>>【은는】 조심스럽게 당신을 쳐다보며 냄새를 맡는다.
+	<</if>>
+	<<set $NPCList[0].stance to "top">>
+	<<if $fox gte 3>>
+		<<deviancy1>>
+	<<else>>
+		<<deviancy4>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+
+<<beast $enemyno>>
+<br><br>
+
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Meadow Chase Hill Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Meadow Chase Hill Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Meadow Chase Hill Sex Finish
+<<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+<</if>>
+
+<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+	<<set $_stone to true>>
+	<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquestonetalisman" "found">>
+	<<wearProp "antique stone talisman">>
+<</if>>
+
+"내 뜻은 분명히 전해졌을 거야." 당신은 일어서며 말한다<<if $_stone>>, 그러면서 이상한 돌을 집어 든다<</if>>.
+<<clotheson>>
+
+초원으로 다시 걸어간다.
+<br><br>
+
+<<endcombat>>
+
+<<link [[다음|Meadow]]>><</link>>
+<br>
+
+:: Meadow Chase Hill Trap
+<<effects>>
+
+위를 올려다본다. 밧줄이 당신의 발목을 감아 위쪽의 굵은 나뭇가지에 매달고 있다.
+<br><br>
+
+<<if !pcAreArmsBound("both")>>
+	<<link [[몸부림친다 (0:10)|Meadow Chase Hill Struggle]]>><<pass 10>><<pain 4>><</link>><<physiquedifficulty 1 15000>><<gpain>>
+	<br>
+<</if>>
+<<link [[꿈틀거린다 (0:10)|Meadow Chase Hill Squirm]]>><<pass 10>><</link>><<dancedifficulty 1 1000>>
+<br>
+<<link [[도움을 요청한다|Meadow Chase Hill Call]]>><</link>>
+<br>
+
+:: Meadow Chase Hill Struggle
+<<effects>>
+<<if $physiqueSuccess>>
+	손가락으로 밧줄을 잡아당기며 발목을 비튼다. 약간 고통스럽지만, <span class="green">간신히 몸을 빼내어</span> 바닥에 쓰러진다.
+	<br><br>
+
+	도둑은 이미 사라지고 없다. 적어도 그런 상태로 누구에게도 들키지 않은 게 다행이다.
+	<br><br>
+
+	<<link [[다음|Meadow]]>><</link>>
+	<br>
+<<else>>
+	손가락으로 밧줄을 잡아당기며 발목을 비틀지만, <span class="red">너무 꽉 조여 있다.</span>
+	<br><br>
+	<<generate1>><<person1>>
+	"이런 건 예상 못 했는데." <<personssimple>> 목소리가 들린다.
+	<<if random(1, 2) is 2>>
+		<<He>>【은는】 당신의 <<bottom>>에 손을 얹고, 다른 손에는 칼을 든다. <<He>>【은는】 밧줄을 잘라낸다. 당신은 바닥에 쓰러진다.
+		<br><br>
+
+		간신히 무릎을 꿇자마자 <<he>>【은는】 당신의 머리채를 잡고 <<his>> <<if $NPCList[0].penis isnot "none">>불룩한 곳<<else>>사타구니<</if>>에 얼굴을 처박는다.
+		<br><br>
+
+		<<link [[다음|Meadow Chase Hill Rape]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		<<set $rescued += 1>>
+		"도와줄게." <<He>>【은는】 밧줄을 잡고 당신을 안정시킨 후 칼로 잘라낸다. 당신은 바닥에 쓰러진다.
+		<br><br>
+
+		"이 숲 근처에서는 조심해." <<he>>【이가】 팔을 내밀며 말한다. <<covered>> "근데 옷도 없이 뭐 하는 거야?"
+		<br><br>
+
+		<<link [[도둑맞았다고 말한다|Meadow Chase Hill Say]]>><<set $phase to 0>><</link>>
+		<br>
+		<<link [[아무 말도 하지 않는다|Meadow Chase Hill Say]]>><<set $phase to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Meadow Chase Hill Squirm
+<<effects>>
+<<if $danceSuccess>>
+	밧줄이 더 조여지지 않도록 조심하며 꿈틀거린다. 조금씩, <span class="green">간신히 발뒤꿈치를 매듭에서 빼내어</span> 바닥에 쓰러진다.
+	<br><br>
+
+	도둑은 이미 사라지고 없다. 적어도 그런 상태로 누구에게도 들키지 않은 게 다행이다.
+	<br><br>
+
+	<<link [[다음|Meadow]]>><</link>>
+	<br>
+<<else>>
+	밧줄에 대고 꿈틀거리지만, <span class="red">오히려 더 조여질 뿐이다.</span>
+	<br><br>
+	<<generate1>><<person1>>
+	"이런 건 예상 못 했는데." <<personssimple>> 목소리가 들린다.
+	<<if random(1, 2) is 2>>
+		<<He>>【은는】 당신의 <<bottom>>에 손을 얹고, 다른 손에는 칼을 든다. 당신은 바닥에 쓰러진다.
+		<br><br>
+
+		간신히 무릎을 꿇자마자 <<he>>【은는】 당신의 머리채를 잡고 <<his>> <<if $NPCList[0].penis isnot "none">>불룩한 곳<<else>>사타구니<</if>>에 얼굴을 처박는다.
+		<br><br>
+
+		<<link [[다음|Meadow Chase Hill Rape]]>><<set $molestationstart to 1>><</link>>
+		<br>
+	<<else>>
+		<<set $rescued += 1>>
+		"도와줄게." <<He>>【은는】 밧줄을 잡고 당신을 안정시킨 후 칼로 잘라낸다. 당신은 바닥에 쓰러진다.
+		<br><br>
+
+		"이 숲 근처에서는 조심해." <<he>>【이가】 팔을 내밀며 말한다. <<covered>> "근데 옷도 없이 뭐 하는 거야?"
+		<br><br>
+
+		<<link [[도둑맞았다고 말한다|Meadow Chase Hill Say]]>><<set $phase to 0>><</link>>
+		<br>
+		<<link [[아무 말도 하지 않는다|Meadow Chase Hill Say]]>><<set $phase to 1>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Meadow Chase Hill Call
+<<effects>>
+
+누가 대답할지 걱정되지만, 당신은 도움을 요청한다. 곧 등 뒤에서 발소리가 들린다.
+<br><br>
+<<generate1>><<person1>>
+"이런 건 예상 못 했는데." <<personssimple>> 목소리가 들린다.
+<<if random(1, 2) is 2>>
+	<<He>>【은는】 당신의 <<bottom>>에 손을 얹고, 다른 손에는 칼을 든다. <<He>>【은는】 밧줄을 잘라낸다. 당신은 바닥에 쓰러진다.
+	<br><br>
+
+	간신히 무릎을 꿇자마자 <<he>>【은는】 당신의 머리채를 잡고 <<his>> <<if $NPCList[0].penis isnot "none">>불룩한 곳<<else>>사타구니<</if>>에 얼굴을 처박는다.
+	<br><br>
+
+	<<link [[다음|Meadow Chase Hill Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<<else>>
+	<<set $rescued += 1>>
+	"도와줄게." <<He>>【은는】 밧줄을 잡고 당신을 안정시킨 후 칼로 잘라낸다. 당신은 바닥에 쓰러진다.
+	<br><br>
+
+	"이 숲 근처에서는 조심해." <<he>>【이가】 팔을 내밀며 말한다. <<covered>> "근데 옷도 없이 뭐 하는 거야?"
+	<br><br>
+
+	<<link [[도둑맞았다고 말한다|Meadow Chase Hill Say]]>><<set $phase to 0>><</link>>
+	<br>
+	<<link [[아무 말도 하지 않는다|Meadow Chase Hill Say]]>><<set $phase to 1>><</link>>
+	<br>
+<</if>>
+
+:: Meadow Chase Hill Say
+<<effects>>
+<<towelup>>
+<<if $phase is 0>>
+	<<person>>【이가】 웃는다. <<He>>【은는】 음흉하게 쳐다보지는 않지만, 당황한 것 같지도 않다. "내 도구 몇 개가 없어졌어. 아마 같은 도둑일 거야. 자." <<He>>【은는】 <<his>> 옆에 있는 가방에서 수건 몇 장을 꺼낸다. 냄새가 좀 나지만, 쓸 만은 할 것이다.
+	<br><br>
+<<else>>
+	"마음대로 해." <<person>>【이가】 말한다. <<He>>【은는】 음흉하게 쳐다보지는 않지만, 당황한 것 같지도 않다. "감기 걸리게 할 순 없지. 자." <<He>>【은는】 <<his>> 옆에 있는 가방에서 수건 몇 장을 꺼낸다. 냄새가 좀 나지만, 쓸 만은 할 것이다.
+	<br><br>
+<</if>>
+
+<<He>>【이가】 작별 인사를 하고 숲 속으로 걸어 들어간다.
+<br><br>
+
+<<link [[다음|Meadow]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Chase Hill Rape
+<<effects>>
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<npcoral>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Meadow Chase Hill Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Meadow Chase Hill Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Meadow Chase Hill Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<person>>【이가】 당신을 땅으로 밀친다. "내 덫 하나를 망가뜨렸어." <<he>>【이가】 말한다. "내려준 것만으로도 운 좋은 줄 알아." <<He>>【은는】 걸어간다.
+	<br><br>
+	<<tearful>> 당신은 일어선다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Meadow]]>><</link>>
+	<br>
+
+<<else>>
+	<<person>>【이가】 당신에게서 뒷걸음질 친다. 바로 <<his>> 덫 중 하나로. 밧줄이 <<him>>【을를】 공중으로 들어 올리자 <<He>>【은는】 놀라서 소리치고, 매달리게 된다.
+	<br><br>
+	<<tearful>> 당신은 일어선다. "봐. 미안해." <<he>>【이가】 빙빙 돌면서 말한다. "내려줄 수 있을까?"
+	<br><br>
+
+	<<link [[도와준다|Meadow Chase Hill Help]]>><</link>>
+	<br>
+	<<link [[그냥 간다|Meadow Chase Hill Walk]]>><<def 1>><</link>>
+	<br>
+	<<link [[강탈한다|Meadow Chase Hill Rob]]>><</link>><<crime "thievery">>
+	<br>
+
+<</if>>
+
+:: Meadow Chase Hill Help
+<<effects>>
+
+당신은 <<person>>에게 <<his>> 버려진 칼을 건네준다. 어슬렁거리지 않는 게 좋다는 걸 안다. <<he>>【이가】 간신히 몸을 풀어주기 전에 당신은 언덕 너머로 돌아간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Meadow]]>><</link>>
+<br>
+
+:: Meadow Chase Hill Walk
+<<effects>>
+
+당신은 <<person>>【을를】 무시하고 걸어간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+<<link [[다음|Meadow]]>><</link>>
+<br>
+
+:: Meadow Chase Hill Rob
+<<effects>>
+
+<<His>> 가방이 <<he>>【이가】 들어 올려질 때 떨어졌다. 당신은 안을 뒤진다. "손 떼." <<he>>【이가】 당신을 잡으려고 손을 뻗으며 말한다. <<He>>【은는】 너무 멀리 있다.
+<br><br>
+
+안에서 <<wallet>>【을를】 찾았고,
+
+<<if $rng gte 81>>
+	<<moneyGain 200 true true>>
+<<elseif $rng gte 61>>
+	<<moneyGain 100 true true>>
+<<elseif $rng gte 41>>
+	<<moneyGain 80 true true>>
+<<elseif $rng gte 21>>
+	<<moneyGain 60 true true>>
+<<else>>
+	<<moneyGain 60 true true>>
+<</if>>
+그 안에 있다.
+<br><br>
+
+"그거 돌려놔." <<person>>【이가】 말한다. 당신은 <<him>>【을를】 무시하고 걸어간다.
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+<<wearProp "wallet">>
+<<link [[다음|Meadow]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Chase Hill Accept
+<<effects>>
+
+당신은 <<beasttype>>【을를】 풀어준다.
+
+<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+	<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquestonetalisman" "found">>
+	<<if $monster is 1>>
+		"고마워요!" <<beasttype>>【이가】 말한다. "금방 돌아올게요." <<bHe>>【은는】 나무 사이로 사라진다.
+		<br><br>
+	<<else>>
+		<<bHe>>【은는】 즉시 서둘러 도망간다.
+	<</if>>
+
+	<<pass 2>>
+	<<if $phase is "monster">>1분 정도 기다린다. 그리고 또 1분. 그러다 나무 뒤에서 바스락거리는 소리가 들린다. 가보니 땅에 조각된 돌이 놓여 있다. 무엇인지는 확실하지 않지만, 복잡해 보인다. 수집가에게는 가치가 있을지도 모른다.<</if>>
+	<<clotheson>><<wearProp "antique stone talisman">>
+<<else>>
+	<<if $monster is 1>>
+		"고마워요!" <<beasttype>>【이가】 말한다. <<bHe>>【은는】 나무 사이로 사라진다.
+	<<else>>
+		<<bHe>>【은는】 당신의 옷을 남겨두고 숲 속 깊이 서둘러 들어간다.
+	<</if>>
+	<<clotheson>>
+<</if>>
+
+<<link [[다음|Meadow]]>><<endevent>><</link>>
+<br>
+
+:: Meadow Chase Hill Punish
+<<effects>>
+
+"그럴 생각 없어." 당신은 말한다. "넌 내가 원하는 곳에 있어." <<bHe>>【이가】 몸부림치며 벗어나려 하지만,
+
+<<if $NPCList[0].penis is "none">>
+	당신은 <<bhim>> 아래로 손을 뻗어 <<bhis>> 음순에 손가락을 댄다. <<bHe>>【은는】 놀라서 비명을 지른다.
+	<br><br>
+
+	"나한테 덤빈 대가야." 당신은 말한다. 당신은 <<bhis>> 입구에 손가락을 대고 안으로 쑤셔 넣는다.
+	<br><br>
+
+	<<bHe>>【은는】 몸부림을 멈추지만, 당신이 두 번째 손가락을 추가하자 경계를 늦추지 않는다. 당신은 다른 손으로 <<bhis>> 어깨를 쓸어내린다. "다시 내 물건 훔치면," 당신은 속도를 높이며 말한다. "후회하게 될 거야." 당신은 세 번째 손가락을 추가한다. <<bHe>>【은는】 쾌감만큼이나 불쾌감에 몸부림치지만, 절정에 가까워지자 몸을 떤다.
+	<br><br>
+
+	신음과 함께, <<bhis>> 온몸이 오르가즘으로 경련한다.
+	<br><br>
+<<else>>
+	당신은 <<bhim>> 아래로 손을 뻗어 <<bhis>> 자지를 감싼다. <<bHe>>【은는】 놀라서 비명을 지른다.
+	<br><br>
+
+	"나한테 덤빈 대가야." 당신은 말한다. 당신은 <<bhis>> 자지를 손바닥에 쥐고 주무르기 시작한다. 곧 발기한다.
+	<br><br>
+
+	<<bHe>>【은는】 몸부림을 멈추지만, 당신이 <<bhis>> 자지를 위아래로 흔들자 경계를 늦추지 않는다. 당신은 다른 손으로 <<bhis>> 어깨를 쓸어내린다. "다시 내 물건 훔치면," 당신은 속도를 높이며 말한다. "후회하게 될 거야." 당신은 더욱 빠르게 흔든다. <<bHe>>【은는】 쾌감만큼이나 불쾌감에 몸부림치지만, 절정에 가까워지자 몸을 떤다.
+	<br><br>
+
+	숨을 헐떡이며, <<bhe>>【은는】 숲 바닥에 사정한다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Meadow Chase Hill Punish 2]]>><</link>>
+<br>
+
+:: Meadow Chase Hill Punish 2
+<<effects>>
+
+"내 뜻은 분명히 전했을 거야." 당신은 옷을 주워 입으며 일어선다.
+<<clotheson>>
+<<if $museumAntiques.antiques.antiquestonetalisman isnot "found" and $museumAntiques.antiques.antiquestonetalisman isnot "talk" and $museumAntiques.antiques.antiquestonetalisman isnot "museum">>
+	<<set $antiquemoney += 1200>><<museumAntiqueStatus "antiquestonetalisman" "found">><<wearProp "antique stone talisman">>
+	옷을 입는 동안 꾸러미에서 무언가 떨어진다. 자세히 보니, 조각이 새겨진 매끄러운 돌이다. 수집가에게는 가치가 있을지도 모른다.
+	<br><br>
+<</if>>
+
+당신은 초원으로 돌아간다.
+<<deviancy4>>
+<<endevent>>
+<<link [[다음|Meadow]]>><<unset $foxGen>><</link>>
+<br>

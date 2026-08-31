@@ -1,0 +1,126 @@
+:: Widgets Dance Studio [widget]
+<<widget "dancingclothes">>
+	<<wearoutfit>>
+	<<set _store_location to "dance_studio">>
+	<<set _earSlimeEnableDancewear to true>>
+
+	<<storeon _store_location "check">>
+	<<set _clothes to clothingInStorage(_store_location)>>
+	<<if $wearoutfittext isnot undefined>>
+		<<if $wearoutfittext and _clothes and _clothes.length>>
+			<<set _slots to _clothes.filter(item => setup.clothingLayer.torso.includes(item.slot))>>
+			<<if _slots.length>>
+				<<set _arrayClothes to _slots.map(slot => slot.name)>>
+				<<set _them to ((_arrayClothes.length gt 1 or _slots[0].word is "n") ? "them" : "it")>>
+				<<set _hooks to (_arrayClothes.length gt 1 ? "벽의 갈고리들" : "벽의 갈고리 하나")>>
+				<<set _clothing to formatList(_arrayClothes)>>
+
+				<span class="purple">
+					당신은 _clothing【을를】 벗어 _hooks에 건다.
+				</span>
+			<<else>>
+				<span class="purple">
+					옷을 벗는다.
+				</span>
+			<</if>>
+		<<else>>
+			<span class="purple">
+				옷을 입는다.
+			</span>
+		<</if>>
+		<<unset $wearoutfittext>>
+	<</if>>
+	<<if _store_check is 1>>
+
+		<<if _clothes.length gt 0>>
+			<<if _clothes.length gt 2>>
+				벽에 있는 갈고리에 옷이 걸려 있다.
+				<br>
+			<<elseif _clothes.length is 2>>
+				벽에 있는 갈고리에 당신의 _clothes[0].name【와과】 _clothes[1].name【이가】 걸려 있다.
+				<br>
+			<<else>>
+				갈고리 중 하나에 당신의 _clothes[0].name【이가】 걸려 있다.
+				<br>
+			<</if>>
+			<<clothingicon _clothes[0] _clothes[0].slot>><<link [[네 옷으로 갈아입는다|$passage]]>><<set $eventskip to 1>><<set $wearoutfittext to 2>><<storeload _store_location>><</link>>
+		<</if>>
+	<<else>>
+		이곳에서 레오타드나 비슷한 무용복을 입을 수 있습니다.
+	<</if>>
+	<br>
+	<br>
+	<<if $worn.under_upper.type.includes("dance") and $worn.under_lower.type.includes("dance")
+		and setup.clothingLayer.torso_outer.some(slot => $worn[slot].name isnot "naked" and ($worn[slot].one_piece isnot 1 or $worn[slot].outfitSecondary is undefined))
+		and clothingInStorage(_store_location).length is 0
+	>>
+		<<link [[댄스복만 남기고 벗는다|$passage]]>>
+			<<if clothingInStorage(_store_location).length is 0>>
+				<<if $worn.head.hood>><<set _hood to true>><</if>>
+				<<storesave _store_location>>
+				<<if _hood>>
+					<<for _slot range setup.clothingLayer.all.except(setup.clothingLayer.torso_outer, "head")>>
+						<<storeload _store_location _slot>>
+					<</for>>
+				<<else>>
+					<<for _slot range setup.clothingLayer.all.except(setup.clothingLayer.torso_outer)>>
+						<<storeload _store_location _slot>>
+					<</for>>
+				<</if>>
+			<<else>>
+				<<for _slot range setup.clothingLayer.torso_outer>>
+					<<generalUndress _store_location _slot>>
+				<</for>>
+			<</if>>
+		<</link>>
+		<br>
+		<br>
+	<</if>>
+	<<if !$worn.under_upper.type.includes("dance") gt 0 or clothingInStorage(_store_location).length is 0>>
+		<<if $wardrobe.under_upper.filter(a => a.type.includes("dance")) lte 0>>
+			//현재 무용복을 가지고 있지 않습니다.//
+		<<else>>
+			//무용복://
+			<br>
+			<<listdancingclothes _store_location>>
+		<</if>>
+		<br>
+	<</if>>
+	<br>
+<</widget>>
+
+<<widget "danceStudioIntro">>
+	/* Requires the name of the exit passage as an argument */
+	<<set $danceStudio.introExit to _args[0]>>
+
+	<<set $danceStudio.intro to true>>
+	<<npc Charlie>><<person1>>
+	안내원에게 돈을 지불하자 당신을 왼쪽 문으로 안내한다. 당신은 나무 바닥과 벽면에 거울이 늘어선 커다란 방으로 들어선다. 십여 명의 사람들이 이미 안에 있다. 강사가 누구인지는 쉽게 알아볼 수 있다. 허리에 손을 얹은 채로, <<he>>【은는】 서서 올바른 자세의 중요성에 대해 설명하며 수강생들을 지도하고 있다.
+	<br><br>
+	등 뒤로 문이 닫히는 소리가 <<him>>에게 당신의 존재를 알린다. <<He>>【은는】 <<his>> 에메랄드빛 눈을 당신에게 돌리며 미소 짓는다. "새 수강생이 왔네요! 환영해요." 짧은 적갈색 머리가 주근깨 있는 <<his>> 얼굴을 장식하고 있다. <<His>> 몸에 딱 붙는 의상이 탄탄하고 운동으로 다져진 <<his>> 몸매를 뽐낸다.
+
+	<<if $NPCList[0].breastsize gte 5>>
+		<<His>> 풍만한 가슴이 몸통에 바싹 밀착되어, <<him>>에게 날씬한 실루엣을 만들어준다.
+	<<elseif $NPCList[0].breastsize gte 3>>
+		<<His>> 가슴이 몸통에 바싹 밀착되어, <<him>>에게 날씬한 실루엣을 만들어준다.
+	<<elseif $NPCList[0].breastsize gte 1>>
+		<<His>> 작은 가슴이 몸통에 납작하게 눌려, <<him>>에게 날씬한 실루엣을 만들어준다.
+	<<else>>
+		<<His>> 평평한 가슴이 <<him>>에게 날씬한 실루엣을 만들어준다.
+	<</if>>
+
+	<<if $NPCList[0].penis isnot "none" and $NPCList[0].penissize gt 1>>
+		당신은 바지에 눌려 볼록 튀어나온 <<his>> 자지의 윤곽을 눈치채지 않을 수 없다.
+	<</if>>
+
+	<br><br>
+	<<he>>【이가】 당신의 음란한 시선을 눈치챘더라도 아무런 내색도 하지 않는다. 자신을 소개해야 하는데, 어떻게 할까?
+	<br><br>
+
+	<<link [[소심하게|Dance Studio Introduction]]>><<npcincr Charlie love 20>><<set $phase to 1>><</link>><<ggglove "Charlie">>
+	<br>
+	<<link [[자신감 있게|Dance Studio Introduction]]>><<set $phase to 2>><</link>>
+	<br>
+	<<link [[추파를 던지며|Dance Studio Introduction]]>><<npcincr Charlie love -10>><<stress -12>><<trauma -6>><<set $phase to 3>><</link>><<promiscuous1>><<lllove "Charlie">><<lstress>><<ltrauma>>
+	<br>
+<</widget>>

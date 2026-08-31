@@ -1,0 +1,987 @@
+:: Robin Chocolate Widgets [widget]
+<<widget "robinChocolateOfferHelp">>
+	<<if ["helped", "sabotaged"].includes($balloonStand.robin.status) and $balloonStand.robin.talked is false and $robin.timer.customer is 0>>
+		<<balloonRobinTalk>>
+		<br><br>
+		<<link [[로빈에게 진실을 말한다|Balloon Robin Check-In]]>><<endevent>><<set $phase to ("confess_"+$balloonStand.robin.status)>><</link>>
+		<br>
+		<<link [[침묵한다|Balloon Robin Check-In]]>><<endevent>><<set $phase to ("quiet_"+$balloonStand.robin.status)>><</link>>
+	<<else>>
+		<!-- Note: Don't try to move the <<endevent>> outside these links, that would make this widget less portable. -->
+		<<if $money gte 200>>
+			<<foodicon "cocoa">><<link [[코코아를 산다 (0:15 £2)|Robin Chocolate Purchase]]>><<stress -6>><<trauma -1>><<pass 15>><<clotheson>><<endevent>><</link>><<lstress>><<ltrauma>>
+			<br>
+		<</if>>
+		<<robinicon "cocoa">><<link [[도와준다 (0:30)|Robin Chocolate Help]]>><<endevent>><<npcincr Robin love 1>><<npcincr Robin trauma -1>><<pass 30>><<clotheson>><</link>><<glove>><<lrtrauma>>
+		<br>
+		<<getouticon>><<link [[떠난다|Park]]>><<endevent>><<clotheson>><</link>>
+	<</if>>
+<</widget>>
+
+:: Robin Chocolate
+<<set $outside to 0>><<set $location to "park">><<effects>>
+<<npc Robin>><<person1>>
+
+<<if $robinchocolateintro isnot 1>>
+	<<set $robinchocolateintro to 1>><<set $daily.robin.freeDrink to 1>>
+
+	로빈은 당신을 보자 손을 흔든다. <<He>>【은는】 다른 손으로는 김이 나는 냄비를 젓고 있다. "안녕." <<he>>【이가】 말한다. "이렇게 추울 땐 사람들이 레모네이드를 잘 안 사. 대신 핫초코를 팔고 있어. 자." <<He>>【은는】 냄비의 따뜻한 우유를 코코아 가루, 설탕과 섞어 머그잔을 건네준다. 아주 달콤하다.<<lstress>><<stress -6>>
+<<else>>
+	추위를 막기 위해 따뜻하게 껴입은 로빈이 <<his>> 핫초코 가판대 뒤에서 <<if $robin.stayup isnot 2>>서 있는<<else>>꾸벅꾸벅 졸고 있는<</if>> 것이 보인다. <<print $robin.timer.hurt gte 1 ? "<<He>>【은는】 당신을 보자 시선을 피한다." : C.npc.Robin.trauma gte 40 ? "<<He>>【은는】 누군가 <<him>> 옆을 지나갈 때마다 움찔한다. 당신을 보자, <<he>>【은는】 소심하게 손을 흔든다." : $robin.stayup is 2 ? "당신이 <<him>>에게 다가가자 <<He>>【은는】 깜짝 놀라 잠에서 깬다." : "<<He>>【은는】 당신을 보자 손을 흔든다.">>
+<</if>>
+<br><br>
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Purchase
+<<effects>><<npc Robin>><<person1>>
+<<money -200>>
+<<wearProp "hot cocoa">>
+<<if Weather.bodyTemperature lte 39.0>><<set Weather.bodyTemperature to Weather.bodyTemperature + 1.0>><</if>>
+
+"<<print $robin.timer.hurt gte 1 ? "I guess." : "Sure!">> One hot chocolate, coming right up!" Robin says, turning to warm up the milk.
+<br><br>
+
+You slip £2 across the counter to <<him>>, and accept the offered mug once it's ready.
+<br><br>
+
+<<if $robin.timer.hurt gte 1>>
+	<<set $robinmoney += 2>>
+	<<balloonRobinAngryPurchase>>
+
+<<elseif $robinpaid is 1 and $daily.robin.freeDrink isnot 1>>
+	<<set $daily.robin.freeDrink to 1>>
+	"I-I can't take this from you..." <<he>> says, sliding the money back across the counter to you. "You're already paying Bailey for me. Besides, I'd just end up giving it back to you."
+	<<money 200>>
+
+<<elseif $robinpaid is 1>>
+	<<set $robinmoney += 2>>
+	"I... do have to take it from you this time," <<he>> says, frowning as <<he>> looks down at the money. "I have to pay for the powder and milk. I can't keep giving it away, even if I want to."
+
+<<else>>
+	<<set $robinmoney += 2>>
+	"Thanks for your purchase!" <<he>> says with a smile, putting the money somewhere under the counter.
+
+<</if>>
+<br><br>
+
+You take your time with the mug, letting it warm your hands as you sip away at the hot chocolate.
+<br><br>
+
+"<<print either(
+"...Have you ever watched the sky on a clear night? There's so many stars out there... So many worlds just like ours. ...It might be a little too cold for that now, though.",
+"...Do you think Bailey will ever be gone? There has to be someone powerful out there who hates <<nnpc_him Bailey>>, right?",
+"It's hard to keep the stand running some days. But it's worth it in the end.")>>"
+<br><br>
+
+<<if Time.hour gte 17>>
+	"It's getting nippy out," Robin says. "Could you help me carry my stuff home?"
+	<br><br>
+	<<link [[Accept (0:30)|Orphanage]]>><<endevent>><<npcincr Robin love 1>><<pass 30>><<clotheson>><</link>><<glove>>
+	<br>
+	<<link [[Refuse|Park]]>><<clotheson>><<endevent>><</link>>
+	<br>
+
+<<else>>
+	<<robinChocolateOfferHelp>>
+
+<</if>>
+
+:: Robin Chocolate Help
+<<npc Robin>><<person1>>
+<<set _robin to statusCheck("Robin")>>
+<<effects>>
+<<if pcAreArmsBound("any")>>
+	<<He>>【은는】 당신의 팔을 쳐다본다. "아. 그 상태로는 도울 수 없겠네. 이리 와." <<He>>【은는】 당신의 등 뒤로 걸어가, 능숙한 손길로 결박을 풀어준다.<<unbind>>
+	<br><br>
+<</if>>
+<<if Time.hour gte 17>>
+	<<if _robin.trauma gte 40>>
+		"집에 가고 싶어." 로빈이 몸을 떨며 말한다. "지금은 너무 벅차."
+	<<else>>
+		"내 물건들 집까지 옮기는 것 좀 도와줄래." 로빈이 말한다. "점점 쌀쌀해지네."
+	<</if>>
+	<br><br>
+	당신은 로빈과 함께 고아원으로 걸어간다.
+	<br><br>
+
+	<<if $arousal gte $arousalmax>>
+		거의 다 도착했을 때 당신의 몸이 결국 당신을 배신한다.
+		<<orgasm>>
+		로빈은 예의 바르게 시선을 피하지만, 동요하는 것을 숨길 수는 없다.<<npcincr Robin lust 1>>
+		<br><br>
+	<</if>>
+	<<endevent>>
+	<<link [[다음|Orphanage]]>><</link>>
+	<br>
+<<elseif $robin.timer.hurt gte 1>>
+	<<balloonRobinAngryHelp>>
+	<<robinChocolateOfferHelp>>
+<<else>>
+	<<He>>【은는】 미소 짓는다.
+	<<if $rng gte 81 and $cow gte 6 and $livestock.intro isnot undefined>>
+		<<if _robin.trauma gte 40>>
+			"지금은 괜찮은 것 같은데, 나랑 같이 있어 주면 안 될까?" 로빈이 꼼지락거리며 당신에게 묻는다.
+		<<else>>
+			"필요한 건 다 있어. 그래도 네가 남아 있으면 좋겠네. 곁에 있어 주면 좋으니까."
+		<</if>>
+		<br><br>
+		당신은 <<he>>【이가】 가판대를 운영하는 동안 곁에 있어 주고, 손님이 없을 때 <<him>>【와과】 잡담을 나눈다.
+		<<npcincr Robin love 1>><<glove>><<ltrauma>><<lstress>><<trauma -3>><<stress -6>>
+		<br><br>
+
+		<<generate2>><<person2>>
+		<<person>>【이가】 가판대로 다가온다.
+		<<if _robin.trauma gte 40>>
+			"안, 안녕하세요." 로빈이 시선을 아래로 깐 채 말한다. "초, 초콜릿은 2파운드예요. 괜찮으시다면요."
+		<<else>>
+			"어서 오세요." 로빈이 말한다. "따뜻한 핫초코 한 잔에 2파운드예요."
+		<</if>>
+		<br><br>
+		"그럼, 꼬마야." <<person>>【은는】 당신을 향해 돌아보며 말한다. <<He>>【은는】 음탕하고 비뚤어진 미소를 짓는다. "너 기억나. 농장에서 봤었지. 나랑 같이 가는 게 어때? 집에 데려다줄게." <<He>>【이가】 손을 내민다.
+		<br><br>
+		당신은 갈등을 느낀다. 학대당했던 기억이 탁 트인 들판의 즐거운 생각과 충돌한다. 당신은 망설이다가, 이내 당신의 손을 <<hers>> 것에게 가져간다.
+		<<if _robin.dom gte 60>>
+			<br><br>
+			<<link [[다음|Robin Chocolate Cow]]>><</link>>
+			<br>
+
+		<<else>>
+			"저, 저기, 손님." 로빈이 끼어든다. "주문하신 핫초코 나왔어요."
+			<br><br>
+			<<person>>【은는】 놀란 듯하지만, <<his>> 미소는 사라지지 않는다. "고맙다, 꼬마야." <<he>>【이가】 건네받은 머그잔을 들며 말한다. "네 친구 잘 감시하렴." <<He>>【은는】 걸어간다.
+			<br><br>
+			다른 손님들은 덜 소름 끼치지만, 로빈은 꽤 동요한 것 같다.
+			<br><br>
+
+			<<robinChocolateOfferHelp>>
+		<</if>>
+	<<elseif $rng gte 61>>
+		"무료 시음 행사를 하고 싶어. 공원 주변에 이 쟁반을 들고 다니면서, 추워 보이는 사람들에게 권해줄 수 있을까? 너무 무겁지 않았으면 좋겠는데."
+		<<wearProp "tray">>
+		<<if _robin.trauma gte 40>>
+			<<He>>【은는】 당신에게 쟁반을 건네기 전에 머뭇거린다. "빨리 돌아와 줘." <<he>>【이가】 기어들어 가는 목소리로 덧붙인다.
+		<</if>>
+		<br><br>
+		당신은 쟁반을 들고 공원을 걷는다. 춥고 목마른 사람들은 얼마든지 찾을 수 있었고, 잊지 않고 로빈의 가판대를 홍보한다.
+		<<set $robinmoney += 5>>
+		<<generate2>><<person2>>
+
+		<<if dangerEvent()>>
+			<br><br>
+			<<person>>【이가】 당신의 등 뒤로 몰래 다가와서,
+			<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+				<span class="purple">당신의 치맛자락을 움켜쥔다.</span>
+			<<elseif $worn.lower.set isnot $worn.upper.set>>
+				<span class="purple">당신의 $worn.lower.name 자락을 움켜쥔다.</span>
+			<<else>>
+				<span class="purple">당신의 <<breasts>>【을를】 움켜쥔다.</span>
+			<</if>>
+			<<gstress>><<stress 6>>
+			<br><br>
+
+			<<him>>【을를】 제지할 수도 있지만, 당장 성가신 쟁반을 들고 있어서 두 손이 자유롭지 않다.
+			<br><br>
+
+			<<link [[밀쳐낸다|Robin Chocolate Slap]]>><<def 1>><</link>><<dancedifficulty 1 1000>>
+			<br>
+			<<link [[참는다|Robin Chocolate Endure]]>><<sub 1>><<trauma 6>><<stress 6>><</link>><<gtrauma>><<gstress>>
+			<br>
+		<<else>>
+			<<famebusiness 1>>
+			<<rng 5>>
+			<<switch $rng>>
+				<<case 1>> 버스 정류장을 지나치자마자 쟁반이 반쯤 비워졌다.
+				<<case 2>> 코가 빨개진 <<father>>【은는】 머그잔 두 개를 받고 특히 고마워하며, 그 핫초코로 나무 위로 올라간 <<his>> 아이들을 달래어 내려오게 한다.
+				<<case 3>> 노숙자인 <<personsimple>>【이가】 한 잔을 가져가더니 머그잔으로 <<his>> 손을 녹인다.
+				<<case 4>> 조깅하던 <<person>>【이가】 지나가며 핫초코를 낚아채더니, 속도를 늦추지도 않고 마셔버린다.
+				<<case 5>> 추위에 대비하지 못한 사람들이 아주 많았다.
+			<</switch>>
+			<br><br>
+			<<if isInPark("doren") and !$weekly.dorenchocolatebuy and random(0,50) gte 25>>
+				<<set $weekly.dorenchocolatebuy to true>><<set _dorenjustbought to true>>
+				<<npc "Doren" 3>><<person3>>
+				"안녕, <<lassie>>!" 도렌이 컵을 집어들며 가판대를 바라본다. "로빈을 돕고 있구나?"
+				<br><br>
+				<<He>>【은는】 뒤에 있는 일행을 돌아본다. 그중에 리버가 있는 것이 보인다. "어이, 저기 저 초콜릿 가판대 보여? 내가 쏜다!"
+				<br><br>
+				순식간에 사람들이 로빈 앞에 줄을 서서 핫초코를 사기 시작한다.
+				<br><br>
+				"나중에 봐, <<lassie>>." 도렌이 일행에 합류하기 전에 말한다.
+				<br><br>
+				<<set $robinmoney += 30>>
+			<</if>>
+			<<person1>>
+			당신이 <<him>>에게 돌아가자 로빈이 미소 짓는다.
+			<<if _robin.trauma gte 40>>
+				<<He>>【은는】 당신이 쟁반을 내려놓자마자 당신을 끌어안는다. "고마워."
+			<<else>>
+				"장사가 훨씬 잘됐어." <<he>>【이가】 말한다. "고마워."
+				<<if _dorenjustbought is true>>
+					<br><br>
+					<<He>>【은는】 당신에게 최근 번 돈을 보여준다. "이것 봐! 방금 도렌이 와서 사람들한테 한 잔씩 쐈어!"
+				<</if>>
+			<</if>>
+			<br><br>
+			<<robinChocolateOfferHelp>>
+		<</if>>
+	<<elseif $rng gte 41 and Weather.isSnow>>
+		<<if _robin.trauma gte 40>>
+			"지금은 괜찮은 것 같은데, 나랑 같이 있어 주면 안 될까?" 로빈이 꼼지락거리며 당신에게 묻는다.
+		<<else>>
+			"필요한 건 다 있어. 그래도 네가 남아 있으면 좋겠네. 곁에 있어 주면 좋으니까."
+		<</if>>
+		<br><br>
+		당신은 <<he>>【이가】 가판대를 운영하는 동안 곁에 있어 주고, 손님이 없을 때 <<him>>【와과】 잡담을 나눈다.
+		<<npcincr Robin love 1>><<glove>><<ltrauma>><<lstress>><<trauma -3>><<stress -6>>
+		<br><br>
+
+		<<if dangerEvent() and !$daily.robin.parkSnow>>
+			<<set $daily.robin.parkSnow to 1>>
+			눈덩이 하나가 허공을 가르며 날아온다.
+			<<if _robin.trauma gte 40>>
+				로빈은 눈덩이를 보았지만 얼어붙은 채 움찔거리기만 하다가 결국 얼굴에 눈을 정통으로 맞는다. 당신은 재빨리 몸을 숙이며 <<him>>【을를】 잡아당겨 앉힌다.
+				<br><br>
+				로빈은 <<his>> 얼굴에서 눈을 닦아내며 몸을 떤다. "그냥 기, 기다리자." <<he>>【이가】 말한다. "결국엔 알아서 갈 거야."
+			<<else>>
+				로빈이 아슬아슬하게 눈덩이를 피하고는, 당신의 팔을 끌어당겨 주저앉힌다. 또 다른 눈덩이가 머리 위로 날아간다. 유치한 웃음소리가 들린다.
+				<br><br>
+				"지루해지면 갈 거야." 로빈이 눈 위에 앉아 말한다. "조금만 참자."
+			<</if>>
+			<br><br>
+			<<link [[기다린다|Robin Chocolate Wait]]>><</link>>
+			<br>
+			<<link [[우두머리에게 도전한다|Robin Chocolate Challenge]]>><</link>>
+			<br>
+			<<link [[전부 상대한다|Robin Chocolate Take]]>><</link>>
+			<br>
+			<<if $robinromance is 1>>
+				<<link [[스킨십한다|Robin Chocolate Kiss]]>><<npcincr Robin love 1>><<npcincr Robin lust 1>><</link>><<promiscuous1>><<glove>><<glust>>
+				<br>
+			<</if>>
+		<<else>>
+			"나랑 같이 시간 보내줘서 고마워." 잠시 후 <<he>>【이가】 말한다.
+			<br><br>
+			<<robinChocolateOfferHelp>>
+		<</if>>
+	<<elseif $rng gte 21 and isInPark("doren") and !$weekly.dorenchocolatebuy>>
+		<<set $dorenhotchocoprice to 40 + Math.floor(Math.random()*31)*2>>
+		<<set $dorenhotchocoamount to $dorenhotchocoprice/2>>
+
+		<<set $weekly.dorenchocolatebuy to true>>
+		<<npc "Doren" 2>><<person2>>
+		도렌이 가판대에 들른다. "좋은 <<= Time.hour lt 12 ? "아침이야" : "오후네">>. 무리한 부탁인 건 알지만, 핫초코 $dorenhotchocoamount잔만 만들어 줄 수 있을까? 노숙자들한테 좀 나눠줄 생각이거든." <<he>>【은는】 로빈에게 £$dorenhotchocoprice【을를】 건넨다.
+		<br><br>
+		로빈은 <<person1>><<his>> 고개를 저으며, 도렌에게 돈을 돌려준다. "어려운 사람들을 위한 거라면, 제가 공짜로 드릴—"
+		<br><br>
+		"아니, 아니야, 로빈. 내가 돈을 낼게." 도렌이 단호하게 주장한다.
+		<br><br>
+		<<print '<<link [[핫초코 값을 대신 낸다고 제안한다 (£'+$dorenhotchocoprice+')|Hot Chocolate Doren]]>><<set $phase to 1>><</link>>'>>
+		<br>
+		<<link [[로빈을 설득한다|Hot Chocolate Doren]]>><<set $phase to 2>><<npcincr Doren love 1>><</link>><<glove Doren>> /*Doren's love */
+		<br>
+		<<link [[로빈의 편을 든다|Hot Chocolate Doren]]>><<set $phase to 3>><<npcincr Robin love 1>><</link>><<glove Robin>> /*Robin's love */
+	<<else>>
+		<<if _robin.trauma gte 40>>
+			"우유가 좀 더 필요해. 미안해. 무겁다는 건 아는데, 좀 사다 줄 수 있을까?" <<He>>【은는】 따뜻한 옷차림에도 불구하고 몸을 떤다. "하베스트 거리에 가면 팔 거야." <<He>>【이가】 당신에게 £5와 큰 병을 건네준다. "이 정도면 충분할 거야."
+		<<else>>
+			"우유를 한 냄비 더 데워야 해. 무거운 걸 알면서 부탁하기는 싫지만, 좀 더 사다 줄 수 있을까? 신선한 우유를 사려면 하베스트 거리까지 가야 해." <<He>>【이가】 당신에게 £5와 큰 병을 건네준다. "가득 채우기엔 이 정도면 충분할 거야."
+		<</if>>
+		<br><br>
+		<<if $settings.breastFeedingEnabled and $lactating is 1 and hasSexStat("promiscuity", 3) and $awareness gte 100>>
+			화장실을 지나칠 때 문득 좋은 생각이 떠오른다. 훨씬 가까운 곳에 신선한 젖이 있다.
+			<br><br>
+
+			<<link [[자신의 모유를 짠다|Robin Milk Masturbation]]>><<set $masturbationstart to 1>><</link>><<promiscuous3>>
+			<br>
+		<<else>>
+			당신은 공원을 떠나 하베스트 거리로 향하는 길을 따라간다.
+			<br><br>
+		<</if>>
+		<<link [[우유를 산다|Robin Milk Buy]]>><</link>>
+		<br>
+		<<set $skulduggerydifficulty to 400>>
+		<<link [[우유를 훔친다|Robin Milk Steal]]>><<crimeUp 5 "petty">><</link>><<skulduggerydifficulty>><<crime "petty">>
+		<br>
+		<<if hasSexStat("promiscuity", 2)>>
+			<<link [[유혹해서 우유를 싸게 산다|Robin Milk Seduction]]>><<endevent>><</link>><<promiscuous2>>
+			<br>
+		<</if>>
+	<</if>>
+<</if>>
+
+
+:: Robin Chocolate Set
+<<set $outside to 1>><<set $location to "park">><<effects>>
+<<set _robin to statusCheck("Robin")>>
+
+<<if pcAreArmsBound("any")>>
+	<<He>>【이가】 당신의 팔을 본다. "오. 그렇게는 도울 수 없겠네. 자." <<He>>【이가】 당신 뒤로 걸어가더니, 능숙한 손길로 당신의 속박을 풀어준다.<<unbind>>
+	<br><br>
+<</if>>
+당신은 로빈이 <<his>> 장비를 공원으로 옮기는 것을 돕는다. "도와줘서 고마워." <<he>>【이가】 말한다.
+<<if _robin.trauma gte 40>>
+	"혼자였으면 어쩔 뻔했는지 모르겠어."
+<<else>>
+	"혼자서 다 옮기기 힘들거든."
+<</if>>
+<<He>>【이가】 <<his>> 휴대용 난로에 불을 붙인다.
+<br><br>
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Set Tutorial
+<<set $outside to 1>><<set $location to "town">><<effects>>
+당신과 로빈은 공원으로 떠난다. 당신은 <<his>> 장비 일부를 들고 조금 앞서 걷고 있다. 로빈과 함께 고아원을 막 나서려던 참에 지나가던 <<endevent>><<generate1>><<person1>><<person>>【와과】 부딪힌다. 충돌로 인해 당신은 들고 있던 것을 떨어뜨린다.
+<<He>>【은는】 비틀거리며 뒤로 물러나더니 화난 눈으로 당신을 쳐다본다. 하지만 당신을 보자 <<his>> 분노는 음탕함으로 바뀐다. "이번 주에 본 것 중에 네가 제일 귀엽네! 이리 와."
+<br><br>
+<<link [[다음|Tutorial]]>><<set $molestationstart to 1>><<set $tutorialExit to "Robin Chocolate Set Tutorial 2">><</link>>
+
+:: Robin Chocolate Set Tutorial 2
+<<set $outside to 1>><<set $location to "park">><<effects>>
+<<npc Robin>><<person1>>
+로빈은 당신이 골목을 빠져나오는 것을 발견한다. "괜, 괜찮아?" <<he>>【이가】 걱정스러운 표정으로 묻는다. "다치게 하진 않았지, 응?"
+<br><br>
+당신은 고개를 끄덕이고, 떨어뜨린 <<his>> 장비를 주워 로빈과 함께 공원으로 계속 걸어간다. 남은 길은 별일 없이 평온했다.
+<br><br>
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Cow
+<<effects>>
+<<set _robin to statusCheck("Robin")>>
+
+당신의 손이 <<persons>> 닿기 전에, 누군가 당신의 팔을 뒤로 잡아당긴다. 로빈이 당신을 <<person1>><<him>> 뒤로 밀어낸다.
+<<if _robin.trauma gte 40>>
+	"ㅇ-얘를 데려갈 순 없어!" <<he>>【이가】 떨리는 손으로 <<person2>><<person>>에게 <<his>> 컵을 건네며 말한다.
+<<else>>
+	"가 주시길 부탁드립니다." <<he>>【이가】 <<person2>><<person>>에게 <<his>> 컵을 건네며 말한다.
+<</if>>
+<br><br>
+
+"조심해, <<nnpc_gendery "Robin">>." <<person2>><<person>>【이가】 말한다. "네 친구는 가치가 꽤 높아. 네가 <<phim>>처럼 되는 꼴은 보고 싶지 않군."
+<br><br>
+
+<<if _robin.trauma gte 40>>
+	로빈은 움찔했지만, <<nnpc_his "Robin">> 자리를 지킨다. "경찰 부르기 전에 떠나."
+<<else>>
+	로빈이 얼굴을 찌푸린다. "경찰 부르기 전에 마지막으로 떠나라고 하는 거야."
+<</if>>
+<br><br>
+
+<<person>>【은는】 웃으며 초콜릿을 눈 위에 쏟아버린다. "돈은 가져. 친구나 잘 지켜보는 게 좋을 거야." <<He>>【은는】 떠난다.
+<br><br>
+
+당신은 로빈에게 몸을 돌려, 고개를 갸웃하고, 걱정스러운 울음소리를 낸다.
+<br><br>
+
+<<if _robin.trauma gte 40>>
+	"다 괜찮아." 로빈이 말한다. "자."
+<<else>>
+	"괜찮아." 로빈이 말한다. "자."
+<</if>>
+<<person1>><<He>>【은는】 핫초코 한 잔을 더 타서 당신에게 건넨다.
+<br><br>
+
+"이거 마시면 기분이 나아질 거야." <<Hes>> 말이 맞다.<<gdom>><<npcincr Robin dom 1>><<lstress>><<stress -6>>
+<br><br>
+
+다른 손님들은 덜 소름 끼친다.
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Slap
+<<effects>>
+<<set _robin to statusCheck("Robin")>>
+
+당신은 쟁반을 공중으로 던지고, 몸을 돌려 <<person>>의 뺨을 후려친다. <<He>>【은는】 얼어붙은 땅 위에서 미끄러져 <<his>> 엉덩방아를 찧는다.<<ltrauma>><<trauma -6>>
+<br><br>
+<<if $danceSuccess>>
+	당신은 빙글 돌아서, <span class="green">쟁반을 잡아챈다.</span> 머그잔은 쏟아지지 않았다.<<lstress>><<stress -6>>
+<<else>>
+	쟁반을 잡으려 했지만, <span class="red">너무 느렸다.</span> 쟁반이 땅에 떨어지며 핫초코가 눈 위에 쏟아진다.<<gstress>><<stress 6>>
+<</if>>
+<br><br>
+
+<<person1>>
+로빈은 당신이 <<him>>에게 돌아오자 미소 짓는다.
+<<if _robin.trauma gte 40>>
+	<<He>>【은는】 당신이 쟁반을 내려놓자마자 껴안는다. "고마워."
+<<else>>
+	"장사가 훨씬 잘되네." <<he>>【이가】 말한다. "고마워."
+<</if>>
+<br><br>
+
+<<if !$danceSuccess>>
+	<<link [[초콜릿을 쏟았다고 고백한다|Robin Chocolate Confess]]>><<npcincr Robin dom 1>><</link>><<gdom>>
+	<br>
+<</if>>
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Confess
+<<effects>>
+<<set _robin to statusCheck("Robin")>>
+
+<<if $speech_attitude is "meek">>
+	"ㅈ-죄송해요." 당신이 말한다. "핫초코를 좀 쏟았어요."
+<<elseif $speech_attitude is "bratty">>
+	"좀 쏟았어." 당신이 말한다. "알려줘야 할 것 같아서."
+<<else>>
+	"유감스럽게도 좀 쏟았어요." 당신이 말한다. "미안해요."
+<</if>>
+<br><br>
+
+<<if _robin.trauma gte 40>>
+	"괜찮아." 로빈이 중얼거린다. "네가 다치지만 않았으면 됐어."
+<<else>>
+	"괜찮아." 로빈이 웃는다. "미끄러지지 않게 조심해. 땅이 얼어붙을 수 있거든."
+<</if>>
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Endure
+<<effects>>
+<<set _robin to statusCheck("Robin")>>
+
+<<set _wearingSkirt to (setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1)>>
+<<set _notWearingSet to ($worn.lower.set isnot $worn.upper.set)>>
+
+<<if _wearingSkirt or _notWearingSet>>
+	<<person>>【은는】 당신의 $worn.lower.name【을를】 <<if _wearingSkirt>>들어 올린다<<else>>끌어내린다<</if>>,
+	<span class="lewd">공원 한가운데서 당신의 <<undies>>【을를】 드러낸다.</span>
+	<br><br>
+
+	<<if $worn.under_lower.type.includes("naked")>>
+		<<if playerChastity()>>
+			"누가 널 잠가놨네." <<he>>【이가】 웃는다. "아쉽군."
+		<<else>>
+			"속옷도 안 입었어?" <<he>>【이가】 웃는다. "네가 <<slut>>일 줄 알았지."
+		<</if>>
+		<<set _exhib to 10>>
+	<<else>>
+		"속옷 예쁘네." <<he>>【이가】 말한다. "너 같은 <<slut>>【은는】 아무것도 안 입고 있을 줄 알았는데."
+		<<set _exhib to 5>>
+	<</if>>
+	<<if _wearingSkirt>>
+		<<He>>【은는】 당신의 치마를 허리에 붙잡고 있다.
+	<<else>>
+		<<He>>【은는】 당신의 <<bottom>>【을를】 감상하기 위해 뒤로 물러선다.
+	<</if>>
+	당신의 손은 쟁반에 딱 붙어 있다. 사람들이 당신 쪽을 가리킨다. 산들바람에 몸이 떨린다.
+	<br><br>
+
+	<<fameexhibitionism _exhib>>
+	<<if _wearingSkirt>>
+		마침내, <<he>>【은는】 당신의 치마를 놓아준다.
+	<<else>>
+		마침내, <<he>>【은는】 당신의 $worn.lower.name【을를】 다시 위로 올려준다.
+	<</if>>
+<<else>>
+	<<if $player.breastsize gte 3>>
+		<<person>>【은는】 당신의 <<breasts>>【을를】 꽉 쥔다,
+	<<else>>
+		<<person>>【은는】 당신의 <<breasts>> 위로 <<his>> 손가락을 움직인다,
+	<</if>>
+	<<if $worn.upper.type.includes("naked") and $worn.under_upper.type.includes("naked")>>
+		그리고 드러난 당신의 젖꼭지를 꼬집는다.
+	<<else>>
+		그리고 천 위로 당신의 젖꼭지를 꼬집는다.
+	<</if>>
+	"네가 이런 걸로 흥분하는 <<slut>> 부류일 줄 알았어." <<he>>【이가】 말한다. 당신의 손은 쟁반에 딱 붙어 있다. 당신은 몸을 떤다.
+	<br><br>
+
+	마침내, <<person>>【은는】 물러난다.
+<</if>>
+<<He>>【은는】 핫초코 한 잔을 들고, 당신에게 고맙다고 말한 뒤 걸어간다.
+<br><br>
+
+<<set $robinmoney += 5>>
+<<person1>>
+로빈은 당신이 <<him>>에게 돌아오자 미소 짓는다.
+<<if _robin.trauma gte 40>>
+	<<He>>【은는】 당신이 쟁반을 내려놓자마자 껴안는다. "고마워."
+<<else>>
+	"장사가 훨씬 잘되네." <<he>>【이가】 말한다. "고마워."
+<</if>>
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Milk Masturbation
+<<effects>>
+
+<<if $masturbationstart is 1>>
+	<<set $masturbationstart to 0>>
+	<<set $masturbationstat += 1>>
+	<<masturbationstart>>
+	<<set $timer to 40>>
+	<<set $masturbation_bowl to 1>>
+	<<set $mouth to "disabled">>
+	당신은 방해받지 않을 만한 화장실 칸으로 들어간다.
+	<<promiscuity3>>
+<</if>>
+<<masturbationeffects>>
+<<masturbationactions>>
+<<masturbationbowl>>
+<br><br>
+
+<<if $corruptionMasturbation>>
+	<span class="red">귀 안의 슬라임이 멈추는 것을 허락하지 않는다.</span>
+<</if>>
+<div id="masturbationButtons">
+	<<if $timer lte 0 or $masturbation_fluid gte 500>>
+		<div id="next"><<link [[계속하기|$passage + " Finish"]]>><<set $finish to 1>><</link>><<nexttext>></div>
+	<<else>>
+		<div id="next"><<link [[계속한다|$passage]]>><</link>><<nexttext>></div>
+	<</if>>
+	<<masturbationStopControls>>
+</div>
+<br><br><br><br><br>
+
+:: Robin Milk Masturbation Finish
+
+<<endmasturbation>>
+<<endcombat>>
+<<clothesontowel>>
+<<npc Robin>><<person1>>
+<<set _robin to statusCheck("Robin")>>
+<<if $masturbation_fluid gte 500>>
+	<<wearProp "bottle of breast milk">>
+	<span class="green">병이 우유로 가득 찼다.</span> 당신은 화장실을 나선다.
+	<br><br>
+	로빈은 당신을 보자 미소 짓는다.
+	<<if _robin.trauma gte 40>>
+		"빨리 돌아와 줘서 고마워."
+	<<else>>
+		"빨리 왔네."
+	<</if>>
+	<<he>>【이가】 말한다. <<He>>【은는】 우유를 받는다. "아직 따뜻하네! 이렇게 신선한 걸 구할 수 있는지 몰랐어." <<He>>【이가】 우유를 냄비에 붓는 동안 당신은 조용히 <<his>> £5를 카운터에 올려놓는다.
+	<<gglove>><<npcincr Robin love 3>>
+	<br><br>
+
+<<else>>
+	<<wearProp "bottle of milk">>
+	당신은 자위를 멈춘다.
+	<<if $finish isnot 1>>
+		꽤 오랫동안 시도했고, 로빈이 기다리고 있다.
+	<</if>>
+
+	<<if $masturbation_fluid gte 400>>
+		<span class="teal">체액을 거의 다 모았다.</span> 하지만 나머지는 사야 할 것이다.
+	<<elseif $masturbation_fluid gte 300>>
+		<span class="lblue">체액을 많이 모았다.</span> 하지만 나머지는 사야 할 것이다.
+	<<elseif $masturbation_fluid gte 200>>
+		<span class="blue">체액을 좀 모았다.</span> 하지만 나머지는 사야 할 것이다.
+	<<elseif $masturbation_fluid gte 100>>
+		<span class="purple">체액을 좀 모았다.</span> 하지만 나머지는 사야 할 것이다.
+	<<elseif $masturbation_fluid gte 50>>
+		<span class="purple">체액을 조금 모았다.</span> 하지만 나머지는 사야 할 것이다.
+	<<elseif $masturbation_fluid gte 1>>
+		<span class="pink">체액을 조금 모았다.</span> 하지만 나머지는 사야 할 것이다.
+	<<else>>
+		<span class="red">체액을 하나도 모으지 못했다.</span> 그러니 사야 할 것이다.
+	<</if>>
+	<br><br>
+
+	<<set _moneySaved to Math.round($masturbation_fluid / 100)>>
+	<<set $robinmoney += _moneySaved>>
+
+	당신은 하베스트 가로 걸어가 신선한 농산물을 광고하는 시골풍 가게로 들어간다. 그들은 밀리리터 단위로 우유를 팔고, 주인은 기꺼이 당신의 병을 채워준다.
+	<br><br>
+
+	<<if $masturbation_fluid gte 1>>
+		당신은 로빈에게 돌아간다. <<He>>【은는】 당신을 보자 미소 짓고 우유를 받는다. <<He>>【이가】 우유를 냄비에 붓는 동안 당신은 조용히 <<his>> 잔돈을 카운터에 올려놓는다.<<glove>><<npcincr Robin love 1>>
+	<<else>>
+		당신은 로빈에게 돌아간다. <<He>>【은는】 당신을 보자 미소 짓고 우유를 냄비에 붓는다.
+	<</if>>
+	<br><br>
+<</if>>
+
+<<robinChocolateOfferHelp>>
+
+
+:: Robin Milk Seduction
+<<effects>>
+<<wearProp "bottle of milk">>
+<<endevent>><<generate1>><<generate2>><<person1>>
+당신은 하베스트 가에 도착해 시골풍 가게로 들어간다. 주인인 <<person>>【은는】 밀리리터 단위로 우유를 팔 의향이 있다. <<he>>【이가】 병을 채우는 동안 당신은 카운터 너머로 몸을 기울인다.
+<br><br>
+
+<<set $seductiondifficulty to 6000>>
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<seductionskilluse>>
+
+"혹시 다른 방식으로 지불할 수 있을까요?" 당신이 애교 섞인 목소리로 말한다.
+<<promiscuity2>>
+
+<<if $seductionrating gte $seductionrequired>>
+
+	<span class="green"> <<person>>【은는】 너무 황홀해져서 병을 넘치도록 채운다.</span> 우유가 <<his>> 손에 쏟아지고 나서야 알아차린다.
+	<br><br>
+
+	<<if $pronoun is "m">>
+		당신은 카운터 뒤로 슬쩍 들어가, 다른 손님이 들어오는 바로 그 순간에 당신의 <<bottom>>【을를】 <<his>> 사타구니에 밀어붙인다.
+		<br><br>
+		손님인 <<person2>><<person>>【은는】 당신과 <<person1>><<person>>【이가】 얼마나 가까이 서 있는지 보고 약간 얼굴을 찌푸린다.
+		주인은 손님 응대를 해내지만, 당신이 <<his>> <<if $NPCList[0].penis isnot "none">><<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>><<else>>보지<</if>>에 몸을 비비자 말을 더듬는다.
+		<br><br>
+		당신은 가득 찬 병을 들고, 헐떡이는 <<person1>><<person>>【을를】 남겨두고 떠난다.
+		<br><br>
+
+	<<else>>
+		당신은 카운터 뒤로 슬쩍 들어가, 당신의 <<if $player.penisExist>><<penis>><<else>><<pussy>><</if>>【을를】 <<his>> 엉덩이에 밀어붙인다, 바로 다른 손님이 들어오는 순간에.
+		당신은 <<his>> 허리를 감싸고 <<his>> <<if $NPCList[0].penis isnot "none">><<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>><<else>>보지<</if>>【을를】 더듬는다.
+		<br><br>
+		손님인 <<person2>><<person>>【은는】 당신과 <<person1>><<person>>【이가】 얼마나 가까이 서 있는지 보고 약간 얼굴을 찌푸린다.
+		주인은 손님 응대를 해내지만, 당신이 <<him>>【을를】 애태우자 말을 더듬는다.
+		<br><br>
+		당신은 가게에서 걸어 나오며 헐떡이는 <<person1>><<person>>【을를】 남겨둔다, 손에는 우유가 가득 찬 병을 들고.
+		<br><br>
+	<</if>>
+
+	<<npc Robin 3>><<person3>>
+	당신은 로빈에게 돌아간다. <<He>>【은는】 당신을 보자 미소 짓고 우유를 받는다. <<He>>【이가】 우유를 냄비에 붓는 동안 당신은 조용히 <<his>> £5를 카운터에 올려놓는다.<<glove>><<npcincr Robin love 1>>
+<<else>>
+
+	<span class="red">"내 타입이 아니야."</span><<person>>【은는】 우유에서 눈을 떼지 않고 말한다.
+	<br><br>
+	<<npc Robin 3>><<person3>>
+	당신은 로빈에게 돌아간다. <<He>>【은는】 당신을 보자 미소 짓는다. <<He>>【은는】 우유를 받아 냄비에 붓는다.
+<</if>>
+<br><br>
+<<robinChocolateOfferHelp>>
+
+:: Robin Milk Steal
+<<effects>>
+
+주변 농장의 우유는 하베스트 가 모퉁이에 있는 공장에서 가공된다. 몇 리터쯤 없어져도 아무도 모를 것이다. 당신은 벽돌 담을 넘어, 금속 틀 문을 통해 공장으로 들어간다.
+<br><br>
+
+당신은 키 큰 금속 탱크로 가득 찬 넓은 방으로 들어간다. 더 깊은 곳에서 낮은 웅웅거리는 소리가 들린다.
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	주변에 아무도 없어서, 당신은 수도꼭지를 열고 병에 우유를 채운다. <span class="green">아무도 당신을 눈치채지 못한다.</span> 이 정도면 로빈에게 충분히 신선할 것이다.
+	<br><br>
+
+	<<skulduggeryuse>>
+
+	<<endevent>><<npc Robin>><<person1>>
+	당신은 로빈에게 돌아간다. <<He>>【은는】 당신을 보자 미소 짓고 우유를 받는다. <<He>>【이가】 우유를 냄비에 붓는 동안 당신은 조용히 <<his>> £5를 카운터에 올려놓는다.<<glove>><<npcincr Robin love 1>>
+<<else>>
+	<br><br>
+	<span class="red">"어이," 위에서 목소리가 외친다.</span> "어디 가는 거야? 경비!" 당신은 돌아서서 왔던 길로 달려가, 누가 도착하기 전에 담을 넘어간다.
+	<br><br>
+
+	<<skulduggeryuse>>
+	당신은 차선책으로, 시골풍 가게에 들어간다. 주인이 카운터 뒤 탱크에서 당신의 병을 채워준다.
+	<br><br>
+
+	<<endevent>><<npc Robin>><<person1>>
+	당신은 로빈에게 돌아간다. <<He>>【은는】 당신을 보자 미소 짓고 우유를 냄비에 붓는다.
+<</if>>
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Milk Buy
+<<effects>>
+
+당신은 하베스트 가에 도착해 시골풍 가게로 들어간다. 주인이 카운터 뒤 탱크에서 당신의 병을 채워준다.
+<br><br>
+
+당신은 공원으로 돌아간다. 로빈은 당신을 보자 미소 짓고 우유를 냄비에 붓는다.
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Wait
+<<effects>>
+
+당신은 불량배들이 괴롭힐 다른 사람을 찾을 때까지 가판대 뒤에서 기다린다.
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Challenge
+<<effects>>
+
+당신은 일어서서 탁 트인 곳으로 걸어 나간다. 로빈이 당신을 막으려고 다리를 잡지만, 당신은 <<him>>【을를】 뿌리친다.
+<br><br>
+
+<<generatey2>><<generatey3>><<generatey4>><!--<<generatey5>>-->
+네 명이 있고, 각자 눈뭉치를 들고 있다. 당신이 말을 꺼내자 그들은 당신에게 눈뭉치를 던지려던 참이었다.
+
+<<if $speech_attitude is "meek">>
+	"ㄱ-겁쟁이들." 당신이 말한다. "너희 중 누구도 나랑 일대일로 붙으려 하지 않을걸."
+<<elseif $speech_attitude is "bratty">>
+	"잘 들어, 이 새끼들아." 당신이 말한다. "너희 중 최고에게 일대일 싸움을 신청한다. 아니면 너희 전부 보기만큼 겁쟁이인 건가?"
+<<else>>
+	"겁쟁이들." 당신이 말한다. "너희 중 최고에게 일대일 싸움을 신청한다."
+<</if>>
+<br><br>
+
+<<person2>><<person>>【이가】 앞으로 나서자 그들은 공격을 멈춘다. "넌 네가 뭘 하는지도 모를 거야." <<he>>【이가】 말한다. "셋을 세면 시작한다." <<He>>【은는】 말하면서 땅을 훑어본다. "하나... 둘... "
+<br><br>
+
+<<link [[최대한 빨리 공격한다|Robin Chocolate Challenge Attack]]>><</link>><<skill_difficulty `currentSkillValue("handskill")` "손 스킬" 1 800>>
+<br>
+<<link [[기회를 엿본다|Robin Chocolate Challenge Bide]]>><</link>><<dancedifficulty 1 800>>
+<br>
+<<link [[이건 나쁜 생각이야|Robin Chocolate Cover]]>><<set $phase to 0>><</link>>
+<br>
+
+:: Robin Chocolate Cover
+<<effects>>
+
+<<if $phase is 0>>
+	"...셋!" 눈뭉치가 머리 위로 날아갈 때 당신은 가판대 뒤로 몸을 던진다.
+<<else>>
+	눈뭉치 세례가 머리 위로 날아갈 때 당신은 가판대 뒤로 몸을 던진다.
+<</if>>
+더 많은 눈뭉치가 날아온다. 당신은 불량배들이 괴롭힐 다른 사람을 찾을 때까지 로빈과 함께 기다린다.
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Challenge Attack
+<<effects>><<wearProp "snowball">>
+
+"..셋!"
+<br><br>
+
+당신은 웅크리고 눈을 모은다, <<person>>도 똑같이 하고 있다는 것을 알면서. 로빈은 <<person1>><<his>> 손으로 <<his>> 입을 가린 채 지켜본다.
+<br><br>
+
+당신이 먼저 끝낸다. 당신은 상대에게 눈뭉치를 던진다. <<person2>><<He>>【은는】 움찔하며 <<his>> 손으로 <<his>> 얼굴을 가린다.
+
+<<if currentSkillValue("handskill") gte random(1, 800)>>
+	<span class="green">하지만 눈뭉치는 <<his>> 가슴에 퍽 하고 부딪힌다.</span> <<He>>【은는】 균형을 잃고 얼음 위에서 미끄러진다.<<ltrauma>><<trauma -6>>
+	<br><br>
+	로빈이 숨을 헐떡인다. 상대의 친구들이 웃는다. 당신은 감사해하는 로빈의 곁으로 돌아간다, 핫초코 가판대의 명예를 지켜냈다.<<person1>><<npcincr Robin love 1>><<glove>>
+	<br><br>
+	<<earnFeat "Flurry">>
+<<else>>
+	<span class="red">하지만 눈뭉치는 <<his>> 어깨 너머로 날아간다.</span> <<He>>【은는】 씨익 웃으며 반격한다. 눈뭉치가 당신의 얼굴에 박힌다.<<gstress>><<stress 6>><<gpain>><<pain 4>>
+	<br><br>
+	<<person1>>
+	로빈이 숨을 헐떡이며 달려온다. <<He>>【은는】 불량배들이 일제히 공격할 때 <<his>> 코트로 당신을 보호하고, 함께 가판대 뒤로 몸을 숨긴다.<<gdom>><<npcincr Robin dom 1>>
+	<br><br>
+
+	그들은 곧 괴롭힐 다른 사람을 찾는다.
+	<br><br>
+<</if>>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Challenge Bide
+<<effects>><<wearProp "snowball">>
+
+당신은 <<person2>><<person>>【이가】 발사 준비를 할 때까지 가능한 한 단단한 눈뭉치를 만드는 데 집중한다. 당신은 발을 굳게 딛고,
+<<if $danceSuccess>>
+	<span class="green">눈뭉치가 당신을 향해 날아올 때 옆으로 비켜선다.</span> 이제 무방비 상태가 된 <<person>>【은는】 당신이 시간을 들여 완벽한 한 방을 노리는 동안 <<his>> 얼굴을 가릴 수밖에 없다. 눈뭉치는 가슴 정중앙에 명중한다. <<He>>【은는】 균형을 잃고 얼음 위에서 미끄러진다.<<ltrauma>><<trauma -6>>
+	<br><br>
+	로빈이 숨을 헐떡인다. 상대의 친구들이 웃는다. 당신은 감사해하는 로빈의 곁으로 돌아간다, 핫초코 가판대의 명예를 지켜냈다.<<person1>><<npcincr Robin love 1>><<glove>>
+	<br><br>
+	<<earnFeat "Flurry">>
+<<else>>
+	<span class="red">하지만 충분히 빨리 피하지 못한다.</span> 눈뭉치가 당신의 얼굴에 박힌다.<<gstress>><<stress 6>><<gpain>><<pain 4>>
+	<br><br>
+	<<person1>>
+	로빈이 숨을 헐떡이며 달려온다. <<He>>【은는】 불량배들이 일제히 공격할 때 <<his>> 코트로 당신을 보호하고, 함께 가판대 뒤로 몸을 숨긴다.<<gdom>><<npcincr Robin dom 1>>
+	<br><br>
+
+	그들은 곧 괴롭힐 다른 사람을 찾는다.
+	<br><br>
+<</if>>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Take
+<<effects>><<wearProp "snowball">>
+<<set _robin to statusCheck("Robin")>>
+
+당신은 탄약을 준비하기 시작한다.
+
+<<if _robin.dom gte 20 and _robin.trauma lt 40>>
+	<<if _robin.dom gte 60>><<set $phase to 0>><<else>><<set $phase to 1>><</if>>
+	로빈이 지켜보다가, <span class="green">이내 합류한다.</span> 함께 곧 충분한 눈뭉치를 만든다.<<note "+ 대비" "green">>
+<<else>>
+	<<set $phase to 2>>
+	로빈이 겁먹은 표정으로 지켜본다. 당신은 눈뭉치가 충분하다고 생각한다.
+<</if>>
+<br><br>
+로빈의 장비에서 공격을 멀리 유도해야 하므로, 당신은 눈뭉치를 한 팔에 안고 숨어있던 곳에서 뛰쳐나간다.
+<br><br>
+어떻게 싸울 것인가?
+<br><br>
+
+<<generatey2>><<generatey3>><<generatey4>><!--<<generatey5>>-->
+<<set _handMaxDifficulty to ($phase is 2 ? 2000 : 1200)>>
+<<link [[대담하게|Robin Chocolate Audacious]]>><</link>><<skill_difficulty `currentSkillValue("handskill")` "손 스킬" 1 _handMaxDifficulty>>
+<br>
+<<link [[끈기 있게|Robin Chocolate Patient]]>><</link>><<dancedifficulty 1 1200>>
+<br>
+<<link [[이건 나쁜 생각이야|Robin Chocolate Cover]]>><<set $phase to 1>><</link>>
+<br>
+
+:: Robin Chocolate Audacious
+<<effects>>
+
+불량배들은 당신의 돌격에 놀란다. 그들은 탁 트인 곳에 함께 서 있다. <<person2>><<person>>【이가】 눈뭉치가 <<his>> 얼굴에 박히면서 얼음 위에서 미끄러져 가장 먼저 쓰러진다. <<His>> 친구들은 흩어진다.
+<br><br>
+<<set _handMaxDifficulty to ($phase is 2 ? 2000 : 1200)>>
+<<if currentSkillValue("handskill") gte random(1, _handMaxDifficulty)>>
+	<<if $phase is 2>>
+		탄약이 많지는 않지만, <span class="green">모든 발사를 명중시킨다.</span>
+	<<else>>
+		<span class="green">미리 만들어 둔 탄약이 결정적이었다.</span>
+	<</if>>
+	그들이 자신들의 눈뭉치를 만들려고 애쓰는 동안 당신은 그들을 공격한다. 그들은 포기하고 나무 뒤로 후퇴한다.<<lltrauma>><<trauma -6>>
+	<br><br>
+	<<earnFeat "Flurry">>
+	당신은 감사해하는 로빈의 곁으로 돌아간다, 핫초코 가판대의 명예를 지켜냈다.<<gglove>><<npcincr Robin love 1>>
+<<else>>
+	그들이 자신들의 눈뭉치를 만들려고 애쓰는 동안 당신은 그들을 공격하지만, <span class="red">탄약이 제한적이다.</span> 눈뭉치가 다 떨어지자, 당신은 적들처럼 더 많은 눈을 찾아 헤맬 수밖에 없다.
+	<<if $phase is 0>>
+		그들이 준비를 마칠 때 당신도 다음 발사를 준비한다. 그들이 조준한다.
+		<br><br>
+
+		눈뭉치들이 여러 각도에서 날아올 것이다. 당신은 몸을 단단히 한다. <span class="green">그때 뒤에서 눈뭉치 하나가 당신의 어깨 너머로 날아온다.</span>, <<person3>><<persons>> 얼굴에 부딪혀 박살 난다. 당신은 뒤를 돌아본다. 로빈이 발을 굳게 딛고 서 있다, 한 팔 가득 눈뭉치를 안고 <<his>> 얼굴에는 굳은 결의가 서려 있다.
+		<br><br>
+
+		이미 지쳐있던 그들에게 로빈의 새로운 맹공은 너무 벅찼다. <<He>>【은는】 여분의 눈뭉치로 그들을 싸움터에서 쫓아낸다.
+		<br><br>
+		<<earnFeat "Flurry">>
+		핫초코 가판대의 명예를 지켜내고, 당신들은 각자의 자리로 돌아간다. <<gdom>><<npcincr Robin dom 1>>
+	<<else>>
+		수적으로 열세인 당신은 일제 사격에 맞아 땅에 쓰러진다.<<gstress>><<stress 6>><<gpain>><<pain 4>>
+		<br><br>
+		<<person1>>
+		로빈이 숨을 헐떡이며 달려온다. <<his>> 코트로 당신을 보호하며, <<he>>【은는】 당신이 일어서는 것을 돕고, 가판대 뒤로 다시 끌어당긴다.<<gdom>><<npcincr Robin dom 1>>
+		<br><br>
+
+		당신은 불량배들이 흥미를 잃고 다른 사람을 괴롭히러 떠날 때까지 기다린다.
+	<</if>>
+<</if>>
+<br><br>
+
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Patient
+<<effects>>
+
+불량배들은 당신의 돌격에 놀란다. 그들은 탁 트인 곳에 함께 서 있다. <<person2>><<person>>【이가】 눈뭉치가 <<his>> 얼굴에 박히면서 얼음 위에서 미끄러져 가장 먼저 쓰러진다. <<His>> 친구들은 흩어진다.
+<br><br>
+기습의 이점이 사라지자, 당신은 적들이 아직 정신없는 틈을 타 덤불 뒤로 몸을 숨긴다. 그들이 반격할 준비를 마쳤을 때, 당신도 준비를 마쳤다. 눈뭉치가 예상치 못한 각도에서 날아가 <<person3>><<persons>> 머리 옆을 강타한다.
+<br><br>
+
+<<His>> 친구들이 눈뭉치를 퍼붓는다.
+<<if $danceSuccess>>
+	<span class="green">당신은 피하고, 다시 한번 모습을 감춘다.</span>
+	<br><br>
+	불량배들이 함께 뭉쳐 사방을 살핀다. 당신이 원하던 바로 그 모습이다.
+	<<if $phase is 2>>
+		남은 탄약이 많지 않지만, 한 발 한 발 소중히 사용한다.
+	<<else>>
+		남은 탄약은 충분하다.
+	<</if>>
+	<<earnFeat "Flurry">>
+	마지막 일제 사격에 그들은 나무 뒤 안전한 곳으로 달아난다. 가판대의 명예를 지켜낸 당신은 고마워하는 로빈에게 돌아간다.<<glove>><<npcincr Robin love 1>><<ltrauma>><<trauma -6>>
+<<else>>
+	당신은 피했지만, <span class="red">얼음 위에서 미끄러져</span> 눈 위에 등으로 넘어진다.
+	<br><br>
+	<<if $phase is 0>>
+		불량배들이 마지막 일제 사격을 준비하지만, 그들이 쏘기 전에 <span class="green">또 다른 눈뭉치가 <<person4>><<persons>> 어깨를 강타한다.</span> <<person1>>로빈이 가판대에서 떨어져 서 있다. <<his>> 팔에는 눈뭉치 한 묶음이 들려 있고, <<his>> 얼굴에는 굳은 결의가 서려 있다.
+		<br><br>
+
+		적들은 이 새로운 위협에 정신이 팔린다. 당신은 허둥지둥 일어나 눈뭉치 두어 개를 회수한다. 당신과 로빈 사이에 갇힌 불량배들은 나무 뒤로 달아난다.
+		<br><br>
+		<<earnFeat "Flurry">>
+		핫초코 가판대의 명예를 지켜낸 당신은 각자의 자리로 돌아간다.<<gdom>><<npcincr Robin dom 1>>
+	<<else>>
+		불량배들이 또 한 차례 눈뭉치를 퍼붓는다.<<gstress>><<stress 6>><<gpain>><<pain 4>>
+		<br><br>
+		<<person1>>
+		로빈이 숨을 헐떡이며 달려온다. <<his>> 코트로 당신을 감싸 보호하며, <<he>>【은는】 당신이 일어서는 것을 돕고 가판대 뒤로 끌어당긴다.<<gdom>><<npcincr Robin dom 1>>
+		<br><br>
+
+		당신은 불량배들이 흥미를 잃고 다른 사람을 괴롭히러 떠날 때까지 기다린다.
+		<br><br>
+	<</if>>
+<</if>>
+<br><br>
+<<robinChocolateOfferHelp>>
+
+:: Robin Chocolate Kiss
+<<effects>>
+<<set _robin to statusCheck("Robin")>>
+<<person1>>
+"시간 보낼 방법이 생각났어." 당신은 로빈 위로 기어 올라가며 말한다. <<He>>【은는】 처음에는 웃다가, 당신이 <<his>> 목에 키스하자 숨을 헐떡인다.
+<br><br>
+<<if _robin.trauma gte 40>>
+	<<He>>【은는】 화답하기보다는 당신을 가까이 껴안는 데 대부분의 시간을 보낸다. 당신은 결국 키스를 멈추고 <<him>> 마주 안아준다.
+	<<npcincr Robin trauma -2>><<lrtrauma>>
+<</if>>
+<<generate2>>
+예상대로 불량배들은 괴롭힐 다른 사람을 찾아 떠난다. 로빈과 당신은 너무 바빠 신경 쓸 겨를이 없다가, 가까이서 목소리가 들린다. "저기요?" <<person2>><<personsimple>>【이가】 말한다. "핫초코 냄새가 좋네요. 아무도 없나요?"
+<br><br>
+<<person1>>
+당신은 로빈이 일어서게 놔두고, <<his>> 갑작스러운 등장에 손님은 놀란다. 당신은 손님이 떠날 때까지 숨어 있기로 한다.
+<<if _robin.trauma lt 40>>
+	<<person2>><<He>>【은는】 당신들이 뭘 하고 있었는지 알아챌 것이고, 로빈은 몹시 당황할 것이다.
+<</if>>
+<br><br>
+<<robinChocolateOfferHelp>>
+
+:: Hot Chocolate Doren
+<<effects>>
+<<set _robin to statusCheck("Robin")>>
+<<pass 60>><<famegood 1>>
+<<if $phase is 1>> /* offer to pay*/
+	<<if $speech_attitude is "meek">>
+		"Maybe I can pay for them?"
+	<<elseif $speech_attitude is "bratty">>
+		"Let me pay for them!"
+	<<else>>
+		"I'll pay for them,"
+	<</if>>
+	you suggest.
+	<br><br>
+	"No." Doren and Robin unanimously say.
+	<br><br>
+	However, after much more convincing from Doren, Robin nods,
+<<elseif $phase is 2>> /* convince Robin*/
+	<<if $speech_attitude is "meek">>
+		"It wouldn't be wise to give away for free when you need the money yourself, Robin."
+	<<elseif $speech_attitude is "bratty">>
+		"Robin. Why would you give away hot chocolate when you yourself also are in need?"
+	<<else>>
+		"<<person2>><<Hes>> right, Robin. You need the money yourself. That's why you're out here, selling hot chocolate."
+	<</if>>
+	<br><br>
+	After much more convincing from you and Doren, Robin nods,
+<<else>> /*support Robin's point*/
+	<<if $speech_attitude is "meek">>
+		"We can't possibly take money from you for this!"
+	<<elseif $speech_attitude is "bratty">>
+		"No, we can't take money if you plan to do that!"
+	<<else>>
+		"Robin's right. We can't take money from you!"
+	<</if>>
+	you protest alongside Robin.
+	<br><br>
+	However, after much more convincing from Doren, Robin nods,
+<</if>>
+<<if _robin.trauma gte 40>>
+	"Okay, if you say so..."
+<<else>>
+	"Alright. Let's do this!"
+<</if>>
+<br><br>
+You and Doren help Robin make the hot chocolate and pour it into $dorenhotchocoamount cups.
+<br><br>
+"Thanks a lot, you two!" Handing Robin £$dorenhotchocoprice, Doren packs them in <<person2>><<his>> bag, then waves goodbye with a smile before walking away.
+<br><br>
+<<set $robinmoney += $dorenhotchocoprice>>
+<<unset $dorenhotchocoprice>><<unset $dorenhotchocoamount>>
+<<robinChocolateOfferHelp>>

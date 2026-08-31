@@ -1,0 +1,1849 @@
+:: Stall Rent
+<<set $outside to 0>><<set $location to "market">><<effects>>
+
+콘누다투스 시장을 담당하는 작은 사무실로 들어간다. <<generate1>><<person1>><<person>>【이가】 당신을 맞이한다.
+<br><br>
+"하루에 <<printmoney 1500>>입니다." <<he>>【이가】 말한다. "저희는 <<ampm 21>>에 문을 닫습니다. 판매하려는 물건의 샘플도 봐야 합니다. 꽃이나 다른 농산물을 파는 게 아니라면 시민권 증명서도 필요하고요."
+<br><br>
+
+<<set _foodstuffKeys to Object.keys($foodstuff)>>
+<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+	<<if $foodstuff[_foodstuffKeys[_t]].amount gte 1>>
+		<<set _foodstuffSample to clone(setup.foodstuff[_foodstuffKeys[_t]].name)>>
+	<</if>>
+<</for>>
+<<if _foodstuffSample is undefined>>
+	<<pass 5>>
+	<span class="purple">판매할 만한 물건이 없다.</span>
+	<br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endstall>><<endevent>><<clotheson>><</link>>
+	<br>
+<<else>>
+	<<money -1500 "marketStall">><<set $daily.stallRented to 1>><<set $stall_money to 0>><<if !$stall_stats>><<set $stall_stats to {}>><</if>><<set $daily.stall_lewdity to 0>>
+	당신은 <<him>>에게 _foodstuffSample 중 하나를 보여준다. 만족한 듯하다. 당신은 서류에 서명하고, 돈을 건네고, 당신의 가판대를 찾아 나선다.
+	<br><br>
+	<<endevent>>
+
+
+	/*Would let PC choose which items to display initially, but it's not functional
+	What goods do you want to present for sale?
+
+	<br><br><<stall_setup>> */
+
+	<<link [[연다|Stall Rent 2]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Stall Rent 2
+<<set $outside to 0>><<set $location to "market">><<effects>>
+
+당신은 상품을 보기 좋게 배치하려 애쓰며 테이블 위에 늘어놓는다.
+비를 막아줄 작은 지붕이 있고, 다리가 아플 때 쉴 수 있는 의자도 있다.
+다른 상인들도 양옆에 자리를 잡고 있다.
+<br><br>
+
+첫 손님들이 거리에 들어설 때쯤 당신은 준비를 마친다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Rent Return
+<<set $outside to 0>><<set $location to "market">><<effects>>
+
+어떤 상품을 판매용으로 진열할까?
+<br><br>
+
+<<stall_setup>>
+
+:: Stall
+<<set $outside to 0>><<set $location to "market">><<effects>>
+
+<<silently>><<stall_inventory>><</silently>>
+<<set _stall_attention to 0>>
+
+/* 2.5 automatic sale on average */
+<<for _autostall to 0; _autostall lt 5; _autostall++>>
+	<<if random(1,2) is 2 and _inventory_found is 1 and _inventory_in_stall is 1>>
+		<<stall_autosale>>
+		<<unset _inventory_found>>
+		<<unset _inventory_in_stall>>
+		<<silently>><<stall_inventory>><</silently>>
+	<</if>>
+<</for>>
+<<unset _inventory_found>>
+<<unset _inventory_in_stall>>
+<<stall_inventory>>
+<br><br>
+
+<<if _inventory_found is 1 and _inventory_in_stall is 1>>
+	<<set _foodstuffKeys to Object.keys($foodstuff)>>
+	<<for _t to 0; _t lt _foodstuffKeys.length; _t++>>
+		<<if $foodstuff[_foodstuffKeys[_t]].amount gte 1>>
+			<<set _foodstuffSample to clone(setup.foodstuff[_foodstuffKeys[_t]].name)>>
+		<</if>>
+	<</for>>
+	<<if 3000 + $attractiveness/2 + $fame.business + (currentSkillValue('tending') * 2) + (Math.min($foodstuff_inventory.length,10) * 500) gte random(1, 10000)>>
+		/* At least 1/3 to get a customer. Attractiveness and inventory have 2.5 times the weight of tending and business fame.
+		Very high stats are needed to have 100% chance to get customers with only 1 item. */
+		<<set _stall_attention to 1>>
+	<</if>>
+<</if>>
+
+<<if Time.dayState is "night">>
+	한 관리가 와서 시장 영업시간이 끝났다고 알린다.
+	<br><br>
+
+	거리 곳곳에서 네온사인이 깜박이며 거리의 영업 형태가 바뀌는 것을 알리는 동안, 당신은 물건을 챙긴다.
+	<br><br>
+
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<elseif _inventory_found isnot 1>>
+	팔 물건이 없으니, 가판대에 있을 이유가 거의 없다.
+	<br><br>
+	<<if _foodstuffSample isnot undefined>>
+		<<ind>><<link [[새 농산물 진열하기|Stall Rent Return]]>><</link>>
+	<</if>>
+	<br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<elseif _inventory_in_stall isnot 1>>
+	진열된 것이 없으니, 가판대에 있을 이유가 거의 없다.
+	<br><br>
+	<<icon "project-maths.png">><<link [[가판대 관리하기|Stall Manage]]>><</link>>
+	<br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<elseif _stall_attention is 1>>
+	<<eventsstall>>
+<<elseif _stall_attention is 0>>
+	<<if $rng gte 81>>
+		몇몇 사람들이 힐끗 쳐다보지만, 별다른 관심을 끌지는 못한다.
+	<<elseif $rng gte 61>>
+		아무도 오지 않지만, 양옆의 가판대도 마찬가지로 고전하고 있다.
+	<<elseif $rng gte 41>>
+		지금은 아무도 관심이 없는 것 같다.
+	<<elseif $rng gte 21>>
+		사람들은 당신의 물건을 쳐다보지도 않고 지나간다.
+	<<else>>
+		당신은 관심을 끄는 데 실패한다.
+	<</if>>
+	<br><br>
+	<<stall_actions>>
+<<else>>
+	<<stall_actions>>
+<</if>>
+
+:: Stall Manage
+<<effects>>
+
+당신은 판매 중인 상품들을 검토한다.
+<br><br>
+
+<<marketStockDisplay>>
+
+<<link [[뒤로|Stall Manage Exit]]>><</link>>
+
+:: Stall Manage Exit
+<<effects>>
+
+<<silently>><<stall_inventory>><</silently>>
+
+<<if _inventory_in_stall isnot 1>>
+	진열된 것이 없으니, 가판대에 있을 이유가 거의 없다.
+	<br><br>
+	<<icon "project-maths.png">><<link [[가판대 관리하기|Stall Manage]]>><</link>>
+	<br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<elseif _inventory_found isnot 1>>
+	팔 물건이 없으니, 가판대에 있을 이유가 거의 없다.
+	<br><br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<else>>
+	당신은 가판대 점검을 마치고 잠재 고객을 기다린다.
+	<br><br>
+	<<stall_actions>>
+<</if>>
+
+:: Stall Bottoms Strip
+
+<<effects>>
+<<silently>><<stall_inventory>><</silently>>
+<<if $worn.under_lower.name is "naked">>
+	<<flaunting>> 당신은 $worn.lower.name【을를】 다리 아래로 벗어내려, 허리 아래를 완전히 드러낸다. 당신의 <<genitals 1>>에 바람이 스친다. 주위에 사람이 아주 많지만, 아무도 눈치채지 못했다.
+	<<if $daily.ex.stall isnot 1>>
+		<<if $exhibitionism lte 80>>
+			<<set $daily.ex.stall to 1>>
+		<</if>>
+		<<exhibitionism4>>
+	<<else>>
+		<br><br>
+	<</if>>
+<<else>>
+	<<flaunting>> 당신은 $worn.lower.name【을를】 다리 아래로 벗어내려, $worn.under_lower.name【을를】 노출한다. 주위에 사람이 아주 많지만, 아무도 눈치채지 못했다.
+	<<if $daily.ex.stall isnot 1>>
+		<<if $exhibitionism lte 40>>
+			<<set $daily.ex.stall to 1>>
+		<</if>>
+		<<exhibitionism2>>
+	<<else>>
+		<br><br>
+	<</if>>
+<</if>>
+<<lowerstrip>>
+<<stall_actions>>
+
+:: Stall Undies Strip
+<<effects>>
+<<flaunting>> 당신은 $worn.under_lower.name【을를】 다리 아래로 벗어내려, 허리 아래를 완전히 드러낸다. 당신의 <<genitals 1>>에 바람이 스친다. 주위에 사람이 아주 많지만, 아무도 눈치채지 못했다.
+<<if $daily.ex.stall isnot 1>>
+	<<if $exhibitionism lte 80>>
+		<<set $daily.ex.stall to 1>>
+	<</if>>
+	<<exhibitionism4>>
+<<else>>
+	<br><br>
+<</if>>
+<<underlowerstrip>>
+<<stall_actions>>
+
+:: Stall Masturbation
+
+<<effects>>
+<<if $masturbationstart is 1>>
+	<<set $masturbationstart to 0>>
+	<<set $masturbationstat += 1>>
+	<<masturbationstart>>
+	<<set $mouth to "disabled">>
+	당신은 가판대 뒤에 웅크린다. 사방이 분주한 공공장소지만, 당신은 시야에서 가려져 있다. 간신히. 당신은 스스로를 만지기 시작한다.
+	<<if $daily.stall_lewdity is 0>>
+		<<lewdity 1>>
+		<<set $phase to 1>>
+	<</if>>
+	<<if $daily.ex.stall isnot 1>>
+		<<set $daily.ex.stall to 1>>
+		<<if $exhibitionism lte 60>>
+			<<set $daily.ex.stall to 1>>
+		<</if>>
+		<<exhibitionism3>>
+	<<else>>
+		<br><br>
+	<</if>>
+<</if>>
+<<masturbationeffects>>
+<<masturbationactions>>
+<<if $orgasmdown is 3 and $orgasmcurrent is 1>>
+	<span class='lewd'>외설적인 기운</span>이 시장에 감돌아, 당신의 절정은 반드시 이목을 끌 것이다.
+	<br><br>
+<</if>>
+<<masturbationControls "stallInterrupt">>
+
+:: Stall Masturbation Finish
+
+<<effects>>
+
+<<if $phase gte 2>>
+		<span class="lewd">누군가 오고 있다.</span> <<tearful>> 당신은 허둥지둥 가판대 뒤 제자리로 돌아간다.<<if $phase is 2>><<glewdity>><<lewdity 1>><</if>><<if $orgasmdown gte 1>><<set _stall_masturbation_caught to 1>><</if>>
+	<br><br>
+
+	<<endmasturbation>>
+	<<endcombat>>
+
+	<<if _stall_masturbation_caught is 1>>
+		<<generate1>><<person1>><<person>>【이가】 당신을 기다리고 있다. "아," 당신이 나타나자 <<he>>【이가】 말한다. "마침 찾던 사람이었는데, 어떻게—"
+		<br><br>
+		소용없다. 당신의 몸이 절정으로 경련하고, 간신히 신음을 억누른다.
+		<br><br>
+		<<if random(1, 2) is 2>>
+			"괜찮아요?" <<he>>【이가】 묻는다. "나중에 다시 올게요. 그때는 좀 나아지겠죠." <<he>>【이가】 떠나자 당신의 무릎에 힘이 풀린다. 시야에서 벗어나자마자 당신은 손에 대고 신음할 수밖에 없다.
+			<br><br>
+			<<endevent>>
+
+			<<stall_actions>>
+		<<else>>
+			"젠장, <<girl>>." <<he>>【이가】 말한다. "거기서 뭘 하고 있었던 거야?" <<He>>【은는】 시장을 둘러본다. "네가 시작한 거, 내가 마무리해줄까, 응?"
+			<br><br>
+
+			<<if hasSexStat("promiscuity", 2)>>
+				<<link [[수락한다|Stall Masturbation Accept]]>><</link>><<promiscuous2>>
+				<br>
+			<<else>>
+				<<insufficientStat "promiscuity" "받아들이기엔">>
+				<br>
+			<</if>>
+			<<refuseicon>><<link [[거절한다|Stall Masturbation Refuse]]>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+
+		<<stall_inventory>>
+		<br><br>
+
+		<<eventsstall>>
+	<</if>>
+	<br>
+<<else>>
+	<<tearful>> 당신은 가판대 뒤 제자리로 돌아간다.
+	<br><br>
+
+	<<endmasturbation>>
+	<<endcombat>>
+
+	<<stall_actions>>
+	<br>
+<</if>>
+
+:: Stall Masturbation Accept
+<<effects>>
+
+당신은 고개를 끄덕인다. <<person>>【은는】 주위를 둘러보더니 테이블 아래로 사라진다. 당신도 그를 따른다.
+<<promiscuity2>>
+
+<<link [[다음|Stall Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Stall Masturbation Refuse
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"아, 아니에요." 당신이 말한다. "제발 그런 끔찍한 소리 하지 마세요."
+<<elseif $speech_attitude is "bratty">>
+	"지금 그딴 식으로 말하는 거 기분 나쁘네." 당신은 겨우 말한다. "살 거 아니면 꺼져."
+<<else>>
+	"잘못 보셨어요." 당신이 말한다. "현지 농산물에 관심 있으신가요?"
+<</if>>
+<br><br>
+
+"난 음탕한 <<girl>>【은는】 보면 딱 알아." <<he>>【이가】 말한다. "또 보자고."
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Shuffle Talk
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"뭐, 뭐라도 사실 건가요?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"서둘러요." 당신이 말한다. "손님들 길 막고 있잖아요."
+<<else>>
+	"관심 있는 거라도 있으세요?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+<<He>> 중얼거리지만, 멈춰서 대화하거나 물건을 사지는 않는다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Shuffle Silent
+<<effects>>
+
+<<person>>【이가】 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span> 앞에 멈춰 선다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+<br><br>
+
+<<stall_trust>>
+<br><br>
+
+<<stall_sell_actions>>
+
+:: Stall Walk Talk
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"뭐, 뭐라도 사실 건가요?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"서둘러요." 당신이 말한다. "손님들 길 막고 있잖아요."
+<<else>>
+	"관심 있는 거라도 있으세요?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+<<person>>【이가】 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span> 앞에 멈춰 선다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+<br><br>
+
+<<stall_trust>>
+<br><br>
+
+<<stall_sell_actions>>
+
+:: Stall Walk Silent
+<<effects>>
+
+당신은 침묵을 지킨다. <<person1>><<person>>【은는】 멈추지 않는다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Sell
+<<effects>>
+
+<<if random(1,4) is 1>>
+	<<stallCustomerArousal>>
+<</if>>
+
+<<stall_sell_man>>
+
+:: Stall Listen
+<<pass 10>><<effects>>
+
+You listen to the <<person1>><<person>> drone on. You struggle to pay attention, though you nod along and that seems to satisfy.
+<br><br>
+
+At last, the <<person>> <<stall_check_text>>. "How much for <span class="green"><<stall_amount>></span> of these?"
+<br><br>
+
+<<stall_trust>>
+<br><br>
+
+<<stall_sell_actions>>
+
+:: Stall Hurry
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"죄, 죄송하지만," 당신이 말한다. "뭐라도 사실 건가요?"
+<<elseif $speech_attitude is "bratty">>
+	"하루 종일 기다려줄 순 없어요." 당신이 말한다. "빨리 뭐라도 사세요."
+<<else>>
+	"말씀 중에 죄송하지만," 당신이 말한다. "뭐라도 사실 건가요?"
+<</if>>
+<br><br>
+
+<<person1>><<person>>【이가】 눈살을 찌푸린다. "네." <<he>>【이가】 말한다. "요즘 애들이란. 예의가 없어." <<He>>【은는】 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span>을 가리킨다. "이거 <span class="green"><<stall_amount>>개</span>는 어때요?"
+<br><br>
+
+<<stall_trust>>
+<br><br>
+
+<<stall_sell_actions>>
+
+:: Stall Converse
+<<effects>>
+
+당신은 <<person1>><<person>>의 말을 따라가려고 애쓴다.
+<<if $tendingSuccess>>
+	<span class="green">당신도 아는 것이 좀 있다.</span> <<gtrust>><<set $enemytrust += 20>>
+	<br><br>
+
+	"말이 통하는 사람을 만나는 게 흔한 일은 아니죠." <<he>>【이가】 앞에 있는 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span>【을를】 보며 말한다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+	<br><br>
+
+	<<stall_trust>>
+	<br><br>
+
+	<<stall_sell_actions>>
+
+<<else>>
+	<span class="red"><<He>>【은는】 너무 빨리 화제를 바꾼다.</span> 당신은 대화의 흐름을 놓친다. <<He>>【은는】 흥미를 잃고 아무것도 사지 않은 채 가버린다.
+	<br><br>
+
+	<<stall_actions>>
+<</if>>
+
+:: Stall Honest
+<<effects>>
+
+<<set _supermarketItem to (V.foodstuff[V.stall_foodstuff]?.supermarket >= 0)>>
+
+<<if _supermarketItem>>
+	<<if $speech_attitude is "meek">>
+		"아니요, <<sir>>." 당신이 말한다. "이건 슈퍼마켓에서 가져온 거예요. 괜찮으시길 바라요."
+	<<elseif $speech_attitude is "bratty">>
+		"물론이죠." 당신은 짓궂게 웃으며 말한다. "슈퍼마켓에서 가져오는 것도 직접 생산하는 걸로 쳐주겠죠, 그렇죠?"
+	<<else>>
+		"죄송하지만, 슈퍼마켓에서 가져왔어요." 당신은 인정한다.
+	<</if>>
+	<br><br>
+
+	<<person1>><<person>>【이가】 껄껄 웃는다. "그런 걸로 부끄러워할 거 없죠, <<girl>>. 전 사업가 정신을 존중하거든요."
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"전부 제가 만든 거예요." 당신이 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"네." 당신이 말한다.
+	<<else>>
+		"네, 맞아요." 당신이 말한다.
+	<</if>>
+	<br><br>
+
+	"놀랍네요." <<person1>><<person>>【이가】 말한다. "저도 그런 기술이 있었으면 좋겠어요."
+<</if>>
+<<He>> <<stall_check_text>>. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+<br><br>
+<<stall_trust>>
+<br><br>
+<<stall_sell_actions>>
+
+:: Stall Evasive
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"죄송해요," 당신은 말한다. "아무에게도 말하고 싶지 않아요."
+<<elseif $speech_attitude is "bratty">>
+	"상관할 바 아니잖아요." 당신은 말한다.
+<<else>>
+	"저만 알면 되는 일이에요." 당신은 말한다.
+<</if>>
+<br><br>
+"꼬치꼬치 캐물을 생각은 아니었어요." <<person1>><<person>>【이가】 말하며 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span> 중 하나를 들어 올린다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+<br><br>
+<<stall_trust>>
+<br><br>
+<<stall_sell_actions>>
+
+:: Stall Encourage
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"뭐, 뭐라도 사실 건가요?" 당신은 진열된 상품을 가리키며 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"저는 파는 게 아니에요." 당신은 진열된 상품을 가리키며 말한다. "저것들이 파는 거죠."
+<<else>>
+	"제 농산물에 관심 있으신가요?" 당신은 진열된 상품을 가리키며 묻는다.
+<</if>>
+<br><br>
+
+<<He>>【은는】 마치 처음 보는 것처럼 아래를 힐끗 본다.
+
+<<if $rng gte 51>>
+	<<He>>【은는】 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span>【을를】 가리킨다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+	<br><br>
+	<<stall_trust>>
+	<br><br>
+	<<stall_sell_actions>>
+<<else>>
+	"됐어요. 나중에 봐요, 아름다운 분."
+	<br><br>
+
+	<<stall_actions>>
+<</if>>
+
+:: Stall Flirt
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 저는 이거 팔러 왔어요." 당신은 진열된 상품을 가리키며 말한다. "저는 안 팔아요. 보통은요."
+<<elseif $speech_attitude is "bratty">>
+	"이것도 못 살 형편이면," 당신은 진열된 상품을 가리키며 말한다. "저도 못 사요."
+<<else>>
+	"원래는 파는 몸이 아니지만," 당신은 직접 테이블에 기대며 말한다. "거래를 제안하면 넘어갈 수도 있구요."
+<</if>>
+<br><br>
+
+<<person1>><<person>>【이가】 더 가까이 기댄다. "그래요?" <<he>>【이가】 말한다. <<He>>【은는】 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span>【을를】 내려다본다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+
+<br><br>
+<<stall_trust>>
+<br><br>
+<<stall_sell_actions>>
+
+:: Stall Leave
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제, 제발 혼자 있게 해주세요." 당신은 말한다. "여긴 그런 곳이 아니에요."
+<<elseif $speech_attitude is "bratty">>
+	"제 가판대를 창관으로 착각하셨나 보군요." 당신은 말한다. "한 번은 용서해드리죠."
+<<else>>
+	"당신과는 거래하고 싶지 않아요." 당신은 말한다. "떠나주세요."
+<</if>>
+<br><br>
+
+<<person1>><<person>>【이가】 똑바로 서서 <<his>> 어깨 위로 손을 든다. "그런 뜻은 아니었어요." <<he>>【이가】 말한다. "나중에 봐요, 아름다운 분."
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Chase Undies
+<<effects>>
+
+<<flaunting>> 당신은 $worn.under_lower.name 차림으로 시장을 가로질러 <<person1>><<person>>【을를】 쫓는다. 당신에게 쏠리는 시선이 한둘이 아님을 느낀다.
+<<exhibitionism3>>
+
+<<if $athleticsSuccess>>
+
+	<span class="green">당신은 목표물에 가까워지고,</span> <<him>>【을를】 골목으로 몰아넣는다. 막다른 길이다. <<He>>【은는】 뒤돌아서고, <<his>> 눈의 공포는 당신의 속옷을 보고 혼란으로 바뀐다. 혼란과 욕정으로. <<covered>>
+	<br><br>
+
+	뒤에서 목소리가 들린다. 당신의 노출증적인 광경에 이끌려 군중이 모여들고 있다.
+	<br><br>
+
+	정신을 차린 <<person>>【은는】 다른 길이 없자 <<print setup.foodstuff[$stall_expensive].name>>【을를】 공중으로 던진다. 당신이 그것을 잡는 동안 <<He>>【은는】 벽 위로 힘겹게 올라간다.
+	<br><br>
+
+	당신은 음흉하게 쳐다보는 군중을 지나쳐 아무 일도 없었다는 듯이 가판대로 돌아간다.
+	<br><br>
+
+	<<stall_actions>>
+<<else>>
+
+<span class="red"><<He>>【은는】 당신보다 너무 빨라서,</span> 당신은 미로 같은 가판대 사이에서 <<him>>【을를】 놓친다.
+<<set $foodstuff[$stall_expensive].amount -= 1>>
+<br><br>
+
+숨을 헐떡이며 주위를 둘러본다. 사방의 사람들이 당신을 쳐다본다. 그렇지 않은 사람들도 얼굴을 붉히고 있다. <<covered>>
+<br><br>
+
+	<<if $rng gte 41>>
+		당신은 아무 일도 없었다는 듯이 가판대로 돌아간다.
+		<br><br>
+		<<stall_actions>>
+	<<else>>
+		<<endevent>>
+		<<generate1>><<generate2>><<generate3>>
+		가판대 쪽으로 돌아섰다가 <<person1>><<person>>【와과】 거의 부딪힐 뻔한다. <<him>> 옆에는 두 명이 더 있다. "어디 가, 음탕한 <<girl>>?" <<he>>【이가】 당신에게 다가와 부딪히며 뒤로 밀치며 말한다. "그렇게 돌아다니는 건 문제를 자초하는 거야. 하지만 걱정 마. 나와 내 친구들이 널 돌봐줄 테니까."
+		<br><br>
+
+		<<He>>【은는】 당신의 허리를 한 손으로 감싸고 더 가까이 끌어당기려 한다.
+		<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+		<br><br>
+
+		<<if hasSexStat("promiscuity", 4)>>
+			<<link [[허락한다|Stall Gang Sex]]>><<set $sexstart to 1>><</link>><<promiscuous4>>
+			<br>
+		<<else>>
+			<<insufficientStat "promiscuity" "받아들이기엔">>
+			<br>
+		<</if>>
+		<<refuseicon>><<link [[밀친다|Stall Gang Shove]]>><<trauma -6>><</link>><<ltrauma>>
+		<br>
+	<</if>>
+
+<</if>>
+
+:: Stall Chase Naked
+<<effects>>
+
+<<flaunting>> 당신은 <<genitals>>【와과】 <<bottom>>【을를】 드러낸 채 시장을 가로질러 <<person1>><<person>>【을를】 쫓는다. 당신에게 쏠리는 시선이 한둘이 아님을 느낀다.
+<<exhibitionism5>>
+
+<<if $athleticsSuccess>>
+
+	<span class="green">당신은 목표물에 가까워지고,</span> <<him>>【을를】 골목으로 몰아넣는다. 막다른 길이다. <<He>>【은는】 뒤돌아서고, <<his>> 눈의 공포는 당신의 나체를 보고 혼란으로 바뀐다. 혼란과 욕정으로. <<covered>>
+	<br><br>
+
+	뒤에서 목소리가 들린다. 당신의 노출증적인 광경에 이끌려 군중이 모여들고 있다.
+	<br><br>
+
+	정신을 차린 <<person>>【은는】 다른 길이 없자 <<print setup.foodstuff[$stall_expensive].name>>【을를】 공중으로 던진다. 당신이 그것을 잡는 동안 <<He>>【은는】 벽 위로 힘겹게 올라간다.
+	<br><br>
+
+	당신은 음흉하게 쳐다보는 군중을 지나쳐 아무 일도 없었다는 듯이 가판대로 돌아간다.
+	<br><br>
+
+	<<stall_actions>>
+<<else>>
+
+<span class="red"><<He>>【은는】 당신보다 너무 빨라서,</span> 당신은 미로 같은 가판대 사이에서 <<him>>【을를】 놓친다.
+<<set $foodstuff[$stall_expensive].amount -= 1>>
+<br><br>
+
+숨을 헐떡이며 주위를 둘러본다. 사방의 사람들이 당신을 쳐다본다. 그렇지 않은 사람들은 얼굴을 붉히고 있다. <<covered>>
+<br><br>
+
+	<<if $rng gte 61>>
+		당신은 아무 일도 없었다는 듯이 가판대로 돌아간다.
+		<br><br>
+		<<stall_actions>>
+	<<else>>
+		<<endevent>>
+		<<generate1>><<generate2>><<generate3>>
+		가판대 쪽으로 돌아섰다가 <<person1>><<person>>【와과】 거의 부딪힐 뻔한다. <<him>> 옆에는 두 명이 더 있다. "어디 가, 음탕한 <<girl>>?" <<he>>【이가】 당신에게 다가와 부딪히며 뒤로 밀치며 말한다. "그렇게 돌아다니는 건 문제를 자초하는 거야. 하지만 걱정 마. 나와 내 친구들이 널 돌봐줄 테니까."
+		<br><br>
+
+		<<He>>【은는】 당신의 허리를 한 손으로 감싸고 더 가까이 끌어당기려 한다.
+		<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+		<br><br>
+
+		<<if hasSexStat("promiscuity", 4)>>
+			<<link [[허락한다|Stall Gang Sex]]>><<set $sexstart to 1>><</link>><<promiscuous4>>
+			<br>
+		<<else>>
+			<<insufficientStat "promiscuity" "받아들이기엔">>
+			<br>
+		<</if>>
+		<<refuseicon>><<link [[밀친다|Stall Gang Shove]]>><<trauma -6>><</link>><<ltrauma>>
+		<br>
+	<</if>>
+
+<</if>>
+
+:: Stall Gang Shove
+<<effects>>
+
+당신은 <<person1>><<person>>【을를】 밀쳐낸다. <<His>> 친구들이 웃는다. "어렵게 구는 거야? 좋아, 하지만 우린 널 지켜볼 거야."
+<<glewdity>><<lewdity 1>>
+<br><br>
+
+당신은 아무 일도 없었다는 듯이 가판대로 돌아간다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Gang Sex
+
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 100>><<promiscuity5>>
+	<<enable_rescue>>
+	<<if $worn.lower.name is "naked">>
+		<<set $striplower to true>>
+		<<if $worn.under_lower.name is "naked">>
+			<<set $stripunderlower to true>>
+		<</if>>
+	<</if>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<audience>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Stall Gang Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Stall Gang Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Stall Gang Sex Finish
+
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<br><br>
+	<<tearful>> 당신은 가판대로 돌아간다.
+	<<glewdity>><<lewdity 1>>
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 길 위로 밀치고, <<he>>【은는】 걸려 넘어진다. 당신은 기회를 틈타 군중 속으로 도망친다.
+	<<glewdity>><<lewdity 1>>
+	<br><br>
+	<<tearful>> 당신은 가판대로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $alarm is 1 and $rescue is 1>><<set $rescued += 1>>
+	"이 변태들아, <<phim>>【을를】 내버려 둬."
+	<br>
+	"네가 뭔데?"
+	<br>
+	"경찰에 신고할 거야."
+	<br><br>
+	<<person1>><<person>>【이가】 당신을 밀치고 군중 속으로 사라진다.
+	<<glewdity>><<lewdity 1>>
+	<br><br>
+	<<tearful>> 당신은 가판대로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<else>>
+	"이 작은 요물 같으니." <<person1>><<person>>【이가】 말한다. "우리가 지켜볼 거야."
+	<<glewdity>><<lewdity 1>>
+	<br><br>
+	<<tearful>> 당신은 가판대로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<</if>>
+
+:: Stall Chase
+<<effects>>
+
+You chase the <<person1>><<person>> through the market.
+<<if $athleticsSuccess>>
+	<<if $rng gte 81>>
+		<span class="green">You gain on your quarry,</span> and chase <<him>> into an alley. It's a dead end.
+		<br><br>
+
+		<<He>> turns to face you, then charges.
+		<br><br>
+
+		<<link [[Next|Stall Fight]]>><<set $fightstart to 1>><</link>>
+		<br>
+	<<elseif $rng gte 41>>
+		<span class="green">You gain on your quarry,</span> and chase <<him>> into an alley. It's a dead end.
+		<br><br>
+
+		<<He>> turns to face you, eyes darting this way and that, looking for a way out. <<He>> throws the <<print $stall_expensive.replace(/_/g," ")>> into the air, then turns and climbs the wall while you catch it.
+		<br><br>
+
+		You return to your stall.
+		<br><br>
+
+		<<stall_actions>>
+	<<else>>
+		<<set $stallThiefPartner to maleChance($pronoun) gte random(1, 100) ? "boyfriend" : "girlfriend">>
+		<span class="green">You gain on your quarry,</span> and chase <<him>> into an alley. It's a dead end.
+		<br><br>
+
+		"S-sorry," <<he>> says, holding out the <<print $stall_expensive.replace(/_/g," ")>> and avoiding your gaze. "I wanted it for my <<print $stallThiefPartner>>, but I couldn't afford it. It was wrong."
+		<br><br>
+
+		<<link [[Let <<him>> keep it|Stall Keep]]>><<famegood 4>><</link>>
+		<br>
+		<<link [[Scold|Stall Scold]]>><</link>>
+		<br>
+		<<link [[Remain silent|Stall Silent]]>><</link>>
+		<br>
+		<<if currentSkillValue('skulduggery') gte 300>>
+			<<link [[Give pointers|Stall Pointers]]>><<trauma -6>><</link>><<ltrauma>>
+			<br>
+		<</if>>
+	<</if>>
+<<else>>
+	<span class="red"><<Hes>> too fast,</span> you're unable to catch up.
+	<br><br>
+
+	You return to your stall empty-handed.
+	<br><br>
+	<<set $foodstuff[$stall_expensive].amount -= 1>>
+	<<stall_actions>>
+<</if>>
+
+:: Stall Fight
+<<if $fightstart is 1>>
+<<set $fightstart to 0>>
+<<neutral 1>>
+<<maninit>>
+<<set $enemytrust -= 100>>
+<<set $enemyanger += 200>>
+<<npcidlegenitals>>
+
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Stall Fight Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Stall Fight]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Stall Fight Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation "short">>
+	<<person1>><<person>>【은는】 지쳐서 헐떡이며 땅에 누워있다. <<print setup.foodstuff[$stall_expensive].name>>【은는】 <<him>> 옆에 놓여있다.
+	<br><br>
+	<<tearful>> 당신은 그것을 집어 들고 가판대로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<br><br>
+	<<link [[다음|Stall Ready]]>><</link>>
+
+<<elseif $enemyhealth lte 0>>
+	<<person1>><<person>>【은는】 <<print setup.foodstuff[$stall_expensive].name>>【을를】 떨어뜨리고 달아난다.
+	<<ltrauma>><<lstress>><<trauma -6>><<stress -6>>
+	<br><br>
+	<<tearful>> 당신은 그것을 집어 들고 가판대로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<br><br>
+	<<link [[다음|Stall Ready]]>><</link>>
+
+<<else>>
+	당신은 너무 다쳐서 더 이상 싸울 수 없어 뒤로 물러난다. <<person1>><<person>>【은는】 당신의 <<print setup.foodstuff[$stall_expensive].name>>【을를】 손에 든 채 골목을 빠져나간다.
+	<<set $foodstuff[$stall_expensive].amount -= 1>>
+	<br><br>
+	<<tearful>> 당신은 가판대로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+
+	<br><br>
+	<<link [[다음|Stall Ready]]>><</link>>
+
+<</if>>
+
+:: Stall Attention
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"<<if $pronoun is "m">>저, 손님<<else>>저, 손님<</if>>!" 당신은 부른다. "제 농산물 좀 보시겠어요?"
+<<elseif $speech_attitude is "bratty">>
+	"어이," 당신은 말한다. "거기 어슬렁거리는 사람. 뭐라도 사든지, 아니면 꺼지든지."
+<<else>>
+	"제 상품에 관심 있으신가요?" 당신은 말한다. "여기서 생산된 것들이에요."
+<</if>>
+<br><br>
+
+<<if $rng gte 51>>
+	<<person>>【은는】 걸어가서 다른 곳에 설 자리를 찾는다.
+	<br><br>
+
+	<<stall_actions>>
+<<else>>
+	<<set $stall_foodstuff to $stall_expensive>>
+	<<stall_update>>
+	<<person>>【이가】 다가와 당신의 <span class="green"><<print setup.foodstuff[$stall_expensive].name>></span>【을를】 살펴본다. "이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?" <<he>>【이가】 묻는다.
+	<br><br>
+
+	<<stall_trust>>
+	<br><br>
+
+	<<stall_sell_actions>>
+<</if>>
+
+:: Stall Ignore
+<<effects>>
+
+당신은 <<person>>【을를】 귀찮게 하지 않기로 결정한다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Pointers
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"괜찮았어." 당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 받으며 말한다. "하지만 더 잘할 수 있었을 텐데."
+<<elseif $speech_attitude is "bratty">>
+	"망쳤네." 당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 낚아채며 말한다. "내가 널 눈치채지 말았어야 했는데."
+<<else>>
+	"실수했네." 당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 낚아채며 말한다. "내가 널 눈치채지 말았어야 했는데."
+<</if>>
+<br><br>
+
+당신은 <<person>>에게 속임수에 대한 몇 가지 조언을 해준다. <<He>>【은는】 당신이 그런 솔직함으로 이것을 공유하는 것에 충격을 받는다. "고, 고마워요." 당신이 말을 마치자 <<he>>【은는】 약간 위축된 채로 말한다. "저, 저는 도둑이 아니에요. 보통 이런 짓 안 해요."
+<br><br>
+
+그 말에 당신은 웃는다. 당신은 가판대로 돌아간다.
+<br><br>
+<<unset $stallThiefPartner>>
+<<stall_actions>>
+
+:: Stall Keep
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"괜, 괜찮아요." 당신은 말한다. "당신의 <<print $stallThiefPartner>>에게 주세요."
+<<elseif $speech_attitude is "bratty">>
+	"애정을 표현하는 더 저렴한 방법을 생각해보는 게 좋을 거예요." 당신은 말한다. "하지만 이번만은 눈감아줄게요. 가지세요."
+<<else>>
+	"당신의 <<print $stallThiefPartner>>에게 주세요." 당신은 말한다.
+<</if>>
+<br><br>
+
+"고마워요." <<he>>【이가】 말한다. "이제 더 죄책감이 드네요. 다시 한번, 죄송해요."
+<br><br>
+
+당신은 가판대로 돌아간다.
+<br><br>
+<<unset $stallThiefPartner>>
+<<set $foodstuff[$stall_expensive].amount -= 1>>
+<<stall_actions>>
+
+:: Stall Scold
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"훔치는 건 나쁜 짓이에요." 당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 받으며 말한다. "부끄러운 줄 아세요."
+<<elseif $speech_attitude is "bratty">>
+	"운 좋은 줄 알아요." 당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 낚아채며 말한다. "벌주지 않을 테니까. 이번에는요."
+<<else>>
+	"조심해야 할 거예요." 당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 낚아채며 말한다. "모두가 나처럼 관대하진 않으니까요."
+<</if>>
+<br><br>
+
+<<He>>【은는】 <<his>> 발을 내려다본다.
+<br><br>
+
+당신은 가판대로 돌아간다.
+<br><br>
+<<unset $stallThiefPartner>>
+<<stall_actions>>
+
+:: Stall Silent
+<<effects>>
+
+당신은 <<print setup.foodstuff[$stall_expensive].name>>【을를】 들고 가판대로 돌아간다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Go
+<<effects>>
+
+당신은 <<he>>【은는】 가판대를 비워둘 가치가 없다고 판단한다.
+
+<<set $foodstuff[$stall_expensive].amount -= 1>>
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Sell Push
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제 <span class="green"><<print setup.foodstuff[$stall_expensive].name>></span> 마음에 드세요?" 당신은 하나를 들어 보이며 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"제 <span class="green"><<print setup.foodstuff[$stall_expensive].name>></span>【을를】 놓치지 마세요." 당신은 하나를 들어 보이며 말한다.
+<<else>>
+	"<span class="green"><<print setup.foodstuff[$stall_expensive].name>></span> 좀 보시겠어요?" 당신은 하나를 들어 보이며 묻는다.
+<</if>>
+<br><br>
+
+<<if $enemytrust gte -50>>
+	<<stall_update>>
+
+	<<He>>【은는】 당신의 농산물을 살펴본다. "정말 좋아 보이네요. <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+	<br><br>
+	<<stall_trust>>
+	<br><br>
+
+	<<stall_sell_actions>>
+<<else>>
+	<<He>>【은는】 돌아보지도 않는다.
+	<br><br>
+
+	<<stall_actions>>
+<</if>>
+
+:: Stall Seduce
+<<effects>>
+
+<<if $stall_seduced is 0>><<set $seductiondifficulty to 2000>>
+	"벌써 가시게요?" 당신은 속삭인다. <<person>>【이가】 돌아선다. 당신은 팔꿈치로 몸을 지탱하고 <<him>>【을를】 눈을 마주치며 말한다. "우린 이제 막 서로를 알아가고 있었잖아요."
+	<<promiscuity1>>
+<<elseif $stall_seduced is 1>><<set $seductiondifficulty to 4000>>
+	"거스름돈을 잊으신 것 같아요." 당신은 말한다. 그 말이 <<his>> 주의를 끈다.
+	<<if $worn.upper.type.includes("naked")>>
+		<<He>>【은는】 당신에게 등을 돌리고, 허리를 숙여 <<bottom>>【을를】 공중에 흔든다. 당신은 어깨 너머로 훔쳐보며 원하는 효과가 있는지 확인한다.
+	<<else>>
+		<<He>>【은는】 당신이 상의가 헐렁하게 늘어진 채 앞으로 숙이고 있는 것을 발견한다. <<He>>【은는】 그 안을 훤히 들여다볼 수 있다.
+		<<if $player.gender_appearance is "f" and $worn.under_upper.type.includes("naked")>>
+			브래지어를 하지 않은 것이 이 상황을 더욱 좋게 만든다.
+		<</if>>
+	<</if>>
+	<<exhibitionism1>>
+	"제 실수네요." 당신은 속삭인다.
+	<br><br>
+<<elseif $stall_seduced is 2>><<set $seductiondifficulty to 6000>>
+	"거래해 주셔서 정말 감사해요." 당신은 말한다. "하지만 잊으신 게 있어요." <<He>>【은는】 테이블로 돌아온다. 당신은 <<his>> 손을 잡고, 앞으로 몸을 숙여 <<his>> 뺨에 키스한다.
+	<<promiscuity2>>
+	<<if $worn.under_lower.type.includes("naked")>><<set $seductiondifficulty to 8000>>
+		"이 가판대에 있는 거 정말 좋아요." 당신은 말한다. "아무도 내가 허리 아래로 아무것도 안 입은 걸 모르거든요."
+		<<exhibitionism3>>
+
+	<<else>><<set $seductiondifficulty to 10000>>
+		"이 가판대에 있는 거 정말 좋아요." 당신은 말한다. "아무도 내가 허리 아래로 속옷만 입고 있는 걸 모르거든요."
+		<<exhibitionism2>>
+	<</if>>
+<<elseif $stall_seduced is 3>>
+<<else>>
+   <<set $seductiondifficulty to 10000>>
+   "아무도 못 보는 걸 보고 싶지 않아요?" 당신이 묻는다.
+   <br>
+   당신은 가판대 테이블 아래에서 천천히 다리를 벌려, <<him>>에게 완전히 드러난 당신의 <<genitals>>【을를】 똑똑히 보여준다.
+   <<exhibitionism4>>
+<</if>>
+
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<stallCustomerArousal>>
+<<seductionskill 5>>
+
+<<if $seductionrating gte $seductionrequired>>
+	<<set $stall_seduced += 1>>
+	<<He>>【은는】 얼굴을 붉히며 시선을 돌리지만, <span class="green">더 이상 떠나고 싶어하지 않는 것 같다.</span>
+	<br><br>
+
+	<<set $stall_foodstuff to $foodstuff_inventory.random()>>
+	<<stall_update>>
+
+	<<He>>【은는】 당신의 가판대로 돌아와 <span class="green"><<print setup.foodstuff[$stall_foodstuff].name>></span> 앞에 멈춘다. "이, 이거 <span class="green"><<stall_amount>>개</span>에 얼마예요?"
+	<br><br>
+
+	<<stall_trust>>
+	<br><br>
+
+	<<stall_sell_actions>>
+
+<<else>>
+
+	<<He>>【은는】 얼굴을 붉히지만, 돌아서서 <span class="red">가던 길을 계속 간다.</span>
+	<br><br>
+
+	<<stall_actions>>
+
+<</if>>
+
+:: Stall Oral
+<<effects>>
+
+아무도 보지 않는지 주위를 살핀 후, 테이블 아래로 미끄러져 들어간다.
+
+<<if $rng gte 51>>
+	<<if $worn.lower.name is "naked">>
+		<<set $striplower to true>>
+		<<if $worn.under_lower.name is "naked">>
+			<<set $stripunderlower to true>>
+		<</if>>
+	<</if>>
+	당신은 반대편에서 테이블보를 들어 올리고,
+
+	<<if $pronoun is "m">>
+		<<persons>> 바지 지퍼를 내린다.
+	<<else>>
+		<<persons>> 치마와 함께.
+	<</if>>
+	<<if $NPCList[0].penis isnot "none">>
+		<<His>> <<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【이가】 발기한 채 기다리고 있다.
+	<<else>>
+		<<His>> 보지가 이미 번들거린다.
+	<</if>>
+	<<promiscuity4>>
+
+	<<link [[다음|Stall Oral Sex]]>><<set $sexstart to 1>><</link>>
+	<br>
+<<else>>
+	<<person1>><<person>>도 그 아래로 미끄러져 들어온다. "네가 뭘 계획하는지 알지만, 입으로만은 안 돼." <<he>>【이가】 말한다. <<threaten>>
+	<br><br>
+
+	<<if hasSexStat("promiscuity", 5)>>
+		<<link [[받아들인다|Stall Oral Accept]]>><</link>><<promiscuous5>>
+		<br>
+	<<else>>
+		<<insufficientStat "promiscuity" "동의하기엔">>
+		<br>
+	<</if>>
+	<<link [[거절한다|Stall Oral Refuse]]>><</link>>
+	<br>
+<</if>>
+
+:: Stall Oral Accept
+<<effects>>
+
+당신은 고개를 끄덕이지만, <<person1>><<person>>【이가】 알아차렸는지 확신할 수 없다. <<He>>【은는】 이미 당신을 더듬고 있다.
+<<promiscuity5>>
+
+<<link [[다음|Stall Sex]]>><<set $sexstart to 1>><</link>>
+<br>
+
+:: Stall Oral Refuse
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"아, 안 돼요." 당신은 말한다. "이런 건 동의한 적 없어요."
+<<elseif $speech_attitude is "bratty">>
+	"씨발, 떨어져." 당신은 말한다. "이런 건 동의한 적 없어."
+<<else>>
+	"떨어져요." 당신은 말한다. "이런 건 동의한 적 없어요."
+<</if>>
+<<person1>><<person>>【은는】 당신을 무시하고, 대신 더듬는다.
+<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+<br><br>
+
+당신은 <<him>>의 정강이를 세게 차서 틈을 만든다. 당신은 테이블 아래에서 기어 나온다. <<person>>【은는】 곧 반대편에 나타난다. <<He>>【은는】 당신을 노려본 후 걸어간다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Sex
+
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 100>>
+	<<enable_rescue>>
+	<<if $worn.lower.name is "naked">>
+		<<set $striplower to true>>
+		<<if $worn.under_lower.name is "naked">>
+			<<set $stripunderlower to true>>
+		<</if>>
+	<</if>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Stall Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Stall Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Stall Sex Finish
+
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>><<fameprostitution 1>>
+	<<ejaculation>>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. <<person>>【은는】 반대편에서 나와 테이블에 기대어 헐떡인다. 당신은 바쁜 시장을 둘러본다. 모두가 자기 일에 신경 쓰고 있고, 아무도 눈치채지 못한 것 같다.
+	<br><br>
+	"고마워, <<girl>>." <<he>>【이가】 <<his>> <<if $pronoun is "f">>치마<<else>>바지<</if>>【을를】 정리하며 말한다. "또 봐."
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 밀쳐낸다. <<He>>【은는】 테이블보를 뚫고 밖으로 넘어진다.
+	<br><br>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. <<person1>><<person>>【은는】 <<if $pronoun is "f">><<his>> 치마를 내리려고<<else>><<his>> 지퍼를 올리려고<</if>> 애쓰고 있다. 다른 사람들은 재미있다는 듯이 지켜본다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $alarm is 1 and $rescue is 1>><<set $rescued += 1>>
+	너무 긴장해서 계속할 수 없게 된 <<person>>【은는】 당신에게서 기어서 멀어진다. 테이블보가 <<him>> 뒤로 떨어져 당신의 시야를 가린다.
+	<br><br>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. 당신이 일어섰을 때 <<He>>【은는】 이미 사라졌다. 시장의 사람들은 비명 소리의 출처에 대해 걱정하며 이쪽을 쳐다본다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<else>>
+	<<person>>【은는】 당신에게서 기어서 멀어진다. 테이블보가 <<him>> 뒤로 떨어져 당신의 시야를 가린다.
+	<br><br>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. 당신이 일어섰을 때 <<He>>【은는】 이미 사라졌다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<</if>>
+
+:: Stall Oral Sex
+
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 100>><<promiscuity5>>
+	<<enable_rescue>>
+	<<if $worn.lower.name is "naked">>
+		<<set $striplower to true>>
+		<<if $worn.under_lower.name is "naked">>
+			<<set $stripunderlower to true>>
+		<</if>>
+	<</if>>
+	<<npcoral>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Stall Oral Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Stall Oral Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Stall Oral Sex Finish
+
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<fameprostitution 1>>
+	<<ejaculation>>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. <<person>>【은는】 테이블에 기대어 헐떡인다. 당신은 바쁜 시장을 둘러본다. 모두가 자기 일에 신경 쓰고 있지만, 아무도 눈치채지 못한 것 같다.
+	<br><br>
+	"고마워, <<girl>>." <<he>>【이가】 <<his>> <<if $pronoun is "f">>치마<<else>>바지<</if>>【을를】 정리하며 말한다. "또 봐."
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 밀쳐낸다. <<He>>【은는】 비틀거리다 맞은편 가판대에 부딪혀 과일들이 길거리로 굴러떨어진다.
+	<br><br>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. <<person1>><<person>>【은는】 <<if $pronoun is "f">><<his>> 치마를 내리려고<<else>><<his>> 지퍼를 올리려고<</if>> 애쓰고 있다. 과일 가게 주인이 <<him>>【을를】 꾸짖는 동안.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $alarm is 1 and $rescue is 1>>
+	<<set $rescued += 1>>
+	<<person>>【은는】 뒤로 물러서고, 테이블보가 떨어져 당신의 시야를 가린다.
+	<br><br>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. 당신이 일어섰을 때 <<He>>【은는】 이미 사라졌다. 시장의 사람들은 비명 소리의 출처에 대해 걱정하며 이쪽을 쳐다본다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<else>>
+	<<person>>【은는】 테이블 아래로 손을 뻗어 당신을 땅으로 밀친다.
+	<br><br>
+	<<tearful>> 당신은 테이블의 당신 쪽으로 돌아온다. 당신이 일어섰을 때 <<He>>【은는】 이미 사라졌다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<</if>>
+
+:: Stall Pull
+<<effects>>
+
+당신은 <<person>>에게서 몸을 뺀다.
+
+<<if $speech_attitude is "meek">>
+	"오, 오해가 있었나 봐요." 당신은 말한다. "여기서 파는 건 이게 아니에요."
+<<elseif $speech_attitude is "bratty">>
+	"손대지 마세요." 당신은 말한다. "아니면 경비를 부를 거예요."
+<<else>>
+	"오해해서 죄송해요." 당신은 말한다. "하지만 전 여기서 농산물만 팔아요."
+<</if>>
+<br><br>
+<<person>>【은는】 당신을 노려본 후 주위를 둘러본다. "네가 날 꼬셨잖아." <<he>>【이가】 속삭인다. "넌 대가를 치르게 될 거야. 조만간." <<He>>【은는】 걸어간다.
+<<stress 3>><<gstress>>
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Shove
+<<effects>>
+
+당신은 몸을 비틀어 <<person1>><<person>>【을를】 밀쳐낸다. <<He>>【은는】 가판대 지지대를 붙잡았고, 넘어지면서 지붕이 거의 무너질 뻔했다. <<He>>【은는】 당신을 쏘아보더니, 이내 몸을 일으켜 떠나버린다.
+<br><br>
+
+<<tearful>> 당신은 다시 진열대로 돌아선다.
+<br><br>
+
+<<stall_actions>>
+
+:: Stall Endure
+<<effects>>
+
+<<if $rng gte 51>>
+당신은 <<person1>><<persons>> 침입적인 더듬기를 견뎌낸다. 몇 분 동안 계속되다가, 마침내 <<he>>【이가】 지겨워하며 멈춘다.
+<br><br>
+
+<<tearful>> 당신은 진열대에 집중하려고 노력한다.
+<br><br>
+
+<<stall_actions>>
+
+<<else>>
+	<<generate2>>
+	당신은 <<person1>><<persons>> 침입적인 더듬기를 견딘다. 몇 분 동안 계속되다가, <<person2>><<person>>【이가】 당신의 진열대에 다가온다. <<He>>【은는】 너무나 그것에 마음을 빼앗겨 테이블 뒤에서 무슨 일이 벌어지고 있는지 알아차리지 못한다. <<he>>【이가】 가까이 다가올 때까지는.
+	<br><br>
+
+	"여기 이 <<girl>>한테 관심 있어?" <<person1>><<person>>【이가】 뒤에서 말한다. "단돈 £100. 한정 판매야."
+	<br><br>
+
+	<<person2>><<person>>【은는】 생각에 잠겨 <<his>> 턱을 쓰다듬는다. "£60. 그 이상은 한 푼도 못 줘."
+	<br><br>
+
+	그들은 당신을 두고 계속해서 흥정한다.
+	<br><br>
+
+	<<link [[항의한다|Stall Protest]]>><</link>>
+	<br>
+	<<link [[침묵을 지킨다|Stall Wait]]>><</link>>
+	<br>
+
+<</if>>
+
+:: Stall Protest
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제-제발 안 돼요." 당신이 말한다. "저는 재고가 아니에요."
+<<elseif $speech_attitude is "bratty">>
+	"참을 만큼 참았어." 당신이 말한다. "그 더러운 손 치워."
+<<else>>
+	"저는 판매용이 아니에요." 당신이 말한다.
+<</if>>
+<br><br>
+
+"<<pShe>>【은는】 좀 버릇없게 구는군." <<person2>><<person>>【이가】 말한다. "사양하지." <<He>>【은는】 떠나버린다.
+<br><br>
+
+<<person1>><<person>>【은는】 당신을 더 꽉 붙잡는다. "좋아." <<he>>【이가】 말한다. "공짜로 하지. 대신 <<phim>>【을를】 나랑 나눠야 해."
+<br><br>
+<<person2>><<person>>【은는】 멈춰 서서 씨익 웃는다. "공짜 <<girl>>【이】라면 거절할 수 없지."
+<br><br>
+
+<<person1>><<person>>【은는】 남은 손으로 당신의 입을 틀어막는다. "씨발 <<bitch>>." <<he>>【이가】 속삭이며, 당신을 덮개가 씌워진 테이블 뒤에 숨겨진 바닥으로 밀어 넘어뜨린다. "쉽게 돈 좀 벌 뻔했는데. 최소한 널 직접 써먹을 수는 있겠군."
+<br><br>
+
+<<link [[다음|Stall Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Stall Wait
+<<effects>>
+
+당신은 두 사람이 가격에 합의할 때까지 기다린다. <<person2>><<person>>【은는】 당신을 싸게 얻었지만, 조건이 하나 있다. <<He>>【은는】 당신을 <<person1>><<person>>【와과】 공유해야 한다.
+<br><br>
+
+<<person>>【은는】 당신을 테이블 아래로 밀어 넣고, <<person2>><<person>>【은는】 <<his>> 쪽의 덮개를 들어 올린다. <<person1>><<person>>【은는】 당신 뒤로 기어들어와 당신 위에 올라타, <<he>>【이가】 당신의 입을 <<person2>><<persons>> <<if $NPCList[_n].penis isnot "none">>발기한 <<print window.KR.getPenisDescKr($NPCList[_n].penisdesc)>><<else>>축축한 보지<</if>>에 강제로 갖다 댄다.
+<br><br>
+
+<<link [[다음|Stall Double Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Stall Double Rape
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<enable_rescue>>
+	<<if $worn.lower.name is "naked">>
+		<<set $striplower to true>>
+		<<if $worn.under_lower.name is "naked">>
+			<<set $stripunderlower to true>>
+		<</if>>
+	<</if>>
+	<<npcoral>>
+	<<set $enemyanger += 20>>
+	<<set $enemytrust -= 20>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Stall Double Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Stall Double Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Stall Double Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>><<set $forcedprostitutionstat += 1>>
+	<<ejaculation>>
+	당신은 가판대 아래 바닥에 버려진다.
+	<br><br>
+	<<tearful>> 당신은 몸을 일으킨다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 옆으로 밀쳐내고, <<he>>【은는】 이웃 가판대와 부딪힌다. 가판대 주인뿐만 아니라 다른 사람들도 알아챈다.
+	<br><br>
+	<<He>>【은는】 비틀거리며 일어나 당신을 노려보지만, 다른 짓을 하지는 않는 게 낫다고 생각한다. <<person2>><<person>>【이가】 자신은 관련 없다는 듯 행동하는 동안, <<He>>【은는】 쿵쿵거리며 떠나버린다.
+	<br><br>
+	<<tearful>> 당신은 가판대 뒤에 자리를 잡는다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+
+<<else>>
+	<<set $rescued += 1>>
+	"방금 비명 소리 들었어?"
+	<br>
+	"저기서 무슨 일이야?"
+	<br>
+	"누가 좀 가봐야겠어."
+	<br><br>
+	<<person2>><<person>>【은는】 테이블에서 물러나 덮개를 떨어뜨리고, <<if $pronoun is "m">><<his>> 바지 지퍼를 올리려<<else>><<his>> 치마를 내리려<</if>> 애쓴다.
+	<br><br>
+	<<person1>><<person>>【은는】 밖을 엿본다. <<his>> 얼굴에 공포가 스친다. <<He>>【은는】 당신을 마지막으로 한 번 쏘아보고는 달아난다.
+	<br><br>
+	<<tearful>> 당신은 진열대 뒤의 자리로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+
+<</if>>
+
+:: Stall Rape
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<enable_rescue>>
+	<<if $worn.lower.name is "naked">>
+		<<set $striplower to true>>
+		<<if $worn.under_lower.name is "naked">>
+			<<set $stripunderlower to true>>
+		<</if>>
+	<</if>>
+	<<hand_gag 0 left>>
+	<<set $enemyanger += 20>>
+	<<set $enemytrust -= 20>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Stall Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Stall Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Stall Rape Finish
+
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	당신은 가판대 뒤 바닥에 버려진다.
+	<br><br>
+	<<tearful>> 당신은 몸을 일으킨다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person1>><<person>>【을를】 옆으로 밀쳐내고, <<he>>【은는】 이웃 가판대와 부딪힌다. 가판대 주인뿐만 아니라 다른 사람들도 알아챈다.
+	<br><br>
+	<<He>>【은는】 비틀거리며 일어나 당신을 노려보지만, 다른 짓을 하지는 않는 게 낫다고 생각한다. <<He>>【은는】 쿵쿵거리며 떠나버린다.
+	<br><br>
+	<<tearful>> 당신은 가판대 뒤에 자리를 잡는다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<<else>>
+	<<set $rescued += 1>>
+	"방금 비명 소리 들었어?"
+	<br>
+	"저기서 무슨 일이야?"
+	<br>
+	"누가 좀 가봐야겠어."
+	<br><br>
+	<<person1>><<person>>【은는】 당신의 테이블 너머를 엿본다. <<his>> 얼굴에 공포가 스친다. <<He>>【은는】 당신을 마지막으로 한 번 쏘아보고는 달아난다.
+	<br><br>
+	<<tearful>> 당신은 진열대 뒤의 자리로 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<if $worn.lower.name isnot "naked" and $striplower>>
+		<<lowerstrip>>
+	<</if>>
+	<<if $worn.under_lower.name isnot "naked" and $stripunderlower>>
+		<<underlowerstrip>>
+	<</if>>
+	<<unset $striplower>>
+	<<unset $stripunderlower>>
+	<<endcombat>>
+	<<link [[다음|Stall Ready]]>><</link>>
+<</if>>
+
+:: Market Street Urchin Help
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "connudatus">>
+<<set $urchin_debt to random(500,2000)>>
+알고 보니 <<person1>><<person>>【이가】 <<if $phase is 0>>음식<<else>>가판대의 물건<</if>>【을를】 <<printmoney $urchin_debt>>어치 훔쳤고, 시장 가판대 주인은 경찰을 부르려 한다.
+<br><br>
+<<if $phase is 0>>
+	<<link [[고아의 절박한 굶주림을 설명하려 시도한다|Market Street Urchin Help Persuade]]>><</link>>
+	<br>
+<<else>>
+	<<link [[가판대 주인을 설득하여 넘어가게 한다|Market Street Urchin Help Persuade]]>><</link>>
+	<br>
+<</if>>
+<<if $money gte $urchin_debt>>
+	<<link [[대신 지불하겠다고 제안한다|Market Street Urchin Help Pay]]>><<set $phase += 1>><</link>> /* incr $phase to indicate price not agreed. */
+	<br>
+<</if>>
+<<if $submissive lte 1100 and (($phase is 0) or ($phase is 10 and ($delinquency gte 400 or $cool gte 40)))>>
+	<<link [[가판대 주인을 공격한다|Market Street Urchin Help Hit]]>><<crimeUp 200 "assault">><</link>><<gcrime "assault">>
+	<br>
+<</if>>
+<<link [[자리를 뜬다|Connudatus Street]]>><<unset $urchin_debt>><<endevent>><</link>>
+<br>
+
+:: Market Street Urchin Help Persuade
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "connudatus">>
+<<if $phase is 0>>
+	당신은 가판대 주인에게 고아원에서의 끔찍한 삶과 <<person1>><<person>>【이가】 겪어야 하는 일들에 대해 설명한다.<br>
+	<<if $chef_speech is "bailey">>
+		가판대 주인이 <<print either("슬프게","어둡게","고통스러운 표정으로")>> 시선을 피한다. "그곳에 대한 소문은 들었지." <<set _bar to random(0,400)>>
+	<<else>>
+		가판대 주인은 당신의 주장에 회의적인 표정을 짓는다. <<set _bar to random(0,1000)>>
+	<</if>>
+<<else>>
+	당신은 가판대 주인에게 <<person>>【이가】 학교에서 얼마나 열심히 공부하는지, 그리고 경찰을 부르는 것이 <<his>> 미래 전체를 망칠 수 있는지에 대해 이야기한다.<<set _bar to random(0,800)>>
+<</if>><br><br>
+<<if currentSkillValue('english') gte _bar>>
+	당신의 말에 담긴 열정을 듣고, 가판대 주인은 마음을 누그러뜨린다.
+	<br>
+	<<if $phase is 0>>
+		가판대 주인은 한숨을 쉬며 걱정하는 구경꾼들을 손짓으로 물리고, 당신 둘을 안으로 부른다.<br>
+		"나도 괴물은 아니야. 배고프면 내가 가게 열었을 때 언제든 물어봐. 그냥 내 물건 훔치지만 말아줘. 알았지?"<br>
+		<<person>>【은는】 미소를 짓고, 망설이다가 음식을 돌려주기 시작한다.<br>
+		"가져가. 네 거야. 자, 이제 여기서 나가. 둘 다." <<lstress>><<stress -3>>
+		<br><br>
+		"고마워." 당신이 떠날 때 <<person>>【이가】 말한다. "신세 졌어." <<ghope>><<hope 1>>
+		<br><br>
+		<<link [[떠난다|Connudatus Street]]>><<famegood 20>><<unset $urchin_debt>><<endevent>><</link>>
+		<br>
+	<<else>>
+		"알았어, 알았어! 그만해!" 가판대 주인이 웃는다. "내가 뭐라고 그렇게 위대하고 세상을 바꿀 잠재력을 가진 미래를 망치겠어!?
+		이번 한 번은 <<him>>【을를】 봐주지. 하지만 그거 돌려주고 여기서 나가, 그리고 내가 후회하게 만들지 마. 다음에 내 가판대 근처에서 보이면 뭐라도 사는 게 좋을 거야.
+		그리고 너... 너는 내가 판매원으로 고용하기 전에 여기서 나가!"<br>
+		<<person>>【은는】 훔친 물건을 돌려준다. 그리고 가판대 주인은 다시 일하러 간다.
+		<br><br>
+		"고마워." 당신이 떠날 때 <<person>>【이가】 말한다. "신세 졌어." <<gcool>><<status 1>>
+		<br><br>
+		<<link [[다음|Connudatus Street]]>><<famegood 20>><<unset $urchin_debt>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif currentSkillValue('english') gte (_bar/2)>>
+	당신의 말에 담긴 확신을 듣고, 가판대 주인은 마음을 누그러뜨린다.
+	<br><br>
+	"좋아, 하지만 누군가는 값을 치러야지."<br><br>
+	<<if $money gte $urchin_debt>>
+		<<link [[대신 지불하겠다고 제안한다|Market Street Urchin Help Pay]]>><</link>>
+		<br>
+		<<link [[지불을 거부한다|Market Street Urchin Not Pay]]>><</link>>
+		<br>
+	<<else>>
+		<span class="red">돈이 부족하다.</span>
+		<br><br>
+		<<link [[돈이 부족하다고 설명한다|Market Street Urchin Not Pay]]>><<famegood 2>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	가판대 주인은 설득되지 않고, <<person>>【을를】 경찰서 쪽으로 끌고 간다.
+	<br><br>
+	<<link [[다음|Connudatus Street]]>><<unset $urchin_debt>><<endevent>><</link>>
+<</if>>
+
+:: Market Street Urchin Help Pay
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "connudatus">>
+<<if $phase % 10 is 1 and $rng % 3 is 0>> /* price not yet agreed? 1 in 3 chance of a price hike */
+	<<set $urchin_debt *= 2>>
+	"좋아." 가판대 주인이 말한다. "하지만 <<person1>><<he>>【이가】 내 물건을 훔치려 했으니, 가격은 <<printmoney $urchin_debt>>【으로로】 올랐어."
+<<else>>
+	"좋아." 가판대 주인이 말한다. "그냥 <<printmoney $urchin_debt>> 내고 여기서 나가. 오늘 장사가 잘된 걸 행운으로 알아."
+<</if>>
+<br><br>
+<<if $money gte $urchin_debt>>
+	당신은 가판대 주인에게 돈을 지불한다. <<ghope>><<hope 1>><<money `-$urchin_debt` "marketStall">>
+	<br><br>
+	주인은 돈을 꼼꼼히 세고는 둘 다에게 손을 흔든다. "여기서 나가."
+	<br><br>
+	<<link [[다음|Connudatus Street]]>><<famegood 20>><<unset $urchin_debt>><<endevent>><</link>>
+	<br>
+<<else>>
+	<span class="red">돈이 부족하다.</span>
+	<br><br>
+	<<link [[돈이 부족하다고 설명한다|Market Street Urchin Not Pay]]>><<famegood 2>><</link>><br>
+<</if>>
+
+:: Market Street Urchin Not Pay
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "connudatus">>
+가판대 주인은 어깨를 으쓱하고, <<person>>【을를】 경찰서 쪽으로 끌고 간다.
+<br><br>
+<<link [[다음|Connudatus Street]]>><<unset $urchin_debt>><<endevent>><</link>>
+
+:: Market Street Urchin Help Hit
+<<set $outside to 1>><<set $location to "town">><<effects>><<set $bus to "connudatus">>
+경고도 없이, 당신은 가판대 주인에게 달려들어 그들을 가판대로 밀어붙인다. 상품들이 사방으로 쏟아져 내린다.
+<br><br>
+뒤이은 혼란 속에서, 당신 둘은 도망친다.
+<<if $phase is 0>>고아는 당신의 도움에 감사한다.<<greb>><<ghope>><<reb 1>><<hope 1>>
+<<else>>학생은 당신의 도움에 감사한다.<<gcool>><<status 1>><<famescrap 5>>
+<</if>>
+<br><br>
+<<link [[다음|Connudatus Street]]>><<unset $urchin_debt>><<endevent>><</link>>
+<br>
+
+:: Stall Ready
+<<effects>>
+
+<<silently>><<stall_inventory>><</silently>>
+
+<<if _inventory_in_stall isnot 1>>
+	진열된 것이 아무것도 없으니, 가판대를 지킬 이유가 없다.
+	<br><br>
+	<<icon "project-maths.png">><<link [[가판대 관리|Stall Manage]]>><</link>>
+	<br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<elseif _inventory_found isnot 1>>
+	팔 물건이 아무것도 없으니, 가판대를 지킬 이유가 없다.
+	<br><br>
+	<<connudatusicon>><<link [[떠난다|Connudatus Street]]>><<endevent>><<endstall>><<clotheson>><</link>>
+	<br>
+<<else>>
+	당신은 가판대를 열고 손님들을 기다린다.
+	<br><br>
+	<<stall_actions>>
+<</if>>

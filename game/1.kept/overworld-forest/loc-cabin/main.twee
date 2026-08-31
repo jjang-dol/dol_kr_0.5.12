@@ -1,0 +1,2942 @@
+:: Eden Cabin
+<<set $outside to 0>><<set $location to "cabin">><<effects>><<set $bus to "edencabin">><<getTarget true>><<edenFluidsCheck>>
+/* make sure that all links that lead here have <<endevent>> */
+<<npc Eden>><<person1>>
+
+당신은 에덴의 오두막에 있다.
+
+<<if $edenpillow is 2>>
+	벽난로 옆에는 양탄자와 베개 몇 개가 놓여 있다.
+<</if>>
+<<if $edencushions is 2 and $edenloveseat is 9>>
+	근처에 2인용 소파가 놓여 있다.
+<</if>>
+<<if $edencurtains is 2>>
+	창문에는 부드러운 커튼이 걸려 있다.
+<</if>>
+<<if $edencoat is 2>>
+	구석에는 코트 걸이가 놓여 있다.
+	<<if $edencoatjacket is 1 and $edenscarf is 1 and !(Time.hour gte 11 and Time.hour lte 14 and $daily.eden.hunting is 1)>>
+		사냥용 코트와 스카프가 걸려 있다.
+	<<elseif ($edenscarf is 1 and !(Time.hour gte 11 and Time.hour lte 14 and Time.season is "winter" and $daily.eden.hunting is 1))>>
+		스카프가 걸려 있다.
+	<<elseif $edencoatjacket is 1 and !(Time.hour gte 11 and Time.hour lte 14 and $daily.eden.hunting is 1)>>
+		사냥용 코트가 걸려 있다.
+	<</if>>
+<</if>>
+
+창문 밖에 온도계가 있다. <span class="teal"><<print Weather.toSelectedString(Weather.temperature, 0)>></span>라고 표시되어 있다.
+<<print setup.WeatherDescriptions.extremeTemperature()>>
+<br><br>
+
+<<if isPregnancyEnding() and !$possessed>>
+	<<pregnancyPassout "edencabin">>
+<<elseif $stress gte $stressmax and !$possessed>>
+	<br><br>
+
+	<<link [[모든 것이 암전된다...|Eden Cabin Passout]]>><</link>>
+<<elseif $edenCagedEscape and Time.hour gte 0 and Time.hour lte 6 and !$possessed>>
+	당신은 숨을 죽이고 오두막 문을 통과한다. 에덴은 침대에서 즉시 몸을 일으키더니, 분노에 차 이불을 걷어찬다. "이제야 기어 돌아왔나? 빌어먹을, 진작 왔어야지."
+	<br><br>
+
+	당신이 한마디도 꺼내기 전에 <<He>>【이가】 당신을 붙잡는다. 그때 구석에 있는 우리가 눈에 들어온다.
+	<br><br>
+
+	<<link [[다음|Eden Caged Intro]]>><<set $phase to 2>><</link>>
+	<br>
+<<elseif edenFreedomStatus() gte 1 and Time.hour gte 0 and Time.hour lte 6 and !$possessed>>
+	<<edenTrackers>>
+	<<npcincr Eden love -2>>
+	안으로 들어서자 에덴은 자고 있다. 문 열리는 소리에 잠이 깬 <<he>>【은는】 재빨리 침대에서 일어나지만, 당신을 보고는 약간 긴장을 푼다.
+	이불을 걷어차고 <<he>>【은는】 당신에게 달려온다.
+	<<if $edenPreyEscaped>><<unset $edenPreyEscaped>>
+		"우리의 게임을 잊었다고 생각하지 마. 넌 내게서 도망치면 안 됐어." <<he>>【이가】 투덜거린다. "이렇게 오래 자리를 비워서도 안 됐고. 대체 어디 있었던 거야?"
+	<<else>>
+		"어디 있었어?" <<he>>【이가】 당신의 어깨를 잡으며 묻는다. "정말 걱정했잖아."
+	<</if>>
+	<br><br>
+
+	<<link [[사과한다|Eden Return Apologise]]>><<npcincr Eden love 1>><<set $phase to 0>><</link>>
+	<br>
+	<<link [[설명한다|Eden Return Apologise]]>><<set $phase to 1>><</link>>
+<<elseif $edenPreyEscaped and Time.hour gte 0 and Time.hour lte 6 and !$possessed>><<unset $edenPreyEscaped>>
+	안으로 들어서자 에덴은 자고 있다. 문 열리는 소리에 잠이 깬 <<he>>【은는】 재빨리 침대에서 일어나, 졸린 눈을 비빈다. 당신을 보자 <<his>> 표정이 쏘아보는 듯 험악해진다.
+	<br><br>
+
+	"나한테서 도망치면 안 됐는데," <<he>>【이가】 당신을 위아래로 훑어보며 말한다. "필요하다면, 정신 못 차리게 박아주지. 다음번엔, 넌 내 거야."
+	<br>
+	<<if $worn.neck.collared isnot 1 and $edenaskcollar isnot 1>>
+		<<He>>【은는】 하품하며 다시 잠들려 하지만, <<his>> 눈이 번쩍 뜨인다. 마치 무언가 깨달은 것처럼.
+		<br>
+		"네 목걸이는 어디 갔지?" <<he>>【이가】 묻는다. <<his>> 목소리에는 걱정이 서려 있다. <<He>>【은는】 이불을 걷어차고 당신을 향해 성큼성큼 다가온다.
+		<br><br>
+
+		<<if $edencollarremove is 1>>
+			<<link [[거짓말하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+		<<else>>
+			<<link [[설명하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+		<</if>>
+		<br>
+		<<link [[그냥 벗었다고 말한다|Eden Collar Remove]]>><</link>>
+		<br>
+	<<else>>
+		<<He>>【은는】 말끝을 흐리며 하품하더니, 옆으로 돌아눕는다. 곧 <<his>> 코 고는 소리가 오두막을 가득 채운다.
+		<br><br>
+
+		<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $worn.neck.collared isnot 1 and $edenaskcollar isnot 1 and Time.hour gte 0 and Time.hour lte 6 and !$possessed>>
+	안으로 들어서자 에덴이 자고 있다. 문 열리는 소리에 잠이 깬 <<he>>【은는】 침대에서 벌떡 일어나지만, 당신을 보고는 약간 긴장을 푼다.
+	<<He>>【은는】 다시 누우려 몸을 돌리지만, <<his>> 시선이 당신의 목에 꽂히자 멈춘다.
+	<br><br>
+
+	"네 목걸이는 어디 갔지?" <<he>>【이가】 침대에서 나와 당신에게 걸어오며 묻는다.
+	<br><br>
+
+	<<if $edencollarremove is 1>>
+		<<link [[거짓말하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+	<<else>>
+		<<link [[설명하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+	<</if>>
+	<br>
+	<<link [[그냥 벗었다고 말한다|Eden Collar Remove]]>><</link>>
+	<br>
+<<elseif ($exposed gte 2 and !hasSexStat("exhibitionism", 5) or $exposed gte 1 and !hasSexStat("exhibitionism", 4)) and !isLoveInterest("Eden")>>
+	이런 모습으로 보이고 싶지 않다! 당신은 서둘러 옷으로 달려간다.
+	<br><br>
+
+	<<link [[다음|Eden Wardrobe]]>><<endevent>><</link>>
+	<br><br>
+<<else>>
+	<<if ($exposed is 1 and hasSexStat("exhibitionism", 4)) or ($exposed is 2 and hasSexStat("exhibitionism", 5))>>
+		<span class="lewd">드러난 <<lewdness>>에서 원초적인 스릴을 느낀다.</span>
+	<<elseif $exposed is 1 or $exposed is 2>>
+		<span class="lewd">여기선 에덴 외에는 아무도 볼 수 없지만, 당신의 <<lewdness>> 때문에 당혹스럽다.</span>
+	<</if>>
+
+	<<if Time.dayState is "night">>
+		벽난로에서 불씨가 타오르고 있다.
+	<</if>>
+
+	<<if Weather.precipitation is "rain">>
+		<<if $edenroof gte 5>>
+			마음을 달래는 듯한 소리를 내며 오두막 지붕 위로 비가 쏟아진다.
+		<<else>>
+			빗방울이 나무 천장 틈으로 새어 들어와 바닥에 후두둑 떨어진다.
+		<</if>>
+		<br><br>
+	<<elseif Weather.precipitation is "snow">>
+		창턱에 눈이 쌓인다.
+		<br><br>
+	<</if>>
+
+	<<if edenFreedomStatus() is 0>>
+		<<edenTrackers>>
+	<</if>>
+
+	<<if $possessed>>
+		<<if $nextPassageCheck is "Eden Clearing" and $worn.neck.collared is 1 and $worn.neck.type.includes("leash")>>
+			목걸이의 사슬이 팽팽해지면서 당신은 멈춰 선다. 당신은 잠든 에덴의 모습을 보며 비웃는다.
+			<br><br>
+
+			당신은 목걸이를 움켜쥐고 당긴다. 팔이나 손의 감각은 없지만, 불가능할 정도의 힘으로 당기고 있다는 것을 안다.
+			<br><br>
+
+			몇 개의 손이 더 나타나 목걸이를 잡고 사방에서 당긴다. 잠시 후, 목걸이가 부서진다. 그 손들은 금속 조각이 바닥에 떨어지기 전에 모두 잡아채 에덴의 옆에 쌓아둔다. 당신은 히죽 웃는다.
+			<<set $forestleashed to 0>><<set $forestleashedwear to 0>><<set $worn.neck.cursed to 0>><<neckruined>>
+		<<else>>
+			에덴은 깊이 잠들어 있다.
+		<</if>>
+		<br><br>
+
+		<<if Time.monthName is "November" and $edenprepare is 1>>
+			<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+			<br><br>
+		<</if>>
+		<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+		<br><br>
+		<<if $nextPassageCheck is "Cabin Actions">>
+			<<bedicon "eden">><span class="nextLink"><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>></span>
+		<<else>>
+			<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+		<</if>>
+		<br><br>
+		<<cabinothers>>
+
+	<<elseif Time.hour gte 0 and Time.hour lte 6>>
+		<<if $edenbed isnot 1 and Time.hour lte 2>><<set $edenbed to 1>>
+			에덴이 기지개를 켜며 당신에게서 멀어진다. "늦었군," <<he>>【이가】 말하며 침대로 향한다. <<He>>【은는】 기대하는 눈빛으로 당신을 쳐다본다.
+			<br><br>
+
+			<<bedicon "eden">><<link [[에덴과 함께 간다|Eden Cabin Bed]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<glove>><<gdom>>
+			<br>
+			<<wardrobeicon>><<link [[잠옷으로 갈아입는다|Eden Night Wardrobe]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<glove>><<gdom>>
+			<br>
+			<<refuseicon>><<link [[남는다|Eden Cabin]]>><<endevent>><</link>>
+			<br>
+
+		<<else>>
+			<<set $edenbed to 1>>
+			에덴은 깊이 잠들어 있다.
+			<br><br>
+
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+			<br><br>
+
+			<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+			<br><br>
+
+			<<cabinothers>>
+		<</if>>
+
+	<<elseif Time.hour lte 8>>
+		<<if $valentines is 1 and Time.monthDay is 14 and $daily.eden.breakfast isnot 1>>
+			<<if $daily.eden.breakfast isnot 1>>
+				<<set $daily.eden.breakfast to 1>>
+			<</if>>
+
+			<<set $valentines_eden_breakfast to 1>>
+			오두막 전체에 주방 식기들이 덜그럭거리는 소리가 울려 퍼지며 당신을 잠에서 깨운다. 눈을 깜빡여 뜨자, 창문 틈으로 아침 햇살이 가느다랗게 비쳐 들어오는 것이 보인다. 잠시 넋을 잃고 풍경을 바라보다가, 음식 냄새에 정신을 차린다.
+			의아하게 생각하며 에덴에게 물어보려고 돌아눕지만, <<he>>【은는】 침대에 없다는 것을 깨닫는다. 몸을 일으키자 마침 <<he>>【이가】 아침 식사를 차리는 모습이 보인다. 당신이 뒤척이는 소리를 듣고, <<he>>【은는】 고개를 돌려 당신을 쳐다본다.
+			<br><br>
+
+			"아침이다," <<he>>【이가】 인사한다. <<He>>【은는】 달걀이 담긴 접시 두 개를 들고 있다.
+			<br>
+			당신은 이불을 걷어차고 어슬렁거리며 다가가, <<him>>에게 의아한 눈길을 보낸다. 에덴은 당신의 헝클어진 모습에 픽 웃는다.
+			<br>
+			"발렌타인데이잖나," <<he>>【이가】 설명한다. "그래서 좀 도와줄까 해서."
+			<br><br>
+
+			음식으로 시선을 옮긴다. <<him>>【을를】 위해 아침을 차리지 않는 것도, 함께 나눠 먹지 않는 것도 낯설지만, 그래도 그 행동이 다정하게 느껴진다. 당신은 <<him>>에게 고마움의 미소를 짓고 식탁에 함께 앉는다.
+			둘이서 식사하는 동안, 당신은 <<him>>에게 말을 걸어본다. <<He>>【은는】 대부분 조용하지만, 가능할 땐 대답하려고 노력한다.
+			<br><br>
+
+			<<if $valentines_eden_bought isnot 1>>
+				<<him>>에게 보답할 방법이 있을지 궁금해진다.
+			<<elseif $valentines_eden_bought is 1>>
+				쇼핑몰에서 에덴을 위해 샀던 선물에 대해 생각한다. 나중에 이걸로 <<him>>에게 보답할 수 있을지도 모른다.
+			<</if>>
+			<br><br>
+
+			<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+		<<elseif $daily.eden.breakfast isnot 1>>
+			<<if $daily.eden.breakfast isnot 1>>
+				<<set $daily.eden.breakfast to 1>>
+			<</if>>
+			에덴이 침대에 누워 있다. "아침 차려," <<he>>【이가】 말한다.
+			<br><br>
+			<<if pcAreArmsBound("any") or $feetuse is "bound">>
+				<<He>>【은는】 당신에게 오라고 손짓한다. 충분히 가까이 다가가자, 에덴이 당신의 어깨를 잡고 몸을 돌린다. <<him>>에게 등을 보인 채 서자, 에덴이 당신의 결박을 만지작거리기 시작한다. <<he>>【이가】 무슨 짓을 하는지 볼 수 없어 불안한 마음에 몸이 굳는다.
+				<br><br>
+				갑자기, 당신의 팔과 다리가 모든 속박에서 풀려난다. 당신은 안도의 한숨을 내쉰다.
+				<br><br>
+				<<unbind>>
+			<</if>>
+
+			<<foodicon "pancakes">><<link [[평소처럼 아침 식사 만들기 (0:20)|Eden Breakfast]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<pass 20>><<set $phase to 0>><<housekeeping 1 100>><</link>><<housekeepingdifficulty 1 100>><<gdom>>
+			<br>
+			<<if $housekeeping gte 100>>
+				<<foodicon "eat">><<link [[새로운 것 만들기 (0:20)|Eden Breakfast]]>><<pass 20>><<set $phase to 1>><</link>>
+				<br>
+				<<if $edengarden gte 3>>
+					<<foodstufficon "wild_carrot">><<link [[텃밭의 채소를 사용한다 (0:20)|Eden Breakfast]]>><<pass 20>><<set $phase to 3>><<npcincr Eden love 3>><</link>><<gglove>>
+					<br>
+				<</if>>
+				<<if $edenshrooms gte 3>>
+					<<foodstufficon "mushroom">><<link [[통에 든 버섯을 사용한다 (0:20)|Eden Breakfast]]>><<pass 20>><<set $phase to 4>><<npcincr Eden lust 30>><</link>><<ggglust>>
+					<br>
+				<</if>>
+			<<else>>
+				<<insufficientStat "housekeeping" "더 창의적인 것을 만들기에는">>
+				<br>
+			<</if>>
+			<<refuseicon>><<link [[거절한다|Eden Breakfast]]>><<npcincr Eden love -1>><<npcincr Eden dom -1>><<set $phase to 2>><</link>><<ldom>><<llove>>
+		<<elseif $edenNightmareWake is true>>
+			<<unset $edenNightmareWake>>
+
+			당신은 <<him>>【이가】 당신의 <<= $settings.asphyxiaLevel gte 3 ? "목" : "손목">>【을를】 훔쳐보는 것을 알아차리지만, <<he>>【은는】 들킨 걸 깨닫자 서둘러 시선을 피한다.
+			<br><br>
+
+			<<link [[어젯밤에 대해 묻는다|Eden Nightmare Morning]]>><<set $phase to 0>><</link>>
+			<br>
+			<<link [[아무 일도 없었던 척한다|Eden Nightmare Morning]]>><<set $phase to 1>><</link>>
+			<br>
+		<<else>>
+			에덴은 하루를 시작할 준비를 하고 있다.
+			<br><br>
+
+			<<edenlust>>
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<getinicon>><<link [[에덴에게 다가가기|Cabin Eden Actions]]>><</link>>
+			<br><br>
+
+			<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+			<br><br>
+
+			<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+			<br><br>
+
+			<<cabinothers>>
+		<</if>>
+
+	<<elseif Time.hour lte 16>>
+		에덴은 밖에서 열심히 일하고 있다.
+		<br><br>
+
+		<<if Time.hour is 15 and $daily.eden.lunch isnot 1>>
+			<<if $housekeeping gte 100>>
+				사냥을 마친 에덴은 배가 고플 것이다. 점심을 차려주면 <<he>>【이가】 좋아할지도 모른다.
+				<br>
+				<<foodicon "eat">><<link [[에덴에게 점심 차려주기 (0:30)|Eden Lunch]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $daily.eden.lunch to 1>><</link>>
+			<<else>>
+				사냥을 마친 에덴은 배가 고플 것이다. 당신은 <<him>>에게 점심을 차려줄까 생각했지만, <span class="blue">가사 실력에 자신이 없어 아무것도 만들 수 없다.</span>
+			<</if>>
+			<br><br>
+		<</if>>
+		<<if Time.monthName is "November" and $edenprepare is 1>>
+			<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+			<br><br>
+		<</if>>
+		<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+		<br><br>
+
+		<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+		<br><br>
+
+		<<cabinothers>>
+
+	<<elseif Time.hour lte 17>>
+		<<if $valentines is 1 and Time.monthDay is 14 and $valentines_eden_bought is 1 and $daily.eden.bath isnot 1 and $valentines_eden_bath isnot 1>>
+			에덴은 아직 밖에서 바쁘다. 지금이 <<him>>【을를】 위해 목욕물을 준비할 기회다.
+			<br><br>
+
+			<<link [[목욕물 받기|Eden Valentines Bath]]>><</link>>
+			<br>
+			<<link [[목욕물을 받지 않는다|Eden Cabin]]>><<endevent>><<set $valentines_eden_bath to 1>><</link>>
+
+		<<elseif ($valentines isnot 1 and $daily.eden.bath isnot 1) or ($valentines is 1 and Time.monthDay isnot 14 and $daily.eden.bath isnot 1) or ($valentines is 1 and Time.monthDay is 14 and !$valentines_eden_bought and $daily.eden.bath isnot 1) or ($valentines is 1 and Time.monthDay is 14 and $valentines_eden_bath is 1 and $daily.eden.bath isnot 1)>>
+			<<if $daily.eden.bath isnot 1>>
+				<<set $daily.eden.bath to 1>>
+			<</if>>
+
+			에덴은 <<his>> 목욕물을 다 받고 옷을 벗기 시작한다. "목욕 시간이야." <<he>>【이가】 말한다. "어서, 물 식기 전에 들어와."
+			<br><br>
+
+			<<noClothingCheck>>
+			<<if _nude is false>>
+				<<link [[옷을 벗고 들어간다 (0:30)|Eden Bath]]>><<pass 30>><<npcincr Eden dom 1>><<npcincr Eden love 1>><<set $phase to 0>><<strip>><<set $edenClothes to true>><<set $edenFluidsCheck to "clean">><</link>><<gdom>><<glove>>
+			<<else>>
+				<<link [[들어간다 (0:30)|Eden Bath]]>><<pass 30>><<npcincr Eden dom 1>><<npcincr Eden love 1>><<set $phase to 0>><<strip>><</link>><<gdom>><<glove>>
+			<</if>>
+			<br>
+			<<link [[거절한다|Eden Bath]]>><<npcincr Eden dom -1>><<npcincr Eden love -1>><<set $phase to 1>><<set $edenjoin to 1>><</link>><<llove>><<ldom>>
+			<br>
+
+		<<else>>
+			에덴은 욕조에서 쉬고 있다.
+			<br><br>
+
+			<<edenlust>>
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<getinicon>><<link [[에덴에게 다가가기|Cabin Eden Actions]]>><</link>>
+			<br><br>
+			<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+			<br><br>
+			<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+			<br><br>
+			<<cabinothers>>
+
+		<</if>>
+
+	<<elseif Time.hour lte 18 and Time.monthDay is 25 and $christmas_gift_eden_given is 1 and $eden_christmas_dinner isnot 1>>
+		에덴은 재료를 모아 무언가를 준비하느라 분주하다. 당신은 오두막을 돌아다니며 <<his>> 어깨 너머로 훔쳐보거나 <<him>>【을를】 도우려 하지만, <<he>>【은는】 오늘 밤은 모든 것을 <<him>>에게 맡기라고 고집하는 바람에 소용이 없다. <<he>>【이가】 요리를 시작하자 군침 도는 냄새가 오두막에 퍼지며 기대감을 부풀린다.
+		<br><br>
+
+		한참을 기다리자 <<He>>【은는】 당신을 식탁으로 부른다. 냄새만큼이나 보기 좋은 2인분의 근사한 식사가 차려져 있다. 에덴을 보니 <<he>>【은는】 조금 지쳐 보이지만, 스스로가 자랑스러운 눈치다. 에덴이 요리에 이토록 공을 들인 것은 처음이라고 생각한다.
+		<br><br>
+
+		<<link [[다음|Eden Christmas Meal 2]]>><<pass 20>><</link>>
+
+	<<elseif Time.hour lte 18 and $daily.eden.dinner isnot 1 and C.npc.Eden.love gte 100>>
+		<<set $daily.eden.dinner to 1>>
+		에덴은 요리를 마치고 저녁 식탁을 차린다. "매일 아침은 네게 부탁하잖아." <<he>>【이가】 말한다. "저녁은 내가 돕는 게 공평하지."
+		<br><br>
+
+		<<link [[에덴과 함께 저녁 식사를 한다 (0:20)|Eden Dinner]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<pass 20>><<set $phase to 1>><</link>><<glove>><<gdom>>
+		<br>
+		<<link [[에덴과 함께하지 않는다|Eden Dinner]]>><<npcincr Eden love -1>><<npcincr Eden dom -1>><<set $phase to 2>><</link>><<llove>><<ldom>>
+		<br>
+
+	<<else>>
+		<<if $rng gte 11 and $syndromeeden is 1 and C.npc.Eden.love gte 100 and C.npc.Eden.dom gte 75 and Weather.dayState is "night" and (Weather.precipitation is "rain" or Weather.name is "thunderstorm") and !$weekly.edenStory>>
+			<<set $weekly.edenStory to true>>
+			날씨가 점점 거세지며 지붕을 두드린다. 번개가 칠 때마다 오두막이 주기적으로 밝아진다. 당신은 부엌 식탁에서 <<his>> 총을 손질하고 있는 에덴을 발견한다.
+			<br><br>
+			천둥소리가 울리자 당신은 저도 모르게 몸을 움찔한다.
+			<br><br>
+			<<link [[다음|Eden Story]]>><</link>>
+
+		<<elseif Time.days % 2 is 0>>
+			에덴은 불 옆에서 <<his>> 총을 닦고 있다. <span class="blue"><<He>>【은는】 조금 외로워 보인다.</span>
+			<br><br>
+
+			<<edenlust>>
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<getinicon>><<link [[에덴에게 다가가기|Cabin Eden Actions]]>><</link>>
+			<br><br>
+			<<if checkSextoysGift("Eden") and C.npc.Eden.penis is "none" and checkIfNPCHasCategorySextoy("Eden","strap-on").length <= 5>>
+				<<sextoysicon "strap-on">><<link [[에덴에게 페니스 밴드 선물하기|Eden Gift Strap-on]]>><</link>>
+				<br><br>
+			<</if>>
+			<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+			<br><br>
+
+			<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+			<br><br>
+
+			<<cabinothers>>
+
+		<<else>>
+			에덴은 불 옆에서 책을 읽고 있다. <span class="blue"><<He>>【은는】 조금 외로워 보인다.</span>
+			<br><br>
+
+			<<edenlust>>
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<getinicon>><<link [[에덴에게 다가가기|Cabin Eden Actions]]>><</link>>
+			<br><br>
+			<<if checkSextoysGift("Eden") and C.npc.Eden.penis is "none" and checkIfNPCHasCategorySextoy("Eden","strap-on").length <= 5>>
+				<<sextoysicon "strap-on">><<link [[에덴에게 페니스 밴드 선물하기|Eden Gift Strap-on]]>><</link>>
+				<br><br>
+			<</if>>
+			<<investigateicon>><<link [[오두막 둘러보기|Cabin House Actions]]>><</link>>
+			<br><br>
+
+			<<bedicon "eden">><<link [[침실 공간 살펴보기|Cabin Actions]]>><</link>>
+			<br><br>
+
+			<<cabinothers>>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Cabin Eden Prepare
+<<effects>>
+<<if Time.hour lte 20>>/* if hour >= 21 and it's the last day of october, passing 3h will make it november, which unsets the variables, making nans */
+	<<if $edenwall lt 5>>
+		<<choreicon "fix">><<link [[벽의 갈라진 틈을 수리한다 (3:00)|Eden Wall]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<housekeeping 1 1000>><</link>><<glove>><<gdom "Eden">><<ghousekeeping 1000>>
+	<<else>>
+		<span class="green">벽이 완전히 수리되었다.</span>
+	<</if>>
+	<br>
+
+	<<if $edenchimney lt 5>>
+		<<choreicon "sweep">><<link [[굴뚝을 청소한다 (3:00)|Eden Chimney]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<housekeeping 1 1000>><</link>><<glove>><<gdom "Eden">><<ghousekeeping 1000>>
+	<<else>>
+		<span class="green">굴뚝이 깨끗해졌다.</span>
+	<</if>>
+	<br>
+
+	<<if $edenroof lt 5>>
+		<<choreicon "fix">><<link [[지붕을 수리한다 (3:00)|Eden Roof]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<housekeeping 1 1000>><</link>><<glove>><<gdom "Eden">><<ghousekeeping 1000>>
+	<<else>>
+		<span class="green">지붕이 수리되었다.</span>
+	<</if>>
+	<br>
+<<else>>
+	수리하기에는 너무 늦었다.
+	<br>
+<</if>>
+<br>
+<<if $outside is 0>>
+	<<getouticon>><<link [[돌아간다|Eden Cabin]]>><<endevent>><</link>>
+<<else>>
+	<<getouticon>><<link [[돌아간다|Eden Clearing]]>><<endevent>><</link>>
+<</if>>
+<br>
+
+:: Cabin Eden Actions
+<<effects>>
+에덴이 당신을 힐끗 본다.
+<br><br>
+<<edenFluidsCheck>>
+<<if Time.hour gte 18 and Time.hour lte 23>>
+	<<if $edencushions is 2 and $edenloveseat is 9>>
+		<<couchicon>><<link [[러브시트에서 껴안기 (0:30)|Eden Cuddle]]>><<trauma -3>><<stress -3>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 1>><</link>><<glove>><<glust>><<ltrauma>><<lstress>>
+		<br>
+	<<else>>
+		<<couchicon>><<link [[껴안기 (0:30)|Eden Cuddle]]>><<trauma -3>><<stress -3>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 1>><</link>><<glove>><<glust>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+	<<if Time.days % 2 is 0>>
+		<<if $eden_shoot gte 1>>
+			<<edenicon "target">><<link [[사격 연습하기 (0:30)|Eden Shoot]]>><<pass 30>><<stress -3>><</link>><<lstress>>
+			<br>
+		<<else>>
+			<<edenicon "target">><<link [[사격하는 법을 배우고 싶다고 말하기 (0:05)|Eden Shoot Ask]]>><<pass 5>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		<<schoolicon "library">><<link [[에덴에게 책을 읽어달라고 부탁하기 (0:30)|Eden Read]]>><<trauma -3>><<pass 30>><<npcincr Eden love 1>><<set $phase to 0>><</link>><<glove>><<ltrauma>>
+		<br>
+	<</if>>
+	<<if $edenradiointro is 2>>
+		<<techicon "radio">><<link [[에덴에게 춤을 추자고 하기 (0:30)|Eden Dance]]>><<trauma -3>><<stress -3>><<danceskill 5>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 1>><<set $phase to 0>><</link>><<glove>><<glust>><<ltrauma>><<lstress>><<gdanceskill>>
+		<br>
+	<</if>>
+	<<if $edenpillow is 2 and !$daily.eden.massage>>
+		<<edenicon "salve">><<link [[에덴에게 마사지해주기 (0:30)|Eden Massage]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 3>><<set $daily.eden.massage to 1>><</link>><<glove>><<gglust>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+	<<if $edenpillow is 2 and $daily.eden.massage is 1>>
+		<<edenicon "salve">><<link [[에덴에게 마사지해주기 (0:30)|Eden Massage]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 3>><<set $daily.eden.massage to 2>><</link>><<glove>><<gglust>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+	<<if $edenpillow is 2 and $daily.eden.massage is 2>>
+		<<edenicon "salve">><<link [[에덴에게 마사지해주기 (0:30)|Eden Massage]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 3>><<set $daily.eden.massage to 3>><</link>><<glove>><<gglust>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+	<<if $edenpillow is 2 and $daily.eden.massage is 3>>
+		<<edenicon "salve">><<link [[에덴에게 마사지해주기 (0:30)|Eden Massage]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 3>><<set $daily.eden.massage to 4>><</link>><<glove>><<gglust>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+	<<if $edenpillow is 2 and $daily.eden.massage is 4>>
+		<<edenicon "salve">><<link [[에덴에게 마사지해주기 (0:30)|Eden Massage]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden lust 3>><<set $daily.eden.massage to 5>><</link>><<glove>><<gglust>><<ltrauma>><<lstress>>
+		<br>
+	<</if>>
+	<br>
+<</if>>
+
+<<if !$edenfurniture>>
+	<<edenicon "rug">><<link [[에덴에게 러그와 베개를 사도 되는지 묻기|Eden Pillows]]>><</link>>
+	<br>
+<<elseif $edenfurniture is 1 and $edenpillow is 2>>
+	<<edenicon "curtains">><<link [[커튼과 코트 걸이를 구해도 되는지 묻기|Eden Curtains]]>><</link>>
+	<br>
+<<elseif $edenfurniture gte 2 and !$edencoat and $edencurtains is 2>>
+	<<edenicon "coat stand">><<link [[코트 걸이 만들기 (3:00)|Eden Coat Stand]]>><<set $edencoat to 1>><<pass 3 hours>><</link>>
+	<br>
+<<elseif $edenfurniture is 2 and $edencurtains is 2 and $edencoat>>
+	<<couchicon>><<link [[러브시트 요청하기|Eden Loveseat]]>><</link>>
+	<br>
+<<elseif $edenfurniture is 3 and $edenloveseat lt 7>>
+	<<couchicon>><<link [[러브시트 작업하기 (3:00)|Eden Loveseat Work]]>><<pass 3 hours>><</link>>
+	<br>
+<</if>>
+<<if Time.hour is 17 and $edenjoin is 1>>
+	<<bathroomicon>><<link [[에덴과 함께 목욕하기 (0:30)|Eden Bath Join]]>><<npcincr Eden love 1>><<pass 30>><</link>><<glove>>
+	<br>
+<</if>>
+<<if $worn.neck.collared isnot 1 and C.npc.Eden.dom gte 100>>
+	<<symbol "dominance">><<link [[에덴에게 개목걸이를 달라고 하기|Eden Collar]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+	<br>
+<</if>>
+<<if $daily.eden.walk isnot 1>>
+	<<lakeicon>><<link [[에덴에게 호수까지 동행해달라고 부탁하기|Eden Lake]]>><</link>>
+	<br>
+<</if>>
+<<if $daily.eden.search is undefined or $daily.eden.search lt (C.npc.Eden.love / 40)>>
+	<<foresticon>><<link [[에덴에게 숲 수색을 도와달라고 부탁하기 (0:30)|Eden Search]]>><<if $daily.eden.search is undefined>><<set $daily.eden.search to 1>><<else>><<set $daily.eden.search += 1>><</if>><</link>>
+	<br>
+<</if>>
+
+<<if Time.monthDay is 31 and $halloween_eden is 1 and $halloween_eden_bought is 1 and !$halloween_eden_candy_given>>
+	<<foodicon "sweets">><<link [[에덴에게 바구니를 건네주기|Eden Halloween]]>><<npcincr Eden love 5>><<npcincr Eden dom 1>><<set $halloween_eden_candy_given to 1>><</link>>
+	<br>
+<</if>>
+
+<<if Time.monthDay is 25 and $christmas_gift_eden is 1 and $christmas_gift_eden_given isnot 1>>
+	<<gifticon "hunting">><<link [[에덴에게 사냥용 재킷을 건네주기|Eden Jacket]]>><<npcincr Eden love 5>><<npcincr Eden dom 1>><<set $christmas_gift_eden_given to 1>><<set $edencoatjacket to 1>><</link>>
+	<br>
+<</if>>
+
+<<if breakableSoftBinding()>>
+	<<undobindingsicon>><<link [[에덴에게 결박을 풀어달라고 부탁하기 (0:01)|Eden Bindings]]>><<pass 1>><<unbind>><</link>>
+	<br>
+<</if>>
+
+<<if $edenfreedom is undefined>>
+	<<socialiseicon "ask">><<link [[마을로 돌아갈 자유를 요청하기|Eden Freedom]]>><</link>>
+	<br>
+<</if>>
+<<if $edenfreedom is 1>>
+	<<socialiseicon "ask">><<link [[마을에 머무를 자유를 요청하기|Eden Freedom 3]]>><</link>>
+	<br>
+<</if>>
+<<if $edenshopping is 1>>
+	<<edenicon "supplies">><<link [[에덴에게 보급품을 건네주기|Eden Supplied]]>><</link>>
+	<br>
+<</if>>
+<<if $edenradiointro is 1>>
+	<<techicon "radio">><<link [[에덴에게 라디오를 건네주기|Eden Radio Intro]]>><</link>>
+	<br>
+<</if>>
+<<if canGiftFood("Eden")>>
+	<<skinicon "give">><<link [[에덴에게 음식 주기|Eden Gifts List]]>><</link>>
+	<br>
+<</if>>
+<br>
+<<getouticon>><<link [[돌아가기|Eden Cabin]]>><<endevent>><</link>>
+
+:: Cabin House Actions
+<<effects>>
+당신은 잠시 오두막을 둘러본다.
+<<if $daily.eden.salve is 1 and $daily.eden.soap is 1>>
+	조리대 위에 연고 단지와 비누가 놓여 있다.
+<<elseif $daily.eden.salve is 1>>
+	조리대 위에 연고 단지가 놓여 있다.
+<<elseif $daily.eden.soap is 1>>
+	조리대 위에 비누가 놓여 있다.
+<</if>>
+<<if $daily.eden.sweep is 1>>
+	바닥은 깨끗하다.
+<</if>>
+<br><br>
+
+<<if $edenpillow is 1>>
+	<<edenicon "rug">><<link [[양탄자와 베개를 설치한다|Eden Pillow Set]]>><<set $edenpillow to 2>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<glove>><<gdom "Eden">>
+	<br><br>
+<</if>>
+<<if $edencurtains is 1>>
+	<<edenicon "curtains">><<link [[커튼을 설치한다|Eden Curtains Set]]>><<set $edencurtains to 2>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<glove>><<gdom "Eden">>
+	<br><br>
+<</if>>
+<<if $daily.eden.sew isnot 1 or $edencushions is 1 or $edendesign lt 9 or (Time.season is "winter" and !$edenscarf and $edencoat is 2)>>
+	찬장 위에 재봉 도구가 놓여 있다.
+	<br>
+<</if>>
+<<if $daily.eden.sew isnot 1>>
+	<<shopicon "tailor">><<link [[에덴의 옷을 수선한다 (0:30)|Eden Fix]]>><<pass 30>><<npcincr Eden love 1>><<set $daily.eden.sew to 1>><<endevent>><</link>><<glove>>
+	<br>
+<</if>>
+<<if $edencushions is 1>>
+	<<shopicon "tailor">><<link [[쿠션을 만든다 (3:00)|Eden Loveseat Work]]>><<pass 3 hours>><<set $edencushions to 2>><</link>>
+	<br>
+<<elseif $edenloveseat is 7>>
+	<i>쇼핑센터에 가서 러브시트용 쿠션 재료를 살 수 있을 것 같다.</i>
+	<br>
+<</if>>
+<<if $edencushions is 2 and $edenloveseat is 9 and !$edenblanket>>
+	<<shopicon "tailor">><<link [[모피 담요를 꿰맨다 (0:30)|Eden Blanket One]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $edenblanket to 1>><</link>><<glove>><<gdom "Eden">>
+	<br>
+<</if>>
+<<if $edencushions is 2 and $edenloveseat is 9 and $edenblanket is 1>>
+	<<shopicon "tailor">><<link [[모피 담요를 꿰맨다 (0:30)|Eden Blanket Two]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $edenblanket to 2>><</link>><<glove>><<gdom "Eden">>
+	<br>
+<</if>>
+<<if $edencushions is 2 and $edenloveseat is 9 and $edenblanket is 2>>
+	<<shopicon "tailor">><<link [[모피 담요를 꿰맨다 (0:30)|Eden Blanket Three]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $edenblanket to 3>><</link>><<glove>><<gdom "Eden">>
+	<br>
+<</if>>
+<<if $edenpillow is 2 and ($edendesign lt 9 or !$edendesign)>>
+	<<if !$edendesign>><<set $edendesign to 0>><</if>>
+	<<shopicon "tailor">><<link [[베개에 디자인을 수놓는다 (0:30)|Eden Design]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $edendesign += 1>><</link>><<glove>><<gdom "Eden">>
+	<br>
+<</if>>
+<<if Time.season is "winter" and !$edenscarf and $edencoat is 2>>
+	<<edenicon "scarf">><<link [[에덴을 위해 스카프를 만든다 (0:30)|Eden Scarf]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $edenscarf to 1>><</link>><<glove>><<gdom "Eden">>
+	<br>
+<</if>>
+<<if $daily.eden.supplies isnot 1>>
+	<br>
+	에덴의 보급품은 찬장에 보관되어 있다.
+	<br>
+	<<edenicon "supplies">><<link [[에덴의 보급품 재고를 확인한다 (0:30)|Eden Stock]]>><<pass 30>><<npcincr Eden love 1>><<set $daily.eden.supplies to 1>><</link>><<glove>>
+	<br>
+<</if>>
+<<if $daily.eden.sweep isnot 1>>
+	<br>
+	구석에 빗자루와 쓰레받기가 놓여 있다.
+	<br>
+	<<choreicon "sweep">><<link [[바닥을 쓴다 (0:30)|Eden Sweep]]>><<pass 30>><<npcincr Eden love 1>><<set $daily.eden.sweep to 1>><</link>><<glove>>
+	<br>
+<</if>>
+<<if $daily.eden.salve isnot 1 or $daily.eden.soap isnot 1>>
+	<br>
+	부엌에 난로가 있다.
+	<br>
+<</if>>
+<<if $daily.eden.salve isnot 1>>
+	<<edenicon "salve">><<link [[연고를 만든다 (0:30)|Eden Salve]]>><<pass 30>><<if !$salve>><<set $salve to 1>><<else>><<set $salve += 1>><</if>><<npcincr Eden love 1>><<set $daily.eden.salve to 1>><</link>><<glove>>
+	<br>
+<</if>>
+<<if $daily.eden.soap isnot 1>>
+	<<edenicon "soap">><<link [[비누를 만든다 (0:30)|Eden Soap]]>><<pass 30>><<if !$soap>><<set $soap to 1>><<else>><<set $soap += 1>><</if>><<npcincr Eden love 1>><<set $daily.eden.soap to 1>><</link>><<glove>>
+	<br>
+<</if>>
+<<kitchenicon "stove-old">><<link [[부엌|Eden Kitchen]]>><</link>>
+<br>
+<br>
+<<furnitureicon "chair">><<link [[휴식 (0:15)|Eden Table]]>><<stress -2>><<endevent>><<pass 15>><</link>><<lstress>>
+<br><br>
+
+<<getouticon>><<link [[돌아가기|Eden Cabin]]>><<endevent>><</link>>
+<br><br>
+
+:: Cabin Actions
+<<effects>><<getTarget true>>
+
+동물 가죽 덮개가 씌워진 커다란 매트리스가 있다.
+<<if Time.hour gte 0 and Time.hour lte 6>>
+	에덴이 시트 사이에서 잠들어 있다.
+<</if>>
+<br>
+<<if $nextPassageCheck is "Eden Cabin Bed">>
+	<span class="nextLink"><<bedicon "eden">><<link [[에덴.|Eden Cabin Bed]]>><<endevent>><</link>></span>
+<<else>>
+	<<bedicon "eden">><<link [[잠자기|Eden Cabin Bed]]>><<endevent>><</link>>
+<</if>>
+<br>
+<<roomoptions>>
+<<if $syndromeeden gte 1>>
+	<<safehouseEvents>>
+<</if>>
+<<bathroomicon "toothbrush">><<link [[양치질하기 (0:05)|Bathroom Brush]]>><<pass 5>><<set $bathroomExit to "Cabin Actions">><</link>>
+<br>
+<<pregnancyTest "Eden Cabin">>
+<br>
+당신의 옷은 구석에 보관되어 있다.
+<br>
+<<wardrobeicon>><<link [[옷장|Eden Wardrobe]]>><<endevent>><</link>>
+<br>
+<<if playerHasSexToys()>>
+	<<sextoysicon>><<link [[섹스 토이|Sextoys Inventory]]>><<set $sextoyInvReturnLink to $passage>><</link>>
+	<br>
+<</if>>
+<<if $nextPassageCheck is "Eden Mirror">>
+	<span class="nextLink"><<mirroricon>><<link [[거울|Eden Mirror]]>><<preMirror>><<endevent>><</link>></span>
+<<else>>
+	<<mirroricon>><<link [[거울|Eden Mirror]]>><<preMirror>><<endevent>><</link>>
+<</if>>
+<br><br>
+
+<<if $nextPassageCheck is "Eden Cabin">>
+	<<getouticon>><span class="nextLink"><<link [[돌아가기|Eden Cabin]]>><<endevent>><</link>></span>
+<<else>>
+	<<getouticon>><<link [[돌아가기|Eden Cabin]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Cabin Punishment
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<npcspank>><<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 200>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or $enemyanger lte 0>>
+	<span id="next"><<link [[다음|Eden Cabin Punishment Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Cabin Punishment]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Cabin Punishment Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>><<npcincr Eden lust -20>>
+	<<He>>【은는】 힘겹게 숨을 몰아쉰다. "네가 교훈을 얻었으면 좋겠군."<<lllust>>
+	<br><br>
+
+	<<tearful>> 당신은 <<his>> 시선을 피한다.
+<<elseif $enemyhealth lte 0>>
+	"배은망덕한 암캐 같으니." <<he>>【이가】 말한다. "널 밖으로 내던져서 늑대들한테나 줘 버릴까 보다!" <<He>>【은는】 옆구리를 붙잡고 얼굴을 찡그린다. "이거 약이라도 발라야겠군."
+	<br><br>
+
+	<<tearful>> 당신은 몸을 추스른다.
+<<elseif $enemyanger lte 0>>
+	<<He>>【은는】 누그러진 듯 당신을 놓아준다. "네가 교훈을 얻었으면 좋겠군."
+	<br><br>
+
+	<<tearful>> 당신은 <<his>> 시선을 피한다.
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Eden Cabin]]>><</link>>
+
+:: Eden Cabin Bed
+<<endevent>>
+<<effects>>
+
+<<if Time.hour gte 0 and Time.hour lte 6>>
+	당신은 에덴 옆에 파고들어 눕는다. <<set $bedGuest to "Eden">>
+<<else>>
+	당신은 이불 속으로 파고든다.
+<</if>>
+<<if $wraith.state and $wraithPrison and ($moonstate is "evening" or $moonstate is _nightstate)>>
+	불안감을 느끼자, 당신의 시선이 거울로 향한다.
+<</if>>
+<br><br>
+
+<<nightmareCheck "Cabin Sleep">>
+
+<<generateSleepLinks "Cabin Sleep">>
+
+<<link [[침대에서 나오기|Eden Cabin]]>><<unset $bedGuest>><<endevent>><<loadTempHairStyle>><</link>>
+<br><br>
+
+:: Cabin Sleep
+<<set _autosavehere to true>>
+<<sleep>>
+<<effects>>
+
+<<if $wraith.nightmare is 2 and Time.isBloodMoon()>>
+	<<sleepeffects>>
+	당신은 붉은 달 아래 서 있는, 흰 옷을 걸친 아름다운 형상의 꿈을 꾼다. 그것은 환영하는 몸짓으로 당신에게 팔을 벌리고 있다. 당신이 가까이 다가갈수록, 그 시선이 당신의 마음을 꿰뚫는 것이 느껴진다.
+	<br><br>
+
+	안쪽으로 휘어진 나무들에 둘러싸여 있고, 호수 위에 떠 있다. 모든 것이 당신 주위에서 움직이고, 당신은 거대한 폐허 위에 매달려 있는 자신을 발견한다. 숨을 쉴 수 없다.
+	<br><br>
+
+	당신은 천천히 눈을 뜨고, 침대에서 느릿느릿 일어선다. 에덴이 깨지 않도록 조심한다. 귀에서 이명이 들린다.
+	<br><br>
+
+	<<wraithPossess "cabin">>
+	<span class="nextLink"><<link [[걷는다|Eden Cabin]]>><<rainWraith>><</link>></span>
+	<br>
+<<else>>
+
+	<<wakingEffects $sleepHoursTotal>>
+	<<if ["dryheaving","nausea"].includes(_wakingEffect)>>
+		<br><br>
+		푹 잤지만, 지금은 몸이 좀 좋지 않다.
+		<br><br>
+	<<elseif $nightmares gte 1 and $controlled is 0>>
+		<<nightmareWake>>
+	<<else>>
+		<<if ($specialClothesEffects.bimbo.total gte random(100,1000) || $specialClothesEffects.pimp.total gte random(100,1000)) or $arousal gte ($arousalmax / 10) * 9>>
+			<<wetDream>>
+		<<elseif !_wakingEffect>>
+			푹 잤다.
+			<br><br>
+		<<else>>
+			<br><br>
+		<</if>>
+	<</if>>
+
+	<<sleepeffects>>
+	<<if _dryheaving is true>>
+		"어디 아픈 거 아니었으면 좋겠네. 침대에 계속 누워 있어." 에덴이 걱정스러운 표정으로 지켜보며 말한다. "아침은 내가 알아서 할게." <<set $daily.eden.breakfast to 1>>
+		<br><br>
+
+		<<getouticon>><<link [[침대에서 나온다|Eden Cabin]]>><</link>>
+	<<elseif _sleepinterrupt>>
+		<<npc Eden>><<person1>>
+		<<if $edenNightmareWake>>
+			에덴이 중얼거리는 소리에 잠에서 깬다. <<He>>【은는】 아직 잠들어 있지만, <<he>>【은는】 불안해 보인다.
+			<br><br>
+
+			<<link [[<<him>>【을를】 깨워본다|Eden Nightmare]]>><<set $phase to 0>><</link>>
+			<br>
+			<<link [[<<him>>【을를】 무시한다|Eden Nightmare]]>><<set $phase to 1>><<unset $edenNightmareWake>><</link>>
+			<br>
+		<<else>>
+			<<if _orgasm is true>>
+				에덴이 더듬기 시작한다. <<He>>【은는】 당신의 가랑이 주변이 축축한 것을 느낀다. "내가 너무 무심했군." <<he>>【은는】 당신에게 몸을 비비며 말한다.
+			<<else>>
+				에덴이 더듬는 손길에 잠에서 깬다. <<He>>【은는】 당신에게 몸을 비비기 시작한다.
+			<</if>>
+			<br><br>
+
+			<<link [[받아들인다|Eden Sleep Sex]]>><<set $sexstart to 1>><</link>><<promiscuous1>>
+			<br>
+			<<link [[밀어낸다|Eden Sleep Push]]>><<npcincr Eden love -3>><<npcincr Eden dom -1>><</link>><<lllove>><<ldom>>
+			<br>
+		<</if>>
+	<<elseif !$edenHotSpring and Weather.isFreezing>>
+		<<include "Eden Hot Spring Creation 1">>
+	<<else>>
+		<br><br>
+
+		<<getouticon>><<link [[침대에서 나온다|Eden Cabin]]>><<endevent>><</link>>
+		<br><br>
+	<</if>>
+<</if>>
+
+<<set $phase to 0>>
+
+:: Eden Sleep Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 100>><<set $enemyhealth to 600>><<set $enemyhealthmax to 600>>
+	<<promiscuity1>>
+<<elseif $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 50>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Sleep Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Sleep Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Sleep Push
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+당신은 <<him>>【을를】 밀쳐낸다.
+<<if C.npc.Eden.love - (C.npc.Eden.lust * 2) gte 1>>
+	<<He>>【은는】 무언가 투덜거리며 돌아눕는다. <<He>>【은는】 금세 잠이 든다.
+	<br><br>
+
+	<<link [[다시 잠든다|Eden Cabin Bed]]>><</link>>
+	<br>
+	<<link [[일어난다|Eden Cabin]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<He>>【은는】 더 세게 더듬는다.
+	<br><br>
+
+	<<link [[다음|Eden Sleep Sex]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Eden Sleep Sex Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>><<npcincr Eden lust -20>>
+
+	<<He>>【은는】 당신의 목에 키스하고는, 돌아누워 잠이 든다.<<lllust>>
+<<elseif $enemyhealth lte 0>>
+	"이 배은망덕한 암캐." <<he>>【이가】 말한다. "차라리 널 밖으로 던져서 늑대들에게나 줘 버릴까!" <<He>>【은는】 얼굴을 찡그리며 <<his>> 옆구리를 붙잡는다. "이거 뭐라도 해야겠어."
+	<br><br>
+
+	<<tearful>> 당신은 이불 아래로 숨는다.
+<<elseif $finish is 1>>
+	<<He>>【은는】 돌아눕는다. 잠시 후 <<his>> 코 고는 소리가 들린다.
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Eden Cabin Bed]]>><</link>>
+
+:: Eden Nightmare
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 0>> /* Try to wake up */
+	당신은 <<him>>【을를】 깨우려 다가가, <<his>> 어깨에 손을 스친다.
+	<br><br>
+	에덴이 깜짝 놀라 일어나 당신의 <<= $settings.asphyxiaLevel gte 3 ? "목" : "손목">>【을를】 붙잡고, 침대에 내리누른다. <<His>> 손이 <<= $settings.asphyxiaLevel gte 3 ? "당신의 목을 조른다. <span class='red'>숨을 쉴 수 없다!</span>" : "당신을 꽉 쥐어 움직이지 못하게 한다.">>
+	<br><br>
+	<<He>>【은는】 당신을 알아보지 못하는 것 같다. 당신이 <<= $settings.asphyxiaLevel gte 3 ? "컥 하는 신음을 내뱉자" : "고통에 찬 비명을 지르자">>, 그 소리에 <<he>>【은는】 정신을 차린다.<<pain 4>><<gpain>>
+	<br><br>
+	<<He>>【은는】 당신을 놓아주고는 노려본다. "놀라게 하지 마.<<if C.npc.Eden.love gte 150>> 이젠 알 때도 됐잖아.<</if>>"
+	<br><br>
+	<<He>>【은는】 돌아누워 다시 잠이 든다. 내일 멍이 들지 않을까 걱정된다.<<= $settings.asphyxiaLevel gte 3 ? "<<bruise neck>>" : "<<bruise leftarm>><<bruise rightarm>>">>
+	<br><br>
+	당신은 겨우 불안한 잠에 다시 빠져든다.
+<<else>> /* Ignore */
+	당신은 다시 잠들기 위해 최선을 다한다.
+<</if>>
+<br><br>
+
+<<link [[다음|Eden Cabin Bed]]>><</link>>
+<br>
+
+:: Eden Nightmare Morning
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $phase is 0>> /* Ask about last night */
+	<<if $speech_attitude is "meek">>
+		당신은 바닥을 내려다본다. "ㅇ-어젯밤에 악몽 꿨어?"
+	<<elseif $speech_attitude is "bratty">>
+		당신은 팔짱을 끼고 <<him>>【을를】 쳐다본다. "어젯밤에 대체 무슨 일이었어?"
+	<<else>>
+		"어젯밤에 악몽 꿨어?" 당신이 묻는다.
+	<</if>>
+	<br><br>
+	<<He>>【은는】 당신과 당신의 멍을 보고 얼굴을 찌푸린다.
+	<<if C.npc.Eden.love gte 150>>
+		"사냥이 별로였어." <<he>>【이가】 말하고는, 당신이 다른 말을 하기도 전에 홱 가버린다.
+	<<else>>
+		<<He>>【이가】 끙 소리를 내고는 당신에게서 등을 돌린다.
+	<</if>>
+	<br><br>
+	당신은 욱신거리는 <<= $settings.asphyxiaLevel gte 3 ? "목" : "손목">>【을를】 문지른다.
+<<else>> /* Pretend nothing happened */
+	당신은 <<him>>에게 묻지 않는 편이 낫겠다고 생각한다.
+<</if>>
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<br>
+
+:: Eden Night Wardrobe
+<<effects>>
+
+에덴의 옷장을 살펴본다.
+<br><br>
+
+<<set $wardrobe_location to "edensCabin">>
+<<wardrobeSelection>>
+<<wardrobewear>>
+<div id="wardrobeExits"><<wardrobeExits>></div>
+<<wardrobe>>
+
+:: Eden Exposed
+<<effects>>
+
+문에 손을 뻗자, 에덴의 목소리가 당신을 그 자리에 멈춰 세운다.
+<br><br>
+
+"잠깐." <<nnpc_he "Eden">>【이가】 말한다. "그런 차림으로 나가면 안 돼."
+<br><br>
+
+<<getinicon>><<link [[안에 있는다|Eden Cabin]]>><<endevent>><</link>>
+<br>
+<<getouticon>><<link [[나간다|Eden Clearing]]>><<set $daily.eden.exposed to 1>><</link>>
+
+:: Eden Bindings
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"ㅅ-실례가 안 된다면, 저 좀 풀어주시겠어요?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"못 보셨을 수도 있겠지만, 저 묶여 있거든요. 좀 도와주시죠?" 당신이 묻는다.
+<<else>>
+	"저 좀 풀어줄 수 있어?" 당신이 묻는다.
+<</if>>
+
+에덴은 말없이 칼을 집어 들어 당신의 결박을 끊어버린다.
+<br><br>
+
+<<if $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+	<br>
+<<else>>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Eden Pillow Set
+<<effects>>
+
+당신은 벽난로 옆에 새 양탄자를 깔고 그 주위에 베개를 놓는다. 일을 마치고 뒤로 물러나 작업물을 살펴본다.
+꽤 아늑해 보이는 모습에 성취감이 느껴진다. 에덴도 당신의 선택에 만족할 거라고 확신한다.
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Curtains Set
+<<effects>>
+
+당신은 낡은 커튼을 떼어내고 새것으로 교체하는 데 시간을 보낸다. 일을 마친 후, 뒤로 물러나 노력의 결과를 살펴본다.
+새 커튼은 오두막에 확실히 매력을 더해주었고, 당신은 그 성과에 미소 짓는다.
+<br><br>
+
+이제 남은 일은 에덴과 함께 코트 걸이를 만드는 것뿐이다.
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Coat Stand
+<<effects>>
+
+<<if $bus is "edenclearing">>
+에덴이 다양한 크기의 나무 막대들을 가져온다.
+<<else>>
+에덴이 당신을 밖으로 데리고 나가 다양한 크기의 나무 막대들을 가져온다.
+<</if>>
+
+"이것들 사포질해야 해." <<he>>【이가】 사포를 건네주며 말한다. 당신은 현관 옆에 앉아 막대 하나를 집어 들고, 그 거친 나무 질감을 확인한다.
+<br><br>
+
+약간의 노력이 필요했지만, 두 사람은 결국 모든 막대를 매끄럽게 갈아냈다. 그 작업이 끝나자, 당신은 에덴을 도와 코트 걸이의 나머지 부분을 조립한다. 받침대를 만드는 것부터 시작해서, 코트를 거는 팔 부분을 고정하기 위해 윗부분에 구멍을 뚫는 것까지.
+<br><br>
+
+마지막 손질로, 에덴은 걸이에 래커 칠을 하고 밤새 말리도록 둔다.
+<br><br>
+
+<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+
+:: Eden Lake
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+/* eden is already generated
+<<npc Eden>><<person1>>*/
+
+<<if $speech_attitude is "meek">>
+	"저를 따라 호수까지 가주시겠어요?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"호수까지 걷고 싶은데. 같이 갈래?" 당신이 묻는다.
+<<else>>
+	"나랑 같이 호수까지 산책할래?" 당신이 묻는다.
+<</if>>
+
+<<if $exposed gte 1>>
+	에덴의 시선이 당신의 노출된 몸을 훑는다. "그렇게는 못 나가. 옷 입어."
+	<br><br>
+
+	<<if $bus is "edenclearing">>
+		<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+
+<<else>>
+	<<set $daily.eden.walk to 1>>
+	에덴은 잠시 생각하더니 어깨를 으쓱한다. "어차피 더 나은 계획도 없었어."
+	<br><br>
+
+	<<if $edenraftintro is 1>>
+		<<if $speech_attitude is "meek">>
+			"아, 저, 잠깐. 방금 생각났어." 당신이 말한다.
+		<<elseif $speech_attitude is "bratty">>
+			"아, 깜빡했네." 당신이 말한다.
+		<<else>>
+			"잠깐, 방금 뭐 하나 생각났어." 당신이 말한다.
+		<</if>>
+		<br>
+
+		당신은 쇼핑센터에서 산 공기주입식 뗏목을 에덴에게 건넨다.
+		<br>
+		<<He>>【은는】 상자 겉면을 훑어본다. "공기주입식 뗏목?" <<he>>【이가】 묻는다.
+		<br><br>
+
+		<<if $speech_attitude is "meek">>
+			"으, 응. 호수에서 쓸 수 있을 거야. <<if Time.season is "autumn">>떨어지는 가을 낙엽<<elseif Time.hour gte 6 and Time.hour lte 8>>노을<<else>>하늘<</if>>【이가】 물 위로 보이면 아름다울 거야."
+		<<elseif $speech_attitude is "bratty">>
+			"응. 호수에서 쓸 수 있을까 해서. 게다가, 물 위로 <<if Time.season is "autumn">>떨어지는 가을 낙엽<<elseif Time.hour gte 6 and Time.hour lte 8>>노을<<else>>하늘<</if>>도 볼 수 있잖아."
+		<<else>>
+			"응. 호수에서 쓸 수 있을 것 같아서. 게다가, 물 위로 <<if Time.season is "autumn">>떨어지는 가을 낙엽<<elseif Time.hour gte 6 and Time.hour lte 8>>노을<<else>>하늘<</if>>도 볼 수 있고."
+		<</if>>
+
+		<<He>>【은는】 상자 안을 몇 초간 들여다보더니, 이내 고개를 끄덕인다. 당신은 <<him>>에게 고마워하며 미소 짓고는 호수를 향해 걷기 시작한다.
+		<br><br>
+	<</if>>
+
+	<<if $edenraftintro is 1>>
+		<<link [[숲속 호수 (0:30)|Eden Raft Intro]]>><<pass 30>><<set $edenlake to 1>><</link>>
+	<<else>>
+		<<link [[숲속 호수 (0:30)|Eden Forest Lake]]>><<pass 30>><<set $edenlake to 1>><</link>>
+	<</if>>
+<</if>>
+
+:: Eden Search
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+/* eden is already generated
+<<npc Eden>><<person1>>*/
+
+<<if $speech_attitude is "meek">>
+	"저기... 숲을 수색하는 것 좀 도와주면 안 될까?" 당신이 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"나 숲 좀 뒤져보려고 하는데, 같이 갈래?" 당신이 묻는다.
+<<else>>
+	"숲 수색하는 것 좀 도와줄래?" 당신이 묻는다.
+<</if>>
+<br><br>
+
+에덴은 잠시 생각하더니 고개를 끄덕인다. "굳이 가야겠다면, 동행하지."
+<br><br>
+
+<<link [[숲을 수색한다 (0:30)|Eden Forest Search]]>><<pass 30>><</link>>
+<br><br>
+
+:: Eden Clearing
+<<set $outside to 1>><<set $location to "cabin">><<effects>><<set $bus to "edenclearing">>
+<<npc Eden>><<person1>>
+
+당신은 에덴의 오두막 바깥 공터에 있다. 주변 나무는 하늘을 보려면 목을 길게 빼야 할 정도로 거대하다. 에덴이 채소를 기르는 작은 밭이 있다. 오두막 뒤 절벽 아래에는 샘이 있다.
+<br><br>
+
+<<if $foresthunt gte 1>>
+	<span class="lblue">에덴의 오두막이라 안전하다. 당신을 쫓던 것은 포기했을 것이다.</span>
+	<br><br>
+	<<set $foresthunt to 0>>
+<</if>>
+<<if Time.hour gte 7>>
+	<<edenFluidsCheck>>
+<</if>>
+
+<<if $edenCagedEscape and Time.hour gte 7>>
+	당신이 오두막으로 다가가자 에덴이 고개를 든다. <<He>>【은는】 당신을 보고는 화들짝 놀란다. "거기 있었군!" <<he>>【이가】 소리치며 당신에게 서둘러 다가온다. "이 말 안 듣는 걸레년, 넌 이제 큰일났어."
+	<br><br>
+
+	당신이 항의하기도 전에 에덴이 당신을 안으로 끌고 들어간다. 구석에 놓인 새장이 불길한 기운을 풍긴다.
+	<br><br>
+
+	<<link [[다음|Eden Caged Intro]]>><<set $phase to 2>><</link>>
+	<br>
+
+<<elseif edenFreedomStatus() gte 1 and Time.hour gte 6>>
+	<<edenTrackers>>
+	<<npcincr Eden love -1>>
+	당신이 오두막에 다가가자 에덴이 고개를 든다. <<He>>【은는】 하던 일을 멈추고 당신에게 달려온다.
+	<<if $edenPreyEscaped>><<unset $edenPreyEscaped>>
+		"우리 게임을 잊었다고 생각하지 마. 내게서 도망치면 안 됐어." <<he>>【이가】 투덜거린다. "이렇게 오래 자리를 비워서도 안 되고. 대체 어디 있었던 거야?"
+	<<else>>
+		"어디 있었어?" <<he>>【이가】 당신의 어깨를 붙잡으며 묻는다. "정말 걱정했잖아."
+	<</if>>
+	<br><br>
+
+	<<link [[사과한다|Eden Return Apologise]]>><<npcincr Eden love 1>><<set $phase to 0>><</link>>
+	<br>
+	<<link [[설명한다|Eden Return Apologise]]>><<set $phase to 1>><</link>>
+
+<<elseif $edenPreyEscaped and Time.hour gte 6>><<unset $edenPreyEscaped>>
+	에덴이 <<his>> 총을 닦고 있는 것이 보인다. 당신이 나타나자 <<him>>【이가】 당신을 노려본다.
+	<br>
+	"내게서 도망치면 안 됐어." <<he>>【은는】 당신을 위아래로 훑어보며 말한다. "필요하다면, 정신 못 차리게 박아주지. 다음번엔, 넌 내 거야."
+	<br>
+	<<if $worn.neck.collared isnot 1 and $edenaskcollar isnot 1>>
+		<<He>>【은는】 무언가 작게 중얼거리더니 다시 하던 일로 돌아가지만, 무언가 깨달은 듯 미간을 찌푸린다.
+		<br>
+		"목걸이는 어디 있어?" <<he>>【이가】 걱정스러운 목소리로 묻는다. <<He>>【은는】 총을 내려놓고 당신에게 걸어온다.
+		<br><br>
+
+		<<if $edencollarremove is 1>>
+			<<link [[거짓말하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+		<<else>>
+			<<link [[설명하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+		<</if>>
+		<br>
+		<<link [[그냥 벗었다고 말한다|Eden Collar Remove]]>><</link>>
+		<br>
+	<<else>>
+		<<He>>【은는】 잠시 더 당신을 쳐다보다가, 다시 하던 일로 돌아간다.
+		<br><br>
+
+		<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+
+<<elseif $worn.neck.collared isnot 1 and $edenaskcollar isnot 1 and Time.hour gte 6>>
+	당신이 에덴 옆을 지나가자, <<he>>【은는】 잠시 하던 일을 멈추고 당신을 돌아본다. <<His>> 시선이 당신의 목에 꽂힌다.
+	<br><br>
+
+	"목걸이는 어디 있어?" <<he>>【이가】 묻는다.
+	<br><br>
+
+	<<if $edencollarremove is 1>>
+		<<link [[거짓말하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+	<<else>>
+		<<link [[설명하고 다른 걸 달라고 한다|Eden Collar Ask]]>><<npcincr Eden love 5>><<npcincr Eden lust 5>><<npcincr Eden dom 5>><</link>><<gglove>><<gglust>><<ggdom>>
+	<</if>>
+	<br>
+	<<link [[그냥 벗었다고 말한다|Eden Collar Remove]]>><</link>>
+
+<<elseif $stress gte $stressmax>>
+	<<if isPregnancyEnding()>>
+		<<pregnancyPassout "edencabin">>
+	<<else>>
+		<<link [[모든 것이 암흑 속으로 사라진다...|Eden Cabin Passout]]>><</link>>
+	<</if>>
+
+<<elseif Time.hour is 17 and $exposed gte 1 and !$daily.eden.exposed>>
+	에덴이 오두막 문으로 걸어가, <<he>>【이가】 들어가기 직전에 당신을 돌아본다. <<He>>【은는】 잠시 당신의 <<lewdness>> 모습을 훑어본다. "안으로 들어가는 게 좋을 거야."
+	<br><br>
+
+	<<link [[에덴을 따라간다|Eden Cabin]]>><<endevent>><</link>>
+	<br>
+	<<link [[밖에 있는다|Eden Clearing]]>><<set $daily.eden.exposed to 1>><<endevent>><</link>>
+
+<<elseif (($exposed gte 2 and !hasSexStat("exhibitionism", 5)) or ($exposed gte 1 and !hasSexStat("exhibitionism", 4))) and isLoveInterest("Eden") and (Time.hour lte 8 or (Time.hour gte 11 and Time.hour lte 14 and $daily.eden.hunting is 1) or Time.hour gte 17)>>
+	에덴이 없을 때 이런 모습으로 보이고 싶지 않다! 당신은 서둘러 옷으로 달려간다.
+	<br><br>
+
+	<<link [[다음|Eden Wardrobe]]>><<endevent>><</link>>
+
+<<else>>
+	<<if ($exposed is 1 and hasSexStat("exhibitionism", 4)) or ($exposed is 2 and hasSexStat("exhibitionism", 5))>>
+		<span class="lewd">자신의 <<lewdness>>【을를】 드러낸 채, 원초적인 전율을 느낀다.</span>
+		<br><br>
+	<<elseif $exposed gte 1>>
+		<span class="lewd">자신의 <<lewdness>> 때문에 당혹스럽지만,
+			<<if Time.hour lte 10 or (Time.hour gte 11 and Time.hour lte 14 and $daily.eden.hunting isnot 1) or Time.hour gte 15>>
+				에덴이 여기 있으니 괜찮다.
+			<<else>>
+				혼자 있으니 괜찮다.
+			<</if>>
+		</span>
+		<br><br>
+	<</if>>
+
+	<<if Weather.precipitation is "rain">>
+		나뭇가지 위에서 빗물이 떨어진다.
+		<br><br>
+	<<elseif Weather.precipitation is "snow">>
+		나뭇가지가 눈의 무게에 휘어져 있다.
+		<br><br>
+	<</if>>
+
+	<<if edenFreedomStatus() is 0>>
+		<<edenTrackers>>
+	<</if>>
+
+	<<if Time.hour gte 9 and Time.hour lte 10>>
+		에덴이 작물을 돌보고 있다.
+		<br><br>
+
+		<<edenlust>>
+		<<if Time.monthName is "November" and $edenprepare is 1>>
+			<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+			<br><br>
+		<</if>>
+		<<getinicon>><<link [[에덴에게 다가가기|Clearing Eden Actions]]>><</link>>
+		<br><br>
+		<<clearingactions>>
+
+	<<elseif Time.hour gte 11 and Time.hour lte 14>>
+		<<if $daily.eden.hunting isnot 1>><<set $daily.eden.hunting to 1>>
+			<<edenpreystart>>
+			<<if _edenPreyEvent>>
+				에덴이 당신에게 다가온다.
+				<<if $edenPrey gte 1>>
+					"자," <<he>>【이가】 말한다. "또 '사냥' 여행을 떠날 시간이야." <<His>> 암시적인 어조는 <<he>>【이가】 무슨 생각을 하는지 정확히 알려준다.
+					<<if _virginityPresent>>
+						<br><br>
+						요점을 확실히 하려는 듯, 에덴은 <<his>> 빈손을 당신의 허리 아래로 뻗어 사타구니를 움켜쥔다. "이번에는," <<he>>【이가】 허스키한 속삭임으로 말한다, "내가 널 잡아먹을 거야."<<arousal 100>><<garousal>>
+					<</if>>
+				<<else>>
+					<<He>>【은는】 당신을 위아래로 훑어본다<<if _virginityPresent>>, 당신의 사타구니에 집중하면서<</if>>. <<his>> 음탕한 시선과 결합된 침묵은 당신을 불안하게 만든다.
+					<br>
+					<<if _virginityPresent>>
+						"네 그 첫 경험 문제에 대해 뭔가 조치를 취해야 할 때가 된 것 같군," <<he>>【이가】 말한다. "특별한 걸 계획해 뒀어. 어때?"
+					<<else>>
+						"긴장을 좀 풀어야 할 때가 된 것 같군," <<he>>【이가】 말한다. "우리 둘을 위한 멋진 아이디어가 있어. 어때?"
+					<</if>>
+				<</if>>
+				<br>
+				<<He>>【은는】 당신의 대답을 기다리지 않고 허리께에 손을 얹는다. 그대로 당신을 오두막에서 밀어내려 한다.
+				<br><br>
+
+				<<link [[따라간다|Eden Prey Yes]]>><<set $phase to 1>><<npcincr Eden love 1>><</link>><<glove>>
+				<br>
+				<<link [[저항한다|Eden Prey No]]>><<set $phase to 1>><<npcincr Eden love -1>><<npcincr Eden dom -1>><</link>><<llove>><<ldom>>
+				<br>
+			<<else>>
+
+				에덴이 오두막을 나선다. <<if Time.season is "winter" and $edenscarf is 1>><<his>> 목에 스카프를 두르고, <</if>>손에는 총을 든 채다. "사냥하러 간다. 내가 없는 동안 오두막 근처에 있어."
+				<br><br>
+
+				<<link [[고개를 끄덕인다|Eden Hunting]]>><<set $phase to 0>><</link>>
+				<br>
+				<<link [[따라가겠다고 요청한다|Eden Hunting]]>><<set $phase to 1>><</link>>
+				<br>
+			<</if>>
+		<<else>>
+			에덴은 사냥하러 나갔다.
+			<br><br>
+
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<clearingactions>>
+		<</if>>
+
+	<<elseif Time.hour is 15>>
+		<<if $rng gte 91 and !$edenhurt>>
+			<<set $edenhurt to 1>>
+			<<person1>>
+			나뭇가지가 갑자기 부러지는 소리에 당신의 시선이 숲 가장자리로 향한다. 에덴이 숲에서 나오는데, <<his>> 옷이 여러 군데 찢어져 너덜너덜해 보인다.
+			보통 <<his>> 어깨에 메고 다니던 소총이 <<his>> 손에 단단히 쥐어져 있다. 당신은 <<his>> 상태를 보고 숨을 헐떡이고, <<his>> 팔과 가슴을 뒤덮은 발톱 모양의 상처를 보고 움찔한다.
+			<br><br>
+
+			<<if $speech_attitude is "meek">>
+				"다쳤잖아요! 무, 무슨 일이에요?" 당신은 눈에 눈물이 그렁그렁한 채로 <<his>> 상처를 살피기 위해 달려간다.
+			<<elseif $speech_attitude is "bratty">>
+				"다쳤잖아요! 어떻게 그렇게 무모할 수가 있어요?" 당신은 발을 구르며 <<his>> 상처를 살피러 간다.
+			<<else>>
+				"다쳤잖아요!" 당신은 소리치며 <<his>> 상처를 살피기 위해 달려간다.
+			<</if>>
+			<br><br>
+
+			에덴은 <<his>> 손짓으로 당신의 걱정을 일축한다. "난 괜찮아," <<he>>【이가】 말한다. "늑대 몇 마리를 만났는데, 겁줘서 쫓아냈어."
+			<<He>>【은는】 <<his>> 얼굴에서 땀을 닦아내고 <<his>> 바지에서 흙덩이를 몇 개 털어낸다. "몸 좀 추슬러야겠어." 오두막 문으로 향하던 <<he>>【은는】 손잡이를 잡으려는 순간 멈춘다.
+			당신을 향해 돌아선 <<he>>【은는】 경계하는 눈빛으로 당신을 본다. "들어오는 게 좋겠어. 너까지 다치게 하고 싶진 않으니까."
+			<br><br>
+
+			<<link [[상처 치료를 돕겠다고 제안한다 (0:20)|Eden Wounds]]>><<pass 20>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<glove>><<gdom>>
+			<br>
+			<<link [[고개를 끄덕인다|Eden Wounds Nod]]>><</link>>
+
+		<<else>>
+			에덴이 사냥감의 가죽을 벗기고 있다. 그 냄새에 속이 메슥거린다.
+			<br><br>
+
+			<<edenlust>>
+			<<if Time.hour is 15 and $daily.eden.lunch isnot 1>>
+				<<if $housekeeping gte 100>>
+					에덴은 그 모든 사냥 후에 배가 고플 것이다. 점심을 만들어주면 좋아할지도 모른다.
+					<br>
+					<<foodicon "eat">><<link [[에덴을 위해 점심을 만든다 (0:30)|Eden Lunch]]>><<pass 30>><<npcincr Eden love 1>><<npcincr Eden dom 1>><<set $daily.eden.lunch to 1>><</link>><<glove>><<gdom>>
+					<br><br>
+				<<else>>
+					에덴은 사냥을 마치고 배가 고플 것이다. 당신은 <<him>>에게 점심을 만들어줄까 생각하지만, <span class="blue">가사 실력에 자신이 없어 아무것도 만들 수 없다.</span>
+					<br><br>
+				<</if>>
+			<</if>>
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<getinicon>><<link [[에덴에게 다가가기|Clearing Eden Actions]]>><</link>>
+			<br><br>
+			<<clearingactions>>
+		<</if>>
+
+	<<elseif Time.hour is 16>>
+		<<if C.npc.Eden.lust gte 26 and $daily.eden.chopLust isnot 1>><<set $daily.eden.chopLust to 1>>
+			<!-- <<npc Eden>><<person1>> -->에덴이 장작을 패고 있다. <<He>>【은는】 <<his>> 등을 쭉 펴다가 <<him>>【을를】 지켜보는 당신을 발견한다. "휴식이 필요하겠군," <<he>>【이가】 말한다. <<He>>【은는】 땀에 젖은 채 도끼를 손에 들고 당신을 향해 걸어온다. 자신이 얼마나 위협적으로 보이는지는 깨닫지 못하는 것 같다.
+			<<if C.npc.Eden.dom gte 75>>
+				<<He>>【은는】 도끼를 떨어뜨리고 당신을 깊은 키스로 끌어당긴다. <<takeKissVirginity "Eden" `($syndromeeden gte 1?"loveInterest":"romantic")`>>
+			<<else>>
+				<<He>>【은는】 도끼를 떨어뜨리고 당신을 <<him>>에게 가까이 끌어당기려 한다.
+			<</if>>
+			<br><br>
+
+			<<link [[허락한다|Eden Firewood Sex]]>><<set $sexstart to 1>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<promiscuous1>>
+			<br>
+			<<link [[거절한다|Eden Firewood Refuse]]>><<npcincr Eden love -3>><<npcincr Eden dom -1>><</link>><<lllove>><<ldom>>
+			<br>
+		<<else>>
+			에덴이 장작을 패고 있다.
+			<br><br>
+
+			<<edenlust>>
+			<<if Time.monthName is "November" and $edenprepare is 1>>
+				<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+				<br><br>
+			<</if>>
+			<<getinicon>><<link [[에덴에게 다가가기|Clearing Eden Actions]]>><</link>>
+			<br><br>
+			<<clearingactions>>
+		<</if>>
+	<<else>>
+		에덴은 실내에 있다.
+		<br><br>
+		<<if Time.monthName is "November" and $edenprepare is 1>>
+			<<choreicon "fix">><<link [[오두막 수리하기|Cabin Eden Prepare]]>><</link>>
+			<br><br>
+		<</if>>
+		<<clearingactions>>
+	<</if>>
+<</if>>
+
+:: Clearing Eden Actions
+<<effects>>
+<<clearingedenactions>>
+
+:: Eden Return Apologise
+<<effects>>
+
+<<if $phase is 0>>
+	<<if $speech_attitude is "meek">>
+		"죄, 죄송해요." 당신은 말한다. "조금 바빴어요."
+	<<elseif $speech_attitude is "bratty">>
+		"바빴어요." 당신은 말한다. "걱정시키려던 건 아니었어요."
+	<<else>>
+		"미안해요." 당신은 말한다. "바빴어요."
+	<</if>>
+<<elseif $phase is 1>>
+	<<if $speech_attitude is "meek">>
+		"조, 조금 바빴어요." 당신은 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"호들갑 떨지 마세요." 당신은 말한다. "그냥 좀 바빴을 뿐이에요."
+	<<else>>
+		"바빴어요." 당신은 말한다.
+	<</if>>
+<</if>>
+<br><br>
+
+에덴이 한숨을 쉬며 당신을 끌어안는다. <<He>>【은는】 잠시 당신을 안고 있다가 놓아준다. "네가 여기 있어야 해." <<he>>【이가】 말한다. "그러니 다음엔 늦지 마."
+<br><br>
+
+당신이 고개를 끄덕이자, <<he>>【은는】 당신을 마지막으로 한 번 쳐다보고는 걸어간다.
+<br><br>
+
+<<if $bus is "edencabin">>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<<elseif $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Freedom
+<<effects>>
+
+<!-- <<npc Eden>><<person1>> --> "왜 떠나고 싶어 하는 거지?" <<he>>【이가】 묻는다. "여기 네게 필요한 건 다 있는데."
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"하, 하지만 제가 마을에 너무 오래 없으면," 당신은 말한다. "사람들이 여기로 저를 찾으러 올 거예요."
+<<elseif $speech_attitude is "bratty">>
+	"제가 없는 걸 눈치채지 못할 거라고 생각해요?" 당신은 말한다. "여기로 절 찾으러 올 거라고요."
+<<else>>
+	"계속 학교에 빠지면," 당신은 말한다. "사람들이 저를 찾기 시작할 거예요."
+<</if>>
+<br><br>
+
+<<if C.npc.Eden.love gte 20>>
+	<<set $edenfreedom to 1>><<set $edenshopping to 0>><<edenTrackers>>
+	<<set $wardrobes.edensCabin.shopSend to true>>
+	<<He>>【은는】 갈등하는 것처럼 보인다. "네가 여기에 만족하며 지내길 바라는 건 너무 큰 욕심이었나 보군. 좋아, 마을로 돌아가도 돼. 하지만 꼭 여기로 돌아와야 한다. <span class="gold">하루 이상 없으면 걱정돼서 미칠 거다.</span> 내가 널 찾으러 가야 할 테니까."
+	<br><br>
+
+	<<link [[껴안는다|Eden Freedom 2]]>><<set $phase to 0>><<npcincr Eden love 1>><</link>><<glove>>
+	<br>
+	<<link [[고개를 끄덕인다|Eden Freedom 2]]>><<set $phase to 1>><</link>>
+	<br>
+
+<<else>>
+	<<He>>【은는】 고개를 젓는다. "우릴 찾지 못할 거다. 난 이 숲을 잘 알고, 필요하다면 내 것을 지킬 거니까."
+	<br><br>
+
+	<i><<he>>【이가】 당신을 더 좋아했다면 당신의 요청에 더 순순히 응했을지도 모른다.</i>
+	<br><br>
+
+	<<if $bus is "edenclearing">>
+		<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Eden Freedom 2
+<<effects>>
+
+<<if $phase is 0>>
+
+	당신은 에덴을 껴안는다. 갑작스러운 행동에 <<him>>【은는】 놀라 거의 넘어질 뻔한다.
+	<br><br>
+
+	<<if $speech_attitude is "meek">>
+		"고마워요." 당신은 <<him>>에게 얼굴을 파묻으며 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"당신 허락이 필요했던 건 아니에요." 당신은 말한다. "그냥 이편이 더 쉬우니까."
+	<<else>>
+		"고마워요." 당신은 말한다.
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 당신을 마주 껴안는다. "한 가지 더. 난 생필품을 사러 일주일에 한 번씩 마을에 가. 네가 나 대신 해주는 게 좋겠어. 난 그곳이 싫거든. 자, 이제 놔도 돼."
+<<elseif $phase is 1>>
+	"한 가지 더." <<he>>【이가】 말한다. "난 생필품을 사러 일주일에 한 번씩 마을에 가. 어차피 가는 김에 네가 나 대신 해주는 게 좋겠어. 난 그곳이 싫거든."
+<<else>>
+	당신은 에덴을 껴안는다. <<He>>【은는】 예상했다는 듯 당신을 받아준다.
+
+	<<if $speech_attitude is "meek">>
+		"고마워요." 당신은 <<him>>에게 얼굴을 파묻으며 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"당신 허락이 필요했던 건 아니에요." 당신은 말한다. "그냥 이편이 더 쉬우니까."
+	<<else>>
+		"고마워요." 당신은 말한다.
+	<</if>>
+
+	<<He>>【은는】 당신을 마주 껴안는다.
+<</if>>
+<br><br>
+
+<<if $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<<else>>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Cabin Escape
+<<location "forest">><<effects>>
+
+당신은 공터 가장자리로 걸어가 숲의 어둠 속을 응시한다. 정말 탈출하겠습니까?
+<br><br>
+
+<<link [[예|Forest]]>><<endevent>><<if $edenFluidsCheck is "clean">><<set $edenFluidsCheck to "cleanLeave">><<set $edenescape to true>><</if>><</link>>
+<br>
+<<link [[아니요|Eden Clearing]]>><<endevent>><</link>>
+<br>
+
+:: Eden Freedom 3
+<<effects>>
+
+<!-- <<npc Eden>><<person1>> -->"이미 하루 꼬박 주잖아." <<he>>【이가】 말한다. "다른 놈 침대에서 자고 싶은 건가, 그런 거야?"
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"아, 아니에요." 당신은 말한다. "전 당신만의 것이라는 거 알잖아요."
+<<elseif $speech_attitude is "bratty">>
+	"난 걸레가 아니에요." 당신은 말한다. "하지만 가끔은 더 오래 떨어져 있어야 할 때도 있다고요."
+<<else>>
+	"아니에요!" 당신은 말한다. "매일 학교 가려고 숲을 지나는 건 위험하단 말이에요."
+<</if>>
+<br><br>
+
+<<if C.npc.Eden.love gte 100>>
+	<<set $edenfreedom to 2>><<edenTrackers>>
+	<<set $wardrobes.edensCabin.transfer to true>>
+	<<He>>【은는】 반박하려는 듯 보였지만, 체념하며 한숨을 쉰다. "좋아. 혼자인 건 익숙하니까. <span class="gold">최대 일주일까지 떠나 있어도 돼.</span> 그보다 더 오래 없으면, 널 사냥하러 갈 거다."
+	<br><br>
+
+	<<link [[껴안는다|Eden Freedom 2]]>><<set $phase to 2>><<npcincr Eden love 1>><</link>><<glove>>
+	<br>
+	<<if $bus is "edenclearing">>
+		<<link [[고개를 끄덕인다|Eden Clearing]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[고개를 끄덕인다|Eden Cabin]]>><<endevent>><</link>>
+	<</if>>
+
+<<else>>
+	<<He>>【은는】 고개를 젓는다. "그 마을은 위험해. 거기서 보내는 시간이 적을수록 좋아."
+	<br><br>
+
+	<i><<he>>【이가】 당신을 더 좋아했다면 당신의 요청에 더 순순히 응했을지도 모른다.</i>
+	<br><br>
+
+	<<if $bus is "edenclearing">>
+		<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+	<</if>>
+<</if>>
+
+:: Forest Cabin Return
+<<set $outside to 1>><<set $location to "cabin">><<effects>>
+<<npc Eden>><<person1>>
+<<set $edendays to 0>>
+
+에덴이 당신을 <<his>> 오두막의 안전한 곳으로 다시 이끈다.
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<br>
+
+:: Eden Pillows
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 저기, 우리 러그 하나 장만하면 어떨까요? 그리고 베개도 좀..." 당신은 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"여긴 좀 휑하잖아요. 러그랑 베개 좀 사는 게 어때요?" 당신은 묻는다.
+<<else>>
+	"오두막에 깔 러그랑 베개 좀 사면 안 될까요?" 당신은 묻는다.
+<</if>>
+<br><br>
+
+<<if C.npc.Eden.love gte 60>><<set $edenfurniture to 1>>
+	/* eden is already generated
+	<<npc Eden>><<person1>> */
+
+	에덴은 당신의 질문에 <<his>> 눈썹을 찌푸린다. "난 마을에 안 가." <<he>>【이가】 당신에게서 등을 돌리며 말한다.
+	<br>
+	"하지만 당신이 갈 필요 없어요. 제가 할게요." 당신은 말한다.
+	<br><br>
+
+	<<He>>【은는】 당신의 말에 한숨을 쉬며, 생각에 잠겨 시선을 피한다. "좋아." <<he>>【이가】 말한다. "하지만 너무 과하게 하진 마."
+	<br>
+	당신은 <<him>>에게 고마움의 미소를 짓고, <<him>>【을를】 내버려 둔다.
+	<br><br>
+<<else>>
+	/* eden is already generated
+	<<npc Eden>><<person1>>*/
+
+	에덴은 짜증이 난 듯 <<his>> 눈을 가늘게 뜬다. "내 오두막에 문제없어."
+	<br><br>
+
+	<<He>>【은는】 당신에게서 등을 돌리며 대화가 끝났음을 알린다.
+	<br><br>
+
+	<i><<he>>【이가】 당신을 더 좋아했다면 당신의 요청에 더 순순히 응했을지도 모른다.</i>
+	<br><br>
+<</if>>
+
+<<if $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<<else>>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Curtains
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 저기, 새 커튼을 달면 어떨까요? 그리고 코트걸이도요." 당신은 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"오두막이 아직도 휑하잖아요. 새 커튼이랑 코트걸이는 어때요?" 당신은 묻는다.
+<<else>>
+	"새 커튼이랑 코트걸이를 사면 안 될까요?" 당신은 묻는다.
+<</if>>
+<br><br>
+
+<<if C.npc.Eden.love gte 120>><<set $edenfurniture to 2>>
+	/* eden is already generated
+	<<npc Eden>><<person1>>*/
+
+	에덴이 한숨을 쉰다. "이미 쇼핑했잖아."
+	<br>
+	"하지만 딱 두 가지만 더 사면 돼요." 당신은 말한다.
+	<br><br>
+
+	잠시 동안, 에덴은 오두막 창문에 걸린 낡은 커튼으로 <<his>> 시선을 옮겼다가, 다시 당신에게로 시선을 돌린다.
+	"좋아." <<he>>【이가】 지난번보다 더 마지못해 말한다. "하지만 코트걸이는 우리가 직접 만들 거다."
+	<br>
+	당신은 <<him>>에게 고마움의 미소를 짓고, <<him>>【을를】 내버려 둔다.
+	<br><br>
+<<else>>
+	<!-- <<npc Eden>><<person1>> -->
+
+	에덴은 고개를 저으며 당신에게서 등을 돌린다. "가구는 충분해."
+	<br><br>
+
+	대화가 끝난 것 같다.
+	<br><br>
+
+	<i><<he>>【이가】 당신을 더 좋아했다면 당신의 요청에 더 순순히 응했을지도 모른다.</i>
+	<br><br>
+<</if>>
+
+<<if $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<<else>>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Loveseat
+<<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 저기, 우리 러브시트를 만들어보면 어떨까요." 당신은 묻는다.
+<<elseif $speech_attitude is "bratty">>
+	"이곳에 마지막 화룡점정이 필요해요. 러브시트를 만드는 건 어때요?" 당신은 묻는다.
+<<else>>
+	"오두막에 놓을 러브시트를 만들면 안 될까요?" 당신은 묻는다.
+<</if>>
+<br><br>
+
+<<if C.npc.Eden.love gte 180>><<set $edenfurniture to 3>><<set $edenloveseat to 1>>
+	/* eden is already generated
+	<<npc Eden>><<person1>>*/
+
+	에덴은 잠시 침묵한다. "일이 많을 거야." <<he>>【이가】 경고한다.
+	<br>
+
+	<<if $speech_attitude is "meek">>
+		"ㅅ-상관없어요." 당신은 말한다.
+	<<elseif $speech_attitude is "bratty">>
+		"그래서요?" 당신은 묻는다.
+	<<else>>
+		"괜찮아요." 당신은 말한다.
+	<</if>>
+	<br><br>
+
+	"좋아." <<he>>【이가】 말한다. "시작하고 싶을 때 말해."
+	<br>
+	당신은 감사하며 <<him>>에게 미소 짓는다.
+	<br><br>
+
+	<i>러브시트를 완성하려면 시간이 좀 걸립니다.</i>
+	<br><br>
+<<else>>
+	/* eden is already generated
+	<<npc Eden>><<person1>>*/
+
+	에덴은 당신에게서 등을 돌리며 고개를 젓는다. "가구는 충분해."
+	<br><br>
+
+	대화는 끝난 것 같다.
+	<br><br>
+
+	<i><<he>>【이가】 당신을 더 좋아했다면 당신의 요청에 더 순순히 응했을지도 모른다.</i>
+	<br><br>
+<</if>>
+
+<<if $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<<else>>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Loveseat Work
+<<effects>>
+<<switch $edenloveseat>>
+	<<case 1>>
+		남은 나무를 가져와, 당신과 에덴은 팔걸이 측면을 잘라내기 시작한다. 구멍을 뚫고 나사로 고정한다. 다음으로 팔걸이의 바닥 지지대를 잘라낸 다음, 앞판과 뒷판을 잘라내는 작업을 한다.
+		<br>
+		그 작업이 끝나면, 팔걸이를 지지대에 부착하여 프로젝트의 첫 부분을 완성한다.
+	<<case 2>>
+		이번에는 둘이서 좌석 바닥을 잘라내고, 내부 지지대에 홈을 만든다. 다음으로 좌석 판을 잘라내고, 홈에 판을 끼워 조립하기 시작한다.
+		<br>
+		마무리로, 외부 틀을 강력 접착제와 몇 개의 나사로 결합한다.
+	<<case 3>>
+		이제 당신과 에덴은 내부 지지대 판자를 놓고 나사로 고정하고, 클리트를 정렬하여 나사로 부착한다.
+		<br>
+		홈에 판을 부착하는 것도 똑같이 한다. 2인용 소파의 기본 골조가 절반쯤 완성되었다.
+	<<case 4>>
+		당신과 에덴은 2인용 소파의 등받이를 만드는 데 주의를 돌린다.
+		<br>
+		다행히도 홈을 파고 지지판을 안에 넣는 비슷한 과정이다.
+	<<case 5>>
+		2인용 소파의 기본 골조가 대부분 완성되자, 당신과 에덴은 공터에서 나무를 사포질하며 시간을 보낸다.
+		<br>
+		세상에서 가장 쉬운 과정은 아니지만, 골조를 조립하기 전에 사포질을 해두면 장기적으로 많은 시간을 절약할 수 있다는 것을 알고 있다.
+	<<case 6>>
+		이제 골조 사포질이 끝났으니, 당신과 에덴은 모든 것을 조립하기 시작한다. 좌석의 위치를 잡고, 모서리에 나사를 박아 고정한다.
+		<br>
+		다음으로 등받이를 연결하고, 다시 한번 나사로 고정한다. 당신과 에덴은 뒤로 물러나 작품을 살펴본다. 이제 쿠션만 있으면 된다.
+		<br><br>
+
+		<i>재료는 쇼핑 센터에서 구매할 수 있습니다.</i>
+	<<case 7>>
+		폼 쿠션을 틀로 삼아, 솜을 자르고 강력 접착제로 쿠션에 붙인다. 다음으로, 천을 잘라내 쿠션 커버를 꿰매기 시작한다.
+		<br>
+		그 작업이 끝나면, 폼 베이스 주위에 커버를 씌워 쿠션을 완성한다.
+	<<case 8>>
+		마지막 단계로, 골조 위에 쿠션을 놓아 2인용 소파를 완성한다. 쉽지 않은 프로젝트였다는 것을 알기에, 완성된 작품을 보니 자부심이 차오른다.
+		<br>
+		오두막을 한 번 더 둘러본다. 새로 추가된 것들 덕분에 오두막은 그 어느 때보다 좋아 보이고, 당신은 만족스럽게 미소 짓는다.
+<</switch>>
+<br><br>
+
+<<if $edenloveseat isnot 7>>
+	<<link [[다음|Eden Cabin]]>><<endevent>><<set $edenloveseat += 1>><</link>>
+<<else>>
+	<<link [[2인용 소파 완성하기|Eden Loveseat Work]]>><<set $edenloveseat += 1>><</link>>
+<</if>>
+
+:: Eden Blanket One
+<<effects>>
+동물 가죽 몇 개를 가져와 바느질을 시작한다. 더딘 작업이지만, 담요의 일부를 완성했다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><</link>>
+
+:: Eden Blanket Two
+<<effects>>
+가죽을 더 가져와 함께 꿰맨다. 담요가 점점 커지고 있다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><</link>>
+
+:: Eden Blanket Three
+<<effects>>
+/* eden is already generated
+<<npc Eden>><<person1>>*/
+남은 가죽들을 꿰매고 작품을 살펴본다. 부드러운 털 위로 손을 쓸어내리며 어디에 둘지 생각한다.
+오두막을 둘러보자 2인용 소파가 눈에 들어온다. 그 위에 담요를 걸치고 뒤로 물러서서 만족스럽게 고개를 끄덕인다. <<nnpc_he "Eden">>【이가】 이걸 보면 기뻐할 것이다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><</link>>
+
+:: Eden Design
+<<effects>>
+<<endevent>><<npc "Eden">><<person1>>
+<<switch $edendesign>>
+	<<case 1>>
+		베개 하나를 집어 천에 무늬를 수놓기 시작한다.
+		호숫가의 일몰을 최종 디자인으로 정하고, 주황색 태양의 이미지를 수놓는 것으로 시작한다.
+	<<case 2>>
+		베개를 집어 들고, 이번에는 물에 집중하여 빛나는 주황색 색조를 입힌다. 디테일을 더하기 위해 백조 몇 마리도 추가한다.
+	<<case 3>>
+		다시 베개를 들고, 하늘로 주의를 돌린다. 노란색과 주황색 실을 번갈아 사용하며 프로젝트를 완성한다.
+		<<he>>【이가】 이걸 보면 기뻐할 것이다.
+	<<case 4>>
+		다른 베개를 집어 들고, 이번에는 어떤 디자인으로 작업할지 생각한다. 결국, 숲의 나무들을 수놓기로 결정한다.
+		갈색 실을 집어 들고, 나무줄기 작업을 시작하며 빽빽하게 채워 넣는다.
+	<<case 5>>
+		다시 베개를 집어 들고, 녹색 실을 사용하여 나뭇잎을 수놓기 시작한다. 디자인에 디테일을 더하기 위해 여러 가지 다른 색조를 번갈아 사용한다.
+	<<case 6>>
+		베개를 집어 들고, 땅을 수놓아 풍경을 완성한다. 작업이 끝나면, 이전에 작업했던 다른 베개 옆에 놓는다.
+		잘 마친 일을 보니 만족스럽고, <<he>>【이가】 이걸 보면 기뻐할 것이다.
+	<<case 7>>
+		또 다른 베개를 집어 들고 다음 디자인은 무엇으로 할지 잠시 고민한다. 주위를 둘러보다 영감이 떠오른다. 오두막 공터를 수놓기로 결정한다.
+		실을 들고, 오두막을 수놓으며 모든 작은 세부 사항을 작업하는 데 시간을 보낸다.
+	<<case 8>>
+		다시 베개를 집어 들고, 텃밭과 샘을 수놓는 작업을 시작한다. 참고를 위해 때때로 창밖을 엿보게 된다.
+	<<case 9>>
+		베개를 들고, 하늘에 집중하여 장면을 마무리한다. 시간이 좀 걸리지만, 작업이 끝나면 이전에 작업했던 다른 모든 베개와 함께 놓는다.
+		그것들을 보니 성취감이 차오르고, 에덴도 기뻐할 것이라고 확신한다.
+<</switch>>
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Scarf
+<<effects>>
+양털을 집어 반으로 접고 꿰매기 시작한다. 더딘 작업이지만, 끝날 때까지 꾸준히 진행한다.
+작업이 끝나면, 에덴이 볼 수 있도록 옷걸이에 목도리를 걸어둔다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Recaptured
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+<<edenTrackers>>
+
+에덴이 당신의 팔을 잡고 <<him>> 앞으로 당신을 민다. <<He>>【은는】 당신을 숲 속으로 밀고 가 <<his>> 오두막으로 돌아간다. 안에 들어가자, <<he>>【이가】 당신을 바닥으로 밀친다.
+<br><br>
+
+"난 널 믿어," <<he>>【이가】 말한다. "그러니 내 말대로 하지 않으면, 상처받아."
+<br><br>
+
+<<link [[유혹한다|Eden Recaptured Seduction]]>><</link>><<promiscuous1>>
+<br>
+<<link [[사과한다|Eden Recaptured Apologise]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<gdom>><<glove>>
+<br>
+<<link [[아무것도 하지 않는다|Eden Recaptured Spank]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Eden Recaptured Seduction
+<<effects>>
+
+<<set $seductiondifficulty to (10000 - (C.npc.Eden.lust * 50))>>
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<seductionskilluse>>
+
+무릎으로 기어간다.
+<<if $speech_attitude is "meek">>
+	"만회할 수 있어요!" 당신은 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"당신에게 뭐가 필요한지 알 것 같아요," 당신은 말한다.
+<<else>>
+	"만회하게 해줘요," 당신은 말한다.
+<</if>>
+당신은 <<npcUndressText `C.npc.Eden` "lower">>.
+
+<<if $seductionrating gte $seductionrequired>>
+	"나한테 만회하기 시작하는 좋은 방법이군," <<he>>【이가】 당신의 뒤통수에 손을 대고 더 가까이 밀어붙이며 말한다.
+	<br><br>
+
+	<<link [[다음|Eden Recaptured Oral]]>><<set $sexstart to 1>><</link>>
+	<br>
+<<else>>
+	<<He>>【이가】 당신을 다시 바닥으로 밀친다. "오, 안 돼, 그렇게 쉽게는 안 끝나."
+	<br><br>
+
+	<<link [[다음|Eden Recaptured Spank]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<</if>>
+
+:: Eden Recaptured Apologise
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+무릎으로 기어가 <<him>>【을를】 올려다본다.
+
+<<if $speech_attitude is "meek">>
+	"정말 죄송해요," 당신은 말한다. "제가 나빴다는 걸 알아요." 당신은 고개를 숙인다.
+<<elseif $speech_attitude is "bratty">>
+	"걱정시키려던 건 아니었어요," 당신은 말한다.
+<<else>>
+	"죄송해요, 제가 나빴다는 걸 알아요," 당신은 말한다.
+<</if>>
+<br><br>
+
+"그래도 널 벌줘야겠어," 에덴이 말한다. "안 그러면 교훈을 잊어버릴 테니."
+<br><br>
+
+<<link [[다음|Eden Recaptured Spank]]>><<set $phase to 1>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Eden Recaptured Spank
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<npcspank>><<npcidlegenitals>><<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 200>>
+	<<if $phase is 1>>
+		<<set $enemyanger -= 75>>
+	<</if>>
+	<<He>>【은는】 <<his>> 무릎 위로 당신을 굽힌다.
+	<br><br>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or $enemyanger lte 0>>
+	<span id="next"><<link [[다음|Eden Recaptured Spank Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Recaptured Spank]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Recaptured Spank Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>><<npcincr Eden lust -20>>
+	<<He>>【은는】 힘겹게 숨을 몰아쉰다. "교훈을 얻었길 바란다. 다시는 내게 불복종하지 마."<<lllust>>
+	<br><br>
+
+	<<tearful>> 당신은 <<his>> 시선을 피한다.
+<<elseif $enemyhealth lte 0>>
+	"이 배은망덕한 암캐 같으니," <<he>>【이가】 말한다. "널 밖으로 내던져 늑대들에게 맡겨야 할지도 모르겠군!" <<He>>【이가】 찡그리며 <<his>> 옆구리를 잡는다. "이거에 쓸 약이 필요하겠어."
+	<br><br>
+
+	<<tearful>> 당신은 몸을 추스른다.
+<<elseif $enemyanger lte 0>>
+	<<He>>【은는】 누그러진 듯 보이며 당신을 놓아준다. "교훈을 얻었길 바란다. 다시는 내게 불복종하지 마."
+	<br><br>
+
+	<<tearful>> 당신은 <<his>> 시선을 피한다.
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Eden Cabin]]>><</link>>
+<br>
+
+:: Eden Recaptured Oral
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>><<npcoral>>
+	<<set $enemytrust -= 100>><<set $enemyhealth to 600>><<set $enemyhealthmax to 600>><<set $enemyanger += 80>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Recaptured Oral Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Recaptured Oral]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Recaptured Oral Finish
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>><<npcincr Eden lust -20>><<npcincr Eden love 1>>
+
+	"너한테 계속 화를 낼 수가 없군," <<he>>【이가】 숨을 헐떡인다. "하지만 다시는 도망칠 생각 마."<<lllust>><<glove>>
+<<elseif $enemyhealth lte 0>>
+	"이 배은망덕한 암캐." <<he>>【이가】 말한다. "차라리 널 밖으로 던져서 늑대들에게나 줘 버릴까!" <<He>>【은는】 얼굴을 찡그리며 <<his>> 옆구리를 붙잡는다. "이거 뭐라도 해야겠어."
+	<br><br>
+
+	<<tearful>> 당신은 테이블 밑에서 기어 나온다.
+<<elseif $finish is 1>>
+	"기억해," <<he>>【이가】 말한다. "계속 지켜보고 있을 테니."
+<</if>>
+<br><br>
+
+<<clotheson>>
+<<endcombat>>
+
+<<link [[다음|Eden Cabin]]>><</link>>
+
+:: Eden Asylum Rescue
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+<<edenTrackers>><<asylumescape>>
+<<badEndTrackingEnd "Asylum" { reason: "asylumEden" }>>
+오두막에 들어서자, 에덴이 등 뒤로 문을 닫고 당신을 힘껏 껴안는다. <<his>> 몸이 떨리고 있는 것 같다.
+<br><br>
+
+"정말, 정말 걱정했어." <<he>>【이가】 말한다. 어깨에 눈물이 떨어지는 것 같았지만, 당신이 무언가 말하기 전에 에덴은 스스로 감정을 추스른다.
+<br><br>
+
+<<if $pain gte 10>>
+	에덴이 꽉 껴안는 바람에 상처가 쓰라려서, <<his>> 어깨를 두드려 <<him>>에게 알린다.
+	<br>
+	"다쳤잖아." <<he>>【이가】 말하며, 몸을 떼고 당신을 위아래로 훑어본다.
+	<br><br>
+
+	에덴은 당신을 식탁으로 이끌고 구급상자로 <<he>>【이가】 할 수 있는 최선의 치료를 해준다. <<he>>【이가】 당신을 돌보는 동안 <<his>> 얼굴에 죄책감이 스치는 것을 본다. 마치 당신의 상처가 <<himself>> 탓이라고 자책하는 것 같다.
+	치료를 마친 <<he>>【은는】 물 한 잔과 진통제를 가져다주고, 당신은 그걸 단숨에 들이킨다. <<He>>【은는】 당신 앞에 의자를 끌어다 앉는다.
+	<<lllpain>><<lltrauma>><<llstress>><<trauma -20>><<pain -200>><<stress -20>>
+	<br><br>
+<</if>>
+
+"무슨 일이었어?" <<he>>【이가】 묻는다. 묻는다기보단 다그치는 것에 가깝다. 당신은 <<him>>에게 겪었던 트라우마와 "치료"를 명목으로 정신병원에 강제로 갇혀 나올 수 없었던 일에 대해 이야기한다. 또한 그곳에 있는 동안 하퍼와 정신병원 직원, 다른 환자들이 당신에게 무슨 짓을 했는지 상세히 설명한다.
+<br><br>
+
+당신의 이야기를 듣는 동안 에덴의 얼굴은 분노와 죄책감, 공포로 일그러진다. 당신이 이야기를 마치자, <<he>>【은는】 식탁에 <<his>> 주먹을 내리친다.
+<br><br>
+
+"빌어먹을 자식들." <<he>>【이가】 말한다. "지금 당장 전부 쏴 죽여 버리고 싶군!"
+<br>
+당신은 <<him>>【을를】 진정시키려 <<his>> 어깨에 손을 얹는다. "난 이제 안전해." 당신이 말한다. "그게 제일 중요하잖아."
+<br>
+<<He>>【은는】 당신의 손을 잡아끌어 아까보다 훨씬 부드럽게 껴안는다. "네 말이 맞아." <<he>>【이가】 말한다. "넌 이제 안전해."
+<br><br>
+
+잠시 후, 당신은 <<him>>에게서 벗어나려 하지만, <<he>>【은는】 당신을 잠시 더 붙잡는다. "다음부턴 제발 더 조심해 줘. 네가 다시 위험해지는 건 싫어." <<he>>【이가】 애원한다.
+<br><br>
+
+당신은 <<him>>에게 아무것도 약속할 순 없지만, 앞으로는 더 조심하도록 노력하겠다고 말한다. 에덴은 고개를 끄덕이고 일어서면서, 걱정스럽지만 부드러운 눈빛으로 당신을 바라본다.
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Farm Rescue
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+<<edenTrackers>>
+숲의 지붕 아래에 들어서자 안전함을 느끼지만, 오두막에 도착할 때까지 멈추지 않는다. 안에 들어서자마자 에덴이 당신을 껴안는다.
+<br><br>
+
+"온 마을을 다 뒤졌어." <<he>>【이가】 말한다. "널 찾을 수가 없었어. 정말 걱정했다고."
+<br><br>
+
+<<if $worn.face.type.includes("gag")>>
+	<<He>>【은는】 당신의 머리 뒤로 손을 뻗어 $worn.face.name【을를】 푸는 것을 돕는다.
+	<<set $worn.face.type.push("broken")>>
+	<<faceruined>>
+<</if>>
+<<if $pain gte 10 or $edenwhip is 1>>
+	에덴이 상처를 건드리자 당신은 움찔한다. "다쳤잖아." <<he>>【이가】 말하며, 몸을 떼고 당신을 살핀다.
+	<br><br>
+
+	<<if $edenwhip is 1>>
+		<<He>>【은는】 채찍 자국을 보고 놀란다.
+	<</if>>
+	<<if $skin.left_bottom.special is "cattle">>
+		<<He>>【은는】 당신의 가축 낙인을 보고 미간을 찌푸린다.
+	<</if>>
+	<<He>>【은는】 당신을 식탁으로 이끌고 누우라고 한다. <<He>>【은는】 당신을 돌보며 죄책감을 느끼는 듯하다. 당신의 상처를 <<himself>> 탓으로 돌리고 있을지도 모른다.
+	<<if $skin.left_bottom.special is "cattle">>
+		<<He>>【은는】 가축 낙인에 이상한 액체를 바른다. 잉크가 피부에서 흘러내린다.
+		<<bodywriting_clear left_bottom>>
+	<</if>>
+	치료를 마친 <<he>>【은는】 물 한 잔과 진통제를 가져다주고, 당신은 그걸 단숨에 들이킨다. <<He>>【은는】 당신 앞에 의자를 끌어다 앉는다.
+	<<lllpain>><<lltrauma>><<llstress>><<trauma -20>><<pain -200>><<stress -20>>
+	<br><br>
+<</if>>
+
+<<if $skin.left_bottom.special is "cattle">>
+		<<He>>【은는】 당신의 가축 낙인을 보고 미간을 찌푸린다. 에덴은 당신을 식탁에 앉히고 이상한 액체를 바른다. 잉크가 피부에서 흘러내린다.
+		<<bodywriting_clear left_bottom>>
+<</if>>
+
+<<if ($edenwhip is 1 or $skin.left_bottom.special is "cattle")>>
+	"누가 이런 짓을 한 거야?" 에덴이 묻는다.
+	<br>
+	"레미." 당신이 말한다.
+		<<if $edenshoutrescue is 1>>
+			"네가 얼굴을 때렸던 그 사람."
+			<br>
+			"그놈?" <<he>>【이가】 묻는다. "주먹으로 때리는 것 이상을 했어야 했는데."
+		<</if>>
+<<else>>
+	"무슨 일이었어?" <<he>>【이가】 묻는다.
+<</if>>
+<br><br>
+
+당신은 <<him>>에게 어떻게 레미의 농장으로 끌려갔는지, 그리고 견뎌야 했던 굴욕에 대해 이야기한다.
+<<if ($edenwhip is 1)>>
+	또한 요구를 거부했을 경우 레미가 당신에게 가했던 고문에 대해서도 상세히 설명한다.
+<</if>>
+당신의 이야기를 듣는 동안 에덴의 얼굴은 분노와 죄책감, 공포로 일그러진다. 당신이 이야기를 마치자, <<he>>【은는】 식탁에 <<his>> 주먹을 내리친다.
+<br><br>
+
+"개자식들." <<he>>【이가】 소리친다. "총알이 더 필요하겠군."
+<br>
+당신은 <<him>>【을를】 진정시키려 <<his>> 어깨에 손을 얹는다. "난 이제 안전해." 당신이 말한다. "그게 제일 중요하잖아."
+<br>
+<<He>>【은는】 당신의 손을 잡아끌어 더 부드럽게 껴안는다. "네 말이 맞아." <<he>>【이가】 말한다. "넌 이제 안전해."
+<br><br>
+
+당신은 <<him>>에게서 벗어나려 하지만, <<he>>【은는】 당신을 꽉 붙잡는다. "다음부턴 제발 더 조심해 줘. 네가 다시 위험해지는 건 싫어."
+<br><br>
+
+당신은 <<him>>에게 아무것도 약속할 순 없지만, 앞으로는 더 조심하도록 노력하겠다고 말한다. 에덴은 고개를 끄덕이고 지친 표정으로 일어선다.
+<br><br>
+
+<<if $edenshoutrescue is 1>>
+	"잠깐만." 당신이 말한다. 당신은 축사를 떠나기 전에 슬쩍했던 모자를 꺼내 에덴에게 건넨다. <<He>>【은는】 잠시 충격받은 듯하더니, 이내 씩 웃는다.
+	<br>
+	"내가 널 너무 얕봤나 보네. 덕분에 쇼핑 갈 일이 줄었어!" <<He>>【은는】 고맙다는 듯 당신의 뺨에 키스하고 식탁에서 멀어진다.
+<</if>>
+<<set $edenshoutrescue to 0>>
+<<set $edenwhip to 0>>
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Supplies
+<<effects>>
+
+<<set $edenshopping to 1>><<wearProp "first aid">>
+당신은 에덴이 만들 수 없거나 없이는 지낼 수 없는 물건들을 사러 간다. 주로 도구나 의료용품이다.
+<br><br>
+
+<<if !$edenradio and $money gte 2500>>
+	쇼핑을 하던 중, 간단한 탁상용 라디오가 눈에 들어온다. 에덴이 생각난다. 오두막에서는 할 일이 별로 없으니, 어쩌면 <<nnpc_he "Eden">>【이가】 좋아할지도 모른다.
+	<br><br>
+
+	<<techicon "radio">><<link [[산다 (£25)|Eden Radio Buy]]>><<money -2500>><</link>>
+	<br>
+	<<refuseicon>><<link [[사지 않는다|Eden Radio Don't Buy]]>><</link>>
+<<elseif $edenradio isnot 0 and !$edenraft and $money gte 4000>>
+	쇼핑을 하던 중, 공기주입식 뗏목이 눈에 들어온다. 에덴이 생각난다. 어쩌면 호수에서 함께 쓸 수 있을지도 모른다.
+	<br><br>
+
+	<<ind>><<link [[산다 (£40)|Eden Raft Buy]]>><<money -4000>><</link>>
+	<br>
+	<<refuseicon>><<link [[사지 않는다|Eden Raft Don't Buy]]>><</link>>
+<<else>>
+	<<link [[다음|Shopping Centre]]>><</link>>
+<</if>>
+<br>
+
+:: Eden Raft Buy
+<<effects>>
+<<set $edenraft to 1>>
+<<set $edenraftintro to 1>>
+뗏목을 사기로 결정한다.
+<br><br>
+
+<<link [[다음|Shopping Centre]]>><</link>>
+<br>
+
+:: Eden Raft Don't Buy
+<<effects>>
+뗏목을 사지 않기로 한다. 다음 기회에 사야겠다.
+<br><br>
+
+<<link [[다음|Shopping Centre]]>><</link>>
+<br>
+
+:: Eden Radio Buy
+<<effects>>
+<<set $edenradio to 1>>
+<<set $edenradiointro to 1>>
+한번 사보기로 하고 라디오를 산다. 혹시 모를 일이다. 에덴이 좋아할지도.
+<br><br>
+
+<<link [[다음|Shopping Centre]]>><</link>>
+<br>
+
+:: Eden Radio Don't Buy
+<<effects>>
+라디오를 사지 않기로 한다. 다음 기회에 사야겠다.
+<br><br>
+
+<<link [[다음|Shopping Centre]]>><</link>>
+<br>
+
+:: Eden Radio Intro
+<<effects>>
+<!-- <<npc Eden>><<person1>> -->
+<<set $edenradiointro to 2>><<npcincr Eden love 10>>
+에덴을 불러 라디오를 보여주기 전에, 식탁 위에 라디오를 놓는다.
+<br><br>
+
+"라디오?" <<he>>【이가】 <<his>> 머리를 긁적이며 묻는다. "선물이 고맙지 않다는 건 아니지만, 왜 갑자기 산 거야?"
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"그-그냥 네가 좋아할 것 같아서." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"에이, 좀 즐기면서 살아." 당신이 말한다. "충동구매 한 번도 안 해봤어?"
+<<else>>
+	"배경 소음이라도 좀 있으면 좋을 것 같아서." 당신이 말한다.
+<</if>>
+<br><br>
+
+라디오의 다이얼을 돌려 신호를 잡으려 애쓴다. 몇 번 시도하자 음악이 들려온다. 사랑 노래인 것 같다.
+<br><br>
+
+<<link [[에덴을 본다|Eden Radio Intro 2]]>><</link>>
+<br>
+
+:: Eden Radio Intro 2
+<<effects>>
+에덴에게로 몸을 돌리자, <<he>>【은는】 얼굴을 붉히며 당신의 시선을 피한다. <<him>>처럼 강인한 사람이 그렇게 수줍어하는 모습에 놀랐지만, 오두막 안에 긴장감이 고조되는 것을 느낀다.
+<br><br>
+
+사랑 노래는 계속 흘러나오고, 두 사람 모두 어쩔 줄 몰라 한다. 에덴이 당신의 허리를 힐끗 보며 무언가를 할 용기를 내려고 애쓴다. <<He>>【은는】 <<himself>>에게 좌절한 것처럼 보인다.
+<br><br>
+
+당신이 먼저 에덴의 손을 잡아 당신의 허리로 이끈다. <<He>>【은는】 망설이다가, 당신의 허리에 <<his>> 팔을 감는다. 당신도 <<his>> 목에 팔을 감는다.
+<br><br>
+
+<<link [[다음|Eden Radio Intro 3]]>><<npcincr Eden love 1>><</link>>
+<br>
+
+:: Eden Radio Intro 3
+<<effects>>
+노래에 맞춰 두 사람은 느린 왈츠를 춘다. 당신은 에덴의 눈을 바라보며 마음이 차분해지는 온기를 느낀다.
+<br><br>
+
+에덴은 당신의 시선을 마주하기 힘들어하는 것 같지만, 그럼에도 당신을 꽉 안는다. <<his>> 어깨에 긴장감이 서려, 당신의 손길에 뻣뻣하게 굳어 있는 것이 느껴진다.
+사실, 이 순간의 취약함이 어쩐지 <<him>>【을를】 드러낸 것 같다. <<he>>【이가】 세상으로부터 그토록 숨기려 애쓰는 <<him>>의 일부를 보게 된다.
+<br><br>
+
+비록 불확실하고 어색한 움직임으로나마, <<he>>【이가】 지금 당신에게 이 모습을 보여준다는 사실이 기쁘다. 어쩌면 그래서 이 순간이 특별한 것일지도 모른다.
+<br><br>
+
+<<He>>【은는】 춤에 능숙하지 않아 몇 번이나 비틀거리지만, 그래도 좋다. 에덴과의 삶이 완벽하지는 않더라도, <<he>>【이가】 당신을 위해 노력하고 있다는 사실을 문득 깨닫는다.
+<br><br>
+
+지금 <<he>>【이가】 노력하고 있는 것처럼.
+<br><br>
+
+<<link [[다음|Eden Radio Intro 4]]>><<npcincr Eden love 1>><</link>>
+<br>
+
+:: Eden Radio Intro 4
+<<effects>>
+너무나도 빨리 노래가 끝난다. 에덴은 실망한 듯 보이지만 움직이지 않는다. 당신은 <<he>>【이가】 무언가 하기를 기다리지만, <<he>>【은는】 복잡한 표정을 지으며 당신에게서 시선을 돌릴 뿐이다.
+실망한 당신이 <<him>>에게서 몸을 떼려 하자, <<he>>【이가】 당신을 막아선다.
+<br><br>
+
+"잠깐." <<he>>【이가】 말한다. 당신은 뭐가 잘못됐는지 물어보려고 돌아섰지만, 키스로 말을 잇지 못한다. 이번 키스는 다른 것 같다.
+당신을 향한 에덴의 모든 감정이 담겨 있다. 날것 그대로이고, 진실하다.
+<br><br>
+
+"라디오 고마워." <<he>>【이가】 말하며 당신을 끌어안는다.
+<br><br>
+
+<span class = "gold">이제 밤에 오두막에서 라디오를 사용해 에덴과 춤을 출 수 있습니다!</span>
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<npcincr Eden love 1>><<endevent>><</link>>
+<br>
+
+:: Eden Supplied
+<<effects>>
+<<set $edenshopping to 2>><<npcincr Eden love 5>>
+<<if $speech_attitude is "meek">>
+	"이거 너 주려고 사 왔어." 당신이 말하며 보급품을 식탁에 놓는다.
+<<elseif $speech_attitude is "bratty">>
+	"네 심부름 대신 해줬어." 당신이 말하며 보급품을 식탁에 놓는다.
+<<else>>
+	"마을에서 네 보급품 사 왔어." 당신이 말하며 보급품을 식탁에 놓는다.
+<</if>>
+<br><br>
+
+"잘했어." 에덴이 말한다. "얼마였어? 돈 줄게."
+<br><br>
+
+<<link [[돈은 필요 없어|Eden Supplied 2]]>><<set $phase to 0>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<gdom>><<glove>>
+<br>
+<<link [[£50|Eden Supplied 2]]>><<set $phase to 1>><</link>>
+<br>
+<<set $skulduggerydifficulty to 200>>
+<<link [[£200|Eden Supplied 2]]>><<set $phase to 2>><</link>><<skulduggerydifficulty>>
+<br>
+
+:: Eden Supplied 2
+<<effects>>
+<!-- <<npc Eden>><<person1>> -->
+<<if $phase is 0>>
+	"네 건 어차피 내 거나 마찬가지야." 에덴이 말한다. "그래도 고맙다."
+	<br><br>
+
+	<<if $bus is "edenclearing">>
+		<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+	<</if>>
+
+<<elseif $phase is 1>>
+	"그 정도면 맞네." <<He>>【은는】 <<his>> 주머니에 손을 넣는다. "자, 여기."
+	<br><br>
+
+	<<moneyGain 50>>【을를】 획득했습니다.
+	<br><br>
+
+	<<if $bus is "edenclearing">>
+		<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+	<<else>>
+		<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+	<</if>>
+
+<<else>>
+	<<skulduggerycheck>>
+	<<if $skulduggerysuccess is 1>>
+		"200이라고?" 에덴이 짜증스러운 표정을 짓는다. "바가지 썼네." <<He>>【은는】 <<his>> 주머니에 손을 넣는다. "그래도 내가 직접 하는 것보단 낫지. 자, 여기."
+		<br><br>
+
+		<<moneyGain 200>>【을를】 획득했습니다.
+		<br><br>
+
+		<<skulduggeryuse>>
+
+		<<if $bus is "edenclearing">>
+			<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+		<<else>>
+			<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+		<</if>>
+
+	<<else>>
+		"그런 수에 안 넘어가." 에덴이 말한다. "네 돈으로 내."
+		<br><br>
+
+		<<skulduggeryuse>>
+
+		<<if $bus is "edenclearing">>
+			<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+		<<else>>
+			<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+		<</if>>
+	<</if>>
+<</if>>
+
+:: Cabin Settings [exitCheckBypass]
+<<set $settingsExitPassage to "Eden Cabin">>
+<<settings>>
+
+:: Eden Fix
+<<effects>>
+<<npc Eden>><<person1>>
+당신은 에덴의 옷을 수선한다. <<his>> 사냥 여행 때문에 옷이 온통 찢어지고 해져 있다.
+<<if Time.hour lte 6>>
+	당신은 <<his>> 휴식을 방해하지 않기 위해 옷을 탁자 위에 두기로 한다.
+<<elseif Time.hour gte 11 and Time.hour lte 14 and $daily.eden.hunting is 1>>
+	당신은 <<he>>【이가】 돌아올 때까지 옷을 탁자 위에 두기로 한다.
+<<else>>
+	<<He>>【은는】 당신이 <<him>>에게 옷을 돌려주자 고마워하는 것 같다.
+<</if>>
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Sweep
+<<effects>><<wearProp "broom">>
+<!-- <<npc Eden>><<person1>> -->
+당신은 빗자루와 쓰레받기를 사용해 오두막 바닥이 깨끗해질 때까지 쓴다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Salve
+<<effects>><<wearProp "salve">>
+<!-- <<npc Eden>><<person1>> -->
+당신은 연고 재료를 모아 스토브에서 녹인다. 다 만들고 나면, 식히고 말리기 위해 탁자 위에 연고를 둔다.
+<br><br>
+
+연고 $salve병을 가지고 있습니다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Soap
+<<effects>><<wearProp "soap">>
+<!-- <<npc Eden>><<person1>> -->
+당신은 비누 재료를 모아 스토브에서 녹인다. 다 만들고 나면, 식히고 굳히기 위해 탁자 위에 비누를 둔다.
+<br><br>
+
+비누 $soap개를 가지고 있습니다.
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Stock
+<<effects>>
+<!-- <<npc Eden>><<person1>> -->
+당신은 에덴의 보급품 재고를 조사하여, 무엇을 보충해야 하고 비용이 얼마나 들지 기록한다.<<gmaths>><<mathsskill>>
+<br><br>
+
+<<link [[다음|Cabin House Actions]]>><<endevent>><</link>>
+
+:: Eden Mirror
+<<effects>>
+<<edenicon>><<link [[물러선다|Eden Cabin]]>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</link>>
+<br>
+<<mirror>>
+<br><br>
+
+:: Eden Plots
+<<effects>>
+
+<<plot_effects>>
+
+<<if $eden_plot_intro is 1>><<unset $eden_plot_intro>>
+	<<plots_init eden 3 earth 2 medium>>
+<</if>>
+
+<<display_plot eden>>
+
+<<if !$plants_known.includes("poppy")>>
+	<<foodstufficon "poppy">> <<link [[씨앗 찾기 (0:30)|Eden Plots Seeds]]>><<set $plants_known.push("poppy")>><<pass 30>><</link>>
+	<br>
+<</if>>
+<br>
+
+<<getouticon>><<link [[떠난다|Eden Clearing]]>><<endevent>><</link>>
+<br>
+
+:: Eden Plots Seeds
+<<effects>><<wearProp "poppy basket">>
+당신은 들꽃을 찾아 공터를 뒤지다가, 풀 사이에서 자라는 양귀비를 여러 송이 발견한다. 당신은 씨앗을 좀 모은다.
+<br><br>
+
+<span class="gold">이제 <<foodstufficon "poppy">> 양귀비를 재배할 수 있습니다.</span>
+<br><br>
+
+<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<br>
+
+:: Eden Recaptured Resist Normal
+<<effects>>
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyhealth to 600>>
+	<<set $enemyhealthmax to 600>>
+	<<set $enemyanger += 200>>
+	<<forestRescueSetup>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+
+<<forestRescueCheck "Eden">>
+
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Eden Recaptured Resist Normal Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Recaptured Resist Normal]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Recaptured Resist Normal Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>><<if $foresthunt gte 1>><<set $foresthunt to 0>><</if>>
+	<<ejaculation "short">>
+	에덴이 근처 나무에 쓰러진다.
+	<br><br>
+
+	<<tearful>> 당신은 기회를 포착하고 숲으로 탈출한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+<<elseif $rescue is 1>>
+	<<forestRescue>>
+<<else>>
+	<<if $foresthunt gte 1>><<set $foresthunt to 0>><</if>>
+	에덴이 근처 나무에 쓰러진다.
+	<br><br>
+
+	<<tearful>> 당신은 기회를 포착하고 숲으로 탈출한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+<</if>>
+
+:: Eden Recaptured Resist
+<<effects>>
+<<if $fightstart is 1>>
+	<<set $fightstart to 0>>
+
+	<<neutral 1>>
+
+	<<maninit>>
+	<<set $enemytrust -= 100>>
+	<<set $enemyanger += 200>>
+	<<npcidlegenitals>>
+	<<if $worn.neck.name is "familiar collar" and $worn.neck.cursed is 1>>
+		<<set $nochoke to 1>><<defiance 2 0>>
+		"이러고 싶지 않아." 에덴이 당신의 목 위로 <<his>> 손을 옮기며 말한다. <span class="green">하지만 당신 목걸이의 황금 심장이 <<him>>에게 충격을 주자 즉시 움찔하며 물러난다.</span>
+		<br><br>
+
+		"그 마녀가 너한테 <<nnpc_his "Gwylan">> 손을 댔어? 내가 어떻게든 다시는 <<nnpc_him "Gwylan">>【을를】 못 보게 할 거야."
+	<<else>>
+		<<set $NPCList[0].righthand to "throat">><<set $NPCList[0].lefthand to "throat">><<set $neckuse to "hand">>
+		"이러고 싶지 않아." 에덴이 당신의 목 위로 <<his>> 손을 옮기며 말한다. <span class="red">목이 졸리고 있다!</span>
+	<</if>>
+	<br><br>
+
+	<<forestRescueSetup>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+
+<<forestRescueCheck "Eden">>
+
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+	<span id="next"><<link [[다음|Eden Recaptured Resist Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Eden Recaptured Resist]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Eden Recaptured Resist Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>><<if $foresthunt gte 1>><<set $foresthunt to 0>><</if>>
+	<<ejaculation "short">>
+	에덴이 근처 나무에 쓰러진다.
+	<br><br>
+
+	<<tearful>> 당신은 기회를 포착하고 숲으로 탈출한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+
+<<elseif $enemyhealth lte 0>><<if $foresthunt gte 1>><<set $foresthunt to 0>><</if>>
+	에덴이 근처 나무에 쓰러진다.
+	<br><br>
+
+	<<tearful>> 당신은 기회를 포착하고 숲으로 탈출한다.
+	<br><br>
+
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Forest]]>><<endevent>><<set $eventskip to 1>><</link>>
+	<br>
+<<elseif $rescue is 1>>
+	<<forestRescue>>
+<<else>>
+	에덴이 당신의 의식이 희미해질 때까지 목을 조른다.
+	<br><br>
+
+	<<endcombat>>
+	<<link [[다음|Eden Recaptured 2]]>><<clotheson>><</link>>
+	<br>
+<</if>>
+
+:: Eden Recaptured 2
+<<effects>>
+<<npc Eden>><<person1>>
+<<edenTrackers>>
+
+<<if $rng gte 51>>
+	깨어나 보니 에덴의 어깨에 축 늘어져 있다. 당신은 <<his>> 오두막 밖 공터에 있다. 안에 들어서자 <<He>>【이가】 당신을 바닥에 내던진다.
+	<br><br>
+
+	"난 널 믿어." <<he>>【이가】 말한다. "그러니 네가 내 말대로 하지 않으면, 상처받는다고."
+	<br><br>
+
+<<else>>
+	에덴이 <<his>> 장화로 당신을 툭 차는 바람에 잠에서 확 깬다. 당신은 오두막 바닥에 있다.
+	<br><br>
+
+	"난 널 믿어." <<he>>【이가】 말한다. "그러니 네가 내 말대로 하지 않으면, 정말 상처받는다고."
+	<br><br>
+<</if>>
+
+<<link [[유혹한다|Eden Recaptured Seduction]]>><</link>><<promiscuous1>>
+<br>
+<<link [[사과한다|Eden Recaptured Apologise]]>><<npcincr Eden love 1>><<npcincr Eden dom 1>><</link>><<gdom>><<glove>>
+<br>
+<<link [[아무것도 하지 않는다|Eden Recaptured Spank]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Eden Cabin Rescued
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+/* eden is not actually generated on passages that lead here */
+<<edenTrackers>>
+<<npc Eden>><<person1>>
+
+당신은 의식이 오락가락한다. 무언가 당신을 옮기는 것이 느껴지고, 숲의 소리가 들린다.
+<br><br>
+
+얼마 후 당신은 침대에서 깨어난다. 익숙한 느낌이다. 주위를 둘러보니 숲속 오두막이라는 것을 깨닫는다. 에덴이 당신 옆에 앉아 머그잔으로 무언가를 마시고 있다. <<He>>【이가】 당신을 힐끗 보더니, <<his>> 음료를 내려놓는다.
+<br><br>
+
+"일어났구나. 걱정했어." <<he>>【이가】 안심한 듯 말하며 당신에게 손을 뻗어, 단단히 껴안는다.
+
+<<if isLoveInterest("Eden")>>
+	아직 힘이 없지만, 당신도 <<him>>【을를】 마주 안는다.
+	<br><br>
+	<<if $speech_attitude is "meek">>
+		"고마워!" 당신이 말한다. "네가 구해 주지 않았다면 어떻게 됐을지 몰라."
+	<<elseif $speech_attitude is "bratty">>
+		"도와줘서 고마워." 당신이 말한다. "신세 하나 졌네."
+	<<else>>
+		"고마워!" 당신이 말한다. "데려와 줘서 정말 고마워."
+	<</if>>
+	<br><br>
+<<else>>
+	<br><br>
+<</if>>
+
+"이제 여긴 안전해. 네 집이야. 괜찮아." 에덴은 잠시 더 당신을 안고 있다가, 풀어주고는 당신을 살펴본다. "다친 곳은 없군. 살 수 있을 거야." <<He>>【은는】 일어서서 기지개를 켜며 미소 짓는다.
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Cabin Passout
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+<<set $stress -= 2000>>
+/* eden is already generated on passages that lead here
+<<npc Eden>><<person1>> */
+
+당신은 오두막 침대에서 깨어난다. 고개를 옆으로 돌리자, 당신 옆에 앉아 있는 에덴이 보인다. <<He>>【은는】 당신이 뒤척이는 것을 알아차린다.
+<br><br>
+
+"일어났군. 걱정했어." <<he>>【이가】 말한다. <<His>> 목소리는 안심한 듯하다.
+<br><br>
+
+<<if $pain gte 10>>
+	당신이 정신을 잃은 동안 <<he>>【이가】 상처를 치료해 준 것 같다. <<He>>【은는】 당신이 일어서는 것을 돕고, 마지막으로 한 번 쳐다본 뒤 걸어간다.
+	<<lllpain>><<pain -200>>
+<<else>>
+	"다친 곳은 없었어. 스트레스로 기절한 게 틀림없어." <<He>>【은는】 당신이 일어서는 것을 돕고, 마지막으로 한 번 쳐다본 뒤 걸어간다.
+<</if>>
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Passout Lake Rescue
+<<effects>>
+누군가 당신을 공중으로 들어 올리고 허리에 팔을 감싸는 것이 느껴진다.
+<br><br>
+
+<<if isLoveInterest("Eden")>>
+	당신은 구조자의 가슴에 얼굴을 묻는다. 익숙하고 편안한 냄새가 난다.
+	<br><br>
+<</if>>
+
+당신은 다시 정신을 잃는다.
+<br><br>
+
+<<link [[다음|Eden Cabin Rescued]]>><<pass 30>><</link>>
+
+:: Eden Collar Remove
+<<set $outside to 1>><<set $location to "cabin">><<effects>><<set $edenaskcollar to 1>>
+/* eden is already generated on passages that lead here
+<<npc Eden>><<person1>> */
+
+<<if $speech_attitude is "meek">>
+	"내-내가 벗었어." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"내가 벗었어." 당신이 말한다.
+<<else>>
+	"내가 벗었어." 당신이 말한다.
+<</if>>
+<br><br>
+
+"뭐? 왜?" <<he>>【이가】 좌절하며 묻는다.
+<br>
+
+<<if $speech_attitude is "meek">>
+	"네가 없을 때 사람들이 그걸 이용해서 날 멋대로 할 수도 있었단 말이야."
+<<elseif $speech_attitude is "bratty">>
+	"그것 때문에 위험한 상황에 처했었어." 당신이 말한다. "사람들이 그걸 이용해서 날 멋대로 할 수도 있었고."
+<<else>>
+	"위험하잖아." 당신이 말한다. "사람들이 그걸로 날 멋대로 할 수도 있었어."
+<</if>>
+<br><br>
+
+<<He>>【은는】 시선을 피하고 당신의 말을 곱씹어 보더니, 결국 패배감에 한숨을 쉰다. "알았어." <<he>>【이가】 등을 돌리며 말한다. <<He>>【은는】 더 이상 그 주제를 꺼내지 않는다.
+<br><br>
+
+<<if $bus is "edencabin">>
+	<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+<<elseif $bus is "edenclearing">>
+	<<link [[다음|Eden Clearing]]>><<endevent>><</link>>
+<</if>>
+
+:: Eden Collar
+<<set $outside to 1>><<set $location to "cabin">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"다-다른 목걸이를 줄 수 있을까?" 당신은 얼굴을 붉히며 고개를 돌린다.
+<<elseif $speech_attitude is "bratty">>
+	"다른 목걸이 하나 더 줄 수 있어?" 당신은 말하면서 눈을 마주치려고 노력하지만, 뺨이 달아오르는 것을 느낀다.
+<<else>>
+	"다른 목걸이를 줄 수 있을까?" 당신은 자신의 말에 얼굴이 뜨거워지는 것을 느낀다.
+<</if>>
+<br><br>
+
+<<if $bus is "edenclearing">>
+	당신의 질문에 에덴의 눈썹이 올라간다. "마음이 바뀌었나?" <<He>>【은는】 당신의 상기된 얼굴을 훑어보며 씨익 웃는다. 그 반응에 당신의 심장이 빠르게 뛰는 것을 느낀다. "이리 와." <<he>>【이가】 당신의 손을 잡고 오두막으로 이끌며 말한다.
+	<br><br>
+<<else>>
+	당신의 질문에 에덴의 눈썹이 올라간다. "마음이 바뀌었나?" <<He>>【은는】 당신의 상기된 얼굴을 훑어보며 씨익 웃는다. 그 반응에 당신의 심장이 빠르게 뛰는 것을 느낀다. "이리 와." <<he>>【이가】 당신의 손을 잡으며 말한다.
+	<br><br>
+<</if>>
+
+<<link [[다음|Eden Collar Ask 2]]>><</link>>
+
+:: Eden Collar Ask
+<<set $outside to 1>><<set $location to "cabin">><<effects>>
+/* eden is already generated on passages that lead here
+<<npc Eden>><<person1>> */
+
+<<if $speech_attitude is "meek">>
+	"누, 누가 가져갔어요." 당신은 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"누가 벗겨 갔어요." 당신은 말한다.
+<<else>>
+	"누가 가져갔어요." 당신은 말한다.
+<</if>>
+<br>
+
+"뭐?" <<He>>【은는】 화가 난 것 같다.
+<br>
+
+<<if $speech_attitude is "meek">>
+	"죄, 죄송해요." 당신은 말한다. "하지만 화내셔도 소용없어요."
+<<elseif $speech_attitude is "bratty">>
+	"누가 가져갔다고 했잖아요. 당신이 화낸다고 달라지는 건 없어요."
+<<else>>
+	"누가 가져갔다고 말했어요. 당신의 분노는 아무것도 바꾸지 못해요."
+<</if>>
+<br><br>
+
+<<He>>【은는】 대답하려 입을 열었다가, 한숨을 쉬며 고개를 돌린다. "알았어." <<he>>【은는】 등을 돌리며 말한다.
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	당신은 땅을 보며 손가락만 만지작거린 채, 그 자리에 가만히 서 있다. 잠시 후, 에덴이 당신을 올려다본다.
+<<elseif $speech_attitude is "bratty">>
+	"잠깐만요." 당신이 말하자, 에덴이 당신을 올려다본다.
+<<else>>
+	당신은 잠시 용기를 내다가, 에덴에게 다가가 <<him>>의 어깨를 톡 친다. <<He>>【이가】 당신을 올려다본다.
+<</if>>
+<br>
+
+<<if $speech_attitude is "meek">>
+	"다, 다른 거 하나 주실 수 있어요?" 당신은 얼굴을 붉히며 고개를 돌린다.
+<<elseif $speech_attitude is "bratty">>
+	"다른 거 하나 주실 수 있어요?" 당신은 말을 하면서 눈을 맞추려 하지만, 그럼에도 뺨이 붉어지는 것을 느낀다.
+<<else>>
+	"다른 거 하나 주실 수 있어요?" 당신은 자신의 말에 얼굴이 뜨거워지는 것을 느낀다.
+<</if>>
+<br><br>
+
+<<if $bus is "edenclearing">>
+	당신의 질문에 에덴의 눈썹이 올라간다. <<He>>【은는】 당신의 얼굴을 훑어보며, 붉어진 얼굴을 보고는 씨익 웃는다. "이리 와." <<he>>【은는】 당신의 손을 잡고 오두막으로 이끌며 말한다.
+<<else>>
+	당신의 질문에 에덴의 눈썹이 올라간다. <<He>>【은는】 당신의 얼굴을 훑어보며, 붉어진 얼굴을 보고는 씨익 웃는다. "이리 와." <<he>>【은는】 당신의 손을 잡으며 말한다.
+<</if>>
+<br><br>
+
+<<link [[다음|Eden Collar Ask 2]]>><</link>>
+
+:: Eden Collar Ask 2
+<<leash 21>><<attach_leash>>
+<<set $outside to 1>><<set $location to "cabin">><<effects>>
+
+<<He>>【은는】 당신을 근처 서랍으로 안내한다. 서랍을 열고, <<he>>【은는】 목줄에 손을 뻗는다. 긴 금속 사슬이 빛에 반짝이며 매달려 있다.
+<<He>>【은는】 <<his>> 고개를 까딱이며 당신에게 다가오라는 신호를 보낸다.
+<br><br>
+
+당신은 떨리는 숨을 내쉬고 다가가 <<him>> 앞에 멈춰 선다.
+<<if $hairlength gte 200>>
+	"머리 올려." <<he>>【이가】 말한다. 당신은 순순히 따르며, 머리 뒤로 손을 뻗어 머리카락을 치운다.
+<</if>>
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	당신은 <<his>> 강렬한 시선에 뺨이 화끈거려, 계속 땅바닥만 쳐다본다.
+<<elseif $speech_attitude is "bratty">>
+	아무리 애써도, <<him>>의 눈을 차마 쳐다볼 수가 없다. <<his>> 강렬한 시선에 창피할 정도로 뺨이 붉게 타오른다.
+<<else>>
+	당신은 <<his>> 강렬한 시선에 뺨이 화끈거려, 땅바닥에 시선을 고정한다.
+<</if>>
+<br><br>
+
+천천히, <<he>>【이가】 당신의 목에 목줄을 가져다 대며, <<his>> 손으로 당신의 피부를 스친다. 당신의 숨이 저도 모르게 멎자, 에덴이 킥킥 웃는다.
+등 뒤에서 목줄이 채워지며, 오두막 안에 선명한 '찰칵' 소리가 울려 퍼진다.
+<br><br>
+
+에덴이 뒤로 물러서며 당신을 위아래로 훑어본다. 용기를 내어 <<his>> 얼굴을 쳐다본다. <<His>> 눈은 어둡고 굶주려 있다. <<npcincr Eden lust 5>><<gglust>>
+<br><br>
+
+<<link [[다음|Eden Collar Ask 3]]>><</link>>
+
+:: Eden Collar Ask 3
+<<set $outside to 1>><<set $location to "cabin">><<effects>>
+
+당신의 목줄을 잡고, 에덴은 당신을 오두막 거울로 이끌어 고개를 들게 한다. 목줄이 당신의 목을 꼭 맞게 감싸고 있다.
+<<He>>【은는】 당신 뒤에 서서 <<his>> 손을 당신의 어깨에 올리고, <<his>> 얼굴을 당신의 귀 높이까지 낮춘다.
+<br><br>
+
+"어때?" <<he>>【이가】 속삭인다. <<his>> 뜨거운 숨결이 느껴져 미칠 것 같다.
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"저, 저는..." 당신은 말을 더듬다가 이내 포기하고, 붉어진 얼굴을 두 손에 파묻는다. 에덴이 씨익 웃는다.
+<<elseif $speech_attitude is "bratty">>
+	"뭐... 괜찮네요." 당신은 얼굴을 붉히며 거울에 비친 모습을 보려고 애쓰며 말한다. 에덴이 씨익 웃는다.
+<<else>>
+	"이... 좋네요." 당신은 얼굴을 붉히며 거울에 비친 모습을 피하며 말한다. 에덴이 씨익 웃는다.
+<</if>>
+<br><br>
+
+<<He>>【은는】 당신을 <<his>> 가슴으로 끌어당기고 당신의 새 목줄을 손가락으로 쓰다듬는다. "잘 어울리네." <<he>>【은는】 당신의 턱을 잡고 입술에 가볍게 입을 맞추며 말한다.
+목줄을 놓고, <<he>>【은는】 걸어간다. 거울을 응시하는 당신만 남겨둔 채. 당신은 다리에 힘이 풀리는 것을 느낀다.
+<<takeKissVirginity "Eden" "romantic">>
+<br><br>
+
+<<link [[다음|Eden Cabin]]>><<endevent>><</link>>
+
+:: Eden Kitchen
+<<set $outside to 0>><<set $location to "cabin">><<effects>>
+
+당신은 에덴의 부엌에 있다. 불 위에 그릴이 놓여 있는데, 오두막의 다른 곳보다는 위생적으로 보인다. 좁은 계단이 식품 저장고로 이어진다.
+<br><br>
+
+<<ingredientsSupplied "beef" "bird_egg">>
+<<allowLewdIngredients>>
+<br><br>
+
+<<kitchenDisplay>>
+
+<<link [[떠나기|Eden Cabin]]>><<kitchenExit>><<endevent>><</link>>
+<br>

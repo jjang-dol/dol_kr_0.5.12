@@ -1,0 +1,159 @@
+:: Stolen Clothing Shop Result
+<<effects>>
+<<ShowUnderEquip "over">>
+<<ShowUnderEquip "normal">>
+<<if currentSkillValue('skulduggery') lt 100>>
+	경비원이 입구를 감시하고 있다. 다른 출구는 없으므로 당신은 떠나기 전에 모든 것을 제자리에 돌려놓는다.
+	<<clothingReset>>
+<<else>>
+	<<rng>>
+	<<if crimeSumCurrent() gte 50000 or (crimeSumCurrent() gte 40000 and $rng * 20 gte currentSkillValue('skulduggery')) or (crimeSumCurrent() gte 25000 and $rng * 10 gte currentSkillValue('skulduggery'))
+	or (crimeSumCurrent() gte 10000 and $rng * 5 gte currentSkillValue('skulduggery'))>>
+		<<generateSecurity 1>><<person1>>
+		경비원이 입구를 감시하고 있고, 당신이 지나가려 하자 <<he>>【이가】 당신을 멈춰 세운다.
+		<br><br>
+		"그래. 내가 널 계속 지켜보고 있었지," <<he>>【이가】 계속해서 말한다. "이번엔 그냥 보내주겠지만, 넌 한동안
+		이 건물 출입 금지야. 왜 옷을 훔치면 안 되는지 깨닫는 계기가 되길 바란다."
+		<<if $clothingShop.banCount lt 4>>
+			<<set $clothingShop.ban to 7>>
+		<<elseif $clothingShop.banCount lt 8>>
+			<<set $clothingShop.ban to 10>>
+		<<else>>
+			<<set $clothingShop.ban to 14>>
+		<</if>>
+		<<crime "thievery">>
+		<<set $clothingShop.banCount++>>
+	<<else>>
+		경비원이 입구를 감시하고 있지만, 당신은 의심을 사지 않고 유유히 지나간다.
+		<<crime "thievery">>
+	<</if>>
+	<<set _crime to ($tryOn.value / 100)>>
+	<<crimeUp _crime "thievery">>
+<</if>>
+<br><br>
+<<link [[다음|Shopping Centre Top]]>><<set $tryOn.autoReset to true>><<endevent>><</link>>
+
+:: Clothing Shop Guard
+<<effects>>
+<<generateSecurity 1>><<person1>>
+경비원이 입구를 지키다 당신을 발견합니다. <<He>>【은는】 보이지 않는 누군가에게 몇 마디 하더니 당신에게 다가옵니다.
+<br><br>
+"죄송하지만, 들여보내 드릴 수 없습니다." <<he>>【이가】 말합니다. "출입 금지가 풀릴 때까지 <<if $clothingShop.ban gt 1>><<number $clothingShop.ban>>일<<else>>하루<</if>> 더 남았습니다."
+<br><br>
+
+<<link [[다음|Shopping Centre Top]]>><<endevent>><</link>>
+
+:: Clothing Shop Sneak Guard
+<<effects>>
+입구 바로 옆에 경비원이 보입니다. 몰래 지나갈 수는 없을 것 같습니다.
+<br><br>
+
+<<link [[다음|Shopping Centre Top]]>><</link>>
+
+:: Clothing Shop Night Guard Found
+<<effects>>
+<<generateSecurity 1>><<person1>>
+<<set $clothingShop.banCount++>>
+<<set $clothingShop.spotted to false>>
+최대한 조용히 가게 문을 닫고 돌아서자, 당신은 경비원과 얼굴을 마주하고 충격에 빠집니다. 당신이 도망칠 생각조차 하기 전에 <<He>>【이가】 당신의 어깨에 손을 얹습니다.
+<br><br>
+"이게 누구야? 멋진 자수품을 훔쳐 달아나려는 작은 쥐새끼인가?" <<he>>【은는】 못마땅한 표정으로 말합니다. "이 상황을 주인에게 알리도록 하지."
+<br><br>
+<<He>>【은는】 <<his>> 폰을 꺼내 가게 주인에게 전화하는 것 같습니다.
+<<if $clothingShop.ban gt 0>>
+	<<set $clothingShop.banExtension to true>>
+	<<set $clothingShop.ban += 7>>
+	"아하! 이미 출입 금지 조치가 내려져 있었군." <<he>>【이가】 말을 잇습니다. "그들은 꽤 엄격한 출입 금지 정책을 가지고 있으니, 여기서 쇼핑하려면 한참 기다려야 할 거야."
+<<else>>
+	<<if $clothingShop.banCount lt 4>>
+		<<set $clothingShop.ban to 7>>
+	<<elseif $clothingShop.banCount lt 8>>
+		<<set $clothingShop.ban to 10>>
+	<<else>>
+		<<set $clothingShop.ban to 14>>
+	<</if>>
+	"이걸로 됐군." <<he>>【이가】 말을 잇는다. "자. 넌 한동안 이 건물에 들어오지 못할 거야. 이걸로 교훈을 얻길 바라."
+<</if>>
+<br><br>
+"자, 날 따라와. 여기서 밖으로 데려다주지. 널 곧장 형틀로 끌고 가지 않는 걸 다행으로 알아."
+<<tryOnReset>><<set $tryOn.autoReset to true>>
+<br><br>
+<<link [[도망친다|Clothing Shop Night Guard Found Run]]>><</link>><<athleticsdifficulty 500>>
+<br>
+<<link [[경비원을 따라간다|Clothing Shop Night Guard Found Follow]]>><</link>>
+
+:: Clothing Shop Night Guard Found Run
+<<effects>>
+당신은 도망쳐 숨기로 결심한다.
+<<if $athleticsSuccess>>
+	경비원이 당신을 완전히 잡으려 하지만, 당신은 <<him>>【을를】 간신히 피해서 달아납니다. 멀리서 <<him>>【이가】 소리치는 것을 들으며 옥상으로 달려갑니다.
+	<br><br>
+	<<link [[옥상|Commercial rooftops]]>><<endevent>><</link>>
+<<else>>
+	하지만 경비원을 지나치기 전에, <<he>>【이가】 당신을 세게 잡아당겨 엉덩방아를 찧게 만듭니다.
+	<br><br>
+	"나한테서 도망치려 한 걸 후회하게 될 거다." <<he>>【은는】 <<his>> 얼굴에 미소를 지으며 말합니다. "여긴 카메라도 없거든."
+	<br><br>
+	<<link [[다음|Clothing Shop Night Guard Molestation]]>><<set $molestationstart to 1>><</link>>
+<</if>>
+
+:: Clothing Shop Night Guard Found Follow
+<<effects>>
+<<He>>【은는】 당신을 출구 쪽으로 안내한다.
+<<if random(0,100) gte 50>>
+	"그거 알아?" <<he>>【이가】 묻는다. "이곳엔 카메라가 없어."
+	<br><br>
+	<<he>>【이가】 당신을 붙잡기 직전, 당신은 걱정스러운 표정으로 <<him>>【을를】 쳐다봅니다.
+	<br><br>
+	<<link [[다음|Clothing Shop Night Guard Molestation]]>><<set $molestationstart to 1>><</link>>
+<<else>>
+	당신은 조용히 계단을 내려가고, 쇼핑 센터 정문에 도착하자 경비원이 당신을 위해 문을 열어줍니다.
+	<br><br>
+	"이게 좋은 교훈이 되었으면 좋겠군." <<He>>【이가】 미소 짓습니다. "돈을 버는 더 정직한 방법을 찾아보는 게 좋을 거야. 그게 모두에게 덜 골치 아픈 길이지."
+	<br><br>
+	당신이 떠나자 <<He>>【은는】 문을 잠급니다.
+	<br><br>
+	<<link [[떠난다|High Street]]>><<endevent>><</link>>
+<</if>>
+
+:: Clothing Shop Night Guard Molestation
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>>
+	<<set $enemytrust -= 40>>
+	<<set $enemyanger += 40>>
+	<<set $NPCList[0].lefthand to "arms">>
+	<<set $leftarm to "grappled">>
+	<<set $rightarm to "grappled">>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Clothing Shop Night Guard Molestation Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Clothing Shop Night Guard Molestation]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Clothing Shop Night Guard Molestation Finish
+<<if $enemyhealth lte 0>>
+	당신은 <<him>>【을를】 충분히 다치게 해서 도망칠 수 있었다. <<tearful>> 당신은 가게에서 도망친다.
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[옥상|Commercial rooftops]]>><<endevent>><</link>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	"음, 재미있었어." <<he>> 말한다. "하지만 이제 네가 떠날 시간인 것 같군."
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[떠난다|High Street]]>><<endevent>><</link>>
+<</if>>

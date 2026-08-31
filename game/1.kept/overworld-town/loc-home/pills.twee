@@ -1,0 +1,276 @@
+:: Widgets managePill [widget]
+<<widget "managePill">>
+	<<if _args[0] and _args[1] and _args[2]>>
+		<<if _args[3] isnot true or $sexStats.pills[_args[0]].owned[_args[1]] gt 0>>
+			<<set $sexStats.pills[_args[0]].owned[_args[1]] += _args[2]>>
+			<<if _args[3] is true>>
+				<<set $sexStats.pills[_args[0]].type to _args[1]>>
+				<<set $sexStats.pills[_args[0]].doseTaken++>>
+				<<set $pillsConsumed++>>
+			<</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+:: Take Pill From Medicine Drawer
+<<print $lastPillTakenDescription>>
+<<if V.lastPillTakenDescription.includes("cream")>>
+	<<wearProp "parasite cream">>
+<<elseif V.lastPillTakenDescription.includes("spray")>>
+	<<wearProp "hairspray">>
+<<elseif V.lastPillTakenDescription.includes("fertility")>>
+	<<wearProp "fertility pills">>
+<<else>>
+	<<wearProp "pills">>
+<</if>>
+<br><br>
+<<link [[돌아가기|PillCollection]]>><</link>>
+
+:: PillCollection
+<<set $outside to 0>><<effects>>
+<<set _pills to $sexStats.pills>>
+
+당신은 약 서랍을 연다.
+<br><br>
+<div class="hpi_gridHeader">
+	<div class="hpi_header">
+	약 서랍
+	</div>
+</div>
+<div class="hpi_gridContainer" id="homeMainPillContainer"></div>
+<<run window.generateHomePillsInventory()>>
+<br>
+<div class="hpi_gridDescContainer" id="homeDescPillContainer" style="display:none">
+	<div id="hpi_descContainer">
+		<div id="hpi_desc_img"></div>
+		<div id="hpi_desc"></div>
+		<div class="hpi_closeContainer" id="hpi_closeContainer1" title="닫기" onclick="document.getElementById(`homeDescPillContainer`).style.display = `none`">x</div>
+	</div>
+</div>
+<br>
+<<link [[물러선다|$pillsExitPassage]]>><<unset $pillsExitPassage>><</link>>
+
+:: PillCollectionSecondDose
+<<set $outside to 0>><<effects>>
+
+경고 문구를 무시하고, 당신은 호르몬제의 권장 복용량을 초과한다.
+<br>
+<<run window.onSecondDoseTakenSetVars()>>
+<<set _result to random(0, 100)>>
+<<if _result gte 80 + _risk>>
+	<<set $timePassed to 2>> 경고에도 불구하고, 아무런 나쁜 일도 일어나지 않는 것 같다.
+<<elseif _result gte 70 + _risk>>
+	<<set $timePassed to 2>> 당신의 <<print ($pillCat is "breast" ? "가슴은" : ($pillCat is "penis" ? "자지는" : ($pillCat is "bottom" ? "엉덩이는" : $pillCat + "【은는】 ")))>> 몇 분간 약간 이상하게 느껴졌지만, 그 후에는 괜찮아 보인다.
+<<elseif _result gte 60 + _risk>>
+	<<set $timePassed to 10>> 당신의 <<print ($pillCat is "breast" ? "가슴은" : ($pillCat is "penis" ? "자지는" : ($pillCat is "bottom" ? "엉덩이는" : $pillCat + "【은는】 ")))>> 몇 분간 약간 따뜻하게 느껴졌지만, 그 후에는 괜찮아 보인다.
+	<<garousal>><<arousal 500>>
+<<elseif _result gte 40 + _risk>>
+	<<set $timePassed to 20>> 당신의 <<print ($pillCat is "breast" ? "가슴이" : ($pillCat is "penis" ? "자지가" : ($pillCat is "bottom" ? "엉덩이가" : $pillCat + "【이가】")))>> 갑자기 정말 따뜻하고 가렵게 느껴지기 시작한다. 그 느낌이 사라질 때까지 다른 어떤 것에도 집중할 수 없다.
+	<<garousal>><<gpain>><<pain 3>><<arousal 2000>>
+<<elseif _result gte 5 + _risk>>
+	<<set $timePassed to 30>>
+	<<switch _pillAmountOfCategoriesUsed>>
+		<<case 1>>
+			당신의 <<print ($pillCat is "breast" ? "가슴" : ($pillCat is "penis" ? "자지" : ($pillCat is "bottom" ? "엉덩이" : $pillCat)))>>에 날카로운 통증이 느껴진다.
+		<<case 2>>
+			당신의 <<print ($pillCat is "breast" ? "가슴" : ($pillCat is "penis" ? "자지" : ($pillCat is "bottom" ? "엉덩이" : $pillCat)))>>에 날카로운 통증이 느껴지고, 이어서 <<print (_secondaryPill is "breast" ? "가슴" : (_secondaryPill is "penis" ? "자지" : (_secondaryPill is "bottom" ? "엉덩이" : _secondaryPill)))>>에 또 다른 날카로운 통증이 느껴진다<<pain 12>><<set $timePassed += 30>>.
+		<<case 3>>
+			당신의 <<print ($pillCat is "breast" ? "가슴" : $pillCat)>>에 날카로운 통증이 느껴지고, 이어서 당신의 <<print ($pillCat is "breast" ? "자지와 엉덩이" : ($pillCat is "penis" ? "가슴과 엉덩이" : "가슴과 자지"))>>에 더 많은 날카로운 통증이 느껴진다<<pain 12>><<set $timePassed += 30>>.
+	<</switch>>
+	<<gpain>><<pain 12>>
+	<br><br>
+	시간이 좀 걸렸지만 점차 나아진다.
+<<else>>
+	<<set $timePassed to random(120, 420)>>
+	<<switch _pillAmountOfCategoriesUsed>>
+		<<case 1>>
+			당신의 <<print ($pillCat is "breast" ? "가슴" : ($pillCat is "penis" ? "자지" : ($pillCat is "bottom" ? "엉덩이" : $pillCat)))>>에 날카로운 통증이 느껴진다. 통증은 점점 심해지다가 결국 의식을 잃는다.
+		<<case 2>>
+			당신의 <<print ($pillCat is "breast" ? "가슴" : ($pillCat is "penis" ? "자지" : ($pillCat is "bottom" ? "엉덩이" : $pillCat)))>>에 날카로운 통증이 느껴지고, 이어서 <<print (_secondaryPill is "breast" ? "가슴" : (_secondaryPill is "penis" ? "자지" : (_secondaryPill is "bottom" ? "엉덩이" : _secondaryPill)))>>에 또 다른 날카로운 통증이 느껴진다<<pain 12>><<set $timePassed += 30>>. 통증은 점점 심해지다가 결국 의식을 잃는다.
+		<<case 3>>
+			당신의 <<print ($pillCat is "breast" ? "가슴" : $pillCat)>>에 날카로운 통증이 느껴지고, 이어서 당신의 <<print ($pillCat is "breast" ? "자지와 엉덩이" : ($pillCat is "penis" ? "가슴과 엉덩이" : "가슴과 자지"))>>에 더 많은 날카로운 통증이 느껴진다<<pain 12>><<set $timePassed += 30>>. 통증은 점점 심해지다가 결국 의식을 잃는다.
+	<</switch>>
+	<<ggstress>><<gtrauma>><<gpain>>
+	<<set $pain += 400>><<pain 1>><<set $stress += 4000>><<trauma 100>>
+	<<set _passout to true>>
+<</if>>
+
+<<set _hoursPassed to Math.floor($timePassed / 60)>>
+<<set _minutesPassed to $timePassed - (_hoursPassed * 60)>>
+
+<br><br>
+<<if _passout is true>>
+	<<link [[다음|PillCollectionPassOut]]>><<pass $timePassed>><</link>>
+<<else>>
+	<<print '<<link [[다음 ('+_hoursPassed+':'+ (_minutesPassed lt 10 ? "0" : "") + _minutesPassed + ')|PillCollection]]>><<unset $pillCat>><<pass $timePassed>><<unset $timePassed>><</link>>'>>
+<</if>>
+
+:: PillCollectionPassOut
+<<set $outside to 0>><<effects>>
+<<set _pills to $sexStats.pills>>
+<<set $pain += 300>><<pain 1>>
+당신은 극심한 고통 속에서 깨어나 무슨 일이 있었는지 궁금해한다. 몸을 잠시 더듬어보다가, 당신의 <<print ($pillCat is "breast" ? "가슴" : ($pillCat is "penis" ? "자지" : ($pillCat is "bottom" ? "엉덩이" : $pillCat)))>>【을를】 살짝 건드린 후 고통에 비명을 지른다. 다른 일이 생기지 않고 움직일 수 있을 것 같다고 느낄 때까지 더 누워 있는다.
+
+<br><br>
+일어나서 시간을 확인하니 <<if $timePassed gt 240>>몇 시간이나<<else>>두어 시간밖에<</if>> 지나지 않았다.
+
+<<set _change to random(100, 500)>>
+<<if _change gte 200>>
+	당신은 당신의 <<print ($pillCat is "breast" ? "가슴" : ($pillCat is "penis" ? "자지" : ($pillCat is "bottom" ? "엉덩이" : $pillCat)))>>【을를】 확인해 본다. <<print ($pillCat is "breast" ? "그것들" : "그것")>>에 대해 뭔가 변한 것 같다고 생각한다.
+<</if>>
+<<if $pillCat is "breast">>
+	<<if _pills.lastTaken[$pillCat] is "growth">>
+		<<set $breastgrowthtimer -= _change>>
+	<<else>>
+		<<set $breastgrowthtimer += _change>>
+	<</if>>
+<<elseif $pillCat is "penis">>
+	<<if _pills.lastTaken[$pillCat] is "growth">>
+		<<set $penisgrowthtimer -= _change>>
+		<<set $sexStats.pills.pills["penis growth"].overdose += 5>>
+	<<else>>
+		<<set $penisgrowthtimer += _change>>
+		<<set $sexStats.pills.pills["penis reduction"].overdose += 5>>
+	<</if>>
+<<else>>
+	<<if _pills.lastTaken[$pillCat] is "growth">>
+		<<set $bottomgrowthtimer -= _change>>
+	<<else>>
+		<<set $bottomgrowthtimer += _change>>
+	<</if>>
+<</if>>
+<<mouth_sensitivity 0.25>>
+<<breast_sensitivity 0.25>>
+<<bottom_sensitivity 0.25>>
+<<genital_sensitivity 0.25>>
+<<clamp>>
+<br><br>
+<<link [[다음 (1:00)|PillCollection]]>><<unset $pillCat>><<pass 60>><<unset $timePassed>><</link>>
+
+:: PillCollectionSecondDosePregnancy
+<<set $outside to 0>><<effects>>
+<<cleareventpool>>
+<<set _pills to $sexStats.pills>>
+<<set _menstruation to $sexStats.vagina.menstruation>>
+/*If this passage has no links, double check the widget 'autoTakePillCheck' for the $location variable */
+<<if $overdosePillsTaken is "fertility booster" or _pills.lastTaken.pregnancy is "fertility booster">>
+	<<set _fertilityPillName to "fertility booster">>
+	경고 문구를 무시하고, 당신은 임신 촉진제를 두 번째로 복용한다.
+	<br><br>
+	<<addinlineevent "no fertility overdose" 10>>
+		경고에도 불구하고, 아무런 문제도 없는 것 같다.
+		<br><br>
+		<<link [[다음 (0:02)|PillCollection]]>><<pass 2>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "simple fertility overdose" 5>>
+		경고에도 불구하고, 몇 분간 약간 따뜻하게 느껴질 뿐, 그 후에는 괜찮다. <<garousal>><<arousal 100>>
+		<br><br>
+		<<link [[다음 (0:03)|PillCollection]]>><<pass 3>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "simple fertility overdose 2" 4>>
+		당신의 <<genitals 2>> 주변에서 몇 분간 이상한 온기가 느껴지지만, 그 후에는 괜찮다. 이상하게도 마음이 편안해졌다. <<garousal>><<arousal 200>>
+		<<if _pills.pills[_fertilityPillName].doseTaken lt 3>>
+			<<set _pills.pills[_fertilityPillName].doseTaken to 3>>
+		<</if>>
+		<br><br>
+		<<link [[다음 (0:05)|PillCollection]]>><<pass 5>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "advanced fertility overdose" 2>>
+		당신의 <<genitals 2>> 주변에서 이상한 온기가 느껴지기 시작하지만, 멈추지 않고 어느 순간 타는 듯한 느낌이 든다. 열기가 몸의 다른 부위로 퍼져나가기 시작하다가 가라앉기 시작한다. <<garousal>><<arousal 1000>><<gpain>><<pain 10>>
+		<<if _pills.pills[_fertilityPillName].doseTaken lt 4>>
+			<<set _pills.pills[_fertilityPillName].doseTaken to 4>>
+		<</if>>
+		<<if !_menstruation.running>>
+		<<elseif _menstruation.currentState is "normal">>
+			<<for _i to 0; _i lt 2; _i++>>
+				<<if _menstruation.currentDay lt _menstruation.stages[3] - 1.5>>
+					<<set _menstruation.currentDay += 1>>
+				<</if>>
+			<</for>>
+			<<if _menstruation.baseDays gte 28>>
+				<<set _menstruation.baseDays-->>
+			<</if>>
+		<</if>>
+		<br><br>
+		<<link [[다음 (0:15)|PillCollection]]>><<pass 15>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "advanced fertility overdose" 2>>
+		당신의 <<genitals 2>> 주변에서 이상한 온기가 느껴지더니, 거의 타는 듯한 느낌이 들 때까지 강해진다. 열기는 순식간에 몸 전체로 퍼져나가고, 당신은 고통에 쓰러진다. 열기가 마침내 가라앉을 때까지 당신은 그 상태로 남아 있는다. <<garousal>><<arousal 1000>><<ggpain>><<pain 100>>
+		<<if _pills.pills[_fertilityPillName].doseTaken lt 4>>
+			<<set _pills.pills[_fertilityPillName].doseTaken to 4>>
+		<</if>>
+		<<if !_menstruation.running>>
+		<<elseif _menstruation.currentState is "normal">>
+			<<for _i to 0; _i lt 6; _i++>>
+				<<if _menstruation.currentDay lt _menstruation.stages[3] - 1.5>>
+					<<set _menstruation.currentDay += 1>>
+				<</if>>
+			<</for>>
+			<<if _menstruation.baseDays gte 24>>
+				<<set _menstruation.baseDays-->>
+			<</if>>
+		<</if>>
+		<br><br>
+		<<link [[다음 (1:00)|PillCollection]]>><<pass 60>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "advanced fertility overdose 2" 2>>
+		당신의 <<genitals 2>> 주변에서 이상한 온기가 느껴지더니, 거의 타는 듯한 느낌이 들 때까지 강해진다. 열기는 순식간에 몸 전체로 퍼져나가고, 당신은 고통에 쓰러진다. 엄청난 강도가 당신의 감각을 압도하고, 시야가 검게 변한다... <<garousal>><<arousal 1000>><<ggpain>><<pain 100>>
+		<<if _pills.pills[_fertilityPillName].doseTaken lt 4>>
+			<<set _pills.pills[_fertilityPillName].doseTaken to 4>>
+		<</if>>
+		<<if !_menstruation.running>>
+		<<elseif _menstruation.currentState is "normal">>
+			<<set _menstruation.currentDay to _menstruation.stages[3] - 0.5>>
+			<<menstruationCycle "overdose">>
+			<<set _menstruation.currentDay to _menstruation.stages[3] - 0.5>>
+			<<if _menstruation.baseDays gte 18>>
+				<<set _menstruation.baseDays-->>
+			<</if>>
+		<</if>>
+		<<rutCycle true>>
+		<br><br>
+		<<link [[다음 (3:00)|PillCollectionFertilityPassOut]]>><<pass 3 hours>><</link>>
+	<</addinlineevent>>
+<<elseif $overdosePillsTaken is "contraceptive" or _pills.lastTaken.pregnancy is "contraceptive">>
+	경고 문구를 무시하고, 당신은 피임약을 두 번째로 복용한다.
+	<br><br>
+	<<addinlineevent "no contraceptive overdose" 10>>
+		그럼에도 불구하고, 아무런 문제도 없는 것 같다.
+		<br><br>
+		<<link [[다음 (0:02)|PillCollection]]>><<pass 2>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "simple contraceptive overdose" 5>>
+		그럼에도 불구하고, 몇 분간 약간 쌀쌀하게 느껴질 뿐, 그 후에는 괜찮다. <<larousal>><<arousal -100>>
+		<br><br>
+		<<link [[다음 (0:03)|PillCollection]]>><<pass 3>><</link>>
+	<</addinlineevent>>
+	<<addinlineevent "contraceptive overdose" 3>>
+		몇 분 후, 이상하고 쌀쌀한 느낌이 당신을 덮친다. 그것은 당신의 <<genitals 2>>【을를】 통해 퍼져나가며, 그 여파로 약간의 무감각을 남기지만 곧 저절로 사라진다.<<llarousal>><<arousal -200>>
+		<br><br>
+		<<if $genitalsensitivity gt 2>>
+			<<genital_sensitivity -0.25>>
+		<</if>>
+		<<if $bottomsensitivity gt 2>>
+			<<bottom_sensitivity -0.25>>
+		<</if>>
+		<<link [[다음 (0:30)|PillCollection]]>><<pass 30>><</link>>
+	<</addinlineevent>>
+<</if>>
+<<if !_eventpool.length>>
+	<<addinlineevent "Pills Error" 1>>
+		<span class="red">오류가 발생했습니다. 세이브 파일과 함께 개발자에게 이 문제를 보고해 주세요.</span>
+		<br><br>
+		<<link [[다음|PillCollection]]>><</link>>
+	<</addinlineevent>>
+<</if>>
+<<unset $overdosePillsTaken>>
+
+<<runeventpool>>
+
+:: PillCollectionFertilityPassOut
+<<set $outside to 0>><<effects>>
+
+당신은 천천히 의식을 되찾는다. <<genitals 2>>【이가】 꽤 따뜻하게 느껴진다. 이상하게도 편안하다. 약이 당신에게 어떤 영향을 미쳤는지 궁금해진다.
+
+<br><br>
+<<link [[다음 (0:02)|PillCollection]]>><<pass 2>><</link>>

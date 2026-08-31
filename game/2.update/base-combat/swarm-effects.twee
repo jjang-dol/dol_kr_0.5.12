@@ -1,0 +1,989 @@
+:: Widgets Swarm Actions Generation [widget]
+<<widget "generateActionsSwarm">>
+	<<set $combat to 1>>
+	<<if _targetlist is undefined>>
+		<<getTargetList>>
+	<</if>>
+	<div id="listContainer">
+		<div id="leftaction" @class="$options.combatControls + 'Control'">
+			<<if $lefttarget is "self">>
+				<<leftActionInitSelf>>
+			<<else>>
+				<<leftActionInitSwarm>>
+			<</if>>
+		</div>
+
+		<div id="rightaction" @class="$options.combatControls + 'Control'">
+			<<if $righttarget is "self">>
+				<<rightActionInitSelf>>
+			<<else>>
+				<<rightActionInitSwarm>>
+			<</if>>
+		</div>
+
+		<div id="feetaction" @class="$options.combatControls + 'Control'">
+			<<feetActionInitSwarm>>
+		</div>
+
+		<<if ($mouthuse is 0 and !($dissociation lte 1 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined)))>>
+			<div id="mouthaction" @class="$options.combatControls + 'Control'">
+				<<mouthActionInit>>
+			</div>
+		<</if>>
+	</div>
+<</widget>>
+
+<<widget "leftActionInitSwarm">>
+	<<set $lefttarget to "swarm">>
+	<<switch $leftarm>>
+		<<case 0>>
+			<<if $orgasmdown gte 1>>
+				<<set _leftOptions to "orgasm">>
+				<span class="lewd">왼팔은 자유롭지만, 경련을 멈출 수 없다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _leftOptions to "pain">>
+				<span class="red">왼팔은 자유롭지만, 움직이면 아프다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _leftOptions to "unreal">>
+				<span class="pink">왼팔은 자유롭지만, 현실감각이 없다.</span>
+			<<else>>
+				<<if _targetYourself is true and _targetnumber gt 1>>
+					<<set _targetlistarms["자신"] to "self">>
+				<</if>>
+				<<if not $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "left" _targetlistarms>>
+				<</if>>
+				<<set _leftOptions to "free">>
+				<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔은 자유롭다.</span>
+				<<if $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "left" _targetlistarms>>
+					<<if $options.combatControls is "radio">><br><</if>>
+				<</if>>
+			<</if>>
+		<<case "swarmgrappled">>
+			<<set _leftOptions to "unable">>
+			<span class="purple">$swarm["name"]【이가】 당신의 왼팔을 조이고 있다!</span>
+			<<if $options.combatControls.includes("adio")>><br><</if>>
+		<<case "bound">>
+			<<if $orgasmdown gte 1>>
+				<<set _leftOptions to "unable">>
+				<span class="lewd">왼팔이 결박에서 벗어나려 꿈틀거린다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _leftOptions to "unable">>
+				<span class="red">왼팔이 고통스럽게 결박되어 있다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _leftOptions to "unable">>
+				<span class="pink">왼팔이 결박된 채 축 늘어져 있다.</span>
+			<<else>>
+				<<set _leftOptions to "bound">>
+				<span @class="($lastOptions.left isnot _leftOptions ?'gold':'')">왼팔이 속수무책으로 결박되어 있다.</span>
+			<</if>>
+			<<if $options.combatControls.includes("adio")>><br><</if>>
+		<<case "trapped">>
+			<<set $_changetype to true>><<leftActionInitVore>>
+		<<case "grappled" "penis" "othervagina" "vagina" "coverpenis" "anus" "behind">>
+			<<set $_changetype to true>><<leftActionInit>>
+		<<case "struggle">>
+			<<set $_changetype to true>><<leftActionInitStruggle>>
+		<<case "mechgrappled">>
+			<<set $_changetype to true>><<leftActionInitMachine>>
+		<<default>>
+			<<set $_changetype to true>><<leftActionInitTentacle>>
+	<</switch>>
+	<<if $_changetype isnot true>>
+		<<leftActionsSwarm>>
+		<<if Object.keys(_leftaction).length gt 0>>
+			<<if !(Object.values(_leftaction).includes($leftactiondefault))>>
+				<<set $leftactiondefault to "swarmrest">>
+			<</if>>
+			<<set $leftaction to $leftactiondefault>>
+			<div class="extraMargin">
+				<<generateCombatAction _leftaction "leftaction" "Swarm">>
+				<br>
+			</div>
+			<<if $options.combatControls.includes("ists")>>
+				<div id="leftactionDifficulty">
+					<<leftactionDifficulty>>
+				</div>
+			<</if>>
+		<</if>>
+		<<set $lastOptions.left to clone(_leftOptions)>>
+	<</if>>
+<</widget>>
+
+<<widget "leftactionDifficultySwarm">>/* Yes, it is supposed to be blank. */
+	<!-- Does nothing -->
+<</widget>>
+
+<<widget "leftActionsSwarm">>
+	<<set _leftaction to {}>>
+	<<switch _leftOptions>>
+		<<case "free">>
+			<<if $rightarm is "swarmgrappled" and ($lefttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _leftaction["오른팔을 자유롭게 한다"] to "leftfree">>
+			<<elseif _swarmamounts.active[2] gte 1 and $lefttarget isnot "self">>
+				<<silently>><<swarmName>><</silently>>
+				<<set _leftaction[_swarmname + " 중 하나를 " + $swarm["steady"]] to "leftswarm">>
+			<</if>>
+			<<if _swarmamounts.genital[0] lte 0 and _swarmamounts.genital[1] lte 0 and ($lefttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<silently>><<genitals>><</silently>>
+				<<set _leftaction[_text_output + "【을를】 가린다"] to "frontcoverleft">>
+			<</if>>
+			<<if _swarmamounts.butt[0] lte 0 and _swarmamounts.butt[1] lte 0 and ($lefttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _leftaction["엉덩이를 가린다"] to "backcoverleft">>
+			<</if>>
+			<<if _swarmamounts.chest lte 0 and ($lefttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _leftaction["가슴을 가린다"] to "chestcoverleft">>
+			<</if>>
+			<<if $lefttarget isnot "self">>
+				<<if _swarmamounts.genital[1] gte 1 and !playerChastity()>>
+					<<silently>><<genitals>><</silently>>
+					<<set _leftaction[$swarm["name"] + "【을를】 " + _text_output + "에서 떼어낸다"] to "frontpurgeleft">>
+				<</if>>
+				<<if _swarmamounts.genital[0] gte 1>>
+					<<silently>><<genitals>><</silently>>
+					<<set _leftaction[$swarm["name"] + "【이가】 " + _text_output + "에 닿지 못하게 막는다"] to "frontclearleft">>
+				<</if>>
+				<<if _swarmamounts.butt[1] gte 1 and !playerChastity("anus")>>
+					<<set _leftaction["항문에서 " + $swarm["name"] + "【을를】 빼낸다"] to "backpurgeleft">>
+				<</if>>
+				<<if _swarmamounts.butt[0] gte 1>>
+					<<set _leftaction[$swarm["name"] + "【이가】 엉덩이에 닿지 못하게 막는다"] to "backclearleft">>
+				<</if>>
+				<<if _swarmamounts.chest gte 1>>
+					<<set _leftaction["가슴에서 " + $swarm["name"] + "【을를】 떼어낸다"] to "chestclearleft">>
+				<</if>>
+			<</if>>
+			<<if $water is 1 and $vorecreature is 0 and ($consensual isnot 1 or $gamemode is "soft") and ($lefttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _leftaction["헤엄쳐서 안전한 곳으로 간다"] to "swim">>
+			<</if>>
+			<<if $vorecreature is 0>>
+				<<set _leftaction["쉰다"] to "swarmrest">>
+			<</if>>
+			<<leftclothesnew>>
+		<<case "bound">>
+			<<if $gamemode is "soft" and $nowiggle isnot true>>
+				<<set _leftaction["몸부림쳐 빠져나온다"] to "leftwriggle">>
+			<</if>>
+		<<case "orgasm">>
+			<<set _leftaction["접는다"] to "leftfold">>
+			<<set _leftaction["움켜쥔다"] to "leftgrip">>
+		<<case "pain">>
+			<<set _leftaction["버둥거린다"] to "leftstruggleweak">>
+			<<set _leftaction["보호한다"] to "leftprotect">>
+		<<case "unreal">>
+			<<set _leftaction["자신을 찌른다"] to "leftpoke">>
+			<<set _leftaction["팔을 치워둔다"] to "leftcurl">>
+	<</switch>>
+<</widget>>
+
+<<widget "rightActionInitSwarm">>
+	<<set $righttarget to "swarm">>
+	<<switch $rightarm>>
+		<<case 0>>
+			<<if $orgasmdown gte 1>>
+				<<set _rightOptions to "orgasm">>
+				<span class="lewd">오른팔은 자유롭지만, 경련을 멈출 수 없다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _rightOptions to "pain">>
+				<span class="red">오른팔은 자유롭지만, 움직이면 아프다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _rightOptions to "unreal">>
+				<span class="pink">오른팔은 자유롭지만, 현실감각이 없다.</span>
+			<<else>>
+				<<if _targetYourself is true and _targetnumber gt 1>>
+					<<set _targetlistarms["자신"] to "self">>
+				<</if>>
+				<<if not $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "right" _targetlistarms>>
+				<</if>>
+				<<set _rightOptions to "free">>
+				<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔은 자유롭다.</span>
+				<<if $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<targetListBox "right" _targetlistarms>>
+					<<if $options.combatControls is "radio">><br><</if>>
+				<</if>>
+			<</if>>
+		<<case "swarmgrappled">>
+			<<set _rightOptions to "unable">>
+			<span class="purple">$swarm["name"]【이가】 당신의 오른팔을 조이고 있다!</span><<if $options.combatControls.includes("adio")>><br><</if>>
+		<<case "bound">>
+			<<if $orgasmdown gte 1>>
+				<<set _rightOptions to "unable">>
+				<span class="lewd">오른팔이 결박에서 벗어나려 꿈틀거린다.</span>
+			<<elseif $pain gte 100 and $willpowerpain is 0>>
+				<<set _rightOptions to "unable">>
+				<span class="red">오른팔이 고통스럽게 결박되어 있다.</span>
+			<<elseif $dissociation gte 2>>
+				<<set _rightOptions to "unable">>
+				<span class="pink">오른팔이 결박된 채 축 늘어져 있다.</span>
+			<<else>>
+				<<set _rightOptions to "bound">>
+				<span @class="($lastOptions.right isnot _rightOptions ?'gold':'')">오른팔이 속수무책으로 결박되어 있다.</span>
+			<</if>><<if $options.combatControls.includes("adio")>><br><</if>>
+		<<case "trapped">>
+			<<set $_changetype to true>><<rightActionInitVore>>
+		<<case "grappled" "penis" "othervagina" "vagina" "coverpenis" "anus" "behind">>
+			<<set $_changetype to true>><<rightActionInit>>
+		<<case "struggle">>
+			<<set $_changetype to true>><<rightActionInitStruggle>>
+		<<case "mechgrappled">>
+			<<set $_changetype to true>><<rightActionInitMachine>>
+		<<default>>
+			<<set $_changetype to true>><<rightActionInitTentacle>>
+	<</switch>>
+	<<if $_changetype isnot true>>
+		<<rightActionsSwarm>>
+		<<if Object.keys(_rightaction).length gt 0>>
+			<<if !(Object.values(_rightaction).includes($rightactiondefault))>>
+				<<set $rightactiondefault to "swarmrest">>
+			<</if>>
+			<<set $rightaction to $rightactiondefault>>
+			<div class="extraMargin">
+				<<generateCombatAction _rightaction "rightaction" "Swarm">>
+			</div>
+			<<if $options.combatControls.includes("ists")>>
+				<div id="rightactionDifficulty">
+					<<rightactionDifficulty>>
+				</div>
+			<</if>>
+		<</if>>
+		<<set $lastOptions.right to clone(_rightOptions)>>
+	<</if>>
+<</widget>>
+
+<<widget "rightactionDifficultySwarm">>/* No, it cannot be removed. */
+	<!-- Does nothing -->
+<</widget>>
+
+<<widget "rightActionsSwarm">>
+	<<set _rightaction to {}>>
+	<<switch _rightOptions>>
+		<<case "free">>
+			<<if $leftarm is "swarmgrappled" and ($righttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _rightaction["왼팔을 자유롭게 한다"] to "rightfree">>
+			<<elseif _swarmamounts.active[2] gte 1 and $righttarget isnot "self">>
+				<<silently>><<swarmName>><</silently>>
+				<<set _rightaction[_swarmname + " 중 하나를 " + $swarm["steady"]] to "rightswarm">>
+			<</if>>
+			<<if _swarmamounts.genital[0] lte 0 and _swarmamounts.genital[1] lte 0 and ($righttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<silently>><<genitals>><</silently>>
+				<<set _rightaction[_text_output + "【을를】 가린다"] to "frontcoverright">>
+			<</if>>
+			<<if _swarmamounts.butt[0] lte 0 and _swarmamounts.butt[1] lte 0 and ($righttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _rightaction["엉덩이를 가린다"] to "backcoverright">>
+			<</if>>
+			<<if _swarmamounts.chest lte 0 and ($righttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _rightaction["가슴을 가린다"] to "chestcoverright">>
+			<</if>>
+			<<if $righttarget isnot "self">>
+				<<if _swarmamounts.genital[1] gte 1 and !playerChastity()>>
+					<<silently>><<genitals>><</silently>>
+					<<set _rightaction[$swarm["name"] + "【을를】 " + _text_output + "에서 떼어낸다"] to "frontpurgeright">>
+				<</if>>
+				<<if _swarmamounts.genital[0] gte 1>>
+					<<silently>><<genitals>><</silently>>
+					<<set _rightaction[$swarm["name"] + "【이가】 " + _text_output + "에 닿지 못하게 막는다"] to "frontclearright">>
+				<</if>>
+				<<if _swarmamounts.butt[1] gte 1 and !playerChastity("anus")>>
+					<<set _rightaction["항문에서 " + $swarm["name"] + "【을를】 빼낸다"] to "backpurgeright">>
+				<</if>>
+				<<if _swarmamounts.butt[0] gte 1>>
+					<<set _rightaction[$swarm["name"] + "【이가】 엉덩이에 닿지 못하게 막는다"] to "backclearright">>
+				<</if>>
+				<<if _swarmamounts.chest gte 1>>
+					<<set _rightaction["가슴에서 " + $swarm["name"] + "【을를】 떼어낸다"] to "chestclearright">>
+				<</if>>
+			<</if>>
+			<<if $water is 1 and $vorecreature is 0 and ($consensual isnot 1 or $gamemode is "soft") and ($righttarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+				<<set _rightaction["헤엄쳐서 안전한 곳으로 간다"] to "swim">>
+			<</if>>
+			<<if $vorecreature is 0>>
+				<<set _rightaction["쉰다"] to "swarmrest">>
+			<</if>>
+			<<rightclothesnew>>
+
+		<<case "bound">>
+			<<if $gamemode is "soft" and $nowiggle isnot true>>
+				<<set _rightaction["몸부림쳐 빠져나온다"] to "rightwriggle">>
+			<</if>>
+		<<case "orgasm">>
+			<<set _rightaction["접는다"] to "rightfold">>
+			<<set _rightaction["움켜쥔다"] to "rightgrip">>
+		<<case "pain">>
+			<<set _rightaction["버둥거린다"] to "rightstruggleweak">>
+			<<set _rightaction["보호한다"] to "rightprotect">>
+		<<case "unreal">>
+			<<set _rightaction["자신을 찌른다"] to "rightpoke">>
+			<<set _rightaction["팔을 치워둔다"] to "rightcurl">>
+	<</switch>>
+<</widget>>
+
+<<widget "feetActionInitSwarm">>
+	<<if $dissociation lte 1 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined)>>
+		<<set $feettarget to "swarm">>
+		<<switch $feetuse>>
+			<<case 0>>
+				<<if _targetYourself is true and _targetnumber gt 1>>
+					<<set _targetlistall["자신"] to "self">>
+				<</if>>
+				<<if not $options.combatControls.includes("adio") and _targetnumber gt 1>>
+					<<if ($leftleg is "grappled" and $rightleg is "grappled") or ($leftleg is "bound" and $rightleg is "bound")>>
+					<<else>>
+						<<targetListBox "feet" _targetlistall>>
+					<</if>>
+				<</if>>
+				<<if $leftleg is 0 and $rightleg is 0>>
+					<<set _feetOptions to "free">>
+					<span @class="($lastOptions.feet isnot _feetOptions ?'gold':'')">발은 자유롭다.</span>
+				<<elseif $leftleg is 0>>
+					<<set _feetOptions to "leftfree">>
+					<span @class="($lastOptions.feet isnot _feetOptions ?'gold':'')">왼쪽 다리는 자유롭다.</span>
+				<<elseif $rightleg is 0>>
+					<<set _feetOptions to "rightfree">>
+					<span @class="($lastOptions.feet isnot _feetOptions ?'gold':'')">오른쪽 다리는 자유롭다.</span>
+				<<elseif $leftleg is "grappled" and $rightleg is "grappled">>
+					<<set $_changetype to true>><<feetActionInitTentacle>>
+				<<elseif $leftleg is "bound" and $rightleg is "bound">>
+					<<set $_changetype to true>><<feetActionInitTentacle>>
+				<<else>>
+					<<set _feetOptions to "free">>
+					<span @class="($lastOptions.feet isnot _feetOptions or _feetGold is true ?'gold':'')">발은 자유롭다.</span>
+				<</if>>
+				<<if $options.combatControls.includes("adio") and _targetnumber gt 1 and _feetOptions.toLowerCase().includes("free")>>
+					<<targetListBox "feet" _targetlistall>>
+				<</if>>
+				<<if _targetnumber is 1>>
+					<<set $feettarget to _firsttarget>>
+				<</if>>
+			<<case "bound" "penis" "othervagina" "walk" "strut" "run" "none">>
+				<<set $_changetype to true>><<feetActionInit>>
+			<<case "mechgrappled">>
+				<<set $_changetype to true>><<feetActionInitMachine>>
+			<<default>>
+				<<set $_changetype to true>><<feetActionInitTentacle>>
+		<</switch>>
+		<<if $lastOptions.feet isnot _feetOptions>>
+			<<set _feetGold to true>>
+		<</if>>
+		<<if $_changetype isnot true>>
+			<<feetActionsSwarm>>
+			<<if Object.keys(_feetaction).length gt 0>>
+				<<if !(Object.values(_feetaction).includes($feetactiondefault))>>
+					<<set $feetactiondefault to "swarmrest">>
+				<</if>>
+				<<set $feetaction to $feetactiondefault>>
+				<div class="extraMargin">
+					<<generateCombatAction _feetaction "feetaction" "Swarm">>
+				</div>
+				<<if $options.combatControls.includes("ists")>>
+					<div id="feetactionDifficulty">
+						<<feetactionDifficulty>>
+					</div>
+				<</if>>
+			<</if>>
+			<<set $lastOptions.feet to clone(_feetOptions)>>
+		<</if>>
+	<<else>>
+		<<timed 100ms>>
+			<<run jQuery("#feetaction").remove();>>
+		<</timed>>
+	<</if>>
+<</widget>>
+
+<<widget "feetactionDifficultySwarm">>/* If removed, expect errors in combats with controls set to "lists". */
+	<!-- Does nothing -->
+<</widget>>
+
+<<widget "feetActionsSwarm">>
+	<<set _feetaction to {}>>
+	<<if $swarm.amount.active[2] gte 1 and $feettarget isnot "self">>
+		<<silently>><<swarmName>><</silently>>
+		<<set _feetaction[_swarmname + " 중 하나를 " + $swarm["steady"]] to "feetswarm">>
+	<</if>>
+	<<if _feetOptions is "free">>
+		<<if $water is 1 and $vorecreature is 0 and currentSkillValue('swimmingskill') gt 700 and $consensual isnot 1 and ($feettarget is "self" or $options.targetYourself is false or _targetnumber is 1)>>
+			<<set _feetaction["헤엄쳐서 안전한 곳으로 간다"] to "swim">>
+		<</if>>
+	<</if>>
+	<<if $vorecreature is 0>>
+		<<set _feetaction["쉰다"] to "swarmrest">>
+	<</if>>
+<</widget>>
+
+:: Widgets Swarm Actions [widget]
+<<widget "swarmactions">>
+	<div @class="($debugLines ? 'debugLines-swarmactions' : '')">
+	<<set $chest to 0>>
+	<<set $front to 0>>
+	<<set $back to 0>>
+	<<if $vorecreature is 0>>
+		<<set _swarmactive to $swarm.amount.active ? $swarm.amount.active[0] : 0>>
+		<<animateCombat>>
+	<</if>>
+	<<willpowerpain>>
+	<<willpowerorgasm>>
+	<<actioncarry>>
+	<<actioncarrydrop>>
+
+	<<combatstate>>
+	<<carryblock>>
+
+	<<if $trance lte 0 and $panicparalysis is 0 and $panicviolence is 0 and $options.combatControls isnot "disabled">>
+		<<set _swarmsteady to $swarm["steady"].toUpperFirst()>>
+		<<set _swarmamounts to $swarm.amount>>
+		<<generateActionsSwarm>>
+	<</if>>
+	<<if $trance lte 0 and $dissociation lte 1 and $panicparalysis is 0 and $panicviolence is 0 and $orgasmdown lte 0 and ($pain lt 100 or $willpowerpain is undefined) and $options.combatControls is "disabled">>
+		<<set _swarmsteady to $swarm["steady"].toUpperFirst()>>
+		<<set _swarmamounts to $swarm.amount>>
+
+		<<if $leftarm is "bound">>
+			당신의 왼팔이 묶여 꼼짝할 수 없다.
+			<<if $gamemode is "soft" and $nowiggle isnot true>>
+				<br>
+				<label>몸부림쳐 빠져나온다<<radiobutton "$leftaction" "leftwriggle" checked>></label> |
+			<</if>>
+			<br><br>
+		<<elseif $leftarm is "swarmgrappled">>
+			<span class="purple">$swarm["name"]【이가】 당신의 왼팔을 조르고 있다!</span>
+			<br><br>
+		<<elseif $leftarm is 0>>
+			당신의 왼팔은 자유롭다.
+			<br>
+			<<if $rightarm is "swarmgrappled">>
+				<label><span class="brat">오른팔을 풀어준다</span> <<radiobutton "$leftaction" "leftfree">></label> |
+			<<elseif _swarmamounts.active[2] gte 1>>
+				<label>_swarmsteady <<swarmName>> 중 하나를 가라앉힌다 <<radiobutton "$leftaction" "leftswarm">></label> |
+			<</if>>
+
+			<<if _swarmamounts.genital[0] lte 0 and _swarmamounts.genital[1] lte 0>>
+				<label><<genitals>>【을를】 가린다 <<radiobutton "$leftaction" "frontcoverleft">></label> |
+			<</if>>
+
+			<<if _swarmamounts.butt[0] lte 0 and _swarmamounts.butt[1] lte 0>>
+				<label>엉덩이를 가린다 <<radiobutton "$leftaction" "backcoverleft" checked>></label> |
+			<</if>>
+
+			<<if _swarmamounts.chest lte 0>>
+				<label>가슴을 가린다 <<radiobutton "$leftaction" "chestcoverleft">></label> |
+			<</if>>
+
+			<<if _swarmamounts.genital[1] gte 1 and !playerChastity()>>
+				<label><span class="brat"><<genitals>>에서 $swarm["name"]【을를】 떼어낸다</span> <<radiobutton "$leftaction" "frontpurgeleft">></label> |
+			<</if>>
+
+			<<if _swarmamounts.genital[0] gte 1 and !playerChastity()>>
+				<label><span class="brat">$swarm["name"]【이가】 <<genitals>>에 닿지 못하게 막는다</span> <<radiobutton "$leftaction" "frontclearleft">></label> |
+			<</if>>
+
+			<<if _swarmamounts.butt[1] gte 1 and !playerChastity("anus")>>
+				<label><span class="brat">항문에서 $swarm["name"]【을를】 빼낸다</span> <<radiobutton "$leftaction" "backpurgeleft" checked>></label> |
+			<</if>>
+
+			<<if _swarmamounts.butt[0] gte 1 and !playerChastity("anus")>>
+				<label><span class="brat">엉덩이에 $swarm["name"]【이가】 오지 못하게 막는다</span> <<radiobutton "$leftaction" "backclearleft" checked>></label> |
+			<</if>>
+
+			<<if _swarmamounts.chest gte 1>>
+				<label><span class="brat">가슴에서 $swarm["name"]【을를】 떼어낸다</span> <<radiobutton "$leftaction" "chestclearleft">></label> |
+			<</if>>
+
+			<<if $water is 1 and $vorecreature is 0 and ($consensual isnot 1 or $gamemode is "soft")>>
+				<label><span class="teal">헤엄쳐서 안전한 곳으로 간다</span> <<radiobutton "$leftaction" "swim" checked>></label> |
+			<</if>>
+
+			<<if $vorecreature is 0>>
+				<label>쉰다 <<radiobutton "$leftaction" "swarmrest">></label> |
+			<</if>>
+			<br><br>
+		<</if>>
+
+		<<if $rightarm is "bound">>
+			당신의 오른팔이 묶여 꼼짝할 수 없다.
+			<<if $gamemode is "soft" and $nowiggle isnot true>>
+				<br>
+				<label>몸부림쳐 빠져나온다<<radiobutton "$rightaction" "rightwriggle" checked>></label> |
+			<</if>>
+			<br><br>
+		<<elseif $rightarm is "swarmgrappled">>
+			<span class="purple">$swarm["name"]【이가】 당신의 오른팔을 조르고 있다!</span>
+			<br><br>
+		<<elseif $rightarm is 0>>
+			당신의 오른팔은 자유롭다.
+			<br>
+			<<if $leftarm is "swarmgrappled">>
+				<label><span class="brat">왼팔을 풀어준다</span> <<radiobutton "$rightaction" "rightfree">></label> |
+			<<elseif _swarmamounts.active[2] gte 1>>
+				<label>_swarmsteady <<swarmName>> 중 하나를 가라앉힌다 <<radiobutton "$rightaction" "rightswarm">></label> |
+			<</if>>
+
+			<<if _swarmamounts.genital[0] lte 0 and _swarmamounts.genital[1] lte 0>>
+				<label><<genitals>>【을를】 가린다 <<radiobutton "$rightaction" "frontcoverright" checked>></label> |
+			<</if>>
+
+			<<if _swarmamounts.butt[0] lte 0 and _swarmamounts.butt[1] lte 0>>
+				<label>엉덩이를 가린다 <<radiobutton "$rightaction" "backcoverright">></label> |
+			<</if>>
+
+			<<if _swarmamounts.chest lte 0>>
+				<label>가슴을 가린다 <<radiobutton "$rightaction" "chestcoverright">></label> |
+			<</if>>
+
+			<<if _swarmamounts.genital[1] gte 1 and !playerChastity("hidden")>>
+				<label><span class="brat"><<genitals>>에서 $swarm["name"]【을를】 떼어낸다</span> <<radiobutton "$rightaction" "frontpurgeright" checked>></label> |
+			<</if>>
+
+			<<if _swarmamounts.genital[0] gte 1 and !playerChastity("hidden")>>
+				<label><span class="brat">$swarm["name"]【이가】 <<genitals>>에 닿지 못하게 막는다</span> <<radiobutton "$rightaction" "frontclearright" checked>></label> |
+			<</if>>
+
+			<<if _swarmamounts.butt[1] gte 1 and !playerChastity("anus")>>
+				<label><span class="brat">항문에서 $swarm["name"]【을를】 빼낸다</span> <<radiobutton "$rightaction" "backpurgeright">></label> |
+			<</if>>
+
+			<<if _swarmamounts.butt[0] gte 1 and !playerChastity("anus")>>
+				<label><span class="brat">엉덩이에 $swarm["name"]【이가】 오지 못하게 막는다</span> <<radiobutton "$rightaction" "backclearright">></label> |
+			<</if>>
+
+			<<if _swarmamounts.chest gte 1>>
+				<label><span class="brat">가슴에서 $swarm["name"]【을를】 떼어낸다</span> <<radiobutton "$rightaction" "chestclearright">></label> |
+			<</if>>
+
+			<<if $water is 1 and $vorecreature is 0 and ($consensual isnot 1 or $gamemode is "soft")>>
+				<label><span class="teal">헤엄쳐서 안전한 곳으로 간다</span> <<radiobutton "$rightaction" "swim" checked>></label> |
+			<</if>>
+
+			<<if $vorecreature is 0>>
+				<label>쉰다 <<radiobutton "$rightaction" "swarmrest">></label> |
+			<</if>>
+			<br><br>
+		<</if>>
+
+		<<if $feetuse is 0>>
+			당신의 발은 자유롭다.
+			<br>
+			<<if $swarm.amount.active[2] gte 1>>
+				<label>_swarmsteady <<swarmName>> 중 하나를 가라앉힌다 <<radiobutton "$feetaction" "feetswarm" checked>></label> |
+			<</if>>
+
+			<<if $water is 1 and $vorecreature is 0 and currentSkillValue('swimmingskill') gt 700 and $consensual isnot 1>>
+				<label><span class="teal">헤엄쳐서 안전한 곳으로 간다</span> <<radiobutton "$feetaction" "swim" checked>></label> |
+			<</if>>
+
+			<<if $vorecreature is 0>>
+				<label>쉰다 <<radiobutton "$feetaction" "swarmrest">></label> |
+			<</if>>
+
+		<</if>>
+		<br><br>
+	<</if>>
+
+	<br><br><br>
+	</div>
+<</widget>>
+
+:: Widgets Swarm Effects [widget]
+<<widget "swarmeffects">>
+	<<effectspain>>
+	<<effectsorgasm>>
+	<<effectsdissociation>>
+
+	<<set _swarmamounts to $swarm.amount>>
+
+	/* -------- Clothes -------- */
+	<<effectshandsclothes>>
+
+	/* -------- Arms and Legs -------- */
+	<<unset _br>>
+	<<if $leftaction is "swim" and $rightaction is "swim" and $feetaction is "swim">>
+		<<set $leftactiondefault to $leftaction>>
+		<<set $rightactiondefault to $rightaction>>
+		<<set $feetactiondefault to $feetaction>>
+		<<set $leftaction to 0>>
+		<<set $rightaction to 0>>
+		<<set $feetaction to 0>>
+		<<set _br to true>>
+		<<set $swimdistance -= 3>>
+		You paddle towards safety with your arms and legs.
+	<</if>>
+
+	<<if $leftaction is "swarmrest" and $rightaction is "swarmrest" and $feetaction is "swarmrest">>
+		<<set $leftactiondefault to $leftaction>>
+		<<set $rightactiondefault to $rightaction>>
+		<<set $feetactiondefault to $feetaction>>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $rightaction to 0>>
+		<<set $feetaction to 0>>
+		You rest your arms and legs.
+	<</if>>
+
+	/* -------- Both Arms -------- */
+	<<if $leftaction is "swim" and $rightaction is "swim">>
+		<<set $leftactiondefault to $leftaction>>
+		<<set $rightactiondefault to $rightaction>>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $rightaction to 0>>
+		<<set $swimdistance -= 2>>
+		You paddle towards safety with both arms.
+	<</if>>
+
+	<<if $leftaction is "swarmrest" and $rightaction is "swarmrest">>
+		<<set $leftactiondefault to $leftaction>>
+		<<set $rightactiondefault to $rightaction>>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $rightaction to 0>>
+		You rest your arms.
+	<</if>>
+
+	/* -------- Legs and Left Arm -------- */
+	<<if $leftaction is "swim" and $feetaction is "swim">>
+		<<set $leftactiondefault to $leftaction>>
+		<<set $feetactiondefault to $feetaction>>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $feetaction to 0>>
+		<<set $swimdistance -= 2>>
+		You paddle towards safety with your legs and left arm.
+	<</if>>
+
+	<<if $leftaction is "swarmrest" and $feetaction is "swarmrest">>
+		<<set $leftactiondefault to $leftaction>>
+		<<set $feetactiondefault to $feetaction>>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $feetaction to 0>>
+		You rest your legs and left arm.
+	<</if>>
+
+
+	/* -------- Legs and Right Arm -------- */
+	<<if $rightaction is "swim" and $feetaction is "swim">>
+		<<set $rightactiondefault to $rightaction>>
+		<<set $feetactiondefault to $feetaction>>
+		<<set $rightaction to 0>>
+		<<set $feetaction to 0>>
+		<<set _br to true>>
+		<<set $swimdistance -= 2>>
+		You paddle towards safety with your legs and right arm.
+	<</if>>
+
+	<<if $rightaction is "swarmrest" and $feetaction is "swarmrest">>
+		<<set $rightactiondefault to $rightaction>>
+		<<set $feetactiondefault to $feetaction>>
+		<<set $rightaction to 0>>
+		<<set $feetaction to 0>>
+		<<set _br to true>>
+		You rest your legs and right arm.
+	<</if>>
+
+	/* -------- Left Arm -------- */
+	<<if $leftaction is "leftwriggle">>
+		<<set $leftactiondefault to "swim">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<if $leftarm is "bound">>
+			<<unbind>><span class="green">You wriggle free from your bonds.</span>
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "leftfree">>
+		<<set $leftactiondefault to "swim">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $rightarm to 0>>
+		<span class="lblue">You push away the $swarm["type"] covering your right arm, freeing it.</span>
+	<</if>>
+
+	<<if $leftaction is "leftswarm">>
+		<<set $leftactiondefault to "leftswarm">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.active[2] -= 1>>
+		<<set _swarmamounts.active[3] += 1>>
+		<span class="lblue">You $swarm["steady"] one of the <<swarmName>> with your left hand.</span>
+	<</if>>
+
+	<<if $leftaction is "frontcoverleft">>
+		<<set $leftactiondefault to "frontcoverleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $front to "covered">>
+		You cover your <<genitals>> with your left hand to prevent the $swarm["type"] from violating you.
+	<</if>>
+
+	<<if $leftaction is "backcoverleft">>
+		<<set $leftactiondefault to "backcoverleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $back to "covered">>
+		You cover your butt with your left hand. Hopefully it will keep the $swarm["type"] from invading your rear. They prod and poke without success, for now.
+	<</if>>
+
+	<<if $leftaction is "chestcoverleft">>
+		<<set $leftactiondefault to "chestcoverleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $chest to "covered">>
+		You cover your chest with your left hand, keeping the $swarm["type"] away from your sensitive bust.
+	<</if>>
+
+	<<if $leftaction is "frontpurgeleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.genital[1] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="teal">You remove some of the $swarm["type"] that are <<print ($player.vaginaExist ? "penetrating" : "wrapped around")>> your <<if $player.vaginaExist and $player.penisExist>><<pussy>><<else>><<genitals>><</if>>.</span>
+		<<if _swarmamounts.genital[1] gte 1>>
+			<<set $leftactiondefault to "frontpurgeleft">>
+			However, there are still some violating you.
+		<<else>>
+			<<set $leftactiondefault to "swim">>
+			You think you got them all, for now.
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "frontclearleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.genital[0] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="lblue">You prevent the encroaching $swarm["type"] from <<print ($player.vaginaExist ? "entering" : "enveloping")>> your <<if $player.vaginaExist and $player.penisExist>><<pussy>><<else>><<genitals>><</if>>.</span>
+		<<if _swarmamounts.genital[0] gte 1>>
+			<<set $leftactiondefault to "frontclearleft">>
+			<span class="purple">There are so many, however, that some make it through your guard.</span>
+		<<else>>
+			<<set $leftactiondefault to "swim">>
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "backpurgeleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.butt[1] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="teal">You extract some of the $swarm["type"] from your anus.</span>
+		<<if _swarmamounts.butt[1] gte 1>>
+			<<set $leftactiondefault to "backpurgeleft">>
+			However, there are still some infesting you.
+		<<else>>
+			<<set $leftactiondefault to "swim">>
+			You think you got them all.
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "backclearleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.butt[0] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="lblue">You prevent the encroaching $swarm["type"] from burrowing into your anus.</span>
+		<<if _swarmamounts.butt[0] gte 1>>
+			<<set $leftactiondefault to "backclearleft">>
+			<span class="purple">There are so many, however, that some make it through your guard.</span>
+		<<else>>
+			<<set $leftactiondefault to "swim">>
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "chestclearleft">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.chest -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="lblue">You clear away some of the $swarm["type"] around your sensitive nipples.</span>
+		<<if _swarmamounts.chest gte 1>>
+			<<set $leftactiondefault to "chestclearleft">>
+			<span class="purple">Many more remain however.</span>
+		<<else>>
+			<<set $leftactiondefault to "swim">>
+		<</if>>
+	<</if>>
+
+	<<if $leftaction is "swim">>
+		<<set $leftactiondefault to "swim">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		<<set $swimdistance -= 1>>
+		You paddle towards safety with your left arm.
+	<</if>>
+
+	<<if $leftaction is "swarmrest">>
+		<<set $leftactiondefault to "swarmrest">>
+		<<set $leftaction to 0>>
+		<<set _br to true>>
+		You rest your left arm.
+	<</if>>
+
+	/* -------- Right Arm -------- */
+	<<if $rightaction is "rightwriggle">>
+		<<set $rightactiondefault to "swim">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<if $rightarm is "bound">>
+			<<unbind>><span class="green">You wriggle free from your bonds.</span>
+		<</if>>
+	<</if>>
+
+	<<if $rightaction is "rightfree">>
+		<<set $rightactiondefault to "swim">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set $leftarm to 0>>
+		<span class="lblue">You push away the $swarm["type"] covering your left arm, freeing it.</span>
+	<</if>>
+
+	<<if $rightaction is "rightswarm">>
+		<<set $rightactiondefault to "rightswarm">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.active[2] -= 1>>
+		<<set _swarmamounts.active[3] += 1>>
+		<span class="lblue">You $swarm["steady"] one of the <<swarmName>> with your right hand.</span>
+	<</if>>
+
+	<<if $rightaction is "frontcoverright">>
+		<<set $rightactiondefault to "frontcoverright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set $front to "covered">>
+		You cover your <<genitals>> with your right hand to prevent the $swarm["type"] from violating you.
+	<</if>>
+
+	<<if $rightaction is "backcoverright">>
+		<<set $rightactiondefault to "backcoverright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set $back to "covered">>
+		You cover your butt with your right hand. Hopefully it will keep the $swarm["type"] from invading your rear.
+	<</if>>
+
+	<<if $rightaction is "chestcoverright">>
+		<<set $rightactiondefault to "chestcoverright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set $chest to "covered">>
+		You cover your chest with your right hand, keeping the $swarm["type"] away from your sensitive bust.
+	<</if>>
+
+	<<if $rightaction is "frontpurgeright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.genital[1] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="teal">You remove some of the $swarm["type"] that are <<print ($player.vaginaExist ? "penetrating" : "wrapped around")>> your <<if $player.vaginaExist and $player.penisExist>><<pussy>><<else>><<genitals>><</if>>.</span>
+		<<if _swarmamounts.genital[1] gte 1>>
+			<<set $rightactiondefault to "frontpurgeright">>
+			However, there are still some violating you.
+		<<else>>
+			<<set $rightactiondefault to "swim">>
+			You think you got them all, for now.
+		<</if>>
+	<</if>>
+
+	<<if $rightaction is "frontclearright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.genital[0] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="lblue">You prevent the encroaching $swarm["type"] from <<print ($player.vaginaExist ? "entering" : "enveloping")>> your <<if $player.vaginaExist and $player.penisExist>><<pussy>><<else>><<genitals>><</if>>.</span>
+		<<if _swarmamounts.genital[0] gte 1>>
+			<<set $rightactiondefault to "frontclearright">>
+			<span class="purple">There are so many, however, that some make it through your guard.</span>
+		<<else>>
+			<<set $rightactiondefault to "swim">>
+		<</if>>
+	<</if>>
+
+	<<if $rightaction is "backpurgeright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.butt[1] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="teal">You extract some of the $swarm["type"] from your anus.</span>
+		<<if _swarmamounts.butt[1] gte 1>>
+			<<set $rightactiondefault to "backpurgeright">>
+			However, there are still some infesting you.
+		<<else>>
+			<<set $rightactiondefault to "swim">>
+			You think you got them all.
+		<</if>>
+	<</if>>
+
+	<<if $rightaction is "backclearright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.butt[0] -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="lblue">You prevent the encroaching $swarm["type"] from burrowing into your anus.</span>
+		<<if _swarmamounts.butt[0] gte 1>>
+			<<set $rightactiondefault to "backclearright">>
+			<span class="purple">There are so many, however, that some make it through your guard.</span>
+		<<else>>
+			<<set $rightactiondefault to "swim">>
+		<</if>>
+	<</if>>
+
+	<<if $rightaction is "chestclearright">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set _swarmamounts.chest -= 1>>
+		<<set _swarmamounts.active[4] += 1>>
+		<span class="lblue">You clear away some of the $swarm["type"] around your sensitive nipples.</span>
+		<<if _swarmamounts.chest gte 1>>
+			<<set $rightactiondefault to "chestclearright">>
+			<span class="purple">Many more remain however.</span>
+		<<else>>
+			<<set $rightactiondefault to "swim">>
+		<</if>>
+	<</if>>
+
+	<<if $rightaction is "swim">>
+		<<set $rightactiondefault to "swim">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		<<set $swimdistance -= 1>>
+		You paddle towards safety with your right arm.
+	<</if>>
+
+	<<if $rightaction is "swarmrest">>
+		<<set $rightactiondefault to "swarmrest">>
+		<<set $rightaction to 0>>
+		<<set _br to true>>
+		You rest your right arm.
+	<</if>>
+
+	/* -------- Legs -------- */
+	<<if $feetaction is "feetswarm">>
+		<<set $feetactiondefault to "feetswarm">>
+		<<set $feetaction to 0>>
+		<<set _br to true>>
+		<<set $swarm.amount.active[2] -= 1>>
+		<<set $swarm.amount.active[3] += 1>>
+		<span class="lblue">You $swarm["steady"] one of the <<swarmName>> with your feet.</span>
+	<</if>>
+
+	<<if $feetaction is "swim">>
+		<<set $feetactiondefault to "swim">>
+		<<set $feetaction to 0>>
+		<<set _br to true>>
+		<<set $swimdistance -= 1>>
+		You paddle towards safety with your legs.
+	<</if>>
+
+	<<if $feetaction is "swarmrest">>
+		<<set $feetactiondefault to "swarmrest">>
+		<<set $feetaction to 0>>
+		<<set _br to true>>
+		You rest your legs.
+	<</if>>
+
+	<<if _br>>
+		<br>
+		<<unset _br>>
+	<</if>>
+	<br>
+<</widget>>

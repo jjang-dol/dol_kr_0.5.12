@@ -1,0 +1,945 @@
+:: Temple Quarters
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 신전 2층에 있는 수사와 수녀들의 거처인 신전 숙소에 있다. 중앙 홀을 둘러싼 네 개의 큰 방이 있다. 2층 침대들은 병영을 떠올리게 한다.
+<br><br>
+<<if Time.dayState is "night">>
+	침상들은 가득 차 있고, 방 안은 이따금 들리는 코골이 외에는 조용하다.
+<<elseif Time.dayState is "day">>
+	수련생들이 먼지를 털고 청소하느라 여념이 없다.
+<<elseif Time.dayState is "dawn">>
+	수사와 수녀들은 이미 일어나 활동하고 있다.
+<<elseif Time.dayState is "dusk">>
+	수도사와 수녀들 몇몇은 잠자리에 들 준비를 하고 있다.
+<</if>>
+<br><br>
+
+창문 옆 벽에 온도계가 있다. 바깥 기온은 <span class="teal"><<print Weather.toSelectedString(Weather.temperature, 0)>></span>라고 표시되어 있다.
+<<print setup.WeatherDescriptions.extremeTemperature()>>
+<br><br>
+
+<<if $temple_quarters gte 100>>
+	방들은 <span class="green">티끌 하나 없이 깨끗하고,</span> 먼지도 없으며 모든 것이 제자리에 있다.
+<<elseif $temple_quarters gte 80>>
+	방들은 <span class="teal">깨끗하지만,</span> 손이 닿기 어려운 곳에는 먼지가 남아 있다.
+<<elseif $temple_quarters gte 60>>
+	방들은 <span class="lblue">제법 깨끗하지만,</span> 성직자들의 기준에는 조금 못 미칠지도 모른다.
+<<elseif $temple_quarters gte 40>>
+	방들은 <span class="blue">정돈되어 있다.</span> 대부분의 옷과 물건이 제자리에 있지만, 개선할 여지는 있다.
+<<elseif $temple_quarters gte 20>>
+	방들은 <span class="purple">조금 어수선하다.</span> 옷이 주인의 침상 옆에 더미로 쌓여 있고, 방에는 먼지를 털어낼 필요가 있다.
+<<elseif $temple_quarters gte 10>>
+	방들은 <span class="pink">엉망이다.</span> 옷과 다른 물건들이 먼지 낀 바닥에 어질러져 있다.
+<<else>>
+	방들은 <span class="red">무질서한 난장판</span>이다. 침대보는 풀어져 있고, 옷은 옷장에서 쏟아져 나오며, 표면마다 두꺼운 먼지가 내려앉아 있다.
+<</if>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passouttemple>>
+<<else>>
+	<<if $exposed gte 1>>
+		<<if $temple_rank is "monk">>
+			당신은 품위를 지키기 위해 당신의 2층 침대 아래에 숨는다.
+			<br>
+			<<templeicon "quarters">><<link [[당신의 침상|Temple Bunk]]>><</link>>
+			<br><br>
+		<<else>>
+			당신은 품위를 지키기 위해 2층 침대 아래에 숨는다.
+			<br><br>
+		<</if>>
+	<<else>>
+		<<if Time.dayState is "night">>
+			<span class="blue">지금 청소하면 사람들을 깨울 것이다.</span>
+		<<elseif $temple_quarters gte 100>>
+			<span class="green">방들은 완벽하게 깨끗하다. 오늘은 더 할 일이 없다.</span>
+		<<elseif pcAreArmsBound("both")>>
+			<span class="red">두 팔이 모두 묶여 있어</span>, 방을 청소할 수 없다.
+		<<else>>
+			<<choreicon "sweep">>
+			<<link [[방 청소하기 (1:00)|Temple Quarters Clean]]>>
+				<<if currentSkillValue('housekeeping') gte 1500>>
+					<<set $temple_quarters += 9>>
+				<<elseif currentSkillValue('housekeeping') gte 1200>>
+					<<set $temple_quarters += 8>>
+				<<elseif currentSkillValue('housekeeping') gte 800>>
+					<<set $temple_quarters += 7>>
+				<<elseif currentSkillValue('housekeeping') gte 600>>
+					<<set $temple_quarters += 6>>
+				<<elseif currentSkillValue('housekeeping') gte 400>>
+					<<set $temple_quarters += 5>>
+				<<elseif currentSkillValue('housekeeping') gte 200>>
+					<<set $temple_quarters += 4>>
+				<<else>>
+					<<set $temple_quarters += 3>>
+				<</if>>
+			<<pass 60>><<grace 1 monk>><<housekeeping 1 1000>><</link>><<ghousekeeping>><<ggrace monk>><<note "가사 스킬이 효율에 영향을 줍니다" "blue">>
+		<</if>>
+		<br><br>
+		<<if $temple_rank is "monk" || isPubfameTaskAccepted("temple")>>
+			<<if $temple_rank is "monk">>
+				<<templeicon "quarters">><<link [[당신의 침상|Temple Bunk]]>><</link>>
+				<br>
+			<</if>>
+			<<if isPubfameTaskAccepted("temple")>>
+				<<schoolicon "library">><<link [[책을 찾는다 (0:05)|Temple Quarters Book]]>><<set $pubfame.temple.chance to 0>><<pass 5>><</link>>
+				<br>
+			<</if>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $temple_cloister_progress gte 1>>
+		<<getinicon>><<link [[회랑으로 가는 비밀 통로 (0:01)|Temple Cloister]]>><<pass 1>><</link>>
+		<br>
+	<</if>>
+	<<getouticon>><<link [[아래층 (0:01)|Temple]]>><<pass 1>><</link>>
+	<br>
+<</if>>
+
+:: Temple Quarters Clean
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+
+<<if $rng gte 81>>
+	<<wearProp "feather duster">>
+	당신은 깃털 먼지떨이를 잡고 일을 시작한다. <<generateTemple 1>><<person1>>당신은 무릎을 꿇고 침대 밑 먼지를 털고, 옷장 꼭대기에 닿기 위해 발끝으로 선다.
+	<br><br>
+	<<if dangerEvent()>>
+		당신이 선반의 먼지를 털려고 몸을 숙이는 순간, <<bottom>>에 시선이 꽂히는 것이 느껴진다. 뒤돌아보니 침상에서 한 <<monk>>【이가】 당신을 빤히 쳐다보고 있다. <<He>> 계속 쳐다본다.
+		<<gstress>><<stress 6>>
+		<br><br>
+		"왜 멈췄어?" <<he>> 묻는다. "계속해."
+		<br><br>
+		<<link [[과시한다|Temple Quarters Flaunt]]>><<grace 1 monk>><</link>><<exhibitionist1>><<ggrace monk>>
+		<br>
+		<<link [[무시한다|Temple Quarters Ignore]]>><<grace 1 monk>><</link>><<ggrace monk>>
+		<br>
+		<<link [[화낸다|Temple Quarters Angry]]>><<grace -3>><<trauma -6>><<stress -6>><<def 1>><</link>><<llgrace>><<ltrauma>><<lstress>>
+		<br>
+	<<else>>
+		당신이 선반의 먼지를 털려고 몸을 숙이는 순간, <<bottom>>에 시선이 꽂히는 것이 느껴진다. 뒤돌아보니 침상에서 한 <<monk>>【이가】 당신을 쳐다보고 있다. 눈이 마주치자 <<He>> 시선을 피한다.
+		<br><br>
+		<<link [[다음|Temple Quarters]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $rng gte 61>>
+	당신은 사람들의 침대를 정리하는 일을 시작한다. 분명 그들 스스로 해야 할 일이라고 확신하지만 말이다.
+	<br><br>
+	<<if dangerEvent()>>
+		<<generateyTemple 1>><<person1>>
+		당신은 <<if $temple_rank is "initiate">>또 다른<<else>>한<</if>> 입문자가 당신을 훑어보는 것을 본다. <<He>> 시선을 피하고 얼굴을 붉힌다.
+		<br><br>
+		<<link [[추파를 던진다|Temple Quarters Flirt]]>><</link>><<promiscuous1>>
+		<br>
+		<<link [[무시한다|Temple Quarters]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		당신은 방의 한쪽 끝에서 다른 쪽 끝까지 일한 다음, 돌아서서 당신의 작업 결과를 감상한다.
+		<br><br>
+		<<link [[다음|Temple Quarters]]>><</link>>
+		<br>
+	<</if>>
+<<elseif $rng gte 41>>
+	<<generateTemple 1>><<person1>><<wearProp "laundry basket">>
+	당신은 더러운 옷들을 바구니에 모은다. 세탁실로 가던 중, 지나가던 <<monk>> 한 명이 당신을 붙잡는다. <<He>> 한 팔에 두루마리 묶음을 들고 있다.
+	<br><br>
+	"착하지," <<he>> 말한다. "내 종이 하나를 떨어뜨렸는데, 저 벽난로 안으로 굴러 들어갔단다. 내 늙은 무릎이 영 말이 아니라서. 네가 좀 꺼내 줄 수 있겠니?" <<He>> 근처 문 너머를 가리킨다.
+	<br><br>
+	당신은 <<he>>【이가】 말하는 벽난로를 본다. 꽉 끼는 공간일 것이고, 뒤쪽은 보이지 않는다.
+	<br><br>
+	<<if dangerEvent()>>
+		<<link [[두루마리를 꺼낸다|Temple Quarters Deception]]>><<grace 3 monk>><</link>><<gggrace monk>>
+		<br>
+	<<else>>
+		<<link [[두루마리를 꺼낸다|Temple Quarters Scroll]]>><<grace 3 monk>><</link>><<gggrace monk>>
+		<br>
+	<</if>>
+	<<link [[거절한다|Temple Quarters Refuse]]>><<grace -3 monk>><</link>><<llgrace monk>>
+<<elseif $rng gte 21>>
+	<<generateTemple 1>><<person1>>
+	<<wearProp "broom">>
+	당신은 빗자루를 잡고 쓸기 시작한다.
+	<<if dangerEvent()>>
+		당신이 일하는 동안 한 <<monk>>【이가】 스쳐 지나간다. <<He>> 지나가며 <<his>> 손가락으로 당신의 <<bottom>>【을를】 훑는다.
+		<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+		<br><br>
+		1분 뒤 같은 <<monk>>【이가】 다시 스쳐 지나가며 또 한 번 당신을 더듬는다. 같은 <<monk>>【은는】 바쁜 척하며 방을 여러 번 오가고, 모두가 보는 앞에서 당신을 추행한다.
+		<br><br>
+		<<link [[견딘다|Temple Quarters Endure]]>><<grace 3 monk>><<trauma 6>><<stress 6>><</link>><<gggrace monk>><<gtrauma>><<gstress>>
+		<br>
+		<<link [[화낸다|Temple Quarters Harassed Anger]]>><<grace -3 monk>><<trauma -6>><<stress -6>><</link>><<llgrace monk>><<ltrauma>><<lstress>>
+		<br>
+		<<if hasSexStat("promiscuity", 4)>>
+			<<link [[되갚아준다|Temple Quarters Even]]>><</link>><<promiscuous4>>
+			<br>
+		<</if>>
+	<<else>>
+		당신은 한 걸음 물러서서 자신이 해낸 일을 감상한다. 지켜보던 <<monk>> 한 명이 만족스럽게 고개를 끄덕인다.
+		<br><br>
+		<<link [[다음|Temple Quarters]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<else>>
+	<<wearProp "laundry basket">>
+	당신은 더러운 옷들을 바구니에 모은다.
+	<<if random(1, 100) gte 51>>
+		침대 밑으로 손을 뻗었을 때, 당신의 손이 헐거운 돌을 건드려 구멍을 드러낸다. 안은 너무 어두워서 보이지 않는다.
+		<br><br>
+		<<link [[손을 넣는다|Temple Quarters Hole]]>><</link>>
+		<br>
+		<<link [[무시한다|Temple Quarters Hole Ignore]]>><</link>>
+		<br>
+	<<else>>
+		당신은 온갖 곳에 버려진 짝 없는 양말들을 발견한다. 침대 밑, 옷장 위, 벽 틈새에 쑤셔 박혀 있다. 바구니를 가득 채운 당신은 그것을 세탁실로 가져간다.
+		<br><br>
+		<<link [[다음|Temple Quarters]]>><</link>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Temple Quarters Hole
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<if $rng gte 81 or ($museumAntiques.antiques.antiquebrassstatuette isnot "found" and $museumAntiques.antiques.antiquebrassstatuette isnot "talk" and $museumAntiques.antiques.antiquebrassstatuette isnot "museum")>>
+	당신은 손을 뻗어 날카로운 것을 만진다. 당신은 손을 뺀다.
+	<<gpain>><<pain 4>><<gstress>><<stress 6>>
+	<br><br>
+	이번에는 조심스럽게 다시 손을 넣고, 차갑고 단단한 무언가에 손가락을 감는다. 그것을 빛 속으로 꺼낸다. <span class="gold">독수리 모양으로 주조된 황동 조각상이다.</span> 손이 그 부리에 긁혔다.
+	<br><br>
+	오래돼 보인다.
+	<<wearProp "antique brass statuette">>
+	<<set $antiquemoney += 120>><<museumAntiqueStatus "antiquebrassstatuette" "found">>
+	<br><br>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<<elseif $rng gte 61 or $stone_pendant_found is undefined>>
+	당신은 손을 뻗는다. 구멍은 깊다. 당신은 엎드려 침대 밑으로 기어들어가, 팔을 구멍 아래로 더 깊이 넣을 수 있게 한다.
+	<br><br>
+	<<if $stone_pendant_found is undefined>><<set $stone_pendant_found to 1>>
+		손끝에 차갑고 단단한 무언가가 스친다. 그것을 꺼내 보니 <span class="green">오래된 종교 상징 모양의 돌</span>이다. 고리 모양 끈이 달려 있다.
+		<<if $worn.neck.cursed is 1>>
+			<<wearProp "stone pendant">>
+			당신은 그것을 챙겨 넣고 하던 일을 계속한다.
+			<<generalSend "wardrobe" "neck" 5>>
+		<<else>>
+			당신은 그것을 목에 건다.<<neckwear 5>>
+		<</if>>
+		<br><br>
+		<<specialClothesUnlock "item" "stone pendant">>
+	<<elseif random(1, 100) gte 51>>
+		손끝에 천이 스친다. 작은 주머니를 꺼낸다. 안에는 <<moneyGain 20>>【이가】 들어 있다.
+		<br><br>
+	<<else>>
+		<span class="red">무언가가 당신의 손목을 붙잡는다.</span> 당신은 팔을 홱 빼내 그 손아귀를 끊고, 구멍에서 물러난다.
+		<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+		<br><br>
+	<</if>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<<elseif $rng gte 41>>
+	손을 넣어보지만, 먼지뿐이다.
+	<br><br>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<<elseif $rng gte 21>>
+	당신은 손을 뻗어 날카로운 것을 만진다. 당신은 손을 뺀다.
+	<<gpain>><<pain 4>><<gstress>><<stress 6>>
+	<br><br>
+	이번에는 조심스럽게 다시 손을 넣고, 차갑고 단단한 무언가에 손가락을 감는다. 그것을 빛 속으로 꺼낸다.
+	<br><br>
+	그것은 단지 깨진 회색 돌 조각일 뿐이고, 날카로운 모서리가 위를 향하고 있다.
+	<br><br>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<<else>>
+	손을 넣자 부드러운 무언가가 만져진다. 붙잡으려 하지만, 그것은 살아 움직이듯 꿈틀대며 빠져나간다.
+	<<gtrauma>><<gstress>><<trauma 6>><<stress 6>>
+	<br><br>
+	<<link [[다음|Temple Quarters]]>><</link>>
+<</if>>
+
+:: Temple Quarters Hole Ignore
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>><<wearProp "laundry basket">>
+당신은 이상한 구멍을 무시하고 옷을 계속 모으기로 한다. 바구니가 가득 차자 세탁실로 옮긴다.
+<br><br>
+<<link [[다음|Temple Quarters]]>><</link>>
+<br>
+
+:: Temple Quarters Endure
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<set $temple_harassed += 1>>
+당신은 그것을 참는다. <<monkapo>>의 장난은 점점 더 노골적으로 변한다.
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+	<<if $worn.under_lower.type.includes("naked")>>
+		<<his>> 머리를 휙 돌려 아무도 자세히 보지 않는 것을 확인한 후, <<he>>【은는】 당신의 $worn.lower.name【을를】 걷어 올린다. <<He>>【은는】 당신의 <<genitals>>【을를】 직접 더듬는다.
+		<br><br>
+		"속옷도 안 입었어?" <<he>> 몸을 기울여 속삭인다. "못된 <<girl>> 같으니. 방 건너편에서 날 유혹하려고 했구나. 이건 네 탓이야."
+	<<else>>
+		<<his>> 머리를 휙 돌려 아무도 자세히 보지 않는 것을 확인한 후, <<he>>【은는】 당신의 $worn.lower.name【을를】 걷어 올린다. <<He>>【은는】 당신의 $worn.under_lower.name 위로 당신의 <<genitals>>【을를】 더듬는다.
+	<</if>>
+<<elseif $worn.lower.type.includes("naked")>>
+	<<if $worn.under_lower.type.includes("naked")>>
+		<<his>> 머리를 휙 돌려 아무도 자세히 보지 않는 것을 확인한 후, <<he>>【은는】 당신의 노출된 <<genitals>>【을를】 직접 더듬는다.
+		<br><br>
+		"그 꼴로 돌아다니다니," <<he>> 몸을 기울여 속삭인다. "못된 <<girl>> 같으니. 방 건너편에서 날 유혹하려고 했구나. 이건 네 탓이야."
+	<<else>>
+		아무도 너무 자세히 보고 있지 않은지 확인하려고 <<his>> 고개를 홱 돌린 뒤, <<he>> 당신의 $worn.under_lower.name 너머로 <<genitals>>【을를】 움켜쥔다.
+	<</if>>
+<<else>>
+	<<if $worn.under_lower.type.includes("naked")>>
+		<<his>> 머리를 휙 돌려 아무도 자세히 보지 않는 것을 확인한 후, <<he>>【은는】 당신의 $worn.lower.name【을를】 끌어내린다. <<He>>【은는】 당신의 <<genitals>>【을를】 직접 더듬는다.
+		<br><br>
+		"속옷도 안 입었어?" <<he>> 몸을 기울여 속삭인다. "못된 <<girl>> 같으니. 방 건너편에서 날 유혹하려고 했구나. 이건 네 탓이야."
+	<<else>>
+		<<his>> 머리를 휙 돌려 아무도 자세히 보지 않는 것을 확인한 후, <<he>>【은는】 당신의 $worn.lower.name【을를】 끌어내린다. <<He>>【은는】 당신의 $worn.under_lower.name 위로 당신의 <<genitals>>【을를】 더듬는다.
+	<</if>>
+<</if>>
+당신은 본능적으로 몸을 빼려 하지만, <<he>> 다른 손으로 당신의 엉덩이를 붙잡아 제자리에 못 박는다.
+<br><br>
+<<He>> 잠시 동안 당신을 계속 추행하지만, <<generate2>><<person2>><<priest>>【이가】 방에 들어오자 그만둔다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+<br>
+
+:: Temple Quarters Harassed Anger
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+다음번에 <<he>>【이가】 지나갈 때, 당신은 그 불쾌한 손을 당신의 손으로 잡고는 <<him>>【을를】 때린다.
+<br><br>
+<<He>> 충격 받은 얼굴을 감싸 쥐고 당신에게서 물러난다. <<He>> 비웃으며 보복하려고 <<his>> 팔을 들어 올리지만, 방 건너편에서 지켜보는 시선들을 알아차린다.
+<br><br>
+<<He>> 떠나기 전 마지막으로 당신에게 악의에 찬 눈길을 던진다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+<br>
+
+:: Temple Quarters Even
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+다음번에 <<he>> 지나갈 때, 당신이 먼저 움직여 <<his>> 수도복 너머로 <<his>> <<if $NPCList[0].penis isnot "none">><<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>><<else>>보지<</if>>【을를】 움켜쥔다. <<He>> 충격 받은 표정으로 방 안을 둘러본다.
+<br><br>
+"너무 대담하게 굴지 마세요," <<he>>【이가】 말한다. "우릴 곤경에 빠뜨릴 겁니다."
+<br><br>
+<<if $temple_rank is "initiate">>
+	<<if $speech_attitude is "meek">>
+		"저는 그냥 작은 수련생일 뿐이에요," 당신이 말한다. "그들은 저를 벌주는 데 관심 없을 거예요."
+	<<elseif $speech_attitude is "bratty">>
+		"나는 손목이나 한 대 맞겠지," 당신이 말한다. "당신은 훨씬 더 심한 벌을 받을걸."
+	<<else>>
+		"그들은 당신만큼 저를 심하게 벌하지는 않을 거예요," 당신이 말한다.
+	<</if>>
+<<elseif $temple_rank is "monk">>
+	<<if $speech_attitude is "meek">>
+		"그들은 저를 믿어요," 당신이 말한다. "분명 당신은 전에도 이런 일로 곤경에 처한 적이 있겠죠."
+	<<elseif $speech_attitude is "bratty">>
+		"나는 곤경을 감당할 수 있어," 당신이 말한다. "당신은?",
+	<<else>>
+		"그들은 저를 믿어요," 당신이 말한다. "분명 당신은 전에도 이런 일로 곤경에 처한 적이 있겠죠."
+	<</if>>
+<<else>>
+	<<if $speech_attitude is "meek">>
+		"그들은 저를 믿어요," 당신이 말한다. "분명 당신은 전에도 이런 일로 곤경에 처한 적이 있겠죠."
+	<<elseif $speech_attitude is "bratty">>
+		"내가 당신보다 계급이 높아," 당신이 말한다. "그들이 누구를 탓할까?"
+	<<else>>
+		"그들은 저를 믿어요," 당신이 말한다. "분명 당신은 전에도 이런 일로 곤경에 처한 적이 있겠죠."
+	<</if>>
+<</if>>
+<<promiscuity4>>
+<<if $NPCList[0].penis isnot "none">>
+	당신은 경고하듯 <<his>> 두툼한 것을 세게 움켜쥔다. <<He>> 빠져나가려던 시도를 멈춘다. 손바닥 안에서 그것을 더듬으며, 단단하게 섰음에도 살이 압력에 눌리는 감각을 느낀다.<<if $pronoun is "f">> 당신은 다른 손으로 <<his>> <<= window.KR.getBreastSizeKr($NPCList[0].breastdesc)>>【을를】 주무른다.<</if>>
+<<else>>
+	<<if $pronoun is "m">>
+		천 아래로 <<his>> 클리가 느껴진다. <<Hes>> 속옷을 입고 있지 않다. <<He>> 빠져나가려 하지만, 당신이 경고하듯 <<his>> 봉오리를 세게 움켜쥐자 멈춘다. 손가락 사이에서 그것이 딱딱해지면서도 압력에 눌리는 감각을 즐긴다.
+	<<else>>
+		천 아래로 <<his>> 클리가 느껴진다. <<Hes>> 팬티를 입고 있지 않다. <<He>> 빠져나가려 하지만, 당신이 경고하듯 <<his>> 봉오리를 세게 움켜쥐자 멈춘다. 손가락 사이에서 그것이 딱딱해지면서도 압력에 눌리는 감각을 즐긴다. 당신은 다른 손으로 <<his>> <<= window.KR.getBreastSizeKr($NPCList[0].breastdesc)>>【을를】 주무른다.
+	<</if>>
+<</if>>
+<br><br>
+만족한 당신은 <<him>> 밀쳐내고 일로 돌아간다. <<He>> 다시는 당신을 귀찮게 하지 않는다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+<br>
+
+:: Temple Quarters Refuse
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 <<person>>【을를】 무시하고 옷을 계속 옮긴다. <<He>> 젊음의 어리석음에 대해 무언가 중얼거린다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+<br>
+
+:: Temple Quarters Scroll
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>><<wearProp "scroll">>
+당신은 무릎을 꿇고 벽난로 안으로 비집고 들어간다. 저 멀리 위에서 들어오는 빛에만 의지해 어둠 속을 들여다본다. 두루마리가 보인다.
+<<if $rng gte 81>>
+	두루마리가 풀려 있다. 글자는 크고, 많지 않다. 종이는 그림이 대부분을 차지하고 있다.
+	<br><br>
+	호기심이 발동한다.
+	<br><br>
+	<<link [[읽는다|Temple Quarters Read]]>><</link>>
+	<br>
+	<<link [[그냥 전한다|Temple Quarters Deliver]]>><</link>>
+	<br>
+<<else>>
+	봉인은 아직 멀쩡하다.
+	<br><br>
+	두루마리를 팔 아래 안전하게 끼고, 당신은 좁은 공간에서 기어 나온다. <<person>>【이가】 당신을 기다리다가 기쁨에 차 <<his>> 손을 마주 잡는다.
+	<br><br>
+	"정말 고마워요," <<he>>【이가】 말한다. "이것들은 아주 오래된 것들이라, 모두가 저처럼 부주의했다면 이렇게 오래가지 못했을 겁니다."
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Quarters Read
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>><<wearProp "scroll">>
+
+<<if $rng gte 100>>
+	당신은 두루마리를 더 자세히 들여다본다. 다음 순간, 당신은 벽난로 밖에서 숨을 헐떡이며 그 옆에 기대어 있다. <<monk>>【은는】 당신 옆에 웅크리고 앉아 한 손을 어깨에 얹고 있다. 무엇을 보았는지 기억나지 않는다. <span class="red">하지만 끔찍했다.</span>
+	<<gggawareness>><<awareness 50>><<ggtrauma>><<trauma 12>><<ggstress>><<stress 12>><<ggarousal>><<arousal 1200>>
+	<br><br>
+	"검댕에 목이 막힌 거란다, 아이야," <<monk>>【이가】 말한다. <<He>> <<his>> 팔에 묶여 있는 두루마리들을 두드린다. "무사하구나. 이것들은 아주 오래된 것이라, 모두가 나처럼 부주의했다면 지금까지 남아 있지 못했을 게다."
+	<br><br>
+	<<He>> 자리에서 일어나 방을 나간다. <<tearful>> 당신도 뒤따른다.
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<<elseif $rng gte 81>>
+	당신은 두루마리를 더 자세히 본다. 그것은 교회와 관련된 유명한 이야기의 한 장면을 보여준다. 당신이 정설로 여겨지지 않을 것이라 의심하는 신화적 요소들이 포함되어 있다.
+	<<gawareness>><<awareness 6>>
+	<br><br>
+	두루마리를 팔 아래 안전하게 끼운 채, 당신은 비좁은 공간에서 빠져나온다. <<person>>【이가】 당신을 기다리다가 기쁨에 차 <<his>> 손뼉을 친다.
+	<br><br>
+	정말 고맙습니다." <<he>>【이가】 말한다. "이것들은 아주 오래된 것들이라, 모두가 저처럼 부주의했다면 이렇게 오래 버티지 못했을 겁니다."
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<<else>>
+	두루마리를 더 자세히 살펴본다. 수 세기 전의 사건에 대해 묘사되어 있다.
+	<<ghistory>><<historyskill 6>>
+	<br><br>
+	두루마리를 팔 아래 안전하게 끼운 채, 당신은 비좁은 공간에서 빠져나온다. <<person>>【이가】 당신을 기다리다가 기쁨에 차 <<his>> 손뼉을 친다.
+	<br><br>
+	정말 고맙습니다." <<he>>【이가】 말한다. "이것들은 아주 오래된 것들이라, 모두가 저처럼 부주의했다면 이렇게 오래 버티지 못했을 겁니다."
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<</if>>
+<br><br>
+
+:: Temple Quarters Deliver
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>><<wearProp "scroll">>
+손에 두루마리를 든 채 비좁은 공간에서 빠져나온다. <<person>>【이가】 당신을 기다리다가 기쁨에 차 <<his>> 손뼉을 친다.
+<br><br>
+"정말 고맙습니다." <<he>>【이가】 말한다. "이것들은 아주 오래된 것들이라, 모두가 저처럼 부주의했다면 이렇게 오래 버티지 못했을 겁니다."
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+<br>
+
+:: Temple Quarters Deception
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+무릎을 꿇고 벽난로 안으로 비집고 들어간다. 저 위에서 들어오는 빛에만 의지한 채 어둠 속을 들여다본다. 두루마리는 보이지 않는다.
+<br><br>
+등 뒤에서 문이 쾅 닫히는 소리가 들린다. "알고 보니 두루마리를 잃어버린 게 아니었군." <<monk>>【이가】 웃는다. "하지만 네가 거기 내려간 김에, 날 좀 도와줄 일이 생겼어."
+<br><br>
+<<set $temple_harassed += 1>>
+<<his>> 손이 당신의 <<bottom>>에 닿는 것이 느껴진다. 달아나려 하지만, <span class="red">꼼짝없이 끼어 있다.</span>
+<br><br>
+<<link [[다음|Temple Quarters Rape]]>><<set $molestationstart to 1>><</link>>
+<br>
+
+:: Temple Quarters Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<maninit>><<set $position to "wall">><<set $leftarm to "bound">><<set $rightarm to "bound">><<set $head to "bound">>
+	<<set $timer to 15>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend or $timer lte 0>>
+	<span id="next"><<link [[다음|Temple Quarters Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Quarters Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Quarters Rape Finish
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<monk>>【이가】 당신의 <<bottom>>【을를】 마지막으로 한 번 더 때린다. 그 충격에 당신의 몸이 앞으로 쏠린다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	벽난로가 터널의 시작점이라는 것을 깨닫는다. <<tearful>> 당신은 어둠 속으로 기어 들어간다.
+	<br><br>
+	모퉁이를 돌자 다른 입구에서 빛이 새어 들어오는 것을 발견한다. 계속 기어가 다른 방으로 나온다.
+	<br><br>
+	<<link [[다음|Temple Jordan Room]]>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	민감한 부위를 건드린 게 틀림없다. <<monk>>【이가】 고통에 찬 비명을 지른다. 문이 열리는 소리가 들린다.
+	<br><br>
+	"거기서 뭘 하는 거지?" 새로운 목소리가 말한다.
+	<br><br>
+	아, 아무것도 아닙니다." <<monk>>【이가】 말한다. "막 나가려던 참이었습니다." 문이 다시 닫히는 소리가 들리고, 정적이 흐른다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	당신은 계속 꿈틀거리며 힘을 준다. 애쓴 끝에 몸을 앞으로 조금 움직이는 데 성공한다. 벽난로가 터널의 시작이라는 걸 깨닫는다. <<tearful>> 당신은 어둠 속으로 기어 들어간다.
+	<br><br>
+	모퉁이를 돌자 다른 입구에서 빛이 새어 들어오는 것을 발견한다. 계속 기어가 다른 방으로 나온다.
+	<br><br>
+	<<link [[다음|Temple Jordan Room]]>><</link>>
+	<br>
+<<else>>
+	문이 열리는 소리가 들린다.
+	<br><br>
+	"거기서 뭘 하는 거지?" 새로운 목소리가 말한다.
+	<br><br>
+	아, 아무것도 아닙니다." <<monk>>【이가】 말한다. "막 나가려던 참이었습니다." 문이 다시 닫히는 소리가 들리고, 정적이 흐른다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	당신은 계속 꿈틀거리며 힘을 준다. 애쓴 끝에 몸을 앞으로 조금 움직이는 데 성공한다. 벽난로가 터널의 시작이라는 걸 깨닫는다. <<tearful>> 당신은 어둠 속으로 기어 들어간다.
+	<br><br>
+	모퉁이를 돌자 다른 입구로 빛이 새어 들어오는 것을 발견한다. 계속 기어가 다른 방으로 나온다.
+	<br><br>
+	<<link [[다음|Temple Jordan Room]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Jordan Room
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<set $jordansong to true>>
+당신은 좁고 긴 침실에 있다. 높은 창문으로 약간의 자연광이 들어오고, 그 아래에는 침대가 놓여 있다. 문 근처에는 금속 막대, 철퇴, 채찍이 걸린 무기 거치대가 있다. 그 옆 바닥에는 방패가 기대어 있다.
+<br><br>
+방 반대편 끝에는 커튼이 쳐져 있다. 물 흐르는 소리가 들린다. 그러다 누군가 노래를 부르기 시작한다.
+<br><br>
+<<if $islander_language gte 100>>
+	당신은 그 언어를 알아듣는다. 섬 주민의 언어다.
+	<<if $seabird_lullaby gte 2>>
+		당신은 그 선율도 <span class="teal">바닷새의 자장가</span>라는 것을 알아본다.
+	<<else>>
+		<<set $seabird_lullaby to 1>>
+		그 선율은 <span class="teal">어렴풋이 익숙하다</span>.
+	<</if>>
+	<br><br>
+
+	<span class="narration">
+	사랑하는 내 아이야, 곧 보게 될 거란다,<br>
+	너의 날개 위에서, 자유롭게 날아오르리,<br>
+	영원히 감싸 안기리라...
+	</span>
+<<else>>
+	언어는 알아듣지 못하지만, 목소리는 알아본다. 조던이다. 그 선율도 <span class="teal">어렴풋이 익숙하게</span> 느껴진다.
+<</if>>
+<br><br>
+<<link [[커튼 뒤를 엿본다|Temple Jordan Peek]]>><<trauma -6>><<grace -5>><</link>><<llgrace>><<ltrauma>>
+<br>
+<<set $skulduggerydifficulty to 300>>
+<<link [[몰래 빠져나간다|Temple Jordan Sneak]]>><</link>><<skulduggerydifficulty>>
+<br>
+
+:: Temple Jordan Peek
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<set $jordanSin to 1>>
+당신은 발소리를 죽여 커튼으로 다가가 옆으로 머리를 내민다.
+<br><br>
+<<npc Jordan>><<person1>>조던이 보인다. <<Hes>> 샤워 중이다. 물이 <<his>> 감긴 눈 위로, 그리고 <<his>> 벌거벗은 몸을 따라 흘러내린다.
+<<if $NPCList[0].penis isnot "none">>
+	<<if $NPCList[0].breastsize gte 3>>
+		<<His>> <<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【와과】 <<= window.KR.getBreastSizeKr($NPCList[0].breastsdesc)>>【이가】 <<he>> 움직일 때마다 흔들리고 출렁인다.
+	<<else>>
+		<<His>> <<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【이가】 <<he>> 움직일 때마다 흔들린다.
+	<</if>>
+<<else>>
+	<<if $NPCList[0].breastsize gte 3>>
+		<<His>> <<= window.KR.getBreastSizeKr($NPCList[0].breastsdesc)>>【이가】 <<he>> 움직일 때마다 출렁인다.
+	<<else>>
+	<</if>>
+<</if>>
+금빛 머리카락이 <<him>> 주위로 흘러내려 거의 <<his>> 발에 닿을 듯하다. <<His>> 보수적인 옷가지들은 근처에 벗겨져 있다.
+<br><br>
+<<He>> 비누 묻은 손으로 <<his>> 몸을 문지른다.
+<br><br>
+<<endevent>>
+<<if hasSexStat("exhibitionism", 3)>>
+	<<skinicon "masturbate">><<link [[자위한다|Temple Jordan Masturbation]]>><<set $masturbationstart to 1>><</link>>
+	<br>
+<</if>>
+<<set $skulduggerydifficulty to 500>>
+<<getouticon>><<link [[몰래 빠져나간다|Temple Jordan Sneak]]>><</link>><<skulduggerydifficulty>>
+<br>
+
+:: Temple Jordan Masturbation
+<<effects>>
+<<if $masturbationstart is 1>>
+	<<set $jordanSin to 2>>
+	<<set $masturbationstart to 0>>
+	<<set $masturbationstat += 1>>
+	<<masturbationstart>>
+	<<set $timer to random(6, 24)>>
+<</if>>
+조던은 계속 노래하며 <<nnpc_his "Jordan">> 몸을 문지르고, 당신이 있는 줄은 전혀 모른다. 그 상태가 얼마나 오래갈지는 알 수 없다.
+<br><br>
+<<masturbationeffects>>
+<<masturbationactions>>
+<<masturbationControls "timer">>
+
+:: Temple Jordan Masturbation Finish
+<<effects>>
+<<if $timer lte 0>>
+	<<npc Jordan>><<person1>>
+	조던은 눈을 뜨고 비명을 지른다. <<He>> 한쪽 무릎을 들어 올려 한 손으로 <<his>> 사타구니를 가리고, 다른 손으로는 수건을 더듬어 찾는다.
+	<<lllgrace>><<grace -15>><<npcincr Jordan love -1>><<npcincr Jordan dom 1>>
+	<br>
+	<br>
+	<<endmasturbation>>
+	<<endcombat>>
+	<!-- Reinsert Jordan into the scene after combat clearup - Likely not a good solution. -->
+	<<npc Jordan>><<person1>>
+	<<link [[달아난다|Temple Jordan Run]]>><</link>><<athleticsdifficulty 1 1400>>
+	<br>
+	<<link [[사과한다|Temple Jordan Apologise]]>><<grace 1>><</link>><<ggrace>>
+	<br>
+	<<if hasSexStat("promiscuity", 2)>>
+		<<link [[추파를 던진다|Temple Jordan Flirt]]>><</link>><<promiscuous2>>
+		<br>
+	<</if>>
+<<else>>
+	<<endmasturbation>>
+	<<endcombat>>
+	<<tearful>> 당신은 커튼에서 물러난다.
+	<br><br>
+	<<set $skulduggerydifficulty to 600>>
+	<<link [[다음|Temple Jordan Sneak]]>><<clotheson>><</link>>
+	<br>
+<</if>>
+
+:: Temple Jordan Sneak
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 발소리를 죽여 문 쪽으로 향한다.
+<br><br>
+
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+	<span class="green"><<nnpc_He "Jordan">> 물소리와 <<nnpc_his "Jordan">> 목소리 때문에 당신 소리를 듣지 못한다.</span> 당신은 문을 삐걱 열고 어두운 석조 복도로 들어선다.
+	<br><br>
+	<<skulduggeryuse>>
+	<<pass 10>>
+	복도와 계단이 미로처럼 얽힌 곳에 들어선다. 나무 문이 많이 있지만 모두 잠겨 있다. 마침내 열리는 문 하나를 발견한다. 안으로 들어서자 중앙 홀이 나온다.
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple]]>><</link>>
+	<br>
+<<else>>
+	당신의 발이 이상한 금속판을 건드려, <span class="red">그것이 바닥을 요란하게 굴러간다.</span>
+	<br><br>
+	<<skulduggeryuse>>
+	<<endevent>>
+	<<npc Jordan>><<person1>>노랫소리가 갑자기 멈추고, 커튼이 젖혀진다. 조던이 그 너머로 고개를 내밀더니 비명을 지른다.
+	<<llgrace>><<grace -5>>
+	<br><br>
+	<<link [[달아난다|Temple Jordan Run]]>><</link>><<athleticsdifficulty 1 1400>>
+	<br>
+	<<link [[사과한다|Temple Jordan Apologise]]>><<grace 1>><</link>><<ggrace>>
+	<br>
+	<<if hasSexStat("promiscuity", 2)>>
+		<<link [[추파를 던진다|Temple Jordan Flirt]]>><</link>><<promiscuous2>>
+		<br>
+	<</if>>
+<</if>>
+
+:: Temple Jordan Run
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 돌아서서 달린다.
+<<if $athleticsSuccess>>
+	당신은 문을 벌컥 열고 어두운 석조 복도로 <span class="green">빠져나간다</span>.
+	<br><br>
+	복도와 계단이 미로처럼 얽힌 곳에 들어선다. 나무 문이 많이 있지만 모두 잠겨 있다. 마침내 열리는 문 하나를 발견한다. 안으로 들어서자 중앙 홀이 나온다.
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple]]>><</link>>
+	<br>
+<<else>>
+	문에 거의 다다랐을 때, <span class="red">무언가가 당신의 발목을 낚아채</span> 당신을 바닥에 나동그라뜨린다.
+	<br><br>
+	조던이 수건 하나만 두른 채 욕조 옆에 서 있다. <<His>> 손에는 채찍이 들려 있고, 다른 쪽 끝은 당신의 다리에 묶여 있다. <<He>> 잠시 당신을 살피더니 벽난로를 바라본다. <<His>> 엄한 표정이 풀리고, <<he>> 웃음을 터뜨린다.
+	<br><br>
+	"온통 그을음투성이군요," <<he>> 당신을 일으켜 세우려 팔을 내밀며 말한다. <<if $exposed gte 1>><<He>> 여분의 수건을 당신에게 둘러준다.<<towelup>> <</if>>"좀 더 조심해야 합니다. 하지만 당신이 말하지 않는다면 저도 아무에게도 말하지 않겠습니다."
+	<br><br>
+	<<He>> 당신을 문까지 데려가 본당으로 돌아가는 길을 알려준다. 문을 지나자 어두운 석조 복도와 계단의 미로가 펼쳐진다. 알려준 길이 도움이 된다.
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Jordan Apologise
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<npcincr Jordan love 1>>
+<<if $speech_attitude is "meek">>
+	"죄, 죄송합니다." 당신은 말을 더듬는다. "벽난로에 갇혔는데, 너무 어두워서 나가는 길을 못 찾겠고, 그리고..."—
+<<elseif $speech_attitude is "bratty">>
+	"이 상황이 안 좋게 보인다는 건 알아요." 당신이 말한다. "하지만 전 그냥 길을 잃었을 뿐이에요."
+<<else>>
+	"죄송합니다." 당신이 말한다. "벽난로에 갇혔는데, 여기가 유일한 출구였어요."
+<</if>>
+<br><br>
+조던은 수건 한 장만 걸친 당신을 훑어본다. <<He>>【은는】 벽난로를 보고는, <<his>> 굳은 표정이 누그러진다. <<He>>【은는】 웃는다.
+<br><br>
+"온통 그을음투성이군요," <<he>> 욕조에서 나오며 말한다. <<if $exposed gte 1>><<He>> 여분의 수건을 당신에게 둘러준다.<<towelup>> <</if>>"좀 더 조심해야 합니다. 하지만 당신이 말하지 않는다면 저도 아무에게도 말하지 않겠습니다."
+<br><br>
+<<He>> 당신을 문까지 데려가 본당으로 돌아가는 길을 알려준다. 문을 지나자 어두운 석조 복도와 계단의 미로가 펼쳐진다. 알려준 길이 도움이 된다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple]]>><</link>>
+<br>
+
+:: Temple Jordan Flirt
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+<<if $speech_attitude is "meek">>
+	"머리카락이 정말 아름다워요." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"그 수건은 당신에게 어울리지 않는 것 같아요." 당신이 말한다. "벗어버리는 게 좋겠어요."
+<<else>>
+	"왜 그렇게 멋진 몸을 가리고 있는지 모르겠어요." 당신이 말한다.
+<</if>>
+<<promiscuity2>>
+<<His>> 얼굴이 더 붉어지지만, <<his>> 표정은 엄하다. <<He>> 당신과 벽난로를 차례로 살핀다. 그러다 <<his>> 표정이 풀리고, <<he>> 웃음을 터뜨린다.
+<br><br>
+"온통 그을음투성이군요," <<he>> 욕조에서 나오며 말한다. <<if $exposed gte 1>><<He>> 여분의 수건을 당신에게 둘러준다.<<towelup>> <</if>>"좀 더 조심해야 합니다. 하지만 당신이 말하지 않는다면 저도 아무에게도 말하지 않겠습니다."
+<br><br>
+<<He>> 당신을 문까지 데려가 본당으로 돌아가는 길을 알려준다. 문을 지나자 어두운 석조 복도와 계단의 미로가 펼쳐진다. 알려준 길이 도움이 된다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple]]>><</link>>
+<br>
+
+:: Temple Quarters Flirt
+
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+"여기 우리 둘 뿐이네요." 당신은 지나가면서 속삭인다. "그리고 이 텅 빈 침대들도요."
+<<promiscuity1>>
+<<person>>【은는】 이미 깨끗한 한 지점만 계속 먼지를 털어낸다.
+<br><br>
+<<if hasSexStat("promiscuity", 2)>>
+	<<link [[유혹한다|Temple Quarters Seduce]]>><</link>>
+	<br>
+<</if>>
+<<link [[일하러 돌아간다|Temple Quarters]]>><<endevent>><</link>>
+<br>
+
+:: Temple Quarters Seduce
+
+<<effects>>
+<<set $seductiondifficulty to 6000>>
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<seductionskilluse>>
+
+당신은 <<person>>【을를】 근처 침대로 민다. 당신도 뒤따라 올라가 <<him>>의 위로 기어 올라간다.
+<<promiscuity2>>
+<<if $seductionrating gte $seductionrequired>>
+	아까의 수줍음과 달리, <span class="green"><<he>> 당신의 허리를 붙잡고 더 가까이 끌어당긴다.</span>
+	<br><br>
+	<<link [[다음|Temple Quarters Sex]]>><<set $sexstart to 1>><</link>>
+	<br>
+<<else>>
+	<<He>> 새빨개진 얼굴로 당신에게서 허둥지둥 떨어진다.
+	<<lgrace>><<grace -1>>
+	<br><br>
+	<<endevent>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+	<br>
+<</if>>
+
+:: Temple Quarters Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 100>>
+	<<enable_rescue>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Temple Quarters Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Temple Quarters Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Temple Quarters Sex Finish
+<<set $outside to 0>><<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	<<person>>【은는】 들키는 게 두려운 듯 주위를 둘러본다. <<He>> 옷매무새를 바로잡고 다시 먼지를 턴다.
+	<br><br>
+	<<tearful>> 당신은 일하러 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+<<elseif $enemyhealth lte 0>>
+	당신은 <<person>>【을를】 침대에서 밀쳐내고 이웃 방으로 달아난다.
+	<br><br>
+	<<tearful>> 당신은 몸에 묻은 먼지를 털어낸다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+<<elseif $alarm is 1 and $rescue is 1>>
+	<<generate2>><<person2>>
+	당신의 외침을 듣고 <<person2>><<monk>> 한 명이 무슨 일인지 보러 온다. <<His>> 얼굴은 당신을 보자 창백해진다. "이런 행위는 교회에 대한 모욕입니다!" <<he>>【이가】 소리친다. "주교님께서 이 일을 아시게 될 겁니다."
+	<<llgrace>><<grace -5>>
+	<br><br>
+	<<tearful>> 당신은 침상에서 내려온다. <<person1>><<person>>【은는】 부끄러워하며 달아난다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+<<else>>
+	<<person>>【은는】 들키는 게 두려운 듯 주위를 둘러본다. <<He>> 다시 먼지를 턴다.
+	<br><br>
+	<<tearful>> 당신은 일하러 돌아간다.
+	<br><br>
+	<<clotheson>>
+	<<endcombat>>
+	<<link [[다음|Temple Quarters]]>><</link>>
+<</if>>
+
+:: Temple Quarters Flaunt
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 일하러 돌아가지만, 필요 이상으로 몸을 숙인다. 청소하면서 <<bottom>>【을를】 흔든다.
+<<exhibitionism1>>
+선반 정리를 마치고 돌아선다. <<monk>>【은는】 <<his>> 수도복 아래로 손을 집어넣은 상태다.
+<<if $awarelevel gt 0>>
+	<<Hes>> <<himself>> 위로하고 있다.
+	<br><br>
+	<<if hasSexStat("promiscuity", 3)>>
+		<<link [[<<him>>【을를】 도와준다|Temple Quarters Hand]]>><<grace 3 monk>><</link>><<promiscuous3>><<gggrace monk>>
+		<br>
+	<</if>>
+<<else>>
+	<br><br>
+<</if>>
+<<link [[무시한다|Temple Quarters]]>><<endevent>><</link>>
+
+:: Temple Quarters Hand
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 <<him>>에게 다가간다. "실례할게요," 당신은 나직하게 속삭인다. <<him>> 뒤쪽 선반의 먼지를 털려는 척 몸을 숙인다. 다른 손은 <<his>> 수도복 아래로 미끄러져 들어간다.
+<<promiscuity3>>
+<<monk>>【은는】 당신을 막지 않지만, 불안한 눈으로 방 안을 둘러본다. <<if $temple_rank is "initiate">>다른 <</if>>입문자 몇 명이 일하고 있다. 당신이 이렇게까지 할 줄은 예상하지 못한 듯하다.
+<br><br>
+<<if $NPCList[0].penis isnot "none">>
+	당신의 손이 이미 발기한 <<his>> 자지를 찾아내자 <<his>> 긴장이 풀린다. 당신은 <<handtext>> 기둥을 다룬다. <<He>> 뒤로 기대며 신음한다.
+<<else>>
+	당신의 손이 이미 젖은 <<his>> 보지를 찾아내자 <<his>> 긴장이 풀린다. 당신은 <<handtext>> 움직이기 시작한다. <<He>> 뒤로 기대며 신음한다.
+<</if>>
+<<handstat>>
+<br><br>
+<<if currentSkillValue("handskill") gte 800>>
+	숙련된 손놀림으로 당신은 순식간에 <<him>>【을를】 몰아붙인다. <<He>> 거의 곧바로 사정한다. 당신은 손을 빼고 아무 일 없었다는 듯 계속 먼지를 턴다. <<He>> 당신 아래에서 헐떡이며, 움직일 힘도 내지 못한다.
+	<br><br>
+<<elseif currentSkillValue("handskill") gte 100>>
+	당신은 계속해서 움직이며, <<he>>【이가】 절정에 가까워지자 속도를 높인다. <<his>> 몸이 긴장하더니, <<he>>【은는】 당신의 손에 사정한다.
+	<br><br>
+	몇몇 사람들이 <<his>> 신음 소리에 이쪽을 쳐다본다. 당신이 무슨 짓을 하는지는 보지 못하는 것 같다.
+	<<gstress>><<stress 6>>
+	<br><br>
+	당신은 <<monk>>【이가】 당신의 손길에서 회복하도록 내버려 둔 채 계속 먼지를 턴다.
+	<br><br>
+<<else>>
+	<<generatey2>>
+	서툰 손가락이 <<his>> 체액에 몇 번이나 미끄러지지만, <<hes>> 절정에 가까워지고 있다는 건 알 수 있다. 하지만 <<he>> 거기에 이르기 전, 뒤에서 무언가 덜컹거리는 소리가 들린다. 입문자 하나가 입을 떡 벌린 채 서 있고, 빗자루는 <<person2>><<him>> 옆 바닥에 떨어져 있다. <span class="red">들켰다.</span>
+	<<gstress>><<stress 6>>
+	<br><br>
+	<<He>> 음탕한 <<person1>><<monk>>【이가】 허둥지둥 뒤따라오며 약한 변명을 더듬는 사이 달아난다.
+	<<llgrace>><<grace -3>>
+	<br><br>
+<</if>>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+
+:: Temple Quarters Ignore
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 <<monk>>【이가】 이 구경을 얼마나 즐기는지 애써 무시하며 계속 먼지를 턴다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+
+:: Temple Quarters Angry
+<<set $outside to 0>><<set $location to "temple">><<temple_effects>><<effects>>
+당신은 먼지떨이를 내려놓고 <<monk>>에게로 성큼성큼 다가간다. 주먹을 들어 올려 <<his>> 사타구니를 세게 내리친다. <<His>> 비명은 벽에 부딪혀 울려 퍼지며, 근처에 있던 수사들은 물론 다른 방에 있던 <<monks>>들의 주의까지 끈다.
+<br><br>
+당신은 <<monk>>【이가】 체면을 추스를 수 있도록 내버려 둔 채 계속 먼지를 턴다.
+<br><br>
+<<endevent>>
+<<link [[다음|Temple Quarters]]>><</link>>
+
+:: Temple Quarters Book
+<<effects>>
+
+<<if $rng - $pubfame.temple.chance gte $temple_quarters>>
+	<<set $pubfame.temple.chance += 10>>
+	<<if $rng % 3>>
+		<<wearProp "open bible">>
+		건축에 관한 책을 찾는다. 안쪽 표지를 확인한다. <span class="red">비밀번호처럼 보이는 것은 없다.</span> 이 책은 아니다.
+	<<else>>
+		숙소를 뒤져 보지만, <span class="red">건축 관련 책은 찾지 못한다.</span>
+	<</if>>
+	<br><br>
+
+	<<if $pubfame.temple.chance is 30>>
+		<span class="purple">숙소가 더 정돈되어 있었다면 아마 훨씬 쉬웠을 것이다.</span> 그래도 이제 대부분을 뒤졌으니 곧 나오긴 할 것이다.
+		<br><br>
+	<</if>>
+
+	<<link [[계속 찾는다 (0:05)|Temple Quarters Book]]>><<pass 5>><</link>>
+	<br>
+	<<link [[뒤로|Temple Quarters]]>><</link>>
+
+<<else>>
+	<<wearProp "open bible">>
+	<<if $temple_quarters gte 75 and $pubfame.temple.chance is 0>>
+		<span class="green">숙소가 정돈된 덕분에,</span> 당신은 금방 건축에 관한 책을 찾는다.
+	<<else>>
+		건축에 관한 책을 발견한다.
+	<</if>>
+	<<if $rng % 3>>
+		<<set $pubfame.detail to "templeBack">>
+		앞표지를 확인한다. 암호로 보이는 것은 없다.
+		<br><br>
+
+		뒤표지를 확인하자 <span class="green">글자와 숫자, 기호가 길게 이어진 문자열</span>이 보인다. 분명 이거다.
+	<<else>>
+		앞표지 안쪽을 확인하자 <span class="green">글자와 숫자, 기호가 길게 이어진 문자열</span>이 보인다. 분명 이거다.
+	<</if>>
+	<br><br>
+	<<pubfameComplete "temple">>
+	<<link [[다음|Temple Quarters]]>><</link>>
+<</if>>

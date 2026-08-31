@@ -1,0 +1,246 @@
+:: Cosmetics Lock
+
+<<set $outside to 0>><<effects>><<set $lock to 0>>
+
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔이 묶여 있지만 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+
+		<<lockicon "pick">><<link [[자물쇠를 딴다 (0:10)|Cosmetics Store]]>><<pass 10>><<crimeUp 5 "trespassing">><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 능력 밖인 것 같다.</span>
+	<<skulduggeryrequired>>
+	<br><br>
+<</if>>
+
+<<getouticon>><<link [[떠난다|Shopping Centre Top]]>><</link>>
+
+:: Cosmetics Store
+<<set $outside to 0>><<set $location to "shopping_centre">><<effects>>
+
+당신은 화장품 가게에 있다. 온갖 색깔의 튜브, 병, 상자로 가득 찬 선반들이 늘어서 있다.
+<br><br>
+
+<<if Time.dayState is "night" and Time.hour isnot $closinghour>>
+	어둠 속에 당신 혼자 있다.
+	<br><br>
+<<elseif $exposed gte 1>>
+	당신은 존엄성을 지키기 위해 선반 뒤에 숨는다.
+	<br><br>
+<</if>>
+
+<<if $stress gte $stressmax>>
+	<<passoutshop "shop">>
+<<elseif Time.hour is $closinghour>>
+	폐점 시간이다. 경비원이 모든 사람을 밖으로 몰아내고 있다.
+	<<if $exposed gte 1>>
+		경비원이 이 옷차림을 본다면 얼마나 수치스러울지 깨닫고 공황 상태에 빠진다.
+	<</if>>
+	<br><br>
+	<<if $exposed lte 0>>
+		<<highicon>><<link [[밖으로 나간다|High Street]]>><</link>>
+		<br>
+	<<else>>
+		<<ind>><<link [["끝날 때까지 숨는다 (1:00)"|Cosmetics Store]]>><<pass 1 hour>><</link>>
+	<</if>>
+<<else>>
+	<<if Time.dayState is "night" and !$weekly.theft.cosmeticsShop>>
+		<<shopicon "register">><<link [[계산대를 살펴본다|Cosmetics Store Register]]>><</link>>
+		<br><br>
+	<</if>>
+	<<if Time.dayState is "night" or $exposed lte 0>>
+		<<cosmeticsicon>><<link [[립스틱을 본다|Cosmetics Lipstick]]>><</link>>
+		<br>
+		<<cosmeticsicon "eyeshadow">><<link [[아이쉐도우를 본다|Cosmetics Eyeshadow]]>><</link>>
+		<br>
+		<<cosmeticsicon "mascara">><<link [[마스카라를 본다|Cosmetics Mascara]]>><</link>>
+		<br>
+		<<cosmeticsicon "blusher">><<link [[블러셔를 본다|Cosmetics Blusher]]>><</link>>
+		<br>
+		<<cosmeticsicon "dyes">><<link [[염색약을 본다|Cosmetics Dyes]]>><</link>>
+		<br>
+		<<cosmeticsicon "sunscreen">><<link [[자외선 차단제를 본다|Cosmetics Sunscreen]]>><</link>>
+		<br><br>
+	<</if>>
+	<<getouticon>><<link [[떠난다|Shopping Centre Top]]>><</link>>
+<</if>>
+
+:: Cosmetics Lipstick
+<<CosmeticsGenericDepartment "lipstick" "립스틱" "립스틱" "lipstick" "" "#FF0000" 1000 "Cosmetics Lipstick" "형형색색의 립스틱들이 선반에 진열되어 있다." true true 20 `setup.colours.lipstick.map(c=>c.variable)`>>
+
+:: Cosmetics Eyeshadow
+<<CosmeticsGenericDepartment "eyeshadow" "아이쉐도우" "아이쉐도우" "eyeshadow" "" "#FF0000" 1500 "Cosmetics Eyeshadow" "반짝이는 아이쉐도우가 담긴 작은 상자들이 놓여 있다." true true 20 `setup.colours.eyeshadow.map(c=>c.variable)`>>
+
+:: Cosmetics Mascara
+<<CosmeticsGenericDepartment "mascara" "마스카라" "마스카라" "mascara" "" "#FF0000" 1500 "Cosmetics Mascara" "십여 개의 마스카라가 놓여 있다." true true 20 `setup.colours.mascara.map(c=>c.variable)`>>
+
+:: Cosmetics Blusher
+<<CosmeticsGenericDepartment "blusher" "블러셔" "블러셔" "blusher" "" "#FF0000" 1500 "Cosmetics Blusher" "여러 개의 블러셔 팩트가 놓여 있다. 그중 하나는 당신의 피부톤과 잘 어울릴 것 같다." true true 20 `setup.colours.blusher.map(c=>c.variable)`>>
+
+:: Cosmetics Dyes
+<<CosmeticsGenericDepartment "hairdye" "염색약" "염색약" "hair" "colour-hair" "#FD6064" 4000 "Cosmetics Dyes" "당신은 염색약이 있는 선반으로 다가간다." false true 1 `setup.colours.hair.filter(c=>c.dye).map(c=>c.variable)`>>
+
+
+:: Cosmetics Sunscreen
+<<set _sunscreen to Skin.Sunscreen.bottle>>
+<<set _sunscreen.durationHours to Math.floor(Skin.Sunscreen.duration / TimeConstants.secondsPerHour)>>
+
+당신은 자외선 차단제가 가득한 선반으로 다가간다.
+<<if Skin.Sunscreen.usesLeft gt 0>>
+	<<set _ownedBottles to Math.ceil(Skin.Sunscreen.usesLeft / _sunscreen.uses)>>
+	<br>
+	당신은 이미 <<print _ownedBottles>>병을 소유하고 있으며, 총 <<print Skin.Sunscreen.usesLeft>>회 사용할 수 있는 양이 남아있다.
+<</if>>
+
+<br><br>
+각 병의 가격은 <<printmoney _sunscreen.price>>이며 <<print _sunscreen.uses>>회 사용할 수 있다. 1회 사용 시 약 <<print _sunscreen.durationHours>>시간 동안 지속된다.
+<br>
+<<if Time.dayState is "night">>
+	<<link [[한 병 훔친다|Cosmetics Sunscreen]]>>
+		<<crimeUp `_sunscreen.price / 100` "petty">>
+		<<run Skin.Sunscreen.addUses(_sunscreen.uses)>>
+	<</link>><<crime "petty">>
+	<br>
+	<<link [[한 병 훔치고 지금 바로 바른다|Cosmetics Sunscreen]]>>
+		<<crimeUp `_sunscreen.price / 100` "petty">>
+		<<run Skin.Sunscreen.addUses(_sunscreen.uses)>>
+		<<run Skin.Sunscreen.apply()>>
+	<</link>><<crime "petty">>
+<<elseif $money gte _sunscreen.price>>
+	<<link [[한 병 산다 (<<printmoney _sunscreen.price>>)|Cosmetics Sunscreen]]>>
+		<<money `-_sunscreen.price` "cosmetics">>
+		<<run Skin.Sunscreen.addUses(_sunscreen.uses)>>
+	<</link>>
+	<br>
+	<<link [[한 병 사고 지금 바로 바른다 (<<printmoney _sunscreen.price>>)|Cosmetics Sunscreen]]>>
+		<<money `-_sunscreen.price` "cosmetics">>
+		<<run Skin.Sunscreen.addUses(_sunscreen.uses)>>
+		<<run Skin.Sunscreen.apply()>>
+	<</link>>
+<<else>>
+	<span class="purple">구매할 돈이 부족하다.</span>
+<</if>>
+<br><br>
+<<link [[뒤로|Cosmetics Store]]>><</link>>
+
+
+:: Cosmetics Store Widgets [widget]
+<<widget "CosmeticsGenericDepartment">>
+	<<if _args.length < 13>>
+		<div class="red">"Cosmetics Generic Department" 구절에 오류가 발생했습니다. 인수가 누락되었습니다.<br><<print _args>></div>
+	<</if>>
+
+	<<set _itemType = _args[0]>>
+	<<set _itemSingular = _args[1]>>
+	<<set _itemPlural = _args[2]>>
+	<<set _cssClassOuter = _args[3]>>
+	<<set _cssClassInner = _args[4]>>
+	<<set _baseColour = _args[5]>>
+	<<set _price = _args[6]>>
+	<<set _passageCurrent = _args[7]>>
+	<<set _textIntro = _args[8]>>
+	<<set _canUseNow = _args[9]>>
+	<<set _isConsumable = _args[10]>>
+	<<set _usesPerBuy = _args[11]>>
+	<<set _availableColours = _args.slice(12)>>
+	<<if _availableColours.length === 1 && Array.isArray(_availableColours)>>
+		<<set _availableColours = _availableColours[0]>>
+	<</if>>
+
+	_textIntro
+	<<if _isConsumable isnot true>>
+		<<if $makeup.owned[_itemType].length > 0>>
+			<br>
+			보유중인 _itemPlural색상:
+			<<for _i, _colour range $makeup.owned[_itemType]>>
+				<span class="grey-shadow"><span @class="_cssClassOuter + '-' + _colour.replace(/ /g, '-')"><span @class="_cssClassInner"><span @style="'color:' + _baseColour + ';'"><<print setup.colourName(_colour)>></span></span></span></span>
+				<<if _i < $makeup.owned[_itemType].length - 1>>, <</if>>
+			<</for>>.
+		<</if>>
+	<<else>>
+		<<set _owned = $makeup.owned[_itemType].filter(x => x.count > 0)>>
+		<<if _owned.length > 0>>
+			<br>
+			보유중인 _itemPlural 색상:
+			<<for _i, _item range _owned>>
+				<<if _item.count > 0>>
+					<span class="grey-shadow"><span @class="_cssClassOuter + '-' + _item.colour.replace(/ /g, '-')"><span @class="_cssClassInner"><span @style="'color:' + _baseColour + ';'"><<print setup.colourName(_item.colour)>></span></span></span></span>
+					&nbsp;×&nbsp;_item.count
+					<<if _i < _owned.length - 1>>, <</if>>
+				<</if>>
+			<</for>>.
+		<</if>>
+	<</if>>
+
+	<br><br>
+
+	<<if _isConsumable == false>>
+		<<set _availableColours = _availableColours.filter(x => !$makeup.owned[_itemType].includes(x))>>
+	<</if>>
+	<<if _availableColours.length == 0>>
+		모든 색상의 _itemPlural【을를】 가지고 있다. 더 이상 살 것이 없다.
+		<br><br>
+	<<else>>
+		각 _itemSingular 가격은 <<printmoney _price>>이다<<if _usesPerBuy > 1>> (총 _usesPerBuy회 사용 가능)<</if>>.
+		<br>
+		<<if $cosmeticsChoice is undefined>>
+			<<set $cosmeticsChoice = _availableColours[0]>>
+		<</if>>
+		<<for _i, _colour range _availableColours>>
+			<label><span class="grey-shadow"><span @class="_cssClassOuter + '-' + _colour.replace(/ /g, '-')"><span @class="_cssClassInner"><span @style="'color:' + _baseColour + ';'"><<print setup.colourName(_colour)>></span></span></span></span>&nbsp;<<print '<<radiobutton "$cosmeticsChoice" "'+_colour+'" ' + ($cosmeticsChoice is _colour ? "checked" : "") + '>>'>></label> |
+		<</for>>
+
+		<br><br>
+		<<if $money gte _price or Time.dayState is "night">>
+			<<set _buy = Time.dayState == "night" ? "훔친다" : "산다">>
+			<<if _isConsumable == true>>
+				<<set _usesText = _usesPerBuy > 1 ? " ("+_usesPerBuy+"회)" : "">>
+				<<link [[_buy + _usesText|_passageCurrent]]>><<addConsumableCosmetics _itemType $cosmeticsChoice _usesPerBuy>><<if Time.dayState is "night">><<crimeUp `_price / 100` "petty">><<else>><<money `-_price `"cosmetics">><</if>><</link>><<if Time.dayState is "night">><<crime "petty">><</if>>
+				<br>
+				<<if _canUseNow == true>>
+					<<link [[_buy + _usesText + " (지금 바로 " + (_usesPerBuy > 1 ? "1회 " : "") + "바른다)"|_passageCurrent]]>><<addConsumableCosmetics _itemType $cosmeticsChoice _usesPerBuy-1>><<set $makeup[_itemType] = $cosmeticsChoice>><<if Time.dayState is "night">><<crimeUp `_price / 100` "petty">><<else>><<money `-_price` "cosmetics">><</if>><</link>><<if Time.dayState is "night">><<crime "petty">><</if>>
+					<br>
+				<</if>>
+			<<else>>
+				<<link [["집으로 보내고 " + _buy|_passageCurrent]]>><<set $makeup.owned[_itemType].push($cosmeticsChoice)>><<if Time.dayState is "night">><<crimeUp `_price / 100` "petty">><<else>><<money `-_price` "cosmetics">><</if>><</link>><<if Time.dayState is "night">><<crime "petty">><</if>>
+				<br>
+				<<if _canUseNow == true>>
+					<<link [["지금 바로 사용하고 " + _buy|_passageCurrent]]>><<set $makeup.owned[_itemType].push($cosmeticsChoice)>><<set $makeup[_itemType] = $cosmeticsChoice>><<if Time.dayState is "night">><<crimeUp `_price / 100` "petty">><<else>><<money `-_price` "cosmetics">><</if>><</link>><<if Time.dayState is "night">><<crime "petty">><</if>>
+					<br>
+				<</if>>
+			<</if>>
+		<<else>>
+			<span class="purple">구매할 돈이 부족하다.</span>
+			<br><br>
+		<</if>>
+	<</if>>
+	<<link [[뒤로|Cosmetics Store]]>><<unset $cosmeticsChoice>><</link>>
+<</widget>>
+
+<!-- for buying consumable makeup stuff. Usage <<addConsumableCosmetics "lipstick" "red" 20>> -->
+<<widget "addConsumableCosmetics">><<script>>
+	let _args = T.args;
+	let $makeup = V.makeup;
+	let _itemType = _args[0];
+	let _colour = _args[1];
+	let _count = _args[2];
+
+	let done = false;
+	for (let i = 0; i < $makeup.owned[_itemType].length; i++) {
+		if ($makeup.owned[_itemType][i].colour == _colour) {
+			$makeup.owned[_itemType][i].count += _count;
+			done = true;
+			break;
+		}
+	}
+	if (!done) {
+		$makeup.owned[_itemType].push({"colour": _colour, "count": _count});
+	}
+<</script>><</widget>>

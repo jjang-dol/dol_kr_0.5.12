@@ -1,0 +1,443 @@
+:: Combat Demo Preparation
+<<set $demo to $demo or {
+	type: "human",
+	position: "missionary",
+	consent: true,
+	debug: true,
+}>>
+
+<<endcombat>>
+
+전투 시스템 설정을 구성합니다:<br><br>
+
+유형:
+<div>
+	<label><<radiobutton "$demo.type" "human" autocheck>> 인간</label>
+	<label><<radiobutton "$demo.type" "animal" autocheck>> 야수</label>
+</div>
+
+동의:
+<div>
+	<label><<radiobutton "$demo.consent" true autocheck>> 합의</label>
+	<label><<radiobutton "$demo.consent" false autocheck>> 비합의</label>
+</div>
+
+디버깅:
+<div>
+	<label><<radiobutton "$demo.debug" true autocheck>> 활성화</label>
+	<label><<radiobutton "$demo.debug" false autocheck>> 비활성화</label>
+</div>
+
+<div id="combat-setup">
+	<<combatsetup>>
+</div>
+
+<<combatdemotools>>
+
+<br>
+<<link [[시작|Combat Demo]]>><<set $sexstart to 1>><</link>>
+<br>
+<<link [[에디터|Canvas Combat Editor]]>><<set $sexstart to 1>><</link>>
+<br><br>
+<<link [[침실|Bedroom]]>><</link>>
+<br>
+<<link [[의류 상점|Shopping Centre Top]]>><</link>>
+<br>
+<<link [[숲속 상점|Forest Shop]]>><</link>>
+
+:: Combat Demo
+<<set $demo to $demo or {
+	type: "human",
+	position: "missionary",
+	consent: true,
+	debug: true,
+}>>
+
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<div class="combat-init">
+		<<switch $demo.type>>
+			<<case "human">>
+				<p class="text-muted">인간 초기화</p>
+				<<maninit>>
+			<<case "bestial">>
+				<p class="text-muted">야수 초기화</p>
+				<<beastCombatInit>>
+		<</switch>>
+		<<if $demo.consent>>
+			<<consensual>>
+			<<set $consensual to 1>>
+		<<else>>
+			<<molested>>
+			<<set $consensual to 0>>
+		<</if>>
+		<<set $position to $demo.position>>
+	</div>
+<</if>>
+
+<<if $demo.type is "tentacles">>
+	<div class="combat-state">
+		<p class="text-muted">상태 촉수</p>
+		<<statetentacles>>
+	</div>
+<</if>>
+
+<div class="combat-effects">
+	<p class="text-muted">효과</p>
+	<<effects>>
+</div>
+<div class="combat-effectsman">
+	<p class="text-muted">효과 인간</p>
+	<<effectsman>>
+</div>
+<div class="combat-man">
+	<<switch $demo.type>>
+		<<case "human">>
+			<p class="text-muted">인간</p>
+			<<man>>
+		<<case "bestial">>
+			<p class="text-muted">야수</p>
+			<<beast>>
+	<</switch>>
+</div>
+
+<<if $demo.type.includes("human")>>
+	<div class="combat-state">
+		<p class="text-muted">상태 인간</p>
+		<<stateman>>
+	</div>
+<</if>>
+<div class="combat-actions">
+	<p class="text-muted">전투 애니메이션</p>
+	<<animateCombat>>
+</div>
+<div class="combat-actions">
+	<p class="text-muted">행동 인간</p>
+	<<actionsman>>
+</div>
+<span id="next"><<link [[다음|$passage]]>><</link>></span><<nexttext>>
+<<link [[침실|Bedroom]]>>
+	<<endcombatdemo>>
+<</link>>
+<br><br>
+
+<<combatdemotools>>
+<br>
+
+<<if $demo.consent>>
+	<<link [[강간으로 설정|$passage]]>>
+		<<set $demo.consent to false>>
+		<<endcombat>>
+		<<set $sexstart to 1>>
+	<</link>>
+<<else>>
+	<<link [[합의로 설정|$passage]]>>
+		<<set $demo.consent to true>>
+		<<endcombat>>
+		<<set $sexstart to 1>>
+	<</link>>
+<</if>>
+<br><br>
+
+<<if $position isnot "wall">>
+	<<link [[정상위로 설정|$passage]]>>
+		<<set $demo.position to "missionary">>
+		<<endcombat>>
+		<<set $sexstart to 1>>
+	<</link>> |
+	<<link [[후배위로 설정|$passage]]>>
+		<<set $demo.position to "doggy">>
+		<<endcombat>>
+		<<set $sexstart to 1>>
+	<</link>> |
+	<<link [[체위 설정 안 함|$passage]]>>
+		<<set $demo.position to 0>>
+		<<endcombat>>
+		<<set $sexstart to 1>>
+	<</link>> |
+	<br><br>
+<</if>>
+
+:: CanvasModel Example
+<<link [[침실|Bedroom]]>><</link>>
+<hr>
+
+<!-- "divsex" is cache slot id to preserve layer caches between passages -->
+<<selectmodel "sexdemo" "divsex">>
+	<<set _modeloptions.animation_speed to "fast">>
+	<<set _modeloptions.position to "doggy">>
+	<<set _modeloptions.penis to "default">>
+	<<set _modeloptions.vagina to true>>
+	<<set _modeloptions.worn.under_lower.index to 1>>
+	<<set _modeloptions.worn.under_lower.state to "totheside">>
+	<<set _modeloptions.worn.under_lower.colour to "blue">>
+	<<set _modeloptions.xray_vaginal_show to true>>
+	<<set _modeloptions.close_vagina_show to true>>
+	<<set _modeloptions.vagina_state to "penetrated">>
+	<<set _modeloptions.vagina_penetrator to "tentacle">>
+	<<set _modeloptions.vagina_penetrator_size to 5>>
+	<<set _modeloptions.vagina_cumming to true>>
+<<animatemodel "">>
+
+<!-- Editor hooks to "last model" -->
+<<canvasModelEditor>>
+
+:: Combat Demo Widgets [widget]
+<<widget "animateCombat">>
+	<<if !$options.images or !$options.combatImages>>
+		<<exit>>
+	<</if>>
+	<<if $position is "stalk">>
+		<<exit>>
+	<</if>>
+
+	<<if $debug>>
+		<<addLayerDialog>>
+	<</if>>
+
+	<<canvasCombatEditor>>
+
+	<!-- Centres the inner grid -->
+	<div class="d-flex flex-row flex-centre flex-wrap">
+		<!-- Organises canvas windows into a grid -->
+		<div class="combat-grid d-grid">
+
+			<div class="combat-centre">
+				<!-- Top row - Contains miniture viewports -->
+				<<if !_crHideCloseImages>>
+					<div class="combat-close d-flex flex-row justify-content-center">
+						<div class="combat-close-mouth">
+							<<selectmodel "combatCloseMouth" "divCloseMouth">>
+							<<animatemodel "">>
+						</div>
+						<div class="combat-close-chest">
+							<<selectmodel "combatCloseChest" "divCloseChest">>
+							<<animatemodel "">>
+						</div>
+						<div class="combat-close-penis">
+							<<selectmodel "combatClosePenis" "divClosePenis">>
+							<<animatemodel "">>
+						</div>
+						<div class="combat-close-vagina">
+							<<selectmodel "combatCloseVagina" "divCloseVagina">>
+							<<animatemodel "">>
+						</div>
+						<div class="combat-close-arse">
+							<<selectmodel "combatCloseArse" "divCloseArse">>
+							<<animatemodel "">>
+						</div>
+					</div>
+				<</if>>
+
+				<!-- Main canvas container. -->
+				<div class="combat-main d-flex justify-content-center position-relative">
+					<<selectmodel "lighting" "combat-lighting">>
+					<<configureCombatLighting>>
+					<<rendermodel "lighting position-absolute z-hidden">>
+
+					<<setup-multi-canvas "combatMain" "combatMainPc" "combatMainPc0">>
+
+					<<for $_npcIndex, $_npc range $NPCList>>
+						<<if CombatRenderer.npcTypes.includes($_npc.type)>>
+							<<set _metadata to { index: $_npcIndex }>>
+							<<add-multi-canvas "combatMain" "combatMainNpc" `"combatMainNpc" + $_npcIndex` _metadata>>
+						<</if>>
+					<</for>>
+
+					<<add-multi-canvas "combatMain" "combatMainSwarm" "combatMainSwarm0">>
+
+					<<reset-multi-canvas "combatMain">>
+					<<start-multi-canvas-rendering "combatMain">>
+
+					<<set _animspeed to NpcCombatMapper.getNpcAnimationSpeed()>>
+				</div>
+			</div>
+
+			<<if XrayCombatMapper.isPcBlowjobVisible()>>
+				<div class="combat-xray-penis">
+					<<selectmodel "combatXrayPenis" "divXrayPenis">>
+					<<animatemodel "w-100 mw-256">>
+				</div>
+			<</if>>
+
+			<<if XrayCombatMapper.isPcVaginaVisible()>>
+				<div class="combat-xray-vagina">
+					<<selectmodel "combatXrayVagina" "divXrayVagina">>
+					<<animatemodel "w-100 mw-256">>
+				</div>
+			<</if>>
+
+			<<if XrayCombatMapper.isPcAnusVisible()>>
+				<div class="combat-xray-arse">
+					<<selectmodel "combatXrayArse" "divXrayArse">>
+					<<animatemodel "w-100 mw-256">>
+				</div>
+			<</if>>
+
+		</div>
+	</div>
+	<<if $debug and $options.showCombatTools>>
+		<<set _crOverrides to {}>>
+		<<set _options to T.multiCombatModels.combatMain.models.combatMainPc0.options>>
+		<div class="combat">
+			<<bindCombatDebugControls>>
+			<details>
+				<summary class="d-flex flex-row justify-content-between">
+					<span>레이어</span>
+					<<if CombatEditor.layersChecked>>
+						<input type="checkbox" name="layers" checked />
+					<<else>>
+						<input type="checkbox" name="layers" />
+					<</if>>
+				</summary>
+				<div @class="'combat-layers ' + (CombatEditor.layersChecked ? 'show-first' : '')">
+					<<addLayerElements>>
+				</div>
+			</details>
+			<details>
+				<summary>주요 설정</summary>
+				<label class="d-inline-flex flex-column">
+					위치:
+					<<listbox "$position" autoselect>>
+						<<optionsfrom setup.positions>>
+					<</listbox>>
+				</label>
+
+				<<set _crOverrides.legFrontPosition to PlayerCombatMapper.mapPcToLegFrontPosition(_options)>>
+				<label class="d-inline-flex flex-column">
+					앞다리:
+					<<listbox "_crOverrides.legFrontPosition" autoselect>>
+						<<optionsfrom setup.legPositions>>
+					<</listbox>>
+				</label>
+
+				<<set _crOverrides.legBackPosition to PlayerCombatMapper.mapPcToLegBackPosition(_options)>>
+				<label class="d-inline-flex flex-column">
+					뒷다리:
+					<<listbox "_crOverrides.legBackPosition" autoselect>>
+						<<optionsfrom setup.legPositions>>
+					<</listbox>>
+				</label>
+
+				<<set _crOverrides.animFrames to PlayerCombatMapper.getPcAnimationFrameCount(_options)>>
+				<label class="d-inline-flex flex-column">
+					프레임:
+					<<listbox "_crOverrides.animFrames" autoselect>>
+						<<option "4" 4>>
+						<<option "2" 2>>
+					<</listbox>>
+				</label>
+
+				<<set _crOverrides.animSpeed to PlayerCombatMapper.getPcAnimationSpeed(_options)>>
+				<label class="d-inline-flex flex-column">
+					속도:
+					<<listbox "_crOverrides.animSpeed" autoselect>>
+						<<option "매우 빠름" "vfast">>
+						<<option "빠름" "fast">>
+						<<option "보통" "mid">>
+						<<option "느림" "slow">>
+						<<option "대기" "idle">>
+					<</listbox>>
+				</label>
+			</details>
+
+			<details>
+				<summary>의상 설정</summary>
+				<div class="d-grid grid-auto-2 gap-1">
+					<<for _slot range Object.keys($worn)>>
+						<<set _wornSetup to CombatRenderer.getClothingSetupBySlot(_slot)>>
+						<<set _source to CombatRenderer.getSourceClothing(_slot, _wornSetup)>>
+						<<set _worn to $worn[_slot]>>
+						<<set _slotKr to window.KR.getClothingSlotKr(_slot)>>
+						<<capture _worn, _wornSetup, _source, _slotKr>>
+							<div class="d-flex flex-column border rounded justify-content-space-between p-1">
+								<label class="d-flex flex-row justify-content-space-between">
+									<<= _slotKr>>
+								</label>
+								<label class="d-flex flex-row justify-content-space-between">
+									<<= _wornSetup.name_cap>>
+								</label>
+								<label class="d-flex flex-row justify-content-space-between">
+									<<= _source.variable>>
+								</label>
+								<label class="d-flex flex-row justify-content-space-between">
+									상태:
+									<<listbox "_worn.state" autoselect>>
+										<<optionsfrom setup.clothingStates>>
+									<</listbox>>
+								</label>
+							</div>
+						<</capture>>
+					<</for>>
+				</div>
+			</details>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "endcombatdemo">>
+	<<run delete $demo>>
+	<<endcombat>>
+<</widget>>
+
+<<widget "combatsetup">>
+	<div class="d-flex flex-horizontal flex-wrap gap-2 my-2">
+		<<for _i = 0; _i lt $NPCList.length; _i++>>
+			<<set _npc to $NPCList[_i]>>
+			<<if _npc.type eq null>>
+				<<continue>>
+			<</if>>
+			<<capture _npc>>
+				<div class="p-2 border border-primary">
+					타입: <<- _npc.type>>
+					성별: <<- _npc.gender>>
+					외형: <<- _npc.pronoun>>
+				</div>
+			<</capture>>
+		<</for>>
+	</div>
+
+	<div class="d-flex flex-vertical">
+		<<button "인간 추가">>
+			<<generateNPC `$NPCList.countWith(a => a.type) + 1`>>
+			<<replace "#combat-setup">>
+				<<combatsetup>>
+			<</replace>>
+		<</button>>
+		<<listbox "_animalType" autoselect>>
+			<<optionsfrom $BeastList>>
+		<</listbox>>
+		<<button `"설정: " + _animalType`>>
+			<<beastNEWinit `$NPCList.countWith(a => a.type) + 1` _animalType>>
+			<<replace "#combat-setup">>
+				<<combatsetup>>
+			<</replace>>
+		<</button>>
+		<<button "초기화">>
+			<<endevent>>
+			<<replace "#combat-setup">>
+				<<combatsetup>>
+			<</replace>>
+		<</button>>
+	</div>
+<</widget>>
+
+<<widget "combatdemotools">>
+	도구:
+	<div>
+		<div id="tools-random-peek">
+			다음 난수: <<- State.prng.peek(1)>>
+		</div>
+		<<button "RNG 무작위 변경">>
+			<<script>>
+				const iterations = Math.trunc(Math.random() * 1000);
+				for (let index = 0; index < iterations; index++) {
+					State.random();
+				}
+			<</script>>
+			<<replace "#tools-random-peek">>
+				다음 난수: <<- State.prng.peek(1)>>
+			<</replace>>
+		<</button>>
+	</div>
+<</widget>>

@@ -1,0 +1,865 @@
+:: Pharmacy
+<<unset $pharmacyItem>>
+<<if $daily.pharm.closed>>
+	문에는 "휴업" 표지판이 걸려 있습니다. 문을 당겨보지만 잠겨 있습니다.
+	<br><br>
+
+	<<link [[돌아가기|Hospital Foyer]]>><</link>>
+<<else>>
+	<<set $outside to 0>><<set $location to "hospital">><<effects>>
+	<<endevent>>
+	당신은 병원 약국 안에 있습니다.
+
+	<<if "pharmNurse" in $per_npc>>
+		<<loadNPC 0 "pharmNurse">><<person1>>
+		<<if $daily.pharm.seductionResult is "fail">>
+			<br>
+			"어, 또 오셨네요." <<person>>【이가】 당신을 알아보고는 다시 <<his>> 책으로 시선을 돌립니다.
+		<<elseif $daily.pharm.seductionResult is "pass">>
+			<<if $daily.pharm.sexResult is "buy">>
+				계산대에 있던 <<person>>【이가】 당신을 힐끗 보더니, 살짝 얼굴을 붉히며 <<his>> 책으로 돌아갑니다.
+			<<elseif $daily.pharm.sexResult is "embarrassed">>
+				계산대에 있던 <<person>>【이가】 당신을 힐끗 보더니, 씩 웃으며 <<his>> 책으로 돌아갑니다.
+			<<else>>
+				계산대에 있던 <<person>>【이가】 당신을 힐끗 보더니, <<his>> 책으로 돌아갑니다.
+			<</if>>
+		<<else>>
+			계산대에 있던 <<person>>【이가】 당신을 힐끗 보더니, <<his>> 책으로 돌아갑니다.
+		<</if>>
+	<<else>>
+		<<generateRole 0 0 "nurse">><<person1>>
+		<<saveNPC 0 "pharmNurse">>
+		<<print window.KR.getDescriptionKr($description)>> <<male>> 간호사가 계산대 옆에 앉아 책을 읽고 있습니다.
+	<</if>>
+	<br>
+	<<if $brothelVending and $brothelVending.status is "set" and $settings.condomLevel gte 1 and !($brothelVending.products % 2)>>
+		<br>
+		<<socialiseicon "ask">><<link [[콘돔 대량 구매에 대해 묻기 (0:15)|Pharmacy Buy Condoms in Bulk]]>><<unset $phase2>><<pass 15>><</link>>
+		<br><br>
+	<</if>>
+	선반 위의 물건들을 살펴보니, 몇 가지 흥미로운 것들이 눈에 띕니다.
+	<br><br>
+
+	<<if $player.penisExist>>
+		자지 강화제:
+		<br>
+		<<pillicon "penisReduce">><<link [[자지 축소제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["penis_reduction"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["penis reduction"].owned>></span>
+		<br>
+		<<pillicon "penisEnlarge">><<link [[자지 성장제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["penis_growth"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["penis growth"].owned>></span>
+		<br>
+		<<pillicon "penisBlock">><<link [[자지 성장 억제제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["penis_blocker"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["penis blocker"].owned>></span>
+		<br><br>
+	<</if>>
+
+	가슴 강화제:
+	<br>
+	<<pillicon "breastReduce">><<link [[가슴 축소제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["breast_reduction"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["breast reduction"].owned>></span>
+	<br>
+	<<pillicon "breastEnlarge">><<link [[가슴 성장제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["breast_growth"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["breast growth"].owned>></span>
+	<br>
+	<<pillicon "breastBlock">><<link [[가슴 성장 억제제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["breast_blocker"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["breast blocker"].owned>></span>
+	<br><br>
+
+	엉덩이 강화제:
+	<br>
+	<<pillicon "bottomReduce">><<link [[엉덩이 축소제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["bottom_reduction"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["bottom reduction"].owned>></span>
+	<br>
+	<<pillicon "bottomEnlarge">><<link [[엉덩이 성장제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["bottom_growth"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["bottom growth"].owned>></span>
+	<br>
+	<<pillicon "bottomBlock">><<link [[엉덩이 성장 억제제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["bottom_blocker"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["bottom blocker"].owned>></span>
+	<br><br>
+
+	기생충 예방:
+	<br>
+	<<procedureicon "parasite">><<link [[항기생충 크림 튜브|Pharmacy Sale]]>><<set $phase2 to "parasite cream">><<set $pharmacyItem to clone(setup.pharmacyItems["Anti-Parasite Cream"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["Anti-Parasite Cream"].owned>></span>
+	<br><br>
+
+	가족 계획:
+	<br>
+	<<sextoysicon "pump">><<link [[유축기|Pharmacy Sale]]>><<set $phase2 to "breast pump">><<set $pharmacyItem to clone(setup.pharmacyItems["breast_pump"])>><</link>> | 보유: <span class="gold"><<= $player.inventory.sextoys["breast pump"]?.length || 0>></span>
+	<br>
+	<<pregnancytesticon>><<link [[임신 테스트기 2개입|Pharmacy Sale]]>><<unset $phase2>><<set $pharmacyItem to clone(setup.pharmacyItems["pregnancy_test"])>><</link>> | 보유: <span class="gold"><<= $pregnancyTest || 0>></span>
+	<br>
+	<<pillicon "fertility">><<link [[임신 촉진제 14개입|Pharmacy Sale]]>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["fertility_pills"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["fertility booster"].owned>></span>
+	<br><br>
+
+	피임약:
+	<br>
+	<<if $brothelVending and $brothelVending.status is "set" and $brothelVending.products % 2 and $brothelVending.condomsToRefill gte 10 and $settings.condomLevel gte 1>>
+		<<condomicon>><<link [[창관용 콘돔 구매 (0:10)|Pharmacy Buy Condoms in Bulk]]>><<unset $phase2>><<pass 10>><</link>>
+		<br>
+	<</if>>
+	<<if $settings.condomLevel gte 1>>
+		<<condomicon>><<link [[콘돔 3개입|Pharmacy Sale]]>><<set $phase2 to "condom">><<set $pharmacyItem to clone(setup.pharmacyItems["condoms"])>><</link>> | 보유: <span class="gold"><<= $condoms || 0>></span>
+		<br>
+	<</if>>
+	<<pillicon "contraceptive">><<link [[피임약 14개입|Pharmacy Sale]]>><<unset $phase2>><<set $phase2 to "pills">><<set $pharmacyItem to clone(setup.pharmacyItems["contraceptive_pills"])>><</link>> | 보유: <span class="gold"><<= $sexStats.pills.pills["contraceptive"].owned>></span>
+	<br>
+	<<pillicon "morningAfter">><<link [[사후 피임약 요청하기|Pharmacy Morning After pill]]>><<unset $phase2>><<set $pharmacyItem to clone(setup.pharmacyItems["Morning_After_pill"])>><</link>>
+	<br><br>
+
+	콘택트 렌즈:
+	<br>
+	<<cosmeticsicon "contacts">><<link [[콘택트 렌즈 진열대 살펴보기|Pharmacy Lenses]]>><<unset $phase2>><</link>>
+	<<if !($daily.pharm.impatient gte 3) and $lenses_ordered.length gt 0>>
+		<br>
+		<<cosmeticsicon "contacts">><<link [[주문한 콘택트 렌즈가 도착했는지 묻기|Pharmacy Ask If Lenses Delivered]]>><<unset $phase2>><</link>>
+	<</if>>
+	<br><br>
+	<<getouticon>><<link [[로비로 돌아가기|Hospital Foyer]]>><<endevent>><</link>>
+<</if>>
+
+:: Pharmacy Lenses
+유리 진열장 뒤로 다양한 색상의 콘택트렌즈가 전시되어 있습니다. 렌즈를 구매하여 눈 색깔을 바꿀 수 있습니다.
+<<if $makeup.owned.eyelenses.length + $makeup.owned.custom_eyelenses.length gt 0>>
+	<br>
+	다음 색상의 렌즈를 이미 소유하고 있습니다:
+	<span style="display: inline-block;">
+	<<set _lenses to []>>
+	<<run $makeup.owned.eyelenses.forEach(colour => {
+		const colourClass = colour.replace(/ /g, '-')
+		_lenses.push(`<span @class="'eye-${colourClass}'"><span class="left-iris" style="color:#6E4E11;">${colour}</span></span>`);
+	})>>
+	<<if ($makeup.owned.custom_eyelenses.length gt 0)>>
+		<<set _uniqueCustomLenses to [...new Set($makeup.owned.custom_eyelenses)]>> /* Filter out non-unique lenses */
+		<<run _uniqueCustomLenses.forEach(lens => {
+			const colour = window.colorNameTranslate(lens, "spaced name");
+			const colourClass = nullable(nullable($custom_eyecolours.find(c => c.name is colour)).canvasfilter).blend; /* nullable fix to be removed when we can use ?. again */
+			if (colourClass){
+				_lenses.push(`<span class="eye-custom"><span @style="'color:${colourClass}'">${colour}</span></span>`);
+			}
+		})>>
+	<</if>>
+
+	<<print _lenses.join(", ")>> /* Print the list */
+	</span>
+<</if>>
+<br><br>
+
+<<set _availableColours = ["dark blue", "light blue", "purple", "hazel", "amber", "green", "light green", "lime green", "grey", "light grey", "red", "pink", "brown", "black"].filter(x => !$makeup.owned.eyelenses.includes(x))>>
+<<if _availableColours.length == 0>>
+		구매 가능한 모든 색상의 콘택트렌즈를 모았다. 더 이상 살 것이 없다.
+	<br><br>
+<<else>>
+	각 렌즈 한 쌍의 가격은 <<printmoney 20000>>입니다.
+	<br>
+	<<set _lensChoice = _availableColours[0]>>
+	<<for _i, _colour range _availableColours>>
+		<<set _colourName to setup.colours.eyes_map[_colour]?.name || setup.colourName(_colour)>>
+		<<set _cssColour to setup.colours.eyes_map[_colour]?.csstext || _colour.replace(/ /g, '-')>>
+		<label><span @class="'eye-' + _cssColour"><span class="colour-eye" style="color:#6E4E11;"><<print _colourName>></span></span>&nbsp;<<print '<<radiobutton "_lensChoice" "'+_colour+'" ' + (_lensChoice is _colour ? "checked" : "") + '>>'>></label> |
+	<</for>>
+
+	<br><br>
+
+	<<if $money gte 20000>>
+		<<link [[구매해서 집으로 보내기|Pharmacy Lenses]]>><<money -20000 "pharmacyContacts">><<set $makeup.owned.eyelenses.push(_lensChoice)>><</link>>
+		<br>
+		<<link [[구매해서 착용하기|Pharmacy]]>><<money -20000 "pharmacyContacts">><<set $makeup.owned.eyelenses.push(_lensChoice)>><<set $makeup.eyelenses = {"left":_lensChoice, "right":_lensChoice}>><</link>>
+		<br>
+	<<else>>
+		<span class="purple">구매할 돈이 부족합니다.</span>
+		<br>
+	<</if>>
+<</if>>
+<<link [[맞춤 색상 콘택트렌즈 문의하기|Pharmacy Ask Custom Lenses]]>><</link>>
+<br>
+<<link [[돌아가기|Pharmacy]]>><</link>>
+
+:: Pharmacy Ask Custom Lenses
+<<if $daily.pharm.impatient gt 2>>
+	"이게 누구야," 간호사가 얼굴을 찡그리며 말한다. "나가, 이미 내 시간 충분히 낭비했으니까. 그 같잖은 장난 다 끝냈으면 내일 다시 와."
+	<br><br><<getouticon>><<link [[떠나기|Pharmacy Lenses]]>><</link>>
+<<else>>
+	<<if $custom_lenses_already_ordered is 1>>
+		"지난번에 주문한 게 마음에 들었으면 좋겠군." 간호사가 말한다. "가격은 알지, 제품 가격 <<printmoney 45000>>, 배송비 <<printmoney 5000>>. 양쪽 눈을 다른 색으로 고르면 총 <<printmoney 95000>>【이】야."
+	<<else>>
+		"진열된 것 중엔 마음에 드는 게 없나?" 간호사가 묻는다.
+		"원하는 색상으로 주문을 넣어줄 수는 있지만, 비용이 두 배가 될 거야. 제품 가격 <<printmoney 45000>>에 배송비 <<printmoney 5000>> 정도 생각하면 돼. 배송은 하루 정도 걸리고. 양쪽 눈을 다른 색으로 하고 싶으면 총 <<printmoney 95000>>【이】야."
+	<</if>>
+	<br><br>
+	<<if $money gte 50000>>
+		<<ind>><<link [[맞춤 색상 선택하기|Pharmacy Select Custom Lenses]]>><<set $pharmacy_order_colours to 1>><</link>>
+		<br>
+	<<else>>
+		<span class="purple">구매할 돈이 부족합니다.</span>
+		<br>
+	<</if>>
+	<<if $money gte 95000>>
+		<<ind>><<link [[양쪽 눈을 다른 색으로 선택하기|Pharmacy Select Custom Lenses]]>><<set $pharmacy_order_colours to 2>><</link>>
+		<br>
+	<<elseif $money gte 50000>>
+		<span style="color:#566a9b; cursor:pointer">양쪽 눈을 다른 색으로 선택하기</span> <span class="purple">구매할 돈이 부족합니다.</span>
+		<br>
+	<</if>>
+	<<getouticon>><<link [[돌아가기|Pharmacy Lenses]]>><</link>>
+<</if>>
+
+:: Pharmacy Select Custom Lenses
+"여기." <<he>>【이가】 태블릿을 건네며 말한다. "색상 팔레트를 사용하면 도움이 될 거야. 원하는 색을 고르면 내가 주문을 넣어주지."
+<br><br><br>
+<div id="picker"></div>
+<<set _color_lenses_temp>> <!-- used inside colorWheelContactLenses() -->
+<<run colorWheelContactLenses()>>
+<br><br>
+<<link [[주문하기|Pharmacy Order Custom Lenses]]>>
+	<<money -50000 "pharmacyContacts">>
+	<<set $custom_lenses_already_ordered to 1>>
+	<<run $lenses_ordered.push([window.colorNamer(_color_lenses_temp[0].hexString), Time.monthDay.toString() + Time.month + Time.year.toString(), [_color_lenses_temp[0].hexString, _color_lenses_temp[0].hsl["l"] / 500]])>>
+	<<if $pharmacy_order_colours is 2>>
+		<<money -45000 "pharmacyContacts">>
+		<<run $lenses_ordered.push([window.colorNamer(_color_lenses_temp[1].hexString), Time.monthDay.toString() + Time.month + Time.year.toString(), [_color_lenses_temp[1].hexString, _color_lenses_temp[1].hsl["l"] / 500]])>>
+	<</if>>
+<</link>>
+<br>
+<<link [[돌아가기|Pharmacy]]>><</link>>
+
+:: Pharmacy Order Custom Lenses
+"여기 영수증." 간호사가 표를 건네며 덧붙인다. "내일쯤 도착할 테니, 언제든 영수증을 가지고 오면 그날 근무하는 사람이 물건을 건네줄 거야."
+<br><br>
+<<link [[다음|Pharmacy]]>><</link>>
+
+:: Pharmacy Ask If Lenses Delivered
+<<if $daily.pharm.impatient is 1>>
+	"안녕하세요, 어떻게 도와드..." <<He>>【이가】 얼굴을 찌푸린다. "지난번 일 잊어버린 줄 알았나. 그건 멋진 행동이 아니었어. 네 물건 찾게 해놓고 그냥 가버리면 안 되지. 다시는 그러지 마, 제발."
+	<br>당신이 사과하자, <<he>>【은는】 당신의 소포가 도착했는지 확인하러 간다.
+<<elseif $daily.pharm.impatient is 2>>
+	"이게 누구야?" 간호사가 얼굴을 찡그리며 말한다. "나가, 이미 내 시간 충분히 낭비했으니까. 그 같잖은 장난 다 끝냈으면 내일 다시 와."
+	<<set $daily.pharm.impatient to 3>>
+<<else>>
+	"어떻게 도와드..." <<He>>【이가】 말을 멈춘다. "오, 콘택트렌즈 주문했던 사람이구나. 잠깐만 기다려봐, 자기. 벌써 도착했는지 확인해볼게." 당신은 <<he>>【이가】 뒷방으로 사라지는 것을 지켜본다.
+<</if>>
+<br><br>
+<<if !($daily.pharm.impatient gte 2)>>
+	<<loitericon>><<link [[기다린다 (0:15)|Pharmacy Ask If Lenses Delivered 2]]>><<set $daily.pharm.impatient to 0>><<pass 15>><</link>>
+	<br>
+<</if>>
+<<getouticon>><<link [[떠나기|Pharmacy]]>><<set $daily.pharm.impatient to ($daily.pharm.impatient + 1) || 1>><</link>>
+
+:: Pharmacy Ask If Lenses Delivered 2
+<<set _received to 0>>
+<<set _tmp_length to clone($lenses_ordered.length)>>
+<<for _i = 0; _i < $lenses_ordered.length; _i++>>
+	<<if Time.monthDay.toString() + Time.month + Time.year.toString() != $lenses_ordered[_i][1]>>
+		<<set _received += 1>>
+		<<set _spaced_colour_name = window.colorNameTranslate($lenses_ordered[_i][0], "spaced name")>>
+		<<run $makeup.owned.custom_eyelenses.push(clone($lenses_ordered[_i][0]))>>
+		<<run $custom_eyecolours.push({
+			variable: $lenses_ordered[_i][0],
+			name: _spaced_colour_name,
+			name_cap: _spaced_colour_name.toUpperFirst(),
+			csstext: $lenses_ordered[_i][0],
+			natural: false,
+			lens: true,
+			canvasfilter: {
+				blend: $lenses_ordered[_i][2][0],
+				brightness: +$lenses_ordered[_i][2][1]
+			}
+		})>>
+		<<run $lenses_ordered.deleteAt(_i)>>
+		<<run _i-->>
+	<</if>>
+<</for>>
+<<if _received > 0>>
+	<<run window.initCustomLenses()>>	/* push custom eyelenses inside setup.colours.eyes */
+	<<if _received isnot _tmp_length>>
+		<<He>>【은는】 잠시 후 눈에 띄게 헐떡이며 돌아온다. "주문하신 콘택트렌즈 <<if _received > 1>><<print _received>>개<</if>>【은는】 도착했는데, 나머지 <<print (_tmp_length - _received == 1) ? '하나' : _tmp_length - _received>>【은는】 내일 다시 와봐야 할 것 같아." <<he>>【이가】 소포를 건네며 말한다.
+	<<else>>
+		당신은 간호사가 방에서 작은 소포를 손에 들고 돌아오는 것을 본다. "여기 있어." <<he>>【이가】 당신에게 건네며 말한다.
+		<br>
+		"문제 있으면 그냥 여기로 다시 와, 자기. 우리가 해결해 줄 테니."
+	<</if>>
+	<br><br>
+
+	<span class="gold">콘택트렌즈가 든 소포를 집어 든다.</span>
+<<else>>
+	몇 분 후 <<he>>【이가】 돌아온다. "아직 도착 안 했어, 미안 자기. 내일 다시 와봐. 그때쯤이면 도착해 있을 거야."
+<</if>>
+<br><br>
+<<getouticon>><<link [[떠나기|Pharmacy]]>><</link>>
+
+:: Pharmacy Sale
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<wearProp $phase2>>
+<<person>>【은는】 당신이 들고 있는 <<print $pharmacyItem.name>>【을를】 본다.
+<<formatmoney $pharmacyItem.price>>
+<<switch $pharmacyItem.type>>
+	<<case "penis reduction">>
+		"_printmoney입니다.<<if !$daily.pharm.seductionResult>> 너무 큰가요, 아니면 그냥 작아지고 싶은 건가요?<</if>>"
+	<<case "penis growth">>
+		"_printmoney입니다.<<if !$daily.pharm.seductionResult>> 자기 것이 너무 작다고 생각하는 건가요?<</if>>"
+	<<case "penis blocker">>
+		"_printmoney입니다.<<if !$daily.pharm.seductionResult>> 얼마나 클지 궁금하네요.<</if>>"
+	<<case "breast reduction">>
+		"_printmoney입니다. 효과는 다양하게 나타날 겁니다."
+	<<case "breast growth">>
+		"_printmoney입니다. 효과는 다양하게 나타날 겁니다."
+	<<case "breast blocker">>
+		"_printmoney입니다."
+	<<case "bottom reduction">>
+		"_printmoney입니다. 효과는 다양하게 나타날 겁니다."
+	<<case "bottom growth">>
+		"_printmoney입니다. 효과는 다양하게 나타날 겁니다."
+	<<case "bottom blocker">>
+		"_printmoney입니다."
+	<<case "Anti-Parasite Cream">>
+		"_printmoney입니다. 어디에 바르느냐에 따라 다르지만, 튜브 하나로 약 2주 정도 쓸 수 있을 겁니다."
+	<<case "Breast Pump">>
+		"_printmoney입니다."
+	<<case "condoms">>
+		"_printmoney입니다." <<He>>【이가】 당신을 훑어본다.
+		<<if $player.gender_appearance is "m">>
+			"사람들이 안전하게 즐기는 걸 보니 기쁘네요. 당신 여자친구는 운이 좋군요."
+		<</if>>
+	<<case "pregnancy test">>
+		"_printmoney입니다." <<He>>【이가】 당신을 훑어본다.
+		<<if $player.gender_appearance is "m">>
+			"당신 여자친구는 운이 좋군요.
+		<<else>>
+			"원하는 결과를 얻길 바랍니다.
+		<</if>>
+		수정 직후에는 다소 부정확할 수 있으니, 시간을 좀 두거나 며칠 뒤에 다시 검사해 보세요."
+		<<if $pregnancyTest is undefined>><<set $pregnancyTest to 0>><</if>>
+	<<case "fertility booster">>
+		"_printmoney입니다." <<He>>【이가】 당신을 훑어본다.
+		<<if $player.gender_appearance is "m">>
+			"여자친구를 임신시키려는 건가요? 행운을 빕니다.
+		<<else>>
+			"오, 운 좋은 아버지는 누구죠?
+			<!-- ^ This reads kinda weirdly -->
+		<</if>>
+		하루에 한 알씩, 시간을 정해두고 복용하세요."
+	<<case "contraceptive">>
+		"_printmoney입니다.
+		<<if $player.gender_appearance is "m">>
+			사람들이 안전하게 즐기는 걸 보니 기쁘네요. 당신 여자친구는 운이 좋군요.
+		<</if>>
+		하루에 한 알씩, 시간을 정해두고 복용하세요. 그래도 조심해야 합니다. 안전을 보장하는 유일한 방법은 금욕뿐이니까요."
+	<<default>>
+		<<run throw new Error(`Missing pharmacyItem type! ${V.pharmacyItem.type}`)>>
+<</switch>>
+<br><br>
+
+<<if $money gte $pharmacyItem.price>>
+	<<switch $pharmacyItem.type>>
+		<<case "Breast Pump">>
+			<<link [[돈을 건넨다|Pharmacy]]>><<run sexShopOnBuyClick(11, false, T.prop.colour.replace(" ","-"), false)>><<money `-$pharmacyItem.price` "pharmacyBreastPump">><</link>>
+		<<case "condoms">>
+			<<link [[돈을 건넨다|Pharmacy]]>><<money `-$pharmacyItem.price` "pharmacyCondoms">><<gcondoms 3>><</link>>
+		<<case "pregnancy test">>
+			<<link [[돈을 건넨다|Pharmacy]]>><<money `-$pharmacyItem.price` "pharmacyPregnancyTest">><<set $pregnancyTest += 2>><</link>>
+		<<case "Anti-Parasite Cream">>
+			<<link [[돈을 건넨다|Pharmacy]]>><<money `-$pharmacyItem.price` "pharmacyCream">><<set $sexStats.pills.pills[$pharmacyItem.type].owned += 1>><<boughtOnce>><</link>>
+		<<default>>
+			<<link [[돈을 건넨다|Pharmacy]]>><<money `-$pharmacyItem.price` "pharmacyPills">><<set $sexStats.pills.pills[$pharmacyItem.type].owned += 14>><<boughtOnce>><</link>>
+	<</switch>>
+<<else>>
+	<span class="purple">돈이 부족합니다.</span>
+<</if>>
+<br>
+<<if $pharmacyItem.type.includes("penis") and hasSexStat("promiscuity", 2) and !$daily.pharm.seductionResult>>
+	<<link [[유혹하기|Pharmacy Seduction]]>><</link>><<seductiondifficulty>><<promiscuous2>>
+	<br>
+<</if>>
+<<link [[사지 않기|Pharmacy]]>><</link>>
+
+:: Widgets boughtOnce [widget]
+<<widget "boughtOnce">>
+	<<set $sexStats.pills.boughtOnce to true>>
+<</widget>>
+
+:: Pharmacy Seduction
+"직접 확인해 보는 건 어때요?" 당신이 <<his>> 눈을 응시하며 말한다.
+<br><br>
+
+<<set $seductiondifficulty to (8888 - ($rng * 20) - ($pharmacyItem.type.includes("growth") ? 500 : 1000))>>
+<<seductioncheck>>
+<<seductionskilluptext>>
+<<seductionskilluse>>
+
+<<if $seductionrating gte $seductionrequired>>
+	<<set $daily.pharm.seductionResult to "pass">>
+	<<He>>【은는】 눈썹을 치켜올리며 얼굴을 붉히고는, 주변을 둘러보며 둘만 있는지 확인한다. 만족한 <<he>>【은는】 당신의 손을 잡고 카운터 뒤로 이끈다.
+	<br>
+	<<He>>【은는】 당신을 벽으로 밀치고 무릎을 꿇더니, 서둘러 당신의 <<allBottomsUnderwear>>【을를】 벗긴다.
+	<br><br>
+
+	<<set $sexstart to 1>>
+	<<link [[다음|Pharmacy Encounter Sex]]>><</link>>
+<<else>>
+	<<set $daily.pharm.seductionResult to "fail">>
+	잠깐의 침묵 후, <<he>>【은는】 큰 소리로 웃음을 터뜨린다.<<ggstress>><<stress 23>>
+	<br>
+	"시도는 좋았어, <<lass>>!" <<he>>【이가】 말한다.
+	<br>
+	"그래서, 살 거야 말 거야?"
+	<br><br>
+
+	<<print $pharmacyItem.name>> 한 상자가 테이블 위에 놓여 있다.
+	<br><br>
+
+	<<if $money gte $pharmacyItem.price>>
+		<<formatmoney $pharmacyItem.price>>
+		<<link [["결제하기 " + _printmoney|Pharmacy Seduction End]]>><<set $phase to "pay">><</link>>
+	<<else>>
+		<span class="purple">돈이 부족합니다.</span>
+	<</if>>
+	<br>
+	<<link [[그만두기|Pharmacy Seduction End]]>><<set $phase to "nevermind">><</link>>
+<</if>>
+
+:: Pharmacy Seduction End
+<<switch $phase>>
+	<<case "nevermind">>
+		당신은 돌아서서 떠난다.
+		<br>
+		"이봐," <<he>>【이가】 말한다. "기분 상하게 하려던 건 아니었어."
+		<br><br>
+
+		<<link [[다음|Hospital Foyer]]>><<endevent>><</link>>
+	<<case "pay">>
+		당신은 어색한 침묵 속에서 돈을 건네고, 약 상자를 받아 들고 떠난다.
+		<br><br>
+
+		<<money `-$pharmacyItem.price` "pharmacy">><<set $sexStats.pills.pills[$pharmacyItem.type].owned += 14>><<boughtOnce>>
+		<<link [[다음|Hospital Foyer]]>><<endevent>><</link>>
+<</switch>>
+<<unset $pharmacyItem>>
+
+:: Pharmacy Encounter Sex
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+
+	<<if $worn.lower.name isnot "naked">>
+		<<set $NPCList[0].lefthand to "lowerclothes">>
+		<<set $NPCList[0].righthand to "lowerclothes">>
+	<<elseif $worn.under_lower.name isnot "naked">>
+		<<set $NPCList[0].lefthand to "underlowerclothes">>
+		<<set $NPCList[0].righthand to "underlowerclothes">>
+	<</if>>
+	<<set $NPCList[0].mouth to "penisentrance">>
+	<<set $NPCList[0].location.head to "genitals">>
+	<<npcidlegenitals>>
+	<<set $enemytrust += 100>>
+	<<set $position to "doggy">>
+	<br><br>
+<</if>>
+
+<<set $exposedPrev to $exposed>>
+<<effectsman>>
+<<man>>
+<<exposure>>
+
+<!-- Reaction to seeing penis for the first time during encounter -->
+<<if $exposed is 2 and $exposedPrev lt 2>> <!-- if penis was exposed just now -->
+	<<if playerChastity()>>
+		"이게 대체 뭐야?" <<He>>【이가】 당신의 <<genitals>>【을를】 본다. "장난하는 거 아니지!"
+		<br>
+		<<He>>【은는】 잠시 침묵한다.
+		<br>
+		"계속하고 싶지 않아. 나가."
+		<br>
+		"정말 실망스럽군." <<he>>【이가】 조용히 덧붙인다.
+		<<set $finish to 1>><<set $phase to "chastity">>
+	<<elseif $player.penissize lte 2>>
+		<<He>>【은는】 당신의 <<penis>>【이가】 드러나는 순간 얼어붙는다.
+		<<if $player.penissize lte random(0,3)>> <!-- More likely at smaller sizes; guaranteed at smallest, but never impossible -->
+			"이게 뭐야? 장난해? 이게 나한테 보여주고 싶었던 거라고?" <<He>>【이가】 킥킥 웃기 시작한다.
+			<br><br>
+
+			<<He>>【은는】 한동안 아무 말도 하지 않는다. "그래. 더 이상 그럴 기분 아니야."
+			<<incggpenisinsecurity>>
+			<br><br>
+
+			<<He>>【은는】 일어나 옷을 고쳐 입고 계산대와 <<his>> 책으로 돌아간다.
+			<<set $finish to 1>><<set $phase to "tiny">>
+		<<else>>
+			"어머, 귀여워라." <<He>>【이가】 킥킥 웃기 시작한다.
+			<<incggpenisinsecurity>>
+		<</if>>
+	<<elseif $player.penissize is 3>>
+		<<if $rng gte 71>>
+			당신의 <<penis>>【이가】 덜렁거리며 나오자 낄낄거리는 소리가 들리지만, <<he>>【은는】 아무 말 없이 계속한다.
+		<<else>>
+			<<He>>【은는】 당신의 <<penis>>【이가】 덜렁거리며 나오자 말을 멈춘다. "오, 이게 다야? 바지 속에 뭔가 특별한 거라도 있는 것처럼 말하더니." <<he>>【이가】 말한다.
+			<br><br>
+
+			"감명 깊진 않네. 그리고 계속할 마음도 싹 사라졌어. 약이나 더 사서 커지면 다시 와."
+			<<incggpenisinsecurity>>
+			<br><br>
+
+			<<He>>【은는】 일어나 옷을 고쳐 입고 계산대와 <<his>> 책으로 돌아간다.
+			<<set $finish to 1>><<set $phase to "small">>
+		<</if>>
+	<<elseif $player.penissize is 5>>
+		당신의 <<penis>>【이가】 덜렁거리며 나오자 아래쪽에서 놀라 숨을 들이마시는 소리가 들린다.
+		<br>
+		당신이 <<his>> 얼굴을 보니 <<his>> 눈이 빛나고 있다.
+	<<elseif $player.penissize gte 6>>
+		"젠장," 당신의 <<penis>>【이가】 덜렁거리며 나오자 아래쪽에서 조용한 속삭임이 들려온다.
+		<br>
+		아래를 내려다보니 <<he>>【이가】 입을 벌린 채 당신의 자지를 쳐다보고 있다.
+		<<if insecurityExists("penis_big")>>
+			<<acceptance "penis_big" 10>><<gacceptance>>
+		<</if>>
+	<</if>>
+	<br><br>
+<</if>>
+<<if $finish isnot 1>>
+	<<stateman>>
+	<<actionsman>>
+<</if>>
+
+<<if _combatend or $finish is 1>>
+	<span id="next"><<link [[다음|Pharmacy Encounter Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Pharmacy Encounter Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Pharmacy Encounter Sex Finish
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<set $daily.pharm.sexFinished to true>>
+
+<<capture $pharmacyItem>>
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+
+	"와!" <<he>>【이가】 카운터에 기댄 채 간신히 일어서며 숨을 헐떡인다. <<tearful>> 당신은 몸을 추스른다.
+	<br><br>
+
+	<<clotheson>>
+
+	<<He>>【은는】 숨을 고르고 <<his>> 옷매무새를 다듬은 뒤 계산대로 돌아간다.
+	<br>
+	<<if !$pharmacyItem.type.includes("reduction") or $player.penissize lt 5>>
+		<<set $pharmacyItem.price /= 2>>
+		"이 정도면 할인받을 자격이 충분하다고 생각해, 아가. 이 약은 <<printmoney $pharmacyItem.price true>>에 줄게."
+		<br>
+		"다음에 또 와줘." <<He>>【이가】 윙크한다.
+		<br><br>
+
+		<<endcombat>>
+		<<if $money gte $pharmacyItem.price>>
+			<<pillicon>><<link [["가격 " + _printmoney + "에 " + $pharmacyItem.name + " 구매하기"|Pharmacy]]>>
+				<<set $eventskip to 1>><<set $daily.pharm.sexResult to "buy">>
+				<<money `-$pharmacyItem.price` "pharmacy">><<set $sexStats.pills.pills[$pharmacyItem.type].owned += 14>><<boughtOnce>>
+			<</link>>
+		<<else>>
+			<span class="purple">돈이 부족해서 살 수 없습니다.</span>
+		<</if>>
+	<<else>>
+		<<set $pharmacyItem to clone(setup.pharmacyItems["penis_blocker"])>>
+		<<set $pharmacyItem.price /= 2>>
+		"미안하지만, 아가. 네 그 육즙 가득한 자지로 나한테 이런 짓을 한 이상, 이 축소 약은 못 팔겠어. 도저히 안 되겠어. 지금처럼 계속 커다랗게 남아 있었으면 좋겠거든."
+		<br>
+		"대신 성장 억제제는 할인해서 팔 수 있어." <<He>>【이가】 미소 짓는다.
+		<br><br>
+
+		<<endcombat>>
+		<<if $money gte $pharmacyItem.price>>
+			<<formatmoney $pharmacyItem.price>>
+			<<pillicon>><<link [["가격 " + _printmoney + "에 성장 억제제 구매하기"|Pharmacy]]>>
+				<<set $eventskip to 1>><<set $daily.pharm.sexResult to "buy">>
+				<<money `-$pharmacyItem.price` "pharmacy">><<set $sexStats.pills.pills["penis blocker"].owned += 14>><<boughtOnce>>
+			<</link>>
+		<<else>>
+			<span class="purple">돈이 부족해서 살 수 없습니다.</span>
+		<</if>>
+	<</if>>
+	<br>
+	<<getouticon>><<link [[사지 않는다|Pharmacy]]>><<set $eventskip to 1>><<set $daily.pharm.sexResult to "dontBuy">><</link>>
+
+<<elseif $enemyhealth lte 0>>
+	<<personsimple>>【은는】 바닥에 쓰러져 <<his>> 상처를 돌본다. <<tearful>> 당신은 몸을 추스른다.
+	<br><br>
+
+	<<clotheson>>
+
+	카운터를 보니 당신이 사려 했던 <<print $pharmacyItem.name>> 상자가 보인다.
+	<br><br>
+
+	<<set $daily.pharm.closed to true>>
+	<<ind>><<link [[간호사가 일어나기 전에 약을 훔친다|Hospital Foyer]]>>
+		<<set $eventskip to 1>>
+		<<crimeUp $pharmacyItem.price "thievery">><<set $sexStats.pills.pills[$pharmacyItem.type].owned += 14>><<boughtOnce>>
+	<</link>><<crime "thievery">>
+	<br>
+	<<getouticon>><<link [[그냥 떠난다|Hospital Foyer]]>><<set $eventskip to 1>><</link>>
+	<<endcombat>>
+	<<clearNPC "pharmNurse">>
+
+<<elseif $finish is 1>>
+	<<set $daily.pharm.sexResult to "embarrassed">>
+	<<switch $phase>>
+		<<case "chastity">>
+			당황한 당신은 아무 말 없이 일어선다.
+			<<clotheson>><<endcombat>>
+
+		<<case "tiny">>
+			극심한 당혹감에 얼굴이 붉어진 채, 당신은 일어선다. <<clotheson>>
+			간호사는 당신 쪽을 쳐다보지도 않는다.
+			<br><br>
+			<<endcombat>>
+
+		<<case "small">>
+			당황한 당신은 일어선다. <<clotheson>>
+			"약 잊지 마세요." 간호사가 말한다. <<if $pharmacyItem.type.includes("growth")>>"당신한테는 필요하니까요."<</if>>
+			<br><br>
+			<<endcombat>>
+
+			<<if $money gte $pharmacyItem.price>>
+				<<formatmoney $pharmacyItem.price>>
+				<<pillicon>><<link [["가격 " + _printmoney + "에 " + $pharmacyItem.name + " 지불하기"|Pharmacy]]>>
+					<<set $eventskip to 1>>
+					<<money `-$pharmacyItem.price` "pharmacy">><<set $sexStats.pills.pills[$pharmacyItem.type].owned += 14>><<boughtOnce>>
+				<</link>>
+				<br>
+			<<else>>
+				<span class="purple">돈이 부족해서 살 수 없습니다.</span>
+			<</if>>
+
+		<<default>>
+			<!-- Is this for error catching? I don't think it should be able to happen. -->
+			<<personsimple>>【은는】 낙담한 표정으로 일어나 <<his>> 옷매무새를 바로잡는다. <<He>>【은는】 계산대로 돌아가 <<his>> 책을 집어 든다.
+			<br>
+			<<clotheson>><<endcombat>>
+	<</switch>>
+
+	<<getouticon>><<link [[떠난다|Hospital Foyer]]>><<set $eventskip to 1>><</link>>
+<<else>>
+	<br><br>
+	<<link [[다음|Hospital Foyer]]>><<endevent>><<set $eventskip to 1>><</link>>
+<</if>>
+<</capture>>
+
+<<unset $pharmacyItem>>
+<<unset $exposedPrev>>
+
+:: Pharmacy Morning After pill
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+You ask the nurse for morning after pills.
+<br><br>
+<<if playerBellyVisible() or playerAwareTheyArePregnant()>>
+	"You <<if $pregnancyStats.aftermorningpills>>already know you <</if>>can't take these pills if you are pregnant, and it's obvious you are. It's very dangerous for your health and it won't have the desired effects," <<he>> tells you while looking openly at your <<bellyDescription "pc">>. "If you still want to take it, £500 please. For legal reasons, we're unable to sell these in bulk. You'll have to take it while I'm supervising you, just in case issues occur."
+	<br><br>
+	<<if not playerAwareTheyArePregnant()>>
+		<<if $money gte 50000>>
+			<<link [[Hand over the money and take the pill anyway (0:15)|Pharmacy Morning After pill 2]]>><<pass 15>><</link>>
+		<<else>>
+			<span class="purple">You cannot afford them.</span>
+		<</if>>
+	<<else>>
+		You know you are pregnant and you won't take any risks.
+		<br>
+	<</if>>
+	<br>
+	<<link [["Don't buy"|Pharmacy]]>><</link>>
+<<else>>
+	"These pills are only effective for a short period after intercourse. If an egg has been fertilised and nestled in your uterus, taking them can be dangerous to your health.<<if $pregnancyStats.aftermorningpills>> Keep in mind that these pills are not a contraceptive method. Perhaps you should consider the option of using condoms or contraceptive pills that you can buy here, they are less harmful.<</if>>"
+	<br><br>
+	<<He>> opens a drawer and pulls out a blister with a single pill. "£500 please. For legal reasons, we're unable to sell these in bulk. You'll have to take it while I'm supervising you, just in case issues occur."
+	<br><br>
+	<<if playerAwareTheyArePregnant()>>
+		You know you are pregnant and won't take any risks.
+	<<elseif $money gte 50000>>
+		<<link [[Hand over the money and take the pill (0:15)|Pharmacy Morning After pill 2]]>><<pass 15>><</link>>
+	<<else>>
+		<span class="purple">You cannot afford them.</span>
+	<</if>>
+	<br>
+	<<link [["Don't buy"|Pharmacy]]>><</link>>
+<</if>>
+
+
+:: Pharmacy Morning After pill 2
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<money -50000 "pharmacyAfterPill">>
+<<set $pregnancyStats.aftermorningpills++>>
+<<set _morningAfterPillResult to takeMorningAfterPill()>>
+
+The nurse points you to a chair to sit on and you take the pill while <<he>> watches you carefully.
+<br><br>
+<<switch _morningAfterPillResult>>
+	<<case "notPregnant">>
+		You sit on the chair and wait for it to take effect. You only feel a cold sensation in your belly. After a few minutes, the nurse checks your pupils and your blood pressure. "Everything is fine, you can go." <<lllarousal>> <<llstress>>
+		<br><br>
+		<<arousal -5000>>
+		<<stress -12>>
+		<<link [[Go back|Pharmacy]]>><</link>>
+	<<case "success">>
+		You sit on the chair and wait for it to take effect. You feel a cold sensation in your belly and a little pain. After a few minutes, the nurse checks your pupils and your blood pressure. <<He>> can see the discomfort in your face. "It seems that the pill has taken effect. You may feel some pain, but it will pass quickly. You can go now." <<lllarousal>> <<llstress>> <<gpain>>
+		<br><br>
+		<<arousal -5000>>
+		<<stress -12>>
+		<<pain 2>>
+		<<link [[Go back|Pharmacy]]>><</link>>
+	<<case "aLittleLate">>
+		You sit on the chair and wait for it to take effect. You feel an unpleasant sensation in your belly and a sharp pain. The nurse notices your pained face and approaches you. <<He>> checks your pupils and your blood pressure. "It seems that the pill has taken effect, but you have reached the limit of time. If you ever need this pill again, don't wait for so long. The pain you feel now will disappear after a while. You can go now." <<lllarousal>> <<llstress>> <<ggpain>>
+		<br><br>
+		<<arousal -5000>>
+		<<stress -12>>
+		<<pain 8>>
+		<<link [[Go back|Pharmacy]]>><</link>>
+	<<case "late">>
+		You sit on the chair and wait for it to take effect. You feel a strange sensation in your belly and immediately you writhe in pain. The nurse rushes over to you and checks your pupils and your blood pressure. <<He>> can see the discomfort in your face. "It seems like it's been too long since..." You feel a sharp pinch in your belly and wince in pain. The nurse notices your pained face. "Well, in any case, the pill has taken effect. You will feel pain for a while, it's normal, it will pass. If you ever need this pill again, don't wait for so long. You can go now." <<lllarousal>> <<ggtrauma>> <<ggpain>>
+		<br><br>
+		<<arousal -5000>>
+		<<trauma 20>>
+		<<pain 20>>
+		<<link [[Go back|Pharmacy]]>><</link>>
+	<<case "tooLate">>
+		You sit on the chair and wait for it to take effect. You feel an unpleasant sensation in your belly and immediately writhe in pain. The nurse rushes over to you and checks your pupils and your blood pressure. <<He>> can see the discomfort in your face. "It seems like it's been too long since..." You feel a sharp pain in your belly, bend over, and fall from the chair. Your vision blurs, the pain is unbearable. <<lllarousal>> <<ggtrauma>> <<ggpain>>
+		<br><br>
+		<<set $arousal to 0>>
+		<<trauma 50>>
+		<<pain 200>>
+		<<link [[Everything fades to black...|Pharmacy Morning After pill passout]]>><<pass 60>><<endevent>><</link>>
+	<<default>>
+		There must be an error...
+		<br><br>
+		<<link [[Go back|Pharmacy]]>><</link>>
+<</switch>>
+
+:: Pharmacy Morning After pill passout
+You feel your body rise, being moved, you hear voices around you. You open your eyes for a moment and you see the nurse with a worried face. Another person in a white coat approaches
+<<if $harperSeen isnot undefined>>
+	and you recognise Dr Harper.
+<<else>>
+	and you see "Dr Harper" written on <<nnpc_his "Harper">> name tag.
+<</if>>
+"I don't know if you were aware of it, but <span class="red">you're pregnant</span>. You shouldn't have taken that pill." <<lllarousal>> <<ggstress>>
+<br><br>
+Before you can answer, you feel another intense and painful cramp in your belly. <<ggtrauma>> <<gggpain>>
+<br><br>
+<<run setPlayerLearnedPregnancyFrom("pharmacy")>>
+<<stress 12>>
+<<trauma 50>>
+<<pain 200>>
+<<arousal -5000>>
+<<link [[Next|Passout hospital]]>><<endevent>><<pass 60>><</link>>
+
+:: Pharmacy Buy Condoms in Bulk
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<if $brothelVending.products % 2>>
+	<<if $weekly.brothelVMCondoms>>
+		이번 주에는 이미 자판기에 콘돔을 채워 넣었다.
+		<br><br>
+		<<link [[돌아가기|Pharmacy]]>><</link>>
+	<<elseif $brothelVending.condomsToRefill lt 10>>
+		지금은 자판기에 콘돔을 채울 필요가 없다.
+		<br><br>
+		<<link [[돌아가기|Pharmacy]]>><</link>>
+	<<elseif $money lt 60000>>
+		자판기를 채울 콘돔을 살 돈이 없다.
+		<br><br>
+		<<link [[돌아가기|Pharmacy]]>><</link>>
+	<<else>>
+		당신은 간호사에게 필요한 콘돔 수량을 묻는다:
+		<br><br>
+		<<link [[10팩 구매 (£600)|Pharmacy Bought Condoms in Bulk]]>><<set $condomsBought to 10>><</link>>
+		<br>
+		<<if $brothelVending.condomsToRefill gte 25>>
+			<<if $money gte 25 * 6000>>
+				<<link [[25팩 구매 (£1,500)|Pharmacy Bought Condoms in Bulk]]>><<set $condomsBought to 25>><</link>>
+				<br>
+			<<else>>
+				25팩을 살 돈이 없다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.condomsToRefill gte 50>>
+			<<if $money gte 50 * 6000>>
+				<<link [[50팩 구매 (£3,000)|Pharmacy Bought Condoms in Bulk]]>><<set $condomsBought to 50>><</link>>
+				<br>
+			<<else>>
+				50팩을 살 돈이 없다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.condomsToRefill gte 100>>
+			<<condomsPrice 100>>
+			<<formatmoney _price>>
+			<<if $money gte _price>>
+				<<link [[`100팩 구매 (${_printmoney})`|Pharmacy Bought Condoms in Bulk]]>><<set $condomsBought to 100>><</link>>
+				<br>
+			<<else>>
+				100팩을 살 돈이 없다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.condomsToRefill gte 150>>
+			<<condomsPrice 150>>
+			<<formatmoney _price>>
+			<<if $money gte _price>>
+				<<link [[`150팩 구매 (${_printmoney})`|Pharmacy Bought Condoms in Bulk]]>><<set $condomsBought to 150>><</link>>
+				<br>
+			<<else>>
+				150팩을 살 돈이 없다.
+				<br>
+			<</if>>
+		<</if>>
+		<<if $brothelVending.condomsToRefill gte 11 and ![25, 50, 100, 150].includes($brothelVending.condomsToRefill)>>
+			<<condomsPrice $brothelVending.condomsToRefill>>
+			<<formatmoney _price>>
+			<<if $money gte _price>>
+				<<link [[`${$brothelVending.condomsToRefill}팩 구매 (${_printmoney})`|Pharmacy Bought Condoms in Bulk]]>><<set $condomsBought to $brothelVending.condomsToRefill>><</link>>
+				<br>
+			<<else>>
+				$brothelVending.condomsToRefill팩을 살 돈이 없다.
+				<br>
+			<</if>>
+		<</if>>
+		<<link [["사지 않는다"|Pharmacy]]>><</link>>
+	<</if>>
+<<else>>
+	당신은 간호사에게 창관의 자판기에 대해 이야기하고 대량 구매 할인을 요청한다.
+	<br><br>
+	<<He>>【은는】 믿을 수 없다는 표정을 짓는다. "대량이라는 게 어느 정도를 말하는 거죠? 수백, 수천, 수백만? 차라리 도매업자를 찾아보는 게 낫겠네요."
+	<br><br>
+	당신은 자판기에 200팩이 들어가고, 10개 단위로 구매할 생각이라고 답한다.
+	<br><br>
+	"그건 대량이 아니에요, <<girl>>. 50개 미만은 할인해 줄 수 없어요. 51개에서 100개까지는 2% 할인해 줄 수 있고, 100개 이상이면 5% 할인해 줄게요. 그 이상은 안 돼요. 제가 남기는 마진이 그리 높지 않거든요. 여기 콘돔은 아주 비싸요. 하지만 보너스로, 구매한 콘돔을 창관까지 배달해 드릴게요."
+	<br><br>
+	<<set $brothelVending.products += 1>>
+	<<set $brothelVending.condomsToRefill to 200>>
+	<<link [[창관용 콘돔 구매하기 (0:10)|Pharmacy Buy Condoms in Bulk]]>><<pass 10>><</link>>
+	<br>
+	<<link [["사지 않는다"|Pharmacy]]>><</link>>
+<</if>>
+
+:: Pharmacy Bought Condoms in Bulk
+<<set $outside to 0>><<set $location to "hospital">><<effects>>
+<<set _partial to Math.min($condomsBought, 50)>>
+<<condomsPrice _partial>>
+<<formatmoney _price>>
+"알겠습니다, 콘돔 3개입 $condomsBought팩이요." <<He>>【은는】 총액을 소리 내어 계산하며<<if $condomsBought lte 25>> 작은<</if>> 판지 상자에 포장한다. "이건 _partial개, 개당 £60, _printmoney입니다.
+<<condomsPrice $condomsBought>>
+<<if $condomsBought gt 50>>
+	<<set _partial to Math.min($condomsBought - 50, 50)>>
+	<<set _price2 to _partial * 6000 * .98>>
+	<<formatmoney _price2>>
+	거기에 _partial개, 개당 £60에 2% 할인해서, _printmoney입니다.
+	<<if $condomsBought gt 100>>
+		<<set _partial to $condomsBought - 100>>
+		<<set _price2 to _partial * 6000 * .95>>
+		<<formatmoney _price2>>
+		그리고 _partial개, 개당 £60에서 5% 할인해서, _printmoney입니다.
+	<</if>>
+	총액은 <<printmoney _price>>입니다.
+<</if>>
+이것들은 배송되도록 보내겠습니다. 구매해 주셔서 감사합니다."
+<br><br>
+당신은 돈을 세어 <<him>>에게 건넨다.
+<br><br>
+<<money `-_price` "pharmacyCondoms">>
+<<set $brothelVending.condoms += $condomsBought>>
+<<set $brothelVending.condomsToRefill -= $condomsBought>>
+<<set $brothelVending.weeksEmpty to 0>>
+<<set $weekly.brothelVMCondoms to true>>
+<<unset $condomsBought>>
+<<earnFeat "Brothel Provider">>
+<<link [[다음|Pharmacy]]>><</link>>

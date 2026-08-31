@@ -1,0 +1,1004 @@
+:: Museum Look around
+<<set $outside to 0>>
+<<museumAntiqueText>><<museumPaintingText>>
+<<npc Winter>><<person1>>
+박물관을 둘러본다. 받침대에는 특정 물건을 기다리는 듯 홈이 파여 있다.
+<br><br>
+<<if $museumAntiques.museumCount is 0>>
+    박물관이 <span class="red">텅 비어</span> 있다.
+<<elseif $museumAntiques.museumCount lt $museumAntiques.maxCount / 3>>
+    박물관에 채워진 유물이 <span class="pink">거의 없다</span>.
+<<elseif $museumAntiques.museumCount lt $museumAntiques.maxCount / 2>>
+    박물관이 예전보다 <span class="purple">조금 더 채워진</span> 모습이다.
+<<elseif $museumAntiques.museumCount lt $museumAntiques.maxCount / 1.5>>
+    박물관에 <span class="blue">상당한</span> 소장품이 모여 있다.
+<<elseif $museumAntiques.museumCount lt $museumAntiques.maxCount / 1.25>>
+    박물관의 소장품들이 <span class="teal">제법 훌륭한</span> 구색을 갖추고 있다.
+<<elseif $museumAntiques.museumCount lt $museumAntiques.maxCount>>
+    박물관이 <span class="green">놀라운</span> 소장품들로 가득 차 있다.
+<<elseif $museumAntiques.museumCount is $museumAntiques.maxCount>>
+    모든 전시 공간이 <span class="gold">빠짐없이 꽉 찼다</span>.
+<</if>>
+<br><br>
+
+<<set _possibleHints to []>>
+<details class="journal" open>
+	<summary class="journal">박물관 아이템</summary>
+	<<if $museum_paintings_intro>>
+		<span class="gold bold m-2">골동품</span>
+		<br>
+	<</if>>
+	<div class="itemCollectible">
+		<<for _labelM, _valueM range $museumAntiques.antiques>>
+			<<switch _valueM>>
+				<<case "museum">>
+					<div class="item" @tooltip="_museumAntiqueText[_labelM].museum">
+						<<icon _museumAntiqueText[_labelM].icon>>
+					</div>
+				<<case "stolen">>
+					<div class="item" @tooltip="_museumAntiqueText[_labelM].stolen">
+						<<icon "museum-empty.png">>
+					</div>
+				<<case "recovered">>
+					<div class="item" @tooltip="_museumAntiqueText[_labelM].recovered">
+						<<icon _museumAntiqueText[_labelM].icon>>
+					</div>
+				<<case "found" "talk">>
+						<<set _tooltip to `당신은 ${_museumAntiqueText[_labelM].name}을 윈터에게 보여줘야 한다`>>
+						<div class="item" @tooltip="_tooltip">
+							<span class="icon-container">
+								<<icon _museumAntiqueText[_labelM].icon>>
+								<img class="alert" src="img/misc/icon/alert.png">
+							</span>
+						</div>
+				<<case "notFound">>
+					<div class="item" tooltip="비어 있음.">
+						<<run _possibleHints.push(_labelM)>>
+						<<icon "museum-empty.png">>
+					</div>
+			<</switch>>
+		<</for>>
+	</div>
+	<<if $museum_paintings_intro>>
+		<hr>
+		<span class="gold bold m-2">그림</span>
+		<br>
+		<div class="itemPainting">
+			<<for _labelP, _valueP range $museumAntiques.paintings>>
+				<<set _painting to _valueP isnot "museum" ? _museumPaintingText[_labelP].journalName : _museumPaintingText[_labelP].name>>
+				<<switch _valueP>>
+					<<case "museum" "recovered">>
+						<<if _labelP is "paintingward">>
+							<<if $bleedingWardCheckpoint>>
+								<<set _painting += ": 50% heard">>
+							<</if>>
+						<<elseif _labelP is "paintingsnake">>
+							<<set _painting to `<div style='text-align:center'>${_museumPaintingText[_labelP].name}`>>
+							<<if $hcEndings.length is 0>>
+								<<set _painting += "<br><span class='gold'>0/7 엔딩:</span><br><span class='black'>S, A, B, C, D, E, F</span></div>">>
+							<<else>>
+								<<set _painting += `<br><span class='gold'>${$hcEndings.length}/7 엔딩:</span><br>`>>
+								<<set _painting += `<span class=${$hcEndings.includes('S') ? 'gold' : 'black'}> ${$hcEndings.includes('S') ? 'S' : '?'}</span>,`>>
+								<<set _painting += `<span class=${$hcEndings.includes('A') ? 'green' : 'black'}> ${$hcEndings.includes('A') ? 'A' : '?'}</span>,`>>
+								<<set _painting += `<span class=${$hcEndings.includes('B') ? 'teal' : 'black'}> ${$hcEndings.includes('B') ? 'B' : '?'}</span>,`>>
+								<<set _painting += `<span class=${$hcEndings.includes('C') ? 'blue' : 'black'}> ${$hcEndings.includes('C') ? 'C' : '?'}</span>,`>>
+								<<set _painting += `<span class=${$hcEndings.includes('D') ? 'purple' : 'black'}> ${$hcEndings.includes('D') ? 'D' : '?'}</span>,`>>
+								<<set _painting += `<span class=${$hcEndings.includes('E') ? 'pink' : 'black'}> ${$hcEndings.includes('E') ? 'E' : '?'}</span>,`>>
+								<<set _painting += `<span class=${$hcEndings.includes('F') ? 'red' : 'black'}> ${$hcEndings.includes('F') ? 'F' : '?'}</span></div>`>>
+							<</if>>
+						<</if>>
+						<div class="item" @tooltip="_painting">
+							<img class="icon" @src="'img/misc/prop/' + _museumPaintingText[_labelP].inlineFull" width="120" height="120">
+							<<switch _labelP>>
+								<<case "paintingsnake">><<set _percent to (Math.round($hcEndings.length) / 7 * 100)>>
+								<<case "paintingward">><<set _percent to $bleedingWardCheckpoint ? 50 : 100>>
+								<<default>><<set _percent to 100>>
+							<</switch>>
+							<div class="paintingProgress" @style="'--progress: ' + _percent + '%;'">
+								<<if $options.images>>
+									<div class="progress">
+										<span class="starBar">
+											<img class="active-icon-img" src="img/ui/star-gold.png">
+											<img class="inactive-icon-img" src="img/ui/star-empty.png">
+										</span>
+									</div>
+								<<else>>
+									<div class="meter">
+										<div class="goldbar" @style="'width:' + _percent + '%'"></div>
+									</div>
+								<</if>>
+							</div>
+						</div>
+					<<case "stolen">>
+						<div class="item" @tooltip="_museumPaintingText[_labelP].stolen">
+							<img class="icon" src="img/misc/prop/curtain-closed.png" width="120" height="120">
+						</div>
+					<<case "found">>
+						<<set _tooltip to `당신은 ${_museumPaintingText[_labelP].journalName.toLowerCase()}을 윈터에게 보여줘야 한다.`>>
+						<div class="item" @tooltip="_tooltip">
+							<img class="icon" @src="'img/misc/prop/' + _museumPaintingText[_labelP].inlineRaw" width="120" height="120">
+						</div>
+					<<case "talk">>
+						<<set _tooltip to `당신은 윈터에게 ${_museumPaintingText[_labelP].journalName.toLowerCase()}에 대해 물어봐야 한다.`>>
+						<div class="item" @tooltip="_tooltip">
+							<img class="icon" @src="'img/misc/prop/' + _museumPaintingText[_labelP].inlineFull" width="120" height="120">
+						</div>
+					<<case "notFound">>
+						<div class="item" tooltip="비어 있음.">
+							<img class="icon" src="img/misc/prop/curtain.png" width="120" height="120">
+						</div>
+				<</switch>>
+			<</for>>
+		</div>
+	<</if>>
+</details>
+
+<<if _possibleHints.length gt 0>>
+	<<if $winterHint is "notGiven">>
+		<<set $winterHint to _possibleHints[random(0,_possibleHints.length - 1)]>>
+		<br>
+		주위를 둘러보자 윈터가 다가온다.
+		<br><br>
+		<<print _museumAntiqueText[$winterHint].hint>>
+		<<if $museumAntiqueJournalHints is undefined>>
+			<<set $museumAntiqueJournalHints to []>>
+		<</if>>
+		<<run $museumAntiqueJournalHints.delete($winterHint)>>
+		<<run $museumAntiqueJournalHints.push($winterHint)>>
+		<br>
+	<</if>>
+<</if>>
+
+<br>
+<<getouticon>><<link [[입구로 돌아간다|Museum]]>><<endevent>><</link>>
+
+:: MuseumAntiques [widget]
+<<widget "museumAntiqueStatus">>
+	<<if _args[0] and _args[1]>>
+		<<if _args[1] is "found">><<museumClearHint _args[0]>><</if>>
+		<<if ($museumAntiques.antiques[_args[0]] is "notFound" and _args[1] is "found")
+		or ($museumAntiques.antiques[_args[0]] is "found" and _args[1] is "talk")
+		or ($museumAntiques.antiques[_args[0]] is "talk" and _args[1] is "museum")
+		or _args[1] is "stolen" or _args[1] is "recovered" or (($museumAntiques.antiques[_args[0]] is "found" or $museumAntiques.antiques[_args[0]] is "talk") and _args[1] is "notFound")>>
+			<<set $museumAntiques.antiques[_args[0]] to _args[1]>>
+			<<switch _args[1]>>
+				<<case "museum">><<set $museumAntiques.museumCount++>>
+				<<case "stolen">><<set $museumAntiques.stolenCount++>>
+				<<case "recovered">><<set $museumAntiques.recoveredCount++>>
+			<</switch>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "museumPaintingGet">>
+	<<set $_painting to _args[0]>>
+	<<if $museumAntiques.paintings[$_painting] is "notFound">>
+		<<set $museumAntiques.paintings[$_painting] to "found">>
+		<<museumPaintingText>>
+		<span class="gold"><<print _museumPaintingText[$_painting].journalName.toLowerCase()>>【을를】 발견했다!</span>
+		<<if $options.images>>
+			<br>
+			<img class="icon" @src="'img/misc/prop/' + _museumPaintingText[$_painting].inlineRaw" width="120" height="120">
+		<</if>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget "museumAntiqueText">>
+    <<if _museumAntiqueText is undefined>>
+        <!--Should not have been converted to a $ variable-->
+        <!--journalName used in cases where the name would be a spoiler ("waterlogged ivory box" telling players it's in a body of water, "Bailey sign" being a spoiler, etc-->
+        <<unset $museumAntiqueText>>
+        <<set _museumAntiqueText to {
+            "antiquebox":{
+                hint: `"보석함을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "이 근방 사람들은 귀중품을 최고급 상아와 마을 바로 밖에서 베어낸 나무를 깎아 만든 화려한 상자에 보관하곤 했지.
+                    오늘날 흔히 볼 수 있는 그런 물건들과는 다르게 생겼을 거다."<br><br> <<He>>【은는】 고개를 돌린다. "내 수업에 집중했다면, 뭘 찾아야 할지 알 텐데 말이지."`,
+                museum: "상아 상자가 대좌 위에 놓여 있다.",
+                name: "물에 젖은 상아 상자",
+                key: "Waterlogged Ivory Box",
+                journal: `"보석함이다. 이 근방 사람들은 귀중품을 최고급 상아와 마을 바로 밖에서 베어낸 나무를 깎아 만든 화려한 상자에 보관하곤 했다. 오늘날 흔히 볼 수 있는 그런 물건들과는 다르게 생겼을 거다. 내 수업에 집중했다면, 뭘 찾아야 할지 알 텐데 말이다."`,
+                journalName: "상아 보석함",
+                icon: "antiques/antique-ivory-box.png"
+            },
+            "antiquesilverring":{
+                hint: `"단순한 은반지를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "이런 장신구에는 은이 흔하게 쓰였지. 주인이 죽은 후에도 멀쩡히 남을 정도로 단단해서 종종 함께 매장되곤 했다." <br><br><<He>>【은는】 고개를 돌린다. "다른 금속에 비해 은은 물속에서도 꽤 잘 견딘다고 알려져 있다."`,
+                museum: "닳은 은반지가 대좌 위 붉은 베개에 놓여 있다.",
+                name: "닳은 은반지",
+                key: "Worn Silver Ring",
+                journal: `"단순한 은반지다. 이런 장신구에는 은이 흔하게 쓰였다. 주인이 죽은 후에도 멀쩡히 남을 정도로 단단해서 종종 함께 매장되곤 했다. 다른 금속에 비해 은은 물속에서도 꽤 잘 견딘다고 알려져 있다."`,
+                journalName: "은반지",
+                icon: "antiques/antique-silver-ring.png"
+            },
+            "antiquegoldnecklace":{
+                hint: `"금목걸이를 둘 자리다. 이건 꽤나 희귀한 발견이 되겠지." 윈터가 빈 대좌를 가리키며 말한다. "보통 상류층 사람들이 착용했으니까."<br><br><<He>>【은는】 고개를 돌린다. "금이 절대 녹슬지 않는다는 사실을 알고 있나? 영원히 물에 담가두어도 끄떡없지."`,
+                museum: "화려한 금목걸이가 대좌 위 붉은 베개에 놓여 있다.",
+                name: "화려한 금목걸이",
+                key: "Ornate Gold Necklace",
+                journal: `"금목걸이다. 이건 꽤나 희귀한 발견이 되겠다. 보통 상류층 사람들이 착용했다. 금이 절대 녹슬지 않는다는 사실을 알고 있나? 영원히 물에 담가두어도 끄떡없다."`,
+                journalName: "금목걸이",
+                icon: "antiques/antique-gold-necklace.png"
+            },
+            "antiqueivorynecklace":{
+                hint: `"이게 실제로 존재하는지는 확신할 수 없다만." 윈터가 빈 대좌를 가리키며 말한다. "이와 비슷한 물건을 언급하는 오래된 시가 있지. '거대한 짐승의 엄니, 새로이 조각되니. 별빛을 머금은 사파이어, 한밤의 검푸른 빛. 완벽에 이른 세공, 그 광택과 색채. 소수만이 아는 티 없이 순결한 허영심. 영원히 갇혀, 몸부림이 이어지네. 영원히 갇혀, 호수 생물들의 무리 속에. 영원히 버려져, 파도에 씹히다가. 영원히 버려져, 마침내 찾아올 자는...'" <<He>>【은는】 제자리에서 휙 돌며, 당신의 코를 튕긴다. "너지."<br><br><<He>>【은는】 다시 고개를 돌린다. "아마 다른 조잡한 보석들에 둘러싸여 있을 가능성이 높다. 행운을 빌지."`,
+                museum: "티 없는 상아 목걸이가 있던 자리는 목걸이가 사라져 텅 비어 있다.",
+                name: "티 없는 상아 목걸이",
+                key: "Immaculate Ivory Necklace",
+                journal: `"상아 목걸이다. 이게 실제로 존재하는지는 확신할 수 없다만, 이와 비슷한 물건을 언급하는 오래된 시가 있다. '거대한 짐승의 엄니, 새로이 조각되니. 별빛을 머금은 사파이어, 한밤의 검푸른 빛. 완벽에 이른 세공, 그 광택과 색채. 소수만이 아는 티 없이 순결한 허영심. 영원히 갇혀, 몸부림이 이어지네. 영원히 갇혀, 호수 생물들의 무리 속에. 영원히 버려져, 파도에 씹히다가. 영원히 버려져, 마침내 찾아올 자는...' 너지. 아마 다른 조잡한 보석들에 둘러싸여 있을 가능성이 높다. 행운을 빈다."`,
+                journalName: "상아 목걸이",
+                icon: "clothes/ivory-necklace.png"
+            },
+            "antiquecrystal":{
+                hint: `"이 자리에 둘 물건에 대해 전화를 받은 적이 있다." 윈터가 빈 대좌를 가리키며 말한다. "문양이 새겨진 작고 불그스름한 결정체라니, 참 특이하지."<br><br><<He>>【은는】 고개를 돌린다. "전화를 건 자는 배수관 아래로 뭔가를 떨어뜨렸다고 하더군."`,
+                museum: "자극적인 결정체가 대좌 위 붉은 베개에 놓여 있다.",
+                name: "자극적인 결정체",
+                key: "Arousing Crystal",
+                journal: `"이 자리에 둘 물건에 대해 전화를 받은 적이 있다. 문양이 새겨진 작고 불그스름한 결정체라니, 참 특이하지. 전화를 건 자는 배수관 아래로 뭔가를 떨어뜨렸다고 하더군."`,
+                journalName: "분홍색 결정체",
+                icon: "antiques/antique-crystal-pink.png"
+            },
+            "antiquehorn":{
+                hint: `"일종의 사냥 전리품을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "속이 빈 뿔이지. 구시가지의 사냥꾼들은 전리품을 수집하는 걸 아주 좋아했거든."<br><br><<He>>【은는】 고개를 돌린다. "유감스럽게도, 구시가지의 유적들은 대부분 파묻혀 있다만."`,
+                museum: "사냥 뿔피리가 대좌 위 붉은 베개에 놓여 있다.",
+                name: "사냥 뿔피리",
+                key: "Hunting Horn",
+                journal: `"일종의 사냥 전리품, 속이 빈 뿔이다. 구시가지의 사냥꾼들은 전리품을 수집하는 걸 아주 좋아했다. 유감스럽게도, 구시가지의 유적들은 대부분 파묻혀 있다."`,
+                icon: "antiques/antique-horn.png"
+            },
+            "antiquewatch":{
+                hint: `"오래된 기계 장치를 둘 자리다, 십중팔구 작동하지 않겠지만." 윈터가 빈 대좌를 가리키며 말한다. "단순한 손목시계라도 그 가치를 알면 깜짝 놀랄 거다."<br><br><<He>>【은는】 고개를 돌린다. "가끔은 그 시계와 시간이 맞춰진 전용 금고에 잠겨 있기도 했지."`,
+                museum: "오래된 시계가 대좌 위의 특별히 마련된 보관함에 놓여 있다.",
+                name: "오래된 시계",
+                key: "Old Watch",
+                journal: `"일종의 오래된 기계 장치, 단순한 손목시계라도 그 가치를 알면 깜짝 놀랄 거다. 가끔은 그 시계와 시간이 맞춰진 전용 금고에 잠겨 있기도 했다."`,
+                icon: "antiques/antique-watch.gif"
+            },
+            "antiquedildo":{
+                hint: `"이건 의료 보조기구라 부르도록 하지." 윈터가 빈 대좌를 가리키며 말한다. "시대착오적인 데다 대체로 비위생적이지."<br><br><<He>>【은는】 고개를 돌린다. "비위생적이라고 하니 말인데, 누군가 우연히 오래된 하수도로 들어갔다는 소문이 들리더군."`,
+                museum: "기이한 의료 보조기구가 대좌 위에 놓여 있다.",
+                name: "기이한 의료 보조기구",
+                key: "Odd Medical Aid",
+                journal: `"'의료 보조기구'다. 시대착오적인 데다 대체로 비위생적이다. 비위생적이라고 하니 말인데, 누군가 우연히 오래된 하수도로 들어갔다는 소문이 들리더군."`,
+                icon: "antiques/antique-dildo.png"
+            },
+            "antiquecandlestick":{
+                hint: `"귀족 가문의 권력의 상징이 된 소박한 촛대를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "그렇게 많이 만들어졌으니 아직 남아있는 게 분명 있을 거다."<br><br><<He>>【은는】 고개를 돌린다. "오래된 하수도가 가장 발견하기 쉬운 곳이겠지."`,
+                museum: "귀족의 촛대가 벽에 걸린 모조 촛대꽂이 안에 꽂혀 있다.",
+                name: "귀족의 촛대",
+                key: "Noble Candlestick",
+                journal: `"귀족 가문의 권력의 상징이 된 소박한 촛대다. 그렇게 많이 만들어졌으니 아직 남아있는 게 분명 있을 거다. 오래된 하수도가 가장 발견하기 쉬운 곳이다."`,
+                icon: "antiques/antique-candlestick.png"
+            },
+            "antiqueforestarrow":{
+                hint: `"화살촉을 둘 자리다. 무척 흔한 물건이지." 윈터가 빈 대좌를 가리키며 말한다. "호기심을 끄는 골동품 정도에 불과하지만, 전시해 두면 나름의 가치는 있을 거다."<br><br><<He>>【은는】 고개를 돌린다. "마을 외곽에 나가보면 사방에 널려 있거든."`,
+                museum: "이끼 낀 숲속 화살촉이 대좌 위 초록색 베개에 놓여 있다.",
+                name: "이끼 낀 숲속 화살촉",
+                key: "Mossy Forest Arrow",
+                journal: `"화살촉이다. 무척 흔한 물건으로, 호기심을 끄는 골동품 정도에 불과하지만, 전시해 두면 나름의 가치는 있을 거다. 마을 외곽에 나가보면 사방에 널려 있다."`,
+                journalName: "화살촉",
+                icon: "antiques/antique-arrow.png"
+            },
+            "antiqueforestdagger":{
+                hint: `"오래된 무기를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "십중팔구 마을에서 꽤 떨어진 곳, 수 미터 깊이의 땅속에 파묻혀 있겠지."<br><br><<He>>【은는】 고개를 돌린다. "혹시 모르니, 바깥을 돌아다닐 땐 발밑을 조심하도록."`,
+                museum: "녹슨 숲속 단검이 대좌 위 초록색 베개에 놓여 있다.",
+                name: "녹슨 숲속 단검",
+                key: "Rusted Forest Dagger",
+                journal: `"오래된 무기다. 십중팔구 마을에서 꽤 떨어진 곳, 수 미터 깊이의 땅속에 파묻혀 있을 거다. 혹시 모르니, 바깥을 돌아다닐 땐 발밑을 조심하도록."`,
+                journalName: "오래된 무기",
+                icon: "antiques/antique-dagger.png"
+            },
+            "antiqueforestgem":{
+                hint: `"너와 같은 반 학생이 이 물건에 대해 제보하더군." 윈터가 빈 대좌를 가리키며 말한다. "기이할 정도로 마음을 차분하게 해주는, 움직이는 문양이 새겨진 신록의 보석을 봤다는 허무맹랑한 이야기였지. 만약 그게 진짜고, 나에게 가져온다면 꽤 괜찮은 보상을 주도록 하마."<br><br><<He>>【은는】 고개를 돌린다. "예전에는 숲 깊은 곳에서 이런 보석을 캐내곤 했다더군."`,
+                museum: "맥동하는 숲속 보석이 대좌 위 초록색 베개에 놓여 있다.",
+                name: "맥동하는 숲속 보석",
+                key: "Pulsing Forest Gem",
+                journal: `"같은 반 학생이 이 물건에 대해 제보했는데, 기이할 정도로 마음을 차분하게 해주는, 움직이는 문양이 새겨진 신록의 보석을 봤다는 허무맹랑한 이야기였다. 만약 그게 진짜고, 나에게 가져온다면 꽤 괜찮은 보상을 줄 것이다. 예전에는 숲 깊은 곳에서 이런 보석을 캐내곤 했다고 한다."`,
+                journalName: "신록의 보석",
+                icon: "antiques/antique-forest-gem.png"
+            },
+            "antiquesilverbrooch":{
+                hint: `"이해할 수가 없군." 윈터가 빈 대좌를 가리키며 말한다. "순은으로 된 브로치를 둘 자리다. 이런 물건은 더 흔해야 정상이거든. 이 디자인은 불과 몇십 년 전만 해도 유행했으니까."<br><br><<He>>【은는】 고개를 돌린다. "어딘가 다락방 구석에 숨겨져 있을 확률이 높지. 반항기 다분한 녀석이 부모님의 낡은 물건을 뒤지다 보면 결국 발견하게 될 거다."`,
+                museum: "은 브로치가 대좌 위에 놓여 있다.",
+                name: "은 브로치",
+                key: "Silver Brooch",
+                journal: `"순은으로 된 브로치다. 이런 물건은 더 흔해야 정상이다. 이 디자인은 불과 몇십 년 전만 해도 유행했다. 어딘가 다락방 구석에 숨겨져 있을 확률이 높다. 반항기 다분한 녀석이 부모님의 낡은 물건을 뒤지다 보면 결국 발견하게 될 거다."`,
+                icon: "antiques/antique-silver-brooch.png"
+            },
+            "antiquetrashcup":{
+                hint: `"안타까운 일이 아닐 수 없지." 윈터가 빈 대좌를 가리키며 말한다. "단순한 술잔을 둘 자리다. 1세기 전만 해도 아주 흔했던 물건이야. 누구도 보관해 둘 생각을 하지 않지만 말이다."<br><br><<He>>【은는】 고개를 돌린다. "대부분의 사람들은 이걸 일반 쓰레기처럼 내다 버리더군."`,
+                museum: "버려진 술잔이 대좌 위에 놓여 있다.",
+                name: "버려진 술잔",
+                key: "Discarded Cup",
+                journal: `"단순한 술잔이다. 1세기 전만 해도 아주 흔했던 물건이다. 누구도 보관해 둘 생각을 하지 않는다. 대부분의 사람들은 이걸 일반 쓰레기처럼 내다 버린다."`,
+                icon: "antiques/antique-cup.png"
+            },
+            "antiquetrashburner":{
+                hint: `"종교 의식에 쓰인 향로를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "신전에는 아직도 굴러다니는 게 좀 있을 거다. 그렇다고 마음대로 훔쳐올 수 있으리란 생각은 하지 마라."<br><br><<He>>【은는】 고개를 돌린다. "얼마 전에 무더기로 내다 버렸더군. 너무 오래 사용해서 망가진 거겠지."`,
+                museum: "향로가 대좌 위에 놓여 있다. 최근에 닦고 복원한 모양이다.",
+                name: "향로",
+                key: "Incense Burner",
+                journal: `"종교 의식에 쓰인 향로다. 신전에는 아직도 굴러다니는 게 좀 있다. 그렇다고 마음대로 훔쳐올 수 있으리란 생각은 하지 마라. 얼마 전에 무더기로 내다 버렸더군. 너무 오래 사용해서 망가진 것 같다."`,
+                icon: "antiques/antique-incense.png"
+            },
+            "antiquebrassstatuette":{
+                hint: `"황동으로 주조된 이국적인 조각상을 둘 자리다. 이런 조각상은 이곳에서 생산된 적이 없지." 윈터가 빈 대좌를 가리키며 말한다. "진정한 고대 유물이다. 이걸 가져온 이에게는 나름의 영적인 의미가 있었겠지."<br><br><<He>>【은는】 고개를 돌린다. "종교 구역을 이 잡듯 뒤지다 보면 이런 물건을 하나쯤은 찾을 수 있을 거다."`,
+                museum: "잊혀진 황동 조각상이 대좌 위에 놓여 있다.",
+                name: "잊혀진 황동 조각상",
+                key: "Forgotten Brass Statuette",
+                journal: `"황동으로 주조된 이국적인 조각상이다. 이런 조각상은 이곳에서 생산된 적이 없다. 진정한 고대 유물이다. 이걸 가져온 이에게는 나름의 영적인 의미가 있었을 것이다. 종교 구역을 이 잡듯 뒤지다 보면 이런 물건을 하나쯤은 찾을 수 있을 것이다."`,
+                journalName: "황동 조각상",
+                icon: "antiques/antique-brass-statuette.png"
+            },
+            "antiquegoldchastitybelt":{
+                hint: `"이건 내가 각별히 관심을 두고 있는 물건이다." 윈터가 빈 대좌를 가리키며 말한다. "고대의 여사제들은 의식을 위해 특별한... 보호구를 착용하곤 했다. 오늘날 신전에서 나누어 주는 것보다 훨씬 높은 품질이지. 단순한 보호 목적 이상으로 쓰였을 것 같지만 말이다."<br><br><<He>>【은는】 고개를 돌린다. "문헌을 번역하다 보면 '도금된'이라는 단어가 수차례 나오더군. 더럽혀진 성물이 신성한 호수에서 정화된다는 전설이 떠오르는구나."`,
+                museum: "여성용 마네킹에 황금 정조대가 채워져 있다.",
+                name: "황금 정조대",
+                key: "Golden Chastity Belt",
+                journal: `"고대의 여사제들은 의식을 위해 특별한... 보호구를 착용하곤 했다. 오늘날 신전에서 나누어 주는 것보다 훨씬 높은 품질이다. 단순한 보호 목적 이상으로 쓰였을 것 같지만 말이다. 문헌을 번역하다 보면 '도금된'이라는 단어가 수차례 나온다. 더럽혀진 성물이 신성한 호수에서 정화된다는 전설이 떠오른다."`,
+                journalName: "도금된 정조대",
+                icon: "antiques/antique-chastity.png"
+            },
+            "antiquecoppercompass":{
+                hint: `"구리 나침반을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "엄청나게 많이 만들어졌고 빈번하게 사용되었지."<br><br> <<He>>【은는】 고개를 돌린다. "몇 마을 떨어진 해변으로 떠밀려 왔다는 소리를 들었다. 필시 바다에서 잃어버린 나침반이 더 많이 떠돌고 있을 거다."`,
+                museum: "구리 나침반이 대좌 위에 놓여 있다. 본분대로 정북쪽을 가리키고 있다.",
+                name: "구리 나침반",
+                key: "Copper Compass",
+                journal: `"구리 나침반이다. 엄청나게 많이 만들어졌고 빈번하게 사용되었다. 몇 마을 떨어진 해변으로 떠밀려 왔다는 소리를 들었다. 필시 바다에서 잃어버린 나침반이 더 많이 떠돌고 있을 거다."`,
+                icon: "antiques/antique-copper-compass.png"
+            },
+            "antiquegrenade":{
+                hint: `"거대한 전쟁의 잔해물을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "원래 용도대로 쓰이지 못한 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "시골에 사는 사람들은 가끔 전쟁 유물을 발견하고 자신만의 수집품을 만들곤 한단다."`,
+                museum: "수류탄이 대좌 위에 놓여 있다. 짐작하건대 불발탄일 것이다.",
+                name: "오래된 수류탄",
+                key: "Old Grenade",
+                journal: `"거대한 전쟁의 잔해물이다. 원래 용도대로 쓰이지 못한 물건이다. 시골에 사는 사람들은 가끔 전쟁 유물을 발견하고 자신만의 수집품을 만들곤 한다."`,
+                journalName: "전쟁 유물",
+                icon: "antiques/antique-grenade.png"
+                },
+            "antiquestonetalisman":{
+                hint: `"고대의 성스러운 목걸이를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "마을 시가지에서 멀리 떨어진 곳에서 치러진 의식에 쓰였겠지."<br><br> <<He>>【은는】 고개를 돌린다. "어디서 찾을 수 있을지는 유감스럽게도 확신할 수 없군. 누구도 감히 찾아볼 생각을 못 한 그런 곳에 있을 거다."`,
+                museum: "돌 부적이 대좌 위에 놓여 있다.",
+                name: "돌 부적",
+                key: "Stone Talisman",
+                journal: `"고대의 성스러운 목걸이다. 마을 시가지에서 멀리 떨어진 곳에서 치러진 의식에 쓰였을 것이다. 어디서 찾을 수 있을지는 유감스럽게도 확신할 수 없다. 누구도 감히 찾아볼 생각을 못 한 그런 곳에 있을 거다."`,
+                journalName: "성스러운 목걸이",
+                icon: "clothes/holy-pendant.png"
+            },
+            "antiquesilvermask":{
+                hint: `"어떤 기이한 물건을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "고대 종교의 예복이거나, 어쩌면 장신구일지도 모르지."<br><br> <<He>>【은는】 고개를 돌린다. "어디서 찾아야 할진 전혀 감도 잡히지 않는군. 다른 물건들을 찾다 보면 우연히 하나쯤 나오지 않겠나."`,
+                museum: "은가면이 벽에 걸려 있다.",
+                name: "은가면",
+                key: "Silver Mask",
+                journal: `"어떤 기이한 물건이다. 고대 종교의 예복이거나, 어쩌면 장신구일지도 모른다. 어디서 찾아야 할진 전혀 감도 잡히지 않는다. 다른 물건들을 찾다 보면 우연히 하나쯤 나오지 않을까 싶다."`,
+                journalName: "기이한 물건",
+                icon: "antiques/antique-silver-mask.png"
+            },
+            "antiquediamond":{
+                hint: `"보석을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "아니면 원석이거나."<br><br> <<He>>【은는】 고개를 돌린다. "예전에는 밀수업자들이 이 마을을 거쳐 이런 물건들을 밀매하곤 했지. 아주 오래전 일이다만."`,
+                museum: "다이아몬드가 베개 위에 놓여 있다.",
+                name: "다이아몬드",
+                key: "Diamond",
+                journal: `"보석, 아니면 원석이다. 예전에는 밀수업자들이 이 마을을 거쳐 이런 물건들을 밀매하곤 했다. 아주 오래전 일이다만."`,
+                journalName: "보석",
+                icon: "antiques/antique-diamond.png"
+            },
+            "antiquesilvercompass":{
+                hint: `"나침반을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "그냥 나침반은 아니고. 지체 높은 자가 쓰던 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "어디에 잘못 두고 다닐 법한 종류의 물건이 아니야. 절대 자의로 버리진 않았을 거다."`,
+                museum: "은 나침반이 대좌 위에 놓여 있다.",
+                name: "은 나침반",
+                key: "Silver Compass",
+                journal: `"나침반이다. 그냥 나침반은 아니고 지체 높은 자가 쓰던 물건이다. 어디에 잘못 두고 다닐 법한 종류의 물건이 아니다. 절대 자의로 버리진 않았을 거다."`,
+                journalName: "나침반",
+                icon: "antiques/antique-silver-compass.png"
+            },
+            "antiquesilverdagger":{
+                hint: `"장식용 무기를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "전투용은 아니고, 일종의 장신구로 달고 다녔던 거지."<br><br> <<He>>【은는】 고개를 돌린다. "뱃사람들이 주로 차고 다녔다."`,
+                museum: "은장도가 벽에 걸려 있다.",
+                name: "은장도",
+                key: "Silver Dagger",
+                journal: `"장식용 무기다. 전투용은 아니고, 일종의 장신구로 달고 다녔던 거다. 뱃사람들이 주로 차고 다녔다."`,
+                journalName: "장식용 무기",
+                icon: "antiques/antique-silver-dagger.png"
+            },
+            "antiquerustedcutlass":{
+                hint: `"커틀러스를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "녹슨 거면 충분하겠지."<br><br> <<He>>【은는】 고개를 돌린다. "뱃사람들이 쓰던 물건이니, 놈들의 오랜 소굴에 하나쯤 숨겨져 있지 않다면 오히려 놀라울 노릇일 거다."`,
+                museum: "녹슨 커틀러스가 벽에 걸려 있다.",
+                name: "녹슨 커틀러스",
+                key: "Rusted Cutlass",
+                journal: `"커틀러스다. 녹슨 거면 충분할 거다. 뱃사람들이 쓰던 물건이니, 놈들의 오랜 소굴에 하나쯤 숨겨져 있지 않다면 오히려 놀라울 노릇일 거다."`,
+                icon: "antiques/antique-rusted-cutlass.png"
+            },
+            "antiquecutlass":{
+                hint: `"커틀러스를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "보존 상태가 좋은 녀석으로. 내가 여태껏 본 것들은 죄다 녹슬고 닳아 빠졌었거든."<br><br> <<He>>【은는】 고개를 돌린다. "수천 자루는 족히 이 마을을 거쳐 갔을 테니, 그중 몇 자루쯤은 온전히 남아있어야 마땅하지."`,
+                museum: "커틀러스가 벽에 걸려 있다.",
+                name: "커틀러스",
+                key: "Cutlass",
+                journal: `"커틀러스다. 가급적 보존 상태가 좋은 녀석이었으면 좋겠다. 여태껏 발견된 것들은 죄다 녹슬고 닳아 빠졌으니까. 수천 자루는 족히 이 마을을 거쳐 갔을 테니, 그중 몇 자루쯤은 온전히 남아있어야 마땅하다."`,
+                icon: "antiques/antique-cutlass.png"
+            },
+            "antiqueleathermap":{
+                hint: `"해적 지도를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "전설에 따르면 해적들이 인근 시골에 보물을 숨겨뒀다더군." <br><br> <<He>>【은는】 고개를 돌린다. "터무니없는 소리 같지만, 해적이나 밀수업자들이 비밀 통로를 통해 마을로 들어왔던 건 사실이니까. 어쩌면 그들의 소지품이 아직 그곳에 남아있을지도 모르지."`,
+                museum: "가죽 지도가 벽에 걸려 있다.",
+                name: "가죽 지도",
+                key: "Leather Map",
+                journal: `"해적 지도다. 전설에 따르면 해적들이 인근 시골에 보물을 숨겨뒀다고 한다. 터무니없는 소리 같지만, 해적이나 밀수업자들이 비밀 통로를 통해 마을로 들어왔던 건 사실이다. 어쩌면 그들의 소지품이 아직 그곳에 남아있을지도 모른다."`,
+                journalName: "해적 지도",
+                icon: "antiques/antique-map.png"
+            },
+            "antiquebell":{
+                hint: `"종을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "과거 신앙의 유물이지. 단 하나만 만들어졌다. 신전에서 보관하고 있었는데 도둑맞았다고 하더군."<br><br> <<He>>【은는】 고개를 돌린다. "그 후로는 어디서도 발견된 적이 없지. 다른 곳의 박물관에 아직 나타나지 않은 게 놀라울 지경이다."`,
+                museum: "종을 두는 대좌 위로 천이 덮여 내용물을 가리고 있다.",
+                stolen: "종을 두는 대좌는 비어 있고, 예정된 전시를 제공할 수 없다는 윈터의 사과 메모만 덩그러니 놓여 있다.",
+                recovered: "",
+                name: "낭랑한 종",
+                key: "Sonorous Bell",
+                journal: `"과거 신앙의 유물인 종이다. 단 하나만 만들어졌다. 신전에서 보관하고 있었는데 도둑맞았다고 한다. 그 후로는 어디서도 발견된 적이 없다. 다른 곳의 박물관에 아직 나타나지 않은 게 놀라울 지경이다."`,
+                journalName: "신전의 종",
+                icon: "antiques/antique-bell.png"
+            },
+            "antiquebullet":{
+                hint: `"총알을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "거대한 전쟁의 잔해물이지. 그때는 실탄으로 연습을 했거든. 등산객들이 가끔 발견하곤 한단다."<br><br> <<He>>【은는】 고개를 돌린다. "예전에는 자원병들을 황야로 끌고 나가 훈련을 시키곤 했지."`,
+                museum: "총알이 대좌 위에 놓여 있다.",
+                name: "총알",
+                key: "Bullet",
+                journal: `"거대한 전쟁의 잔해물인 총알이다. 그때는 실탄으로 연습을 했으니, 등산객들이 가끔 발견하곤 한다. 예전에는 자원병들을 황야로 끌고 나가 훈련을 시키곤 했다."`,
+                icon: "antiques/antique-bullet.png"
+            },
+            "antiqueshell":{
+                hint: `"폭발물을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "거대한 전쟁의 잔해물이지. 탄약이 사라지면, 결국 암시장에서 버젓이 나타나곤 했거든."<br><br> <<He>>【은는】 고개를 돌린다. "황야로 끌고 나가 실탄으로 연습을 시키곤 했단다."`,
+                museum: "포탄이 대좌 위에 놓여 있다.",
+                name: "포탄",
+                key: "Artillery Shell",
+                journal: `"거대한 전쟁의 잔해물인 폭발물이다. 탄약이 사라지면 결국 암시장에서 버젓이 나타나곤 했다. 황야로 끌고 나가 실탄으로 연습을 시키곤 했다."`,
+                icon: "antiques/antique-artillery.png"
+            },
+            "antiquegoldring":{
+                hint: `"고대의 금반지를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "귀족이 끼던 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "아무도 찾아보지 않은 그런 곳에 있을 거다. 어쩌면 땅속에 묻혀 있을지도 모르지."`,
+                museum: "금반지가 대좌 위에 놓여 있다.",
+                name: "금반지",
+                key: "Gold Ring",
+                journal: `"고대의 금반지다. 귀족이 끼던 물건이다. 아무도 찾아보지 않은 그런 곳에 있을 것이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-gold-ring.png"
+            },
+            "antiquegoldbrooch":{
+                hint: `"고대의 금 브로치를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "이곳 귀족들이 꿍쳐뒀을 법한 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "그렇다고 나 같은 사람을 들여보내서 확인하게 해주진 않겠지만 말이다."`,
+                museum: "금 브로치가 대좌 위에 놓여 있다.",
+                name: "금 브로치",
+                key: "Gold Brooch",
+                journal: `"고대의 금 브로치다. 귀족들이 숨겨둔 물건이다. 어쩌면 그들의 저택 어딘가에 있을지도 모른다."`,
+                icon: "antiques/antique-gold-brooch.png"
+            },
+            "antiquecoralring":{
+                hint: `"고대의 산호 반지를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "이 근방 해적 무리의 선장이 끼고 다니던 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "그 후손들이 아직도 가지고 있다던데, 괜히 문제 일으키진 마라."`,
+                museum: "산호 반지가 대좌 위에 놓여 있다.",
+                name: "산호 반지",
+                key: "Coral Ring",
+                journal: `"한때 해적 선장이 끼고 다녔던 고대의 산호 반지다. 어쩌면 바다에서 잃어버렸을지도 모른다."`,
+                icon: "antiques/antique-coral-ring.png"
+            },
+            "antiquehourglass":{
+                hint: `"고대의 모래시계를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "뭐, 이론상 고대란 소리지. 자료마다 얼마나 오래됐는지에 대해선 의견이 분분하거든."<br><br> <<He>>【은는】 고개를 돌린다. "비교적 최근에 언급된 적이 있다. 분명 질 나쁜 자들의 손에 들어갔을 거다."`,
+                museum: "글귀가 새겨진 모래시계가 대좌 위에 놓여 있다.",
+                name: "글귀가 새겨진 모래시계",
+                key: "Inscribed Hourglass",
+                journal: `"고대의 모래시계다. 얼마나 오래됐는지에 대해선 논란의 여지가 있다만, 십중팔구 질 나쁜 자들의 손에 들어갔을 거다."`,
+                journalName: "고대의 모래시계",
+                icon: "antiques/antique-hourglass.png"
+            },
+            "antiquecoppercoin":{
+                hint: `"구리 동전을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "엄청나게 많이 주조되었겠지만, 세월의 풍파를 견뎌낸 건 그리 많지 않을 거다."<br><br> <<He>>【은는】 고개를 돌린다. "남아있는 것들도 전부 깊은 곳에 묻혀 있을 테지."`,
+                museum: "구리 동전이 전시되어 있다.",
+                name: "구리 동전",
+                key: "Copper Coin",
+                journal: `"고대의 구리 동전이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-copper-coin.png"
+            },
+            "antiquesilvercoin":{
+                hint: `"은 동전을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "가끔 오래된 무덤에서 발견되기도 하지."<br><br> <<He>>【은는】 고개를 돌린다. "세상 밖에 드러난 채로 온전히 살아남은 건 그리 많지 않다."`,
+                museum: "은 동전이 전시되어 있다.",
+                name: "은 동전",
+                key: "Silver Coin",
+                journal: `"고대의 은 동전이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-silver-coin.png"
+            },
+            "antiquegoldcoin":{
+                hint: `"금 동전을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "그 당시의 풍습이 그랬던 것처럼, 아마 부유한 주인과 함께 묻혀 있을 거다."<br><br> <<He>>【은는】 고개를 돌린다. "그렇다고 무덤 도굴이나 하고 다니라는 소리는 아니다만!"`,
+                museum: "금 동전이 전시되어 있다.",
+                name: "금 동전",
+                key: "Gold Coin",
+                journal: `"고대의 금 동전이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-gold-coin.png"
+            },
+            "antiquesilverblade":{
+                hint: `"은검을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "자연의 비바람으로부터 꽤 잘 보호받았어야 온전하겠지."<br><br> <<He>>【은는】 고개를 돌린다. "어쩌면 땅속에 파묻혀 있을지도 모른다."`,
+                museum: "은검이 대좌 위에 놓여 있다.",
+                name: "은검",
+                key: "Silver Blade",
+                journal: `"고대의 은검이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-silver-blade.png"
+            },
+            "antiqueivorystatuette":{
+                hint: `"상아 조각상을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "아주 독특한 종교 유물이지."<br><br> <<He>>【은는】 고개를 돌린다. "이게 실존한다면 말이다. 사제들은 분명 있다고 믿는 모양이더군. 아무도 감히 찾아볼 엄두조차 내지 못하는 깊고 어두운 곳 어딘가에 있을 거다."`,
+                museum: "상아 조각상이 대좌 위에 놓여 있다.",
+                name: "상아 조각상",
+                key: "Ivory Statuette",
+                journal: `"고대의 상아 조각상이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-ivory-statuette.png"
+            },
+            "antiquestrangefetish":{
+                hint: `"이상한 주술품을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "초기 정착지 중 한 곳에서 가져온 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "필시 고대의 어딘가에 있을 거다."`,
+                museum: "이상한 주술품이 대좌 위에 놓여 있다.",
+                name: "이상한 주술품",
+                key: "Strange Fetish",
+                journal: `"고대의 이상한 주술품이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-fetish.png"
+            },
+            "antiquesilvergoblet":{
+                hint: `"은술잔을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "어딘가 단단히 잠겨 있을 게 분명하다."<br><br> <<He>>【은는】 고개를 돌린다. "은은 예나 지금이나 귀한 물건이니, 아무도 찾아보지 않은 그런 곳에 숨겨져 있겠지."`,
+                museum: "은술잔이 대좌 위에 놓여 있다.",
+                name: "은술잔",
+                key: "Silver Goblet",
+                journal: `"고대의 은술잔이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-silver-goblet.png"
+            },
+            "antiquesilvercrown":{
+                hint: `"은 왕관을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "단 하나뿐인 아주 독특한 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "아마 주인과 함께 묻혀 있을 확률이 높다."`,
+                museum: "은 왕관이 대좌 위에 놓여 있다.",
+                name: "은 왕관",
+                key: "Silver Crown",
+                journal: `"고대의 은 왕관이다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-silver-crown.png"
+            },
+            "antiquewhitecrystal":{
+                hint: `"하얀 결정체를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "이 물건에 대해선 전화를 한 통 받은 적이 있지."<br><br> <<He>>【은는】 고개를 돌린다. "오래된 교회 묘지 근처, 숲속 어딘가에서 잃어버렸다고 하더군."`,
+                museum: "하얀 결정체가 쿠션 위에 놓여 있다.",
+                name: "하얀 결정체",
+                key: "White Crystal",
+                journal: `"고대의 하얀 결정체다. 어쩌면 땅속에 묻혀 있을지도 모른다."`,
+                icon: "antiques/antique-crystal.png"
+            },
+            "antiqueminesign":{
+                hint: `"철제 표지판을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "예전에는 광산 앞에 걸려 있던 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "광산이 문을 닫았을 때 폐기되었다더군."`,
+                museum: "베일리의 표지판이 쿠션 위에 놓여 있다.",
+                name: "베일리 표지판",
+                key: "Bailey Sign",
+                journal: `"오래된 광산의 표지판이다. 수년 전에 버려졌다."`,
+                journalName: "오래된 광산 표지판",
+                icon: "antiques/antique-bailey.png"
+            },
+            "antiqueobsidiandisc":{
+                hint: `"흑요석 원판을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "아주 오래전, 고대의 사람들에 의해 다듬어진 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "아무도 찾아보지 않은 그런 곳에 있을 거다."`,
+                museum: "흑요석 원판이 대좌 위에 놓여 있다.",
+                name: "흑요석 원판",
+                key: "Obsidian Disc",
+                journal: `"고대의 사람들이 만든 흑요석 원판이다."`,
+                icon: "antiques/antique-disc.png"
+            },
+            "antiquewoodenmask":{
+                hint: `"나무 가면을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "수백 년 전 이 지역 사람들이 쓰던 것과 같은 거지. 하나가 해변으로 떠밀려 왔었다."<br><br> <<He>>【은는】 고개를 돌린다. "상당히 많이 썩어버린 상태이긴 했지만 말이다."`,
+                museum: "나무 가면이 대좌 위에 놓여 있다.",
+                name: "나무 가면",
+                key: "Wooden Mask",
+                journal: `"고대의 사람들이 썼던 나무 가면이다."`,
+                icon: "clothes/islander-mask.png"
+            },
+            "antiquetrilobitefossil":{
+                hint: `"삼엽충 화석을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "그냥 화석이 아니야. 이 지역에만 서식했던 거대한 변종인데, 아직 상태가 좋은 표본이 발견된 적은 없지."<br><br> <<He>>【은는】 고개를 돌린다. "아무도 찾아보지 않은 그런 곳에 있을 거다."`,
+                museum: "삼엽충 화석이 대좌 위에 놓여 있다.",
+                name: "삼엽충 화석",
+                key: "Trilobite Fossil",
+                journal: `"희귀한 변종의 삼엽충 화석이다."`,
+                icon: "antiques/antique-trilobite.png"
+            },
+            "antiqueislandarrow":{
+                hint: `"화살을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "고대 사람들이 사용했던, 온전히 나무로만 만들어진 화살이지."<br><br> <<He>>【은는】 고개를 돌린다. "큰 기대는 안 하고 있다. 수백 년 전에 진작 썩어 문드러졌을 테니."`,
+                museum: "섬 주민의 화살이 대좌 위에 놓여 있다.",
+                name: "섬 주민의 화살",
+                key: "Islander Arrow",
+                journal: `"고대의 사람들이 사용했던 온전히 나무로만 만들어진 화살이다."`,
+                journalName: "나무 화살",
+                icon: "antiques/antique-islander-arrow.png"
+            },
+            "antiquegoldcompass":{
+                hint: `"금 나침반을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "어떤 불한당이 훔쳐 달아나기 전까지 이 마을의 유서 깊은 가문 중 하나가 소유하고 있었지."<br><br> <<He>>【은는】 고개를 돌린다. "반드시 다시 나타날 거라고 확신한다."`,
+                museum: "금 나침반이 대좌 위에 놓여 있다.",
+                name: "금 나침반",
+                key: "Gold Compass",
+                journal: `"도둑맞은 금 나침반이다."`,
+                icon: "antiques/antique-gold-compass.png"
+            },
+            "antiqueswordcane":{
+                hint: `"검이 숨겨진 지팡이를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "1세기도 더 된 물건이지. 실전 무기라기보다는 호기심을 자극하는 장신구에 가깝다만."<br><br> <<He>>【은는】 고개를 돌린다. "그래도 폭력적인 성향을 가진 자들의 손에 들어가지 않았나 의심되더군."`,
+                museum: "검이 숨겨진 지팡이가 유리관 뒤에 놓여 있다.",
+                name: "검이 숨겨진 지팡이",
+                key: "Sword Cane",
+                journal: `"검이 숨겨진 지팡이로 폭력적인 성향을 가진 자들의 손에 있다."`,
+                icon: "antiques/antique-cane.png"
+            },
+            "antiquechocolate":{
+                hint: `"초콜릿을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "그냥 평범한 초콜릿은 아니고. 수년 동안 먹히지 않고 살아남은 초콜릿 말이지."<br><br> <<He>>【은는】 고개를 돌린다. "좋은 초콜릿을 왜 그냥 썩혀 두는 걸까? "`,
+                museum: "초콜릿 통이 열린 채로 유리관 뒤에 놓여 있다.",
+                name: "초콜릿",
+                key: "Chocolate",
+                journal: `"수년 동안 먹히지 않고 남겨진 초콜릿이다."`,
+                icon: "antiques/antique-chocolate.png"
+            },
+            "antiqueteacaddy":{
+                hint: `"차 보관함을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "화물을 실어 전 세계로 나르던 시절의 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "아마 오래된 배에 여전히 실려 있을지도 모른다."`,
+                museum: "차 보관함이 대좌 위에 놓여 있다.",
+                name: "차 보관함",
+                key: "Tea Caddy",
+                journal: `"화물을 실어 바다를 건널 때 쓰였던 차 보관함이다."`,
+                icon: "antiques/antique-tea.png"
+            },
+            "antiquewoodenfigurine":{
+                hint: `"목각 인형을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "문헌에 따르면, 오래전에 꽤 인기가 있었다더군."<br><br> <<He>>【은는】 고개를 돌린다. "아직까지 온전히 남아있는 건 하나도 없는 걸로 안다. 아마 해외에서 들여온 물건일지도 모르지."`,
+                museum: "목각 인형이 대좌 위에 놓여 있다.",
+                name: "목각 인형",
+                key: "Wooden Figurine",
+                journal: `"해외에서 들여왔을지도 모르는 목각 인형이다."`,
+                icon: "antiques/antique-figurine.png"
+            },
+            "antiquecopperring":{
+                hint: `"구리 반지를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "수백 년 전의 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "십중팔구 닳아 빠진 채 어딘가에 잊혀져 있을 거다."`,
+                museum: "구리 반지가 대좌 위에 놓여 있다.",
+                name: "구리 반지",
+                key: "Copper Ring",
+                journal: `"수백 년 전에 만들어진 구리 반지다."`,
+                icon: "antiques/antique-copper-ring.png"
+            },
+            "antiquesilveramulet":{
+                hint: `"은 부적을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "부자들이 꿍쳐둘 만한 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "뭔가 숨길 게 많은 부류들 말이다."`,
+                museum: "은 부적이 대좌 위에 놓여 있다.",
+                name: "은 부적",
+                key: "Silver Amulet",
+                journal: `"고대의 은 부적이다. 어떤 부자가 숨겨둔 물건이다."`,
+                icon: "antiques/antique-silver-amulet.png"
+            },
+            "antiquebucket":{
+                hint: `"양동이를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "단순하지만, 오래된 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "어떤 중요한 일에 쓰였을 거다."`,
+                museum: "양동이가 대좌 위에 놓여 있다.",
+                name: "양동이",
+                key: "Bucket",
+                journal: `"고대의 양동이다. 어떤 중요한 일에 쓰였다."`,
+                icon: "antiques/antique-bucket.png"
+            },
+            "antiquesilvermanacle":{
+                hint: `"은 수갑을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "예전에 신전에서 마녀를 결박할 때 쓰던 거라더군."<br><br> <<He>>【은는】 고개를 돌린다. "다 아주 오래된 이야기지. 더 개화된 시대로 접어들면서 싹 다 내다 버렸거든."`,
+                museum: "은 수갑이 대좌 위에 놓여 있다.",
+                name: "은 수갑",
+                key: "Silver Manacle",
+                journal: `"고대의 은 수갑이다. 신전에서 버려졌다."`,
+                icon: "antiques/antique-silver-manacle.gif"
+            },
+            "antiquesnuffer":{
+                hint: `"횃불 끄개를 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "꽤 실용적인 물건이었을 거야. 아마 오래된 유적에 몇 개쯤 남아있겠지."<br><br> <<He>>【은는】 고개를 돌린다. "농장 쪽에 그런 유적이 하나 있다만, 거기를 뒤져보는 건 추천하지 않으마."`,
+                museum: "횃불 끄개가 대좌 위에 놓여 있다.",
+                name: "횃불 끄개",
+                key: "Snuffer",
+                journal: `"고대의 횃불 끄개다. 오래된 유적에 몇 개쯤 남아있을지도 모른다."`,
+                icon: "antiques/antique-snuffer.png"
+            },
+            "antiquewhip":{
+                hint: `"채찍을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "신전에서 쓰던 것과 비슷하지만, 훨씬 오래된 녀석이지."<br><br> <<He>>【은는】 고개를 돌린다. "요즘이야 의식용으로나 쓴다지만, 그 옛날 채찍들은 사람을 징벌하기 위해 만들어졌다. 그러니 가까운 곳에 보관해 두진 않았겠지."`,
+                museum: "채찍이 대좌 위에 놓여 있다.",
+                name: "채찍",
+                key: "Whip",
+                journal: `"고대의 채찍이다. 신전에서 버려졌다."`,
+                icon: "antiques/antique-whip.png"
+            },
+            "antiquehorn2":{
+                hint: `"장식된 뿔을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "은과 보석으로 치장되어 있지."<br><br> <<He>>【은는】 고개를 돌린다. "어쩌면 조각상의 일부일지도 모르지만, 그런 걸 어디서 찾을 수 있을진 장담할 수 없군."`,
+                museum: "장식된 뿔이 대좌 위에 놓여 있다.",
+                name: "정교한 뿔",
+                key: "Intricate Horn",
+                journal: `"고대의 장식된 뿔이다. 어쩌면 조각상의 일부일지도 모른다."`,
+                icon: "antiques/antique-horn-2.png"
+            },
+            "antiquegolddagger":{
+                hint: `"금 단검을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "금이 그렇게 잘 들 리는 없겠지만, 그래도 조심하도록."<br><br> <<He>>【은는】 고개를 돌린다. "개인 수집가의 손에 들어갔을 거라 짐작한다."`,
+                museum: "금 단검이 대좌 위에 놓여 있다.",
+                name: "금 단검",
+                key: "Gold Dagger",
+                journal: `"금 단검이다. 어쩌면 개인 수집품의 일부일지도 모른다."`,
+                icon: "antiques/antique-gold-dagger.png"
+            },
+            "antiquegoldamulet":{
+                hint: `"금 부적을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "굳이 골동품이 아니더라도 값비싼 물건이지."<br><br> <<He>>【은는】 고개를 돌린다. "얼마 전에 경매에 나왔었는데, 익명의 입찰자에게 밀리고 말았다."`,
+                museum: "금 부적이 대좌 위에 놓여 있다.",
+                name: "금 부적",
+                key: "Gold Amulet",
+                journal: `"고대의 금 부적이다. 어쩌면 개인 수집품의 일부일지도 모른다."`,
+                icon: "antiques/antique-gold-amulet.png"
+            },
+            "antiquegoldmask":{
+                hint: `"금가면을 둘 자리다." 윈터가 빈 대좌를 가리키며 말한다. "고대의 것이지."<br><br> <<He>>【은는】 고개를 돌린다. "그 정도 가치가 있는 물건이라면 더 잘 알려져야 정상이건만. 누군가 꽁꽁 숨겨두고 있는 게 틀림없다."`,
+                museum: "금가면이 대좌 위에 놓여 있다.",
+                name: "금가면",
+                key: "Gold Mask",
+                journal: `"고대의 금가면이다. 어쩌면 개인 수집품의 일부일지도 모른다."`,
+                icon: "antiques/antique-gold-mask.png"
+            }
+        }>>
+    <</if>>
+<</widget>>
+
+<<widget "museumPaintingText">>
+    <<if _museumPaintingText is undefined>>
+        <!--journalName used before player talks about painting with Winter, who reveals the name at that point. -->
+        <!--icon used next to links, with standard icon dimension (30x30px). inlineFull and inlineRaw are 60x60px versions of the icon with twice the amount of detail, and are used within the passage text when the player finds the painting, as well as in the journal and museum UI. Inline files belong with other passage props, in img/misc/prop. -->
+        <<set _museumPaintingText to {
+            "paintingward":{
+                hint: `"수십 년 된 그림으로, 붉은 달빛 아래 얕은 물속에 누워있는 갈색 머리의 사람을 그렸단다. 주술적인 의미를 지니고 있지."<br><br>`,
+                museum: "'피 흘리는 병동'이 벽에 걸려 있다.",
+                name: "피 흘리는 병동",
+                key: "Bleeding Ward",
+                journal: `"머리 위 달이 붉게 물드는 동안 얕은 물속에 누워있는 사람을 그린 그림이다."`,
+                journalName: "붉은 달 관찰자 그림",
+                icon: "antiques/paintings/painting-ward.png",
+                inlineFull: "painting-ward-full.png",
+                inlineRaw: "painting-ward-raw.png"
+            },
+            "paintingsnake":{
+                hint: `"약 3백 년 된 그림이다. 타원형 액자에, 뱀의 허물에서 여자가 기어 나오는 모습을 그렸지."<br><br>`,
+                museum: "'절망의 굴레'가 벽에 걸려 있다.",
+                name: "절망의 굴레",
+                key: "Hopeless Cycle",
+                journal: `"울고 있는 여자가 뱀의 허물에서 기어 나오는 모습을 그린 그림이다."`,
+                journalName: "뱀-여자 그림",
+                icon: "antiques/paintings/painting-snake.png",
+                inlineFull: "painting-snake-full.png",
+                inlineRaw: "painting-snake-raw.png"
+            }
+        }>>
+    <</if>>
+<</widget>>
+
+<<widget "updateMuseumAntiques">>
+	<<if $museumAntiques is undefined>>
+		<<set $museumAntiques to {
+			antiques:{
+				"antiquebox": "notFound",
+				"antiquesilverring": "notFound",
+				"antiquegoldnecklace": "notFound",
+				"antiqueivorynecklace": "notFound",
+				"antiquecrystal": "notFound",
+				"antiquehorn": "notFound",
+				"antiquewatch": "notFound",
+				"antiquedildo": "notFound",
+				"antiquecandlestick": "notFound",
+				"antiqueforestarrow": "notFound",
+				"antiqueforestdagger": "notFound",
+				"antiqueforestgem": "notFound",
+				"antiquesilverbrooch": "notFound",
+				"antiquetrashcup": "notFound",
+				"antiquetrashburner": "notFound",
+				"antiquebrassstatuette": "notFound",
+				"antiquegoldchastitybelt": "notFound",
+				"antiquecoppercompass": "notFound",
+				"antiquegrenade": "notFound",
+				"antiquestonetalisman": "notFound",
+				"antiquesilvermask": "notFound",
+				"antiquediamond": "notFound",
+				"antiquesilvercompass": "notFound",
+				"antiquesilverdagger": "notFound",
+				"antiquerustedcutlass": "notFound",
+				"antiquecutlass": "notFound",
+				"antiqueleathermap": "notFound",
+				"antiquebell": "notFound",
+				"antiquebullet": "notFound",
+				"antiqueshell": "notFound",
+				"antiquegoldring": "notFound",
+				"antiquegoldbrooch": "notFound",
+				"antiquecoralring": "notFound",
+				"antiquehourglass": "notFound",
+				"antiquecoppercoin": "notFound",
+				"antiquesilvercoin": "notFound",
+				"antiquegoldcoin": "notFound",
+				"antiquesilverblade": "notFound",
+				"antiqueivorystatuette": "notFound",
+				"antiquestrangefetish": "notFound",
+				"antiquesilvergoblet": "notFound",
+				"antiquesilvercrown": "notFound",
+				"antiquewhitecrystal": "notFound",
+				"antiqueminesign": "notFound",
+				"antiqueobsidiandisc": "notFound",
+				"antiquewoodenmask": "notFound",
+				"antiquetrilobitefossil": "notFound",
+				"antiqueislandarrow": "notFound",
+				"antiquegoldcompass": "notFound",
+				"antiqueswordcane": "notFound",
+				"antiquechocolate": "notFound",
+				"antiqueteacaddy": "notFound",
+				"antiquewoodenfigurine": "notFound",
+				"antiquecopperring": "notFound",
+				"antiquesilveramulet": "notFound",
+				"antiquebucket": "notFound",
+				"antiquesilvermanacle": "notFound",
+				"antiquesnuffer": "notFound",
+				"antiquewhip": "notFound",
+				"antiquehorn2": "notFound",
+				"antiquegolddagger": "notFound",
+				"antiquegoldamulet": "notFound",
+				"antiquegoldmask": "notFound"
+			},
+			paintings:{
+				"paintingward": "notFound",
+				"paintingsnake": "notFound"
+			},
+			museumCount:0
+		}>>
+
+		<<for _labelM, _valueM range $museumAntiques.antiques>>
+			<<print '<<if $'+_labelM+' isnot undefined>>'+
+				'<<set $museumAntiques.antiques.'+_labelM+' to $'+_labelM+'>>'+
+			'<</if>>'>>
+			<<if $museumAntiques.antiques[_labelM] is "museum" or $museumAntiques.antiques[_labelM] is "stolen" or $museumAntiques.antiques[_labelM] is "recovered">>
+				<<set $museumAntiques.museumCount++>>
+			<</if>>
+		<</for>>
+	<</if>>
+	<<if $winterHint is undefined>>
+		<<set $winterHint to "notGiven">>
+	<</if>>
+	<<if $bell_stolen is 1>>
+		<<unset $bell_stolen>>
+		<<museumAntiqueStatus "antiquebell" "stolen">>
+	<</if>>
+	<<if $museumAntiques.stolenCount is undefined>>
+		<<set $museumAntiques.stolenCount to 0>>
+		<<set $museumAntiques.recoveredCount to 0>>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquecoppercompass is undefined>>
+		<<set $museumAntiques.antiques.antiquecoppercompass to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegrenade is undefined>>
+		<<set $museumAntiques.antiques.antiquegrenade to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquestonetalisman is undefined>>
+		<<set $museumAntiques.antiques.antiquestonetalisman to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilvermask is undefined>>
+		<<set $museumAntiques.antiques.antiquesilvermask to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquediamond is undefined>>
+		<<set $museumAntiques.antiques.antiquediamond to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilvercompass is undefined>>
+		<<set $museumAntiques.antiques.antiquesilvercompass to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilverdagger is undefined>>
+		<<set $museumAntiques.antiques.antiquesilverdagger to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquerustedcutlass is undefined>>
+		<<set $museumAntiques.antiques.antiquerustedcutlass to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquecutlass is undefined>>
+		<<set $museumAntiques.antiques.antiquecutlass to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueleathermap is undefined>>
+		<<set $museumAntiques.antiques.antiqueleathermap to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquebell is undefined>>
+		<<set $museumAntiques.antiques.antiquebell to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquebullet is undefined>>
+		<<set $museumAntiques.antiques.antiquebullet to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueshell is undefined>>
+		<<set $museumAntiques.antiques.antiqueshell to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegoldring is undefined>>
+		<<set $museumAntiques.antiques.antiquegoldring to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegoldbrooch is undefined>>
+		<<set $museumAntiques.antiques.antiquegoldbrooch to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquecoralring is undefined>>
+		<<set $museumAntiques.antiques.antiquecoralring to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquehourglass is undefined>>
+		<<set $museumAntiques.antiques.antiquehourglass to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquecoppercoin is undefined>>
+		<<set $museumAntiques.antiques.antiquecoppercoin to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilvercoin is undefined>>
+		<<set $museumAntiques.antiques.antiquesilvercoin to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegoldcoin is undefined>>
+		<<set $museumAntiques.antiques.antiquegoldcoin to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilverblade is undefined>>
+		<<set $museumAntiques.antiques.antiquesilverblade to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueivorystatuette is undefined>>
+		<<set $museumAntiques.antiques.antiqueivorystatuette to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquestrangefetish is undefined>>
+		<<set $museumAntiques.antiques.antiquestrangefetish to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilvergoblet is undefined>>
+		<<set $museumAntiques.antiques.antiquesilvergoblet to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilvercrown is undefined>>
+		<<set $museumAntiques.antiques.antiquesilvercrown to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquewhitecrystal is undefined>>
+		<<set $museumAntiques.antiques.antiquewhitecrystal to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueminesign is undefined>>
+		<<set $museumAntiques.antiques.antiqueminesign to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueobsidiandisc is undefined>>
+		<<set $museumAntiques.antiques.antiqueobsidiandisc to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquewoodenmask is undefined>>
+		<<set $museumAntiques.antiques.antiquewoodenmask to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquetrilobitefossil is undefined>>
+		<<set $museumAntiques.antiques.antiquetrilobitefossil to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueislandarrow is undefined>>
+		<<set $museumAntiques.antiques.antiqueislandarrow to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegoldcompass is undefined>>
+		<<set $museumAntiques.antiques.antiquegoldcompass to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueswordcane is undefined>>
+		<<set $museumAntiques.antiques.antiqueswordcane to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquechocolate is undefined>>
+		<<set $museumAntiques.antiques.antiquechocolate to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiqueteacaddy is undefined>>
+		<<set $museumAntiques.antiques.antiqueteacaddy to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquewoodenfigurine is undefined>>
+		<<set $museumAntiques.antiques.antiquewoodenfigurine to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquecopperring is undefined>>
+		<<set $museumAntiques.antiques.antiquecopperring to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilveramulet is undefined>>
+		<<set $museumAntiques.antiques.antiquesilveramulet to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquebucket is undefined>>
+		<<set $museumAntiques.antiques.antiquebucket to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesilvermanacle is undefined>>
+		<<set $museumAntiques.antiques.antiquesilvermanacle to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquesnuffer is undefined>>
+		<<set $museumAntiques.antiques.antiquesnuffer to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquewhip is undefined>>
+		<<set $museumAntiques.antiques.antiquewhip to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquehorn2 is undefined>>
+		<<set $museumAntiques.antiques.antiquehorn2 to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegolddagger is undefined>>
+		<<set $museumAntiques.antiques.antiquegolddagger to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegoldamulet is undefined>>
+		<<set $museumAntiques.antiques.antiquegoldamulet to "notFound">>
+	<</if>>
+	<<if $museumAntiques.antiques.antiquegoldmask is undefined>>
+		<<set $museumAntiques.antiques.antiquegoldmask to "notFound">>
+	<</if>>
+	<<if $museumAntiques.paintings is undefined>>
+		<<set $museumAntiques.paintings to {
+			"paintingward": "notFound",
+			"paintingsnake": "notFound"
+		}>>
+	<</if>>
+	/*Should be the last to always run*/
+	<<set $museumAntiques.maxCount to Object.keys($museumAntiques.antiques).length>>
+<</widget>>
+
+<<widget "museumClearHint">>
+	<<set $winterHint to "notGiven">>
+	<<if $museumAntiqueJournalHints.includes(_args[0])>>
+		<<run $museumAntiqueJournalHints.delete(_args[0])>>
+	<</if>>
+<</widget>>

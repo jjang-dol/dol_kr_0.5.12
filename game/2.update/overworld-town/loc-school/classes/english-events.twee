@@ -1,0 +1,661 @@
+:: English Event1
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 1>>
+	<<He>>【은는】 몇 분 동안 당신의 곁에 앉아, 부족했던 부분을 이해할 수 있도록 도와준다. 수업 내용을 더 잘 이해하게 된 것 같다.
+	<br><br>
+	<<link [[다음|English Lesson]]>><<endevent>><</link>>
+	<br>
+<<elseif $phase is 0>>
+	<<He>>【은는】 고개를 끄덕이고 넘어간다.
+	<br><br>
+	<<link [[다음|English Lesson]]>><<endevent>><</link>>
+	<br>
+<</if>>
+<<endnpc>>
+
+:: English Outbuilding
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 0>>
+	당신은 별관으로 천천히 다가가, 무사히 쪽지를 전달하고 빠져나온다. 하지만 몇 분이 걸렸고, 교실로 돌아오자 도렌이 늑장 부렸다고 꾸짖는다.
+	<br><br>
+	<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<<elseif $phase is 1>>
+	<<if $rng gte 51>>
+		당신은 별관으로 빠르게 걸어가, 무사히 쪽지를 전달하고 빠져나온다.
+		<br><br>
+		<<link [[다음|English Lesson]]>><<endevent>><</link>>
+	<<else>>
+		<<beastNEWinit 1 dog>>
+		당신은 별관으로 빠르게 걸어가 쪽지를 전달하지만, <span class="red">돌아서자 <<beasttype>>【이가】 당신에게 다가오는 것을 발견한다</span>.
+		<br><br>
+		<<if $monster is 1 or $settings.bestialityEnabled>>
+			<<link [[다음|English Outbuilding Molestation]]>><<set $molestationstart to 1>><</link>>
+			<br>
+		<<else>>
+			당신은 상처를 입긴 했지만, 간신히 교실로 도망친다.<<beastescape>>
+			<br><br>
+			<<integritycheck>><<towelup>>
+			<<link [[다음|English Lesson]]>><<endevent>><</link>>
+		<</if>>
+
+	<</if>>
+<</if>>
+
+:: English Outbuilding Molestation
+
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+
+	<<enable_rescue>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|English Outbuilding Molestation Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|English Outbuilding Molestation]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: English Outbuilding Molestation Finish
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $alarm is 1 and $rescue is 1>>
+	<<if $NPCList[0].stance is "top">>
+		<<set $rescued += 1>>
+		<<clothesontowel>>
+		<<saveNPC 0 english_dog>>
+		<<endcombat>>
+		<<loadNPC 0 english_dog>>
+		무슨 소란인지 확인하러 별관에서 나온 관리인이, <<beasttype>>【이가】 당신에게 허리를 흔드는 모습을 보고 입을 떡 벌린 채 멈춰 선다.
+		<<generate2>><<person2>>
+		<<He>>【은는】 멍한 상태에서 벗어나 당신 위에서 <<beasttype 0>>【을를】 끌어내린다. <<He>>【은는】 당신만큼이나 당황한 듯, 아무 말 없이 짐승을 개집에 가두고 별관으로 돌아간다. <<tearful>> 당신은 교실로 돌아간다.
+
+		<<famebestiality 10>>
+		<br><br>
+		<<link [[다음|English Lesson]]>><<clearNPC english_dog>><<endevent>><</link>>
+		<br>
+	<<else>>
+		<<set $rescued += 1>>
+		<<clothesontowel>>
+		무슨 소란인지 확인하러 별관에서 관리인이 나온다. "나쁜 <<beasttype>>! 안 돼!" <<beasttype>>【은는】 귀와 꼬리를 축 늘어뜨린 채 물러난다. "정말 미안해, <<bhes>> 그저 사람을 너무 좋아해서 그래." 관리인이 <<beasttype>>【을를】 개집으로 돌려보내며 말한다. "그래도 다친 데는 없지?"
+		<br><br>
+		<<endcombat>>
+		<<generate1>><<person1>>
+		<<He>>【은는】 별관으로 돌아간다. <<tearful>> 당신은 교실로 돌아간다.
+
+		<br><br>
+		<<link [[다음|English Lesson]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+<<elseif $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	<<beasttype>>【은는】 만족스러운 듯 끙끙대며, 당신을 잔디밭에 내버려 둔 채 떠난다. <<tearful>> 당신은 먼지를 털고 교실로 돌아간다.
+	<br><br>
+	<<clothesontowel>>
+	<<endcombat>>
+	<<link [[다음|English Lesson]]>><</link>>
+	<br>
+<<elseif $enemyhealth lte 0>>
+	<<beasttype>>【은는】 낑낑대며 다리 사이에 꼬리를 만 채 도망친다. <<tearful>> 당신은 먼지를 털고 교실로 돌아간다.
+	<br><br>
+	<<clothesontowel>>
+	<<endcombat>>
+	<<link [[다음|English Lesson]]>><</link>>
+	<br>
+<</if>>
+
+:: English Molest
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase is 0>> /* Call for help */
+	You shout out to Doren for help, and try to explain that you're being harassed. The <<person>> looks shocked, <<his>> eyes widen and <<his>> lip trembles, as if on the verge of tears.
+	<<npc Doren 2>><<person2>>
+		<<if !$dorenintro || C.npc.Doren.dom lt 10>>
+			Doren puts <<his>> hands on <<his>> hips and gives you a level stare. "You're not gonna fool me that easily, <<lassie>>. You should sit over there, away from the innocent."
+			<br><br>
+			Doren makes you sit alone on the other side of the room. You got away at least.
+			<br><br>
+		<<else>>
+			Doren applauds. "Amazing performance, almost fooled me." <<He>> puts <<his>> hands on <<his>> hips and gives the <<person1>><<person>> a level stare.
+			<<if $delinquency gte 400>>
+				"You should sit over there, away from the innocent <<lassie>>."
+				<br><br>
+				With a frown, the <<person>> drops the act and sits alone on the other side of the room.
+			<<else>>
+				"Office, now."
+				<br><br>
+				With a frown, the <<person>> drops the act and heads straight to Leighton's office.
+			<</if>>
+			<<if $cool gte 120>>
+				The classmates sitting near you check on you, making sure you're alright.<<lstress>><<ltrauma>><<stress -1>><<trauma -1>>
+			<<else>>
+				The class continues uneventfully.
+			<</if>>
+		<</if>>
+<<elseif $phase is 1>> /* Endure */
+	<<moleststat>>
+
+	<<if $NPCList[0].name is "Doren" or $NPCList[0].name is undefined>>
+		<<person2>>
+	<<else>>
+		<<person1>>
+	<</if>>
+
+	<<He>> runs <<his>> hand further up your thigh, with no regard for how you feel about it.
+	<<if playerChastity() and $worn.under_lower.type.includes("naked")>>
+		<<if $worn.genitals.name is "chastity parasite">>
+			<<He>> stops when <<he>> feels the flesh of your $worn.genitals.name. "Ew, What's this? It's attached to you." <<He>> smirks. "I'd best be careful, I don't want to catch anything from you." <<He>> doesn't bother you for the rest of the lesson.
+		<<else>>
+			<<He>> stops when <<he>> feels the metal of your $worn.genitals.name. "What's this? I heard slaves are sometimes forced to wear these things, are you someone's property?" <<He>> smirks. "I'd best be careful, I don't want to offend anyone." <<He>> doesn't bother you for the rest of the lesson.
+		<</if>>
+	<<elseif $worn.under_lower.type.includes("naked")>>
+		<<fameexhibitionism 1>>
+		<<He>> suddenly recoils, blushing. "You aren't wearing any underwear?! You really are a pervert." <<He>> doesn't bother you for the rest of the lesson.
+	<<else>>
+		<<He>> traces the outline of your $worn.under_lower.name with a finger, from your waist to your groin. <<He>> moves slowly, clearly enjoying the moment. <<He>> takes things no further though, withdrawing <<his>> hand and acting like nothing happened.
+	<</if>>
+	<<garousal>><<arousal 200>>
+	<<if $worn.genitals.name is "chastity parasite">>
+		<<gstress>><<stress 6>>
+	<</if>>
+<<elseif $phase is 2>> /* Confront */
+	<<switch $speech_attitude>>
+		<<case "meek">>
+			"Please stop harassing me!"
+		<<case "bratty">>
+			"I'll fuck you up, you cunt!"
+		<<default>>
+			"Stop it, you perv!"
+	<</switch>>
+
+	You <<= either ("punch", "slap", "kick")>> <<if $enemyno gte 2>>the delinquents<<else>><<him>><</if>> right <<= either ("in the face", "where it hurts")>>.
+	<<set $attackstat += 1>>
+	<br><br>
+
+	<<if $cool gte 160>>
+		The whole class erupts.
+		<br>
+		"Woooo!"
+		<br>
+		"Yeah, get <<if $enemyno gte 2>>their<<else>><<his>><</if>> arse!"
+		<br>
+		"Serves <<if $enemyno gte 2>>them<<else>><<him>><</if>> right!"
+	<<else>>
+		The whole class gasps.
+		<br>
+		"<<pShe>> just fucking twatted <<if $enemyno gte 2>>them<<else>><<him>><</if>>!"
+		<br>
+		"Holy shit!"
+		<br>
+		"What the hell?"
+	<</if>>
+	<<gcool>><<status 3>>
+	<br><br>
+
+	Doren separates you and <<if $enemyno gte 2>>the delinquents<<else>>the <<person1>><<person>><</if>> and asks for explanations. You both explain your sides, polar opposite of one another.
+	<br><br>
+
+	<<npc Doren 2>><<person2>>
+	Fortunately, <<he>> believes you and sends <<if $enemyno gte 2>>the delinquents<<else>>the <<person1>><<person>><</if>> to
+		<<if $delinquency gte 400>>
+			sit at the other side of the room.
+			<br>
+			"You should sit over there, away from the innocent."
+		<<else>>
+			the head's office.
+			<br>
+			"Tell Leighton we said hi." Doren says as everyone waves <<if $enemyno gte 2>>them<<else>><<him>><</if>> goodbye.
+		<</if>>
+	<<detention -2>><<ldelinquency>>
+	<br><br>
+
+	<<He>> turns to you, "I'm glad you stood up for yourself, <<lassie>>." <<if $cool gte 160>>Your classmates affirm <<him>>.<</if>>
+	<br><br>
+
+	The class continues uneventfully with the occasional whispering about what just happened. <<if $cool gte 120>>The classmates sitting near you check on you, making sure you're alright.<<lstress>><<ltrauma>><<stress -1>><<trauma -1>><</if>>
+<<elseif $phase is 3>> /* Call for help (delinquents) */
+	You shout out to Doren for help, and try to explain that you're being harassed. The delinquents deny, "<<pShe>>'s lying!"
+	<br><br>
+
+	<<npc Doren>><<person1>>
+	Doren puts <<his>> hands on <<his>> hips and gives them a level stare. "You're not gonna fool me that easily. Office, now."
+	<br><br>
+	With a scoff, the delinquents drop the act and head straight to Leighton's office.
+	<br><br>
+	<<if $cool gte 120>>
+		The classmates sitting near you check on you, making sure you're alright.<<lstress>><<ltrauma>><<stress -1>><<trauma -1>>
+	<<else>>
+		The class continues uneventfully.
+	<</if>>
+<</if>>
+<br><br>
+
+<<link [[Next|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Events Pinch
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<person1>><<person>>【이가】 깜짝 놀라 비명을 지른다. 도렌이 고개를 들어 <<him>>【을를】 쳐다본다. 하지만 <<person>>【은는】 너무 부끄러워 불평하지 못하고, 발끝만 쳐다보며 중얼거리듯 사과한 뒤 자리에 다시 앉는다.
+<<promiscuity2>>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Events Own
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+"왜 그러세요, <<sir>>?" 당신이 말한다. "질투 나세요?" 킥킥거리던 소리가 웃음바다로 변한다.
+<<promiscuity3>>
+
+"너희들은 유머 감각이 참 이상하구나." 도렌이 고개를 저으며 말한다.
+<br><br>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Events Stare
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 손을 내려다보며 웃음소리를 무시하려 애쓴다. 도렌이 <<person2>><<person>>【을를】 쳐다본다. "내가 방과 후 남기는 걸 좋아하지 않는다는 건 알 텐데." <<person1>><<he>>【이가】 말한다. "하지만 피하기 어렵게 만드는구나." <<person2>><<person>>【은는】 씩 웃으며 시선을 피한다. <<npcincr Doren dom 1>><<gdom "Doren">>
+<br><br>
+<<if $dorenhonest isnot 1>>
+	<<person1>>도렌이 다시 당신을 쳐다본다. "밖에서 얘기 좀 하자꾸나. 따라오렴." 당신은 모두가 쳐다보고 있다는 것을 알기에 고개를 숙인 채 <<him>>【을를】 따라 교실을 나선다.
+	<br><br>
+	<<He>>【은는】 등 뒤로 문을 닫고 평소답지 않게 조용한 목소리로 말한다. "다 괜찮은 거니, <<lassie>>? 아니면 나한테 하고 싶은 말이 있니?"
+	<br><br>
+	<<link [[솔직하게 말한다|English Events Honest]]>><<npcincr Doren love 1>><<stress 6>><<trauma -6>><</link>><<glove>><<gstress>><<ltrauma>>
+	<br>
+	<<link [[괜찮다고 한다|English Events Fine]]>><</link>>
+	<br>
+<<else>>
+	<<endevent>>
+	<<link [[다음|English Lesson]]>><</link>>
+	<br>
+<</if>>
+
+:: English Events Honest
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<set $dorenhonest to 1>>
+당신은 도렌에게 수차례 공격을 받았고, 더 이상 감당할 수 없다고 말한다. 소리 내어 말하자 어지러움이 밀려온다. 자세한 이야기는 하지 않았지만, 당신이 얼마나 갇힌 기분인지 분명히 전한다.
+<br><br>
+
+<<if $trauma gte (($traumamax / 5) * 3)>>
+	당신은 도렌의 품에서 깨어날 때까지 기절했다는 사실조차 깨닫지 못했다. <<Hes>> 당신이 쓰러지기 전에 붙잡아 주었다.
+<<else>>
+당신은 도렌의 팔에 부축받은 채 바닥에 주저앉아 있다는 것을 깨닫는다. 쓰러진 기억이 없다.
+<</if>>
+"괜찮다, <<lassie>>. 내가 잡고 있으마." <<He>>【은는】 주머니에서 전화를 꺼내 누군가에게 전화를 건다. "여보세요? 네. 제 수업을 대신 맡아줄 사람이 필요합니다. 네, 응급 상황입니다. 아닙니다. 끊겠습니다." <<He>>【은는】 전화를 집어넣는다.<<npcincr Doren dom 1>><<gdom "Doren">>
+<br><br>
+
+<<He>>【은는】 당신이 일어서도록 돕는다. "도움을 받을 수 있는 곳으로 데려가고 싶구나, 괜찮겠니?" <<He>>【은는】 당신의 손을 잡고 함께 교실에서 멀어진다. <<He>>【은는】 주차된 <<his>> 차로 당신을 이끈다. "타렴. 오래 걸리지 않을 거다."
+<br><br>
+
+<<link [[차에 탄다 (0:05)|English Events Police]]>><<pass 5>><</link>>
+<br>
+
+:: English Events Fine
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 애써 태연한 척하며 <<him>>에게 괜찮다고 말한다. "알겠다. 네가 그렇다면야." <<he>>【이가】 말한다. "그럼 녀석들이 창문을 깨기 전에 교실로 돌아가자꾸나."
+<br><br>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Events Police
+<<set $outside to 0>><<set $location to "town">><<effects>>
+
+도렌은 바브 가로 차를 몰아 경찰서 밖에 차를 세운다. "힘들다는 건 알지만, 나한테 했던 말을 저 사람들에게도 해야 한단다." 당신은 차에서 내려 경찰서로 들어간다.
+<br><br>
+
+<<generatePolice 3>><<person3>>경찰 제복을 입은 <<person>>【이가】 책상에 앉아 있다. 당신이 들어와도 <<He>>【은는】 쳐다보지도 않는다. 도렌이 연필이 바닥에 굴러떨어질 정도로 세게 책상을 두드린다. <<person1>>"범죄를 신고하러 왔소." <<he>>【이가】 말한다. "어쩌면 여러 건일지도 모르지."
+<br><br>
+
+경찰관이 고개를 든다. "대기 줄이 있습니다." <<person3>><<he>>【이가】 말한다.
+<br><br>
+
+도렌이 텅 빈 방을 둘러본다. "내 눈엔 대기 줄 같은 건 안 보이는데."
+<br><br>
+
+"그럼 밀린 업무라고 해두죠." 경찰관이 대답한다. "3년 동안은 도와드릴 수 없습니다."
+<br><br>
+
+"3년!?" 도렌이 <<person1>><<his>> 주먹으로 책상을 내리치자, 이번엔 머그잔이 쓰러진다. "이 <<girl>>【은는】 강ㄱ..." <<He>>【은는】 말을 멈춘다. "<<pShe>>【은는】 공격을 당했소. 한두 번이 아니라고. 그런데 아무것도 할 수 없다는 거요?"
+<br><br>
+
+"할 수 있죠. 3년 뒤에요." <<person3>><<He>>【은는】 컴퓨터에 무언가를 타이핑한다. "이미 기록에 남아 있습니다. 조서를 받을 준비가 되면 연락드리죠. 좋은 하루 보내십시오."
+<br><br>
+
+<<link [[다음|Doren Intro]]>><</link>>
+<br>
+
+:: English Kylar Moved
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 고개를 젓는다. 도렌이 카일라를 쳐다본다. "이봐, 낙서꾼." <<he>>【이가】 말한다. "앞에서 좀 도와줘야겠다."
+<br><br>
+
+<<endevent>><<npc Kylar>><<person1>>
+카일라는 인상을 찌푸리지만, 말대꾸하지 않는다. 도렌이 자리를 옮기게 하자 <<He>>【은는】 당신을 애처롭게 쳐다본다.
+<<set $kylarenglishstate to "watching">>
+<br><br>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Kylar Nod
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+당신은 고개를 끄덕인다. "알겠다." 도렌이 말한다. <<He>>【은는】 납득하지 못한 눈치다.
+<br><br>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Read Passage
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>><<wearProp "open English">>
+
+<<if $phase is 0>> /* Tell Doren */
+	<<if C.npc.Doren.love gte 10>>
+		도렌은 고개를 저으며 <<his>> 책을 당신에게 건네준다.<br>
+		"이번 한 번만 봐주마." <<he>>【이가】 말한다. "하지만 다음엔 준비해 오렴."
+	<<else>>
+		도렌은 고개를 저으며 <<his>> 책을 당신에게 건네준다.<br>
+		"이래선 안 되지." <<he>>【이가】 말한다. "다음엔 제대로 준비해 오렴." <<detention 1>><<gdelinquency>>
+	<</if>>
+<<elseif $phase is 1>> /* Ask friends for help */
+	<<if $kylarenglishstate is "active">> /* Active Kylar will always help */
+		카일라가 당신에게 책을 건네준다. "여기 있어, 내 사랑." <<status -10>><<llcool>>
+		<br><br>
+		당신은 구절을 소리 내어 읽는다.
+		<br><br>
+		도렌은 고개를 끄덕이고 다음 학생으로 넘어간다.
+	<<elseif ($cool - random(1,$coolmax)) gte 0>> /* Cooler you are, the greater the chance other students will help */
+		당신은 근처의 다른 학생들을 쳐다본다. 한 친구가 조용히 <<pher>> 책을 밀어준다.
+		<br><br>
+		당신은 재빨리 구절을 소리 내어 읽는다.
+		<br><br>
+		도렌은 고개를 끄덕이고 다음 사람을 가리킨다.
+	<<else>>
+		아무도 도와주지 않는다. 잠시 후, 도렌이 딱하게 여긴다.
+		<br><br>
+		"내 생각엔 <<pshes>> 책을 안 가져왔다는 걸," 도렌이 말한다. "표현하려는 것 같구나. 누가 <<phim>> 좀 도와주겠니?"
+		<br><br>
+		아무도 대답하지 않는다. 도렌은 실망한 표정으로 마침내 <<his>> 책을 당신에게 건네준다. "다들, 이것보단 나을 줄 알았는데."<<npcincr Doren dom 1>><<gdom "Doren">>
+		<br><br>
+		"여기 있다." <<he>>【이가】 한숨을 쉰다. "계속하렴." <<status -5>><<lcool>>
+		<br><br>
+		당신이 구절을 소리 내어 읽자 도렌은 다음 사람으로 넘어간다.
+	<</if>>
+<<elseif $phase is 2>> /* Make up something */
+	<<if currentSkillValue('english') gte 700>>
+		<<skulduggerycheck "silent">>
+		<<if $skulduggerysuccess is 1>>
+			당신은 원문의 어조, 어휘, 운율을 흉내 내어 가짜 구절을 지어내며 읽는 척한다.
+			<<if hasSexStat("promiscuity", 4) or hasSexStat("exhibitionism", 4)>>
+				재미 삼아, 당신은 주인공 <<girl>>【을를】 과장되게 성적인 방식으로 읽으며
+				어떤 문장은 노골적으로 유혹적으로 들리게 하고, 다른 문장은 음탕한 이중 의미로 들리게 만든다.
+				<br><br>
+				반 친구들은 즐거워하지만, 도렌은 의심스러운 듯 당신의 말을 끊고 다음 학생으로 넘어간다. <<gcool>><<status 3>>
+			<<elseif $purity lte 400 or $awareness gte 500>>
+				재미 삼아, 당신은 음탕한 말장난과 야한 농담을 덧붙인다. 몇몇 학생이 당신의 애드리브에 웃음을 터뜨린다. <<gcool>><<status 2>>
+				<br><br>
+				도렌은 조금 의심스러워하지만, 다음 학생으로 넘어간다.
+			<<else>>
+				도렌은 눈치채지 못하지만, 다음 학생은 어느 부분을 읽어야 할지 혼란스러워한다.
+			<</if>>
+			<br><br>
+
+			<<skulduggeryuse>>
+
+			당신은 무사히 넘어갔다.
+		<<else>>
+			<<generates2>><<person1>>
+			당신은 원문을 흉내 내어 가짜 구절을 지어내며 읽는 척한다. 하지만 끝까지 해낼 자신감이 부족하다.
+			반 전체의 시선이 느껴지자, 당신은 머뭇거리고 더듬거리다 완전히 멈춰버린다.
+			<br><br>
+			"방금 지어낸 거니, <<lassie>>?" 도렌이 묻는다.
+			<br><br>
+			<<if $speech_attitude is "meek">>
+				"죄송해요, <<sir>>." 당신은 책상을 내려다본다. <<status -5>><<lcool>>
+				<br><br>
+				도렌은 슬픈 듯 고개를 젓는다. "더 잘해야 한단다." <<detention 1>><<gdelinquency>>
+			<<elseif $speech_attitude is "bratty">>
+				"아니요." 당신이 말한다. "안 그랬는데요."
+				<br><br>
+				"<<pShe>> 지어낸 거 맞아요, <<sir>>." <<person2>><<person>>【이가】 말한다. "책엔 그런 내용 하나도 없어요."
+				<br><br>
+				"누가 물어봤어?" 당신이 <<him>>【을를】 노려본다. <<He>>【은는】 움찔하며 물러선다. <<status 2>><<gcool>>
+				<br><br>
+				"당장 그만둬라!" <<person1>>도렌이 당신을 쳐다본다.
+				<<if $delinquency gte 400>>
+					"네 소문은 익히 들었다, <<lassie>>. 하지만 내 수업에선 더 잘하길 바란다."
+				<<else>>
+					"너한테 이것보단 더 기대했는데, <<lassie>>."
+				<</if>><<detention 3>><<gdelinquency>>
+			<<else>>
+				당신이 무슨 말을 할지 생각하기도 전에, <<person2>><<person>>【이가】 대답한다. "<<pShe>> 지어낸 거 맞아요, <<person1>><<sir>>. 책엔 그런 내용 하나도 없어요."
+				<br><br>
+				도렌이 당신을 쳐다본다.
+				<<if $delinquency gte 400>>
+					"이러지 마라, <<lassie>>. 내 수업에선 더 잘하길 바란다."
+				<<else>>
+					"너한테 이것보단 더 기대했는데, <<lassie>>."
+				<</if>><<detention 2>><<gdelinquency>>
+			<</if>>
+			<br><br>
+
+			<<skulduggeryuse>>
+
+			<<person1>>도렌은 고개를 저으며 다음 학생을 가리킨다. "계속하렴."
+		<</if>>
+	<<elseif currentSkillValue('english') gte 250 and ((currentSkillValue('english') + currentSkillValue('skulduggery')) gte 500)>>
+		당신은 가짜 구절을 지어내며 읽는 척한다. 도렌은 곧 당신이 무슨 짓을 하는지 알아챈다.
+		<br><br>
+		"상상력은 좋구나." <<he>>【이가】 말한다. "하지만 진짜 텍스트를 읽어주겠니, <<lassie>>."
+		<br><br>
+		"저— 책이 없어요."
+		<br><br>
+		"그건 곤란한데, 그렇지?" <<detention 2>><<gdelinquency>>
+		<br><br>
+		도렌이 다른 학생을 가리킨다. 그 학생은 고개를 끄덕이고 읽기를 계속한다.
+	<<else>>
+		당신은 무언가를 지어내기 시작한다. 스스로는 꽤 잘하고 있고 진짜 이야기처럼 들린다고 생각하지만, 곧 몇몇 학생이 당신을 비웃고,
+		<<if $kylarenglishstate is "active">>
+			카일라는 당신을 대신해 부끄러워하며,
+		<</if>>짜증 난 도렌이 당신의 말을 끊는다. <<status -5>><<lcool>>
+		<br><br>
+		"이제 제대로 읽어주겠니, <<lassie>>."
+		<br><br>
+		"저— 책이 없어요."
+		<br><br>
+		"알겠다." <<detention 2>><<gdelinquency>>
+		<br><br>
+		도렌이 다른 학생을 가리킨다. "넌 책이 있겠지?"
+		<br><br>
+		그 학생은 고개를 끄덕이고 읽기를 계속한다.
+	<</if>>
+<<elseif $phase is 3>> /* Refuse */
+	당신은 읽기를 거부한다.
+	<br><br>
+	도렌은 짜증을 내지만, 몇몇 학생은 새로운 존경심을 담아 당신을 쳐다본다. <<detention 3>><<gdelinquency>><<gcool>><<status 2>>
+	<br><br>
+	다음 학생이 읽기를 계속한다.
+<</if>>
+<br><br>
+
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<br>
+
+:: English Pantsing
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>><<silently>><<clotheson>><</silently>>
+<<set _fix to setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1 ? "smooth out" : "tug up">>
+
+<<if $phase is "cover">>
+	당신은 서둘러 $worn.lower.name【을를】 _fix, 이미 엎질러진 물이다.
+	<br><br>
+	<<englishNudeReactions>>
+	<br><br>
+	도렌은 노려보며 반을 조용히 시키고 <<person1>><<person>>에게 방과 후 남으라고 지시한다. 반 친구들은 진정하지만, 당신의 뺨은 여전히 부끄러움으로 붉게 달아올라 있다. <<gstress>><<stress 6>><<gtrauma>><<trauma 6>><<npcincr Doren dom 1>><<gdom "Doren">>
+
+<<elseif $phase is "flaunt">>
+	<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+		당신은 $worn.lower.name【을를】 허벅지 위로 더 끌어올렸다가 마침내 <<lowerit>> 쓸어내린다.
+	<<else>>
+		당신은 $worn.lower.name의 허리띠를 따라 손가락을 훑은 뒤 마침내 <<lowerit>> 끌어올린다.
+	<</if>>
+	주변 학생들은 당신의 <<undies 2>>【을를】 더 잘 보게 되자 환호한다. 당신은 그들에게 윙크를 날린다.
+	<<if $worn.under_lower.type.includes("naked")>>
+		<<exhibitionism5>>
+	<<else>>
+		<<exhibitionism3>>
+	<</if>>
+	<<englishNudeReactions>>
+	<br><br>
+	도렌이 소란을 눈치채고 다가온다. "무슨 일이니?" <<nnpc_he Doren>>【이가】 묻는다.
+	<br><br>
+	<<if $speech_attitude is "meek">>
+		"아-아무것도 아니에요." 당신이 대답한다.
+	<<elseif $speech_attitude is "bratty">>
+		"아무것도 아니에요." 당신이 대답한다.
+	<<else>>
+		"아무것도 아니에요." 당신이 대답한다.
+	<</if>>
+	<br><br>
+	<<if $delinquency gte 400>>
+		"내 수업을 방해하는 건 아무것도 아닌 게 아니란다." 도렌이 말한다. "널 지켜보고 있다, <<lassie>>." <<nnpc_He Doren>>【은는】 당신에게 방과 후 남으라고 지시한다.
+	<<else>>
+		도렌은 납득하지 못한다. "솔직한 대답을 기대했는데, <<lassie>>." <<nnpc_He Doren>>【은는】 고개를 저으며 수업을 방해한 벌로 방과 후 남으라고 지시한다.
+	<</if>>
+	"다들 조용히 해라. 수업으로 돌아가자." <<detention 3>><<gdelinquency>>
+<</if>>
+
+<br><br>
+<<link [[다음|English Lesson]]>><<endevent>><</link>>
+
+:: English Dream
+<<npc Doren>><<generate2>><<person2>>
+<<if random(0, 99) lt $settings.straponChance and $NPCList[0].penis is "none">><<npcstrapon 0>><</if>>
+<<set $outside to 0>><<set $location to "forest">>
+
+당신은 쫓기고 있지만, 아무리 빨리 달려도 역부족이다. 추격자가 다가오는 소리가 들린다. 폐가 헐떡이고 다리가 타는 듯이 아프지만, <span class="red">도망칠 곳은 없다</span>.
+<br><br>
+
+<<personsimple>>【이가】 당신의 팔을 잡고 바닥으로 내동댕이친다. <<he>>【이가】 당신의 옷을 찢어발길 때 <<His>> 웃음소리가 귓가에 맴돈다. 당신은 반항하지만 소용없다.
+
+<<if $NPCList[0].penis is "none">>
+	<<He>>【은는】 당신 위로 올라타, <<his>> 보지에서 흐르는 애액을 <<print $player.penisExist ? "당신의 <<penis 1>>" : "당신의 보지">> 위로 뚝뚝 떨어뜨린다.
+	<<set $phase to $player.penisExist ? "penetrate dick" : "trib">>
+<<else>>
+	<<He>>【은는】 <<his>> <<= window.KR.getPenisDescKr($NPCList[0].penisdesc)>>【을를】 당신의 <<print $player.vaginaExist ? "보지" : "엉덩이">>에 맞춘다.
+	<<set $phase to $player.vaginaExist ? "penetrate pussy" : "penetrate ass">>
+<</if>>
+<<He>>【은는】 <<print $settings.asphyxiaLevel gte 1 ? "<<his>> 손으로 당신의 기도를 짓누른다. 숨을 쉴 수가 없다" : "당신을 바닥에 짓누른다. 움직일 수가 없다">>. 당신은 그저 누워 있을 수밖에 없다. <<he>>【이가】
+
+<<switch $phase>>
+	<<case "penetrate dick">>
+		당신 위로 주저앉으며,
+		<<if $player.virginity.penile is true>>
+			<span class="red">당신의 포피가 귀두에서 분리되게 만들고, 영원히 당신의 순결을 빼앗는다.</span>
+		<<else>>
+			당신을 뿌리까지 삼킨다.
+		<</if>>
+	<<case "penetrate pussy">>
+		당신 안으로 찔러 넣으며,
+		<<if $player.virginity.vaginal is true>>
+			<span class="red">당신의 처녀막을 찢고, 영원히 당신의 순결을 빼앗는다.</span>
+		<<else>>
+			거칠고 가혹하게 범한다.
+		<</if>>
+	<<case "penetrate ass">>
+		당신 안으로 찔러 넣으며,
+		<<if $player.virginity.anal is true>>
+			<span class="red">당신이 상상조차 하지 못했던 방식으로 당신을 유린한다.</span>
+		<<else>>
+			당신의 엉덩이를 유린한다.
+		<</if>>
+	<<case "trib">>
+		<<his>> 보지를 당신의 것에 짓누른다.
+<</switch>>
+<<gstress>><<gtrauma>><<stress 6>><<trauma 6>>
+
+<br><br>
+<<link [[다음|English Dream 2]]>><</link>>
+
+:: English Dream 2
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<span class="green">당신은 비명을 지르며 깨어난다</span>. <<tearful>> 당신은 미친 듯이 습격자를 찾지만, 반 친구들만 보일 뿐이다. 그들은 당신의 돌발 행동에 걱정스러운 눈빛을 교환한다. <<lcool>><<status -1>>
+<br><br>
+
+도렌이 더욱 걱정스러운 표정으로 달려온다. "무슨 일이니? 괜찮은 거니?"<<npcincr Doren dom 1>><<gdom "Doren">>
+<br><br>
+
+당신은 악몽을 떨쳐내지 못한 채 공허한 눈으로 <<person1>><<him>>【을를】 마주 본다. 안전하다는 사실이 믿기지 않는다.
+<br><br>
+
+<<link [[괜찮다고 한다|English Dream 3]]>><<set $phase2 to 0>><<stress 3>><</link>><<gstress>>
+<br>
+<<link [[무너져 내린다|English Dream 3]]>><<set $phase2 to 1>><<stress -6>><<trauma -12>><<status -3>><</link>><<lstress>><<lltrauma>><<lcool>>
+
+:: English Dream 3
+<<set $outside to 0>><<set $location to "school">><<schooleffects>><<effects>>
+
+<<if $phase2 is 0>>
+	<<if $speech_attitude is "meek">>
+		당신은 시선을 피하고, 떨림을 감추려 주먹을 꽉 쥔다. "저-전 괜찮아요. 그-그냥 스트레스를 좀 받아서 그런가 봐요."
+	<<elseif $speech_attitude is "bratty">>
+		당신은 <<his>> 시선을 마주하며 두려움을 삼키고, 떨림을 감추려 주먹을 꽉 쥔다. "전 괜찮아요. 그냥 스트레스를 좀 받았을 뿐이에요."
+	<<else>>
+		당신은 고개를 저으며, 떨림을 감추려 주먹을 꽉 쥔다. "전 괜찮아요. 그냥 스트레스 때문이에요."
+	<</if>>
+	<<gstress>>
+	<br><br>
+
+	도렌은 납득하지 못하지만, 더 이상 캐묻지 않는다. "네가 그렇다면야, <<lassie>>. 수업 끝나고 양호 선생님을 찾아가 보렴."
+	<br><br>
+	<<link [[다음|English Lesson]]>><<endevent>><</link>>
+<<else>>
+	<<if $speech_attitude is "meek">>
+		도렌이 진심으로 걱정하며 당신을 바라보자, 당신은 무너져 내린다. 당신은 수업 도중에 대놓고 흐느끼기 시작한다.
+	<<elseif $speech_attitude is "bratty">>
+		당신은 최선을 다해 태연한 척하려 하지만, 눈물이 얼굴을 타고 흘러내리기 시작한다.
+	<<else>>
+		도렌이 진심으로 걱정하며 당신을 바라보자, 눈물이 얼굴을 타고 흘러내리기 시작한다.
+	<</if>>
+	감정을 쏟아내니 기분이 한결 낫다. <<lltrauma>><<lstress>>
+	<br><br>
+
+	"<<pShes>> 우는데." 한 학생이 <<print $cool gte 160 ? "중얼거린다" : $cool lte 80 ? "낄낄거린다" : "말한다">>. 반 전체가 당신에 대해 떠드는 소리가 들린다. <<lcool>><<status -1>>
+	<br><br>
+
+	"다들 조용히 해라." 도렌이 단호한 목소리로 말한다. 반은 조용해지지만, 몇몇은 계속해서 속닥거린다.<<npcincr Doren dom 1>><<gdom "Doren">>
+	<br><br>
+	<<if $dorenhonest isnot 1>>
+		도렌이 다시 당신을 쳐다본다. "밖에서 얘기 좀 하자꾸나. 따라오렴." 당신은 고개를 숙인 채 <<him>>【을를】 따라 교실을 나선다. 모두가 쳐다보고 있다는 것을 안다.
+		<br><br>
+		<<He>>【은는】 등 뒤로 문을 닫고 평소답지 않게 조용한 목소리로 말한다. "다 괜찮은 거니, <<lassie>>? 아니면 나한테 하고 싶은 말이 있니?"
+		<br><br>
+		<<link [[솔직하게 말한다|English Events Honest]]>><<npcincr Doren love 1>><<stress 6>><<trauma -6>><</link>><<glove>><<gstress>><<ltrauma>>
+		<br>
+		<<link [[괜찮다고 한다|English Events Fine]]>><</link>>
+	<<else>>
+		<<link [[다음|English Lesson]]>><<endevent>><</link>>
+	<</if>>
+<</if>>

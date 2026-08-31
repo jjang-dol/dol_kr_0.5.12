@@ -1,0 +1,136 @@
+:: School Library Shop [exitCheckBypass]
+<div id="clothingShop-div" class="main-shop-div">
+	<<schoolShop-main>>
+</div>
+
+:: School Library Shop Widgets [widget]
+
+<<widget "schoolShop-main">>
+	<<set $outside to 0>><<set $location to "school">><<effects>>
+	<<set $shopName = "school">>
+	<<if $tryOn.autoReset isnot false>><<tryOnReset>><</if>>
+	<<if $school_shop_intro isnot 1>>
+		<<set $school_shop_intro to 1>>
+		시드니는 고개를 끄덕이고는 당신을 카운터 반대쪽 끝으로 이끈다. 셔츠, 바지, 치마가 원형 진열대에 걸려 있고, 수영복은 선반 위에 가지런히 접혀 있다.
+		<br><br>
+		"여기선 복장 규정에 맞는 건 거의 다 찾을 수 있어요," <<he>>【이가】 <<him>> 뒤쪽 벽을 가리키며 말한다. "작은 탈의실도 있어요, 이쪽이에요. 누, 누가 훔쳐보거나 하진 않을 테니까 걱정하지 마세요." <<His>> 얼굴이 붉어진다.
+		<br><br>
+		<<link [[다음|School Library Shop]]>><<endevent>><</link>>
+		<br>
+	<<else>>
+		대여 카운터 모퉁이를 돌면 학교에서 허가한 의류를 위한 작은 공간이 있다. 셔츠, 바지, 치마가 원형 진열대에 걸려 있고, 수영복은 선반 위에 가지런히 접혀 있다.
+		<br><br>
+		<<if $schoolShopAction is undefined>>
+			<<set $schoolShopAction to []>>
+		<</if>>
+		<<run statusCheck("Sydney")>>
+		<<if $schoolShopAction.includes("wear") or $schoolShopAction.includes("try") or $schoolShopAction.includes("under")>>
+			<<if random(1,10) is 1>>
+				밖에서 시드니가 말하는 소리가 들린다. "아, 지금 탈의실은 사용 중이에요! 죄송해요."
+			<<elseif !$daily.sydney.peek and random(1,10) is 2 and (_sydneyStatus.includes("corrupt") or _sydneyStatus.includes("Lust"))>>
+				<<set $daily.sydney.peek to true>><<set $sydneySeen.pushUnique("changing room")>>
+				뒤에서 커튼이 스치는 소리가 들린다. 당신이 재빨리 돌아서자 누군가 숨을 들이켜는 소리가 난다. <span class="lewd">시드니의 얼굴이 커튼 뒤로 사라진다.</span> <<stress 3>><<gstress>><<npcincr Sydney lust 1>><<glust>><<arousal 50>><<garousal>>
+			<<else>>
+				시드니는 탈의실 밖에서 얌전히 당신을 기다린다.
+			<</if>>
+		<<else>>
+			시드니는 얌전히 당신을 기다린다.
+		<</if>>
+		<br><br>
+		<div id="tryonstats-div"><<tryOnStats>></div>
+		<<unset $shopListStartCount>>
+		<<unset $clothes_choice>>
+		<<set $shopPage = 0>>
+
+		<span>보온:</span>
+		<<warmthscale>>
+		<div id="warmth-description">
+			<<warmth_description>>
+		</div>
+		<br><br>
+
+		<<clothingcategoryicon "all">>
+		<<link "전체 보기">><<replace "#clothingShop-div">><<AllShop>><</replace>><</link>>
+		<br><br>
+		<<if $debug is 1>>
+			<<clothingcategoryicon "over-outfit">>
+			<<link "겉옷 보기">><<replace "#clothingShop-div">><<OverOutfitShop>><</replace>><</link>>
+			<br><br>
+		<</if>>
+		/*
+		*<<clothingcategoryicon "outfit">>
+		*<<link "한벌옷 보기">><<replace "#clothingShop-div">><<OutfitShop>><</replace>><</link>>
+		*<br>
+		*/
+		<<clothingcategoryicon "upper">>
+		<<link "상의 보기">><<replace "#clothingShop-div">><<TopShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "lower">>
+		<<link "하의 보기">><<replace "#clothingShop-div">><<BottomShop>><</replace>><</link>>
+		<br><br>
+		<<clothingcategoryicon "under-outfit">>
+		<<link "속옷 세트 보기">><<replace "#clothingShop-div">><<UnderOutfitShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "under-upper">>
+		<<link "상의 속옷 보기">><<replace "#clothingShop-div">><<UnderTopShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "under-lower">>
+		<<link "하의 속옷 보기">><<replace "#clothingShop-div">><<UnderBottomShop>><</replace>><</link>>
+		<br><br>
+		<<clothingcategoryicon "head">>
+		<<link "머리 장식 보기">><<replace "#clothingShop-div">><<HeadShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "face">>
+		<<link "얼굴 장식 보기">><<replace "#clothingShop-div">><<FaceShop>><</replace>><</link>>
+		<br>
+		/*
+		*<<clothingcategoryicon "neck">>
+		*<<link "목 장신구 보기">><<replace "#clothingShop-div">><<NeckShop>><</replace>><</link>>
+		*<br>*/
+		<<clothingcategoryicon "handheld">>
+		<<link "휴대품 보기">><<replace "#clothingShop-div">><<HandheldShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "hand">>
+		<<link "손 장식 보기">><<replace "#clothingShop-div">><<HandsShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "legs">>
+		<<link "다리 장식 보기">><<replace "#clothingShop-div">><<LegsShop>><</replace>><</link>>
+		<br>
+		<<clothingcategoryicon "feet">>
+		<<link "신발 보기">><<replace "#clothingShop-div">><<FeetShop>><</replace>><</link>>
+		<br><br>
+		<<run linkifyDivs('.button-back-to-shop')>>
+
+		<<if $tryOn.value isnot 0>>
+			<<icon "hanger.png">><<link "옷 돌려놓기">><<clothingReset>>
+				<<updatesidebarimg>>
+				<<updatesidebardescription>>
+				<<updateallure>>
+				<<updatewarmthscale>>
+				<<updatewarmthdescription>>
+				<<updateclothingshop>>
+				<<run updateMoment()>>
+			<</link>>
+			<br>
+			<<if $tryOn.value gt 0 and $tryOn.value lte $money>>
+				<<sendItemsToDropdown>>
+				<<highicon>><<link "옷 구매하기">><<buyTryOnClothes "wear">><<updatesidebarmoney>><<updateclothingshop>><</link>>
+				<br>
+				<<wardrobeicon>><<link "옷을 구매해 옷장으로 보내기">>
+					<<buyTryOnClothes "wardrobe">>
+					<<updatesidebarmoney>>
+					<<updatesidebarimg>>
+					<<updatesidebardescription>>
+					<<updateallure>>
+					<<updatewarmthscale>>
+					<<updatewarmthdescription>>
+					<<updateclothingshop>>
+				<</link>>
+				<br>
+			<</if>>
+		<<elseif $tryOn.value is 0>>
+			<<getouticon>><<link [[나가기|Library Rental Counter]]>><<shopClothingFilterReset>><<ShowUnderEquip "normal">><<endnpc>><<unset $clothes_choice>><<set $tryOn.autoReset to true>><<set $eventskip to 1>><<unset $tempDisable>><<shopCommandoCheck>><<endevent>><</link>>
+			<br><br>
+		<</if>>
+	<</if>>
+<</widget>>

@@ -1,0 +1,3005 @@
+:: Ocean Breeze
+
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $oceanbreezejob>><<timeTrackingEndCafe>><</if>>
+
+<<if $chef_sus gt 0>>
+	Suspicion:
+	<div class="meter">
+		<<set _percent=Math.floor(($chef_sus / 100)*100)>>
+		<<print '<div class="redbar" style="width:' + _percent + '%"></div>'>>
+	</div>
+<</if>>
+
+You are in the Ocean Breeze Cafe.
+<<if Time.openingHours()>>
+	<<if Weather.precipitation is "rain">>
+		No one is sitting outside due to the rain, but the cafe proper is crowded.
+	<<elseif Weather.isFreezing>>
+		No one is sitting outside due to the cold, but the cafe proper is crowded.
+	<<elseif !Weather.isOvercast>>
+		Most of the tables are full.
+	<<else>>
+		The cafe is busy, and despite the strong winds some people are sitting outside.
+	<</if>>
+<</if>>
+<br><br>
+
+<<if $stress gte $stressmax>>
+	<<passoutshop "cafe">>
+
+<<elseif Time.openingHours() and $exposed lt 1 and $bunstat gte 50 and $chef_state is 1>>
+	<<set $chef_state to 2>><<set $bun_value to 7500>>
+	<<npc Sam>><<person1>>
+	Sam approaches you, wiping <<his>> hands on a towel and beaming.
+	"I've made a decision," <<he>> says. "I wanted to keep the buns affordable, but we've attracted interest."
+	<<He>> holds out a holiday brochure, opened on a page that advertises the town.
+	There's a picture of the cafe with a caption that describes the buns as "world-class."
+	<br><br>
+
+	"World-class!" Sam beams.
+	"I've decided to increase the price to <<printmoney 7500>>. We have a limited supply after all, it's already difficult to keep up with demand as it is."
+	<br><br>
+
+	<<He>> returns to work, humming some tune.
+	<br><br>
+	<<endevent>>
+	<<link [[Next|Ocean Breeze]]>><</link>>
+	<br>
+
+<<elseif Time.openingHours() and $exposed lt 1 and $bunstat gte 200 and $chef_state is 2>>
+	<<set $chef_state to 3>>
+	<<npc Sam>><<person1>>
+	Sam approaches you.
+	"I was at a party," <<he>> says.
+	"And I may have had one too many. Anyway, the topic of our buns came up.
+	People were very curious about how they're made. When I told them I didn't know, that a new chef was responsible, they became even hungrier.
+	I think a myth is building around you."
+	<br><br>
+	"Anyway," <<he>> continues.
+	"It got me thinking. I'd like to use your image in our advertisements.
+	Maybe redesign the front of the building. It's only fair people know who's responsible for these treats."
+	<br><br>
+	"I'm willing to increase your cut to <span class="gold">30%</span> of each bun sale," <<he>> adds, cleaning a vacated table.
+	"I'm in talks with a professional photographer. Mull it over, then let me know what you think."
+	<br><br>
+
+	<<endevent>>
+
+	<<link [[Next|Ocean Breeze]]>><</link>>
+	<br>
+
+<<elseif Time.openingHours() and $exposed lt 1 and $chef_state is 5>>
+	<<set $chef_state to 6>>
+	<<npc Sam>>Sam approaches you. "The photographer sent the pictures over," <<he>> says.
+	"They're fantastic! The new adverts are going to look great. You'll get <span class="gold">30%</span> of each bun sold from now on, as promised."
+	<<set $bun_cut to 0.3>>
+	<br><br>
+
+	Sam returns to work, humming
+	<<if $seabird_lullaby gte 2>>
+		the first few notes of <span class="teal">Seabird's Lullaby</span>.
+	<<else>>
+		<<set $seabird_lullaby to 1>>
+		some <span class="teal">faintly familiar</span> tune.
+	<</if>>
+	<br><br>
+	<<endevent>>
+
+	<<link [[Next|Ocean Breeze]]>><</link>>
+	<br><br>
+
+<<elseif Time.openingHours() and $exposed lt 1 and $bunstat gte 400 and $chef_state is 6>>
+	<<set $chef_state to 7>>
+	<<set $chef_rework to 37>>
+	<<npc Sam>><<person1>>
+	Sam approaches you, looking more serious than normal. "I've made a decision," <<he>> says.
+	"The buns are our flagship, but people are more interested than ever in our other dishes too.
+	Even when people know the chef is not in the building, they still queue for a chance to eat here. You've probably noticed."
+	<br><br>
+	"I've bought next-door," <<he>> continues.
+	"The big one. I'm going to merge the buildings, make one huge cafe. One that can accommodate the numbers we're pulling. I'm giddy just thinking about it!"
+	<br><br>
+	<span class="pink">"We'll need to close for a month,"</span> <<he>> adds.
+	"It's unfortunate, but the changes are so big. We'll have a grand opening event when it's done, with you as the star."
+	<br><br>
+	"We're closing down in a week. I don't want you to be caught off guard. Drop by when we're finished and we'll discuss the opening event."
+	<br><br>
+	<<He>> returns to work.
+	<br><br>
+	<<endevent>>
+	<<link [[Next|Ocean Breeze]]>><</link>>
+	<br>
+
+<<elseif !$daily.earSlimeOceanBreezeCafeEat and Time.openingHours() and $exposed lt 1 and !$daily.cafeEaten and $money gte 200 and numberOfEarSlime() and ((earSlimeMakingMundaneRequests() and random(0,100) gte 90) or random(0,100) gte 96)>>
+	<<set _cafeOptions to []>>
+	<<if $money gte 200>>
+		<<run _cafeOptions.push("coffee")>>
+	<</if>>
+	<<if $money gte 700 and !playerAwareTheyArePregnant()>>
+		<<switch Time.season>>
+			<<case "winter">><<run _cafeOptions.push("winter ale")>>
+			<<case "spring">><<run _cafeOptions.push("fruity ale")>>
+			<<case "summer">><<run _cafeOptions.push("shandy")>>
+			<<default>><<run _cafeOptions.push("autumn ale")>>
+		<</switch>>
+	<</if>>
+	<<if $money gte 500>>
+		<<run _cafeOptions.push("fruit salad")>>
+	<</if>>
+	<<if $money gte 1000>>
+		<<run _cafeOptions.push("pancake")>>
+	<</if>>
+	<<if $money gte 5000>>
+		<<run _cafeOptions.push("deluxe cream bun")>>
+	<</if>>
+	<<set $daily.earSlimeOceanBreezeCafeEat to _cafeOptions.random()>>
+	<span @class="$earSlime.startedThreats ? 'lewd' : 'lblue'">You feel the slime in your head command you to have <<= (["a","e","i","o","u"].some(letter => $daily.earSlimeOceanBreezeCafeEat.startsWith(letter))) ? "an" : "a">> $daily.earSlimeOceanBreezeCafeEat.</span>
+	It promises rewards if you comply<<if $earSlime.startedThreats>> and threatens consequences if you do not<</if>>.
+	<br><br>
+
+	<<earSlimeCafeLinks "Obey">>
+	<br>
+	<<if $earSlime.startedThreats>>
+		<<link [[Defy|Ocean Breeze Slime Defy]]>><<corruption -1>><<pain 8>><<stress 6>><<trauma 6>><<def 1>><</link>><<lcorruption>><<ggpain>><<ggtrauma>><<ggstress>>
+	<<else>>
+		<<link [[Ignore|Ocean Breeze]]>><</link>>
+	<</if>>
+<<else>>
+	<<if Time.hour is $closinghour>>
+		It's closing time. Sam is herding everyone outside.
+		<<if $exposed gte 1>>
+			You feel a twinge of panic as you realise how exposed you'll be should you be found in this state of dress.
+		<</if>>
+		<br><br>
+
+	<<elseif !Time.openingHours()>>
+		You are alone in the darkness.
+		<br><br>
+
+	<<elseif $exposed gte 1>>
+		You are hiding beneath a table to protect your dignity.
+		<br><br>
+
+	<</if>>
+
+	<<if $arousal gte $arousalmax>>
+		<<orgasmLocation "cafe">>
+	<</if>>
+
+	<<if Time.openingHours() and $exposed lt 1 and $oceanbreezejob isnot 1>>
+		<<if $oceanbreezejoboffer is 1>>
+			<<socialiseicon "ask">><<link [[Ask for work|Ocean Breeze Ask Again]]>><</link>>
+			<br>
+		<<else>>
+			<<socialiseicon "ask">><<link [[Ask for work|Ocean Breeze Ask]]>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+
+	<<if Time.openingHours() and $exposed lt 1 and $oceanbreezejob is 1>>
+		You see Sam attending to the customers. <<nnpc_He "Sam">> looks like <<nnpc_he "Sam">> could use some help.
+		<br>
+		<<if $chef_state is 0>>
+			<<ind>><<link [[Accept job offer|Chef Work Accept]]>><</link>>
+			<br>
+		<<elseif $chef_state gte 1>>
+			<<if pcAreArmsBound("both")>>
+				<span class="red">Both of your arms are bound</span>, so you are unable to work as a chef.
+			<<else>>
+				<<skinicon "chef">><<link [[Work as a chef (1:00)|Chef Work]]>><</link>>
+			<</if>>
+			<br>
+		<</if>>
+		<<if $chef_state is 3>>
+			<<ind>><<link [["Accept Sam's offer"|Chef Photographer]]>><</link>>
+			<br>
+		<</if>>
+		<<if pcAreArmsBound("both")>>
+			<span class="red">Both of your arms are bound</span>, so you are unable to work as a <<pwaitress>>.
+		<<else>>
+			<<skinicon "waiter">><<link [[`Work as a <<pwaitress>> (1:00)`|Ocean Breeze Work]]>><<set $tablesservedstat += random(10,30)>><</link>>
+		<</if>>
+		<br>
+	<</if>>
+
+	<<if gwylanSchedule() is "cafe" and Time.openingHours() and $exposed lt 1>>
+		<<run statusCheck("Gwylan")>>
+		<<if _gwylanStatus?.includes("met")>>
+			<<if getRobinLocation() is "cafe">>
+				<br>
+				Gwylan and Robin sit on the exterior balcony, gazing out to the sea.
+				<br>
+				<<socialiseicon>><<link [[Join them|Gwylan Ocean Breeze]]>><<set $phase to 3>><</link>>
+				<br>
+			<<else>>
+				<br>
+				Gwylan sits alone on the exterior balcony, gazing out to the sea.
+				<br>
+				<<socialiseicon>><<link [[Join <<nnpc_him 'Gwylan'>>|Gwylan Ocean Breeze]]>><<set $phase to 0>><</link>>
+				<br>
+			<</if>>
+		<</if>>
+	<</if>>
+
+<<if Time.openingHours() and $exposed lt 1 and $daily.cafeEaten isnot 1>>
+
+	<<if $money gte 200>>
+		<br>
+		A menu lists what's currently being served.
+		<br>
+		<<foodicon "coffee">><<link [[Buy coffee (0:02 £2)|Cafe Coffee]]>>
+			<<set $daily.cafeEaten to 1>><<money -200 "cafe">><<stress -3>><<tiredness -4>><<pass 2>>
+		<</link>><<lstress>><<ltiredness>>
+		<br>
+	<</if>>
+	<<if $money gte 700>>
+		<<if Time.season is "winter">>
+			<<foodicon "winterale">>
+			<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+				<span class="blue">You can't bring yourself to drink winter ale while you know you're with child.</span>
+			<<else>>
+				<<link [[Buy winter ale (0:10 £7)|Cafe Eat]]>><<set $phase to "winter ale">><<set $daily.cafeEaten to 1>><<money -700 "cafe">><<stress -6>><<drunk 100>><<pass 10>><</link>><<lstress>><<ggdrunk>>
+			<</if>>
+			<br>
+		<<elseif Time.season is "spring">>
+			<<foodicon "fruityale">>
+			<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+				<span class="blue">You can't bring yourself to drink fruity ale while you know you're with child.</span>
+			<<else>>
+				<<link [[Buy fruity ale (0:10 £7)|Cafe Eat]]>><<set $phase to "fruity ale">><<set $daily.cafeEaten to 1>><<money -700 "cafe">><<stress -6>><<drunk 60>><<pass 10>><</link>><<lstress>><<gdrunk>>
+			<</if>>
+			<br>
+		<<elseif Time.season is "summer">>
+			<<foodicon "shandy">>
+			<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+				<span class="blue">You can't bring yourself to drink shandy while you know you're with child.</span>
+			<<else>>
+				<<link [[Buy shandy (0:10 £7)|Cafe Eat]]>><<set $phase to "shandy">><<set $daily.cafeEaten to 1>><<money -700 "cafe">><<stress -6>><<drunk 40>><<pass 10>><</link>><<lstress>><<gdrunk>>
+			<</if>>
+			<br>
+		<<else>>
+			<<foodicon "autumnale">>
+			<<if playerIsPregnant() and playerAwareTheyArePregnant()>>
+				<span class="blue">You can't bring yourself to drink autumn ale while you know you're with child.</span>
+			<<else>>
+				<<link [[Buy autumn ale (0:10 £7)|Cafe Eat]]>><<set $phase to "autumn ale">><<set $daily.cafeEaten to 1>><<money -700 "cafe">><<stress -6>><<drunk 80>><<pass 10>><</link>><<lstress>><<gdrunk>>
+			<</if>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $money gte 300>>
+		<<if ndef $milkshake>><<set $milkshake to 0>><</if>>
+		<<if $milkshake lt 2>>
+			<<foodicon "milkshake">><<link [[Buy milkshake to go (0:02 £3)|Ocean Breeze]]>><<money -300 "cafe">> <<set $milkshake +=1>> <<pass 2>><</link>>
+			<br>
+		<</if>>
+	<</if>>
+	<<if $money gte 500>>
+		<<foodicon "fruitsalad">>
+		<<link [[Buy fruit salad (0:20 £5)|Cafe Eat]]>><<set $phase to "fruit salad">><<set $daily.cafeEaten to 1>><<money -500 "cafe">><<stress -6>><<pass 20>><</link>><<lstress>>
+		<br>
+	<</if>>
+	<<if $money gte 600 and Time.season is "winter">>
+		<<foodicon "gingerbread">>
+		<<link [[Buy gingerbread (0:20 £6)|Cafe Eat]]>><<set $phase to "gingerbread">><<set $daily.cafeEaten to 1>><<money -600 "cafe">><<stress -8>><<pass 20>><</link>><<lstress>>
+		<br>
+	<</if>>
+	<<if $money gte 1000>>
+		<<foodicon "pancakes">>
+		<<link [[Buy pancakes (0:20 £10)|Cafe Pancakes]]>><<set $phase to "pancakes">><<set $daily.cafeEaten to 1>><<money -1000 "cafe">><<tiredness -6>><<pass 20>><</link>><<ltiredness>>
+		<br>
+		<<foodicon "crepes">>
+		<<link [[Buy crepes (0:20 £10)|Cafe Pancakes]]>><<set $phase to "crepes">><<set $daily.cafeEaten to 1>><<money -1000 "cafe">><<tiredness -6>><<pass 20>><</link>><<ltiredness>>
+		<br>
+	<</if>>
+	<<if $money gte 5000>>
+		<<foodicon "creambun">>
+		<<link [[Buy Deluxe Cream Bun (0:20 £50)|Cafe Cream Bun]]>><<set $daily.cafeEaten to 1>><<transform cat 1>><<money -5000 "cafe">><<pass 20>><<stress -18>><</link>><<llstress>>
+		<br>
+	<</if>>
+<</if>>
+
+<<if !Time.openingHours() and Time.hour isnot $closinghour and !$weekly.theft.oceanBreeze>>
+	<<shopicon "register">><<link [[Examine the cash register|Ocean Breeze Register]]>><</link>>
+	<br>
+<</if>>
+
+<br>
+<<clifficon>><<link [[Leave|Cliff Street]]>><</link>>
+<br><br>
+
+<</if>>
+
+:: Ocean Breeze Lock
+<<set $outside to 1>><<effects>><<set $lock to 200>>
+카페는 문을 닫았다. <<openinghours>>
+<br><br>
+
+<<if currentSkillValue('skulduggery') gte $lock>>
+	<<if pcAreArmsBound("both")>>
+		<span class="blue">팔만 묶여 있지 않다면</span> 자물쇠를 딸 수 있을 것 같다.
+		<br><br>
+	<<else>>
+		<<wearProp "lockpick">>
+		<span class="green">자물쇠는 쉽게 딸 수 있을 것 같다.</span>
+		<br><br>
+
+		<<lockicon "pick">><<link [[따고 들어간다 (0:10)|Ocean Breeze]]>><<pass 10>><<crimeUp 5 "trespassing">><</link>><<crime "trespassing">>
+		<br>
+	<</if>>
+<<else>>
+	<span class="red">자물쇠는 당신의 실력으로 딸 수 없을 것 같다.</span><<skulduggeryrequired>>
+	<br><br>
+<</if>>
+
+<<clifficon>><<link [[떠난다|Cliff Street]]>><</link>>
+<br>
+
+:: Ocean Breeze Ask
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<set $oceanbreezejoboffer to 1>>
+<<npc Sam>><<person1>>
+당신은 카운터 뒤에 있는 과체중의 <<personsimple>>에게 다가간다. <<He>>【이가】 당신을 보고 미소 짓는다.
+"이런 귀염둥이가 다 있네! 뭘 원하니?"
+<br><br>
+
+당신은 <<he>>에게 할 만한 일이 있는지 묻는다. <<His>> 미소가 더 넓어진다.
+"마침 잘 됐네, 귀여운 <<pwaitress>>【이가】 필요했거든.
+시급은 £5에 팁은 별도야. 근데 경고 하나 하자면, 몇몇 손님들이 널 더듬으려고 할 수도 있어.
+부디 그들을 너그럽게 봐줘. 악의는 없으니까! 우린 항상 일손이 부족해서, 가게가 열려 있을 땐 언제든 일할 수 있어."
+<br><br>
+
+<<link [[일을 수락한다|Ocean Breeze Take Job]]>><<pass 5>><</link>>
+<br>
+<<link [[일을 거절한다|Ocean Breeze]]>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Take Job
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<set $oceanbreezejob to 1>>
+
+"훌륭해요!" <<he>>【이가】 당신의 손을 양손으로 잡고 흔들며 말한다. "참, 전 샘이라고 해요. 이곳은 오션 브리즈 카페, 우리 마을의 가십과 카페인 충전의 중심지죠. 자, 제가 일하는 법을 알려드릴게요."
+<br><br>
+
+샘은 당신에게 이곳저곳을 보여주며 대화를 나눈다. "우리는 커피만큼이나 미소도 많이 대접한답니다!" <<He>>【이가】 밝게 웃는다. "기본부터 시작하죠. 주문받기, 리필하기, 그리고 가장 중요한 건 모두의 특이한 취향을 파악하는 거예요. 예를 들어 저분은 커피보다 파이를 먼저 드시는 걸 좋아하죠. 가끔 시장님이 오시는데, <<nnpc_he "Quinn">>【은는】 차를 정확히 일곱 번 젓는 걸 좋아해요. 아! 그리고 카운터에서 어떤 심술궂은 어부를 보게 된다면요?" <<He>>【이가】 은밀하게 몸을 기울인다. "베이컨 추가. 무조건이요."
+<br><br>
+
+<<He>>【은는】 커피콩과 굽고 있는 페이스트리의 진한 냄새가 더 강해지는 카운터 뒤로 당신을 안내한다. "저쪽에 우리 시그니처 음료를 가르쳐 줄 다른 직원이 있어요. 그리고 이건," <<he>>【이가】 오래됐지만 잘 닦인 금전등록기를 애정 어린 손길로 토닥인다. "올드 벳시예요. 가끔 걸리긴 하지만, 그냥 살짝 밀어주면 돼요."
+<br><br>
+
+<<He>>【이가】 신나서 두 손을 마주 잡는다. "자! 첫 근무 준비됐나요? 곧 <<= Time.hour lte 3 or Time.hour gte 18 ? "저녁" : Time.hour lte 12 ? "아침" : "점심">> 러시가 시작될 거예요!"
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Ask Again
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<npc Sam>><<person1>>당신은 카운터 뒤에 있는 과체중의 <<personsimple>>에게 다가간다. <<He>>【이가】 당신을 보고 미소 짓는다.
+"다시 왔구나! 마음이 바뀌었니?"
+<br><br>
+
+<<link [[일을 수락한다|Ocean Breeze Take Job]]>><</link>>
+<br>
+<<link [[일을 거절한다|Ocean Breeze]]>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Work
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<set C.npc.Sam.love = Math.clamp(C.npc.Sam.love, -50, 50)>>
+<<set _gwylanLocation to gwylanSchedule()>>
+
+<<if (_gwylanLocation is "walking_to_cafe" or _gwylanLocation is "sulking") and $gwylan_cafe_intro and !$daily.gwylan.cafe>>
+	<<set $daily.gwylan.cafe to true>>
+	<<if $gwylanSeen?.includes("cafe") and C.npc.Gwylan.love gte 30>>
+		당신은 그윌란을 위해 계산대 옆에 <<seagullFood>> 한 접시를 두고 근무를 시작한다.
+		<<if _gwylanLocation is "sulking">>
+			<span class="red"><<nnpc_He "Gwylan">>【은는】 나타나서 가져가지 않았다.</span>
+		<</if>>
+	<<else>>
+		근무를 시작하자, 계산대 근처에 아무도 가져가지 않은 <<seagullFood>> 한 접시가 보인다. 잠시 후 그윌란이 들어와 접시를 집어 들고, 카운터 위에 정확한 금액을 깔끔하게 놓아둔 뒤 발코니로 향한다.
+	<</if>>
+	<br><br>
+<</if>>
+
+<<if !$gwylan_cafe_intro and ["cafe", "walking_to_cafe"].includes(_gwylanLocation)>>
+	<<npc Gwylan 1>><<npc Sam 2>><<person1>>
+	<<set $daily.gwylan.cafe to true>>
+	<<run statusCheck("Gwylan")>>
+	테이블을 서빙하던 중, 계산대 근처에 아무도 가져가지 않은 <<seagullFood>> 한 접시가 놓여 있는 것을 발견한다.
+	<br><br>
+
+	주위를 둘러본다. 아무도 신경 쓰지 않는 것 같다.
+	<br><br>
+
+	<<if _gwylanStatus.includes("met") and _gwylanLocation is "cafe">>
+		어떻게 해야 할지 고민하고 있을 때, 그윌란이 발코니 밖 <<his>> 자리에서 일어나 계산대 앞으로 다가오는 것이 보인다.
+	<<else>>
+		어떻게 해야 할지 고민하고 있을 때, 쥐색 머리를 한 <<nnpc_gendery "Gwylan">>【이가】 계산대 앞으로 다가온다. <<He>>【은는】 헐렁한 햇빛 가리개 모자를 쓰고 있다.
+		<<if _gwylanStatus.includes("met")>>
+			그윌란이다.
+		<</if>>
+	<</if>>
+
+	<<if $gwylanSeen?.includes("cafe")>>
+		<<He>>【은는】 카운터 위에 지폐 몇 장과 동전 몇 개를 동전 크기별로 쌓아 깔끔하게 놓는다.
+		<<He>>【은는】 당신을 알아보고 미소를 지으며 손을 흔든 뒤 접시를 가져간다.
+		<<if _gwylanLocation is "cafe">>
+			발코니로 돌아간다.
+		<<else>>
+			발코니에 있는 <<his>> 평소 자리로 간다.
+		<</if>>
+	<<else>>
+		<<He>> 카운터 위에 지폐 몇 장과 동전 몇 개를 동전 크기별로 쌓아 깔끔하게 놓은 뒤, 접시를 가져간다
+		<<if _gwylanStatus.includes("met") and _gwylanLocation is "cafe">>
+			발코니로 돌아간다.
+		<<else>>
+			바깥 발코니의 테이블로 간다.
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<if $gwylanSeen?.includes("cafe")>>
+		"우리 작은 갈매기가 친구를 찾았나 보네,"
+	<<else>>
+		"저 애는 그냥 우리 작은 갈매기야,"
+	<</if>>
+	등 뒤에서 샘의 목소리가 들린다. "<<He>>【은는】 <<his>> <<father>>처럼 정말 사랑스러운 아이야." <<person2>><<He>>【은는】 미소를 지으며 당신에게 오렌지 주스 한 잔을 건넨다. <<wearProp "juice" "tangerine">>
+	"이거 <<person1>><<him>>에게 가져다줄 수 있니? 가게에서 서비스로 주는 거라고 말해줘. 비타민 C가 필요할 거야. 항상 저 큰 모자 아래에 숨어 있어서 햇빛을 전혀 쬐지 않거든."
+	<br><br>
+
+	<<if $sciencetrait gte 1>>
+		햇빛은 비타민 C가 아니라 비타민 D 합성에 도움이 된다고 <<person2>><<him>>에게 정정해주려다 그만둔다.
+		<br><br>
+	<</if>>
+	<<person1>>
+
+	<<link [[<<him>>에게 가져다준다|Ocean Breeze Gwylan Juice]]>><</link>>
+	<br>
+<<else>>
+	<<cleareventpool>>
+
+	<<if !$weekly.robinCafeVisit and C.npc.Robin.init gte 1 and $robinmissing is 0 and !["school", "sleep"].includes(getRobinLocation())>>
+		<<set $weekly.robinCafeVisit to true>>
+		<<if _gwylanLocation is "cafe" and $gwylanSeen?.includes("cafe") and $gwylan_cafe_intro and $gwylan?.robin gte 5>>
+			<<addinlineevent "robin_cafe_gwylan" 4>>
+				<<npc Robin 1>><<npc Gwylan 2>><<person1>>
+				이전 손님이 떠난 테이블을 치우고 있을 때, 눈 한쪽 구석에 익숙한 얼굴이 보인다. 로빈이다. <<person1>><<He>>【은는】 발코니의 한 테이블에 앉아 누군가와 이야기하고 있다.
+				<br><br>
+
+				<<if C.npc.Robin.trauma gte 40>>
+					<<set $gwylanSeen.pushUnique("robin_cafe_trauma")>>
+					<<gwylanRobin 3 25>>
+					로빈이 속삭이듯 말해서 그들의 대화를 제대로 들을 수 없다.
+					다른 사람을 보려고 목을 길게 뺀다. 그윌란이다. 로빈의 이야기를 듣는 <<person2>><<his>> 얼굴에는 슬픔과 매혹이 뒤섞인 표정이 떠올라 있다.
+					<br><br>
+
+					<<generateRole 2 0 "waiter/waitress">>
+					한 <<person3>><<personsimple>>【이가】 그들에게 다가가 로빈에게 말한다. "자리를 옮기는 걸 봤어, 꼬마야. 미안하지만, 그래도 뭔가를 사야 해. 회사 방침이거든. 우리는 장사를 하는—"
+					<br><br>
+
+					<<person1>>
+					"<<He>>【은는】 내 일행이야," 그윌란이 말을 끊는다. "<<He>>【은는】 내가 평소에 먹는 걸로 할 거야. 이제, 제발, 중요한 이야기를 방해하고 있잖아." <<person2>><<He>>【은는】 <<person3>><<personsimple>>에게 손을 흔들어 쫓아내고, 그 사람은 어깨를 으쓱한다.
+					<br><br>
+
+					"나-나는 그거 살 돈이 없어," 로빈이 말한다.
+					<br><br>
+
+					"네가 돈 내는 거 아니야," 그윌란이 미소 지으며 대답한다. "자, 어디까지 이야기했지?"
+					<br><br>
+
+					그들은 계속해서 속삭이듯 대화한다. 당신은 두 사람이 이야기를 나누도록 내버려 둔다. 이야기가 끝날 무렵, 로빈은 더 행복해 보인다. <<npcincr Robin trauma -5>><<llrtrauma>>
+					<br><br>
+
+					남은 근무 시간은 별일 없이 지나간다. <<money 500 "cafeWaiter">><<printmoney 500>>【을를】 벌었다.
+				<<else>>
+					<<set $gwylanSeen.pushUnique("robin_cafe")>>
+					<<gwylanRobin 1 25>>
+					<<set $gwylan.timer.lastSeen to Time.date.timeStamp>>
+					그윌란이다. 그들의 대화를 엿듣는다.
+					<<if $robinromance gte 1 and $rng gte 51>>
+						<<if C.npc.Robin.dom gte 50>>
+							"예전에는 정말 무력하게 느껴졌는데, <<pshe>>【은는】 나를... 덜 작게 느껴지게 해줘? 적절한 단어를 못 찾겠어,"
+						<<else>>
+							"나는 <<phim>>에게 짐이 되는 것 같아,"
+						<</if>>
+						로빈이 말한다. "<<phe>>【이가】 없었다면, 베일리가..."
+						<br><br>
+
+						그윌란은 잠시 긴장했지만, 두 사람이 당신을 알아차리자마자 긴장이 풀린다.
+					<<else>>
+						"청소년 병동에 있었던 일은 잘 기억나지 않아," 로빈이 말한다. "<<pShe>>【와과】 나는 그때도 서로 알고 지냈어. 더 많이 기억해야 할 것 같은데, 막상 생각하려고 하면..."
+						<br><br>
+
+						두 사람이 당신을 알아차리자 <<person1>><<He>>【은는】 말을 멈춘다.
+					<</if>>
+					둘 다 미소를 지으며 당신에게 손짓한다.
+					<br><br>
+
+					"로빈이 네 얘기를 하더군," 그윌란이 말한다. "이제 네 끔찍한 비밀을 다 알게 됐어."
+					<br><br>
+
+					로빈은 얼굴을 붉히며 <<person1>><<his>> 고개를 젓는다. "나-나는 <<person2>><<him>>에게 창피한 얘기는 하나도 안 했어! 그냥—"
+					<br><br>
+
+					그윌란은 킥킥 웃으며 <<person1>><<him>>에게 손을 내젓는다. "장난이야. 내가 캐물었는데도 <<He>>【은는】 꽤 신중했어."
+					<br><br>
+
+					샘이 다른 테이블을 치우라고 부르기 전까지, 세 사람은 가능한 한 오랫동안 수다를 떤다. <<stress -3>><<trauma -3>><<lstress>><<ltrauma>>
+					<br><br>
+
+					남은 근무 시간은 별일 없이 지나간다.
+					<<set $tipmod to 0.2>><<tipset "serving">>
+					<<set $tip += 500>>
+					<<if $robinmoney gte 5>>
+						<<set $tip += 500>>
+						<<set $robinmoney -= 5>>
+						그윌란과 로빈 둘 다 당신에게 팁을 남겼다. <<tipreceive "cafeWaiter">>
+					<<else>>
+						그윌란이 당신에게 팁을 남겼다. <<tipreceive "cafeWaiter">>
+					<</if>>
+				<</if>>
+				<br><br>
+
+				<<link [[다음|Ocean Breeze]]>><<pass 60>><<endevent>><</link>>
+				<br>
+			<</addinlineevent>>
+		<<else>>
+			<<addinlineevent "robin_cafe_visit" 2>>
+				<<if C.npc.Robin.trauma gte 40>>
+					<<npc Robin>><<person1>><<generateRole 1 0 "waiter/waitress">>
+
+					이전 손님이 떠난 테이블을 치우고 있을 때, 눈 한쪽 구석에 익숙한 얼굴이 보인다. 로빈이다. <<person1>><<He>>【은는】 테이블에 홀로 앉아 있고, 다른 <<person2>><<personsimple>>【이가】 서빙하고 있다.
+					<br><br>
+
+					그들의 대화를 엿듣는다. "미안하지만, 물 한 잔이라도 마시려면 뭔가를 사야 해. 회사 방침이거든. 어쨌든 우린 장사하는 사람들이니까," <<personsimple>>【이가】 말한다.
+					<br><br>
+
+					로빈은 <<personsimple>>【을를】 올려다본다. "죄-죄송해요... 지금은 아무것도 못 먹을 것 같아요." <<person1>><<He>>【은는】 일어나서 문밖으로 나간다.<<gstress>><<stress 6>>
+					<br><br>
+
+					그 <<person2>><<personsimple>>【은는】 당신 쪽으로 걸어오며 비웃는다. "이 근처엔 공짜로 먹으려는 놈들뿐이야. 불쌍한 척 연기해서 동정심을 유발하려 할 테니, 속지 마." <<He>>【은는】 당신을 지나쳐 주방으로 들어간다.
+					<br><br>
+
+					당신이 뭐라고 말하기도 전에 샘이 다른 테이블을 치우라고 부른다. 남은 근무 시간은 별일 없이 지나간다. <<money 500 "cafeWaiter">><<printmoney 500>>【을를】 벌었다.
+					<br><br>
+
+					<<link [[다음|Ocean Breeze]]>><<pass 60>><<endevent>><</link>>
+					<br>
+				<<else>>
+					<<set _beverage to Time.season is "winter" ? "에그노그" : "밀크쉐이크">>
+					<<npc Robin>><<person1>>이전 손님이 떠난 테이블을 치우고 있을 때, 눈 한쪽 구석에 익숙한 얼굴이 보인다. 로빈이다. <<person1>><<He>>【은는】 자리를 안내받기 위해 앞에서 기다리고 있다. 당신이 <<him>>에게 다가가자 <<he>>【은는】 미소를 짓는다.
+					<br><br>
+
+					<<if $robinromance gte 1>>
+						<<if C.npc.Robin.dom gte 50>>
+							"안녕! 일은 어때? 오늘 정말 멋져 보여. 손님들이 잘 대해줬으면 좋겠다. 시간 나면 영화 보러 가자." <<He>>【은는】 이어서 <<he>>【이가】 관심 있는 장르에 대해 이야기한다.
+						<<else>>
+							"아-안녕! 정말 보고 싶었는데 오늘 여기서 일한다고 들었어! 고아원에서는 할 일이 별로 없어서, 내가 너무 방해되는 건 아니었으면 좋겠어," <<he>>【이가】 말한다.
+						<</if>>
+
+					<<else>>
+						"안녕! 오늘 일하는 줄 몰랐네! 그냥 뭐 좀 마시러 들렀는데, 만나서 반가워."
+
+					<</if>>
+					<br><br>
+
+					당신은 로빈과 몇 분간 즐겁게 대화를 나눈 후 <<his>> 주문을 받는다. <<He>>【은는】 _beverage【을를】 주문한다. 당신은 <<his>> 음료를 준비해서 <<his>> 테이블로 가져다준다. <<He>>【은는】 _beverage【을를】 한 모금 마시고 미소 짓는다. "정말 맛있다!"
+					<br><br>
+
+					<<He>>【은는】 <<his>> 음료를 다 마시고 일어선다. <<He>>【은는】 <<if $robinromance gte 1>>키스한다<<else>>껴안는다<</if>> 당신을 떠나기 전에.
+					<br><br>
+
+					<<if $robinmoney gte 5>>
+						<<set $tip to 500>>
+						<<set $robinmoney -= 5>>
+						남은 근무 시간은 별일 없이 지나간다. 로빈이 당신에게 팁을 남겼다. <<printmoney 1000>>【을를】 벌었다.
+						<<silently>><<money 500 "cafeWaiter">><<tipreceive "cafeWaiter">><</silently>>
+
+					<<else>>
+						남은 근무 시간은 별일 없이 지나간다. <<money 500 "cafeWaiter">><<printmoney 500>>【을를】 벌었다.
+
+					<</if>>
+					<br><br>
+
+					<<link [[다음|Ocean Breeze]]>><<pass 60>><<endevent>><</link>>
+					<br>
+				<</if>>
+			<</addinlineevent>>
+		<</if>>
+	<<elseif _gwylanLocation is "cafe" and $gwylan_cafe_intro and !$daily.gwylan.cafeServe>>
+		<<addinlineevent "cafe_serve_gwylan" 2>>
+			<<run statusCheck("Gwylan")>>
+			<<set $daily.gwylan.cafeServe to true>>
+			<<npc Gwylan>><<person1>>발코니 밖 테이블을 청소한다.
+			<br><br>
+
+			청소를 마치자 그윌란이 당신에게 손짓한다.
+			<<if $gwylanSeen.includes("partners")>>
+				두 사람은 잠시 이야기를 나눈다. 샘이 당신을 다시 안으로 부른다. 당신이 돌아서자, 그윌란이 당신의
+				<<if $worn.upper.type.includes("naked")>>
+					$worn.lower.name【을를】 잡고 당신을 뒤로 끌어당긴다
+				<<else>>
+					$worn.upper.name【을를】 잡고 당신을 아래로 끌어내린다
+				<</if>>
+				깊은 키스로. <<His>> 혀가 당신의 입술 사이로 미끄러져 들어온다. <<gwylanKiss>>
+				<br><br>
+
+				<<if _gwylanLastSeenDays gte 21>>
+					"나를 두고 사라져 버렸구나, 자기. 정말 걱정했어. 넌 나한테 빚진 거야."
+					<<He>>【은는】 당신의 입술에 한 번 더 짧게 입을 맞춘 후 당신을 밀어낸다. "내 가게. 나중에. 할 일이 있어." <<arousal 1000>><<garousal>><<npcincr Gwylan lust 2>><<npcincr Gwylan dom 1>><<glust>><<gyearning>>
+				<<elseif $gwylan.timer.ritual and (Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual)) <= -7)>>
+					"나를 소홀히 했구나, 자기. 네가 굶주려. 계속 날 굶길 거야?"
+					<<He>>【은는】 당신의 입술에 한 번 더 짧게 입을 맞춘 후 당신을 밀어낸다. "내 가게. 나중에. 기다리고 있을게." <<arousal 1500>><<ggarousal>><<npcincr Gwylan lust 2>><<npcincr Gwylan dom 1>><<glust>><<gyearning>>
+				<<elseif $gwylan.timer.ritual and Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual)) <= 0>>
+					<<He>>【은는】 당신을 놓아주고 교활한 미소를 지으며 밀어낸다. "나중에 가게에 꼭 들러, 자기. 할 일이 있어." <<arousal 1000>><<garousal>>
+				<<else>>
+					<<He>>【은는】 당신을 놓아주고 교활한 미소를 지으며 밀어낸다. <<arousal 500>><<garousal>>
+				<</if>>
+			<<else>>
+				<<if _gwylanLastSeenDays gte 21>>
+					"오랫동안 못 봤네. 무슨 일 있었는지 궁금해지기 시작했어." 두 사람은 잠시 이야기를 나눈다. 샘이 당신을 다시 안으로 부른다. <<stress -3>><<lstress>>
+				<<else>>
+					두 사람은 잠시 이야기를 나눈다. 샘이 당신을 다시 안으로 부른다. <<stress -3>><<lstress>>
+				<</if>>
+			<</if>>
+			<br><br>
+
+			<<set $gwylan.timer.lastSeen to Time.date.timeStamp>>
+			남은 근무 시간은 별일 없이 지나간다. 그윌란이 당신에게 팁을 남겼다.
+			<<set $tipmod to 0.2>><<tipset "serving">>
+			<<set $tip += 500>>
+			<<set $tip += 100>>
+			<<tipreceive "cafeWaiter">>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</addinlineevent>>
+	<</if>>
+
+	<<addinlineevent "cafe_plates" 1.2>>
+		샘이 손님이 많은 큰 테이블에 음식 접시를 가져다 달라고 부탁한다.
+		<br><br>
+		<<link [[여러 번 나눠서 옮긴다|Ocean Breeze Plates]]>><<set $phase to 0>><</link>>
+		<br>
+		<<link [[한 번에 다 가져간다|Ocean Breeze Plates]]>><<set $phase to 1>><</link>><<dancedifficulty 200 800>>
+		<br>
+	<</addinlineevent>>
+
+	<<if Weather.precipitation is "none">>
+		<<addinlineevent "cafe_breeze" 1.2>>
+			<<if dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+				<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+					카페 밖에서 테이블 서빙을 하고 있을 때, 바다에서 강한 바람이 불어와 치마를 들어 올려 당신의 <<undies>>【을를】 보는 사람 누구에게나 노출시킨다.
+					<<undiestrauma>>
+					<br><br>
+
+					<<if !$worn.under_lower.type.includes("naked")>>
+						<<link [[당당하게 있는다|Ocean Breeze Own]]>><<set $phase to 0>><</link>><<exhibitionist1>>
+						<br>
+					<<elseif hasSexStat("exhibitionism", 3)>>
+						<<link [[당당하게 있는다|Ocean Breeze Own]]>><<set $phase to 1>><</link>><<exhibitionist3>>
+						<br>
+					<</if>>
+					<<link [[몸을 가린다|Ocean Breeze Cover]]>><</link>>
+					<br>
+					<<if !$worn.under_lower.type.includes("naked")>>
+						<<fameexhibitionism 5>>
+					<<else>>
+						<<fameexhibitionism 10>>
+					<</if>>
+				<<else>>
+					카페 밖에서 테이블 서빙을 하고 있을 때, 바다에서 강한 바람이 불어와 기분 좋게 피부를 스친다.
+					<<lstress>><<stress -4>>
+					<br><br>
+
+					<<waiter_default>>
+					<<pass 1 hour>>
+					<br><br>
+
+					<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+					<br>
+				<</if>>
+			<<else>>
+				근무 시간 대부분을 바다가 내려다보이는 야외 테이블을 서빙하며 보낸다.
+				<br><br>
+
+				남은 근무 시간은 별일 없이 지나간다.
+				<<if _gwylanLocation is "cafe" and $gwylan_cafe_intro>>
+					<<set $tipmod to 0.2>><<tipset "serving">>
+					<<set $tip += 500>>
+					그윌란이 당신에게 팁을 남겼다. <<tipreceive "cafeWaiter">>
+				<<else>>
+					<<money 500 "cafeWaiter">><<printmoney 500>>【을를】 벌었다.
+				<</if>>
+				<<pass 1 hour>>
+				<br><br>
+
+				<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+				<br>
+			<</if>>
+		<</addinlineevent>>
+	<</if>>
+
+	<<addinlineevent "cafe_bun" 1>>
+		<<if playerBellyVisible() and $lactating is 1 and $settings.breastFeedingEnabled>>
+			<<generate1>><<generate2>><<person1>>
+			누군가 당신을 부르는 목소리가 들린다. "어이, <<pwaitress>>!" 카페 구석에서 들려온다. 테이블로 다가가자, 당신이 도착하자마자 분노에 찬 눈으로 당신을 쳐다보는 <<person>>【이가】 있다. <<person2>><<person>>【이가】 <<him>> 앞에 앉아 있다.
+			<br><br>
+
+			"디럭스 크림빵을 주문했는데, 대신 이게 나왔잖아!" <<person1>><<person>>【이가】 말한다. "이게 디럭스라고? 크림이 거의 없잖아! 이거에 50퀴드나 냈다고! 너희들 다 멍청한 거야, 아니면 그냥 장난치는 거야?" <<He>>【은는】 계속해서 불평을 쏟아내고, 당신이 시선을 피하려고 할 때마다 억지로 듣게 만든다.
+			<br><br>
+
+			<<person2>><<person>>【은는】 <<his>> 친구의 언어폭력 동안 조용히 있지만, <<his>> 눈은 당신의 가슴에 고정되어 있다. "잠깐, 너 임신했지?" <<he>>【이가】 마침내 폭언을 중단시키며 묻는다. "그 가슴 지금쯤 꽉 차 있겠네, 내 친구가 불평 좀 그만하게 네 특별한 손길을 빵에 더해주는 게 어때?" <<person1>><<person>>【은는】 그 제안에 만족한 듯 잠잠해진다.
+			<br><br>
+
+			<<if $milk_amount gte 1>>
+				<<link [[동의한다|Ocean Breeze Pregnant Milk Accept]]>><<npcincr Sam love 2>><</link>><<glove Sam>><<promiscuous1>>
+				<br>
+			<<else>>
+				<span class = "pink">남아있는 모유가 충분하지 않습니다.</span>
+				<br>
+			<</if>>
+			<<link [[거절한다|Ocean Breeze Pregnant Milk Refuse]]>><</link>>
+			<br>
+
+		<<elseif dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+			<<generate1>><<person1>>빵을 주문한 <<person>>에게 서빙한다. <<He>>【은는】 크림을 핥는다. "정말 맛있네," <<he>>【이가】 숨을 헐떡인다.
+			<<He>>【은는】 의자를 뒤로 빼고 그 앞에 접시를 밀어 놓는다. "제발, 앉아서 좀 먹어봐. 내가 살게." 카페는 그다지 붐비지 않는다.
+			<br><br>
+
+			<<link [[앉는다|Ocean Breeze Sit]]>><</link>>
+			<br>
+			<<link [[거절한다|Ocean Breeze Sit Refuse]]>><</link>>
+			<br>
+		<<else>>
+			<<generate1>><<person1>>빵을 주문한 <<person>>에게 서빙한다. <<He>>【은는】 크림을 핥으며 당신을 빤히 쳐다본다.
+			<br><br>
+
+			<<waiter_default>>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_oral" 1>>
+		<<generate1>><<person1>>한 <<person>>【이가】 테이블에 혼자 앉아 고개를 뒤로 젖히고 눈을 감고 있다.
+		<<if $awareness gte 400>>
+			<<generates2>><<he>>【이가】 몸을 비비는 모습으로 보아, 구강성교를 받고 있는 것이 분명하다. <<He>>【은는】 거의 숨기려고도 하지 않는다.
+			몰래 확인해보니, 테이블 아래에 <<person2>><<person>>【이가】 있다,
+			<<print either("부드럽게","열렬하게","힘차게","관능적으로","서투르게","격렬하게","의무적으로","능숙하게")>>
+			<<person1>>
+			<<if $NPCList[0].penis isnot "none">>
+				그 <<personsimple>>의 것을 빨아주고 있다.
+			<<else>>
+				그 <<personsimple>>의 것을 핥아주고 있다.
+			<</if>>
+			<<garousal>><<arousal 200>>
+		<<elseif $awareness gte 200>>
+			<<if !Weather.isOvercast>>
+				<<He>>【은는】 일광욕에서 거의 성적인 쾌감을 느끼는 것 같다.
+			<<else>>
+				규칙적으로 꿈틀거리지 않았다면, <<he>>【이가】 잠들었다고 생각했을 것이다.
+			<</if>>
+			어느 순간 <<he>>【은는】 거의 오르가슴에 가까운 방식으로 몸을 떤다.
+		<<else>>
+			<<if !Weather.isOvercast>>
+				아름다운 날이다 - <<hes>>【은는】 
+			<<else>>
+				<<Hes>>
+			<</if>>
+			아마 잠이 들었을 것이다.
+		<</if>>
+		<br><br>
+
+		<<waiter_default>>
+		<<pass 1 hour>>
+		<br><br>
+
+		<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+		<br>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_pair" 1>>
+		<<if dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+			<<generatey1>><<generatey2>>젊은 한 쌍, <<fullGroup>>에게 서빙한다.
+			<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+				<<if $worn.under_lower.type.includes("naked")>>
+					당신이 떠나려고 돌아서자, <<person1>><<person>>【이가】 당신의 $worn.lower.name 밑단을 들어 올려, 카페에 당신의 맨 <<bottom>>【을를】 드러낸다.
+					"속옷도 안 입었어?" <<he>>【이가】 믿을 수 없다는 듯이 말한다. "너 좀 밝히는구나, 안 그래?"
+					<<fameexhibitionism 10>><<stress 6>><<arousal 600>><<gstress>><<garousal>>
+					<br><br>
+
+					<<link [[화낸다|Ocean Breeze Angry]]>><</link>>
+					<br>
+					<<link [[무시한다|Ocean Breeze Ignore]]>><<trauma 6>><<stress 6>><<set $phase to 2>><</link>><<gtrauma>><<gstress>>
+					<br>
+				<<else>>
+					당신이 떠나려고 돌아서자, <<person1>><<person>>【이가】 당신의 $worn.lower.name 밑단을 들어 올려, 카페에 당신의 $worn.under_lower.name【을를】 드러낸다.
+					<<He>>【와과】 <<person2>><<person>> 둘 다 웃으며, 당신에게 더 많은 시선을 끈다.
+					<<fameexhibitionism 1>><<stress 3>><<arousal 300>><<gstress>><<garousal>>
+					<br><br>
+
+					<<link [[화낸다|Ocean Breeze Angry]]>><</link>>
+					<br>
+					<<link [[무시한다|Ocean Breeze Ignore]]>><<trauma 3>><<stress 3>><<set $phase to 1>><</link>><<gtrauma>><<gstress>>
+					<br>
+				<</if>>
+			<<else>>
+				<<if $worn.under_lower.type.includes("naked")>>
+					당신이 떠나려고 돌아서자, <<person1>><<person>>【이가】 당신의 $worn.lower.name 뒷부분을 끌어내려, 카페에 당신의 맨 <<bottom>>【을를】 드러낸다.
+					"속옷도 안 입었네!" <<he>>【이가】 믿을 수 없다는 듯이 말한다. "지금 후회하고 있겠지."
+					<<fameexhibitionism 5>><<stress 3>><<arousal 300>><<gstress>><<garousal>>
+					<br><br>
+
+					<<link [[화낸다|Ocean Breeze Angry]]>><</link>>
+					<br>
+					<<link [[무시한다|Ocean Breeze Ignore]]>><<trauma 3>><<stress 3>><<set $phase to 1>><</link>><<gtrauma>><<gstress>>
+					<br>
+				<<else>>
+					당신이 떠나려고 돌아서자, <<person1>><<person>>【이가】 당신의 $worn.lower.name 뒷부분을 끌어내려, 카페에 당신의 $worn.under_lower.name【을를】 드러낸다.
+					<<fameexhibitionism 1>><<stress 2>><<arousal 200>><<gstress>><<garousal>>
+					<br><br>
+
+					<<link [[화낸다|Ocean Breeze Angry]]>><</link>>
+					<br>
+					<<link [[무시한다|Ocean Breeze Ignore]]>><<trauma 2>><<stress 2>><<set $phase to 0>><</link>><<gtrauma>><<gstress>>
+					<br>
+				<</if>>
+			<</if>>
+		<<else>>
+			<<generatey1>><<generatey2>>젊은 한 쌍, <<fullGroup>>에게 서빙한다.
+			<<person1>><<person>>【이가】 당신을 훑어보는 것 같지만, 아무 말도 하지 않는다.
+			<br><br>
+
+			<<waiter_default>>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_tourists" 1>>
+		당신이 맡은 테이블 중 하나에 관광객 몇 명이 앉아 있다.
+		<<if dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+			<<generate1>><<generate2>>
+			<<person1>>당신은 <<person>>【이가】 <<person2>><<person>>에게 속삭이는 목소리로 마을에 대해 이야기하는 것을 엿듣는다.
+			<br>
+			<<person1>>"맹세코," <<he>>【이가】 말한다. "이 마을은 우리 같은 사람들에게 꿈의 장소야. 여기서 원하는 건 뭐든지 할 수 있어. 아무도 막지 않아."
+			<br>
+			"경찰조차도— 라는 게 사실이야?"
+			<br>
+			"경찰? 그들은 나머지보다 더 심해! 돈 몇 푼 쥐여주면, 아마 <<girl>>【을를】 묶어줄 걸."
+			<br>
+			"와. 그러니까, 아무나? 상관없어, 어떻게—"
+			<br>
+			"아무나. 이봐." <<He>>【이가】 당신을 본다. "너. <<if playerBellyVisible()>>임신했네.<<elseif $beauty gte ($beautymax / 7) * 2>>귀엽네.<</if>> 강간당해 본 적 있지, 그렇지?"
+			<br><br>
+
+			<<if ($rapestat + $beastrapestat + $tentaclerapestat) gt 0>>
+				<<link [[끄덕인다|Ocean Breeze Tourist]]>><<set $phase to 1>><</link>>
+				<br>
+				<<link [[부인한다 (거짓말)|Ocean Breeze Tourist]]>><<set $phase to 2>><</link>>
+				<br>
+				<<link [[대답을 거부한다|Ocean Breeze Tourist]]>><<set $phase to 3>><</link>>
+				<br>
+			<<else>>
+				<<link [[끄덕인다 (거짓말)|Ocean Breeze Tourist]]>><<set $phase to 1>><</link>>
+				<br>
+				<<link [[부인한다|Ocean Breeze Tourist]]>><<set $phase to 2>><</link>>
+				<br>
+				<<link [[대답을 거부한다|Ocean Breeze Tourist]]>><<set $phase to 3>><</link>>
+				<br>
+			<</if>>
+		<<else>>
+			그들은
+			<<print either(
+				"해변", "서핑", "박물관", "남자애들", "여자애들", "음식", "뉴스",
+				"생명의 궁극적인 통합", "다음 주말 계획", "정치 상황"
+			)>>에 대해 길게 이야기한다.
+			<br><br>
+
+			<<waiter_default>>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_freeloader" 1>>
+		<<generate1>><<person1>> 한 <<person>>【이가】 카페에 들어와 구석에 혼자 앉는다.
+		<<if dangerEvent(0.5,6000)>> /* Roughly 50% at game start, max 80% */
+			<<He>>【이가】 계속 당신을 힐끗거리더니, <<his>> 주문을 받으러 가자 물 한 잔만 달라고 한다.
+			당신이 떠나려고 몸을 돌리자 <<he>> 당신의 손목을 잡는다.
+			"혹시 당신도 메뉴에 있는 건 아니지?" <<He>>【은는】 미소 짓는다.
+			"너랑 나, 조용한 데 가서 재미 좀 보면 어때? 섭섭지 않게 챙겨줄게." <<He>> <<his>> <<wallet>>【을를】 톡톡 친다.
+			<<His>>의 의도는 명백히 음란하다.
+			<br><br>
+			<<if hasSexStat("promiscuity", 2)>>
+				<<link [[제안을 받아들인다|Ocean Breeze Whore]]>><<set $sexstart to 1>><</link>><<promiscuous2>>
+				<br>
+			<<elseif $uncomfortable.prostituting is false>>
+				<<His>> 제안은 역겹지만, 돈이 필요하다.
+				<br><br>
+				<<set _desperateaction to 1>>
+				<<link [[마지못해 제안을 받아들인다|Ocean Breeze Whore]]>><<set $desperateaction to _desperateaction>><<set $sexstart to 1>><</link>><<promiscuous2>>
+				<br>
+			<<else>>
+				<<insufficientStat "promiscuity" "그런 제안을 받아들이기엔">>
+				<br><br>
+			<</if>>
+			<<link [[거절한다|Ocean Breeze Whore Refuse]]>><</link>>
+		<<else>>
+			<<He>>【이가】 계속 당신을 힐끗거린다. 하지만, <<his>> 주문을 받을 때 <<he>> 눈을 마주치려 하지 않는다.
+			<br><br>
+
+			<<waiter_default>>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_collision" 1>>
+		<<if dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+			<<generateRole 0 0 "waiter/waitress">><<person1>>
+			주방에서 나오던 당신과 한 <<person>>【이가】 부딪히면서, 당신의
+			<<if $worn.upper.type.includes("naked")>>가슴<<else>>$worn.upper.name.<</if>> 위로 따뜻한 수프가 쏟아진다.
+			"정말 죄송합니다." <<he>>【이가】 말하며 수건을 집어 든다. 손님들이 돌아본다.
+			<br><br>
+
+			<<link [[무시한다|Ocean Breeze Soup Ignore]]>><<npcincr Sam love 2>><<stress 6>><<pain 20>><</link>><<glove Sam>><<gpain>><<gstress>>
+			<br>
+			<<link [[따진다|Ocean Breeze Soup Confront]]>><<npcincr Sam love -1>><<stress -6>><<trauma -6>><</link>><<llove Sam>><<ltrauma>><<lstress>>
+			<br>
+			<<if !$worn.upper.type.includes("naked")>>
+				<<if $player.gender_appearance is "m" and $player.breastsize lte 2>>
+					<<link [[상의를 벗는다|Ocean Breeze Remove]]>><<npcincr Sam love 2>><</link>><<glove Sam>>
+					<br>
+				<<elseif hasSexStat("exhibitionism", 4)>>
+					<<link [[상의를 벗는다|Ocean Breeze Remove Lewd]]>><<npcincr Sam love 2>><</link>><<glove Sam>><<exhibitionist4>>
+					<br>
+				<</if>>
+			<</if>>
+		<<else>>
+			<<generateRole 0 0 "waiter/waitress">><<person1>>
+			<<wearProp "tray">>
+			주방에서 나오던 당신과 한 <<person>>【이가】 부딪힐 뻔한다.
+			<br><br>
+
+			<<waiter_default>>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_crowd" 1>>
+		<<if dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+			<<generate1>><<generate2>><<generate3>><<generate4>>
+			한 무리의 손님들이 카페에 들어와 여러 테이블을 차지한다.
+			주문을 받으려 하자, 상석에 앉은 <<person1>><<person>>【이가】 당신의 말을 가로막는다.
+			"오늘 내 생일인 거 알아? 뭐 특별한 거 없어?" <<He>>【은는】 노골적으로 당신의 몸을 훑어본다. "테이블 위로 올라와서 춤이라도 한번 춰볼래?"
+			<br><br>
+
+			<<link [[그들을 위해 춤춘다|Ocean Breeze Dance]]>>
+				<<danceinit>><<set $dancing to 1>><<set $audience to 4>><<set $venuemod to 2>><<set $timer to 12>><<set $dancelocation to "cafe">>
+			<</link>><<exhibitionist1>><<gstress>><<gtiredness>>
+			<br>
+			<<link [[거절한다|Ocean Breeze Dance Refuse]]>><</link>>
+		<<else>>
+			한 무리의 손님들이 카페에 들어와 여러 테이블을 차지한다. 하지만 별다른 문제는 일으키지 않는다.
+			<br><br>
+
+			<<waiter_default>>
+			<<pass 1 hour>>
+			<br><br>
+
+			<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<</addinlineevent>>
+
+	<<addinlineevent "cafe_dog" 1>>
+		<!-- Modified for Monster People -->
+		<<beastNEWinit 1 dog>>
+		<<if $rng gte 51 and ($monster is 1 or $settings.bestialityEnabled)>>
+			샘이 카페 옆 쓰레기통에 쓰레기를 버려달라고 부탁한다. 하지만 쓰레기통 옆에는 길 잃은 <<beasttype>>【이가】 서 있다. 당신이 다가가자 으르렁거린다.
+			<br><br>
+
+			<<link [[상관없이 계속한다|Ocean Breeze Dumpster Dog]]>><<stress 6>><</link>><<gstress>>
+			<br>
+			<<link [[할 일을 잊고 안으로 돌아간다|Ocean Breeze Dumpster Refuse]]>><</link>>
+		<<else>>
+			<<endevent>>
+			<<generate1>><<generate2>>
+			샘이 카페 옆 쓰레기통에 쓰레기를 버려달라고 부탁한다.
+			하지만 쓰레기통 옆에는 <<fullGroup>>【이가】 서 있다. 위험해 보이는 무리다.
+			<br><br>
+
+			<<link [[상관없이 계속한다|Ocean Breeze Dumpster]]>><<stress 6>><</link>><<gstress>>
+			<br>
+			<<link [[할 일을 잊고 안으로 돌아간다|Ocean Breeze Dumpster Refuse]]>><</link>>
+		<</if>>
+	<</addinlineevent>>
+
+	<<if $chef_state is undefined>>
+		<<if C.npc.Sam.love gte 10>>
+			<<addinlineevent "cafe_chef_start" 2>>
+				<<npc Sam>><<person1>>샘이 당황한 표정으로 주방에서 뛰쳐나온다.
+				<<He>>【이가】 당신 쪽을 힐끗 보더니, <span class="green">서둘러 다가온다.</span>
+				"좀 곤란한 상황에 처했어." <<he>> 말한다.
+				"주방장이 또 뛰쳐나가 버렸어. 대신 일해 줄 사람이 필요해. 걱정 마, 어렵지 않고, 급여는 두 배로 줄게. 도와줄 수 있을까?"
+				<br><br>
+
+				<<link [[수락한다|Chef Help]]>><<npcincr Sam love 2>><</link>><<glove Sam>>
+				<br>
+				<<link [[거절한다|Ocean Breeze Chef Refuse]]>><<npcincr Sam love -1>><</link>><<llove Sam>>
+				<br>
+			<</addinlineevent>>
+		<<else>>
+			<<addinlineevent "cafe_chef_denied" 1>>
+				<<npc Sam>><<person1>>샘이 당황한 표정으로 주방에서 뛰쳐나온다.
+				<<He>>【이가】 당신 쪽을 힐끗 보더니, <span class="red">그냥 지나친다.</span>
+				<<He>>【이가】 다른 직원에게 다가가, 이번 근무에 주방장을 대신해 주면 더 많은 급여를 주겠다고 제안한다.
+				<i>샘이 당신을 더 좋아했다면 기회를 줬을지도 모른다.</i>
+				<br><br>
+
+				<<waiter_default>>
+				<<pass 1 hour>>
+				<br><br>
+
+				<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+				<br>
+			<</addinlineevent>>
+		<</if>>
+	<</if>>
+
+	<<runeventpool>>
+<</if>>
+
+:: Ocean Breeze Gwylan Juice
+<<effects>><<run statusCheck("Gwylan")>><<wearProp "juice" "tangerine">>
+<<person1>>당신은 오렌지 주스 잔을 들고 발코니로 나간다.
+<<if Weather.precipitation isnot "none">>
+	카페의 지붕이 <<print window.KR.getWeatherKr(Weather.precipitation)>>【을를】 막아줄 만큼 충분히 뻗어 있다.
+<</if>>
+<<if _gwylanStatus.includes("met")>>
+	그윌란
+<<else>>
+	생쥐처럼 생긴 <<nnpc_gendery "Gwylan">>
+<</if>>
+바다를 바라보며 생각에 잠겨 있는 것 같다. 당신은 <<his>> 테이블에 음료를 놓는다.
+<br><br>
+
+"제가 주문한 게 아닌데요, 얘야." <<he>>【은는】 당신을 쳐다보지도 않고 말한다. <<His>> 목소리는 무심하지만 정중하다.
+<br><br>
+
+<<if $speech_attitude is "meek">>
+	"저, 이건 서비스예요." 당신은 말한다. "사장님이 당신을 걱정하셔서요. <<person2>><<He>>【이가】 비타민 C가 더 필요할 거라고 생각하시더라고요."
+<<elseif $speech_attitude is "bratty">>
+	"돈 내달라고 한 적 없는데요." 당신은 말한다. "샘이 당신을 걱정하더라고요. <<person2>><<He>>【이가】 괴혈병에 걸릴 거라고 생각하던데요."
+<<else>>
+	"서비스입니다." 당신은 말한다. "사장님이 당신을 걱정하시면서 비타민 C가 더 필요할 거라고 하셨어요."
+<</if>>
+<br><br>
+
+<<if _gwylanStatus.includes("met")>>
+	<<person1>><<He>>【은는】 당신의 목소리를 듣고는 활기를 띠며 당신에게로 돌아선다. "여기서 일하는 줄은 몰랐네요, 정말 반가운걸요!"
+	<<He>>【은는】 당신에게 따뜻한 미소를 짓는다.
+<<else>>
+	<<person1>><<He>>【은는】 한숨을 쉰다.
+<</if>>
+"고맙긴 하지만, 새미가 뭘 걱정하는지 모르겠네요. 전 과일은 충분히 먹거든요." <<he>>【이가】 말한다. "<<person2>><<he>>【이가】 또 비타민 C랑 비타민 D【을를】 헷갈린 거 아닐까요?"
+<br><br>
+
+<<person1>><<He>>【은는】 주스를 한 모금 마신다.
+<<if !_gwylanStatus.includes("met")>>
+	<<set $daily.gwylan.firstMet to true>>
+	<<his>> 음료를 내려놓은 뒤, <<he>>【은는】 당신을 향해 몸을 돌려 당신의 옷을 훑어본다.
+	<<if $worn.upper.type.includes("serving")>>
+		"샘의 가게를 잘 대표하는 모습을 보니 좋네요."
+	<<elseif $worn.upper.type.includes("costume")>>
+		"취향이 좋으시군요. 일하면서 그런 옷을 입는 사람은 흔치 않은데 말이죠."
+	<<else>>
+		"조언 하나 해도 괜찮다면, 일에 맞는 옷을 입으면 손님들이 팁을 더 기꺼이 낼지도 몰라요. 샘에게도 도움이 될 거고요."
+	<</if>>
+	<<He>>【은는】 미소를 지으며 일어선다.
+	<br><br>
+
+	<<He>>【은는】 당신 또래로 보이며, 쥐색 머리카락에 주근깨가 살짝 있다. "보기보다 나이 많아요." <<he>>【은는】 당신의 마음을 읽기라도 한 듯 말한다.
+	"<span class="green">저는 그윌란이라고 합니다.</span>" <<He>>【은는】 앞으로 손을 뻗어 당신의 손을 잡고 <<his>> 두 손으로 흔든다. "만나서 반가워요. 전 숲 외곽에 가게가 하나 있어요. 놓칠 리가 없죠. 제가 파는 건—"
+	<<He>>【은는】 말을 멈춘다. "제 할아버지가 파는 건—" 다시 말을 멈춘다. "제가 거기서 옷이랑 잡동사니를 팔아요. <span class="blue">평범한 가게에선 찾을 수 없는 물건들이죠.</span> 저조차도 뭐가 있는지 모를 때가 있다니까요!" <<He>>【은는】 자랑스러워하는 것 같다.
+	<br><br>
+
+	"이만하면 됐고. 음료 고마워요, 얘야."
+<<elseif !$forest_shop_intro>>
+	"고마워요. 제 가게에 들러주길 아직도 기대하고 있어요." <<he>>【이가】 말한다.
+<<elseif $gwylan.request.event is "meetAtShop">>
+	"고마워요. 나중에 숲속 상점에 들르는 거 잊지 마세요. 제 정원에 무단 침입한 건 만회해야죠."
+<<else>>
+	"고마워요."
+<</if>>
+<<set $gwylan.timer.lastSeen to Time.date.timeStamp>>
+<<He>> 다시 바다를 응시한다.
+<br><br>
+
+<<set $gwylan_cafe_intro to true>>
+<<set $tipmod to 0.2>><<tipset "serving">>
+
+<<set $tip += 500>>
+<<set $tip += 100>>
+
+남은 근무 시간은 별일 없이 지나갔다. 그윌란이 팁을 남겼다.
+<<tipreceive "cafeWaiter">>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Plates
+<<wearProp "tray">>
+<<if $phase is 0>>
+	몇 분이 걸렸지만, 당신은 모든 것을 테이블로 옮기는 데 성공한다.
+	<br><br>
+
+	<<waiter_default>>
+	<br><br>
+<<elseif $phase is 1>>
+	<<if $danceSuccess>>
+		<<set $tipmod to 0.2>><<tipset "serving">>
+
+		<<set $tip += 500>>
+		<<set $tip += 100>>
+
+		당신은 접시를 쟁반에 올리고, <<dancetext>> 어깨 위에서 균형을 잡으며 아무것도 쏟지 않도록 조심한다. <span class="green">당신은 모든 것을 무사히 테이블로 옮기는 데 성공한다.</span>
+		<br><br>
+		<<npc Sam>><<person1>>샘이 지나가며 엄지를 치켜세운다.<<npcincr Sam love 1>><<glove Sam>>
+		<br><br>
+		남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.<<tipreceive "cafeWaiter">>
+	<<else>>
+		당신은 접시를 쟁반에 올리고, <<dancetext>> 어깨 위에서 균형을 잡으며 아무것도 쏟지 않도록 조심한다. 하지만 주방을 나오던 중 균형을 잃고, <span class="red">실수로 접시 몇 개 분량의 음식을 바닥에 쏟고 만다.</span> 샘이 못마땅한 표정으로 당신을 쳐다본다.<<npcincr Sam love -1>><<llove Sam>><<stress 6>><<gstress>>
+		<br><br>
+		당신은 한숨을 쉬며 어질러진 것을 치우기 시작한다.
+		<br><br>
+
+		<<waiter_default>>
+	<</if>>
+	<br><br>
+<</if>>
+<<pass 1 hour>>
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Soup Ignore
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"제, 제 잘못이에요." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"앞으로는 가는 길 좀 잘 보고 다녀요." 당신이 말한다.
+<<else>>
+	"괜찮아요." 당신이 말한다.
+<</if>>
+<<personsimple>>【은는】 고개를 끄덕이고 주방으로 사라지고, 당신은 몸을 말린다.
+<br><br>
+
+"잘 대처했네." 계산대 뒤에서 샘이 말한다.
+<br><br>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Soup Confront
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"화상 입을 뻔했잖아요." 당신이 말한다.
+<<elseif $speech_attitude is "bratty">>
+	"당신처럼 칠칠치 못한 사람은 여기서 일하면 안 되죠." 당신이 말한다.
+<<else>>
+	"일부러 그랬죠." 당신이 말한다.
+<</if>>
+<<He>>【은는】 고개를 숙이고, 손님들은 자기들끼리 속삭이며 킥킥거린다. 샘이 못마땅한 표정으로 당신을 쳐다본다.
+<br><br>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Remove
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 몸을 말리기 쉽도록 $worn.upper.name【을를】 벗는다.
+<<personsimple>>【은는】 시선을 피하고 한 손님이 휘파람을 불지만, 당신은 별 탈 없이 몸을 말린다.
+<br><br>
+
+<<upperstrip>>
+
+<<set $tipmod to 0.2>><<tipset "serving">>
+
+<<set $tip += 500>>
+<<set $tip += 100>>
+
+남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.<<tipreceive "cafeWaiter">><<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<clotheson>><<endevent>><</link>>
+
+:: Ocean Breeze Remove Lewd
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 몸을 말리기 쉽도록 $worn.upper.name【을를】 벗는다.
+<<personsimple>>【은는】 당신의 <<breasts>>【을를】 보고 얼굴을 붉히며 시선을 피한다.
+한 손님이 휘파람을 분다. 다른 손님은 환호한다. 당신은 별 탈 없이 몸을 말린다.
+<<exhibitionism4>>
+
+<<upperstrip>>
+
+<<set $tipmod to 0.2>><<tipset "serving">>
+
+<<set $tip += 500>>
+<<set $tip += 500>>
+
+남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.
+<<tipreceive "cafeWaiter">><<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<clotheson>><<endevent>><</link>>
+
+:: Ocean Breeze Angry
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<npcincr Sam love -1>><<run statusCheck("Gwylan")>>
+
+당신은 그 자리에서 돌아서서 <<person1>><<person>>【을를】 노려본다.
+<<his>> 얼굴에서 미소가 사라진다. "그냥 장난 좀 친 거야. 삐칠 필요는 없잖아." 샘이 못마땅한 듯 당신을 쳐다본다.<<npcincr Sam love -1>><<llove Sam>>
+<br><br>
+
+<<if gwylanSchedule() is "cafe" and $gwylan_cafe_intro>>
+	얼마 후, 당신은 그 둘이 떠나는 것을 유심히 지켜본다. 그들이 밖으로 나가자마자, 앞문이 닫히기도 전에, <span class="teal"><<person1>><<person>>【은는】 먹다 남은 <<seagullFood>>에 머리를 맞는다.</span>.
+	일부는 <<him>>에게 달라붙고, 일부는 바닥에 떨어진다.
+	<br><br>
+
+	<<He>>【은는】 움찔하며 소리가 난 쪽으로 돌아선다. "조심해. 갈매기에게 먹이를 주는 건 현명하지 못해." 그윌란의 목소리가 들리고, <<nnpc_he "Gwylan">>【은는】 <<him>>【을를】 스쳐 지나가며 서둘러 문을 닫는다.
+	<br><br>
+
+	문이 완전히 닫히는 순간, 두 사람은 <span class="red">갈매기 떼에게 둘러싸인다.</span>. 희미한 비명과 새들의 울음소리가 카페를 가득 채우자 대부분의 손님들이 쳐다본다.
+	갈매기들은 <<persons>> 머리와 땅에 흩어진 음식을 쪼아대며, 도망치려는 두 사람의 발을 걸어 넘어뜨린다. 샘을 포함한 몇몇 사람들의 웃음소리가 들린다.
+	<<nnpc_He "Sam">>【은는】 이번에는 그윌란을 향해 못마땅한 시선을 보내며 그것을 감추려 한다. <<stress -6>><<lstress>>
+	<br><br>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 100>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 그윌란이 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<<else>>
+
+	<<waiter_default>>
+	<<pass 1 hour>>
+<</if>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Ignore
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<run statusCheck("Gwylan")>>
+
+<<if gwylanSchedule() is "cafe" and $gwylan_cafe_intro>>
+	<<if $phase is 0 or $phase is 1>>
+		당신은 $worn.lower.name【을를】 고쳐 입고 아무 일 없었다는 듯이 계속한다.
+	<<else>>
+		당신은 $worn.lower.name【을를】 고쳐 입고 아무 일 없었다는 듯이 계속하지만, 사람들 앞에서 이렇게 노출되고 굴욕을 당한 것에 얼굴을 붉힌다.
+	<</if>>
+	<br><br>
+
+	얼마 후, 당신은 그 둘이 떠나는 것을 유심히 지켜본다. 그들이 밖으로 나가자마자, 앞문이 닫히기도 전에, <span class="teal"><<person1>><<person>>【은는】 먹다 남은 <<seagullFood>>에 머리를 맞는다.</span>.
+	일부는 <<him>>에게 달라붙고, 일부는 바닥에 떨어진다.
+	<br><br>
+
+	<<He>>【은는】 움찔하며 소리가 난 쪽으로 돌아선다. "조심해. 갈매기에게 먹이를 주는 건 현명하지 못해." 그윌란의 목소리가 들리고, <<nnpc_he "Gwylan">>【은는】 <<him>>【을를】 스쳐 지나가며 서둘러 문을 닫는다.
+	<br><br>
+
+	문이 완전히 닫히는 순간, 두 사람은 <span class="red">갈매기 떼에게 둘러싸인다.</span>. 희미한 비명과 새들의 울음소리가 카페를 가득 채우자 대부분의 손님들이 쳐다본다.
+	갈매기들은 <<persons>> 머리와 땅에 흩어진 음식을 쪼아대며, 도망치려는 두 사람의 발을 걸어 넘어뜨린다. 샘을 포함한 몇몇 사람들의 웃음소리가 들린다.
+	<<nnpc_He "Sam">>【은는】 그윌란을 향해 못마땅한 시선을 보내며 그것을 감추려 한다. <<stress -6>><<lstress>>
+	<br><br>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 100>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 그윌란이 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<<elseif $phase is 0>>
+	당신은 $worn.lower.name【을를】 고쳐 입고 아무 일 없었다는 듯이 계속한다.
+	<br><br>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 100>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<<elseif $phase is 1>>
+	당신은 $worn.lower.name【을를】 고쳐 입고 아무 일 없었다는 듯이 계속한다.
+	<br><br>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 200>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<<else>>
+	당신은 $worn.lower.name【을를】 고쳐 입고 아무 일 없었다는 듯이 계속하지만, 사람들 앞에서 이렇게 노출되고 굴욕을 당한 것에 얼굴을 붉힌다.
+	<br><br>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 500>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<</if>>
+<br><br>
+
+<<pass 1 hour>>
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Whore
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 40>>
+	<<set $tipmod to 2>><<tipset "serving">>
+	"5분 뒤에 카페 옆 골목, 쓰레기통 뒤에서 봐." <<He>>【은는】 뒤도 돌아보지 않고 떠난다.
+	<<pass 5>>
+	아무도 보지 않을 때 당신은 슬쩍 빠져나와, 약속대로 쓰레기통 뒤에서 기다리고 있는 <<him>>【을를】 발견한다. <<He>>【은는】 시간을 낭비하지 않는다.
+	<<promiscuity2>>
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Ocean Breeze Whore Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Ocean Breeze Whore]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Ocean Breeze Whore Refuse
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 <<person>>에게 이 가게는 메뉴에 없는 것은 팔지 않는다고 말하고, <<his>> 물을 가지러 간다. 당신이 돌아왔을 때, <<hes>>【은는】 이미 사라지고 없다.
+<br><br>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Whore Finish
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $consensual is 1>>
+	<<if $enemyarousal gte $enemyarousalmax>>
+		<<ejaculation>><<set $prostitutionstat += 1>><<fameprostitution 1>>
+
+		"여기 네 몫이다, 창녀야." <<He>>【은는】 떠나면서 당신에게 현금을 던져준다. <<tearful>> 당신은 들키기 전에 서둘러 안으로 돌아간다.
+		<br><br>
+		<<tipreceive "prostitution">>
+
+	<<else>>
+		"알았어. 아무것도 기대하지 마." <<He>>【은는】 떠나면서 역겹다는 듯이 당신을 쳐다본다. <<tearful>> 당신은 들키기 전에 서둘러 안으로 돌아간다.
+		<br><br>
+
+	<</if>>
+<<else>>
+	<<if $enemyarousal gte $enemyarousalmax>>
+		<<ejaculation>><<fameprostitution 1>><<set $prostitutionstat += 1>>
+		"여기 네 몫이다, 창녀야." <<He>>【은는】 떠나면서 당신에게 현금을 던져준다. <<tearful>> 당신은 들키기 전에 서둘러 안으로 돌아간다.
+		<br><br>
+		<<tipreceive "prostitution">>
+
+	<<elseif $enemyhealth lte 0>>
+		당신은 <<person>>【을를】 뒤로 밀쳐내 도망칠 시간을 번다. <<tearful>> 당신은 카페 안으로 도망친다.
+		<br><br>
+
+	<<elseif $alarm gte 1>>
+		샘이 무슨 소란인지 보려고 카페 뒷문으로 뛰쳐나온다.
+		<<person>>【은는】 얼굴을 가리고 당신을 땅으로 밀치며 달아난다. 샘이 당신을 일으켜 세우고 부드럽게 안으로 이끈다.
+		<<famerape 1>>
+		<br><br>
+
+	<</if>>
+<</if>>
+
+<<clothesontowel>>
+
+<<endcombat>>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><</link>>
+
+:: Ocean Breeze Dance
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<danceeffects>>
+<<danceaudience>>
+<<danceactions>>
+
+<<if $danceevent is 0 and !hasSexStat("exhibitionism", 5) and $exposed gte 2>>
+	이렇게 노출된 상태로는 춤을 계속 출 수 없어! 얼굴이 붉어지며, 당신은 그 자리에서 도망친다.
+	<br><br>
+<<elseif $danceevent is 0 and !hasSexStat("exhibitionism", 3) and $exposed gte 1 and !$worn.under_lower.type.includes("dance")>>
+	이렇게 노출된 상태로는 춤을 계속 출 수 없어! 얼굴이 붉어지며, 당신은 그 자리에서 도망친다.
+	<br><br>
+<</if>>
+
+<<if $danceevent is "finish">>
+	<<link [[다음|Ocean Breeze]]>><<endevent>><<clotheson>><</link>>
+<<elseif $danceevent is 0>>
+	<<if $exposed gte 2 and !hasSexStat("exhibitionism", 5)>>
+		<<link [[도망친다|Ocean Breeze Dance Stop]]>><</link>>
+	<<elseif $exposed gte 1 and !hasSexStat("exhibitionism", 3)>>
+		<<link [[도망친다|Ocean Breeze Dance Stop]]>><</link>>
+	<<else>>
+		<<link [[멈춘다|Ocean Breeze Dance Stop]]>><</link>>
+	<</if>>
+<</if>>
+
+:: Ocean Breeze Dance Refuse
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Dance Stop
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 보이지 않는 뒷방으로 달려간다. <<clotheson>> 남은 근무 시간은 아무 일 없이 지나가지만, 당신이 춤추는 것을 본 많은 손님들이 당신을 힐끗거린다.
+<br><br>
+
+당신은 <<money 500 "cafeWaiter">><<printmoney 500>>【을를】 벌었다.
+
+<<set _pass to 5 * Math.clamp($timer, 0, 12)>>
+<<pass _pass>>
+
+<br><br>
+
+<<clothesontowel>>
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Dumpster
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+
+<<if dangerEvent()>>
+	<<set $outside to 1>>
+	당신은 괜한 걱정이라 생각하고 쓰레기통으로 걸어간다. 하지만 떠나려고 돌아섰을 때, 두 사람이 당신의 길을 막고 있는 것을 발견한다.
+	<<person1>><<person>>【은는】 당신의 팔을 잡고 입을 막고, <<person2>><<person>>【은는】 당신을 보며 씨익 웃는다. "정말 예쁜 아가씨네."
+	<br><br>
+
+	<<link [[다음|Ocean Breeze Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<<else>>
+	당신은 괜한 걱정이라 생각하고 쓰레기통으로 걸어간다. 당신이 지나갈 때 두 사람은 당신을 훑어보지만 아무 말도 하지 않는다.
+	<br><br>
+
+	<<waiter_default>>
+	<<pass 1 hour>>
+	<br><br>
+
+	<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+<</if>>
+
+:: Ocean Breeze Dumpster Refuse
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<endevent>>
+<<npc Sam>><<person1>>
+당신은 위험을 감수하지 않고 안으로 돌아가기로 한다. 샘은 이해한다고 말하지만, 표정이 좋지 않다.<<npcincr Sam love -1>><<llove Sam>>
+<br><br>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+
+	<<enable_rescue>>
+	<<maninit>>
+	<<set $leftarm to "grappled">><<set $rightarm to "grappled">><<hand_gag 0 left>><<set $NPCList[0].righthand to "arms">>
+<</if>>
+
+<<effects>>
+<<effectsman>><<man>>
+
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0 and $alarm lte 0>>
+	<span id="next"><<link [[다음|Ocean Breeze Rape]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Ocean Breeze Rape Finish]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Ocean Breeze Rape Finish
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<ejaculation>>
+	만족한 두 사람은 당신을 내버려 둔다. <<tearful>> 당신은 들키기 전에 서둘러 안으로 돌아간다.
+	<br><br>
+
+<<elseif $enemyhealth lte 0>>
+	당신은 두 사람을 쓰레기통에 부딪히게 만들어 도망칠 시간을 번다. <<tearful>> 당신은 카페 안으로 도망친다.
+	<br><br>
+
+<<elseif $alarm gte 1>>
+	<<run statusCheck("Gwylan")>>
+	<<if ["cafe", "walking_to_cafe"].includes(gwylanSchedule()) and _gwylanLovePercent gte 50 and $hallucinations gte 2>>
+		<<set $daily.gwylan.cafeSkip to true>>
+		카페 뒷문이 천천히 삐걱거리며 열린다. 두 사람이 얼어붙는다. 아무도 나오지 않지만, 당신의 목덜미 털이 곤두선다.
+		"가서 확인해 봐." <<person1>><<person>>【이가】 말한다. <<He>>【은는】 <<person2>><<person>>【이가】 조사하는 동안 당신을 붙잡고 있다.
+		<br><br>
+
+		"아무도 없—" <<He>>【은는】 무언가를 내려다보며 말을 멈춘다. "이게 뭐야? 어떻게 들어왔지?" <<He>>【은는】 옆으로 비켜서며 문 앞에 앉아 있는 작은 갈색 여우를 드러낸다.
+		<br><br>
+
+		여우는 잠시 <<person2>><<person>>【을를】 쳐다보다가 짧은 비명을 지른다. 두 사람은 그 소리에 깜짝 놀란다. "이 새끼, 저리 꺼져! 훠이!" <<He>>【은는】 여우를 놀라게 하려고 팔을 휘젓기 시작한다.
+		<br><br>
+
+		<<person1>><<person>>【은는】 위를 쳐다보고 있다. "멈춰. 씨발 움직이지 마. 당장." <<he>>【이가】 <<person2>><<person>>에게 말한다.
+		<br><br>
+
+		"왜? 뭐가 문제—" <<He>>【은는】 <<person1>><<persons>> 시선을 따라가다 멈춘다. 당신도 그 시선을 따른다. 당신 위, 모든 지붕 위에, <span class="red">수백 마리는 족히 되어 보이는 갈매기들이 있다. 모두 두 사람을 쳐다보고 있다.</span>
+		<br><br>
+
+		여우가 다시 비명을 지른다. 갈매기들이 일제히 화답하며 날아오른다. 소음이 귀를 먹먹하게 한다. 갈매기들은 당신은 완전히 무시한 채 두 사람에게 달려든다. 그들은 새들이 무자비하게 괴롭히자 머리 주위를 휘저으며 도망친다.
+		<br><br>
+
+		여우는 당신에게 다가와 다리에 머리를 부딪친 후, 마치 웃는 듯한 소리를 내며 두 사람을 쫓아 달아난다.
+		<br><br>
+
+		<<tearful>> 당신은 방금 본 것이 무엇인지 확신하지 못한 채 카페로 돌아간다.
+	<<else>>
+		샘이 무슨 소란인지 보려고 카페 뒷문으로 뛰쳐나온다. 두 사람은 당신을 땅으로 밀치며 현장에서 도망친다.
+		샘이 당신을 일으켜 세우고 부드럽게 안으로 이끈다.
+	<</if>>
+	<<set $rescued += 1>><<famerape 1>>
+	<br><br>
+<</if>>
+
+<<clothesontowel>>
+
+<<endcombat>>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><</link>>
+
+:: Ocean Breeze Dumpster Dog
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+
+<<if dangerEvent()>>
+	<<set $outside to 1>>
+	당신은 괜한 걱정이라 생각하고 쓰레기통으로 걸어간다. 하지만 떠나려고 돌아섰을 때, <<beasttype>>【이가】 당신의 길을 막고 있다.
+	<br><br>
+
+	<<link [[다음|Ocean Breeze Dog Rape]]>><<set $molestationstart to 1>><</link>>
+	<br>
+<<else>>
+	당신은 괜한 걱정이라 생각하고 쓰레기통으로 걸어간다. 당신이 가까이 다가가자 <<beasttype>>【이가】 도망친다.
+	<br><br>
+
+	<<waiter_default>>
+	<<pass 1 hour>>
+	<br><br>
+
+	<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+<</if>>
+
+:: Ocean Breeze Dog Rape
+<<if $molestationstart is 1>>
+	<<set $molestationstart to 0>>
+	<<controlloss>>
+	<<violence 1>>
+	<<neutral 1>>
+	<<molested>>
+	<<beastCombatInit>>
+	<<enable_rescue>>
+
+<</if>>
+
+<<effects>>
+<<effectsman>>
+<<alarmstate>>
+<<beast $enemyno>>
+<br><br>
+
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+	<span id="next"><<link [[다음|Ocean Breeze Dog Rape Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[다음|Ocean Breeze Dog Rape]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Ocean Breeze Dog Rape Finish
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $enemyarousal gte $enemyarousalmax>>
+	<<beastejaculation>>
+	만족한 <<beasttype>>【이가】 당신을 내버려 둔다. <<tearful>> 당신은 카페 안으로 돌아간다.
+	<br><br>
+
+<<elseif $enemyhealth lte 0>>
+	<<beasttype>>【이가】 아픈 듯 낑낑거리며 도망친다. <<tearful>> 당신은 카페 안으로 돌아간다.
+	<br><br>
+
+<<elseif $alarm gte 1>>
+	<<run statusCheck("Gwylan")>>
+	<<if ["cafe", "walking_to_cafe"].includes(gwylanSchedule()) and $gwylanSeen?.includes("ritual_beast")>>
+		카페 뒷문이 천천히 삐걱거리며 열린다. <<beasttype>>【이가】 얼어붙는다. 아무도 나오지 않지만, 당신의 목덜미 털이 곤두선다.
+		<br><br>
+
+		희미한 속삭임이 당신의 귀에 들린다.
+		<br><br>
+
+		<<if $hypnosis_traits.devotion gte 4>>
+			<b>"<span class="witch">집으로 가.</span>"</b> 당신은 아주 약간의 강제력을 느끼지만, 곧 사라진다. 당신을 향한 것이 아니었다.
+		<<else>>
+			"집으로 가."
+		<</if>>
+		<br><br>
+
+		<<beasttype>>의 머리가 아래로 축 처진다. 그것은 서투르게 당신에게서 떨어져, 터벅터벅 걸어간다. 카페 뒷문이 다시 천천히 닫힌다.
+		<<tearful>> 당신은 일을 마치고 카페 안으로 돌아간다.
+	<<else>>
+		샘이 무슨 소란인지 보려고 카페 뒷문으로 뛰쳐나온다.
+		놀란 <<beasttype>>【이가】 도망친다. 당신은 굴욕감을 느끼지만, 샘이 당신을 일으켜 세우고 부드럽게 안으로 이끈다.
+	<</if>>
+	<<famebestiality 1>><<set $rescued += 1>>
+	<br><br>
+<</if>>
+
+<<clothesontowel>>
+
+<<endcombat>>
+
+<<waiter_default>>
+<<pass 53>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><</link>>
+
+:: Ocean Breeze Own
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $phase is 0>>
+	당신은 그 자리에서 빙글 돌아, 치마를 더욱 펄럭이며 바람이 잦아들기 전에 모두가 잘 볼 수 있도록 한다.
+	<<exhibitionism1>>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 200>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<<else>>
+	당신은 치마 앞부분을 눌러 <<genitals>>【을를】 가리지만, 그렇게 하면서 앞으로 몸을 숙여 당황한 척하며 맨 엉덩이를 내민다. <<exhibitionism3>>
+
+	<<set $tipmod to 0.2>><<tipset "serving">>
+
+	<<set $tip += 500>>
+	<<set $tip += 500>>
+
+	남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.
+	<<tipreceive "cafeWaiter">>
+<</if>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><<pass 1 hour>><</link>>
+
+:: Ocean Breeze Cover
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+뺨이 붉어지며, 당신은 상황이 악화되기 전에 치마를 눌러 존엄성을 지키고, 서둘러 안으로 돌아간다.
+<br><br>
+
+<<if $player.gender_appearance is "f" and $player.penisExist>>
+	카페로 도망치면서 누군가 "방금 그거 자지였어?"라고 말하는 소리를 들은 것 같다.
+	<br><br>
+<</if>>
+
+<<set $tipmod to 0.2>><<tipset "serving">>
+
+<<set $tip += 500>>
+<<set $tip += 100>>
+
+남은 근무 시간은 아무 일 없이 지나간다. 누군가 당신에게 팁을 남겼다.<<tipreceive "cafeWaiter">>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><<pass 1 hour>><</link>>
+
+:: Ocean Breeze Sit
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 자리에 앉는다. <<person>>【이가】 당신에게 숟가락을 건네주고는 아래를 내려다본다. "신발 끈이 풀렸네." <<he>>【은는】 한숨을 쉬며 테이블 아래로 사라진다.
+<br><br>
+
+당신이 빵에 숟가락을 누르려는데, 무릎 사이로 나타난 <<person>> 때문에 방해받는다.
+"여기 내려온 김에," <<he>>【이가】 속삭인다. "다른 게 당기네." 당신은 주위를 힐끗 본다. 아무도 눈치채지 못했다.
+<br><br>
+
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>
+	<<He>>【이가】 당신의 $worn.lower.name【을를】 들어 올리려 한다.
+<<else>>
+	<<He>>【이가】 당신의 $worn.lower.name【을를】 끌어내리려 한다.
+<</if>>
+<br><br>
+
+<<link [[계속 앉아 있는다|Ocean Breeze Oral]]>><</link>><<promiscuous1>>
+<br>
+<<link [[자리를 뜬다|Ocean Breeze Stand]]>><</link>>
+<br>
+
+:: Ocean Breeze Sit Refuse
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"죄, 죄송해요." 당신이 말한다. "저 일해야 해서요."
+<<elseif $speech_attitude is "bratty">>
+	"안 돼요." 당신이 말한다. "일해야 해요."
+<<else>>
+	"일하는 중이에요." 당신이 말한다. "곤란해지고 싶지 않아요."
+<</if>>
+<br><br>
+
+"놓치는 거네." <<person>>【이가】 빵을 뒤로 빼며 말한다. "이거 정말 맛있는데."
+<br><br>
+
+<<waiter_default>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><<pass 1 hour>><</link>>
+
+:: Ocean Breeze Stand
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 <<he>>【이가】 더 나아가기 전에 숟가락을 떨어뜨리고 일어선다.
+<br><br>
+
+<<person>>【이가】 테이블 밑에서 다시 기어 나온다. "배 안 고파?" <<he>>【이가】 말한다. "정말 귀엽네."
+<br><br>
+
+<<waiter_default>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><<pass 1 hour>><</link>>
+
+:: Ocean Breeze Oral
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+당신은 <<person>>【이가】 계속하도록 내버려 둔다.
+
+<<if playerChastity("hidden")>>
+	<<His>> 눈이 커진다.
+	<<promiscuity1>>
+
+	"전부 잠겨 있네," <<he>>【이가】 말한다. "맛 좀 보고 싶었는데." <<He>>【은는】 다시 사라졌다가, <<his>> 의자 옆에 나타난다.
+	"비밀은 지켜줄게." <<He>>【은는】 윙크한다.
+	<br><br>
+
+	<<set $tip += 500>>
+	<<set $tip += 100>>
+
+<<else>>
+	<<if $player.penisExist and $player.vaginaExist>>
+		<<he>>【이가】 당신의 <<genitals>>【을를】 드러내자 <<His>> 눈이 빛난다.
+		"아름다워," <<he>>【이가】 말하고는, 황홀경에 빠진 듯 눈을 감고 당신의 기둥 끝에서부터 뿌리까지, 그리고 음순 위로 입을 맞춘다.
+		<br><br>
+
+		<<if !playerChastity("cage")>>당신은 반응하여 발기한다. <</if>><<He>>【은는】 몸을 떼고 당신을 살핀다.
+		<<if ($parasite.penis.name and $parasite.penis.name isnot "parasite") or $worn.genitals.name is "chastity parasite">>
+			"이렇게 자지를 보호하고 있는 걸 보니, 혹시 처녀가 아닐까 싶은데," <<he>>【이가】 경외감에 찬 눈으로 당신의 사타구니를 바라보며 속삭인다.
+			<<if $player.virginity.vaginal is true>>
+				"정말 소중하네. 내가 가져갈 순 없지. 부드럽게 다뤄야겠어."
+			<<else>>
+				"하지만 네 질은 다른 이야기를 하는군," <<he>>【이가】 속삭인다. <<He>>【은는】 만족스러운 목소리다.
+			<</if>>
+		<<elseif $player.virginity.penile is true or $player.virginity.vaginal is true>>
+			"처녀구나," <<he>>【이가】 경외감에 찬 눈으로 당신의 사타구니를 바라보며 속삭인다. "정말 소중하네. 내가 가져갈 순 없지. 부드럽게 다뤄야겠어."
+		<<else>>
+			"효과가 있네," <<he>>【이가】 속삭인다. <<He>>【은는】 만족스러운 목소리다.
+		<</if>>
+		<<He>> 다시 앞으로 몸을 숙여, <<his>> 혀로 당신의 기둥을 훑는다.
+	<<else>>
+		<<His>> 당신의 <<genitals>>【을를】 드러내자 눈을 빛내더니, 이내 황홀경에 빠져 눈을 감고 그곳에 입을 맞춘다. <<He>>【은는】 당신을 올려다본다.
+		"네 <<print ($player.penisExist ? "자지" : "보지")>>【은는】 아름다워," <<he>>【이가】 말한다. <<He>>【은는】 눈을 감고 다시 한번 입을 맞춘다. 그리고 또 한 번.
+		<<promiscuity1>>
+
+		<<if $player.penisExist>>
+			<<if !playerChastity("cage")>>당신은 반응하여 발기한다. <</if>><<He>>【은는】 몸을 떼고 당신을 살핀다.
+			<<if ($parasite.penis.name and $parasite.penis.name isnot "parasite") or $worn.genitals.name is "chastity parasite">>
+				"이렇게 보호하고 있는 걸 보니, 혹시 처녀가 아닐까 싶은데," <<he>>【이가】 경외감에 찬 눈으로 당신의 사타구니를 바라보며 속삭인다. "정말 소중하네. 부드럽게 다뤄야겠어."
+			<<elseif $player.virginity.penile is true>>
+				"처녀구나," <<he>>【이가】 경외감에 찬 눈으로 당신의 사타구니를 바라보며 속삭인다. "정말 소중하네. 내가 가져갈 순 없지. 부드럽게 다뤄야겠어."
+			<<else>>
+				"효과가 있네," <<he>>【이가】 속삭인다. <<He>>【은는】 만족스러운 목소리다.
+			<</if>>
+			<<He>> 다시 앞으로 몸을 숙여, <<his>> 혀로 당신의 기둥을 훑는다.
+		<<else>>
+			<<He>> 몸을 떼고 당신을 살핀다.
+			<<if $player.virginity.vaginal is true>>
+				"처녀구나," <<he>>【이가】 경외감에 찬 눈으로 당신의 사타구니를 바라보며 속삭인다. "정말 소중하네. 내가 가져갈 순 없지. 부드럽게 다뤄야겠어."
+			<<else>>
+				"효과가 있네," <<he>>【이가】 속삭인다. <<He>>【은는】 만족스러운 목소리다.
+			<</if>>
+			<<He>> 다시 앞으로 몸을 숙여, <<his>> 혀로 당신의 클리토리스 주변을 핥는다.
+		<</if>>
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 계속해서 당신을 핥고, 입 맞추고, 입김을 불어넣는다. <<He>>【은는】 당신의 얼굴과 <<genitals>>【을를】 번갈아 쳐다본다.
+	<<He>>【은는】 당신의 반응에 민감해서, 당신이 한 가지 기술에 너무 익숙해지기 전에 자세를 바꾼다. 당신의 숨이 가빠진다.
+	<br><br>
+
+	<<arousal 1000 "genitals">><<orgasm>>
+
+	<<if !$player.penisExist or ($parasite.penis.name and $parasite.penis.name isnot "parasite") or $worn.genitals.name is "chastity parasite">>
+		<<He>>【은는】 당신이 몸을 떠는 것을 지켜보며 미소 짓는다. "특별한 간식이 마음에 들었으면 좋겠네," <<he>>【이가】 속삭인다.
+	<<elseif $orgasmcount gte 24 or $femaleclimax or _deniedOrgasm>>
+		<<He>>【은는】 당신이 몸을 떨자 눈을 감았다가, 이내 혼란스러운 표정으로 당신을 보고는 미소 짓는다. "특별한 간식이 마음에 들었으면 좋겠네," <<he>>【이가】 속삭인다.
+	<<else>>
+		<<He>>【은는】 당신이 몸을 떨자 눈을 감고, <<his>> 얼굴로 당신의 정액을 받아낸다.
+		<<He>>【은는】 손가락으로 정액을 떠서 핥아 먹는다. "최고의 크림이야," <<he>>【이가】 속삭인다.
+	<</if>>
+	<br><br>
+
+	<<He>>【은는】 테이블 밑에서 나와 다시 자리에 앉는다. 당신이 다시 일하러 돌아가자 <<He>>【은는】 윙크한다.
+	<br><br>
+
+	<<set $tip += 500>>
+	<<set $tip += 500>>
+
+<</if>>
+
+<<set $tipmod to 0.2>><<tipset "serving">>
+
+남은 근무 시간은 별일 없이 지나간다. 누군가 당신에게 팁을 남겼다.<<tipreceive "cafeWaiter">>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><<pass 1 hour>><</link>>
+<br>
+
+:: Ocean Breeze Pregnant Milk Accept
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+당신은 두 사람에게 고개를 끄덕인 후
+<<if $worn.upper.type.includes("naked")>>
+	$worn.under_upper.name
+	<<underupperstrip>>
+<<else>>
+	$worn.upper.name
+	<<upperstrip>>
+	<<if !$worn.under_upper.type.includes("naked")>>
+		그리고 $worn.under_upper.name
+		<<underupperstrip>>
+	<</if>>
+<</if>>
+몸을 숙여 당신의 <<breasts>>【을를】 빵 바로 위로 가져간다. 테이블이 외딴 곳에 있어 눈에 띄지 않게 그들의 요구를 들어줄 수 있다. 당신이 가슴에 손을 가져가자, <<person1>><<person>>【이가】 그 손을 쳐낸다.
+<br><br>
+
+"이리 내, 내가 직접 할게." <<he>>【이가】 비웃는다. "또 우리한테 인색하게 굴면 안 되지." <<He>>【이가】 당신의 <<breasts>> 한쪽을 잡고, 당신의 편안함은 조금도 고려하지 않은 채 쥐어짠다. <<person2>><<person>>도 뒤처지고 싶지 않은지, 당신의 다른 가슴을 잡고 <<his>> 친구와 경쟁하듯 세게 잡아당긴다. 당신이 젖을 흘리기 시작하기까지는 오랜 시간이 걸리지 않았다.
+<<promiscuity1>><<breastfeed 5>>
+
+두 사람은 그들의 빵이 당신의 모유로 넉넉하게 코팅될 때까지 계속해서 젖을 짜냈고, 당신의 유두는 혹사당해 쓰라렸다.
+"마음이 바뀌었어." <<person1>><<person>>【이가】 훨씬 행복해진 태도로 말한다. "여기 서비스는 최고야. 고마워, <<girl>>." 그들은 빵을 먹기 시작했고, 마침내 당신은 다른 사람이 보기 전에 옷을 고쳐 입을 수 있게 되었다.
+<br><br>
+
+샘이 당신 옆을 지나간다. "그 사람들 엄청 화난 것 같던데, 잘 처리해줘서 고마워. 기억해, 손님은 언제나 옳아!"
+<br><br>
+<<set $tipmod to 0.2>><<tipset "serving">>
+
+<<set $tip += 500>>
+<<set $tip += 100>>
+
+남은 근무 시간은 별일 없이 지나갔다. 누군가 당신에게 팁을 남겼다. <<tipreceive "cafeWaiter">><<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<clotheson>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Pregnant Milk Refuse
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+당신은 고개를 저으며 그들에게서 멀어진다. "어이, 너한테 말하고 있잖아, 이 <<bitch>>!" <<person1>><<person>>【이가】 당신에게 욕설을 퍼붓는다.
+<br><br>
+
+당신은 <<him>>【을를】 무시하기 위해 최선을 다한다. 샘은 카페 건너편에서 들려오는 고함 소리를 듣고는, 실망한 표정으로 당신을 쳐다보다가 이내 자리를 뜬다.
+<br><br>
+
+<<waiter_default>>
+<<pass 1 hour>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+<br>
+
+:: Ocean Breeze Slime Defy
+<<effects>><<run statusCheck("Gwylan")>>
+<<if $earSlime.corruption gte (currentSkillValue('willpower') / 10)>>
+	<<set $earSlime.defyCooldown += 2>>
+	슬라임이 통제권을 주장하려 한다. <span class="red">그것이 당신의 의지를 압도하고,</span> 강제로 $daily.earSlimeOceanBreezeCafeEat【을를】 사게 만든다.
+	<<ggwillpower>><<willpower 1>>
+	<br><br>
+
+	<<if ["cafe", "walking_to_cafe"].includes(gwylanSchedule()) and ($gwylanSeen?.includes("cafe") or $gwylan_cafe_intro) and !$gwylanSeen?.includes("ear_slime_intro")>>
+		<<npc Gwylan>><<person1>>
+		<<set $gwylanSeen.pushUnique("ear_slime_intro")>><<set $gwylan.timer.lastSeen to Time.date.timeStamp>>
+		"결정하기 힘드신가요?" 등 뒤에서 익숙한 목소리가 들린다. 당신은 고개를 돌리려 하지만, <span class="red">고통스러운 노력일 뿐이다. 슬라임이 원하지 않는다.</span>
+		<br><br>
+
+		"아니면 그저... <i>침입적인</i> 생각인가요?" 누군가 당신 주위를 걸으며 목소리가 말한다.
+		<<if !$daily.gwylan.cafe>>
+			그윌란이다. <<seagullFood>> 접시를 들고 있다.
+		<<else>>
+			그윌란이다.
+		<</if>>
+		"주제넘게 굴어서 죄송하지만, 힘들어 보이시는군요." 슬라임이 꿈틀거린다.
+		<br><br>
+
+		<<He>>【이가】 천천히 당신의 귀 한쪽으로 손을 뻗는다. <span class="red">당신의 팔이 움찔하며, 본능적으로 그윌란의 손을 쳐낸다.</span>
+		<<He>>【은는】 얼굴을 찌푸린다. "알겠습니다. 제가 도울 수 있을지도 모르겠군요. <span class="blue">나중에 제정신이 아닌 것 같으면 가게로 찾아오세요.</span>"
+		<<He>>【은는】 발코니로 떠난다.
+		<<set $daily.gwylan.cafe to true>>
+		<<endevent>>
+		<br><br>
+	<</if>>
+	<<earSlimeCafeLinks>>
+<<else>>
+	당신은 슬라임의 명령을 무시하고 계속 나아가려 한다. 그것이 당신에게 $daily.earSlimeOceanBreezeCafeEat【을를】 사도록 강요하려 하지만, <span class="green">실패하는 것</span>을 느낀다.
+	<br><br>
+
+	<<if ["cafe", "walking_to_cafe"].includes(gwylanSchedule()) and ($gwylanSeen?.includes("cafe") or $gwylan_cafe_intro) and !$gwylanSeen?.includes("ear_slime_intro")>>
+		<<npc Gwylan>><<person1>>
+		<<set $gwylanSeen.pushUnique("ear_slime_intro")>><<set $gwylan.timer.lastSeen to Time.date.timeStamp>>
+		"결정하기 힘드신가요?" 등 뒤에서 익숙한 목소리가 들린다. 당신은 돌아선다.
+		<<if !$daily.gwylan.cafe>>
+			그윌란이다. <<seagullFood>> 접시를 들고 있다.
+		<<else>>
+			그윌란이다.
+		<</if>>
+		<br><br>
+
+		"아니면 그저... <i>침입적인</i> 생각인가요?" <<he>>【이가】 당신 주위를 걸으며 말한다.
+		"주제넘게 굴어서 죄송하지만, 잠시 힘들어 보이셨습니다."
+		<br><br>
+
+		<<He>>【이가】 천천히 당신의 귀 한쪽으로 손을 뻗는다. <span class="red">당신의 팔이 마치 본능적으로 그윌란의 손을 쳐내려는 듯 움찔거린다.</span>
+		<<He>>【은는】 그 모습을 보고 손을 거둔다. "제가 도울 수 있을지도 모르겠군요. <span class="blue">나중에 제정신이 아닌 것 같으면 가게로 찾아오세요.</span>"
+		<<He>>【은는】 발코니로 떠난다.
+		<<set $daily.gwylan.cafe to true>>
+		<br><br>
+	<</if>>
+
+	<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+	<br>
+<</if>>
+
+:: Cafe Coffee
+<<endevent>>
+<<set _coffee to ["모카", "라떼", "카라멜 라떼", "화이트초콜릿 모카", "플랫 화이트", "카라멜 아이스 라떼"].pluck()>>
+<<wearProp "coffee">>
+<<if $daily.earSlimeOceanBreezeCafeEat>>
+	당신은 귀 슬라임이 옳다고 판단하고
+<<else>>
+	당신은
+<</if>>
+창가의 높은 좌석 중 하나에 앉아 메뉴에서 <<print _coffee>>【을를】 주문한다.
+커피는 금방 나왔고, 신선한 커피의 맛있는 향기가 코를 찔렀다.
+
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1 and hasSexStat("exhibitionism", 4)>>
+	커피를 한 모금 마시자 사악한 생각이 떠오른다.
+	지나가는 사람들의 시점에서 보면 좌석이 거의 눈높이까지 다리를 올리게 되어 있고, 당신은 치마를 입고 있다.
+	<<if hasSexStat("exhibitionism", 5) and $worn.under_lower.exposed>>
+		게다가 속옷도 입지 않았다. <<arousal 500>><<garousal>>
+		<br><br>
+		<<link [[다리를 벌린다 (0:01)|Cafe Coffee Flash]]>><</link>><<exhibitionist4>>
+		<br>
+	<<elseif !$worn.under_lower.exposed>>
+		<<arousal 500>><<garousal>>
+		<br><br>
+		<<link [[다리를 벌린다 (0:02)|Cafe Coffee Flash]]>> <<set $phase to 0>> <<pass 2>> <</link>><<exhibitionist3>>
+		<br>
+	<<else>>
+		<br><br>
+	<</if>>
+<<else>>
+	당신은 커피를 한 모금씩 음미하며 풍부한 맛을 즐기며 여유를 부린다.
+	<br><br>
+<</if>>
+
+<<link [[음료를 다 마신다|Cafe Coffee Finish]]>><</link>>
+
+:: Cafe Coffee Flash
+<<if ndef _caught>> <<set _caught to 0>> <</if>>
+<<if ndef $resting>> <<set $resting to 0>> <</if>>
+<<if ndef $cameras_raised>> <<set $cameras_raised to 0>> <</if>>
+<<if ndef $still>> <<set $still to 0>> <</if>>
+<<if ndef $coffee_sips>> <<set $coffee_sips to 12>> <</if>>
+<<wearProp "coffee">>
+
+<<if $coffee_sips gte 11>>
+	당신 앞에는 커피가 거의 가득 찬 잔이 있다.
+<<elseif $coffee_sips gte 8>>
+	당신 앞에는 커피가 꽤 많이 남은 잔이 있다.
+<<elseif $coffee_sips gte 5>>
+	커피가 반 잔 정도 남았다.
+<<elseif $coffee_sips gte 3>>
+	커피가 반 잔도 채 남지 않았다.
+<<elseif $coffee_sips gt 1>>
+	커피가 얼마 남지 않았다.
+<<elseif $coffee_sips is 1>>
+	잔이 거의 비었다. 마저 마시고 나갈 시간이다.
+<<else>>
+	커피잔이 비었다.
+<</if>>
+<br><br>
+
+<<if $coffee_sips gt 1>>
+	<<if $resting>>
+		당신은 따뜻하고 훌륭한 카페인을 음미하며 커피를 한 모금 마신다.
+		<<cafecoffeesip>>
+		<br><br>
+	<<elseif $arousal gte $arousalmax - 20>>
+		<<orgasm>>
+		절정의 여운으로 몽롱한 상태에서 고개를 들자, 밖에 있는 낯선 사람들이 당신을 보며 히죽거리고, 그중 몇몇은 낄낄대며 서로 수군거리는 것이 보인다.
+		당신은 들켰다. 다름 아닌 당신 자신의 몸 때문에 들통난 것이다.
+		<<if $cameras_raised gte 1>>
+			<span class="pink">
+				그중 몇몇은 당신이 절정에 달한 모습을 카메라에 담기까지 했다.
+			</span>
+			<<if $uncomfortable.nude is true>>
+				당신은 철저하게 굴욕감을 느낀다.
+				<<trauma 10>><<gtrauma>>
+			<<else>>
+				공개적인 절정을 지켜보는 관객이 있다는 사실에 아랫배가 기쁨으로 떨린다.
+				단순히 노출하는 것만으로 가버렸다는 사실도 나쁘지 않다.
+				<<stress -5>><<lstress>>
+			<</if>>
+			<<fameexhibitionism 50>>
+		<</if>>
+		<<set _caught to 1>>
+		<br><br>
+	<<else>>
+		<<switch $phase>>
+			<<case 0>>
+				<<if !$still>>
+					당신은 커피를 입가로 가져가 얼굴을 살짝 가리고, 무릎을 아주 약간 벌린다.
+					많이는 아니고, 우연히 쳐다보는 사람에게 당신의 <<undies>>【을를】 아주 살짝 보여줄 수 있을 정도로만.
+					당신은 커피를 한 모금 마신다.
+				<<else>>
+					당신은 다리를 아주 살짝 벌린 채로, 커피를 마시며 애태우는 감각을 음미한다.
+				<</if>>
+				<<cafecoffeesip>>
+				<br><br>
+				몇몇 행인들이 평소보다 조금 더 오래 창문에 시선을 머물게 하더니,
+				<<if currentSkillValue('skulduggery') gte 100 + random(0, 50)>>
+					자신들이 본 것이 맞는지 확신하지 못하는 기색이 역력하다.
+				<<else>>
+					이내 능글맞게 웃으며 걸어간다. 너무 쉽게 들켜버렸다.
+					<<trauma $phase>><<gtrauma>>
+					<br><br>
+					<<set _caught to 1>>
+				<</if>>
+			<<case 1>>
+				커피를 한 모금 더 마시며, 당신은
+				<<if !$still>>
+					무릎이 살짝 벌어지도록 다리를 조정해,
+					모든 비밀을 드러내지는 않으면서도 구경꾼들에게 감질날 정도로 당신의 <<undies>>【을를】 노출한다.
+				<<else>>
+					발을 조금 움직여, 비슷한 수준의 노출을 유지한다. 애태우는 건 즐겁다.
+				<</if>>
+				<<cafecoffeesip>>
+				<br><br>
+				<<if currentSkillValue('skulduggery') gte 200 + random(0, 50)>>
+					행인들이 핑계를 대며 멈춰 서서 당신 쪽을 바라본다.
+				<<else>>
+					일부 행인들이 핑계를 대며 멈춰 서서 당신 쪽을 바라보더니, 능글맞게 웃으며 걸어간다. 너무 쉽게 들켜버렸다.
+					<<trauma $phase>><<gtrauma>>
+					<br><br>
+					<<set _caught to 1>>
+				<</if>>
+			<<case 2>>
+				<<if !$still>>
+					자신의 뻔뻔한 노출증에 한껏 들뜬 당신은 발을 움직여 허벅지를 활짝 벌리고, 상상할 여지조차 거의 남기지 않는다.
+				<<else>>
+					이렇게 자신을 노출하는 스릴을 음미하며, 당신은 발을 조금 움직여 <<undies>>【이가】 조금도 가려지지 않게 한다.
+				<</if>>
+				당신은 커피를 한 모금 더 마신다.
+				<<cafecoffeesip>>
+				<br><br>
+				일부 행인들이
+				<<if currentSkillValue('skulduggery') gte 300 + random(0, 50)>>
+					작은 무리를 지어 모여들고, 관음증을 들키지 않으려 애쓰며 서로 속삭인다.
+				<<else>>
+					작은 무리를 지어 모여들고, 서로 속삭이더니 손가락질하며 웃는다. 들켜버렸다.
+					<<trauma $phase>><<gtrauma>>
+					<br><br>
+					<<set _caught to 1>>
+				<</if>>
+			<<case 3>>
+				대담해진 기분으로 <<seatedflashcrotchunderskirt>> 구경꾼들에게 당신의 맨 <<undies>>【을를】 볼 수 있는 <<print ["놀라운", "즐거운", "환상적인"].pluck()>> 광경을 선사하며 커피를 한 모금 더 마신다.
+				<<cafecoffeesip>>
+				<br><br>
+				일부 낯선 사람들은 자신들이 보는 광경에 얼빠진 표정을 지으며, 관음증을 숨기려 애쓴다. 그중 몇몇은
+				<<if currentSkillValue('skulduggery') gte 400 + random(0, 50)>>
+					재미를 망치지 않으려고 다른 사람의 옆구리를 찌른다.
+				<<else>>
+					당신을 가리키고, 다른 사람들에게 무언가 속삭인 뒤 다시 당신을 쳐다보며 능글맞은 미소로 시선을 맞춘다. 들켜버렸다.
+					<<trauma $phase>><<gtrauma>>
+					<br><br>
+					<<set _caught to 1>>
+				<</if>>
+			<<case 4>>
+				당신은 다리를 천천히 자연스럽게 오므리고, 방금 저지른 짓을 떠올리며 혼자 낄낄거리는 시간을 갖는다.
+				창문을 쳐다보며 시간을 끌 핑계를 찾던 낯선 사람들은 쇼가 끝났다고 생각하며 흩어지기 시작한다.
+				당신은 커피를 한 모금 더 마신다.
+				<<cafecoffeesip>>
+				<br><br>
+				<<if $cameras_raised gt 0>>
+					휴대폰을 꺼냈던 낯선 사람<<if $cameras_raised gt 1>>들<</if>>【은는】 찌푸린 얼굴로 휴대폰을 주머니에 넣고 떠난다.
+				<</if>>
+				<<set $cameras_raised to 0>>
+				<<set $resting to 1>>
+		<</switch>>
+
+		/* up to 3 strangers take photos
+		* each stranger gets 2 shots at taking a photo before they give up and move on
+		*/
+
+		<<if $cameras_raised gt 0>>
+			<br><br>
+			/* for loops seem to hate me so we'll have to do it this way i guess */
+			<<set _photos_taken to 0>>
+			<<if $cameras_raised gte 1>>
+				<!-- Necessary as attempting to clear the first NPC if it did not exist would cause issues with $eventslot. -->
+				<<if EventSystem.isSlotTaken(0)>>
+					<<clearsinglenpc 0>>
+				<</if>>
+				<span class="pink">
+				<<generate1>><<person1>><<person>>【이가】 <<his>> 휴대폰을 들어 사진을 찍는다.
+				</span>
+				<<He>>【은는】 휴대폰을 <<his>> 얼굴로 가져가더니
+				<<if random(0,2) gte 1>>
+					당신의 노출된 <<undies>> 사진을 건진 것이 마음에 드는지 씩 웃는다.
+					<<set _photos_taken +=1>>
+				<<else>>
+					당신의 노출된 <<undies>> 사진이 마음에 들지 않는지 얼굴을 찌푸린다.
+					다시 휴대폰을 들어 당신의 노출된 <<undies>> 사진을 한 장 더 찍는다.
+					<<He>>【은는】 휴대폰을 <<his>> 얼굴로 가져가더니
+					<<if random(0,2) gte 1>>
+						이번에는 당신의 노출된 <<undies>> 사진을 건진 것이 마음에 드는지 씩 웃는다.
+						<<set _photos_taken +=1>>
+					<<else>>
+						다시 얼굴을 찌푸리고는, 짜증 난다는 듯 휴대폰을 주머니에 넣는다.
+					<</if>>
+				<</if>>
+				<br><br>
+			<</if>>
+
+			<<if $cameras_raised gte 2>>
+				<<if EventSystem.isSlotTaken(1)>>
+					<<clearsinglenpc 1>>
+				<</if>>
+				<span class="pink">
+				<<generate2>><<person2>><<person>>【이가】 <<his>> 휴대폰을 들어 사진을 찍는다.
+				</span>
+				<<He>>【은는】 휴대폰을 <<his>> 얼굴로 가져가더니
+				<<if random(0,2) gte 1>>
+					당신의 노출된 <<undies>> 사진을 건진 것이 마음에 드는지 씩 웃는다.
+					<<set _photos_taken +=1>>
+				<<else>>
+					당신의 노출된 <<undies>> 사진이 마음에 들지 않는지 얼굴을 찌푸린다.
+					다시 휴대폰을 들어 당신의 노출된 <<undies>> 사진을 한 장 더 찍는다.
+					<<He>>【은는】 휴대폰을 <<his>> 얼굴로 가져가더니
+					<<if random(0,2) gte 1>>
+						이번에는 당신의 노출된 <<undies>> 사진을 건진 것이 마음에 드는지 씩 웃는다.
+						<<set _photos_taken +=1>>
+					<<else>>
+						다시 얼굴을 찌푸리고는, 짜증 난다는 듯 휴대폰을 주머니에 넣는다.
+					<</if>>
+				<</if>>
+				<br><br>
+			<</if>>
+
+			<<if $cameras_raised gte 3>>
+				<<if EventSystem.isSlotTaken(2)>>
+					<<clearsinglenpc 2>>
+				<</if>>
+				<span class="pink">
+				<<generate3>><<person3>><<person>>【이가】 <<his>> 휴대폰을 들어 사진을 찍는다.
+				</span>
+				<<He>>【은는】 휴대폰을 <<his>> 얼굴로 가져가더니
+				<<if random(0,2) gte 1>>
+					당신의 노출된 <<undies>> 사진을 건진 것이 마음에 드는지 씩 웃는다.
+					<<set _photos_taken +=1>>
+				<<else>>
+					당신의 노출된 <<undies>> 사진이 마음에 들지 않는지 얼굴을 찌푸린다.
+					다시 휴대폰을 들어 당신의 노출된 <<undies>> 사진을 한 장 더 찍는다.
+					<<He>>【은는】 휴대폰을 <<his>> 얼굴로 가져가더니
+					<<if random(0,2) gte 1>>
+						이번에는 당신의 노출된 <<undies>> 사진을 건진 것이 마음에 드는지 씩 웃는다.
+						<<set _photos_taken +=1>>
+					<<else>>
+						다시 얼굴을 찌푸리고는, 짜증 난다는 듯 휴대폰을 주머니에 넣는다.
+					<</if>>
+				<</if>>
+				<br><br>
+			<</if>>
+			<<set _new_fame to (_photos_taken * $phase * 2)>>
+			<<fameexhibitionism _new_fame>>
+			<<set $cameras_raised to 0>>
+		<</if>>
+
+		<<if !$resting and random(0, 9) + $phase gte 8>>
+			<<set $cameras_raised to random(1, 3)>>
+			<<if $cameras_raised is 1>>
+				<span class="pink">구경꾼 중 한 명이 주머니에서 휴대폰을 꺼낸다.</span>
+			<<else>>
+				<span class="pink">구경꾼 중 <<Number $cameras_raised>>명이 주머니에서 휴대폰을 꺼낸다.</span>
+			<</if>>
+		<</if>>
+
+		/* handle how aroused we feel about things */
+		<<cafecoffeeflasharousal>>
+	<</if>>
+
+	/* action choices */
+	<<set $still to 0>>
+
+	<<if $resting>>
+		<<link [[다리를 다시 벌린다 (0:01)|Cafe Coffee Flash]]>>
+			<<set $phase to 0>>
+			<<set $resting to 0>>
+			<<pass 1>>
+
+		<</link>>
+		<br>
+		<<link [[다리를 오므린 채로 있는다 (0:01)|Cafe Coffee Flash]]>> <<pass 1>> <</link>>
+		<br>
+	<</if>>
+
+	<<if !_caught and !$resting>>
+		<<if $phase gt 0>>
+			<<link [[수위를 조금 낮춘다 (0:01)|Cafe Coffee Flash]]>>
+					<<set $phase -=1>>
+				<<pass 1>>
+			<</link>>
+			<br>
+		<</if>>
+		<<if $phase isnot 4>>
+			<<link [[다리를 그대로 둔다 (0:01)|Cafe Coffee Flash]]>>
+				<<set $still to 1>>
+				<<pass 1>>
+			<</link>>
+			<br>
+		<</if>>
+
+		<<link [[계속한다 (0:01)|Cafe Coffee Flash]]>>
+			<<if $phase lt 4>>
+				<<set $phase +=1>>
+			<<else>>
+				<<set $phase to 0>>
+			<</if>>
+			<<pass 1>>
+		<</link>>
+		<br>
+		<<link [[다리를 오므린다 (0:01)|Cafe Coffee Flash]]>>
+			<<set $phase to 4>>
+			<<pass 1>>
+		<</link>>
+		<br>
+	<</if>>
+<</if>>
+<<link [[음료를 다 마신다|Cafe Coffee Finish]]>><</link>>
+
+:: Cafe Coffee Finish
+<<unset $resting>>
+<<unset $cameras_raised>>
+<<unset $still>>
+<<unset $coffee_sips>>
+<<wearProp "coffee">>
+남은 커피를 전부 마시고 머그잔을 테이블에 내려놓은 뒤, 의자에서 몸을 빼낸다.
+몸에 카페인이 돌자 정신이 조금 더 맑아지는 기분이다.
+<br><br>
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Cafe Pancakes
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<wearProp "pancake fork">>
+
+<<if $daily.earSlimeOceanBreezeCafeEat>>
+	당신은 귀 슬라임이 옳다고 판단하고
+<<else>>
+	당신은
+<</if>>
+자리에 앉아 <<phaseFoodKR>>【을를】 주문한다. 주문한 음식은 곧 나온다,
+<<if $phase is "pancakes">>
+	커피 한 잔과 함께.
+<<else>>
+	슈가 파우더와
+	<<if playerBellyVisible()>>
+		깍둑썰기한 자두가 덮여 있다.
+	<<elseif $arousal gte 5000>>
+		체리가 덮여 있다.
+	<<else>>
+		딸기가 덮여 있다.
+	<</if>>
+<</if>>
+<<if Weather.precipitation is "rain">>
+	고아원에서 먹었던 그 어떤 것보다 맛있다. 비 내리는 거리를 창밖으로 바라보며 아늑함을 느낀다.
+<<elseif Weather.isSnow>>
+	고아원에서 먹었던 그 어떤 것보다 맛있다. 눈 덮인 거리를 창밖으로 바라보며 아늑함을 느낀다.
+<<else>>
+	고아원에서 먹었던 그 어떤 것보다 맛있다. 창밖으로 바다를 바라보며 산들바람을 즐긴다.
+<</if>>
+<br><br>
+
+<<rng 10>>
+<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1 and $rng gte 6>>
+	<<endevent "phaseless">>
+	카페 건너편에서 <<generate1>><<person1>><<person>>【이가】 당신을 쳐다보고 있는 것을 발견한다.
+	문득 다리를 살짝 벌리고 있었다는 사실을 깨닫는다. 그 <<person>>【은는】 당신의 치마 속을 엿보려 하고 있다.
+	<<if $worn.under_lower.exposed>>
+		속옷을 입고 있지 않다는 사실을 기억해낸다.
+		<<arousal 500>><<garousal>>
+	<</if>>
+	<br><br>
+	/* check if we meet the basic requirements to expose ourselves */
+	<<if hasSexStat("exhibitionism", 2)>>
+		/* show our options depending on our possession of panties */
+		<<if $worn.under_lower.exposed>>
+			<<if hasSexStat("exhibitionism", 5)>>
+				<<link [[다리를 벌리고 윙크한다|Cafe Exhibitionism Legs Part Pantiless Wink]]>><</link>><<exhibitionist5>>
+				<br>
+			<</if>>
+			<<if hasSexStat("exhibitionism", 4)>>
+				<<link [[못 본 척하며 다리를 벌린다|Cafe Exhibitionism Legs Part Pantiless]]>><</link>><<exhibitionist4>>
+				<br>
+				<<link [[변태를 무시하고 음식을 마저 먹는다|Ocean Breeze]]>><<endevent>><</link>>
+				<br>
+			<<else>>
+				<<he>>【이가】 이미 본 것보다 더 보지 못하도록 조심스럽게 다리를 오므린다.
+				맛있는 <<phaseFoodKR>>【을를】 계속 먹으면서도, 다리를 벌려 <<his>> 방황하는 눈에 모든 것을 노출하는 것이 어떤 느낌일지 상상하지 않을 수 없다.
+				<<arousal 15>><<garousal>>
+				<br><br>
+				<<link [[음식을 마저 먹는다|Ocean Breeze]]>><<endevent>><</link>>
+			<</if>>
+		<<else>>
+			<<link [[못 본 척하며 다리를 벌린다|Cafe Exhibitionism Legs Part]]>><</link>><<exhibitionist2>>
+			<br>
+			<<link [[변태를 무시하고 음식을 마저 먹는다|Ocean Breeze]]>><<endevent>><</link>>
+			<br>
+		<</if>>
+	<<else>>
+		/* we don't, so shut your legs you dirty normie */
+		변태에게 이미 보여준 것보다 더 보여주고 싶지 않아 다리를 꽉 오므린다.
+		<<stress 5>><<gstress>>
+		<br><br>
+		<<link [[변태를 무시하고 음식을 마저 먹는다|Ocean Breeze]]>><<endevent>><</link>>
+		<br>
+	<</if>>
+
+<<else>>
+	<<CafeExhibitionismLegsPartNormalTerminate>>
+<</if>>
+
+:: Cafe Exhibitionism Legs Part
+최대한 자연스럽게 다리를 살며시 벌리면서 <<phaseFoodKR>>에 집중하는 척한다.
+
+/* are we stealthy enough to pretend not to be putting on a show? */
+<<rng 50>>
+<<if currentSkillValue('skulduggery') gte (300 + $rng)>>
+	<<CafeExhibitionismLegsPartSuccessS1>>
+
+/* are we good enough to at least not provoke mockery at our poor attempts at stealth exhibitionism? */
+<<elseif currentSkillValue('skulduggery') gte 100>>
+	몸을 노출하고 있다는 생각에 등골이 살짝 떨리지만, 흥분이 고조되고 있다는 기색은 보이지 않으려 애쓴다.
+	<<his>> 관심이 커진 것을 눈치채고, 조금 더 약을 올리기로 한다.
+	<<flashcrotchunderskirt>> <<him>>에게 당신의 $worn.under_lower.name【으로로】 덮인 가랑이를 선명하게 보여준다.
+	그 <<person>>【은는】 <<his>> 음료를 한 모금 마시고 혼자서 살짝 비웃는다. 생각만큼 은밀하지는 않았던 모양이다.
+	<br><br>
+	카페에서 낯선 사람에게 속옷을 노출하는 행위는 음란한 스릴을 안겨준다.
+	그리고 <<he>>【이가】 당신이 일부러 그랬다는 것을 알아챘다는 사실에 초조함과 희열이 뒤섞인 감정이 든다.
+	<<exhibitionism3>>
+
+	일이 커지기 전에 멈추기로 결심하고, <<phaseFoodKR>>【을를】 다 먹은 뒤 다 먹은 뒤 조심스럽게 자리에서 일어나 떠난다.
+	당신이 문으로 향하는 동안 <<His>> 눈과 아는 체하는 미소가 당신을 따라오지만, <<he>>【은는】 당신을 내버려 둘 생각인 것 같다.
+	<br><br>
+	<<CafeExhibitionismLegsPartNormalTerminate>>
+
+/* were bad at this and should feel bad */
+<<else>>
+	몸을 노출하고 있다는 생각에 등골이 살짝 떨리지만, 흥분이 고조되고 있다는 기색은 보이지 않으려 최선을 다한다.
+	그 <<person>>【은는】 <<his>> 음료를 한 모금 마시고 혼자서 살짝 비웃으며, 웃음을 간신히 참는다.
+	생각했던 것만큼 은밀하지는 않았던 모양이다.
+	<br><br>
+	카페에서 낯선 사람에게 속옷을 노출하는 행위는 음란한 스릴을 안겨준다.
+	그리고 <<he>>【이가】 당신이 일부러 그랬다는 것을 알아챘다는 사실에 초조함과 희열이 뒤섞인 감정이 든다.
+	<<exhibitionism2>>
+
+	당황해서, <<phaseFoodKR>>【을를】 다 먹고 자리에서 일어나 떠난다.
+	당신이 문으로 향하는 동안 <<His>> 눈과 아는 체하는 미소가 당신을 따라오지만, <<he>>【은는】 당신을 내버려 둘 생각인 것 같다.
+	<br><br>
+	<<CafeExhibitionismLegsPartNormalTerminate>>
+<</if>>
+
+:: Cafe Exhibitionism Legs Part Photo
+뱃속에서 나비가 날아다니는 듯한 기분으로, 그 <<person>>【이가】 휴대폰으로 당신의 노출된 $worn.under_lower.name【을를】 찍게 내버려 둔다. 한 장, 또 한 장, 그리고 또 한 장.
+낯선 사람이 당신의 그런 민망한 사진을 갖게 된다는 스릴을 만끽하며, 다리 위치를 몇 번 바꿔서 다양한 노출 샷을 제공한다.
+<<arousal 15>><<garousal>>
+<br><br>
+결국 그 <<person>>【이가】 이제 충분히 사진을 찍었다고 판단하고, 다리를 자연스럽게 오므린다.
+약간 실망했지만 명백히 흥분한 <<person>>【은는】 휴대폰을 주머니에 넣고, 당신은 그 음란한 사진들이 결국 어디로 가게 될지 생각한다.
+<<rng 5>>
+<<fameexhibitionism $rng "pic">>
+<<CafeExhibitionismLegsPartSuccessS2>>
+
+:: Cafe Exhibitionism Legs Part No Photo
+낯선 사람의 손에 당신의 $worn.under_lower.name 사진이 들어가는 것을 원치 않아, <<he>>【이가】 사진을 찍기 전에 다리를 꽉 오므린다.
+그 <<person>>【은는】 나지막이 욕을 하며 휴대폰을 주머니에 넣는다. 당신이 훔쳐보는 것을 눈치챘는지, 아니면 오늘 운이 없는 건지 궁금해하는 게 틀림없다.
+당신은 <<phaseFoodKR>> 마지막 한 입을 해치우고 문밖으로 나선다.
+<br><br>
+<<CafeExhibitionismLegsPartNormalTerminate>>
+
+:: Cafe Exhibitionism Legs Part Panty Takeoff
+조심스럽게 포크를 내려놓고 카페 화장실로 향한다.
+문을 안전하게 잠근 후, 옷 속으로 손을 뻗어 속옷을 벗는다. 잠시 멈춰서 앞으로 할 일에 대한 스릴을 느낀다.
+$worn.under_lower.name【을를】 벗고 문을 열어, 당신의 접시와 아무것도 모르는 <<person>>에게 돌아간다.
+<br><br>
+당신이 자리에 앉자 그 <<person>>【은는】 슬쩍 당신을 쳐다본다.
+놀라움을 망치고 싶지 않아서, 자리에 앉을 때 치마 끝이 노출된 <<genitals>>【을를】 확실히 가리도록 한다.
+처음에는 약간 장난을 치기로 하고, <<phaseFoodKR>>【을를】 천천히 음미하며 다리를 꼼지락거린다.
+다음에 계획한 일을 위해 <<his>> 완전한 주의를 끌고 싶다.
+<br><br>
+천천히, 무릎을 약간 벌린다. 처음에는 <<he>>【이가】 헛것을 보나 싶을 정도로만 벌린다.
+그러다 특히 맛있어 보이는 <<phaseFoodKR>> 조각을 먹기 위해 몸을 숙이면서 완전히 벌려,
+<<him>>에게 당신의 허벅지 안쪽과 그 사이의 모든 것을 가림 없이 보여준다.
+그 <<person>>의 눈이 충격으로 눈에 띄게 커지며, 당신의 노골적인 노출 행위에 어떻게 반응해야 할지 몰라 당신의 맨 <<genitals>>【을를】 쳐다본다.
+<<if isHermOrCrossdresser()>>
+	<<his>> 얼굴 표정으로 보아, <<he>>【은는】 당신이
+	<<if $player.penisExist and $player.vaginaExist>>
+		자지와 보지를 둘 다 가지고 있을 줄은 예상하지 못한 게 분명하다.
+	<<else>>
+		<<print ($player.sex is "m" ? "남자" : "여자")>>일 줄은 예상하지 못한 게 분명하다.
+	<</if>>
+<</if>>
+<<his>> 시선을 마주하며 윙크하고 다리를 쭉 뻗은 뒤, 마지막 팬케이크 조각을 입에 넣고 자리를 뜬다.
+어안이 벙벙하고 눈에 띄게 흥분한 <<person>>【을를】 뒤로하고 떠난다.
+<br><br>
+<<exhibitionism5>>
+<<CafeExhibitionismLegsPartNormalTerminate>>
+
+:: Cafe Exhibitionism Legs Part Premature End
+시간이 갈수록 <<his>> 시선을 숨기려는 시도가 서툴러지는 것을 보고, <<he>>【이가】 당신이 일부러 쇼를 하고 있다는 것을 깨닫기 전에 접시를 비우고 떠나기로 결심한다.
+음식 마지막 한 입을 먹고 자리를 뜨며, 이제는 꽤 실망한 표정의 <<person>>【을를】 지나친다.
+<br><br>
+<<CafeExhibitionismLegsPartNormalTerminate>>
+
+:: Cafe Exhibitionism Legs Part Pantiless
+최대한 자연스럽게 다리를 살며시 벌리면서 <<phaseFoodKR>>에 집중하는 척한다.
+
+/* are we stealthy enough to pretend not to be putting on a show? */
+<<rng 50>>
+<<if currentSkillValue('skulduggery') gte (350 + $rng)>>
+	몸을 노출하고 있다는 생각에 등골이 살짝 떨리지만, 흥분이 고조되고 있다는 기색은 보이지 않으려 애쓴다.
+	<<his>> 관심이 커진 것을 눈치채고, 조금 더 약을 올리기로 한다. <<flashcrotchunderskirt>>, <<him>>에게 당신의 맨 <<genitals>>【을를】 선명하게 보여준다.
+	<br><br>
+	카페에서 낯선 사람에게 <<genitals>>【을를】 노출하는 행위는 음란한 스릴을 안겨준다.
+	<<exhibitionism5>>
+
+	/* check for photo scene */
+	<<rng 10>>
+	<<if $rng gte 8>>
+		/* person attempts to take photo */
+		<<CafeExhibitionismLegsPartPantilessPhotoDecision>>
+	<<else>>
+		<<CafeExhibitionismLegsPartNormalTerminate>>
+	<</if>>
+
+/* are we good enough to at least not provoke mockery at our poor attempts at stealth exhibitionism? */
+<<elseif currentSkillValue('skulduggery') gte 100>>
+	몸을 노출하고 있다는 생각에 등골이 살짝 떨리지만, 흥분이 고조되고 있다는 기색은 보이지 않으려 애쓴다.
+	<<his>> 관심이 커진 것을 눈치채고, 조금 더 약을 올리기로 한다. <<flashcrotchunderskirt>> <<him>>에게 당신의 맨 <<genitals>>【을를】 선명하게 보여준다.
+	그 <<person>>【은는】 <<his>> 음료를 한 모금 마시고 혼자서 살짝 비웃는다. 생각만큼 은밀하지는 않았던 모양이다.
+	<br><br>
+	카페에서 낯선 사람에게 <<genitals>>【을를】 노출하는 행위는 음란한 스릴을 안겨준다.
+	그리고 <<he>>【이가】 당신이 일부러 그랬다는 것을 알아챘다는 사실에 초조함과 희열이 뒤섞인 감정이 든다.
+	<<exhibitionism5>>
+
+	일이 커지기 전에 멈추기로 결심하고, <<phaseFoodKR>>【을를】 다 먹은 뒤 조심스럽게 자리에서 일어나 떠난다.
+	당신이 문으로 향하는 동안 <<His>> 눈과 아는 체하는 미소가 당신을 따라오지만, <<he>>【은는】 당신을 내버려 둘 생각인 것 같다.
+	<br><br>
+	<<CafeExhibitionismLegsPartNormalTerminate>>
+
+/* were bad at this and should feel bad */
+<<else>>
+	몸을 노출하고 있다는 생각에 등골이 살짝 떨리지만, 흥분이 고조되고 있다는 기색은 보이지 않으려 최선을 다한다.
+	그 <<person>>【은는】 <<his>> 음료를 한 모금 마시고 혼자서 살짝 비웃으며, 웃음을 간신히 참는다.
+	생각했던 것만큼 은밀하지는 않았던 모양이다.
+	<br><br>
+	카페에서 낯선 사람에게 <<genitals>>【을를】 노출하는 행위는 음란한 스릴을 안겨준다.
+	그리고 <<he>>【이가】 당신이 일부러 그랬다는 것을 알아챘다는 사실에 초조함과 희열이 뒤섞인 감정이 든다.
+	<<exhibitionism4>>
+
+	당황해서, <<phaseFoodKR>>【을를】 다 먹고 자리에서 일어나 떠난다.
+	당신이 문으로 향하는 동안 <<His>> 눈과 아는 체하는 미소가 당신을 따라오지만, <<he>>【은는】 당신을 내버려 둘 생각인 것 같다.
+	<br><br>
+	<<CafeExhibitionismLegsPartNormalTerminate>>
+<</if>>
+
+:: Cafe Exhibitionism Legs Part Pantiless Photo
+뱃속에서 나비가 날아다니는 듯한 기분으로, 그 <<person>>【이가】 휴대폰으로 당신의 노출된 <<genitals>>【을를】 찍게 내버려 둔다. 한 장, 또 한 장, 그리고 또 한 장.
+낯선 사람이 당신의 그런 민망한 사진을 갖게 된다는 스릴을 만끽하며,
+당신은 다리 위치를 몇 번 바꿔서 극도로 노골적인 샷을 다양하게 제공한다.
+<<arousal 35>><<garousal>>
+<br><br>
+결국 그 <<person>>【이가】 이제 충분히 사진을 찍었다고 판단하고, 다리를 자연스럽게 오므린다.
+약간 실망했지만 명백히 꽤 흥분한 <<person>>【은는】 휴대폰을 주머니에 넣고, 당신은
+당신과 당신의 노출된 <<genitals>> 사진이 결국 어디로 가게 될지 생각한다.
+<<rng 10>>
+<<fameexhibitionism $rng "pic">>
+<br><br>
+<<CafeExhibitionismLegsPartNormalTerminate>>
+
+:: Cafe Exhibitionism Legs Part Pantiless No Photo
+낯선 사람의 손에 당신의 <<genitals>> 사진이 들어가는 것을 원치 않아, <<he>>【이가】 사진을 찍기 전에 다리를 꽉 오므린다.
+그 <<person>>【은는】 나지막이 욕을 하며 휴대폰을 주머니에 넣는다. 당신이 훔쳐보는 것을 눈치챘는지, 아니면 오늘 운이 없는 건지 궁금해하는 게 틀림없다.
+당신은 <<phaseFoodKR>> 마지막 한 입을 해치우고 문밖으로 나선다.
+<br><br>
+<<CafeExhibitionismLegsPartNormalTerminate>>
+
+:: Cafe Exhibitionism Legs Part Pantiless Wink
+앞으로 할 일에 대비하며, 그 <<persons>>【와과】 눈을 맞춘다.
+당신은 의도적으로 다리를 벌리고, 상상할 여지조차 남기지 않을 만큼 충분히 벌어지자 윙크를 보낸다.
+그 <<person>>의 턱이 당신의 맨 <<genitals>>【을를】 보며 떡 벌어진다.
+은밀한 관음 시도가 이토록 뻔뻔한 노출 행위로 보상받을 줄은 전혀 예상하지 못한 것이 분명하다.
+<<flashcrotchunderskirt>>, <<him>>에게 당신의 맨 <<genitals>>【을를】 오랫동안 잘 보여준다.
+<br><br>
+카페에서 완전히 낯선 사람에게 노골적으로 자신을 노출하는 행위는 음란한 스릴을 안겨준다.
+<<exhibitionism5>>
+
+결국 그 <<person>>【이가】 이제 충분히 봤다고 판단하고, 다리를 자연스럽게 오므린다.
+약간 실망했지만 명백히 꽤 흥분한 <<person>>【은는】 당신이 <<phaseFoodKR>> 마지막 한 입을 씹으며 나가는 모습을 쳐다본다.
+<br><br>
+<<CafeExhibitionismLegsPartNormalTerminate>>
+
+:: Cafe Exhibitionism Skirt Flashing Act [widget]
+<<widget "flashcrotchunderskirt">>
+	<<print either(
+		"다리를 들어 올려 허공에 뻗고 발을 살짝 흔들어 노출되는 시간을 조금 더 끈다",
+		"스트레칭하는 척 무릎을 살짝 벌리고, 발을 조금 더 가까이 모아 틈을 넓힌다",
+		"스트레칭하며 발을 들어 올리고 의자에 몸을 살짝 뒤로 젖힌 뒤, \"실수로\" 다리를 벌리는 척 발을 조금 꼼지락거린다",
+		"몸을 조금 숙여 발을 한쪽으로 옮기고, 있지도 않은 다리 가려움을 긁는 척하면서 다른 다리까지 더 벌려 자세를 잡는다",
+		"발에 몹시 거슬리는 이물질이라도 붙은 척하며, 있지도 않은 작은 돌을 찾는 것처럼 발을 들어 몸 가까이 끌어당긴다"
+	)>>
+<</widget>>
+
+<<widget "phaseFoodKR">>
+	<<set _foodMapKR to {
+		"coffee": "커피",
+		"winter ale": "겨울 에일",
+		"fruity ale": "과일 에일",
+		"shandy": "섄디",
+		"autumn ale": "가을 에일",
+		"fruit salad": "과일 샐러드",
+		"gingerbread": "진저브레드",
+		"pancakes": "팬케이크",
+		"crepes": "크레이프",
+		"deluxe cream bun": "디럭스 크림빵"
+	}[$phase] ?? $phase>>
+	_foodMapKR
+<</widget>>
+
+:: Cafe Cream Bun
+<<set $outside to 0>><<set $location to "cafe">><<effects>><<wearProp "cream buns">>
+
+<<if $daily.earSlimeOceanBreezeCafeEat>>
+	당신은 귀 슬라임이 옳다고 판단하고
+<<else>>
+	당신은
+<</if>>
+자리에 앉아 메뉴에 "현지에서 조달한 우유"를 사용한다고 광고된 크림빵을 주문한다. 빵은 곧 나온다.
+<br><br>
+
+크고, 크림으로 터질 듯하다. 크림이 이상한 각도로 접시에 흘러나오지 않게 먹기가 힘들다.
+성공하지는 못했지만, 상관없다. 맛있고, 따뜻하고 만족스러운 기분을 남긴다.
+<br><br>
+
+<<link [[남은 크림을 가져간다|Ocean Breeze]]>><<tending_give cream 1>><</link>>
+<br>
+<<link [[접시를 핥아 깨끗이 먹는다|Cafe Cream Lick]]>><<transform cat 1>><<stress -6>><</link>><<lstress>>
+<br>
+
+:: Cafe Cream Lick
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+	당신은 접시를 들어 올려 크림을 직접 핥아 먹는다.
+
+
+<<if dangerEvent(0.25,4000)>> /* Roughly 33% at game start, max 80% */
+	<<generate1>><<person1>><<person>>【이가】 당신을 쳐다보는 것을 발견한다. <<his>> 숟가락이 <<his>> 입으로 가는 도중에 멈춰 있다.
+	<br><br>
+
+	<<link [[과시한다|Cafe Cream Show]]>><</link>><<exhibitionist1>>
+	<br>
+	<<link [[무시한다|Cafe Cream Ignore]]>><</link>>
+	<br>
+
+<<else>>
+	아무도 별로 신경 쓰지 않는다. 만족하며 등을 기댄다.
+	<br><br>
+
+	<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+	<br>
+
+<</if>>
+
+:: Cafe Cream Show
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+그 <<person>>【와과】 눈을 마주치지만, 접시 핥는 것을 멈추지 않는다.
+속도를 늦추고 동작을 과장하며, <<he>>【이가】 핥을 때마다 혀에 묻은 크림을 보고 나서야 입안으로 가져간다.
+황홀경에 빠진 척 눈을 반쯤 감고 접시가 완전히 깨끗해질 때까지 계속 핥는다.
+<<exhibitionism1>>
+만족하며 등을 기댄다. 그 <<person>>【은는】 얼굴이 새빨개진 채 시선을 돌린다.
+<br><br>
+<<endevent>>
+<<link [[다음|Ocean Breeze]]>><</link>>
+<br>
+
+:: Cafe Cream Ignore
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+그 <<person>>【을를】 무시하고 접시를 깨끗이 핥아 먹는다. 만족하며 등을 기댄다.
+<br><br>
+<<endevent>>
+<<link [[다음|Ocean Breeze]]>><</link>>
+<br>
+
+:: Cafe Eat
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<switch $phase>>
+	<<case "fruity ale">>
+		<<wearProp "fruity ale">><<set _food to "과일 에일">><<set _foodDesc to "평범한 맥주잔에 담겨 금방 나온다. 아주 달콤하고 가볍다. 맛있다.">>
+	<<case "winter ale">>
+		<<wearProp "winter ale">><<set _food to "겨울 에일">><<set _foodDesc to "아름답게 휘어진 잔에 담겨 금방 나온다. 쓴맛보다는 단맛이 난다. 맛있다.">>
+	<<case "shandy">>
+		<<wearProp "shandy">><<set _food to "섄디">><<set _foodDesc to "금방 나온다. 캔과 맥주잔이 함께 제공되며, 직접 따라 마시라는 뜻이 분명하다. 레몬 맛이 나고 무척 상쾌하다.">>
+	<<case "autumn ale">>
+		<<wearProp "autumn ale">><<set _food to "가을 에일">><<set _foodDesc to "금방 나온다. 달콤하고 캐러멜 향이 살짝 난다. 맛있다.">>
+	<<case "fruit salad">>
+		<<wearProp "salad fork">><<set _food to "과일 샐러드">><<set _foodDesc to "신선한 딸기, 블루베리, 키위, 파인애플 조각이 가득 담겨 금방 나온다. 달콤하고 맛있다.">>
+	<<case "gingerbread">>
+		<<wearProp "gingerbread">><<set _food to "진저브레드 맨">>
+		<<set _foodDesc to "친근한 아이싱 얼굴이 당신을 향해 웃고 있다. 달콤하고 맛있으며, ">>
+		<<if $christmas is 1 and Time.monthDay is 25>>
+			<<set _foodDesc to _foodDesc + "크리스마스 당일에 딱 맞는 간식이다.">>
+		<<else>>
+			<<set _foodDesc to _foodDesc + "크리스마스가 떠오른다.">>
+		<</if>>
+	<<default>>
+		<<wearProp "fork">><<set _food to "음식">><<set _foodDesc to "금방 나오고, 당신은 빠르게 먹어치운다. 맛있다.">>
+<</switch>>
+
+<<print $daily.earSlimeOceanBreezeCafeEat ? "귀 슬라임의 말이 맞다고 판단하고" : "당신은">> 자리에 앉아 _food【을를】 주문한다. _foodDesc
+<br><br>
+창밖을 바라본다. <<print Weather.precipitation is "rain" ? "비 내리는 거리를 보며 아늑함을 느낀다" : Weather.isSnow ? "눈 덮인 거리를 보며 아늑함을 느낀다" : "바다를 바라보며 산들바람을 즐긴다">>.
+<br><br>
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Tourist
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<set $tip to 0>> /*Ensure tip is 0 so that nothing can be carried over from anything else*/
+<<if ($rapestat + $beastrapestat + $tentaclerapestat) gt 0>>
+	<<if $phase is 1>>
+		You nod.
+		<br>
+		"How was it?" <<he>> leers.
+		<br>
+		<<if $trauma gte ($traumamax / 5) * 4>>
+			In an empty, even monotone, you describe your experiences in exacting, clinical detail. Between your quiet monotone, your gentle rocking,
+			and the infinite void behind your stare, your words clearly unsettle the <<fullGroup>>.
+			They watch after you as you leave.
+			<br>
+			"Wow. Damaged goods much?"
+			<br>
+			"Well, yeah," you hear the <<person1>><<person>> nervously laugh. "I guess that's the downside."
+			<<set $tip += 400>>
+		<<elseif $speech_attitude is "meek">>
+			You tell them about your abuse and degradation in the kind of gratuitous detail that you hope will satisfy their morbid curiosity.
+			<<if currentSkillValue('english') gte 400>>
+				You are open, eloquent and explicit. They clearly get off on it.
+				<<set $tip += 1000>>
+			<<else>>
+				Your words fail to convey any feeling. They soon start to lose interest.
+				<<set $tip += 200>>
+			<</if>>
+		<<elseif $rapetrait gte 1>>
+			"It was bad," you say. "I mean, it still is, but... I guess I'm used to it now."
+			<br>
+			<<He>> looks at <<his>> friend. "See?"
+			<<set $tip += 200>>
+		<<elseif $submissive lte 500>>
+			<<wearProp "pepper grinder">>
+			You pick up the large cylindrical pepper-grinder on their table. Weigh it in your hand. Contemplate it a moment.
+			<br>
+			You bang it on the table decisively, fixing <<his>> eye. "You really wanna find out?"
+			<br>
+			<<if $rng % 2>>
+				<<He>> looks briefly horrified and shakes <<his>> head fearfully.
+			<<else>>
+				They laugh nervously.
+			<</if>>
+			<br>
+			"Thought not." You leave.
+		<<elseif $speech_attitude is "bratty">>
+			"Bad. Now are you ready to leave or can I take your order?"
+			<br>
+			They place an order.
+		<<else>>
+			"Sorry. It was horrible. I don't like talking about it."
+			<br>
+			They spend the next few minutes harassing you for details.
+			<<gstress>><<stress 2>>
+		<</if>>
+	<<elseif $phase is 2>>
+		You shake your head.
+		<br>
+		<<if $fame.rape gte 800>>
+			A nearby customer laughs. "Right!
+			<<if isCrossdressing()>>
+				'<<pShes>> notorious!
+			<<else>>
+				<<pShes>> notorious!
+			<</if>>
+			Half the town's played around with that little fucktoy."
+			<br>
+			You leave when the other customer starts showing them photos.
+		<<elseif $beauty lte ($beautymax / 7) * 2>>
+			"Well, I mean bad example. Who'd bother? But every <i>attractive</i> person in this town has been raped."
+			<br>
+			You leave them to their conversation.
+		<<else>>
+			"Sure you haven't." <<He>> smiles cynically.
+			<br>
+			You leave them to their conversation.
+		<</if>>
+	<</if>>
+<<else>>
+	<<if $phase is 1>>
+		You nod.
+		<br>
+		"How was it?" <<he>> leers.
+		<br>
+		<<if $speech_attitude is "meek">>
+			You make up a story of abuse and degradation that you hope will satisfy their morbid curiosity.
+			<<if currentSkillValue('english') gte 400>>
+				You are eloquent and convincing. They get off on it.
+				<<set $tip += 500>>
+			<<else>>
+				Your words are hollow and your story doesn't make sense. They soon lose interest.
+			<</if>>
+		<<else>>
+			"Sorry," you tell them. "I don't like talking about it."
+			<br>
+			They spend the next few minutes pestering you for details.
+			<<gstress>><<stress 2>>
+		<</if>>
+	<<elseif $phase is 2>>
+		You shake your head.
+		<br>
+		<<if $beauty lte ($beautymax / 7) * 2>>
+			"Well, I mean bad example. Who'd bother? But every <i>attractive</i> person in this town has been raped."
+			<br>
+			You leave them to their conversation.
+		<<else>>
+			"Sure you haven't." <<He>> smiles cynically.
+			<br>
+			You leave them to their conversation.
+		<</if>>
+	<</if>>
+<</if>>
+<<if $phase is 3>>
+	You refuse to answer their questions. Finally, they place an order.
+<</if>>
+<br><br>
+The rest of the shift passes uneventfully.
+<<if $tip gt 0>>
+	<<set $tip += 500>>
+	Someone left you a tip.
+	<<tipreceive "cafeWaiter">><<pass 1 hour>>
+<<else>>
+	You earn <<money 500 "cafeWaiter">><<printmoney 500>>.
+	<<pass 1 hour>>
+<</if>>
+<br><br>
+<<link [[Next|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Chef Refuse
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+샘이 고개를 끄덕이지만, 짜증이 난 표정이다. <<He>>【은는】 다른 직원에게 다가가 대신 도움을 요청한다.
+<br><br>
+
+<<waiter_default>>
+<br><br>
+
+<<link [[다음|Ocean Breeze]]>><<endevent>><</link>>
+
+:: Ocean Breeze Rework
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+<<set $chef_state to 8>>
+<<npc Sam>><<person1>>
+당신은 재건축된 오션 브리즈의 문으로 들어선다. 중앙 홀은 이전보다 훨씬 넓고 높아졌다. 2층에는 더 많은 테이블이 보인다.
+1층 위로 튀어나와 있다. 소박한 모습은 사라지고, 우아한 아르데코 디자인으로 바뀌었다.
+<br><br>
+샘이 중앙에 서서 다른 직원과 이야기하고 있다. <<He>>【은는】 <<if $pronoun is "m">>정장과 넥타이<<else>>빨간 드레스<</if>>【을를】 입고 있다.
+<br><br>
+<<He>>【은는】 당신을 향해 돌아서며 환하게 웃는다. "셰프님이시군요!" <<he>>【이가】 말하며 달려와 당신의 손을 잡는다. "새로운 모습은 어때요?" <<he>>【이가】 묻는다. "건물이요. 저 말고요."
+<br><br>
+
+<<link [[허세 부리는 것 같다고 말한다|Ocean Breeze Pretentious]]>><<npcincr Sam love -1>><</link>><<llove Sam>>
+<br>
+<<link [[아주 멋지다고 말한다|Ocean Breeze Wonderful]]>><<npcincr Sam love 1>><</link>><<glove Sam>>
+<br>
+<<link [[괜찮아 보인다고 말한다|Ocean Breeze Okay]]>><</link>>
+
+:: Ocean Breeze Pretentious
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	당신은 발끝을 내려다본다. "전 옛날 카페가 더 좋았어요." 당신은 인정한다. "죄송해요."
+<<elseif $speech_attitude is "bratty">>
+	당신은 코웃음을 친다. "크림빵 몇 개 파는 곳치고는 좀 과하네요." 당신은 말한다. "그렇게 생각 안 해요?"
+<<else>>
+	"조금 번쩍거리네요." 당신은 인정한다.
+<</if>>
+<br><br>
+
+샘이 얼굴을 찌푸리지만, 그것도 잠시뿐이다. "당신의 재능을 과소평가하고 있군요." <<he>>【이가】 말한다. "전 항상 이런 곳을 원했어요."
+<br><br>
+
+<<He>>【은는】 방을 둘러본다. "그랜드 오프닝 준비를 시작했어요." <<he>>【이가】 말한다.
+"당신이 모습을 드러내주셨으면 해요. 대단한 건 아니에요! 그냥 짧은 연설 정도죠.
+전 세계에서 사람들이 올 테니, 이 도시의 유력자들도 얼굴을 비추고 싶어 할 거예요."
+<br><br>
+
+"부끄러워할 필요 없어요." <<he>>【이가】 덧붙인다. "정말로, 하고 싶은 말을 아무거나 해도 돼요. 사람들은 그냥 누가 음식을 만드는지 알고 싶어 할 뿐이니까요."
+<br><br>
+
+<<link [[다음|Ocean Breeze Rework 2]]>><</link>>
+<br>
+
+:: Ocean Breeze Wonderful
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"아주 멋져요." 당신은 말한다. "꿈만 같아요."
+<<elseif $speech_attitude is "bratty">>
+	"확실히 업그레이드됐네요." 당신은 말한다.
+<<else>>
+	"정말 마음에 들어요." 당신은 말한다. "아주 화려하네요."
+<</if>>
+<br><br>
+
+샘이 고개를 끄덕인다. "그러게요! 전 항상 이런 곳을 원했어요."
+<br><br>
+
+<<He>>【은는】 방을 둘러본다. "그랜드 오프닝 준비를 시작했어요." <<he>>【이가】 말한다.
+"당신이 모습을 드러내주셨으면 해요. 대단한 건 아니에요! 그냥 짧은 연설 정도죠.
+전 세계에서 사람들이 올 테니, 이 도시의 유력자들도 얼굴을 비추고 싶어 할 거예요."
+<br><br>
+
+"부끄러워할 필요 없어요." <<he>>【이가】 덧붙인다. "정말로, 하고 싶은 말을 아무거나 해도 돼요. 사람들은 그냥 누가 음식을 만드는지 알고 싶어 할 뿐이니까요."
+<br><br>
+
+<<link [[다음|Ocean Breeze Rework 2]]>><</link>>
+<br>
+
+:: Ocean Breeze Okay
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+<<if $speech_attitude is "meek">>
+	"저, 잘 모르겠어요." 당신은 말한다. "전 화려한 것에는 익숙하지 않아서요."
+<<elseif $speech_attitude is "bratty">>
+	"제가 평화롭게 일할 수만 있다면요." 당신은 말한다. "괜찮아요."
+<<else>>
+	"괜찮아 보이네요." 당신은 말한다. "눈에 띄긴 하네요."
+<</if>>
+<br><br>
+
+샘이 고개를 끄덕인다. "전 항상 이런 곳을 원했어요."
+<br><br>
+
+<<He>>【은는】 방을 둘러본다. "그랜드 오프닝 준비를 시작했어요." <<he>>【이가】 말한다.
+"당신이 모습을 드러내주셨으면 해요. 대단한 건 아니에요! 그냥 짧은 연설 정도죠.
+전 세계에서 사람들이 올 테니, 이 도시의 유력자들도 얼굴을 비추고 싶어 할 거예요."
+<br><br>
+
+"부끄러워할 필요 없어요." <<he>>【이가】 덧붙인다. "정말로, 하고 싶은 말을 아무거나 해도 돼요. 사람들은 그냥 누가 음식을 만드는지 알고 싶어 할 뿐이니까요."
+<br><br>
+
+<<link [[다음|Ocean Breeze Rework 2]]>><</link>>
+<br>
+
+:: Ocean Breeze Rework 2
+<<set $outside to 0>><<set $location to "cafe">><<effects>>
+
+"전 빨리 시작하고 싶어요." 샘이 말한다. "하지만 주인공은 당신이에요. 당신이 준비되면 열 거예요. 저녁에 시간 될 때 와서 마무리 짓도록 하죠."
+<br><br>
+<<set $chef_state to 8>>
+
+<<endevent>>
+
+<<clifficon>><<link [[떠난다|Cliff Street]]>><<set $eventskip to 1>><</link>>
+<br>
