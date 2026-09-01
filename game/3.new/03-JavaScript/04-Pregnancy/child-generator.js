@@ -402,7 +402,7 @@ window.KR.babyNameDict = {
 	"Tristin": "트리스틴", "Trudi": "트루디", "Tyson": "타이슨", "Val": "발",
 	"Vernon": "버논", "Wallis": "월리스", "Wilda": "윌다", "Willis": "윌리스",
 	"Wilmer": "윌머", "Winton": "윈턴", "Wisdom": "위즈덤", "Yvette": "이벳",
-	"Unnamed": "이름없음",
+	"Unnamed": "무명",
 };
 
 /**
