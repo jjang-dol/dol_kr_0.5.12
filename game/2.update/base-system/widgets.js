@@ -250,14 +250,14 @@ function genderappearancecheck() {
 						addfemininityfromfactor((-V.player.penissize - 0.5) * 150, "자지가 보임");
 					}
 					if (V.player.vaginaExist) {
-						addfemininityfromfactor(450, "질이 보임");
+						addfemininityfromfactor(450, "보지가 보임");
 					}
 				} else if (V.settings.nudeGenderPerception === 2) {
 					if (V.player.penisExist) {
 						addfemininityfromfactor(-100000, "자지가 보임");
 					}
 					if (V.player.vaginaExist) {
-						addfemininityfromfactor(100000, "질이 보");
+						addfemininityfromfactor(100000, "보지가 보임");
 					}
 				}
 			}
