@@ -705,15 +705,28 @@
 	<<if _args[1] isnot undefined>>
 		<<set $shopHuntActive to _args[1]>>
 	<</if>>
-	<<set $_word to _args[0]>>
+	<<set $_word to _args[0].toLowerCase()>>
+	<<set _pronoun to $shopHunt.actors[$shopHuntActive].pronoun>>
 
-	<<if $_word[0] isnot $_word[0].toLowerCase()>>
-		<<set $_cap to true>>
-		<<set $_word to $_word.toLowerCase()>>
+	<!-- KR: 기존엔 pronouns[word]에 저장된 영문 원본("it" 등)을 그대로 출력해서
+	     마네킹(pronoun "i")이 "It가"처럼 미번역으로 새고 있었음. text.twee의
+	     he/his/him/hers 위젯과 같은 방식으로 pronoun 마커 기준 한글 매핑으로 교체. -->
+	<<set _krPronounMap to {
+		he:      { m: "그",     f: "그녀",     i: "그것",     n: "그들",     t: "그들" },
+		his:     { m: "그의",   f: "그녀의",   i: "그것의",   n: "그의",     t: "그들의" },
+		hers:    { m: "그",     f: "그녀",     i: "그",       n: "그들",     t: "그들" },
+		him:     { m: "그",     f: "그녀",     i: "그것",     n: "그들",     t: "그들" },
+		himself: { m: "그 자신", f: "그녀 자신", i: "그것 자신", n: "그들 자신", t: "그들 자신" },
+		man:     { m: "남자",   f: "여자",     i: "그것",     n: "사람",     t: "사람들" },
+		boy:     { m: "소년",   f: "소녀",     i: "그것",     n: "아이",     t: "아이들" },
+		men:     { m: "남자들", f: "여자들",   i: "그것들",   n: "사람들",   t: "사람들" },
+	}>>
+
+	<<if _krPronounMap[$_word] and _krPronounMap[$_word][_pronoun]>>
+		<<set _text_output to _krPronounMap[$_word][_pronoun]>>
+	<<else>>
+		<<set _text_output to `<span class="red">[에러: "shopHuntPronoun"에서 알 수 없는 조합 ${$_word}/${_pronoun}]</span>`>>
 	<</if>>
-
-	<<set _text_output to $shopHunt.actors[$shopHuntActive].pronouns[$_word]>>
-	<<if $_cap>><<capitalise>><</if>>
 
 	<<exit _text_output>>
 <</widget>>

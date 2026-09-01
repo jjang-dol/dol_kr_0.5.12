@@ -304,6 +304,15 @@ function shopHuntLocNameCap(loc) {
 window.shopHuntLocNameCap = shopHuntLocNameCap;
 
 /**
+ * KR: shopHunt.item에 쓰이는 아이템 키 → 한글 명칭. shop-hunt.twee 본문에서
+ * 이미 쓰이고 있는 용어(손거울/열쇠)와 맞춤.
+ */
+const shopHuntItemNameKr = {
+	key: "열쇠",
+	mirror: "손거울",
+};
+
+/**
  * Returns all items in the specified location
  *
  * @param {string} loc the location in the shop to check for items
@@ -312,7 +321,7 @@ window.shopHuntLocNameCap = shopHuntLocNameCap;
  */
 function shopHuntItemsPresent(loc, list = false) {
 	const items = arrayIntersect(shopHuntContains(loc), Object.keys(V.shopHunt.item));
-	if (list) return formatList(items, "and", true);
+	if (list) return formatList(items.map(item => shopHuntItemNameKr[item] || item), undefined, true);
 	return items;
 }
 window.shopHuntItemsPresent = shopHuntItemsPresent;
