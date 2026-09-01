@@ -1,12 +1,12 @@
-/* Passage that the player is sent to when they start fishing. If the player lands on this passage, there's not going to be an event that fires. The player can then click on the wait for a bite link to get sent into the wait loop passage, which can either trigger an event, or send the user back to this passage. */
+/* 플레이어가 낚시를 시작할 때 이동하는 패시지입니다. 플레이어가 이 패시지에 도달하면 바로 실행되는 이벤트는 없습니다. 이후 플레이어가 입질을 기다린다는 링크를 클릭하면 대기 루프 패시지로 이동하며, 이 과정에서 이벤트가 발생하거나 다시 이 패시지로 돌아올 수 있습니다. */
 :: Fishing LocationName
 <<run initFishingLocationName()>>
 <<wearActiveFishingRodProp>>
 
-/* Ambient description (weather, time of day, the water). */
+/* 주변 환경 설명 (날씨, 시간대, 물). */
 <<fishingLocationDescription "locationName">>
 
-/* Describes any NPCs/animals/whatever currently present as part of an active event. */
+/* 활성화된 이벤트의 일환으로 현재 존재하는 NPC/동물/기타 요소들을 묘사합니다. */
 <<fishingLocationNameLocationAmbient>>
 <br><br>
 
@@ -17,20 +17,20 @@
 <<if $arousal gte $arousalmax>>
 	<<orgasmFishingLocationName>>
 <<else>>
-	/* Displays the waiting text displayed to the user. */
+	/* 플레이어에게 표시되는 대기 텍스트를 출력합니다. */
 	<<fishingLocationNameWaitAmbient>>
 <</if>>
 <br><br>
 
-<<link [[Wait for a bite (0:05)|Fishing LocationName Wait]]>><</link>>
+<<link [[입질을 기다린다 (0:05)|Fishing LocationName Wait]]>><</link>>
 <br>
-<<link [[Leave|SomeParentPassage]]>><</link>>
+<<link [[떠난다|SomeParentPassage]]>><</link>>
 
-/* Wait loop passage. Sending the user here will roll an event and send the user to that event. "Nothing" is treated like every other event, and instead of sending the user to an event, it sends the user back to the Fishing LocationName passage. */
+/* 대기 루프 패시지. 플레이어가 여기로 오면 이벤트를 주사위 굴려 그 이벤트로 보냅니다. "아무 일도 일어나지 않음"도 다른 모든 이벤트처럼 취급되며, 이벤트를 띄우는 대신 Fishing LocationName 패시지로 돌려보냅니다. */
 :: Fishing LocationName Wait Loop
 <<cleareventpool>>
 
-/* Generic bite event. Big fish trigger a fight, small fish are caught without a fight. */
+/* 일반적인 입질 이벤트. 큰 물고기는 힘겨루기가 시작되고, 작은 물고기는 힘겨루기 없이 잡힙니다. */
 <<addinlineevent "bite" fishingCatchEventWeight("fishingLocationName", 10)>>
 	<<set $fishingHookedFish to rollFish("fishingLocationName")>>
 	<<set _isPreferredBait to $fishing.currentBait !== undefined && setup.fishing.lootTables.fish[$fishingHookedFish.type].preferredBait is $fishing.currentBait>>
@@ -38,7 +38,7 @@
 	<<if fishTriggersMinigame($fishingHookedFish)>>
 		<<include "Fishing LocationName Bite Big">>
 	<<else>>
-		You feel a tug on your line as <<a $fishingHookedFish.type>><<if _isPreferredBait>> greedily<</if>> <<if $fishing.currentBait>>takes the bait<<else>>takes the hook<</if>>. You haul back on the line and pull it out of the water without a fight.
+		<<a $fishingHookedFish.type>>【이가】 <<if _isPreferredBait>> 게걸스럽게<</if>> <<if $fishing.currentBait>>미끼를<<else>>낚싯바늘을<</if>> 물자 낚싯줄이 팽팽해지는 것이 느껴진다. 낚싯줄을 힘껏 당겨 녀석과 힘겨루기할 틈도 주지 않고 물 밖으로 건져 올린다.
 		<<include "Fishing LocationName Catch">>
 	<</if>>
 <</addinlineevent>>
@@ -53,7 +53,7 @@
 	<<include "Fishing LocationName Clothing Catch">>
 <</addinlineevent>>
 
-/* Danger event. When this event is rolled, it starts the danger event by setting $fishing.locationName.event to the danger event that was rolled (like a wolf sneaking up on you), but also sends the user back to the wait passage, so it is unclear that something has happened. Once $fishing.locationName.event is set to a value, the <<fishingLocationNameWaitAmbient>> has hints added to it that something will attack you soon, allowing the player to pay attention to that if they want so they can leave. When these wait ambient texts appear, they increase the odds of the actual attack being rolled.
+/* 위험 이벤트. 이 이벤트가 굴려지면, $fishing.locationName.event를 굴려진 위험 이벤트(예: 늑대가 몰래 다가옴)로 설정하여 위험 이벤트를 시작합니다. 하지만 플레이어를 다시 대기 패시지로 보내 무언가 일어났다는 것을 모르게 합니다. $fishing.locationName.event가 값으로 설정되면 <<fishingLocationNameWaitAmbient>>에 곧 무언가가 공격할 것이라는 힌트가 추가되어, 플레이어가 그것에 주의를 기울이고 원한다면 떠날 수 있게 합니다. 이 대기 환경 텍스트가 나타나면, 실제 공격 이벤트가 굴려질 확률이 높아집니다.
 */
 <<if $fishing.locationName.event is "none">>
 	<<addinlineevent "dangerStart" fishingDangerEventWeight(3)>>
@@ -69,7 +69,7 @@
 	<</addinlineevent>>
 <</if>>
 
-/* Nothing happens, wait loop continues. */
+/* 아무 일도 일어나지 않음, 대기 루프가 계속됩니다. */
 <<addinlineevent "wait" 25>>
 	<<include "Fishing LocationName Wait">>
 <</addinlineevent>>
@@ -81,26 +81,26 @@
 
 <<widget "fishingLocationNameLocationAmbient">>
 	<<if $daily.fishing.locationName.eventName.phase is "idle">>
-		/* Widget that should go in the .twee file for the associated event that has the possible text that can appear to describe what that npc/animal/whatever is doing at the time */
+		/* 해당 NPC/동물/기타가 그 시점에 무엇을 하고 있는지 설명하는 텍스트가 포함된 연관 이벤트의 .twee 파일에 들어가야 할 위젯 */
 		<<theLocationAmbientWidgetForThatEvent>>
 	<</if>>
 <</widget>>
 
 
-/* Picks the waiting sentence each loop. <<fishingWaitAmbient>> is a set of inlineEvents, no clear/runeventpool, as should be any other widgets placed here. That way, you can have your default set of wait text from <<fishingWaitAmbient>> be added to any event-specific wait text for any active events. */
+/* 매 루프마다 대기 문장을 선택합니다. <<fishingWaitAmbient>>는 inlineEvents의 집합이며, 여기에 배치된 다른 위젯과 마찬가지로 clear/runeventpool은 없습니다. 이렇게 하면 <<fishingWaitAmbient>>의 기본 대기 텍스트가 활성화된 이벤트에 대한 이벤트 전용 대기 텍스트에 추가될 수 있습니다. */
 <<widget "fishingLocationNameWaitAmbient">>
 	<<if $fishingAmbientOverride is "throwBack">>
 		<<if $fishing.currentBait>>
-			You throw the fish back into the water before <<fishingRebaitMid>>
+			당신은 <<fishingRebaitMid>> 물고기를 물속으로 던져 넣는다.
 		<<else>>
-			You throw the fish back into the water.
+			당신은 물고기를 다시 물속으로 던져 넣는다.
 		<</if>>
 		<<unset $fishingAmbientOverride>>
 	<<elseif $fishingAmbientOverride is "stowAway">>
 		<<if $fishing.currentBait>>
-			You stow the fish away before <<fishingRebaitMid>>
+			당신은 <<fishingRebaitMid>> 물고기를 보관해 둔다.
 		<<else>>
-			You stow the fish away and cast back out.
+			당신은 물고기를 보관해 두고 다시 낚싯줄을 던진다.
 		<</if>>
 		<<unset $fishingAmbientOverride>>
 	<<else>>
@@ -108,7 +108,7 @@
 		<<fishingWaitAmbient $bus>>
 
 		<<if $fishing.locationName.event is "dangerName">>
-			/* Widget that should go in the .twee file for the associated event that has the possible text that can appear instead of the normal wait text. event danger (the odds of the actual attack for the active danger event) should be increased by the inline events used to show that a dangerous event is active. */
+			/* 일반 대기 텍스트 대신 나타날 수 있는 텍스트가 포함된 연관 이벤트의 .twee 파일에 들어가야 할 위젯. 이벤트 위험도(활성화된 위험 이벤트의 실제 공격 확률)는 위험한 이벤트가 활성화되었음을 보여주는 데 사용되는 인라인 이벤트에 의해 증가해야 합니다. */
 			<<fishingLocationNameDangerWaitAmbient>>
 		<</if>>
 
@@ -118,13 +118,13 @@
 
 
 
-/* Example */
+/* 예시 */
 <<widget "fishingLocationNameDangerWaitAmbient">>
 	<<addinlineevent 20>>
 		<<print either(
-			"You hear spooky noises.",
-			"You smell spooky smells.",
-			"You see spooky sights."
+			"소름돋는 소리가 들린다.",
+			"기분나쁜 냄새가 난다.",
+			"으스스한 광경이 보인다."
 		)>>
 		<<set $fishing.locationName.eventDanger += 1>>
 	<</addinlineevent>>
