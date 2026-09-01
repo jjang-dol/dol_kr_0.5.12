@@ -319,3 +319,99 @@ function generateBabyName(name, gender, childId) {
 	return result;
 }
 window.generateBabyName = generateBabyName;
+
+/**
+ * Korean display names for the generateBabyName() pools above. child.name in the save stays
+ * the English pool name (save compatibility with the original game, and it's what usedNames/
+ * name-matching logic above compares against) -- this dict only translates it for display.
+ * A player-typed custom name has no entry here, so getBabyNameKr falls through to the
+ * original string unchanged.
+ */
+window.KR = window.KR || {};
+window.KR.babyNameDict = {
+	"Aaren": "에런", "Addison": "애디슨", "Adelyn": "애덜린", "Alene": "얼린",
+	"Alex": "알렉스", "Alexa": "알렉사", "Algernon": "앨저넌", "Aliah": "얼리아",
+	"Allan": "앨런", "Alpha": "알파", "Alyson": "앨리슨", "Andie": "앤디",
+	"Angelica": "앤젤리카", "Annalise": "애널리스", "Annora": "어노라", "Anton": "앤턴",
+	"Arden": "아든", "Ariel": "아리엘", "Artie": "아티", "Ashton": "애슈턴",
+	"Aston": "애스턴", "Aubrey": "오브리", "Axel": "액셀", "Azaria": "아자리아",
+	"Bazza": "배자", "Beau": "보", "Benton": "벤턴", "Bernard": "버나드",
+	"Bernie": "버니", "Bertie": "버티", "Bessie": "베시", "Betsy": "벳시",
+	"Bettie": "베티", "Beverly": "베벌리", "Biddy": "비디", "Bobbie": "바비",
+	"Brand": "브랜드", "Brett": "브렛", "Brianne": "브리앤", "Brooklyn": "브루클린",
+	"Caelan": "케일런", "Cale": "케일", "Calvin": "캘빈", "Camellia": "커멜리아",
+	"Cameron": "캐머런", "Camille": "카밀", "Camryn": "캠린", "Carol": "캐럴",
+	"Caroline": "캐럴라인", "Cary": "캐리", "Casey": "케이시", "Channing": "채닝",
+	"Charley": "찰리", "Chastity": "채스티티", "Chelsea": "첼시", "Chelsey": "첼시",
+	"Cherokee": "체로키", "Cheyenne": "샤이엔", "Chuck": "척", "Chucky": "척키",
+	"Cindy": "신디", "Clay": "클레이", "Clematis": "클레머티스", "Coby": "코비",
+	"Codie": "코디", "Collyn": "콜린", "Cornelius": "코닐리어스", "Crofton": "크로프턴",
+	"Cyan": "사이언", "Dale": "데일", "Dallas": "댈러스", "Dana": "데이나",
+	"Darby": "다비", "Darden": "다든", "Darla": "달라", "Dax": "댁스",
+	"Deb": "데브", "Debby": "데비", "Dee": "디", "Den": "덴",
+	"Derby": "더비", "Devan": "데번", "Deven": "데번", "Devin": "데빈",
+	"Digby": "딕비", "Don": "돈", "Dortha": "도서", "Douglas": "더글러스",
+	"Driscoll": "드리스콜", "Duane": "듀언", "Duke": "듀크", "Edmund": "에드먼드",
+	"Eleanora": "엘레아노라", "Eliana": "엘리아나", "Elsabeth": "엘사베스", "Elsdon": "엘스던",
+	"Elyse": "엘리스", "Emerson": "에머슨", "Emmeline": "에멀린", "Emmerson": "에머슨",
+	"Emory": "에모리", "Erica": "에리카", "Ettie": "에티", "Eustacia": "유스테이샤",
+	"Evelyn": "에벌린", "Finley": "핀리", "Flannery": "플래너리", "Florence": "플로렌스",
+	"Freeman": "프리먼", "Gabby": "개비", "Gabrielle": "가브리엘", "Garland": "갈런드",
+	"Garnet": "가넷", "Garnett": "가넷", "George": "조지", "Georgiana": "조지아나",
+	"Godfrey": "갓프리", "Graeme": "그레엄", "Gray": "그레이", "Grier": "그리어",
+	"Hadyn": "헤이든", "Hammond": "해먼드", "Harlan": "할런", "Harlow": "할로",
+	"Harper": "하퍼", "Harrietta": "해리에타", "Haylie": "헤일리", "Haze": "헤이즈",
+	"Hendrix": "헨드릭스", "Herman": "허먼", "Hewie": "휴이", "Hollis": "홀리스",
+	"Hugh": "휴", "Hunter": "헌터", "Hyacinth": "하이어신스", "Indiana": "인디애나",
+	"Indie": "인디", "Ingram": "잉그럼", "Jackie": "재키", "Jacquetta": "자케타",
+	"Jade": "제이드", "Jae": "제이", "Jaiden": "제이든", "Janie": "제이니",
+	"Jannine": "재닌", "Jasper": "재스퍼", "Jaxon": "잭슨", "Jaycob": "제이컵",
+	"Jere": "제리", "Johnnie": "자니", "Jonquil": "존퀼", "Joyce": "조이스",
+	"Justice": "저스티스", "Kaelyn": "케일린", "Kam": "캠", "Kamden": "캠든",
+	"Kelcey": "켈시", "Kelsey": "켈시", "Kendall": "켄들", "Kevin": "케빈",
+	"Khloe": "클로이", "Kian": "키안", "Kieran": "키어런", "Kirby": "커비",
+	"Kolleen": "콜린", "Korrine": "코린", "Kourtney": "코트니", "Krystine": "크리스틴",
+	"Lanny": "래니", "Lavena": "러비나", "Lawson": "로슨", "Laz": "래즈",
+	"Leeann": "리앤", "Lela": "릴라", "Leland": "릴런드", "Lesleigh": "레슬리",
+	"Leslie": "레슬리", "Levi": "리바이", "Lindon": "린던", "Lindsey": "린지",
+	"Lindsie": "린지", "Linton": "린턴", "Lionel": "라이오넬", "Lonny": "로니",
+	"Lorena": "로레나", "Lorin": "로린", "Lucas": "루카스", "Lucile": "루실",
+	"Luvinia": "루비니아", "Lyn": "린", "Lyric": "리릭", "Lyssa": "리사",
+	"Madeleine": "매들린", "Maitland": "메이틀런드", "Manley": "맨리", "Marian": "매리언",
+	"Marley": "말리", "Maudie": "모디", "Maureen": "모린", "Maverick": "매버릭",
+	"Maxine": "맥신", "McKinley": "매킨리", "Melody": "멜로디", "Merlyn": "멀린",
+	"Michael": "마이클", "Milani": "밀라니", "Misti": "미스티", "Monty": "몬티",
+	"Murphy": "머피", "Nat": "냇", "Nate": "네이트", "Ned": "네드",
+	"Nicky": "니키", "Noelle": "노엘", "Nowell": "노웰", "Oakley": "오클리",
+	"Odell": "오델", "Ollie": "올리", "Osbert": "오스버트", "Otto": "오토",
+	"Ottoline": "오톨린", "Pacey": "페이시", "Paget": "패짓", "Paige": "페이지",
+	"Pauline": "폴린", "Payton": "페이턴", "Pearl": "펄", "Perlie": "펄리",
+	"Petronel": "페트로넬", "Peyton": "페이턴", "Phebe": "피비", "Pip": "핍",
+	"Posie": "포지", "Praise": "프레이즈", "Presley": "프레슬리", "Quintin": "퀸틴",
+	"Rain": "레인", "Raleigh": "롤리", "Raymund": "레이먼드", "Reagan": "레이건",
+	"Regan": "리건", "Reilly": "라일리", "Remington": "레밍턴", "Rexana": "렉사나",
+	"Ricky": "리키", "Robbie": "로비", "Robert": "로버트", "Rory": "로리",
+	"Ross": "로스", "Royale": "로열", "Rudolph": "루돌프", "Sage": "세이지",
+	"Sam": "샘", "Sammy": "새미", "Schuyler": "스카일러", "Scotty": "스카티",
+	"Selby": "셀비", "Serena": "세레나", "Shae": "셰이", "Sharalyn": "샤랄린",
+	"Sharla": "샬라", "Shauna": "숀아", "Shaye": "셰이", "Shelly": "셸리",
+	"Sky": "스카이", "Skylar": "스카일러", "Sloan": "슬론", "Stacey": "스테이시",
+	"Stacy": "스테이시", "Sybella": "시벨라", "Tayler": "테일러", "Thad": "태드",
+	"Theodore": "테오도어", "Tommie": "토미", "Tommy": "토미", "Tracey": "트레이시",
+	"Tracy": "트레이시", "Tresha": "트레샤", "Trey": "트레이", "Tristen": "트리스텐",
+	"Tristin": "트리스틴", "Trudi": "트루디", "Tyson": "타이슨", "Val": "발",
+	"Vernon": "버논", "Wallis": "월리스", "Wilda": "윌다", "Willis": "윌리스",
+	"Wilmer": "윌머", "Winton": "윈턴", "Wisdom": "위즈덤", "Yvette": "이벳",
+	"Unnamed": "이름없음",
+};
+
+/**
+ * Korean display name for a stored child.name. Falls back to the original string for anything
+ * not in the pool above (a player-typed custom name).
+ *
+ * @param {string} name the stored child.name value
+ * @returns {string}
+ */
+window.KR.getBabyNameKr = function(name) {
+	return window.KR.babyNameDict[name] || name;
+};
