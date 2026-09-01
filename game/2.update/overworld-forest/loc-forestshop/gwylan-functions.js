@@ -23,7 +23,7 @@ function gwylanRequest(override = null) {
 		* If a request requires a specific event(s), have it check V.gwylan.requestLast?.event or V.gwylan.timer matching the required event(s) instead of V.gwylan.requestDone
 		*/
 		if (override.some(entry => typeof entry[0] !== "string" || typeof entry[1] !== "number")) {
-			Errors.report(`[gwylanRequest]: Invalid override array provided! The argument was cleared and a normal request was generated.`, {
+			Errors.report(`[gwylanRequest]: 유효하지 않은 override 배열이 제공되었습니다. 인수를 비우고 일반 요청을 생성했습니다.`, {
 				Stacktrace: Utils.GetStack(),
 				override,
 			});
@@ -32,7 +32,7 @@ function gwylanRequest(override = null) {
 			override = weightedRandom(...override, seedrng);
 		}
 	} else if (override && typeof override !== "string") {
-		Errors.report(`[gwylanRequest]: Invalid override type provided! The argument was cleared and a normal request was generated.`, {
+		Errors.report(`[gwylanRequest]: 유효하지 않은 override 유형이 제공되었습니다. 인수를 비우고 일반 요청을 생성했습니다.`, {
 			Stacktrace: Utils.GetStack(),
 			override,
 		});
@@ -227,7 +227,7 @@ function gwylanRequest(override = null) {
 
 		// Error case
 		default:
-			Errors.report(`[gwylanRequest]: Invalid event!`, {
+			Errors.report(`[gwylanRequest]: 유효하지 않은 이벤트입니다.`, {
 				Stacktrace: Utils.GetStack(),
 				override,
 				selectedEvent,
@@ -267,7 +267,7 @@ function gwylanRequestClothes(override) {
 			category: "clothing",
 			name: "none",
 			slot: "none",
-			word: "a",
+			word: "",
 			gender: "n",
 			colour_requirement: "any",
 			acc_colour_requirement: "any",
@@ -794,7 +794,7 @@ function gwylanRequestIngredients() {
 			category: "tending",
 			name: ingredientKey,
 			type: setupItem.category,
-			need: 1,
+			need: 0,
 		};
 		if (setupItem.shop.available_in?.includes("supermarket")) {
 			const supermarketMaxNeed = Math.trunc(3000 / setup.foodstuff[ingredientKey].shop.sell_price); // supermarket items are set to this every week, so ensure it can't take more than 1 week to complete request

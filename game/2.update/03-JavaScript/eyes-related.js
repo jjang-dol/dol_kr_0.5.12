@@ -2,40 +2,40 @@ function buildEyeDetails() {
 	let sentence = "";
 	let concatFlag = false;
 	const lenses = V.makeup.eyelenses;
-	const colourMap = setup.colours.eyes_map;
+	const eyeMap = setup.colours.eyes_map;
 
 	if (lenses.right !== 0 || lenses.left !== 0) {
-		sentence += "You wear ";
+		sentence += "";
 		if (typeof lenses.left === "string") {
-			sentence += setup.colours.eyes_map[lenses.left].name;
+			sentence += eyeMap[lenses.left].name;
 			concatFlag = true;
 		}
 		if (typeof lenses.right === "string" && lenses.left !== lenses.right) {
-			if (concatFlag) sentence += " and ";
-			sentence += setup.colours.eyes_map[lenses.right].name;
+			if (concatFlag) sentence += "【와과】 ";
+			sentence += eyeMap[lenses.right].name;
 			concatFlag = true;
 		}
 		if (concatFlag) {
-			sentence += " eye lenses ";
+			sentence += " 렌즈를 착용하고 있습니다. ";
 		}
-		sentence += "on top of your ";
+		sentence += " 눈동자 색은 ";
 	} else {
-		sentence += "You have ";
+		sentence += " 눈동자 색은 ";
 	}
 	concatFlag = false;
 
-	const leftEyeColour = colourMap[V.leftEyeColour];
-	const rightEyeColour = colourMap[V.rightEyeColour];
+	const leftEyeColour = eyeMap[V.leftEyeColour];
+	const rightEyeColour = eyeMap[V.rightEyeColour];
 	if (typeof leftEyeColour === "object") {
 		sentence += leftEyeColour.name;
 		concatFlag = true;
 	}
 	if (typeof rightEyeColour === "object" && V.leftEyeColour !== V.rightEyeColour) {
-		if (concatFlag) sentence += " and ";
+		if (concatFlag) sentence += "【와과】 ";
 		sentence += rightEyeColour.name;
 		concatFlag = true;
 	}
-	if (concatFlag) sentence += " eyes";
+	if (concatFlag) sentence += "입니다";
 	return sentence + ".";
 }
 window.buildEyeDetails = buildEyeDetails;
@@ -124,6 +124,22 @@ function initCustomLenses() {
 			if (setup.colours.eyes[i2].variable === V.custom_eyecolours[i].variable) found = 1;
 		}
 		if (!found) setup.colours.eyes.push(V.custom_eyecolours[i]);
+
+		/* KR: 예전 버전(또는 번역 이전 코드)에서 만들어진 커스텀 렌즈는 .name이 영문 그대로
+		   저장되어 있는 경우가 있음. .variable(약국 주문 렌즈)이나 .csstext(cat_tf_stage처럼
+		   .variable이 합성 id인 경우)가 color-namer.js 사전의 실제 키라면, 로드될 때마다
+		   .name/.name_cap을 한글로 다시 계산해서 고쳐준다. */
+		const entry = V.custom_eyecolours[i];
+		const key = window.colors && entry.variable in window.colors
+			? entry.variable
+			: window.colors && entry.csstext in window.colors
+				? entry.csstext
+				: null;
+		if (key) {
+			const krName = window.colorNameTranslate(key, "spaced name");
+			entry.name = krName;
+			entry.name_cap = krName.toUpperFirst();
+		}
 	}
 	window.buildColourMap("eyes", "custom_eyecolours");
 }

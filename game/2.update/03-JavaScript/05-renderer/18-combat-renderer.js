@@ -148,7 +148,7 @@ class CombatRenderer {
 			integrity_max: 10,
 			fabric_strength: 20,
 			reveal: 1,
-			word: "a",
+			word: "",
 			plural: 0,
 			colour: 0,
 			colour_options: [],
@@ -156,7 +156,7 @@ class CombatRenderer {
 			gender: "n",
 			warmth: 0,
 			cost: 0,
-			description: "naked",
+			description: "벗었습니다.",
 			shop: [],
 			accessory: 0,
 			accessory_colour: 0,
@@ -306,7 +306,7 @@ class CombatRenderer {
 			case "wall":
 				return "doggy";
 			case "stalk":
-				Errors.report("Position was set to stalk, and the combat renderer doesn't support it yet.");
+				Errors.report("position이 stalk로 설정되었지만, 전투 렌더러가 아직 이를 지원하지 않습니다.");
 				return "missionary";
 			default:
 				return "missionary";
@@ -327,7 +327,7 @@ class CombatRenderer {
 		const filter = key === "custom" ? this.getCustomFilterColour(customFilter, debugName) : this.getFilterColour(key, dict, debugName);
 
 		if (filter == null) {
-			console.error("Lookup colour failed:", debugName);
+			console.error("색상 조회 실패:", debugName);
 			return Renderer.emptyLayerFilter();
 		}
 
@@ -347,7 +347,7 @@ class CombatRenderer {
 	static getFilterColour(key, dict, debugName) {
 		const record = dict[key];
 		if (!record) {
-			console.error("unknown", debugName, "colour:", key);
+			console.error("알 수 없는 색상:", debugName, key);
 			return null;
 		}
 		const filter = clone(record.canvasfilter);
@@ -364,7 +364,7 @@ class CombatRenderer {
 
 		const filter = getCustomClothesColourCanvasFilter(customFilter);
 		if (!filter) {
-			console.error("Custom colour", debugName, "not configured");
+			console.error("사용자 지정 색상이 설정되지 않았습니다:", debugName);
 			return null;
 		}
 		return filter;
@@ -598,7 +598,7 @@ class CombatRenderer {
 		const reference = item.combat?.reference;
 		// Check to ensure no loops
 		if (failsafe.includes(item.variable)) {
-			console.error("getSourceClothing ran into a potential infinite loop:", item.variable, failsafe);
+			console.error("getSourceClothing에서 무한 루프 가능성을 감지했습니다:", item.variable, failsafe);
 			return item;
 		}
 		failsafe.push(item.variable);
@@ -629,7 +629,7 @@ class CombatRenderer {
 		const reference = item.combat?.reference;
 		// Check to ensure no loops
 		if (failsafe.includes(item.variable)) {
-			console.error("getSourceClothing ran into a potential infinite loop:", item.variable, failsafe);
+			console.error("getSourceClothing에서 무한 루프 가능성을 감지했습니다:", item.variable, failsafe);
 			return item;
 		}
 		failsafe.push(item.variable);

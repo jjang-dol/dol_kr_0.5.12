@@ -76,7 +76,7 @@ const DoLSave = ((Story, Save) => {
 		// an empty slot gives back null, which is not the same as an empty save. JavaScript treats null as an object.
 		// so checking the type alone would let an empty slot through and crash - isObject rules out null
 		if (!isObject(save)) {
-			Errors.report("Could not find a valid save at that slot.", {});
+			Errors.report("해당 슬롯에서 유효한 세이브를 찾을 수 없습니다.", {});
 			return;
 		}
 		const currVersion = parseVersion(StartConfig.version);
@@ -345,13 +345,13 @@ const DoLSave = ((Story, Save) => {
 		const zstate = compressor.compress(state);
 		zstate.dictionary = COMPRESSOR_CURRENT_DICTIONARY_ID;
 		zstate.title =
-			"This save is compressed and is not compatible with old versions of Degrees of Lewdity. If you want to load this save in an older game build, use exporting.";
+				"이 세이브는 압축되어 있어 이전 버전의 Degrees of Lewdity와 호환되지 않습니다. 더 오래된 게임 빌드에서 이 세이브를 불러오려면 내보내기 기능을 사용하세요.";
 		zstate.variables = {};
 		if (shouldVerifyCompression()) {
 			// Sanity check
 			const uzstate = decompressState(zstate);
 			if (JSON.stringify(state) !== JSON.stringify(uzstate)) {
-				throw new Error("Decompression check failed");
+					throw new Error("압축 해제 확인에 실패했습니다");
 			}
 		}
 		return zstate;
@@ -364,13 +364,13 @@ const DoLSave = ((Story, Save) => {
 	 * @param {object} zstate
 	 */
 	function decompressState(zstate) {
-		if (!("dictionary" in zstate)) throw new Error("Unable to load - compressed save has no dictionary");
+		if (!("dictionary" in zstate)) throw new Error("불러올 수 없습니다 - 압축된 세이브에 사전 정보가 없습니다");
 		const dicid = zstate.dictionary;
 		if (!(dicid in COMPRESSOR_DICTIONARIES))
 			throw new Error(
-				"Unable to decompress the save - the dictionary " +
+					"세이브 압축을 해제할 수 없습니다 - 사전 " +
 					JSON.stringify(dicid) +
-					" is unknown to this game version (trying to load newer save from older game?)"
+						"이 현재 게임 버전에서 알 수 없습니다. (구버전 게임에서 신버전 세이브를 불러오려는 건가요?)"
 			);
 		const dictionary = COMPRESSOR_DICTIONARIES[dicid];
 		const decompressor = new JsonDecompressor(dictionary);
@@ -403,7 +403,7 @@ const DoLSave = ((Story, Save) => {
 			saveObj.state.history = saveObj.state.history.map(state => compressState(state));
 			saveObj.metadata.jsoncompressed = 1;
 		} catch (e) {
-			DOL.Errors.report("Unable to compress - " + e);
+			DOL.Errors.report("압축할 수 없습니다 - " + e);
 			console.error(e);
 			// Just return, the saveObj won't be modified
 		}
@@ -441,7 +441,7 @@ const DoLSave = ((Story, Save) => {
 					if (decompressed) dictOverride = otherDicts[k];
 				}
 				if (!decompressed)
-					throw new Error("Unable to decompress the save with any of the game's dictionaries (save is labeled " + JSON.stringify(dictOverride) + ")");
+					throw new Error("게임의 어떤 사전으로도 저장 파일을 압축 해제할 수 없습니다 (저장 파일 이름은 " + JSON.stringify(dictOverride) + ") 입니다.)");
 				return decompressed;
 			} else return state;
 		});
@@ -508,7 +508,7 @@ window.loadSaveData = function () {
 	const input = document.getElementById("saveDataInput");
 	const result = Save.deserialize(input.value);
 	if (result === null) {
-		input.value = "Invalid Save.";
+		input.value = "유효하지 않은 세이브입니다.";
 	}
 };
 
@@ -535,8 +535,8 @@ window.copySavedata = function (id) {
 		document.execCommand("copy");
 	} catch (err) {
 		const copyTextArea = document.getElementById("CopyTextArea");
-		copyTextArea.value = "Copying Error";
-		console.log("Unable to copy: ", err);
+		copyTextArea.value = "복사 오류";
+		console.log("복사할 수 없습니다: ", err);
 	}
 };
 
@@ -724,7 +724,7 @@ function importSettingsData(data) {
 	 */
 	const validateAndSet = (source, target, key) => {
 		if (!validateValue(source[key], target[key])) {
-			console.debug(`Validation fail - Key ${key} Source`, source, "Target", target);
+			console.debug(`검증 실패 - 키 ${key} 소스`, source, "대상", target);
 			return null;
 		}
 		return target[key];
@@ -871,7 +871,7 @@ function exportSettings(data, type) {
 		const startingOutput = traversePair(startingConfig, V, "root", settingContainers, (source, target, key) => {
 			console.debug(source, target, key);
 			if (!validateValue(source[key], target[key])) {
-				console.debug(`Target ${key} does not contain a valid value:`, target[key], "configuration:", source[key]);
+				console.debug(`대상 ${key}에 유효한 값이 없습니다:`, target[key], "설정:", source[key]);
 				return null;
 			}
 			return target[key];
@@ -946,54 +946,54 @@ function settingsObjects(type) {
 					min: 0,
 					max: 3,
 					decimals: 0,
-					displayName: "Body size:",
-					textMap: { 0: "Tiny", 1: "Small", 2: "Normal", 3: "Large" },
+					displayName: "몸집:",
+					textMap: { 0: "아주 작음", 1: "작음", 2: "보통", 3: "큼" },
 					randomize: "characterAppearance",
 				},
 				facevariant: {
 					strings: ["default", "catty", "aloof", "sweet", "foxy", "gloomy"],
-					displayName: "Demeanour:",
-					textMap: { default: "Default", catty: "Catty", aloof: "Aloof", sweet: "Sweet", foxy: "Foxy", gloomy: "Gloomy" },
+					displayName: "인상:",
+					textMap: { default: "기본", catty: "새침함", aloof: "쌀쌀맞음", sweet: "상냥함", foxy: "여우 같음", gloomy: "우울함" },
 					randomize: "characterAppearance",
 				},
 				breastsensitivity: {
 					min: 1,
 					max: 3,
-					displayName: "Breast sensitivity:",
+					displayName: "가슴 민감도:",
 					decimals: 0,
-					textMap: { 1: "Normal", 2: "Sensitive", 3: "Very Sensitive" },
+					textMap: { 1: "보통", 2: "반응함", 3: "예민함" },
 					randomize: "characterTrait",
 				},
 				genitalsensitivity: {
 					min: 1,
 					max: 3,
-					displayName: "Genital sensitivity:",
+					displayName: "성기 민감도:",
 					decimals: 0,
-					textMap: { 1: "Normal", 2: "Sensitive", 3: "Very Sensitive" },
+					textMap: { 1: "보통", 2: "반응함", 3: "예민함" },
 					randomize: "characterTrait",
 				},
 				mouthsensitivity: {
 					min: 1,
 					max: 3,
 					decimals: 0,
-					displayName: "Mouth sensitivity:",
-					textMap: { 1: "Normal", 2: "Sensitive", 3: "Very Sensitive" },
+					displayName: "입 민감도:",
+					textMap: { 1: "보통", 2: "반응함", 3: "예민함" },
 					randomize: "characterTrait",
 				},
 				bottomsensitivity: {
 					min: 1,
 					max: 3,
 					decimals: 0,
-					displayName: "Bottom sensitivity:",
-					textMap: { 1: "Normal", 2: "Sensitive", 3: "Very Sensitive" },
+					displayName: "엉덩이 민감도:",
+					textMap: { 1: "보통", 2: "반응함", 3: "예민함" },
 					randomize: "characterTrait",
 				},
 				drunkSensitivity: {
 					min: 0.5,
 					max: 1.5,
 					decimals: 1,
-					displayName: "Alcohol tolerance:",
-					textMap: { 0.5: "Heavyweight", 1: "Normal", 1.5: "Lightweight" },
+					displayName: "주량:",
+					textMap: { 0.5: "알쓰", 1: "보통", 1.5: "술고래" },
 					randomize: "characterTrait",
 				},
 				eyeselect: {
@@ -1014,7 +1014,7 @@ function settingsObjects(type) {
 						"random",
 					],
 					randomize: "characterAppearance",
-					displayName: "Eye colour:",
+					displayName: "눈 색:",
 				},
 				hairselect: {
 					strings: [
@@ -1037,13 +1037,13 @@ function settingsObjects(type) {
 						"snowwhite",
 						"random",
 					],
-					displayName: "Hair colour:",
+					displayName: "머리색:",
 					randomize: "characterAppearance",
 				},
-				hairlength: { min: 0, max: 400, decimals: 0, displayName: "Hair length:", randomize: "characterAppearance" },
+				hairlength: { min: 0, max: 400, decimals: 0, displayName: "머리 길이:", randomize: "characterAppearance" },
 				awareselect: {
 					strings: ["innocent", "knowledgeable"],
-					displayName: "Awareness:",
+					displayName: "성지식:",
 					randomize: "characterTrait",
 				},
 				background: {
@@ -1060,37 +1060,37 @@ function settingsObjects(type) {
 						"lustful",
 						"plantlover",
 					],
-					displayName: "Background:",
+					displayName: "배경:",
 					randomize: "characterTrait",
 				},
 				startingseason: {
 					strings: ["spring", "summer", "autumn", "winter", "random"],
-					displayName: "Starting season:",
+					displayName: "시작 계절:",
 				},
-				gamemode: { strings: ["normal", "soft", "hard"], displayName: "Game difficulty:" },
-				ironmanmode: { bool: false, displayName: "Ironman mode:" },
+				gamemode: { strings: ["normal", "soft", "hard"], displayName: "게임 난이도:" },
+				ironmanmode: { bool: false, displayName: "아이언맨 모드:" },
 				player: {
 					gender: {
 						strings: ["m", "f", "n"],
-						displayName: "Gender:",
-						textMap: { m: "Male", f: "Female", n: "Neither" },
+						displayName: "성별:",
+						textMap: { m: "남성", f: "여성", n: "둘 다 아님" },
 						randomize: "characterAppearance",
 					},
 					sex: {
 						strings: ["m", "f", "h"],
-						displayName: "Genitals:",
-						textMap: { m: "Penis", f: "Vagina", h: "Hermaphrodite" },
+						displayName: "성기:",
+						textMap: { m: "자지", f: "보지", h: "후타나리" },
 						randomize: "characterAppearance",
 					},
 					gender_body: {
 						strings: ["m", "f", "a"],
-						displayName: "Body type:",
-						textMap: { m: "Masculine", f: "Feminine", a: "Androgynous" },
+						displayName: "신체 유형:",
+						textMap: { m: "남성적", f: "여성적", a: "중성적" },
 					},
 					bodyshape: {
 						strings: ["classic", "slender", "curvy", "soft"],
-						textMap: { classic: "Classic", slender: "Slender", curvy: "Curvy", soft: "Soft" },
-						displayName: "Body shape:",
+						textMap: { classic: "기본형", slender: "가냘픔", curvy: "곡선적", soft: "부드러움" },
+						displayName: "체형:",
 						randomize: "characterAppearance",
 					},
 					skin: {
@@ -1118,14 +1118,14 @@ function settingsObjects(type) {
 								"bgyaru",
 							],
 							randomize: "characterAppearance",
-							displayName: "Natural Skintone:",
+							displayName: "자연 피부색:",
 						},
 					},
-					ballsExist: { bool: true, displayName: "Balls:", textMap: { true: "Existent", false: "Nonexistent" }, randomize: "characterAppearance" },
+					ballsExist: { bool: true, displayName: "고환:", textMap: { true: "있음", false: "없음" }, randomize: "characterAppearance" },
 					freckles: {
 						bool: true,
-						displayName: "Freckles:",
-						textMap: { true: "Existent", false: "Nonexistent" },
+						displayName: "주근깨:",
+						textMap: { true: "있음", false: "없음" },
 						strings: ["random"],
 						randomize: "characterAppearance",
 					},
@@ -1133,24 +1133,24 @@ function settingsObjects(type) {
 						min: 0,
 						max: 4,
 						decimals: 0,
-						displayName: "Breast size:",
-						textMap: { 0: "Flat", 1: "Budding", 2: "Tiny", 3: "Small", 4: "Pert" },
+						displayName: "가슴 크기:",
+						textMap: { 0: "납작한", 1: "아주 작은", 2: "작은", 3: "봉긋한", 4: "볼륨있는" },
 						randomize: "characterAppearance",
 					},
 					penissize: {
 						min: 0,
 						max: 2,
 						decimals: 0,
-						displayName: "Penis size:",
-						textMap: { 0: "Tiny", 1: "Small", 2: "Normal" },
+						displayName: "자지 크기:",
+						textMap: { 0: "매우 작은", 1: "아주 작은", 2: "작은" },
 						randomize: "characterAppearance",
 					},
 					bottomsize: {
 						min: 0,
 						max: 3,
 						decimals: 0,
-						displayName: "Bottom size:",
-						textMap: { 0: "Slender", 1: "Slim", 2: "Modest", 3: "Cushioned" },
+						displayName: "엉덩이 크기:",
+						textMap: { 0: "납작한", 1: "아담한", 2: "둥근", 3: "부드러운" },
 						randomize: "characterAppearance",
 					},
 				},
@@ -1159,291 +1159,291 @@ function settingsObjects(type) {
 		case "general":
 			result = {
 				settings: {
-					analEnabled: { bool: true, displayName: "Anal:" },
-					analingusGivingEnabled: { bool: true, displayName: "Analingus (Giving):" },
-					analingusReceivingEnabled: { bool: true, displayName: "Analingus (Receiving):" },
-					transformAnimalEnabled: { bool: true, displayName: "Animal Transformations:" },
+					analEnabled: { bool: true, displayName: "애널:" },
+					analingusGivingEnabled: { bool: true, displayName: "애널링구스(시행):" },
+					analingusReceivingEnabled: { bool: true, displayName: "애널링구스(받음):" },
+					transformAnimalEnabled: { bool: true, displayName: "동물 변신:" },
 					asphyxiaLevel: {
 						min: 0,
 						max: 4,
 						decimals: 0,
-						displayName: "Asphyxiation:",
+						displayName: "질식:",
 						textMap: {
-							0: "NPCs will not touch your neck",
-							1: "NPCs may grab you by the neck without impeding breathing",
-							2: "NPCs may try to choke you during consensual encounters",
-							3: "NPCs may try to strangle you during non-consensual encounters",
+							0: "NPC가 당신의 목을 건드리지 않습니다",
+							1: "NPC가 호흡을 방해하지 않는 선에서 당신의 목을 잡을 수 있습니다",
+							2: "합의된 조우 중 NPC가 당신의 목을 조르려 할 수 있습니다",
+							3: "비동의 조우 중 NPC가 당신의 목을 조르려 할 수 있습니다",
 						},
 					},
-					penisModifier: { min: -8, max: 8, decimals: 0, displayName: "Average size of NPC penises:", randomize: "encounter" },
-					breastModifier: { min: -12, max: 12, decimals: 0, displayName: "Average size of women's breasts:", randomize: "encounter" },
-					rentCostModifier: { min: 0.1, max: 3, decimals: 1, displayName: "Bailey's rent:", randomize: "gameplay" },
-					baseNpcPregnancyChance: { min: 0, max: 100, decimals: 0, displayName: "Base NPC pregnancy chance:", randomize: "gameplay" },
-					basePlayerPregnancyChance: { min: 0, max: 100, decimals: 0, displayName: "Base player pregnancy chance:", randomize: "gameplay" },
-					beastMaleChanceSplit: { bool: true, displayName: "Beast attraction split by gender appearance:" },
-					beastMaleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "Beasts who are attracted to men:", randomize: "encounter" },
-					beastMaleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "Beasts who are attracted to women:", randomize: "encounter" },
-					beesEnabled: { bool: true, displayName: "Bees:" },
-					bestialityEnabled: { bool: true, displayName: "Bestiality:" },
-					blindStatsEnabled: { bool: true, displayName: "Blind stats mode:" },
+					penisModifier: { min: -8, max: 8, decimals: 0, displayName: "NPC 자지 평균 크기:", randomize: "encounter" },
+					breastModifier: { min: -12, max: 12, decimals: 0, displayName: "여성 가슴 평균 크기:", randomize: "encounter" },
+					rentCostModifier: { min: 0.1, max: 3, decimals: 1, displayName: "베일리의 임대료:", randomize: "gameplay" },
+					baseNpcPregnancyChance: { min: 0, max: 100, decimals: 0, displayName: "NPC 기본 임신 확률:", randomize: "gameplay" },
+					basePlayerPregnancyChance: { min: 0, max: 100, decimals: 0, displayName: "플레이어 기본 임신 확률:", randomize: "gameplay" },
+					beastMaleChanceSplit: { bool: true, displayName: "짐승의 성별 외형별 끌림 분리:" },
+					beastMaleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "남성에게 끌리는 짐승:", randomize: "encounter" },
+					beastMaleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "여성에게 끌리는 짐승:", randomize: "encounter" },
+					beesEnabled: { bool: true, displayName: "벌:" },
+					bestialityEnabled: { bool: true, displayName: "수간:" },
+					blindStatsEnabled: { bool: true, displayName: "블라인드 스탯 모드:" },
 					bodyWritingLevel: {
 						min: 0,
 						max: 3,
 						decimals: 0,
-						displayName: "Bodywriting:",
+						displayName: "몸 낙서:",
 						textMap: {
-							0: "NPCs will not write on you",
-							1: "NPCs may ask to write on you",
-							2: "NPCs may forcibly write on you",
-							3: "NPCs may forcibly write on and tattoo you",
+							0: "NPC가 당신 몸에 낙서하지 않습니다",
+							1: "NPC가 당신 몸에 낙서해도 되는지 물을 수 있습니다",
+							2: "NPC가 억지로 당신 몸에 낙서할 수 있습니다",
+							3: "NPC가 억지로 당신 몸에 낙서하고 문신을 새길 수 있습니다",
 						},
 					},
-					breastFeedingEnabled: { bool: true, displayName: "Breastfeeding:" },
-					cheatsEnabledToggle: { bool: true, displayName: "Cheat mode:" },
+					breastFeedingEnabled: { bool: true, displayName: "모유수유:" },
+					cheatsEnabledToggle: { bool: true, displayName: "치트 모드:" },
 					condomLevel: {
 						min: 0,
 						max: 3,
 						decimals: 0,
-						displayName: "Condoms:",
+						displayName: "콘돔:",
 						textMap: {
-							0: "Everyone is allergic to latex and safe sex",
-							1: "Only you may use condoms, but you may give NPCs condoms",
-							2: "NPCs will only have condoms if pregnancy between them and the player is possible",
-							3: "NPCs may have and use condoms whenever they please",
+							0: "모두가 라텍스와 안전한 성관계에 알레르기가 있습니다",
+							1: "당신만 콘돔을 사용할 수 있지만, NPC에게 콘돔을 줄 수 있습니다",
+							2: "NPC는 플레이어와 임신이 가능한 경우에만 콘돔을 소지합니다",
+							3: "NPC는 원할 때 언제든 콘돔을 소지하고 사용할 수 있습니다",
 						},
 						randomize: "gameplay",
 					},
-					clothingCostModifier: { min: 1, max: 10, decimals: 1, displayName: "Cost of clothing:", randomize: "gameplay" },
-					furnitureCostModifier: { min: 0.6, max: 5, decimals: 1, displayName: "Cost of furniture:", randomize: "gameplay" },
-					lewdClothingCostModifier: { min: 0.1, max: 2, decimals: 1, displayName: "Cost of lewd clothes:", randomize: "gameplay" },
-					schoolClothingCostModifier: { min: 1, max: 2, decimals: 1, displayName: "Cost of school clothes:", randomize: "gameplay" },
-					underwearCostModifier: { min: 1, max: 2, decimals: 1, displayName: "Cost of underwear:", randomize: "gameplay" },
-					tendingYieldModifier: { min: 1, max: 10, decimals: 1, displayName: "Crop yield:", randomize: "gameplay" },
-					toyDildoEnabled: { bool: true, displayName: "Dildos:" },
-					transformDivineEnabled: { bool: true, displayName: "Divine Transformations:" },
-					analDoubleEnabled: { bool: true, displayName: "Double Anal:" },
-					vaginalDoubleEnabled: { bool: true, displayName: "Double Vaginal:" },
-					allureModifier: { min: 0.2, max: 2, decimals: 1, displayName: "Encounter rate:", randomize: "gameplay" },
-					facesitEnabled: { bool: true, displayName: "Facesitting:" },
-					pregnancySpeechEnabled: { bool: true, displayName: "Fertility references:" },
-					footFetishEnabled: { bool: true, displayName: "Foot fetish:" },
-					forcedCrossdressingEnabled: { bool: true, displayName: "Forced crossdressing:" },
-					horsesEnabled: { bool: true, displayName: "Horses:" },
-					humanPregnancyMonths: { min: 1, max: 9, decimals: 0, displayName: "Human pregnancy length:" },
-					hypnosisEnabled: { bool: true, displayName: "Hypnosis:" },
-					npcVirginChanceAdult: { min: 0, max: 100, decimals: 0, displayName: "Likelihood of adults being virgins:", randomize: "encounter" },
-					npcVirginChanceStudent: { min: 0, max: 100, decimals: 0, displayName: "Likelihood of young adults being virgins:", randomize: "encounter" },
-					darkSkinChance: { min: 0, max: 100, decimals: 0, displayName: "Likelihood that NPCs have dark skin:", randomize: "encounter" },
-					lurkersEnabled: { bool: true, displayName: "Lurkers:" },
-					fertilityCycleEnabled: { bool: true, displayName: "Menstrual cycle:" },
-					toyMultiplePenetrationEnabled: { bool: true, displayName: "Multiple penetration with sex toys:" },
-					multipleWardrobes: { strings: [false, "isolated"], displayName: "Multiple wardrobes:" }, //, "all"
-					maleChanceSplit: { bool: true, displayName: "NPC attraction split by gender appearance:" },
+					clothingCostModifier: { min: 1, max: 10, decimals: 1, displayName: "의류 가격:", randomize: "gameplay" },
+					furnitureCostModifier: { min: 0.6, max: 5, decimals: 1, displayName: "가구 가격:", randomize: "gameplay" },
+					lewdClothingCostModifier: { min: 0.1, max: 2, decimals: 1, displayName: "선정적인 의류 가격:", randomize: "gameplay" },
+					schoolClothingCostModifier: { min: 1, max: 2, decimals: 1, displayName: "교복 가격:", randomize: "gameplay" },
+					underwearCostModifier: { min: 1, max: 2, decimals: 1, displayName: "속옷 가격:", randomize: "gameplay" },
+					tendingYieldModifier: { min: 1, max: 10, decimals: 1, displayName: "작물 수확량:", randomize: "gameplay" },
+					toyDildoEnabled: { bool: true, displayName: "딜도:" },
+					transformDivineEnabled: { bool: true, displayName: "신성 변신:" },
+					analDoubleEnabled: { bool: true, displayName: "이중 애널:" },
+					vaginalDoubleEnabled: { bool: true, displayName: "이중 질 삽입:" },
+					allureModifier: { min: 0.2, max: 2, decimals: 1, displayName: "조우율:", randomize: "gameplay" },
+					facesitEnabled: { bool: true, displayName: "페이스시팅:" },
+					pregnancySpeechEnabled: { bool: true, displayName: "가임/임신 관련 언급:" },
+					footFetishEnabled: { bool: true, displayName: "발 페티시:" },
+					forcedCrossdressingEnabled: { bool: true, displayName: "강제 크로스드레싱:" },
+					horsesEnabled: { bool: true, displayName: "말:" },
+					humanPregnancyMonths: { min: 1, max: 9, decimals: 0, displayName: "인간 임신 기간:" },
+					hypnosisEnabled: { bool: true, displayName: "최면:" },
+					npcVirginChanceAdult: { min: 0, max: 100, decimals: 0, displayName: "성인 NPC가 동정/처녀일 확률:", randomize: "encounter" },
+					npcVirginChanceStudent: { min: 0, max: 100, decimals: 0, displayName: "젊은 성인 NPC가 동정/처녀일 확률:", randomize: "encounter" },
+					darkSkinChance: { min: 0, max: 100, decimals: 0, displayName: "NPC가 어두운 피부를 가질 확률:", randomize: "encounter" },
+					lurkersEnabled: { bool: true, displayName: "럴커:" },
+					fertilityCycleEnabled: { bool: true, displayName: "월경 주기:" },
+					toyMultiplePenetrationEnabled: { bool: true, displayName: "성인용품 다중 삽입:" },
+					multipleWardrobes: { strings: [false, "isolated"], displayName: "여러 옷장:" }, //, "all"
+					maleChanceSplit: { bool: true, displayName: "NPC의 성별 외형별 끌림 분리:" },
 					npcPregnancyEnabled: { bool: true, displayName: "Generic NPC pregnancy:" },
 					nnpcPregnancyEnabled: { bool: true, displayName: "NNPC/LI pregnancy:" },
 					analPregnancy: { strings: [false, "exceptional", "always"], displayName: "PC anal pregnancy:" },
 					npcAnalPregnancyEnabled: { bool: true, displayName: "NPC anal pregnancy:" },
-					maleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "NPCs who are attracted to men:", randomize: "encounter" },
-					maleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "NPCs who are attracted to women:", randomize: "encounter" },
+					maleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "남성에게 끌리는 NPC:", randomize: "encounter" },
+					maleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "여성에게 끌리는 NPC:", randomize: "encounter" },
 					nudeGenderPerception: {
 						min: 0,
 						max: 2,
 						decimals: 0,
-						displayName: "Nude gender appearance:",
+						displayName: "나체 성별 인식:",
 						textMap: {
-							"-1": "NPCs will ignore genitals when perceiving gender, and crossdressing warnings will not be displayed",
-							0: "NPCs will ignore genitals when perceiving gender",
-							1: "NPCs will consider your genitals when perceiving your gender",
-							2: "NPCs will judge your gender based on your genitals",
+							"-1": "NPC가 성별을 인식할 때 성기를 무시하며, 크로스드레싱 경고가 표시되지 않습니다",
+							0: "NPC가 성별을 인식할 때 성기를 무시합니다",
+							1: "NPC가 당신의 성별을 인식할 때 성기를 고려합니다",
+							2: "NPC가 성기를 기준으로 당신의 성별을 판단합니다",
 						},
 					},
 					monsterHallucinationsOnly: {
 						bool: true,
-						displayName: "Only replace beasts with monsters while hallucinating:",
+						displayName: "환각 중일 때만 짐승을 몬스터로 대체:",
 						randomize: "encounter",
 					},
-					parasitePregnancyEnabled: { bool: true, displayName: "Parasite pregnancy:" },
-					parasitesEnabled: { bool: true, displayName: "Parasites:" },
+					parasitePregnancyEnabled: { bool: true, displayName: "기생충 임신:" },
+					parasitesEnabled: { bool: true, displayName: "기생충:" },
 					beastMaleChance: {
 						min: 0,
 						max: 100,
 						decimals: 0,
-						displayName: "Percentage of beasts attracted to you that are male:",
+						displayName: "당신에게 끌리는 짐승 중 수컷 비율:",
 						randomize: "encounter",
 					},
 					monsterChance: {
 						min: 0,
 						max: 100,
 						decimals: 0,
-						displayName: "Percentage of beasts that are replaced with monster girls or boys:",
+						displayName: "몬스터 소년/소녀로 대체되는 짐승 비율:",
 						randomize: "encounter",
 					},
-					maleNPCVaginaChance: { min: 0, max: 100, decimals: 0, displayName: "Percentage of men that have vaginas:", randomize: "encounter" },
-					maleVictimChance: { min: 0, max: 100, decimals: 0, displayName: "Percentage of other victims that are male:", randomize: "encounter" },
-					maleChance: { min: 0, max: 100, decimals: 0, displayName: "Percentage of people attracted to you that are male:", randomize: "encounter" },
-					femaleNPCPenisChance: { min: 0, max: 100, decimals: 0, displayName: "Percentage of women that have penises:", randomize: "encounter" },
-					straponChance: { min: 0, max: 100, decimals: 0, displayName: "Percentage of women that have strap-on penises:", randomize: "encounter" },
-					plantsEnabled: { bool: true, displayName: "Plantpeople:" },
-					playerPregnancyEggLayingEnabled: { bool: true, displayName: "Player egg laying:" },
-					playerPregnancyBeastEnabled: { bool: true, displayName: "Player pregnancy with beasts:" },
-					playerPregnancyHumanEnabled: { bool: true, displayName: "Player pregnancy with humans:" },
-					pregnancyType: { strings: ["realistic", "fetish"], displayName: "Pregnancy mode:" },
-					pubicHairEnabled: { bool: true, displayName: "Pubic hair:" },
-					ruinedOrgasmEnabled: { bool: true, displayName: "Ruined orgasms:" },
-					skillCheckStyle: { strings: ["percentage", "words", "skillname"], randomize: "gameplay", displayName: "Skill check display:" },
-					slimesEnabled: { bool: true, displayName: "Slimes:" },
-					slugsEnabled: { bool: true, displayName: "Slugs:" },
-					spidersEnabled: { bool: true, displayName: "Spiders:" },
-					swarmsEnabled: { bool: true, displayName: "Swarms:" },
-					tentaclesEnabled: { bool: true, displayName: "Tentacles:" },
-					voreEnabled: { bool: true, displayName: "Vore:" },
-					waspsEnabled: { bool: true, displayName: "Wasps:" },
-					watersportsEnabled: { bool: true, displayName: "Watersports:" },
-					toyWhipEnabled: { bool: true, displayName: "Whips:" },
-					wolfPregnancyWeeks: { min: 2, max: 12, decimals: 0, displayName: "Wolf pregnancy length:" },
+					maleNPCVaginaChance: { min: 0, max: 100, decimals: 0, displayName: "보지를 가진 남성 비율:", randomize: "encounter" },
+					maleVictimChance: { min: 0, max: 100, decimals: 0, displayName: "다른 피해자 중 남성 비율:", randomize: "encounter" },
+					maleChance: { min: 0, max: 100, decimals: 0, displayName: "당신에게 끌리는 사람 중 남성 비율:", randomize: "encounter" },
+					femaleNPCPenisChance: { min: 0, max: 100, decimals: 0, displayName: "자지를 가진 여성 비율:", randomize: "encounter" },
+					straponChance: { min: 0, max: 100, decimals: 0, displayName: "페니스 밴드를 가진 여성 비율:", randomize: "encounter" },
+					plantsEnabled: { bool: true, displayName: "식물 마물:" },
+					playerPregnancyEggLayingEnabled: { bool: true, displayName: "플레이어 산란:" },
+					playerPregnancyBeastEnabled: { bool: true, displayName: "플레이어의 짐승 임신:" },
+					playerPregnancyHumanEnabled: { bool: true, displayName: "플레이어의 인간 임신:" },
+					pregnancyType: { strings: ["realistic", "fetish"], displayName: "임신 모드:" },
+					pubicHairEnabled: { bool: true, displayName: "음모:" },
+					ruinedOrgasmEnabled: { bool: true, displayName: "망친 절정:" },
+					skillCheckStyle: { strings: ["percentage", "words", "skillname"], randomize: "gameplay", displayName: "스킬 체크 표시:" },
+					slimesEnabled: { bool: true, displayName: "슬라임:" },
+					slugsEnabled: { bool: true, displayName: "민달팽이:" },
+					spidersEnabled: { bool: true, displayName: "거미:" },
+					swarmsEnabled: { bool: true, displayName: "무리:" },
+					tentaclesEnabled: { bool: true, displayName: "촉수:" },
+					voreEnabled: { bool: true, displayName: "보어:" },
+					waspsEnabled: { bool: true, displayName: "말벌:" },
+					watersportsEnabled: { bool: true, displayName: "워터스포츠:" },
+					toyWhipEnabled: { bool: true, displayName: "채찍:" },
+					wolfPregnancyWeeks: { min: 2, max: 12, decimals: 0, displayName: "늑대 임신 기간:" },
 				},
 				blackwolfmonster: {
 					min: 0,
 					max: 2,
 					decimals: 0,
-					displayName: "Black Wolf beast type:",
-					textMap: { 0: "Always a beast", 1: "Monster girl or boy when requirements met", 2: "Always a monster girl or boy" },
+					displayName: "검은 늑대 짐승 유형:",
+					textMap: { 0: "항상 짐승", 1: "조건 충족 시 몬스터 소년/소녀", 2: "항상 몬스터 소년/소녀" },
 					randomize: "encounter",
 				},
 				greathawkmonster: {
 					min: 0,
 					max: 2,
 					decimals: 0,
-					displayName: "Great Hawk beast type:",
-					textMap: { 0: "Always a beast", 1: "Monster girl or boy when requirements met", 2: "Always a monster girl or boy" },
+					displayName: "거대 매 짐승 유형:",
+					textMap: { 0: "항상 짐승", 1: "조건 충족 시 몬스터 소년/소녀", 2: "항상 몬스터 소년/소녀" },
 					randomize: "encounter",
 				},
 				nightmonstermonster: {
 					min: 0,
 					max: 2,
 					decimals: 0,
-					displayName: "Night Monster beast type:",
-					textMap: { 0: "Always a beast", 1: "Monster girl or boy when requirements met", 2: "Always a monster girl or boy" },
+					displayName: "밤의 괴물 짐승 유형:",
+					textMap: { 0: "항상 짐승", 1: "조건 충족 시 몬스터 소년/소녀", 2: "항상 몬스터 소년/소녀" },
 					randomize: "encounter",
 				},
 				breastsizemin: {
 					min: 0,
 					max: 4,
 					decimals: 0,
-					displayName: "Minimum breast size:",
-					textMap: { 0: "Flat", 1: "Budding", 2: "Tiny", 3: "Small", 4: "Pert" },
+					displayName: "가슴 최소 크기:",
+					textMap: { 0: "납작함", 1: "봉긋함", 2: "아주 작음", 3: "작음", 4: "탱탱함" },
 				},
 				breastsizemax: {
 					min: 0,
 					max: 12,
 					decimals: 0,
-					displayName: "Maximum breast size:",
+					displayName: "가슴 최대 크기:",
 					textMap: {
-						0: "Flat",
-						1: "Budding",
-						2: "Tiny",
-						3: "Small",
-						4: "Pert",
-						5: "Modest",
-						6: "Full",
-						7: "Large",
-						8: "Ample",
-						9: "Massive",
-						10: "Huge",
-						11: "Gigantic",
-						12: "Enormous",
+						0: "납작함",
+						1: "봉긋함",
+						2: "아주 작음",
+						3: "작음",
+						4: "탱탱함",
+						5: "적당함",
+						6: "풍만함",
+						7: "큼",
+						8: "넉넉함",
+						9: "육중함",
+						10: "거대함",
+						11: "거대함",
+						12: "어마어마함",
 					},
 				},
 				bottomsizemin: {
 					min: 0,
 					max: 2,
 					decimals: 0,
-					displayName: "Minimum bottom size:",
-					textMap: { 0: "Slender", 1: "Slim", 2: "Modest", 3: "Cushioned" },
+					displayName: "엉덩이 최소 크기:",
+					textMap: { 0: "납작한", 1: "아담한", 2: "둥근", 3: "부드러운" },
 				},
 				bottomsizemax: {
 					min: 0,
 					max: 8,
 					decimals: 0,
-					displayName: "Maximum bottom size:",
-					textMap: { 0: "Slender", 1: "Slim", 2: "Modest", 3: "Cushioned", 4: "Soft", 5: "Round", 6: "Plump", 7: "Large", 8: "Huge" },
+					displayName: "엉덩이 최대 크기:",
+					textMap: { 0: "납작한", 1: "아담한", 2: "둥근", 3: "부드러운" , 4: "통통한", 5: "꽉 찬", 6: "풍만한", 7: "큰", 8: "거대한" },
 				},
-				penissizemin: { min: -2, max: 0, decimals: 0, displayName: "Minimum penis size:", textMap: { 0: "Micro", 1: "Mini", 2: "Tiny" } },
+				penissizemin: { min: -2, max: 0, decimals: 0, displayName: "자지 최소 크기:", textMap: { 0: "매우 작은", 1: "약간 작은", 2: "작은" } },
 				penissizemax: {
 					min: 0,
 					max: 6,
 					decimals: 0,
-					displayName: "Maximum penis size:",
-					textMap: { 0: "Micro", 1: "Mini", 2: "Tiny", 3: "Small", 4: "Normal", 5: "Large", 6: "Enormous" },
+					displayName: "자지 최대 크기:",
+					textMap: { 0: "매우 작은", 1: "약간 작은", 2: "작은", 3: "보통", 4: "큰", 5: "매우 큰", 6: "거대한" },
 				},
-				confirmSave: { bool: true, displayName: "Require confirmation on save:" },
-				confirmLoad: { bool: true, displayName: "Require confirmation on load:" },
-				confirmDelete: { bool: true, displayName: "Require confirmation on delete:" },
-				reducedLineHeight: { bool: true, displayName: "Reduced line height:" },
-				outfitEditorPerPage: { min: 5, max: 20, decimals: 0, displayName: "Items per page:" }, //, "all"
+				confirmSave: { bool: true, displayName: "세이브 확인 요구:" },
+				confirmLoad: { bool: true, displayName: "로드 확인 요구:" },
+				confirmDelete: { bool: true, displayName: "삭제 확인 요구:" },
+				reducedLineHeight: { bool: true, displayName: "줄 높이 축소:" },
+				outfitEditorPerPage: { min: 5, max: 20, decimals: 0, displayName: "페이지당 항목 수:" }, //, "all"
 				options: {
-					neverNudeMenus: { bool: true, displayName: "Hide player nudity in menus:" },
-					showCaptionText: { bool: true, displayName: "Show caption text in sidebar:" },
-					clothingCaption: { bool: true, displayName: "Show clothing description in sidebar:" },
-					clothingReplacementWarning: { bool: true, displayName: "Enable clothing replacement warning:" },
-					sidebarStats: { strings: ["disabled", "limited", "all"], displayName: "Closed sidebar stats:" },
-					sidebarTime: { strings: ["disabled", "top", "bottom"], displayName: "Closed sidebar time:" },
-					combatControls: { strings: ["radio", "columnRadio", "lists", "limitedLists"], displayName: "Combat controls:" },
-					mapMovement: { bool: true, displayName: "Enable movement by clicking on map:" },
-					mapTop: { bool: true, displayName: "Move the map above the map links:" },
-					mapMarkers: { bool: true, displayName: "Show clickable areas on maps:" },
-					images: { min: 0, max: 1, decimals: 0, displayName: "Images:" },
-					combatImages: { min: 0, max: 1, decimals: 0, displayName: "Combat images:" },
-					bodywritingImages: { bool: true, displayName: "Bodywriting images:" },
-					silhouetteEnabled: { bool: true, displayName: "NPC silhouettes:" },
-					sidebarAnimations: { bool: true, displayName: "Sidebar images:" },
-					blinkingEnabled: { bool: true, displayName: "Animated blinking:" },
-					combatAnimations: { bool: true, displayName: "Combat animations:" },
-					halfClosedEnabled: { bool: true, displayName: "Half-closed eyes:" },
-					characterLightEnabled: { bool: true, displayName: "Character lighting:" },
-					lightSpotlight: { min: 0, max: 1, decimals: 2, displayName: "Spotlight:" },
-					lightGradient: { min: 0, max: 1, decimals: 2, displayName: "Gradient:" },
-					lightGlow: { min: 0, max: 1, decimals: 2, displayName: "Glow:" },
-					lightFlat: { min: 0, max: 1, decimals: 2, displayName: "Flat light:" },
-					lightTFColor: { min: 0, max: 1, decimals: 2, displayName: "Angel/Devil TF colour components:" },
-					combatLightEnabled: { bool: true, displayName: "Character lighting:" },
-					combatLightOffsetY: { min: 0, max: 128, decimals: 0, displayName: "Y offset:" },
-					combatLightSpotlight: { min: 0, max: 1, decimals: 2, displayName: "Spotlight:" },
-					combatLightSpotlightX: { min: 0, max: 128, decimals: 0, displayName: "Spotlight width:" },
-					combatLightSpotlightY: { min: 0, max: 48, decimals: 0, displayName: "Spotlight height:" },
-					combatLightGradient: { min: 0, max: 1, decimals: 2, displayName: "Gradient:" },
-					combatLightGlow: { min: 0, max: 1, decimals: 2, displayName: "Glow:" },
-					combatLightFlat: { min: 0, max: 1, decimals: 2, displayName: "Flat light:" },
-					combatLightTFColor: { min: 0, max: 1, decimals: 2, displayName: "Angel/Devil TF colour components:" },
-					maxStates: { min: 1, max: 20, decimals: 0, displayName: "History depth:" },
-					historyControls: { bool: true, displayName: "Show history controls:" },
-					useNarrowMarket: { bool: true, displayName: "Use 'narrow screen' version of market inventory:" },
-					skipStatisticsConfirmation: { bool: true, displayName: "Skip confirmation when viewing extra stats:" },
-					passageCount: { strings: ["disabled", "changes", "total"], displayName: "Display passage count:" },
-					playtime: { bool: true, displayName: "Display play time:" },
-					numberify_enabled: { min: 0, max: 1, decimals: 0, displayName: "Enable numbered link navigation:" },
-					timestyle: { strings: ["military", "ampm"], displayName: "Time style:" },
-					tipdisable: { boolLetter: true, bool: true, displayName: "Sidebar Tips:" },
-					pepperSprayDisplay: { strings: ["none", "sprays", "compact"], displayName: "Pepper spray display:" },
-					condomsDisplay: { strings: ["none", "standard"], displayName: "Condom display:" },
-					closeButtonMobile: { bool: true, displayName: "Items per page:" },
-					showDebugRenderer: { bool: true, displayName: "Enable renderer debugger:" },
-					showCombatTools: { bool: true, displayName: "Enable combat tools:" },
-					numpad: { bool: true, displayName: "Enable numpad:" },
-					traitOverlayFormat: { strings: ["table", "reducedTable", "list"], displayName: "Display traits:" },
+					neverNudeMenus: { bool: true, displayName: "메뉴에서 플레이어 노출 숨기기:" },
+					showCaptionText: { bool: true, displayName: "사이드바 캡션 텍스트 표시:" },
+					clothingCaption: { bool: true, displayName: "사이드바 의류 설명 표시:" },
+					clothingReplacementWarning: { bool: true, displayName: "의류 교체 경고 활성화:" },
+					sidebarStats: { strings: ["disabled", "limited", "all"], displayName: "닫힌 사이드바 스탯:" },
+					sidebarTime: { strings: ["disabled", "top", "bottom"], displayName: "닫힌 사이드바 시간:" },
+					combatControls: { strings: ["radio", "columnRadio", "lists", "limitedLists"], displayName: "전투 조작:" },
+					mapMovement: { bool: true, displayName: "지도 클릭 이동 활성화:" },
+					mapTop: { bool: true, displayName: "지도를 지도 링크 위로 이동:" },
+					mapMarkers: { bool: true, displayName: "지도에서 클릭 가능 영역 표시:" },
+					images: { min: 0, max: 1, decimals: 0, displayName: "이미지:" },
+					combatImages: { min: 0, max: 1, decimals: 0, displayName: "전투 이미지:" },
+					bodywritingImages: { bool: true, displayName: "몸 낙서 이미지:" },
+					silhouetteEnabled: { bool: true, displayName: "NPC 실루엣:" },
+					sidebarAnimations: { bool: true, displayName: "사이드바 이미지:" },
+					blinkingEnabled: { bool: true, displayName: "눈 깜빡임 애니메이션:" },
+					combatAnimations: { bool: true, displayName: "전투 애니메이션:" },
+					halfClosedEnabled: { bool: true, displayName: "반쯤 감은 눈:" },
+					characterLightEnabled: { bool: true, displayName: "캐릭터 조명:" },
+					lightSpotlight: { min: 0, max: 1, decimals: 2, displayName: "스포트라이트:" },
+					lightGradient: { min: 0, max: 1, decimals: 2, displayName: "그라데이션:" },
+					lightGlow: { min: 0, max: 1, decimals: 2, displayName: "광채:" },
+					lightFlat: { min: 0, max: 1, decimals: 2, displayName: "평면광:" },
+					lightTFColor: { min: 0, max: 1, decimals: 2, displayName: "천사/악마 변신 색상 요소:" },
+					combatLightEnabled: { bool: true, displayName: "캐릭터 조명:" },
+					combatLightOffsetY: { min: 0, max: 128, decimals: 0, displayName: "Y 오프셋:" },
+					combatLightSpotlight: { min: 0, max: 1, decimals: 2, displayName: "스포트라이트:" },
+					combatLightSpotlightX: { min: 0, max: 128, decimals: 0, displayName: "스포트라이트 너비:" },
+					combatLightSpotlightY: { min: 0, max: 48, decimals: 0, displayName: "스포트라이트 높이:" },
+					combatLightGradient: { min: 0, max: 1, decimals: 2, displayName: "그라데이션:" },
+					combatLightGlow: { min: 0, max: 1, decimals: 2, displayName: "광채:" },
+					combatLightFlat: { min: 0, max: 1, decimals: 2, displayName: "평면광:" },
+					combatLightTFColor: { min: 0, max: 1, decimals: 2, displayName: "천사/악마 변신 색상 요소:" },
+					maxStates: { min: 1, max: 20, decimals: 0, displayName: "히스토리 깊이:" },
+					historyControls: { bool: true, displayName: "히스토리 조작 표시:" },
+					useNarrowMarket: { bool: true, displayName: "시장 인벤토리에 좁은 화면 버전 사용:" },
+					skipStatisticsConfirmation: { bool: true, displayName: "추가 스탯 보기 확인 건너뛰기:" },
+					passageCount: { strings: ["disabled", "changes", "total"], displayName: "패시지 수 표시:" },
+					playtime: { bool: true, displayName: "플레이 시간 표시:" },
+					numberify_enabled: { min: 0, max: 1, decimals: 0, displayName: "번호 링크 이동 활성화:" },
+					timestyle: { strings: ["military", "ampm"], displayName: "시간 표시 방식:" },
+					tipdisable: { boolLetter: true, bool: true, displayName: "사이드바 팁:" },
+					pepperSprayDisplay: { strings: ["none", "sprays", "compact"], displayName: "호신 스프레이 표시:" },
+					condomsDisplay: { strings: ["none", "standard"], displayName: "콘돔 표시:" },
+					closeButtonMobile: { bool: true, displayName: "페이지당 항목 수:" },
+					showDebugRenderer: { bool: true, displayName: "렌더러 디버거 활성화:" },
+					showCombatTools: { bool: true, displayName: "전투 도구 활성화:" },
+					numpad: { bool: true, displayName: "숫자패드 활성화:" },
+					traitOverlayFormat: { strings: ["table", "reducedTable", "list"], displayName: "특성 표시:" },
 					font: {
 						strings: ["", "Arial", "Verdana", "TimesNewRoman", "Georgia", "Garamond", "CourierNew", "LucidaConsole", "Monaco", "ComicSans"],
-						displayName: "Font:",
+						displayName: "글꼴:",
 					},
-					passageLineHeight: { strings: [0, 1, 1.25, 1.5, 1.75, 2], displayName: "Passage line height:" },
-					overlayLineHeight: { strings: [0, 1, 1.25, 1.5, 1.75, 2], displayName: "Overlay line height:" },
-					sidebarLineHeight: { strings: [0, 1, 1.25, 1.5, 1.75, 2], displayName: "Sidebar line height:" },
-					passageFontSize: { strings: [0, 10, 12, 14, 16, 18, 20], displayName: "Passage font size:" },
-					overlayFontSize: { strings: [0, 10, 12, 14, 16, 18, 20], displayName: "Overlay font size:" },
-					sidebarFontSize: { strings: [0, 12, 14, 16, 18, 20], displayName: "Sidebar font size:" },
-					genderBody: { strings: ["default", "m", "a", "f"], displayName: "Body type displayed:" },
-					notesAutoSave: { bool: true, displayName: "Notes auto saving:" },
-					dateFormat: { strings: ["en-GB", "en-US", "zh-CN"], displayName: "Date format:" },
+					passageLineHeight: { strings: [0, 1, 1.25, 1.5, 1.75, 2], displayName: "패시지 줄 높이:" },
+					overlayLineHeight: { strings: [0, 1, 1.25, 1.5, 1.75, 2], displayName: "오버레이 줄 높이:" },
+					sidebarLineHeight: { strings: [0, 1, 1.25, 1.5, 1.75, 2], displayName: "사이드바 줄 높이:" },
+					passageFontSize: { strings: [0, 10, 12, 14, 16, 18, 20], displayName: "패시지 글자 크기:" },
+					overlayFontSize: { strings: [0, 10, 12, 14, 16, 18, 20], displayName: "오버레이 글자 크기:" },
+					sidebarFontSize: { strings: [0, 12, 14, 16, 18, 20], displayName: "사이드바 글자 크기:" },
+					genderBody: { strings: ["default", "m", "a", "f"], displayName: "표시할 신체 유형:" },
+					notesAutoSave: { bool: true, displayName: "메모 자동 저장:" },
+					dateFormat: { strings: ["en-GB", "en-US", "zh-CN"], displayName: "날짜 형식:" },
 				},
 				shopDefaults: {
 					alwaysBackToShopButton: { bool: true },
@@ -1470,34 +1470,34 @@ function settingsObjects(type) {
 			break;
 		case "npc":
 			result = {
-				pronoun: { strings: ["m", "f"], displayName: "Pronoun: ", textMap: { none: "N/A", m: "Male", f: "Female" } },
-				gender: { strings: ["m", "f"], displayName: "Genitalia: ", textMap: { none: "N/A", m: "Penis", f: "Vagina" } },
+				pronoun: { strings: ["m", "f"], displayName: "대명사: ", textMap: { none: "해당 없음", m: "남성", f: "여성" } },
+				gender: { strings: ["m", "f"], displayName: "성기: ", textMap: { none: "해당 없음", m: "자지", f: "보지" } },
 				skincolour: {
 					strings: ["white", "black", "ghost"],
-					displayName: "Skin colour: ",
-					textMap: { none: "N/A", white: "Pale", black: "Dark", ghost: "Ghostly Pale" },
+					displayName: "피부색: ",
+					textMap: { none: "해당 없음", white: "창백함", black: "어두움", ghost: "유령처럼 창백함" },
 				},
-				penissize: { min: 0, max: 4, decimals: 0, displayName: "Penis size: ", textMap: { 0: "N/A", 1: "Tiny", 2: "Average", 3: "Thick", 4: "Huge" } },
+				penissize: { min: 0, max: 4, decimals: 0, displayName: "자지 크기: ", textMap: { 0: "해당 없음", 1: "작은", 2: "보통", 3: "큰", 4: "거대한" } },
 				breastsize: {
 					min: 0,
 					max: 12,
 					decimals: 0,
-					displayName: "Breast size: ",
+					displayName: "가슴 크기: ",
 					textMap: {
-						none: "N/A",
-						0: "Flat",
-						1: "Budding",
-						2: "Tiny",
-						3: "Small",
-						4: "Pert",
-						5: "Modest",
-						6: "Full",
-						7: "Large",
-						8: "Ample",
-						9: "Massive",
-						10: "Huge",
-						11: "Gigantic",
-						12: "Enormous",
+						none: "해당 없음",
+						0: "납작한",
+						1: "아주 작은",
+						2: "작은",
+						3: "봉긋한",
+						4: "볼륨있는",
+						5: "글래머한",
+						6: "꽉 찬",
+						7: "풍만한",
+						8: "큰",
+						9: "커다란",
+						10: "거대한",
+						11: "엄청난",
+						12: "어마어마한"
 					},
 				},
 			};
@@ -1571,7 +1571,7 @@ window.loadExternalExportFile = function () {
 		.catch(function () {
 			// console.log(err);
 			const button = document.getElementById("LoadExternalExportFile");
-			button.value = "Error Loading";
+			button.value = "불러오기 오류";
 		});
 };
 

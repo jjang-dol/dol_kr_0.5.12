@@ -4260,13 +4260,13 @@ function lookupColour(options, dict, key, debugName, customFilterName, prefilter
 	if (key === "custom") {
 		filter = clone(options.filters[customFilterName]);
 		if (!filter) {
-			console.error(`custom ${debugName} colour not configured`);
+			console.error(`custom ${debugName} 색상이 설정되지 않았습니다`);
 			return {};
 		}
 	} else {
 		let record = dict[key];
 		if (!record) {
-			console.error(`unknown ${debugName} colour: ${key}`);
+			console.error(`알 수 없는 ${debugName} 색상: ${key}`);
 			return {};
 		}
 		filter = clone(record.canvasfilter);
@@ -4313,7 +4313,7 @@ function isPartEnabled(type) {
 	/* Check for undefined in case the object given was a typo. 06/10/22 Sneaky incident :trolldispair: */
 	if (typeof type !== "string") {
 		if (V.debug || V.options.debugdisable === "f") {
-			Errors.report("isPartEnabled was given an unexpected value.", type);
+			Errors.report("isPartEnabled에 예상하지 못한 값이 전달되었습니다.", type);
 		}
 		// return false;
 	};
@@ -4667,7 +4667,7 @@ function genlayer_clothing_accessory(slot, overrideOptions) {
 		masksrcfn(options) {
 				if (options.worn.over_upper.setup.name === "kaiju costume")
 					return `img/clothes/over-upper/kaiju/mask.png`;
-			},
+		},
 	}, overrideOptions));
 }
 

@@ -8,7 +8,7 @@ const setChildFirstWord = (childId, word, playerAbsent = false) => {
 	if (child.development.firstWord) return false;
 
 	if (!word) {
-		const wordList = ["mama", "mummy", "dada", "daddy", "papa", "no", "nana", "yes", "uh oh", "bye", "bye-bye", "hello"];
+		const wordList = ["엄마", "엄마", "아빠", "아빠", "아빠", "싫어", "나나", "응", "어어", "안녕", "빠이빠이", "안녕"];
 		word = wordList[random(0, wordList.length - 1)];
 	}
 	child.development.firstWord = word;

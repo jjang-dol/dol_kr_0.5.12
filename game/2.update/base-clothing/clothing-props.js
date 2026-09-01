@@ -29,7 +29,7 @@ function propLevels(prop) {
 			// @ts-ignore
 			return T.ropeLength || [7, 6, 4, 2, 1].findIndex(x => V.bird.rope >= x) + 1 || 1;
 		default:
-			Errors.report(`[prop]: No levels provided in propLevels()`);
+			Errors.report(`[prop]: propLevels()에 제공된 단계가 없습니다`);
 	}
 }
 window.propLevels = propLevels;

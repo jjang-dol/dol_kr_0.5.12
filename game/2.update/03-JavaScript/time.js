@@ -55,46 +55,46 @@ const Time = (() => {
 			start: 0,
 			end: 0.03,
 			endAlt: 1,
-			description: "New Moon",
+			description: "신월",
 		},
 		waxingCrescent: {
 			start: 0.03,
 			end: 0.22,
-			description: "Waxing Crescent",
+			description: "초승달",
 		},
 		firstQuarter: {
 			start: 0.22,
 			end: 0.28,
-			description: "First Quarter",
+			description: "상현달",
 		},
 		waxingGibbous: {
 			start: 0.28,
 			end: 0.47,
-			description: "Waxing Gibbous",
+			description: "상현망",
 		},
 		full: {
 			start: 0.47,
 			end: 0.53,
-			description: "Full Moon",
+			description: "보름달",
 		},
 		waningGibbous: {
 			start: 0.53,
 			end: 0.72,
-			description: "Waning Gibbous",
+			description: "하현망",
 		},
 		lastQuarter: {
 			start: 0.72,
 			end: 0.78,
-			description: "Last Quarter",
+			description: "하현달",
 		},
 		waningCrescent: {
 			start: 0.78,
 			end: 0.97,
-			description: "Waning Crescent",
+			description: "그믐달",
 		},
 	};
 	const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-	const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
 
 	const holidayMonths = [4, 7, 8, 12];
 
@@ -1721,7 +1721,7 @@ function dailyNPCEffects() {
 
 function dailyPlayerEffects() {
 	if (V.fallenangel === undefined || V.fallenangel < 4) {
-		V.willpower *= 0.99;
+	V.willpower *= 0.99;
 	}
 
 	if (V.awareness <= -200 && V.innocencestate !== 1) {
@@ -1848,7 +1848,7 @@ function dailyPlayerEffects() {
 		statChange.insecurity("pregnancy", -5);
 		// after third pregnancy, acceptance no longer decays
 		if (playerNormalPregnancyTotal() < 3) {
-			statChange.acceptance("pregnancy", -5);
+		statChange.acceptance("pregnancy", -5);
 		}
 	}
 
@@ -2665,31 +2665,12 @@ window.getTimeString = getTimeString;
  * getShortFormattedDate() returns an abbreviated date (e.g. 4th Sep)
  */
 window.getFormattedDate = function (date, includeWeekday = false) {
-	switch (V.options.dateFormat) {
-		case "en-US": {
-			const formattedDate = date.monthName + " " + ordinalSuffixOf(date.day);
-			return includeWeekday ? date.weekDayName + ", " + formattedDate : formattedDate;
-		}
-		case "zh-CN": // Fallthrough to en-GB
-		case "en-GB": {
-			const formattedDate = "the " + ordinalSuffixOf(date.day) + " of " + date.monthName;
-			return includeWeekday ? date.weekDayName + " " + formattedDate : formattedDate;
-		}
-		default:
-			throw new Error(`Invalid date format: ${V.options.dateFormat}`);
-	}
+    const formattedDate = date.monthName + " " + date.day + "일";
+    return includeWeekday ? formattedDate + " " + date.weekDayName + "요일" : formattedDate;
 };
 
 window.getShortFormattedDate = function (date) {
-	switch (V.options.dateFormat) {
-		case "en-US":
-			return date.monthName.slice(0, 3) + " " + ordinalSuffixOf(date.day);
-		case "zh-CN":
-		case "en-GB":
-			return ordinalSuffixOf(date.day) + " " + date.monthName.slice(0, 3);
-		default:
-			throw new Error(`Invalid date format: ${V.options.dateFormat}`);
-	}
+    return date.monthName + " " + date.day + "일";
 };
 
 /* Determines and replenishes stock at supermarket */

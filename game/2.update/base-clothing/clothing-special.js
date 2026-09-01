@@ -42,7 +42,7 @@ function initSpecialClothes() {
 		{ name: "reindeer slippers", 			sets: ["christmas"] },
 		{ name: "candy cane", 					sets: ["christmas"] },
 
-		{ name: "rose", 						sets: ["valentines", "flowers"], requirements: () => V.gwylanSeen?.includes("rose"), hint: "get kissed by a rose" },
+		{ name: "rose", 						sets: ["valentines", "flowers"], requirements: () => V.gwylanSeen?.includes("rose"), hint: "장미에게 키스를 받기" },
 		{ name: "rose eyepatch", 				sets: ["valentines", "rose_wedding"] },
 		{ name: "rose wedding veil", 			sets: ["valentines", "rose_wedding"] },
 		{ name: "long rose wedding veil", 		sets: ["valentines", "rose_wedding"] },
@@ -139,8 +139,8 @@ function initSpecialClothes() {
 
 		{ name: "catsuit", 						sets: ["catsuit"] },
 
-		{ name: "daisy", 						sets: ["flowers"], requirements: () => V.plants_known?.includes("daisy"), hint: "find daisy seeds" },
-		{ name: "flower crown", 				sets: ["flowers"], requirements: () => V.robinSeen?.includes("flowerCrown") || V.specialClothesEvents?.includes("flowerCrownGH"), hint: "make one with someone special to you" },
+		{ name: "daisy", 						sets: ["flowers"], requirements: () => V.plants_known?.includes("daisy"), hint: "데이지 씨앗 찾기" },
+		{ name: "flower crown", 				sets: ["flowers"], requirements: () => V.robinSeen?.includes("flowerCrown") || V.specialClothesEvents?.includes("flowerCrownGH"), hint: "소중한 사람과 함께 만들기" },
 
 		{ name: "janet dress",					sets: ["janet"] },
 
@@ -185,17 +185,17 @@ function initSpecialClothes() {
 		// Holiday sets
 		// Halloween
 		halloween: {
-			text: "collection of Halloween costumes",
+			text: "할로윈 의상 컬렉션",
 			requirements: () => Time.hasDatePassed(10, 21),
-			hint: "in stock from <<= getFormattedDate(new DateTime(Time.year, 10, 21))>>",
+			hint: "<<= getFormattedDate(new DateTime(Time.year, 10, 21))>>에 입고",
 			shop: ["forest"],
 			feat: false,
 			icon: "food/halloween.png",
 		},
 		witch: {
-			text: "witch costume",
+			text: "마녀 의상",
 			requirements: () => V.tentacletrait >= 1,
-			hint: "get accustomed to tentacles",
+			hint: "촉수에 익숙해지기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -207,9 +207,9 @@ function initSpecialClothes() {
 			iconAccColor: "green",
 		},
 		vampire: {
-			text: "vampire costume",
+			text: "뱀파이어 의상",
 			requirements: () => V.syndromekylar >= 1,
-			hint: "succumb to a jealous lover's longing",
+			hint: "질투심 많은 연인의 갈망에 굴복하기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -220,9 +220,9 @@ function initSpecialClothes() {
 			iconColor: "red",
 		},
 		mummy: {
-			text: "mummy costume",
+			text: "미라 의상",
 			requirements: () => V.specialClothesEvents?.includes("cocoon"),
-			hint: "be wrapped up in spider's silk",
+			hint: "거미줄에 휘감기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -230,9 +230,9 @@ function initSpecialClothes() {
 			icon: "clothes/mummy_facewrap.png",
 		},
 		scarecrow: {
-			text: "scarecrow costume",
+			text: "허수아비 의상",
 			requirements: () => V.specialClothesEvents?.includes("farm_defended"),
-			hint: "flawlessly defend a multitude of fields from assault",
+			hint: "수많은 밭을 공격으로부터 완벽하게 지켜내기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -240,9 +240,9 @@ function initSpecialClothes() {
 			icon: "clothes/scarecrow_hat.png",
 		},
 		skeleton: {
-			text: "skeleton costume",
+			text: "해골 의상",
 			requirements: () => V.crypt_intro === 1,
-			hint: "discover a crypt",
+			hint: "지하 묘지 발견하기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -250,9 +250,9 @@ function initSpecialClothes() {
 			icon: "clothes/skeleton_mask.png",
 		},
 		future_suit: {
-			text: "futuristic bodysuit costume",
+			text: "미래형 바디수트 의상",
 			requirements: () => V.tenyclusPlayCount >= 7,
-			hint: "become too invested in a strange arcade game",
+			hint: "이상한 아케이드 게임에 지나치게 빠져들기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -264,9 +264,9 @@ function initSpecialClothes() {
 			iconAccColor: "red",
 		},
 		pumpkin: {
-			text: "pumpkin costume",
+			text: "호박 의상",
 			requirements: () => Object.values(V.foodstuff).filter(food => food.knows_recipe).length >= 15,
-			hint: "learn 15 recipes",
+			hint: "요리법 15개 익히기",
 			shop: ["forest"],
 			subsetOf: ["halloween"],
 			feat: true,
@@ -275,9 +275,9 @@ function initSpecialClothes() {
 		},
 		// Christmas
 		christmas: {
-			text: "Christmas clothes",
+			text: "크리스마스 의상",
 			requirements: () => Time.hasDatePassed(12, 18) || V.specialClothesEvents?.includes("skulduggery_gift"),
-			hint: "in stock from <<= getFormattedDate(new DateTime(Time.year, 12, 18))>>, or leave a generous gift for a family in need",
+			hint: "<<= getFormattedDate(new DateTime(Time.year, 12, 18))>>에 입고 되거나, 도움이 필요한 가족에게 후한 선물을 남기기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 5,
@@ -285,17 +285,17 @@ function initSpecialClothes() {
 		},
 		// Valentines
 		valentines: {
-			text: "collection of Valentine's Day clothes",
+			text: "발렌타인데이 의상 컬렉션",
 			requirements: () => Time.hasDatePassed(2, 6),
-			hint: "in stock from <<= getFormattedDate(new DateTime(Time.year, 2, 7))>>",
+			hint: "<<= getFormattedDate(new DateTime(Time.year, 2, 7))>>에 입고",
 			shop: ["forest"],
 			feat: false,
 			icon: "gift_vday.png",
 		},
 		rose_wedding: {
-			text: "rose wedding attire",
+			text: "장미 웨딩 의상",
 			requirements: () => V.kylarSeen?.includes("basement"),
-			hint: "escape a forced wedding",
+			hint: "강제 결혼식에서 탈출하기",
 			shop: ["forest"],
 			subsetOf: ["valentines"],
 			feat: true,
@@ -307,9 +307,9 @@ function initSpecialClothes() {
 			iconAccColor: "red",
 		},
 		wrap: {
-			text: "gift wrappings",
+			text: "선물 포장",
 			requirements: () => V.robinSeen?.includes("unwrap") || V.gwylanSeen?.includes("steal_wrap"),
-			hint: "face a unique punishment for stealing clothes",
+			hint: "옷을 훔친 대가로 특별한 벌 받기",
 			shop: ["forest"],
 			subsetOf: ["valentines"],
 			feat: true,
@@ -322,15 +322,15 @@ function initSpecialClothes() {
 
 		// Bad end or Stockholm syndrome sets
 		bad_end: {
-			text: "collection of clothes from unsavoury places",
+			text: "불미스러운 장소에서 온 의상 컬렉션",
 			shop: ["forest"],
 			feat: false,
 			icon: "cage.png",
 		},
 		underground_brothel: {
-			text: "slut shirt",
+			text: "걸레 셔츠",
 			requirements: () => V.undergroundbrothelescaped,
-			hint: "survive slavery in an underground brothel",
+			hint: "지하 창관의 노예 생활에서 살아남기",
 			shop: ["forest", "adult"],
 			subsetOf: ["bad_end", "fox"],
 			feat: true,
@@ -342,9 +342,9 @@ function initSpecialClothes() {
 			iconAccColor: "black",
 		},
 		underground_farm: {
-			text: "cow print set",
+			text: "젖소 무늬 세트",
 			requirements: () => V.livestock?.intro !== undefined,
-			hint: "become livestock",
+			hint: "가축이 되기",
 			shop: ["forest", "adult"],
 			subsetOf: ["bad_end", "transformation"],
 			feat: true,
@@ -352,9 +352,9 @@ function initSpecialClothes() {
 			icon: "tf-cow.png",
 		},
 		loincloth: {
-			text: "loincloth",
+			text: "샅바",
 			requirements: () => V.syndromeeden === 1 || V.syndromewolves === 1,
-			hint: "befriend a lonely hunter, or join a pack of wolves",
+			hint: "외로운 사냥꾼과 친해지거나 늑대 무리에 합류하기",
 			shop: ["forest"],
 			subsetOf: ["bad_end", "fox"],
 			feat: true,
@@ -365,9 +365,9 @@ function initSpecialClothes() {
 			iconColor: "white",
 		},
 		bird: {
-			text: "feathered hair clip",
+			text: "깃털 머리핀",
 			requirements: () => V.syndromebird === 1,
-			hint: "romance an avian",
+			hint: "새와 사랑에 빠지기",
 			shop: ["forest"],
 			subsetOf: ["bad_end", "transformation"],
 			feat: true,
@@ -378,9 +378,9 @@ function initSpecialClothes() {
 			iconColor: "tan",
 		},
 		prison: {
-			text: "prison clothes",
+			text: "죄수복",
 			requirements: () => V.prison_intro === 1,
-			hint: "get sent to prison",
+			hint: "교도소에 수감되기",
 			shop: ["forest"],
 			subsetOf: ["bad_end"],
 			feat: true,
@@ -388,9 +388,9 @@ function initSpecialClothes() {
 			icon: "clothes/prison_jumpsuit.png",
 		},
 		asylum: {
-			text: "straightjacket",
+			text: "구속복",
 			requirements: () => V.asylumescaped === 1,
-			hint: "escape the asylum",
+			hint: "정신병원에서 탈출하기",
 			shop: ["forest"],
 			subsetOf: ["bad_end"],
 			feat: true,
@@ -400,15 +400,15 @@ function initSpecialClothes() {
 
 		// Temple
 		temple: {
-			text: "collection of temple attire",
+			text: "신전 의복 컬렉션",
 			shop: ["forest", "temple"],
 			feat: false,
 			icon: "wolf.png",
 		},
 		temple_initiate: {
-			text: "initiate's robe",
+			text: "수련자 로브",
 			requirements: () => ["initiate","monk","priest"].includes(V.temple_rank),
-			hint: "prove your purity",
+			hint: "순결함을 증명하기",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -416,9 +416,9 @@ function initSpecialClothes() {
 			icon: "clothes/initiate_robes.png",
 		},
 		temple_monk_and_nun: {
-			text: "monk and nun habits",
+			text: "수도사와 수녀 수단",
 			requirements: () => ["monk","priest"].includes(V.temple_rank),
-			hint: "advance in rank at the temple",
+			hint: "신전에서 지위를 올리기",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -426,9 +426,9 @@ function initSpecialClothes() {
 			icon: "clothes/monks_habit.png",
 		},
 		temple_evangelist: {
-			text: "evangelist's uniform",
+			text: "전도사 제복",
 			requirements: () => V.specialClothesEvents?.includes("temple_solicitation"),
-			hint: "successfully solicit a donation for the temple",
+			hint: "신전 기부 권유에 성공하기",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -436,9 +436,9 @@ function initSpecialClothes() {
 			icon: "clothes/evangelist_uniform.png",
 		},
 		temple_confessor: {
-			text: "confessor's uniforms",
+			text: "고해사제 제복",
 			requirements: () => V.temple_confessor_intro,
-			hint: "be introduced to the temple's most exalted",
+			hint: "신전의 가장 고귀한 존재를 소개받기",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -446,9 +446,9 @@ function initSpecialClothes() {
 			icon: "clothes/confessor_robes.png",
 		},
 		temple_exorcist: {
-			text: "exorcist's uniforms",
+			text: "구마사제 제복",
 			requirements: () => V.jordan_ritual_dance === 4,
-			hint: "interrupt a heretical ritual",
+			hint: "이단 의식을 방해하기",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -456,9 +456,9 @@ function initSpecialClothes() {
 			icon: "clothes/exorcist_cassock.png",
 		},
 		temple_sparring: {
-			text: "sparring uniforms",
+			text: "수련용 제복",
 			requirements: () => V.prof?.whip >= 600 || V.prof?.baton >= 600,
-			hint: "become proficient with one of the temple's holy tools",
+			hint: "신전의 성스러운 도구 중 하나에 숙련되기",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -466,9 +466,9 @@ function initSpecialClothes() {
 			icon: "clothes/monk's_sparring_habit.png",
 		},
 		temple_sexy: {
-			text: "lewd religious attire",
+			text: "음란한 종교 의복",
 			requirements: () => V.world_corruption_reduced >= 30,
-			hint: "purge enough corruption",
+			hint: "충분한 타락을 정화하기",
 			shop: ["forest", "adult"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -476,9 +476,9 @@ function initSpecialClothes() {
 			icon: "clothes/sexy_nuns_habit.png",
 		},
 		holy_stole: {
-			text: "holy stole",
+			text: "성스러운 스톨",
 			requirements: () => V.grace >= 100,
-			hint: "requires sufficient devotion",
+			hint: "충분한 헌신 필요",
 			shop: ["forest", "temple"],
 			subsetOf: ["temple"],
 			feat: true,
@@ -491,15 +491,15 @@ function initSpecialClothes() {
 
 		// Pendant trio
 		pendant: {
-			text: "three pendants",
+			text: "세 개의 펜던트",
 			shop: ["forest"],
 			feat: false,
 			icon: "altar.gif",
 		},
 		holy_pendant: {
-			text: "holy pendant",
+			text: "성스러운 펜던트",
 			requirements: () => V.soup_kitchen_known === 1,
-			hint: "discover the soup kitchen",
+			hint: "무료 급식소 발견하기",
 			shop: ["forest", "temple"],
 			subsetOf: ["pendant", "temple"],
 			feat: true,
@@ -507,9 +507,9 @@ function initSpecialClothes() {
 			icon: "clothes/holy-pendant.png",
 		},
 		stone_pendant: {
-			text: "stone pendant",
+			text: "돌 펜던트",
 			requirements: () => V.stone_pendant_found === 1,
-			hint: "find beneath a loose stone at the temple",
+			hint: "신전의 헐거운 돌 밑에서 찾기",
 			shop: ["forest", "temple"],
 			subsetOf: ["pendant", "temple"],
 			feat: true,
@@ -517,9 +517,9 @@ function initSpecialClothes() {
 			icon: "clothes/stone_pendant.png",
 		},
 		dark_pendant: {
-			text: "dark pendant",
+			text: "어두운 펜던트",
 			requirements: () => V.loft_known === 1,
-			hint: "discover Bailey's fear",
+			hint: "베일리의 두려움 발견하기",
 			shop: ["forest", "temple"],
 			subsetOf: ["pendant"],
 			feat: true,
@@ -529,16 +529,16 @@ function initSpecialClothes() {
 
 		// Museum and paintings
 		historic: {
-			text: "collection of historic outfits",
+			text: "역사적인 의상 컬렉션",
 			shop: ["forest"],
 			feat: false,
 			icon: "museum.png",
 		},
 		museum_rags: {
-			text: "rags from the museum",
+			text: "박물관의 누더기",
 			// Second case is for legacy compatibility, because the museum rags were previously feat-locked for some reason
 			requirements: () => V.museum_horse_success && V.museum_stool_success || V.feats?.currentSave["Pain Rider"] !== undefined && V.feats?.currentSave.Submerged !== undefined,
-			hint: "demonstrate historical torture devices to completion",
+			hint: "역사적 고문 기구 시연을 끝까지 마치기",
 			shop: ["forest"],
 			subsetOf: ["historic"],
 			feat: true,
@@ -546,9 +546,9 @@ function initSpecialClothes() {
 			icon: "clothes/rag_top.png",
 		},
 		vintage: {
-			text: "vintage suits",
+			text: "빈티지 수트",
 			requirements: () => V.museumAntiques?.paintings?.paintingward === "museum",
-			hint: "help an old fossil remember",
+			hint: "늙은 화석이 기억해내도록 돕기",
 			shop: ["forest"],
 			subsetOf: ["historic"],
 			feat: true,
@@ -560,9 +560,9 @@ function initSpecialClothes() {
 			iconAccColor: "tan",
 		},
 		chain_tunic: {
-			text: "chain tunic",
+			text: "사슬 튜닉",
 			requirements: () => V.hcEndings?.includes("S"),
-			hint: "learn the many tales of a witch and her gaoler",
+			hint: "마녀와 간수에 얽힌 여러 이야기를 배우기",
 			shop: ["forest"],
 			subsetOf: ["historic"],
 			feat: true,
@@ -576,9 +576,9 @@ function initSpecialClothes() {
 
 		// Special event sets
 		foreign_school: {
-			text: "foreign school clothes",
+			text: "외국 교복",
 			requirements: () => V.headdrive === 1,
-			hint: "discover the headteacher's secret",
+			hint: "교장의 비밀 발견하기",
 			shop: ["forest", "school"],
 			feat: true,
 			featCost: 5,
@@ -589,9 +589,9 @@ function initSpecialClothes() {
 			iconAccColor: "white",
 		},
 		brothel: {
-			text: "dancer's outfits",
+			text: "무용수 의상",
 			requirements: () => V.brothelshowdata?.intro,
-			hint: "be offered the star role in a show at the brothel",
+			hint: "창관 공연의 주연 제안을 받기",
 			shop: ["forest", "adult"],
 			feat: true,
 			featCost: 5,
@@ -601,9 +601,9 @@ function initSpecialClothes() {
 			iconColor: "red",
 		},
 		chef: {
-			text: "chef uniform",
+			text: "요리사 제복",
 			requirements: () => V.chef_state >= 9,
-			hint: "become famous for your cream buns",
+			hint: "크림빵으로 유명해지기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 5,
@@ -614,9 +614,9 @@ function initSpecialClothes() {
 			iconAccColor: "white",
 		},
 		hookah: {
-			text: "esoteric spectacles",
+			text: "난해한 안경",
 			requirements: () => V.hookah_state >= 2,
-			hint: "succeed a master",
+			hint: "스승을 계승하기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 10,
@@ -626,9 +626,9 @@ function initSpecialClothes() {
 			iconColor: "black",
 		},
 		islander: {
-			text: "islander mask",
+			text: "섬 주민 가면",
 			requirements: () => V.islander_mask >= 100,
-			hint: "build with foreign wood",
+			hint: "이국의 목재로 만들기",
 			shop: ["forest"],
 			subsetOf: ["mask"],
 			feat: true,
@@ -636,9 +636,9 @@ function initSpecialClothes() {
 			icon: "clothes/islander_mask.png",
 		},
 		fox_mask: {
-			text: "fox mask",
+			text: "여우 가면",
 			requirements: () => V.auriga_artefact !== undefined,
-			hint: "attend an exclusive party",
+			hint: "초대받은 사람만의 파티에 참석하기",
 			shop: ["forest"],
 			subsetOf: ["mask", "fox"],
 			feat: true,
@@ -646,18 +646,18 @@ function initSpecialClothes() {
 			icon: "clothes/fox_mask.png",
 		},
 		fedora: {
-			text: "fedora",
+			text: "페도라",
 			requirements: () => V.specialClothesEvents?.includes("smuggling"),
-			hint: "eavesdrop as a bartender and learn about a criminal undertaking",
+			hint: "바텐더로 일하며 엿듣고 범죄 계획 알아내기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 2,
 			icon: "clothes/fedora.png",
 		},
 		catsuit: {
-			text: "catsuit",
+			text: "캣수트",
 			requirements: () => V.catsuit_found,
-			hint: "pillage a shipment",
+			hint: "화물을 약탈하기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 15,
@@ -667,9 +667,9 @@ function initSpecialClothes() {
 			iconColor: "black",
 		},
 		janet: {
-			text: "janet dress",
+			text: "자넷 드레스",
 			requirements: () => V.janet_book_read === 1,
-			hint: "lose yourself in a classic romance tale",
+			hint: "고전 로맨스 이야기에 빠져들기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 5,
@@ -680,26 +680,26 @@ function initSpecialClothes() {
 			iconAccColor: "red",
 		},
 		dance_studio: {
-			text: "swan lake dress",
+			text: "백조의 호수 드레스",
 			requirements: () => V.danceStudio?.jobOffered,
-			hint: "be offered special dancing jobs",
+			hint: "특별한 춤 일거리 제안을 받기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 5,
 			icon: "dance-studio.png",
 		},
 		sage_witch_hat: {
-			text: "strange witch hat",
+			text: "이상한 마녀 모자",
 			requirements: () => V.gwylanSeen?.includes("ritual_sex"),
-			hint: "take part in an intimate concord",
+			hint: "은밀한 합일에 참여하기",
 			shop: ["forest"],
 			feat: false,
 			icon: "clothes/witch_hat_sage.png",
 		},
 		familiar_collar: {
-			text: "familiar collar",
+			text: "사역마 목걸이",
 			requirements: () => V.gwylanSeen?.includes("familiar_collar"),
-			hint: "at last, yours to keep",
+			hint: "마침내 간직할 수 있게 되기",
 			shop: ["forest"],
 			feat: false,
 			icon: "clothes/familiar_collar.png",
@@ -707,9 +707,9 @@ function initSpecialClothes() {
 
 		// Misc
 		shrine: {
-			text: "spirit mask and shrine robe",
+			text: "정령 가면과 신사 로브",
 			requirements: () => V.fox >= 6 || V.moorLuck !== undefined,
-			hint: "become sufficiently foxy, or pray at wild shrines in the moor",
+			hint: "충분히 여우다워지거나 황야의 야생 신사에서 기도하기",
 			shop: ["forest"],
 			subsetOf: ["fox", "transformation"],
 			feat: true,
@@ -721,9 +721,9 @@ function initSpecialClothes() {
 			iconAccColor: "red",
 		},
 		jasper: {
-			text: "jasper pendant",
+			text: "벽옥 펜던트",
 			requirements: () => V.gwylanSeen?.includesAny("request_gold_accessories", "chastity_gold"),
-			hint: "get an impromptu science lesson",
+			hint: "즉석 과학 수업을 받기",
 			shop: ["forest"],
 			subsetOf: ["fox"],
 			feat: true,
@@ -733,9 +733,9 @@ function initSpecialClothes() {
 			iconIndex: 39,
 		},
 		butterfly: {
-			text: "butterfly costume",
+			text: "나비 의상",
 			requirements: () => V.backgroundTraits?.includes("plantlover"),
-			hint: "become addicted to nectar",
+			hint: "넥타르에 중독되기",
 			shop: ["forest"],
 			feat: true,
 			featCost: 5,
@@ -745,9 +745,9 @@ function initSpecialClothes() {
 			iconColor: "tangerine",
 		},
 		succubus: {
-			text: "succubus costume",
+			text: "서큐버스 의상",
 			requirements: () => V.demon >= 6 || Object.values(V.virginTaken)?.flat().length >= 15,
-			hint: "become sufficiently impure, or take 15 virginities",
+			hint: "충분히 불순해지거나 처녀나 동정 15명을 빼앗기",
 			shop: ["forest"],
 			subsetOf: ["transformation"],
 			feat: true,
@@ -759,7 +759,7 @@ function initSpecialClothes() {
 		},
 		// The flowers set is made up of items that all have different unlock requirements, which individually wouldn't really be worth an entire conversation option or feat entry.
 		flowers: {
-			text: "flowers",
+			text: "꽃",
 			shop: ["forest"],
 			feat: true,
 			featCost: 3,
@@ -768,21 +768,21 @@ function initSpecialClothes() {
 
 		// Sets for talking only
 		transformation: {
-			text: "collection of eerie accessories",
+			text: "기묘한 장신구 컬렉션",
 			shop: ["forest"],
 			subsetOf: ["fox"],
 			feat: false,
 			icon: "transformation.png"
 		},
 		mask: {
-			text: "masks",
+			text: "가면",
 			shop: ["forest"],
 			subsetOf: ["fox"],
 			feat: false,
 			icon: "clothes/islander-mask.png"
 		},
 		fox: {
-			text: "fox-themed items",
+			text: "여우 테마 아이템",
 			shop: ["forest"],
 			feat: false,
 			icon: "clothes/fox-mask.png",
@@ -909,30 +909,29 @@ function specialClothesUnlockText(toUnlock, group) {
 		if (toUnlock.length) {
 			output += "<<shopicon 'forest'>>";
 			if (group === "halloween") {
-				output += '<span class="orange">Halloween clothes</span> <span class="gold">are now available at the forest shop!</span><br>';
+				output += '<span class="gold">숲속 상점에 </span><span class="orange">할로윈 의상</span><span class="gold">이 해금되었습니다!</span><br>';
 				return output;
 			}
 			if (group === "christmas") {
-				output += '<span class="green">Christmas clothes</span> <span class="gold">are now available at the forest shop!</span><br>';
+				output += '<span class="gold">숲속 상점에 </span><span class="green">크리스마스 의상</span><span class="gold">이 해금되었습니다!</span><br>';
 				return output;
 			}
 			if (group === "valentines") {
-				output += `<span class="pink">Valentine's day clothes</span> <span class="gold">are now available at the forest shop!</span><br>`;
+				output += `<span class="gold">숲속 상점에 </span><span class="pink">발렌타인 데이 의상</span><span class="gold">이 해금되었습니다!</span><br>`;
 				return output;
 			}
 			if (toUnlock.length === 1) {
 				const clothingObject = setup.clothes.all.find(item => item.name === toUnlock[0]);
-				const pluralText = clothingObject.plural === 1 ? "are" : "is";
+				const pluralText = clothingObject.plural === 1 ? "【와과】" : "【은는】";
 				if (clothingObject.name === "familiar collar") {
-					output += `<span class="forest-green">Your collar</span> <span class="gold">is now available at the forest shop, whenever you need it.</span><br><br>`;
+					output += `<span class="gold">숲속 상점에 </span><span class="forest-green">당신의 목줄</span><span class="gold">이 해금되었습니다.</span><br><br>`;
 					return output;
 				}
 				output +=
+					'<span class="gold">숲속 상점에 새로 </span>' +
 					'<span class="teal">' +
 					toUnlock[0].toUpperFirst() +
-					'</span> <span class="gold">' +
-					pluralText +
-					" now available at the forest shop!</span><br><br>";
+					'</span><span class="gold">【이가】 입고되었습니다!</span><br><br>';
 				return output;
 			}
 			const fullSetBeingUnlocked =
@@ -946,62 +945,62 @@ function specialClothesUnlockText(toUnlock, group) {
 					case "skeleton":
 					case "pumpkin":
 						output +=
-							'<span class="orange">The ' + group + ' costume</span> <span class="gold">is now available at the forest shop!</span><br><br>';
+							'<span class="gold">숲속 상점에 </span><span class="orange">' + group + ' 코스튬</span><span class="gold">【이가】 해금되었습니다!</span><br><br>';
 						break;
 					case "future_suit":
 						output +=
-							'<span class="orange">The futuristic bodysuit costume</span> <span class="gold">is now available at the forest shop!</span><br><br>';
+							'<span class="gold">숲속 상점에 </span><span class="orange">미래형 바디수트 코스튬</span><span class="gold">이 해금되었습니다!</span><br><br>';
 						break;
 					case "foreign_school":
-						output += '<span class="blue">Foreign school clothes</span> <span class="gold">are now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 </span><span class="blue">외국 교복</span><span class="gold">이 해금되었습니다!</span><br><br>';
 						break;
 					case "brothel":
-						output += `<span class="lewd">The belly dancer's set and harem set</span> <span class="gold">are now available at the forest shop!</span><br><br>`;
+						output += `<span class="gold">숲속 상점에 </span><span class="lewd">벨리댄서 세트와 하렘 세트</span><span class="gold">가 해금되었습니다!</span><br><br>`;
 						break;
 					case "underground_farm":
 						output +=
-							'<span class="lewd">Cow print clothes and a cow bell</span> <span class="gold">are now available at the forest shop.</span><br><br>';
+							'<span class="gold">숲속 상점에 </span><span class="lewd">소 무늬 의상과 소 방울</span><span class="gold">이 해금되었습니다.</span><br><br>';
 						break;
 					case "chain_tunic":
-						output += '<span class="grey">A set of antique chainmail</span> <span class="gold">is now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 </span><span class="grey">고대 사슬 갑옷 세트</span><span class="gold">가 해금되었습니다!</span><br><br>';
 						break;
 					case "vintage":
-						output += '<span class="green">Vintage suits</span> <span class="gold">are now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 </span><span class="green">빈티지 수트</span><span class="gold">가 해금되었습니다!</span><br><br>';
 						break;
 					case "temple_initiate":
-						output += `<span class="purple">Initiate's robes</span> <span class="gold">are now available at the forest shop!</span><br><br>`;
+						output += `<span class="gold">숲속 상점에 </span><span class="purple">수련자 로브</span><span class="gold">가 해금되었습니다!</span><br><br>`;
 						break;
 					case "temple_monk_and_nun":
-						output += '<span class="gold">Monk and nun outfits are now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 수사와 수녀 의상이 해금되었습니다!</span><br><br>';
 						break;
 					case "temple_confessor":
-						output += `<span class="black">Confessor's robes</span> <span class="gold">are now available at the forest shop...</span><br><br>`;
+						output += `<span class="gold">숲속 상점에 </span><span class="black">고해 신부 로브</span><span class="gold">가 해금되었습니다...</span><br><br>`;
 						break;
 					case "temple_sexy":
 						output +=
-							'<span class="lewd">Sexy nun and priest outfits</span> <span class="gold">are now available at the forest shop!</span><br><br>';
+							'<span class="gold">숲속 상점에 </span><span class="lewd">섹시 수녀 및 신부 의상</span><span class="gold">이 해금되었습니다!</span><br><br>';
 						break;
 					case "butterfly":
-						output += '<span class="teal">The butterfly costume</span> <span class="gold">is now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 </span><span class="teal">나비 코스튬</span><span class="gold">이 해금되었습니다!</span><br><br>';
 						break;
 					case "succubus":
-						output += '<span class="lewd">The succubus costume</span> <span class="gold">is now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 </span><span class="lewd">서큐버스 코스튬</span><span class="gold">이 해금되었습니다!</span><br><br>';
 						break;
 					case "bird":
-						output += '<span class="brown">Feathered accessories</span> <span class="gold">are now available at the forest shop!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 </span><span class="brown">깃털 장신구</span><span class="gold">가 해금되었습니다!</span><br><br>';
 						break;
 					default:
 						output +=
-							'<span class="gold">New clothes are available at the forest shop:</span> <span class="teal">' +
-							formatList(toUnlock, "and", true).toUpperFirst() +
-							"!</span><br><br>";
+							'<span class="gold">숲 상점에 </span><span class="teal">' +
+							formatList(toUnlock, "【와과】", true).toUpperFirst() +
+							'</span><span class="gold">【이가】 새로 입고되었습니다!</span><br><br>';
 						break;
 				}
 			} else {
 				output +=
-					'<span class="gold">New clothes are available at the forest shop: </span> <span class="teal">' +
-					formatList(toUnlock, "and", true).toUpperFirst() +
-					"!</span><br><br>";
+					'<span class="gold">숲 상점에 </span><span class="teal">' +
+					formatList(toUnlock, "【와과】", true).toUpperFirst() +
+					'</span><span class="gold">【이가】 새로 입고되었습니다!</span><br><br>';
 			}
 		}
 	}

@@ -286,7 +286,7 @@ window.loadCharacterViewerDate = () => {
 	try {
 		data = JSON.parse(textArea.value);
 	} catch (e) {
-		textArea.value = "Invalid JSON";
+		textArea.value = "잘못된 JSON";
 	}
 	const original = clone(V.characterViewer);
 
@@ -302,7 +302,7 @@ window.loadCharacterViewerDate = () => {
 		};
 		State.display(V.passage);
 	} else {
-		textArea.value = "Invalid Import";
+		textArea.value = "잘못된 불러오기 데이터";
 	}
 };
 
@@ -390,10 +390,10 @@ window.returnTimeFormat = returnTimeFormat;
 
 /* Temporary until npc rework */
 function sensitivityString(value) {
-	if (value >= 3.5) return "sensitive";
-	if (value >= 2.5) return "tender";
-	if (value >= 1.5) return "receptive";
-	return "normal";
+	if (value >= 3.5) return "민감함";
+	if (value >= 2.5) return "예민함";
+	if (value >= 1.5) return "반응함";
+	return "보통";
 }
 
 window.sensitivityString = sensitivityString;
@@ -540,7 +540,7 @@ function getLargestSexStatModifierCssClasses(input, requiredLevel = 0) {
 	const statName = sexStatNameMapper(input);
 	// check if stat name is valid.
 	if (statName == null) {
-		Errors.report(`[getLargestSexStatModifierCssClasses]: input '${statName}' null.`, {
+		Errors.report(`[getLargestSexStatModifierCssClasses]: 입력값 '${statName}'【이가】 null입니다.`, {
 			Stacktrace: Utils.GetStack(),
 			statName,
 		});

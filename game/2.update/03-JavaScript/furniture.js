@@ -52,92 +52,92 @@ const Furniture = (() => {
 
 		/* ------------- CHAIRS ------------- */
 		mapper.set("chair", {
-			name: "chair",
-			nameCap: "Chair",
-			article: "a",
-			nameSolo: "chair",
+			name: "의자",
+			nameCap: "의자",
+			article: "",
+			nameSolo: "의자",
 			category: ["chair"],
 			type: ["starter"],
 			cost: 0,
-			description: "An old, hand-me-down chair. Wobbly and uncomfortable.",
+			description: "낡고 물려받은 의자다. 흔들리고 불편하다.",
 			iconFile: "basicChair",
 			iconFile2: "basic-chair-desk",
 			tier: 0,
 		});
 		mapper.set("stool", {
-			name: "stools",
-			nameCap: "Wooden stools",
-			article: "a",
-			nameSolo: "wooden stool",
+			name: "스툴",
+			nameCap: "나무 스툴",
+			article: "",
+			nameSolo: "나무 스툴",
 			category: ["chair"],
 			type: [],
 			cost: 460,
-			description: "A set of stools. Uncomfortable, but better than nothing.",
+			description: "스툴 세트다. 불편하지만 없는 것보다는 낫다.",
 			iconFile: "stool",
 			iconFile2: "stool-desk",
 			tier: 0,
 		});
 		mapper.set("woodenchair", {
-			name: "wooden chairs",
-			nameCap: "Wooden chairs",
-			article: "a",
-			nameSolo: "wooden chair",
+			name: "나무 의자",
+			nameCap: "나무 의자",
+			article: "",
+			nameSolo: "나무 의자",
 			category: ["chair"],
 			type: [],
 			cost: 1280,
-			description: "A set of regular wooden chairs. Not the most comfortable.",
+			description: "평범한 나무 의자 세트다. 그다지 편하지는 않다.",
 			iconFile: "chair",
 			iconFile2: "chair-desk",
 			tier: 0,
 		});
 		mapper.set("swivelchair", {
-			name: "swivel chairs",
-			nameCap: "Swivel chairs",
-			article: "a",
-			nameSolo: "swivel chair",
+			name: "회전 의자",
+			nameCap: "회전 의자",
+			article: "",
+			nameSolo: "회전 의자",
 			category: ["chair"],
 			type: ["comfy"],
 			cost: 1480,
-			description: "A pair of swivel chairs. Comfortable and ergonomic.",
+			description: "회전 의자 한 쌍이다. 편안하고 인체공학적이다.",
 			iconFile: "swivel-chair",
 			iconFile2: "swivel-chair-desk",
 			tier: 1,
 		});
 		mapper.set("shellchair", {
-			name: "shell chairs",
-			nameCap: "Shell chairs",
-			article: "a",
-			nameSolo: "shell chair",
+			name: "쉘 의자",
+			nameCap: "쉘 의자",
+			article: "",
+			nameSolo: "쉘 의자",
 			category: ["chair"],
 			type: ["comfy"],
 			cost: 1750,
-			description: "A set of wheeled chairs with a shell-shaped back. Luxurious.",
+			description: "조개 모양의 등받이가 있는 바퀴 달린 의자 세트다. 고급스럽다.",
 			iconFile: "shell-chair",
 			iconFile2: "shell-chair-desk",
 			tier: 1,
 		});
 		mapper.set("armchair", {
-			name: "armchairs",
-			nameCap: "Armchairs",
-			article: "an",
-			nameSolo: "armchair",
+			name: "안락의자",
+			nameCap: "안락의자",
+			article: "",
+			nameSolo: "안락의자",
 			category: ["chair"],
 			type: ["comfy"],
 			cost: 1970,
-			description: "A set of armchairs. Soft, relaxing, and expensive.",
+			description: "안락의자 세트다. 부드럽고 편안하며 비싸다.",
 			iconFile: "armchair",
 			iconFile2: "armchair-desk",
 			tier: 1,
 		});
 		mapper.set("egg", {
-			name: "egg armchairs",
-			nameCap: "Egg armchairs",
-			article: "an",
-			nameSolo: "egg armchair",
+			name: "에그 안락의자",
+			nameCap: "에그 안락의자",
+			article: "",
+			nameSolo: "에그 안락의자",
 			category: ["chair"],
 			type: ["comfy"],
 			cost: 2420,
-			description: "A set of armchairs with a rounded back, in exotic colours. A chore to set up.",
+			description: "이국적인 색상의 둥근 등받이가 있는 안락의자 세트다. 설치하기 까다롭다.",
 			iconFile: "armchair-egg",
 			iconFile2: "armchair-egg-desk",
 			tier: 1,
@@ -145,135 +145,139 @@ const Furniture = (() => {
 
 		/* ------------- TABLES ------------- */
 		mapper.set("woodentable", {
-			name: "wooden table",
-			nameCap: "Wooden table",
+			name: "나무 탁자",
+			nameCap: "나무 탁자",
 			category: ["table"],
 			type: [],
 			cost: 1100,
-			description: "Can be used as a working or gathering spot. Just add chairs.",
+			description: "작업이나 모임 장소로 사용할 수 있다. 의자만 추가하면 된다.",
 			iconFile: "table",
 			tier: 0,
 		});
 		mapper.set("marbletable", {
-			name: "marble-topped table",
-			nameCap: "Marble-topped table",
+			name: "대리석 탁자",
+			nameCap: "대리석 탁자",
 			category: ["table"],
 			type: [],
 			cost: 1430,
-			description: "A regular wooden table with a twist.",
+			description: "평범한 나무 탁자에 변화를 주었다.",
 			iconFile: "marble-table",
 			tier: 1,
 		});
 
 		/* ------------- DESKS ------------- */
 		mapper.set("desk", {
-			name: "basic desk",
-			nameCap: "Basic desk",
+			name: "기본 책상",
+			nameCap: "기본 책상",
+			nameSolo: "책상",
 			category: ["desk"],
 			type: ["stable", "starter"],
 			cost: 0,
-			description: "An old, hand-me-down desk. Desecrated with carvings from orphans of yesteryear.",
+			description: "낡고 물려받은 책상이다. 옛날 고아들이 새겨놓은 낙서들로 훼손되어 있다.",
 			iconFile: "desk",
 		});
 		mapper.set("deskGlass", {
-			name: "glass desk",
-			nameCap: "Glass desk",
+			name: "유리 책상",
+			nameCap: "유리 책상",
+			nameSolo: "유리 책상",
 			category: ["desk"],
 			type: ["fragile"],
 			cost: 1250,
-			description: "A sleek, contemporary desk. Breakable.",
+			description: "세련되고 현대적인 책상이다. 깨지기 쉽다.",
 			iconFile: "desk-glass",
 		});
 		mapper.set("deskMidcentury", {
-			name: "mid-century modern desk",
-			nameCap: "Mid-century modern desk",
+			name: "미드센추리 모던 책상",
+			nameCap: "미드센추리 모던 책상",
+			nameSolo: "모던 책상",
 			category: ["desk"],
 			type: ["stable"],
 			cost: 1550,
-			description: "A simple desk with modernist appeal. Popular in the mid-twentieth century.",
+			description: "모더니스트의 매력을 지닌 단순한 책상이다. 20세기 중반에 유행했다.",
 			iconFile: "desk-midcentury",
 		});
 		mapper.set("deskAntique", {
-			name: "antique desk",
-			nameCap: "Antique desk",
+			name: "골동품 책상",
+			nameCap: "골동품 책상",
+			nameSolo: "골동품 책상",
 			category: ["desk"],
 			type: ["sturdy"],
 			cost: 3820,
-			description: "An ornate, antique desk. Built to last a lifetime.",
+			description: "화려한 골동품 책상이다. 평생 쓸 수 있게 튼튼하게 만들어졌다.",
 			iconFile: "desk-antique",
 		});
 
 		/* ------------- BEDS ------------- */
 		mapper.set("bed", {
-			name: "basic bed",
-			nameCap: "Basic bed",
+			name: "기본 침대",
+			nameCap: "기본 침대",
 			category: ["bed"],
 			type: ["single", "starter"],
 			cost: 0,
-			description: "An old, poor bed. Uncomfortable.",
+			description: "낡고 형편없는 침대다. 불편하다.",
 			iconFile: "bed",
 			tier: 0,
 		});
 		mapper.set("singlebed", {
-			name: "single bed",
-			nameCap: "Single bed",
+			name: "싱글 침대",
+			nameCap: "싱글 침대",
 			category: ["bed"],
 			type: ["single"],
 			cost: 1680,
-			description: "A bed for one.",
+			description: "1인용 침대다.",
 			iconFile: "single-bed",
 			tier: 0,
 		});
 		mapper.set("singlebeddeluxe", {
-			name: "deluxe single bed",
-			nameCap: "Deluxe single bed",
+			name: "디럭스 싱글 침대",
+			nameCap: "디럭스 싱글 침대",
 			category: ["bed"],
 			type: ["single", "comfy"],
 			cost: 2400,
-			description: "An ergonomically designed bed. Very comfortable.",
+			description: "인체공학적으로 디자인된 침대다. 매우 편안하다.",
 			iconFile: "single-bed-deluxe",
 			tier: 1,
 		});
 		mapper.set("doublebed", {
-			name: "double bed",
-			nameCap: "Double bed",
+			name: "더블 침대",
+			nameCap: "더블 침대",
 			category: ["bed"],
 			type: ["double"],
 			cost: 3400,
-			description: "A simple bed. Fits two.",
+			description: "단순한 침대다. 두 명이 누울 수 있다.",
 			iconFile: "double-bed",
 			tier: 1,
 			showCheck: "notBedroom",
 		});
 		mapper.set("doublebeddeluxe", {
-			name: "deluxe double bed",
-			nameCap: "Deluxe double bed",
+			name: "디럭스 더블 침대",
+			nameCap: "디럭스 더블 침대",
 			category: ["bed"],
 			type: ["double", "comfy"],
 			cost: 2840,
-			description: "A beautiful bed with a soft mattress. Very comfortable, fits two.",
+			description: "부드러운 매트리스가 있는 아름다운 침대다. 매우 편안하며 두 명이 누울 수 있다.",
 			iconFile: "double-bed-deluxe",
 			tier: 2,
 			showCheck: "notBedroom",
 		});
 		mapper.set("doublebedexotic", {
-			name: "exotic double bed",
-			nameCap: "Exotic double bed",
+			name: "이국적인 더블 침대",
+			nameCap: "이국적인 더블 침대",
 			category: ["bed"],
 			type: ["double", "comfy"],
 			cost: 4884,
-			description: "A bed made in a contemporary, minimalist style. Very comfortable, fits two.",
+			description: "현대적이고 미니멀한 스타일로 만들어진 침대다. 매우 편안하며 두 명이 누울 수 있다.",
 			iconFile: "double-bed-exotic",
 			tier: 2,
 			showCheck: "notBedroom",
 		});
 		mapper.set("doublebedwicker", {
-			name: "wicker double bed",
-			nameCap: "Wicker double bed",
+			name: "고리버들 더블 침대",
+			nameCap: "고리버들 더블 침대",
 			category: ["bed"],
 			type: ["double", "comfy"],
 			cost: 4860,
-			description: "An authentic bed on a rattan frame. Very comfortable, fits two.",
+			description: "등나무 프레임의 정통 침대다. 매우 편안하며 두 명이 누울 수 있다.",
 			iconFile: "double-bed-wicker",
 			tier: 2,
 			showCheck: "notBedroom",
@@ -281,137 +285,137 @@ const Furniture = (() => {
 
 		/* ------------- MISC ------------- */
 		mapper.set("plantpot", {
-			name: "plant pot",
-			nameCap: "Plant pot",
+			name: "화분",
+			nameCap: "화분",
 			category: ["windowsill"],
 			type: [],
 			cost: 680,
-			description: "A clay pot with good soil. Flowers come pre-planted. Can be put on your windowsill.",
+			description: "좋은 흙이 담긴 점토 화분이다. 꽃이 미리 심어져 있다. 창턱에 놓을 수 있다.",
 			handheld: "plant pot",
 			iconFile: "flower",
 		});
 		mapper.set("bunnySucculent", {
-			name: "bunny succulent",
-			nameCap: "Bunny succulent",
+			name: "토끼 다육이",
+			nameCap: "토끼 다육이",
 			category: ["windowsill"],
 			type: [],
 			cost: 840,
-			description: "A cement planter for small succulents. Pre-planted with 'Monilaria obconica', also known as a bunny succulent.",
+			description: "작은 다육 식물을 위한 시멘트 화분이다. 토끼 다육이라고도 불리는 '모닐라리아 옵코니카'가 심어져 있다.",
 			iconFile: "bunny-succulent",
 		});
 		mapper.set("jar", {
-			name: "jar",
-			nameCap: "Jar",
+			name: "병",
+			nameCap: "병",
 			category: ["windowsill"],
 			type: [],
 			cost: 1380,
-			description: "A cylindrical jar. Can be put on your windowsill.",
+			description: "원통형 병이다. 창턱에 놓을 수 있다.",
 			iconFile: "jar",
 		});
 		mapper.set("penguinplushie", {
-			name: "penguin plushie",
-			nameCap: "Penguin plushie",
+			name: "펭귄 인형",
+			nameCap: "펭귄 인형",
 			category: ["windowsill"],
 			type: [],
 			cost: 1030,
-			description: "Soft and cuddly. Can be put on your windowsill.",
+			description: "부드럽고 껴안기 좋다. 창턱에 놓을 수 있다.",
 			handheld: "penguin plushie",
 			iconFile: "penguin-plushie",
 		});
 		mapper.set("yespillow", {
-			name: "consent cushion",
-			nameCap: "Consent cushion",
+			name: "동의 쿠션",
+			nameCap: "동의 쿠션",
 			category: ["windowsill"],
 			type: [],
 			cost: 725,
-			description: "Enthusiastically consensual. Can be put on your windowsill.",
+			description: "열렬히 동의한다. 창턱에 놓을 수 있다.",
 			handheld: "yes pillow",
 			iconFile: "yes-pillow",
 		});
 		mapper.set("nopillow", {
-			name: "nonconsent cushion",
-			nameCap: "Nonconsent cushion",
+			name: "거부 쿠션",
+			nameCap: "거부 쿠션",
 			category: ["windowsill"],
 			type: [],
 			cost: 725,
-			description: "For when no means no. Can be put on your windowsill.",
+			description: "싫은 건 싫은 거다. 창턱에 놓을 수 있다.",
 			handheld: "no pillow",
 			iconFile: "no-pillow",
 		});
 
 		/* ------------- DECORATIONS ------------- */
 		mapper.set("calendar", {
-			name: "calendar",
-			nameCap: "Calendar",
+			name: "달력",
+			nameCap: "달력",
 			category: ["decoration"],
 			type: [],
 			cost: 360,
-			description: "The days of this calendar are numbered.",
+			description: "이 달력에는 날짜가 적혀 있다.",
 			iconFile: "calendar",
 		});
 		mapper.set("painting", {
-			name: "painting",
-			nameCap: "Painting",
+			name: "그림",
+			nameCap: "그림",
 			category: ["decoration"],
 			type: [],
 			cost: 680,
-			description: "It's not actually a painting. It's an illustration. ",
+			description: "사실 그림이 아니다. 일러스트레이션이다.",
 			iconFile: "painting",
 		});
 		mapper.set("banner", {
-			name: "banner",
-			nameCap: "Banner",
+			name: "배너",
+			nameCap: "배너",
 			category: ["decoration"],
 			type: [],
 			cost: 620,
-			description: "A figure from an old movie is poised in the centre.",
+			description: "옛날 영화의 인물이 중앙에 자리 잡고 있다.",
 			iconFile: "banner",
 		});
 		mapper.set("bannerlewd", {
-			name: "lewd banner",
-			nameCap: "Lewd banner",
+			name: "음란한 배너",
+			nameCap: "음란한 배너",
 			category: ["decoration"],
 			type: [],
 			cost: 790,
-			description: "A banner with a tentacle.",
+			description: "촉수가 그려진 배너다.",
 			iconFile: "banner-lewd",
 		});
 		mapper.set("bannerfestive", {
-			name: "festive banner",
-			nameCap: "Festive banner",
+			name: "축제 배너",
+			nameCap: "축제 배너",
 			category: ["decoration"],
 			type: [],
 			cost: 670,
-			description: "It may or may not be in season, but it still looks cool.",
+			description: "시즌에 맞을 수도 안 맞을 수도 있지만, 여전히 멋져 보인다.",
 			iconFile: "banner-festive",
 		});
 		mapper.set("bearplushie", {
-			name: "large bear plushie",
-			nameCap: "Large bear plushie",
+			name: "거대한 곰 인형",
+			nameCap: "거대한 곰 인형",
 			category: ["decoration"],
 			type: [],
 			cost: 1380,
-			description: "Soft, cuddly and forever loyal.",
+			description: "부드럽고 껴안기 좋으며, 영원히 충성스럽다.",
 			handheld: "large teddy bear",
 			iconFile: "bear-plushie",
 		});
 		mapper.set("candypillow", {
-			name: "large candy pillow",
-			nameCap: "Large candy pillow",
+			name: "거대한 사탕 베개",
+			nameCap: "거대한 사탕 베개",
 			category: ["decoration"],
 			type: [],
 			cost: 1380,
-			description: "Soft and sweet.",
+			description: "부드럽고 달콤하다.",
 			handheld: "candy pillow",
 			iconFile: "candy-pillow",
 		});
 		mapper.set("owlplushie", {
-			name: "owl plushie",
-			nameCap: "Owl plushie",
+			name: "부엉이 인형",
+			nameCap: "부엉이 인형",
 			category: ["owlplushie"],
 			type: [],
 			cost: 0,
-			description: "Large eyes stare at the world.",
+			description: "커다란 눈으로 세상을 응시하고 있다.",
 			iconFile: "owl-plushie",
 			handheld: "kylar owl",
 			showCheck: "disabled",
@@ -421,79 +425,79 @@ const Furniture = (() => {
 			spacious - 30 clothing slots for every type
 			organised - 40 clothing slots for every type */
 		mapper.set("wardrobe", {
-			name: "creaky wardrobe",
-			nameCap: "Creaky wardrobe",
+			name: "삐걱거리는 옷장",
+			nameCap: "삐걱거리는 옷장",
 			category: ["wardrobe"],
 			type: ["starter"],
 			cost: 0,
-			description: "An old, creaky wardrobe. Doesn't hold much.",
+			description: "낡고 삐걱거리는 옷장이다. 옷이 많이 들어가지 않는다.",
 			iconFile: "wardrobe",
 			tier: 0,
 			showCheck: "disabled",
 		});
 		mapper.set("wardrobebasic", {
-			name: "wardrobe",
-			nameCap: "Wardrobe",
+			name: "옷장",
+			nameCap: "옷장",
 			category: ["wardrobe"],
 			type: ["spacious"],
 			cost: 3160,
-			description: "A basic wardrobe cabinet.",
+			description: "기본적인 옷장 캐비닛이다.",
 			iconFile: "wardrobe-basic",
 			tier: 1,
 			showCheck: "isWardrobeHigherTier",
 		});
 		mapper.set("armoire", {
-			name: "armoire",
-			nameCap: "Armoire",
+			name: "대형 옷장",
+			nameCap: "대형 옷장",
 			category: ["wardrobe"],
 			type: ["spacious"],
 			cost: 3258,
-			description: "A spacious wooden armoire.",
+			description: "널찍한 나무 대형 옷장이다.",
 			iconFile: "armoire",
 			tier: 1,
 			showCheck: "isWardrobeHigherTier",
 		});
 		mapper.set("organiser", {
-			name: "organiser wardrobe",
-			nameCap: "Organiser wardrobe",
+			name: "정리형 옷장",
+			nameCap: "정리형 옷장",
 			category: ["wardrobe"],
 			type: ["organiser"],
 			cost: 4296,
-			description: "A wardrobe with a lot of space.",
+			description: "수납 공간이 많은 옷장이다.",
 			iconFile: "wardrobe-organiser",
 			tier: 2,
 			showCheck: "isWardrobeHigherTier",
 		});
 		mapper.set("carved", {
-			name: "carved armoire",
-			nameCap: "Carved armoire",
+			name: "조각된 대형 옷장",
+			nameCap: "조각된 대형 옷장",
 			category: ["wardrobe"],
 			type: ["organiser"],
 			cost: 4620,
-			description: "Carved by hand, it holds several drawers and garment rods.",
+			description: "손으로 직접 조각했으며, 여러 개의 서랍과 옷걸이 봉이 있다.",
 			iconFile: "armoire-carved",
 			tier: 2,
 			showCheck: "isWardrobeHigherTier",
 		});
 		/* --------------- POSTERS --------------- */
 		mapper.set("poster", {
-			name: "blank poster",
-			nameCap: "Blank poster",
+			name: "빈 포스터",
+			nameCap: "빈 포스터",
 			category: ["poster"],
 			type: ["poster", "starter"],
 			cost: 135,
-			description: "The poster is currently empty.",
+			description: "포스터가 현재 비어 있다.",
 			handheld: "rolled poster",
 			iconFile: "poster",
 		});
 		/* ------------- WALLPAPERS -------------- */
 		mapper.set("wallpaper", {
-			name: "blank wallpaper",
-			nameCap: "Blank wallpaper",
+			name: "빈 벽지",
+			nameCap: "빈 벽지",
 			category: ["wallpaper"],
 			type: ["wallpaper", "starter"],
 			cost: 135,
-			description: "The wallpaper is currently empty.",
+			description: "벽지가 현재 비어 있다.",
 			iconFile: "wallpaper",
 		});
 	}
@@ -529,11 +533,11 @@ const Furniture = (() => {
 	function furnitureSet(id, category, overrides) {
 		print("Furniture.set > setting:", id, category, overrides);
 		if (!setup.furniture.has(id)) {
-			Errors.report(`Furniture.Set was incorrectly passed an id not listed in furniture: ${id}`);
+			Errors.report(`Furniture.Set에 furniture 목록에 없는 id가 잘못 전달되었습니다: ${id}`);
 			return false;
 		}
 		if (!Categories[category]) {
-			Errors.report(`Furniture.Set was incorrectly passed an invalid category : ${category}`);
+			Errors.report(`Furniture.Set에 잘못된 category가 전달되었습니다: ${category}`);
 			return false;
 		}
 		const home = V.furniture[target];
@@ -558,7 +562,7 @@ const Furniture = (() => {
 		if (Object.values(Locations).includes(location)) {
 			target = location;
 		} else {
-			Errors.report(`Location provided (${location}) does not exist in the furniture system.`);
+			Errors.report(`전달된 location(${location})은 가구 시스템에 존재하지 않습니다.`);
 		}
 		return Furniture;
 	}

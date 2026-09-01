@@ -12,7 +12,7 @@ const StartConfig = {
 	enableImages: true,
 	enableLinkNumberify: true,
 	version: "0.5.12.7",
-	versionName: `"Abyssal" edition`,
+	versionName: `"Abyssal" 에디션`,
 	sneaky: false,
 	socialMediaEnabled: true,
 	sourceLinkEnabled: false,
@@ -34,7 +34,7 @@ Config.saves.isAllowed = () => {
 };
 
 if (idb.updateSettings) idb.updateSettings("useDelta", true);
-idb.footerHTML = `Support development: <a target="_blank" class="link-external" href="https://vrelnir.fanbox.cc/" tabindex="0">Fanbox</a>`;
+idb.footerHTML = `개발 후원: <a target="_blank" class="link-external" href="https://vrelnir.fanbox.cc/" tabindex="0">Fanbox</a>`;
 
 function onLoad(save) {
 	// some flags for version update. ideally, all updating should be done here in onLoad, but we don't live in an ideal world

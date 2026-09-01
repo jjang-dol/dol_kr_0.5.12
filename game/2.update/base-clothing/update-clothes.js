@@ -638,11 +638,11 @@ function wardrobesUpdate() {
 		V.wardrobes = {
 			shopReturn: "wardrobe",
 			wardrobe: {
-				NOTE: "DO NOT USE THIS OBJECT TO STORE CLOTHES",
+				NOTE: "이 물건을 옷 보관용으로 사용하지 마십시오",
 				unlocked: true,
 				shopSend: true,
 				transfer: true,
-				name: "Orphanage",
+				name: "고아원",
 			},
 			changingRoom: clone(defWardrobe),
 			edensCabin: clone(defWardrobe),
@@ -656,10 +656,10 @@ function wardrobesUpdate() {
 			avery_mansion: clone(defWardrobe),
 		};
 		/* beach */
-		V.wardrobes.changingRoom.name = "Beach changing room";
+		V.wardrobes.changingRoom.name = "해변 탈의실";
 		V.wardrobes.changingRoom.unlocked = true;
 		/* eden's */
-		V.wardrobes.edensCabin.name = "Eden's Cabin";
+		V.wardrobes.edensCabin.name = "에덴의 오두막";
 		V.wardrobes.edensCabin.isolated = true;
 		V.wardrobes.edensCabin.space = 10;
 		// allow sending clothes to the cabin when pc can leave for a day
@@ -669,41 +669,41 @@ function wardrobesUpdate() {
 		if (V.syndromeeden) V.wardrobes.edensCabin.unlocked = true;
 		/* asylum */
 		V.wardrobes.asylum.locationRequirement.push("asylum");
-		V.wardrobes.asylum.name = "Asylum";
+		V.wardrobes.asylum.name = "정신병원";
 		V.wardrobes.asylum.transfer = false;
 		V.wardrobes.asylum.isolated = true;
 		/* alex's */
-		V.wardrobes.alexFarm.name = "Alex's Farm";
+		V.wardrobes.alexFarm.name = "알렉스의 농장";
 		V.wardrobes.alexFarm.shopSend = true;
 		V.wardrobes.alexFarm.isolated = true;
 		V.wardrobes.alexFarm.space = 40;
 		if (V.farm_stage >= 7) V.wardrobes.alexFarm.unlocked = true;
 		/* strip club */
-		V.wardrobes.stripClub.name = "Strip Club";
+		V.wardrobes.stripClub.name = "스트립 클럽";
 		V.wardrobes.stripClub.space = 10;
 		if (V.stripclubdancingintro) V.wardrobes.stripClub.unlocked = true;
 		/* brothel */
-		V.wardrobes.brothel.name = "Brothel";
+		V.wardrobes.brothel.name = "창관";
 		V.wardrobes.brothel.space = 10;
 		if (V.brotheljob) V.wardrobes.brothel.unlocked = true;
 		/* school pool boys */
-		V.wardrobes.schoolBoys.name = "Schools boy's locker";
+		V.wardrobes.schoolBoys.name = "학교 남자 라커";
 		V.wardrobes.schoolBoys.unlocked = true;
 		V.wardrobes.schoolBoys.under_lower.push(clone(setup.clothes.under_lower[7]));
 		V.wardrobes.schoolBoys.under_lower.last().colour = "blue";
 		/* school pool girls */
-		V.wardrobes.schoolGirls.name = "Schools girl's locker";
+		V.wardrobes.schoolGirls.name = "학교 여자 라커";
 		V.wardrobes.schoolGirls.unlocked = true;
 		V.wardrobes.schoolGirls.under_lower.push(clone(setup.clothes.under_lower[6]));
 		V.wardrobes.schoolGirls.under_lower.last().colour = "blue";
 		V.wardrobes.schoolGirls.under_upper.push(clone(setup.clothes.under_upper[2]));
 		V.wardrobes.schoolGirls.under_upper.last().colour = "blue";
 		/* prison */
-		V.wardrobes.prison.name = "Prison locker";
+		V.wardrobes.prison.name = "교도소 라커";
 		V.wardrobes.prison.transfer = false;
 		V.wardrobes.prison.isolated = true;
 		/* mansion */
-		V.wardrobes.avery_mansion.name = "Mansion Wardrobe";
+		V.wardrobes.avery_mansion.name = "저택 옷장";
 		V.wardrobes.avery_mansion.transfer = true;
 		V.wardrobes.avery_mansion.isolated = true;
 		V.wardrobes.avery_mansion.shopSend = true;
@@ -716,7 +716,7 @@ function wardrobesUpdate() {
 		if (V.store !== undefined) Object.keys(V.store).forEach(s => V.store[s].forEach(i => (i.lastTaken = "wardrobe")));
 	}
 	/* fix prison wardrobe name */
-	if (V.wardrobes.prison.name === "Prison Locker") V.wardrobes.prison.name = "Prison locker";
+	if (V.wardrobes.prison.name === "Prison Locker") V.wardrobes.prison.name = "교도소 라커";
 	/* very old saves */
 	if (V.objectVersion.wardrobes < 2) {
 		for (const slot in setup.clothes_all_slots) {
@@ -752,7 +752,7 @@ function wardrobesUpdate() {
 		V.wardrobes.temple.space = 20;
 	}
 	if (!V.wardrobes.temple.name) {
-		V.wardrobes.temple.name = "Temple";
+		V.wardrobes.temple.name = "신전";
 	}
 	if (!V.wardrobes.pirate) {
 		V.wardrobes.pirate = clone(defWardrobe);
@@ -760,7 +760,7 @@ function wardrobesUpdate() {
 		V.wardrobes.pirate.space = 5;
 	}
 	if (!V.wardrobes.pirate.name) {
-		V.wardrobes.pirate.name = "Pirate Ship";
+		V.wardrobes.pirate.name = "해적선";
 	}
 	if (V.objectVersion.wardrobes < 7) {
 		Object.values(V.wardrobes).forEach(wardrobe => {
@@ -770,7 +770,7 @@ function wardrobesUpdate() {
 
 	if (!V.wardrobes.officeBuilding) {
 		V.wardrobes.officeBuilding = clone(defWardrobe);
-		V.wardrobes.officeBuilding.name = "Office agency changing room";
+		V.wardrobes.officeBuilding.name = "사무소 탈의실";
 		V.wardrobes.officeBuilding.unlocked = V.officejobintro === 1;
 		V.wardrobes.officeBuilding.space = 5;
 	}
@@ -778,7 +778,7 @@ function wardrobesUpdate() {
 	if (!V.wardrobes.birdTower) {
 		/* Great Hawk's tower */
 		V.wardrobes.birdTower = clone(defWardrobe);
-		V.wardrobes.birdTower.name = "Great Hawk's Tower";
+		V.wardrobes.birdTower.name = "거대 매의 탑";
 		V.wardrobes.birdTower.unlocked = false;
 		V.wardrobes.birdTower.isolated = true;
 		V.wardrobes.birdTower.space = 15;
@@ -793,7 +793,7 @@ function wardrobesUpdate() {
 
 	if (!V.wardrobes.avery_mansion) {
 		V.wardrobes.avery_mansion = clone(defWardrobe);
-		V.wardrobes.avery_mansion.name = "Mansion Wardrobe";
+		V.wardrobes.avery_mansion.name = "저택 옷장";
 		V.wardrobes.avery_mansion.transfer = true;
 		V.wardrobes.avery_mansion.isolated = true;
 		V.wardrobes.avery_mansion.shopSend = true;

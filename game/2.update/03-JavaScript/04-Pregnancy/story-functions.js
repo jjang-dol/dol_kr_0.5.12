@@ -302,17 +302,24 @@ window.dailyPregnancyEvent = dailyPregnancyEvent;
 function pregnancyNameCorrection(name, caps = false) {
 	switch (name) {
 		case "Black Wolf":
+			name = "검은 늑대";
+			break;
 		case "Great Hawk":
+			name = "거대 매";
+			break;
 		case "Night Monster":
+			name = "밤의 괴물";
+			break;
 		case "Ivory Wraith":
+			name = "상아의 원혼";
+			break;
 		case "cum bucket":
-			name = (caps ? "The " : "the ") + name;
+			name = "정액받이";
 			break;
 		case "pc":
-			name = caps ? "Yourself" : "yourself";
+			name = "당신";
 			break;
 		default:
-			name = name[0] === name[0].toLowerCase() ? (caps ? "A" : "a") + (["a", "e", "i", "o", "u"].includes(name[0]) ? "n " : " ") + name : name;
 			break;
 	}
 	return name;

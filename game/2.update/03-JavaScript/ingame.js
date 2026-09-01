@@ -349,7 +349,7 @@ function hairdressersReset() {
 	$(() =>
 		$("#hairDressers").on("change", ".macro-listbox, .macro-radiobutton, .macro-checkbox", function (e) {
 			Wikifier.wikifyEval("<<replace #hairDressers>><<hairDressersOptions>><</replace>>");
-			Wikifier.wikifyEval('<<replace #currentCost>>To pay: £<<print _currentCost / 100>><</replace>><<numberify "#passages > .passage">>');
+			Wikifier.wikifyEval('<<replace #currentCost>>지불 금액: £<<print _currentCost / 100>><</replace>><<numberify "#passages > .passage">>');
 		})
 	);
 }
@@ -359,7 +359,7 @@ function hairdressersResetAlt() {
 	$(() =>
 		$("#hairDressersSydney").on("click", ".macro-cycle", function (e) {
 			Wikifier.wikifyEval("<<replace #hairDressersSydney>><<hairDressersOptionsSydney>><</replace>>");
-			Wikifier.wikifyEval('<<replace #currentCost>>To pay: £<<print _currentCost / 100>><</replace>><<numberify "#passages > .passage">>');
+			Wikifier.wikifyEval('<<replace #currentCost>>지불 금액: £<<print _currentCost / 100>><</replace>><<numberify "#passages > .passage">>');
 		})
 	);
 }
@@ -419,7 +419,7 @@ DefineMacroS("startingPlayerImageReset", startingPlayerImageReset);
 
 function deck() {
 	const names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-	const suits = ["Hearts", "Diamonds", "Spades", "Clubs"];
+	const suits = ["♥", "◆", "♠", "♣"];
 	const cards = [];
 
 	for (let s = 0; s < suits.length; s++) {
@@ -433,31 +433,14 @@ function deck() {
 window.deck = deck;
 
 function ordinalSuffixOf(i) {
-	const j = i % 10;
-	const k = i % 100;
-	if (j === 1 && k !== 11) {
-		return i + "st";
-	}
-	if (j === 2 && k !== 12) {
-		return i + "nd";
-	}
-	if (j === 3 && k !== 13) {
-		return i + "rd";
-	}
-	return i + "th";
+	return i + "번째";
 }
 window.ordinalSuffixOf = ordinalSuffixOf;
 
 function ordinalWritten(i) {
-	const ordinals = ["", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth"];
+	const ordinals = ["", "첫 번째", "두 번째", "세 번째", "네 번째", "다섯 번째", "여섯 번째", "일곱 번째", "여덟 번째", "아홉 번째"];
 	if (i > 0 && i < 10) return ordinals[i];
-
-	const j = i % 10;
-	const k = i % 100;
-	if (j === 1 && k !== 11) return i + "st";
-	if (j === 2 && k !== 12) return i + "nd";
-	if (j === 3 && k !== 13) return i + "rd";
-	return i + "th";
+	return i + "번째";
 }
 window.ordinalWritten = ordinalWritten;
 
@@ -2588,23 +2571,23 @@ function beastMaleChance(override) {
 window.beastMaleChance = beastMaleChance;
 
 function penisNames(override) {
-	const names = ["penis"];
+	const names = ["자지"];
 
 	if (V.player.penissize < 2 && !override) return names;
 
-	if ((V.awareness >= 100 && !override) || override >= 1) names.push("dick");
-	if ((V.awareness >= 200 && V.purity < 900 && !override) || override >= 2) names.push("cock");
+	if ((V.awareness >= 100 && !override) || override >= 1) names.push("자지");
+	if ((V.awareness >= 200 && V.purity < 900 && !override) || override >= 2) names.push("좆");
 
 	return names;
 }
 window.penisNames = penisNames;
 
 function pussyNames(override) {
-	const names = ["vagina"];
+	const names = ["보지"];
 
-	if ((V.awareness >= 100 && !override) || override >= 1) names.push("pussy");
-	if ((V.awareness >= 200 && V.purity < 900 && !override) || override >= 2) names.push("quim");
-	if ((V.awareness >= 300 && V.purity < 100 && !override) || override >= 3) names.push("slit");
+	if ((V.awareness >= 100 && !override) || override >= 1) names.push("보지");
+	if ((V.awareness >= 200 && V.purity < 900 && !override) || override >= 2) names.push("음부");
+	if ((V.awareness >= 300 && V.purity < 100 && !override) || override >= 3) names.push("질");
 
 	return names;
 }
@@ -2632,7 +2615,7 @@ window.crimeSumCountHistory = (...args) => crimeSum("countHistory", ...args);
  */
 function onBrowserTabClose(event) {
 	event.preventDefault();
-	event.returnValue = "Are you sure you want to leave?"; // the string here isn't important, it's mostly not considered by the browser.
+	event.returnValue = "정말 나가시겠습니까?"; // the string here isn't important, it's mostly not considered by the browser.
 }
 
 /**
@@ -3077,12 +3060,12 @@ function marketFilter() {
 		let group = item.category;
 		if (V.foodstuff[product].amount <= 0) {
 			missingItems = true;
-			group = "No Stock";
+			group = "재고 없음";
 		}
 		if (!T.marketKeys.find(productObj => productObj.key === product)) T.marketKeys.push({ key: product, group });
 	});
 
-	if (missingItems) T.marketGroups.push("No Stock");
+	if (missingItems) T.marketGroups.push("재고 없음");
 }
 DefineMacro("marketFilter", marketFilter);
 
@@ -3165,20 +3148,20 @@ window.dangerEvent = dangerEvent;
  */
 function hasSharpSenses(sense = "any") {
 	if (["any", "sight"].includes(sense)) {
-		if (V.transformationParts.traits.sharpEyes !== "disabled") return "sharp eyes";
-		if (currentSkillValue("skulduggery") >= 600) return "experienced eyes";
+		if (V.transformationParts.traits.sharpEyes !== "disabled") return "예리한 눈";
+		if (currentSkillValue("skulduggery") >= 600) return "숙련된 눈";
 	}
 	if (["any", "hearing"].includes(sense)) {
-		if (V.transformationParts.wolf.ears !== "disabled" && V.transformationParts.wolf.ears !== "hidden") return "wolf ears";
-		if (V.transformationParts.cat.ears !== "disabled" && V.transformationParts.cat.ears !== "hidden") return "cat ears";
-		if (V.transformationParts.fox.ears !== "disabled" && V.transformationParts.fox.ears !== "hidden") return "fox ears";
-		if (currentSkillValue("skulduggery") >= 600) return "experienced ears";
+		if (V.transformationParts.wolf.ears !== "disabled" && V.transformationParts.wolf.ears !== "hidden") return "늑대 귀";
+		if (V.transformationParts.cat.ears !== "disabled" && V.transformationParts.cat.ears !== "hidden") return "고양이 귀";
+		if (V.transformationParts.fox.ears !== "disabled" && V.transformationParts.fox.ears !== "hidden") return "여우 귀";
+		if (currentSkillValue("skulduggery") >= 600) return "숙련된 귀";
 	}
 	if (["instincts"].includes(sense)) {
-		if (V.wolfgirl >= 6) return "wolf instincts";
-		if (V.cat >= 6) return "cat instincts";
-		if (V.fox >= 6) return "fox instincts";
-		if (V.dryad >= 6 || currentSkillValue("tending") >= 900) return "nature-trained instincts";
+		if (V.wolfgirl >= 6) return "늑대의 본능";
+		if (V.cat >= 6) return "고양이의 본능";
+		if (V.fox >= 6) return "여우의 본능";
+		if (V.dryad >= 6 || currentSkillValue("tending") >= 900) return "자연에 단련된 본능";
 	}
 	return false;
 }

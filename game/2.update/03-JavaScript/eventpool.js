@@ -36,7 +36,7 @@
  * @param {any[]} items
  */
 function rollWeightedRandomFromArray(items) {
-	if (!Array.isArray(items)) throw new Error("Not an array: " + items);
+	if (!Array.isArray(items)) throw new Error("배열이 아닙니다: " + items);
 	// convert items to array of {weight:number, item:original_item} and filter out bad elements
 	items = items
 		.map(function (el) {
@@ -50,21 +50,21 @@ function rollWeightedRandomFromArray(items) {
 		.filter(function (el) {
 			if (!el || !(el.weight > 0)) {
 				if (StartConfig.debug) {
-					console.debug("Filtered out ", el);
+					console.debug("제외됨 ", el);
 				}
 				return false;
 			}
 			return true;
 		});
 	if (StartConfig.debug) {
-		console.debug("Picking from random pool", items);
+		console.debug("무작위 풀에서 선택 중", items);
 	}
 	if (items.length === 0) return null; // Or could throw an exception (no items with positive weight)
 	let sum = 0;
 	for (let i = 0; i < items.length; i++) {
 		if (!isFinite(items[i].weight)) {
 			if (StartConfig.debug) {
-				console.debug("Returning infinite-weighted", items[i].item);
+				console.debug("무한 가중치 항목 반환", items[i].item);
 			}
 			return items[i].item;
 		}
@@ -76,13 +76,13 @@ function rollWeightedRandomFromArray(items) {
 		roll -= items[i].weight;
 		if (roll <= 0) {
 			if (StartConfig.debug) {
-				console.debug("Roll = ", roll0, "sum = ", sum, "returning ", items[i].item);
+				console.debug("굴림값 = ", roll0, "합계 = ", sum, "반환값 ", items[i].item);
 			}
 			return items[i].item;
 		}
 	}
 	// Should never happen
-	console.warn("Weighted random maths went wrong", roll0, sum, items);
+	console.warn("가중치 무작위 계산에 문제가 발생했습니다", roll0, sum, items);
 	return items[0].item;
 }
 window.rollWeightedRandomFromArray = rollWeightedRandomFromArray;
@@ -121,7 +121,7 @@ Macro.add("addinlineevent", {
 Macro.add("addevent", {
 	handler() {
 		const widget = this.args[0];
-		if (typeof widget !== "string" || !widget || this.args.length > 2) throw new Error("Bad addevent args " + JSON.stringify(this.args));
+		if (typeof widget !== "string" || !widget || this.args.length > 2) throw new Error("잘못된 addevent 인수 " + JSON.stringify(this.args));
 		T.eventpool.push({
 			name: widget,
 			content: "<<" + widget + ">>",
@@ -141,7 +141,7 @@ Macro.add("runeventpool", {
 
 		if (!pick) pick = rollWeightedRandomFromArray(T.eventpool);
 
-		if (!pick) throw new Error("Event pool is empty");
+		if (!pick) throw new Error("이벤트 풀이 비어 있습니다");
 		// Jimmy: For tracking where in the code you may be.
 		// E.G: ['eventAmbient', >>'autumn_anystreet_2'<<, 'generate1']
 		ExecutionContext.instance.callStack.push(new StackMacroMeta(pick.name));

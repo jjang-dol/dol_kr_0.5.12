@@ -383,7 +383,7 @@ class XrayCombatMapper {
 				};
 				break;
 			default:
-				Errors.report("Invalid npc for xray image. penetrator.npcType");
+				Errors.report("엑스레이 이미지에 유효하지 않은 NPC입니다. penetrator.npcType");
 				break;
 		}
 

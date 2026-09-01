@@ -13,6 +13,16 @@ function shopHuntCoords(loc, direction = "here") {
 }
 window.shopHuntCoords = shopHuntCoords;
 
+function shopHuntDirKr(direction) {
+	const map = {
+		here: "여기", north: "북쪽", south: "남쪽", west: "서쪽", east: "동쪽",
+		northwest: "북서쪽", northeast: "북동쪽", southwest: "남서쪽", southeast: "남동쪽",
+	};
+	return map[direction] || direction;
+}
+window.shopHuntDirKr = shopHuntDirKr;
+DefineMacroS("shopHuntDirKr", shopHuntDirKr);
+
 /**
  * Returns the location at the specified coordinates
  *
@@ -22,6 +32,8 @@ function shopHuntLoc(coords) {
 	return V.shopHuntMap[coords[0]][coords[1]];
 }
 window.shopHuntLoc = shopHuntLoc;
+
+
 
 /**
  * Returns whether the coordinates point a "hole", or a blank spot within the primary map border
@@ -239,23 +251,41 @@ window.shopHuntObstacles = shopHuntObstacles;
  * @param  {...any} args Variations
  * @returns {string} A word/name fit for prose
  */
-function shopHuntLocName(loc, ...args) {
-	let name = loc
-		.split(/(?=[A-Z])/)
-		.join(" ")
-		.toLowerCase();
 
-	if (V.shopHunt.locations[loc].state.includes("fallen")) name = ["fallen", ...name.split(" ").slice(1)].join(" ");
+const shopHuntLocNames = {
+	overspillingChest:    { full: "넘쳐흐르는 궤짝",        simple: "궤짝" },
+	hangingBasket:        { full: "매달린 바구니",          simple: "바구니" },
+	rottingCloset:        { full: "썩어가는 벽장",          simple: "벽장" },
+	squeakyRotatingRack:  { full: "삐걱거리는 회전 진열대", simple: "회전 진열대", sound: "삐걱대는 소리" },
+	darkScreen:           { full: "어두운 가림막",          simple: "가림막" },
+	antiqueWardrobe:      { full: "골동품 옷장",            simple: "옷장" },
+	strangeIroningBoard:  { full: "기묘한 다림질대",        simple: "다림질대" },
+	molderingHutch:       { full: "썩어가는 진열장",        simple: "진열장" },
+	rustedHangers:        { full: "녹슨 옷걸이",            simple: "옷걸이" },
+	duskyDrawer:          { full: "어둑한 서랍",            simple: "서랍" },
+	spindlyHatStand:      { full: "가느다란 모자 걸이",      simple: "모자 걸이" },
+	gnarledWall:          { full: "울퉁불퉁한 벽",          simple: "벽" },
+	glowingBox:           { full: "빛나는 상자",            simple: "상자" },
+	bentUmbrellaStand:    { full: "휘어진 우산 꽂이",       simple: "우산 꽂이" },
+	tiltedVanity:         { full: "기울어진 화장대",        simple: "화장대" },
+	wornStocking:         { full: "낡은 스타킹",            simple: "스타킹" },
+	decayingShelf:        { full: "부식된 선반",            simple: "선반" },
+	creakyCabinet:        { full: "삐걱거리는 캐비닛",       simple: "캐비닛", sound: "삐걱대는 소리" },
+};
+
+function shopHuntLocName(loc, ...args) {
+	const entry = shopHuntLocNames[loc];
+	let name = entry.full;
+
+	if (V.shopHunt.locations[loc].state.includes("fallen")) name = "쓰러진 " + entry.simple;
 
 	if (args.includes("simple")) {
-		name = name.split(" ").slice(1).join(" ");
+		name = entry.simple;
 	} else if (args.includes("sound")) {
-		/* Below is only designed to work with "creaky cabinet" and "squeaky rotating rack". Update if other noisy locations are added */
-		name = name.split(" ")[0].slice(0, -1);
+		name = entry.sound || entry.simple;
 	}
 
-	if (args.includes("cap")) name = name.toUpperFirst();
-
+	// 한국어는 대문자 구분이 없으므로 "cap" 인수는 별도 처리 불필요
 	return name;
 }
 window.shopHuntLocName = shopHuntLocName;
@@ -476,7 +506,7 @@ function shopHuntLocationsByDistance(start, sort = "both", order = "descending",
 	T.gridConsoleDisable = true;
 	let loc = start;
 	if (loc instanceof Array) {
-		if (!V.shopLocs.includes(shopHuntLoc(loc))) throw new Error("shopHuntLocationsByDistance error: argument 0 is not array that points to valid location");
+		if (!V.shopLocs.includes(shopHuntLoc(loc))) throw new Error("shopHuntLocationsByDistance 오류: 0번 인수가 유효한 위치를 가리키는 배열이 아닙니다");
 		loc = shopHuntLoc(loc);
 	} else if (!V.shopLocs.includes(loc)) loc = shopHuntFind(loc);
 	const locs = V.shopLocs.filter(x => x !== loc || here).shuffle();
