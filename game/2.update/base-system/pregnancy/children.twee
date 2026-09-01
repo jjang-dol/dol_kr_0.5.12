@@ -821,7 +821,7 @@ Groups littermates by pregnancyId.*/
 			<br>
 			<span class="gold">Age:</span> <<childAge _args[0] "full">>
 			<br>
-			<span class="gold">Size:</span> <<print $childRecords[_args[0]].features.size>>
+			<span class="gold">Size:</span> <<childKrText "size" $childRecords[_args[0]].features.size>>
 			<<if $childRecords[_args[0]].features.hairColour>>
 				<<if $childRecords[_args[0]].species.includes("human")>>
 					| <span class="gold">Hair:</span>
@@ -830,10 +830,13 @@ Groups littermates by pregnancyId.*/
 				<<else>>
 					| <span class="gold">Fur:</span>
 				<</if>>
-				<<hairmapcolourtext $childRecords[_args[0]].features.hairColour>>
+				<<childKrText "hair" $childRecords[_args[0]].features.hairColour>>
+			<</if>>
+			<<if $childRecords[_args[0]].features.eyeColour>>
+				| <span class="gold">Eyes:</span> <<childKrText "eye" $childRecords[_args[0]].features.eyeColour>>
 			<</if>>
 			<<if $childRecords[_args[0]].features.skinColour>>
-				| <span class="gold">Skin:</span> <<skinColourName $childRecords[_args[0]].features.skinColour>>
+				| <span class="gold">Skin:</span> <<childKrText "skin" $childRecords[_args[0]].features.skinColour>>
 			<</if>>
 			<br>
 			<<if $childRecords[_args[0]].identical isnot null>>
@@ -1440,14 +1443,39 @@ Groups littermates by pregnancyId.*/
 	</span>
 <</widget>>
 
-<<widget "skinColourName">><<silently>>
+<<widget "childKrText">><<silently>>
+	<!-- 
+		자녀 화면(children.twee/pregnancy.twee/events.twee) 전용 통합 번역 위젯.
+		child.features.* 에는 원문 영어 키(예: "tiny", "dark brown", "grey")가 그대로 저장되며,
+		이 위젯은 출력 시점에만 한글로 변환한다 — 세이브에는 절대 번역문을 쓰지 않는다.
+		사용법: <<childKrText "size"|"hair"|"eye"|"skin" _rawValue>>
+	-->
 	<<switch _args[0]>>
-		<<case "light" "rlight" "ylight" "glight" "blight">><<set $_text_output to "밝은">>
-		<<case "medium" "rmedium" "ymedium" "gmedium" "bmedium">><<set $_text_output to "보통">>
-		<<case "dark" "rdark" "ydark" "gdark" "bdark">><<set $_text_output to "어두운">>
-		<<case "ghostlyPale" "ghost">><<set $_text_output to "핏기 없이 창백한">>
-		<<case "gyaru" "ygyaru" "rgyaru" "ggyaru" "bgyaru">><<set $_text_output to "보통">>
-		<<default>><<set $_text_output to _args[0]>>
+		<<case "size">>
+			<<switch _args[1]>>
+				<<case "tiny">><<set $_text_output to "아주 작음">>
+				<<case "small">><<set $_text_output to "작음">>
+				<<case "normal">><<set $_text_output to "보통">>
+				<<case "large">><<set $_text_output to "큼">>
+				<<default>><<set $_text_output to _args[1]>>
+			<</switch>>
+		<<case "hair">>
+			<<set _childKrRecord to setup.guessColourInMap(setup.colours.hair_map, _args[1])>>
+			<<set $_text_output to _childKrRecord ? _childKrRecord.name : _args[1]>>
+		<<case "eye">>
+			<<set _childKrRecord to setup.guessColourInMap(setup.colours.eyes_map, _args[1])>>
+			<<set $_text_output to _childKrRecord ? _childKrRecord.name : _args[1]>>
+		<<case "skin">>
+			<<switch _args[1]>>
+				<<case "light" "rlight" "ylight" "glight" "blight">><<set $_text_output to "밝은">>
+				<<case "medium" "rmedium" "ymedium" "gmedium" "bmedium">><<set $_text_output to "보통">>
+				<<case "dark" "rdark" "ydark" "gdark" "bdark">><<set $_text_output to "어두운">>
+				<<case "ghostlyPale" "ghost">><<set $_text_output to "핏기 없이 창백한">>
+				<<case "gyaru" "ygyaru" "rgyaru" "ggyaru" "bgyaru">><<set $_text_output to "보통">>
+				<<default>><<set $_text_output to _args[1]>>
+			<</switch>>
+		<<default>>
+			<<set $_text_output to _args[1]>>
 	<</switch>>
 	<</silently>><<print $_text_output>>
 <</widget>>

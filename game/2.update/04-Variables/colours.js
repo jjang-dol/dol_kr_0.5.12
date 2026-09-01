@@ -736,6 +736,20 @@ setup.colours.hair = [
 		},
 	},
 	{
+		// KR: genePool.wolfFur("tan")이 참조하지만 원본 hair 배열엔 없던 색상. 임시로 clothes 쪽
+		// "tan"(colours.js ~1481행) 블렌드값을 재사용함 — 늑대 새끼 스프라이트에서 실제로
+		// 확인 후 canvasfilter는 조정 필요.
+		variable: "tan",
+		name: "황갈색",
+		name_cap: "황갈색",
+		csstext: "tan",
+		natural: false,
+		dye: false,
+		canvasfilter: {
+			blend: "#c3ad91",
+		},
+	},
+	{
 		variable: "white",
 		name: "흰색",
 		name_cap: "흰색",
@@ -2199,8 +2213,20 @@ buildColourMap("condom");
 buildColourMap("tentacle");
 
 /**
- * Tries to guess colour in the map by removing spaces or replacing them with '-' and checking against name.
- * Return colour record if found and null if no.
+ * Normalizes a colour key for loose comparison: lowercased, with spaces/underscores/hyphens
+ * stripped. Lets "dark brown", "dark_brown", "dark-brown" and "darkbrown" all match each other.
+ *
+ * @param {any} str
+ * @returns {any} the normalized string, or the input unchanged if it isn't a string
+ */
+setup.normalizeColourKey = function (str) {
+	return typeof str === "string" ? str.toLowerCase().replace(/[\s_-]+/g, "") : str;
+};
+
+/**
+ * Tries to guess colour in the map regardless of spacing/underscore/hyphen/case differences
+ * between the lookup key and the map's keys, falling back to a match on the record's display
+ * name. Return colour record if found and null if no.
  *
  * @param {any} map
  * @param {any} colour
@@ -2208,11 +2234,10 @@ buildColourMap("tentacle");
 setup.guessColourInMap = function (map, colour) {
 	if (colour in map) return map[colour];
 
-	let testname = colour.replace(/ /g, "");
-	if (testname in map) return map[testname];
-
-	testname = colour.replace(/ /g, "-");
-	if (testname in map) return map[testname];
+	const normalizedTarget = setup.normalizeColourKey(colour);
+	for (const key in map) {
+		if (setup.normalizeColourKey(key) === normalizedTarget) return map[key];
+	}
 
 	for (const record of Object.values(map)) {
 		if (record.name === colour) return record;
