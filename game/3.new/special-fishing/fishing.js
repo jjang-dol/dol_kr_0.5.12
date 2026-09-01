@@ -716,15 +716,15 @@ window.fishingCatchEventWeight = fishingCatchEventWeight;
 function fishingLocationDisplayName(bus) {
 	switch (bus) {
 		case "fishingBeach":
-			return "Beach";
+			return "해변";
 		case "fishingPier":
-			return "Pier";
+			return "부두";
 		case "fishingCoastPath":
-			return "Coastal Path";
+			return "해안 산책로";
 		case "fishingForestLake":
-			return "Forest Lake";
+			return "숲속 호수";
 		case "fishingMoor":
-			return "Moor";
+			return "황야";
 		default:
 			throw new Error(`fishingLocationDisplayName: unknown bus "${bus}"`);
 	}

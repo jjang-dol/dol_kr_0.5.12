@@ -320,3 +320,40 @@ function initFishingFishConfig() {
 	};
 }
 window.initFishingFishConfig = initFishingFishConfig;
+
+/**
+ * Korean display names for the fish species keys in setup.fishing.lootTables.fish above.
+ * Not in kr_dict.js (no existing entry), so it lives here, following the same save-compat
+ * pattern used elsewhere: the fish key itself (in loot tables, $fishingHookedFish.type, save
+ * records, etc.) stays the English key -- this dict only translates it for display.
+ */
+window.KR = window.KR || {};
+window.KR.fishNameDict = {
+	haddock: "해덕대구",
+	salmon: "연어",
+	trout: "송어",
+	herring: "청어",
+	whiting: "위팅",
+	mackerel: "고등어",
+	flounder: "가자미",
+	bass: "농어",
+	roach: "로치",
+	perch: "퍼치",
+	chub: "처브",
+	grayling: "그레일링",
+	cod: "대구",
+	pike: "파이크",
+	eel: "뱀장어",
+	baitfish: "미끼고기",
+};
+
+/**
+ * Korean display name for a fish species key. Falls back to the original key for anything not
+ * in the pool above.
+ *
+ * @param {string} fishKey
+ * @returns {string}
+ */
+window.KR.getFishNameKr = function(fishKey) {
+	return window.KR.fishNameDict[fishKey] || fishKey;
+};
