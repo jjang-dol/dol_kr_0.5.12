@@ -19,7 +19,10 @@ function effectsWater(waterType = "liquid") {
 		water: "물",
 		rain: "빗물",
 		sea: "바닷물",
-		lake: "호수 물",
+		lake: "호수 물",snow: "눈",
+		cum: "정액",
+		"warm water": "따뜻한 물",
+		slush: "진눈깨비",
 	}[waterType] || waterType;
 
 	switch (V.squidcount) {
