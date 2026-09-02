@@ -1978,11 +1978,13 @@
 			<<set _impregnatableNPC.push($NPCName.indexOf(_pregEnabled))>>
 		<</if>>
 	<</for>>
+	/* ============ 번역 필요 ============== */
 	<<if $player.vaginaExist or playerCanCarryAnally()>>
 		<<set _menstruation to $sexStats.vagina.menstruation>>
 		<<if !playerIsPregnant()>>
 			You aren't pregnant.
 			<<if $settings.pregnancyType is "realistic">>
+				/* ============ 번역 필요 ============== */
 				<<set _stored to $cumLoads[_womb].filter(loadIsLive).length>>
 				You have <span id="cheatSpermSources"><span class="gold">_stored</span> <<pluralise _stored "stored load">></span> contributing to your chances of getting pregnant.
 			<</if>>
@@ -2001,17 +2003,21 @@
 		<</if>>
 		<<if playerIsPregnant()>>
 			You are pregnant.
+			/* ============ 번역 필요 ============== */
 			<<set _pregnancy to getPlayerPregnancy()>>
 			<<numberStepper "Pregnancy progress" pregnancyProgress(_pregnancy) {
 				callback: value => {
+					/* ============ 번역 필요 ============== */
 					const preg = getPlayerPregnancy(); if (preg) { const term = getDueDate(preg) - preg.conceivedDate; preg.conceivedDate = Time.date.timeStamp - value * term; }
 					Wikifier.wikifyEval("<<updatesidebarimg>>");
 				},
+				/* ============ 번역 필요 ============== */
 				min: 0, max: 0.99, step: 0.05,
 				colorArr: ["--teal", "--pink"], activeButtons: ["single", "double"]
 			}>>
 			<br><br>
 			<<link [[Clear current pregnancy|$passage]]>>
+				/* ============ 번역 필요 ============== */
 				<<run clearPlayerPregnancies()>>
 				<<set $cumLoads to { vagina: [], anus: [] }>>
 				<<set $pendingPregnancies to { vagina: null, anus: null }>>
@@ -2109,6 +2115,7 @@
 					<br>
 					<<if $settings.playerPregnancyHumanEnabled>>
 						<<link "An anonymous donor">> /* The sperm owner is always the same, anonymous donor, so it helps pregnancy from only one source */
+							/* ============ 번역 필요 ============== */
 							<<sceneInseminate _womb "anonymous donor" "human" "deep">>
 							<<replace "#cheatSpermSources">><<set _stored to $cumLoads[_womb].filter(loadIsLive).length>><span class="gold">_stored</span> <<pluralise _stored "stored load">><</replace>>
 						<</link>>
@@ -2123,6 +2130,7 @@
 							<<else>>
 								<<set _impregnator += "foreigner">>
 							<</if>>
+							/* ============ 번역 필요 ============== */
 							<<sceneInseminate _womb _impregnator "human" "deep">>
 							<<replace "#cheatSpermSources">><<set _stored to $cumLoads[_womb].filter(loadIsLive).length>><span class="gold">_stored</span> <<pluralise _stored "stored load">><</replace>>
 						<</link>>
@@ -2151,6 +2159,7 @@
 								<</if>>
 								<<set _spermType to "wolf">>
 							<</if>>
+							/* ============ 번역 필요 ============== */
 							<<sceneInseminate _womb _impregnator _spermType "deep">>
 							<<replace "#cheatSpermSources">><<set _stored to $cumLoads[_womb].filter(loadIsLive).length>><span class="gold">_stored</span> <<pluralise _stored "stored load">><</replace>>
 						<</link>>
@@ -2177,6 +2186,7 @@
 						<</switch>>
 						<<capture _actor, _spermType, _womb>>
 						| <<link _actor.nam>>
+							/* ============ 번역 필요 ============== */
 							<<sceneInseminate _womb _actor.nam _spermType "deep">>
 							<<replace "#cheatSpermSources">><<set _stored to $cumLoads[_womb].filter(loadIsLive).length>><span class="gold">_stored</span> <<pluralise _stored "stored load">><</replace>>
 						<</link>>
@@ -2184,6 +2194,7 @@
 					<</for>>
 					<<if $player.penisExist>>
 						| <<link "Yourself">>
+							/* ============ 번역 필요 ============== */
 							<<sceneInseminate _womb "pc" "human" "deep">>
 							<<replace "#cheatSpermSources">><<set _stored to $cumLoads[_womb].filter(loadIsLive).length>><span class="gold">_stored</span> <<pluralise _stored "stored load">><</replace>>
 						<</link>>
@@ -2207,17 +2218,17 @@
 	<</if>>
 <</widget>>
 
-/* ============ 번역 필요 ============== */
 <<widget "cheatsImpregOptions">>
-	<span class="gold">Impregnation</span>
+	<span class="gold">수정</span>
 	<<if $player.penisExist and _impregnatableNPC.length>>
 		<br>
-		You can impregnate <span class="gold">_impregnatableNPC.length</span> fertile <<pluralise _impregnatableNPC.length "NPC">>.
+		당신은 <span class="gold">_impregnatableNPC.length</span>명의 가임기 <<pluralise _impregnatableNPC.length "NPC" "NPC">>【을를】 임신시킬 수 있습니다.
 		<br><br>
 		<<set _fertileNPC to 0>>
 		<<for _pregEnabled range _impregnatableNPC>>
 			<<set _actor to $NPCName[_pregEnabled]>>
 			<<set _actorNameNoSpace to _actor.nam.replace(" ","")>>
+			/* ============ 번역 필요 ============== */
 			<<if !_eligible.includes(_actor.nam) or getActivePregnancies(_actor.nam).length>>
 				<<continue>>
 			<</if>>
@@ -2225,12 +2236,13 @@
 			<<= _actor.nam>>:
 			<br>
 			<<capture _actor>>
-				<<set _linkText to "Impregnate">>
+				<<set _linkText to "임신시키기">>
 				<<link [[_linkText|$passage]]>>
+					/* ============ 번역 필요 ============== */
 					<<namedNpcPregnancy _actor.nam "pc" "human" true true>>
 				<</link>>
 				<<if $settings.fertilityCycleEnabled>>
-					- <<link [[Set cycle to fertile days|$passage]]>>
+					- <<link [[주기를 가임기로 설정|$passage]]>>
 						<<set _actor.pregnancy.cycleDay to _actor.pregnancy.cycleDangerousDay - 1>>
 					<</link>>
 				<</if>>
@@ -2238,14 +2250,15 @@
 			<br>
 		<</for>>
 		<<if !_fertileNPC is 0>>
-			You can't impregnate any other NPCs.
+			당신은 다른 어떤 NPC도 임신시킬 수 없습니다.
 		<</if>>
 	<<else>>
 		<br>
-		You can't currently impregnate any NPCs<<if !$player.penisExist>>, since you have no penis<</if>>.
+		당신은 현재 어떤 NPC도 임신시킬 수 없습니다<<if !$player.penisExist>>, 자지가 없기 때문입니다<</if>>.
 	<</if>>
 
 	<<for _pregEnabled range $NPCName>> /* Checks for any pregnant named NPC. */
+		/* ============ 번역 필요 ============== */
 		<<if npcIsPregnant(_pregEnabled.nam)>>
 			<<set _pregnantNPC[_pregEnabled.nam] to $NPCName.indexOf(_pregEnabled)>>
 		<</if>>
@@ -2253,7 +2266,7 @@
 
 	<<if Object.keys(_pregnantNPC).length>>
 		<hr>
-		<span class="gold">Pregnant NPCs</span>
+		<span class="gold">임신한 NPC</span>
 		<br>
 		<<listbox "_pregnantNPCId" autoselect>>
 			<<optionsfrom _pregnantNPC>>
@@ -2266,22 +2279,24 @@
 	<</if>>
 <</widget>>
 
-/* ============ 번역 필요 ============== */
 <<widget "cheatPregnancyNPCStepper">>
+/* ============ 번역 필요 ============== */
 <<set _pregRecord to getActivePregnancies($NPCName[_args[0]].nam)[0]>>
 <<numberStepper "Pregnancy progress (days)" daysAlong(_pregRecord) {
 	callback: (value, arr) => {
+		/* ============ 번역 필요 ============== */
 		const rec = getActivePregnancies(V.NPCName[arr[0]].nam)[0];
 		rec.conceivedDate = Time.date.timeStamp - value * TimeConstants.secondsPerDay;
 		Wikifier.wikifyEval("<<updatesidebarimg>>");
 	},
 	values: [_args[0]],
+	/* ============ 번역 필요 ============== */
 	min: 0, max: (getDueDate(_pregRecord) - _pregRecord.conceivedDate) / TimeConstants.secondsPerDay - 0.5,
 	colorArr: ["--teal", "--pink"], activeButtons: ["single", "double"]
 }>>
 <</widget>>
-/* ============ 번역 필요 ============== */
 <<widget "cheatPregnancyNPC">>
+	/* ============ 번역 필요 ============== */
 	<<set _pregRecord to getActivePregnancies($NPCName[_args[0]].nam)[0]>>
 	<<set _term to getDueDate(_pregRecord) - _pregRecord.conceivedDate>>
 	<<set $_fatherName to pregnancyNameCorrection(_pregRecord.donor)>>
@@ -2292,25 +2307,30 @@
 	</span>
 	<br>
 
-	<<link "1st trimester">>
+	<<link "임신 초기">>
+		/* ============ 번역 필요 ============== */
 		<<set _pregRecord.conceivedDate to Time.date.timeStamp - _term * .05>>
 		<<replace "#cheatNPCPregnancyProgress">><<cheatPregnancyNPCStepper _args[0]>><</replace>>
 	<</link>> -
-	<<link "2nd trimester">>
+	<<link "임신 중기">>
+		/* ============ 번역 필요 ============== */
 		<<set _pregRecord.conceivedDate to Time.date.timeStamp - _term * .35>>
 		<<replace "#cheatNPCPregnancyProgress">><<cheatPregnancyNPCStepper _args[0]>><</replace>>
 	<</link>> -
-	<<link "3rd trimester">>
+	<<link "임신 말기">>
+		/* ============ 번역 필요 ============== */
 		<<set _pregRecord.conceivedDate to Time.date.timeStamp - _term * .7>>
 		<<replace "#cheatNPCPregnancyProgress">><<cheatPregnancyNPCStepper _args[0]>><</replace>>
 	<</link>> -
-	<<link "End of pregnancy">>
+	<<link "임신 막달">>
+		/* ============ 번역 필요 ============== */
 		<<set _pregRecord.conceivedDate to Time.date.timeStamp - _term>>
 		<<replace "#cheatNPCPregnancyProgress">><<cheatPregnancyNPCStepper _args[0]>><</replace>>
 	<</link>>
 	<br><br>
 
-	<<link [[Clear pregnancy|$passage]]>>
+	<<link [[임신 지우기|$passage]]>>
+		/* ============ 번역 필요 ============== */
 		<<run clearPregnancyRecord(_pregRecord.pregnancyId)>>
 		<<set $NPCName[_args[0]].pregnancy.cycleDay to 1>>
 		<<if _pregnantNPCId is 25>><<run delete C.npc.Alex.pregnancy.selfKnowledge>><</if>>
@@ -2533,19 +2553,19 @@
 	<</if>>
 <</widget>>
 
-/* ============ 번역 필요 ============== */
 <<widget "cheatSection">>
 	<<switch _args[0]>>
 		<<case "state">>
-			<<numberStepper "Pain" $pain { callback: value => { V.pain = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 200, reverse: true}>>
-			<<numberStepper "Arousal" $arousal { callback: value => { V.arousal = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 10000, reverse: true}>>
-			<<numberStepper "Fatigue" $tiredness { callback: value => { V.tiredness = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 2000, reverse: true}>>
-			<<numberStepper "Stress" $stress { callback: value => { V.stress = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 10000, reverse: true}>>
-			<<numberStepper "Trauma" $trauma { callback: value => { V.trauma = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 5000, reverse: true}>>
-			<<numberStepper "Control" $control { callback: value => { V.control = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 1000}>>
+			<<numberStepper "고통" $pain { callback: value => { V.pain = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 200, reverse: true}>>
+			<<numberStepper "흥분도" $arousal { callback: value => { V.arousal = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 10000, reverse: true}>>
+			<<numberStepper "피로도" $tiredness { callback: value => { V.tiredness = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 2000, reverse: true}>>
+			<<numberStepper "스트레스" $stress { callback: value => { V.stress = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 10000, reverse: true}>>
+			<<numberStepper "트라우마" $trauma { callback: value => { V.trauma = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 5000, reverse: true}>>
+			<<numberStepper "통제력" $control { callback: value => { V.control = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 1000}>>
+			/* ============ 번역 필요 ============== */
 			<<numberStepper "Drunk" $drunk { callback: value => { V.drunk = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: V.drunkmax, reverse: true}>>
-			<<numberStepper "Drugs" $drugged { callback: value => { V.drugged = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 1000, reverse: true}>>
-			<<numberStepper "Hallucinogens" $hallucinogen { callback: value => { V.hallucinogen = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 1000, reverse: true}>>
+			<<numberStepper "약물" $drugged { callback: value => { V.drugged = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 1000, reverse: true}>>
+			<<numberStepper "환각제" $hallucinogen { callback: value => { V.hallucinogen = value; Wikifier.wikifyEval("<<updatesidebarimg>>") }, max: 1000, reverse: true}>>
 		<<case "crime">>
 			<<for _cr range Object.keys(setup.crimeNames)>>
 				<<capture _cr>>
@@ -2554,72 +2574,72 @@
 			<</for>>
 			<<unset _cr>>
 		<<case "negative">>
-			<<numberStepper "Sex" $fame.sex { callback: value => { V.fame.sex = value }, max: 2000, reverse: true}>>
-			<<numberStepper "Prostitution" $fame.prostitution { callback: value => { V.fame.prostitution = value }, max: 2000, reverse: true}>>
-			<<numberStepper "Rape" $fame.rape { callback: value => { V.fame.rape = value }, max: 2000, reverse: true}>>
-			<<numberStepper "Bestiality" $fame.bestiality { callback: value => { V.fame.bestiality = value }, max: 2000, reverse: true}>>
-			<<numberStepper "Pregnancy" $fame.pregnancy { callback: value => { V.fame.pregnancy = value }, max: Math.clamp(playerNormalPregnancyTotal(),1,8) * 250, step: 2000 / 100, percentage: false, reverse: true, valueFormat: (value) => `<b>${Math.round(((value - 0) / (2000 - 0)) * 100)}%</b>`}>>
-			<<numberStepper "Impregnation" $fame.impreg { callback: value => { V.fame.impreg = value }, max: 2000, reverse: true}>>
-			<<numberStepper "Exhibitionism" $fame.exhibitionism { callback: value => { V.fame.exhibitionism = value }, max: 2000, reverse: true}>>
+			<<numberStepper "성적" $fame.sex { callback: value => { V.fame.sex = value }, max: 2000, reverse: true}>>
+			<<numberStepper "매춘" $fame.prostitution { callback: value => { V.fame.prostitution = value }, max: 2000, reverse: true}>>
+			<<numberStepper "강간" $fame.rape { callback: value => { V.fame.rape = value }, max: 2000, reverse: true}>>
+			<<numberStepper "수간" $fame.bestiality { callback: value => { V.fame.bestiality = value }, max: 2000, reverse: true}>>
+			<<numberStepper "임신" $fame.pregnancy { callback: value => { V.fame.pregnancy = value }, max: Math.clamp(playerNormalPregnancyTotal(),1,8) * 250, step: 2000 / 100, percentage: false, reverse: true, valueFormat: (value) => `<b>${Math.round(((value - 0) / (2000 - 0)) * 100)}%</b>`}>>
+			<<numberStepper "수정" $fame.impreg { callback: value => { V.fame.impreg = value }, max: 2000, reverse: true}>>
+			<<numberStepper "노출" $fame.exhibitionism { callback: value => { V.fame.exhibitionism = value }, max: 2000, reverse: true}>>
 			<<if playerNormalPregnancyTotal() lt 8>>
 				<span class="description"><<set _pregsNeeded to Math.trunc(8-playerNormalPregnancyTotal())>>
-				Your pregnancy fame is capped by the amount of pregnancies you've had. You need to get pregnant <span class="gold"><<number _pregsNeeded>></span> more <<pluralise _pregsNeeded "time">> to reach maximum pregnancy fame.</span>
+				당신의 임신 명성은 당신이 겪은 임신 횟수에 의해 제한됩니다. 최대 임신 명성에 도달하려면 <span class="gold"><<number _pregsNeeded>></span>번 더 임신해야 합니다.</span>
 			<</if>>
 		<<case "positive">>
-			<<numberStepper "Combat" $fame.scrap { callback: value => { V.fame.scrap = value }, max: 2000}>>
-			<<numberStepper "Kindness" $fame.good { callback: value => { V.fame.good = value }, max: 2000}>>
-			<<numberStepper "Business" $fame.business { callback: value => { V.fame.business = value }, max: 2000}>>
-			<<numberStepper "Socialite" $fame.social { callback: value => { V.fame.social = value }, max: 2000}>>
-			<<numberStepper "Model" $fame.model { callback: value => { V.fame.model = value }, max: 2000}>>
+			<<numberStepper "전투" $fame.scrap { callback: value => { V.fame.scrap = value }, max: 2000}>>
+			<<numberStepper "친절" $fame.good { callback: value => { V.fame.good = value }, max: 2000}>>
+			<<numberStepper "사업" $fame.business { callback: value => { V.fame.business = value }, max: 2000}>>
+			<<numberStepper "사교" $fame.social { callback: value => { V.fame.social = value }, max: 2000}>>
+			<<numberStepper "모델" $fame.model { callback: value => { V.fame.model = value }, max: 2000}>>
 		<<case "skills">>
-			<<numberStepper "Skulduggery" $skulduggery "skulduggery" {max: 1000}>>
-			<<numberStepper "Dance" $danceskill "danceskill" {max: 1000}>>
-			<<numberStepper "Swimming" $swimmingskill "swimmingskill" {max: 1000}>>
-			<<numberStepper "Athletics" $athletics "athletics" {max: 1000}>>
-			<<numberStepper "Tending" $tending "tending" {max: 1000}>>
-			<<numberStepper "Housekeeping" $housekeeping "housekeeping" {max: 1000}>>
+			<<numberStepper "속임수" $skulduggery "skulduggery" {max: 1000}>>
+			<<numberStepper "춤" $danceskill "danceskill" {max: 1000}>>
+			<<numberStepper "수영" $swimmingskill "swimmingskill" {max: 1000}>>
+			<<numberStepper "체육" $athletics "athletics" {max: 1000}>>
+			<<numberStepper "관리" $tending "tending" {max: 1000}>>
+			<<numberStepper "가사" $housekeeping "housekeeping" {max: 1000}>>
 		<<case "school">>
 			/* normally, school traits are adjusted by the widget "school_skill_change" */
-			<<numberStepper "<<scienceicon>> Science" $science "science" {
+			<<numberStepper "<<scienceicon>> 과학" $science "science" {
 				callback: (value) => wikifier('adjust_school_traits'),
 				max: 1000
 			}>>
-			<<numberStepper "<<mathicon>> Maths" $maths "maths" {
+			<<numberStepper "<<mathicon>> 수학" $maths "maths" {
 				callback: (value) => wikifier('adjust_school_traits'),
 				max: 1000
 			}>>
-			<<numberStepper "<<englishicon>> English" $english "english" {
+			<<numberStepper "<<englishicon>> 영어" $english "english" {
 				callback: (value) => wikifier('adjust_school_traits'),
 				max: 1000
 			}>>
-			<<numberStepper "<<historyicon>> History" $history "history" {
+			<<numberStepper "<<historyicon>> 역사" $history "history" {
 				callback: (value) => wikifier('adjust_school_traits'),
 				max: 1000
 			}>>
 		<<case "characteristics">>
-			<<numberStepper "<<tficon angel>> Purity" $purity "purity" {max: 1000}>>
-			<<numberStepper "<<symbol beauty>> Beauty" $beauty "beauty" {max: 10000}>>
-			<<numberStepper "<<symbol physique>> Physique" $physique "physique" {max: $physiquesize}>>
-			<<numberStepper "<<symbol willpower>> Willpower" $willpower "willpower" {max: 1000}>>
-			<<numberStepper "<<symbol awareness>> Awareness" $awareness "awareness" {min: -200, max: 1000, reverse: true}>>
-			<<numberStepper "<<symbol promiscuity>> Promiscuity" $promiscuity "promiscuity" {reverse: true}>>
-			<<numberStepper "<<symbol exhibitionism>> Exhibitionism" $exhibitionism "exhibitionism" {reverse: true}>>
-			<<numberStepper "<<symbol deviancy>> Deviancy" $deviancy "deviancy" {reverse: true}>>
+			<<numberStepper "<<tficon angel>> 순결도" $purity "purity" {max: 1000}>>
+			<<numberStepper "<<symbol beauty>> 아름다움" $beauty "beauty" {max: 10000}>>
+			<<numberStepper "<<symbol physique>> 체력" $physique "physique" {max: $physiquesize}>>
+			<<numberStepper "<<symbol willpower>> 의지력" $willpower "willpower" {max: 1000}>>
+			<<numberStepper "<<symbol awareness>> 인식" $awareness "awareness" {min: -200, max: 1000, reverse: true}>>
+			<<numberStepper "<<symbol promiscuity>> 음란도" $promiscuity "promiscuity" {reverse: true}>>
+			<<numberStepper "<<symbol exhibitionism>> 노출증" $exhibitionism "exhibitionism" {reverse: true}>>
+			<<numberStepper "<<symbol deviancy>> 일탈도" $deviancy "deviancy" {reverse: true}>>
 			<<if numberOfEarSlime()>>
-				<<numberStepper "<<symbol corruption>> Corruption" $earSlime.corruption { callback: value => {V.earSlime.corruption = value; Wikifier.wikifyEval("<<updatesidebarimg>>")}, reverse: true}>>
+				<<numberStepper "<<symbol corruption>> 타락도" $earSlime.corruption { callback: value => {V.earSlime.corruption = value; Wikifier.wikifyEval("<<updatesidebarimg>>")}, reverse: true}>>
 			<</if>>
 		<<case "sex">>
-			<<numberStepper "Seduction" $seductionskill "seductionskill" {max: 1000}>>
-			<<numberStepper "Chest" $chestskill "chestskill" {max: 1000}>>
-			<<numberStepper "Buttocks" $bottomskill "bottomskill" {max: 1000}>>
-			<<if $player.vaginaExist>><<numberStepper "Vaginal" $vaginalskill "vaginalskill" {max: 1000}>><</if>>
-			<<if $player.penisExist>><<numberStepper "Penile" $penileskill "penileskill" {max: 1000}>><</if>>
-			<<numberStepper "Thighs" $thighskill "thighskill" {max: 1000}>>
-			<<numberStepper "Oral" $oralskill "oralskill" {max: 1000}>>
-			<<numberStepper "Hands" $handskill "handskill" {max: 1000}>>
-			<<numberStepper "Anal" $analskill "analskill" {max: 1000}>>
-			<<numberStepper "Feet" $feetskill "feetskill" {max: 1000}>>
+			<<numberStepper "유혹" $seductionskill "seductionskill" {max: 1000}>>
+			<<numberStepper "가슴" $chestskill "chestskill" {max: 1000}>>
+			<<numberStepper "엉덩이" $bottomskill "bottomskill" {max: 1000}>>
+			<<if $player.vaginaExist>><<numberStepper "보지" $vaginalskill "vaginalskill" {max: 1000}>><</if>>
+			<<if $player.penisExist>><<numberStepper "자지" $penileskill "penileskill" {max: 1000}>><</if>>
+			<<numberStepper "허벅지" $thighskill "thighskill" {max: 1000}>>
+			<<numberStepper "입" $oralskill "oralskill" {max: 1000}>>
+			<<numberStepper "손" $handskill "handskill" {max: 1000}>>
+			<<numberStepper "애널" $analskill "analskill" {max: 1000}>>
+			<<numberStepper "발" $feetskill "feetskill" {max: 1000}>>
 		<<default>>
-			ERROR: Skill issue.
+			에러: 스킬 문제.
 	<</switch>>
 <</widget>>

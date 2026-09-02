@@ -88,26 +88,26 @@
 	<</switch>>
 <</silently>><<print $_result>><</widget>>
 
-/* ============ 번역 필요 ============== */
-<<widget "display_plot">> <!-- Argument is the plot location you want to display. -->
+<<widget "display_plot">>/*Argument is the plot location you want to display.*/
 	<<set _location to _args[0]>>
 	<<set $_plotsHere to $plots[_location]>>
 	<<set _water_needed to 0>>
-	There <<pluralise $_plotsHere.length "is">> <<number $_plotsHere.length>> tillable
+	이곳에는 개간할 수 있는
 	<<switch $_plotsHere[0].size>>
-		<<case "small">> <span class="lblue"><<pluralise $_plotsHere.length "bed">></span>
-		<<case "medium">> <span class="teal"><<pluralise $_plotsHere.length "plot">></span>
-		<<default>> <span class="green"><<pluralise $_plotsHere.length "field">></span>
+		<<case "small">> <span class="lblue">화단</span>
+		<<case "medium">> <span class="teal">밭</span>
+		<<default>> <span class="green">들판</span>
 	<</switch>>
-	here.
+	<<number $_plotsHere.length>>곳이 있다.
 	<<if $fertiliser.current + $fertiliser.used gt 0>>
+		/* ============ 번역 필요 ============== */
 		You have <<number $fertiliser.current>> <<pluralise $fertiliser.current "bag">> of fertiliser.
 	<</if>>
-	Tilling time is reduced by tending skill.
+	관리 스킬이 높을수록 개간 시간이 줄어든다.
 	<br><br>
 
 	<<if _location is "garden" and $robin.autoWater and C.npc.Robin.trauma < 50 and ["orphanage", "garden", "bath"].includes(getRobinLocation()) and Time.hour is 16 and between(Time.minute, 30, 59) and orphanagePlotsPlanted() and !orphanagePlotsWatered() and Weather.precipitation !== "rain" and (Weather.precipitation !== "snow" or V.alex_greenhouse >= 3)>>
-		<span class="green">Robin is busy watering the garden for you.</span>
+		<span class="green">로빈이 당신을 위해 정원에 물을 주느라 바쁘다.</span>
 		<br>
 		<<exit>>
 	<</if>>
@@ -116,13 +116,13 @@
 
 	<<for _plantbed range $_plotsHere>>
 		<<capture _plantbed>>
-			<span class="gold"><<wordify_i $_i true>> plot (<<display_quality _plantbed>>):</span>
+			<span class="gold"><<wordify_i $_i true>> 구획 (<<display_quality _plantbed>>):</span>
 
 			<<if _plantbed.stage gte 1>>
 				<<set $_plantedPlant to setup.foodstuff[_plantbed.plant]>>
 				<<if $_plantedPlant is undefined>>
 					<<error {
-						message	: `Could not access property from modded save. (${_plantbed.plant})`,
+						message : `모드 세이브의 속성에 접근할 수 없습니다. (${_plantbed.plant})`,
 					}>>
 					<<exitAll>>
 				<</if>>
@@ -133,38 +133,38 @@
 			<</if>>
 
 			<<if _plantbed.stage gte 5>>
-				<span class="green">The <<print $_plantedPlant.tending?.seed_name ? `$_plantedPlant.tending.seed_name is` : `$_plantedPlant.plural are`>> flowering and ready for picking.</span>
+				<span class="green"><<print $_plantedPlant.tending?.seed_name ? `$_plantedPlant.tending.seed_name` : `$_plantedPlant.plural`>>【이가】 꽃을 피워 수확할 준비가 되어 있다.</span>
 				<br>
 				<<switch _plantbed.size>>
-					<<case "small">> <<set $_timeStr to "0:10">><<set _pass to 10>>
+					<<case "small">> <<set $_timeStr to "0:05">><<set _pass to 5>>
 					<<case "medium">> <<set $_timeStr to "0:15">><<set _pass to 15>>
-					<<default>> <<set $_timeStr to "0:20">><<set _pass to 20>>
+					<<default>> <<set $_timeStr to "1:00">><<set _pass to 60>>
 				<</switch>>
 
 				<<if pcAreArmsBound("both")>>
-					<span class="red">Can't pick when your arms are bound.</span>
+					<span class="red">팔이 묶여 있어 수확할 수 없다.</span>
 				<<else>>
 					<<if $options.images is 1>>
 						<<foodstufficon _plantbed.plant>>
 					<</if>>
-					<<link "Pick ($_timeStr)" $passage>><<pass _pass>><<tending_harvest _plantbed>><<clear_plot _plantbed>><</link>>
+					<<link "수확한다 ($_timeStr)" $passage>><<pass _pass>><<tending_harvest _plantbed>><<clear_plot _plantbed>><</link>>
 				<</if>>
 				<br>
 
 			<<elseif _plantbed.stage is 4>>
-				<span class="teal">The <<print $_plantedPlant.tending?.seed_name ? `$_plantedPlant.tending.seed_name is` : `$_plantedPlant.plural are`>> budding.</span>
+				<span class="teal"><<print $_plantedPlant.tending?.seed_name ? `$_plantedPlant.tending.seed_name` : `$_plantedPlant.plural`>>【이가】 싹을 틔우고 있다.</span>
 			<<elseif _plantbed.stage is 3>>
-				<span class="lblue">The <<print $_plantedPlant.tending?.seed_name ? `$_plantedPlant.tending.seed_name has` : `$_plantedPlant.plural have`>> grown into seedlings.</span>
+				<span class="lblue"><<print $_plantedPlant.tending?.seed_name ? `$_plantedPlant.tending.seed_name` : `$_plantedPlant.plural`>>【이가】 모종으로 자라났다.</span>
 			<<elseif _plantbed.stage is 2>>
-				<span class="blue"><<print $_plantedPlant.tending?.seed_name ? `${$_plantedPlant.tending.seed_name.toUpperFirst()} sprouts` : `Thin $_plantedPlant.plural sprout`>> from the soil.</span>
+				<span class="blue"><<print $_plantedPlant.tending?.seed_name ? `${$_plantedPlant.tending.seed_name.toUpperFirst()}` : `$_plantedPlant.plural`>>【이가】 흙에서 작은 싹을 틔운다.</span>
 			<<elseif _plantbed.stage is 1>>
-				<span class="blue">You planted <<print $_plantedPlant.name.replace(/_/g," ")>> seeds here.</span>
+				<span class="blue">이곳에 <<print $_plantedPlant.plural>> 씨앗을 심었다.</span>
 			<<else>>
 				<<if _plantbed.till gte 1>>
-					The soil is ready for planting.
+					씨앗을 심을 준비가 되었다.
 					<<tendingPlantSeedsOptions _location _plantbed>>
 				<<else>>
-					The soil is ready for tilling.
+					개간할 준비가 되었다.
 					<br>
 					<<tendingTillOptions _plantbed>>
 				<</if>>
@@ -173,10 +173,10 @@
 				<<if _plantbed.bed is "water">>
 					<br>
 				<<elseif _plantbed.water is 1>>
-					<span class="green">The <<print (_plantbed.bed is "large" ? "field" : "plot")>> is watered.</span>
+					<span class="green"><<print (_plantbed.size is "large" ? "들판이" : "밭이")>> 물에 젖었다.</span>
 					<br>
 				<<else>>
-					<span class="purple">The <<print (_plantbed.bed is "large" ? "field" : "plot")>> is dry.</span>
+					<span class="purple"><<print (_plantbed.size is "large" ? "들판이" : "밭이")>> 말라 있다.</span>
 					<br>
 					<<tendingWaterPlot _plantbed>>
 					<br>
@@ -198,11 +198,11 @@
 			<<set $_hoursUntilAttack to (24 - Time.hour)>>
 		<</if>>
 		<<if $location is "alex_farm" and _plotsToWater.length gte $_hoursUntilAttack>>
-			<span class="pink">You won't have enough time to water all your fields before Remy's arrival.</span>
+			<span class="pink">레미가 도착하기 전에 모든 밭에 물을 줄 충분한 시간이 없다.</span>
 		<<else>>
 			<<if !pcAreArmsBound("both")>>
 				<<gardenicon "water">>
-				<<link "Water all dry beds ($_time)" $passage>>
+				<<link "모든 마른 밭에 물을 준다 ($_time)" $passage>>
 					<<tendingWaterAllDryBeds _plotsToWater>><<tiredness _water_needed>><<physique _water_needed>><<tending _water_needed>>
 				<</link>><<gtiredness>><<gtending>>
 			<</if>>
@@ -213,7 +213,7 @@
 
 	<<if $debug is 1 and $_plotsHere.filter(plot => plot.stage > 0 && plot.stage < 5).length gte 1>>
 		<br>
-		<<link "DEBUG: Instagrow all plants here" $passage>><<run tendingInstaGrow(_location)>><</link>>
+		<<link "DEBUG: 이곳의 모든 작물을 즉시 다 자라게 함" $passage>><<run tendingInstaGrow(_location)>><</link>>
 		<br>
 	<</if>>
 <</widget>>

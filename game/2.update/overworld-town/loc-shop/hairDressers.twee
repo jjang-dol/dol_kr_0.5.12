@@ -152,7 +152,6 @@
 	<br>
 <</widget>>
 
-/* ============ 번역 필요 ============== */
 <<widget "hairDressersOptions">>
 	<<set _currentCost to 0>>
 	<<if not $transformationShow>>
@@ -179,19 +178,19 @@
 		<div id="mannequin" @class="'mannequin ' + _hiddenMannequin" style="height:unset">
 			<<mannequinHairdresser>>
 			<<if ($settings.transformAnimalEnabled or $settings.transformDivineEnabled) and getTransformParts().length>>
-				<label><<checkbox "$transformationShow" false true autocheck>> Show transformations</label>
+				<label><<checkbox "$transformationShow" false true autocheck>> 변신 표시</label>
 			<</if>>
-			<div id="currentCost" class="gold">To pay: £0</div>
+			<div id="currentCost" class="gold">결제 금액: £0</div>
 		</div>
 		<div>
-			<<if ($money gte _currentCost + 3000 or $hairOption isnot $hairlength)>>
+			<<if ($money gte _currentCost + 3000 or $hairOption isnot $hairlength) and $hairlength gt 100>>
 				<<if $hairOption isnot $hairlength>>
 					<<set _currentCost += 3000>>
 				<</if>>
-				Have your sides cut to your:
+				옆머리 길이:
 				<br>
-				<<set _hairNames to ["Ears", "Chin", "Shoulders", "Upper chest", "Middle chest", "Upper stomach", "Navel", "Thighs", "Knees", "Ankles"]>>
-				<<set _hairOptions to {"Don't cut":$hairlength}>>
+				<<set _hairNames to ["귀", "턱", "어깨", "윗가슴", "가슴 중앙", "윗배", "배꼽", "허벅지", "무릎", "발목"]>>
+				<<set _hairOptions to {"자르지 않는다":$hairlength}>>
 				<<for _i to 9; _i gte 0; _i-->>
 					<<set $_length to (_i * 100) + 100>>
 					<<if $_length + 50 lt $hairlength>> /* + 50 to ensure it's not cut too early */
@@ -203,18 +202,18 @@
 				<</listbox>>
 				<br><br>
 			<<elseif $hairlength gt 100>>
-				You don't have enough money to cut your hair.
+				머리를 자를 돈이 부족하다.
 				<br><br>
 			<</if>>
 
-			<<if ($money gte _currentCost + 3000 or $fringeOption isnot $fringelength)>>
+			<<if ($money gte _currentCost + 3000 or $fringeOption isnot $fringelength) and $fringelength gte 100>>
 				<<if $fringeOption isnot $fringelength>>
 					<<set _currentCost += 3000>>
 				<</if>>
-				Have your fringe cut until it's:
+				앞머리 길이:
 				<br>
-				<<set _fringeNames to ["Very short", "Short", "Standard", "Long"]>>
-				<<set _fringeOptions to {"Don't cut":$fringelength}>>
+				<<set _fringeNames to ["매우 짧음", "짧음", "표준", "긺"]>>
+				<<set _fringeOptions to {"자르지 않는다":$fringelength}>>
 				<<for _i to 3; _i gte 0; _i-->>
 					<<set $_length to (_i * 200) + 100>>
 					<<if $_length + 50 lt $fringelength>> /* + 50 to ensure it's not cut too early */
@@ -226,10 +225,11 @@
 				<</listbox>>
 				<br><br>
 			<<elseif $fringelength gte 100>>
-				You don't have enough money to cut your fringe.
+				앞머리를 자를 돈이 부족하다.
 				<br><br>
 			<</if>>
 
+			/* ============ 번역 필요 ============== */
 			<<set _dyeNames to ["Red", "Ebony","Jet black", "Black", "Blond", "Soft Blond", "Platinum blond", "Golden", "Ashy blond", "Strawberry blond", "Dark Brown", "Brown", "Copper Brown", "Soft brown", "Light brown", "Burnt Orange", "Ginger", "Blood Orange", "Blue", "Deep Blue", "Neon Blue", "Frost Blue", "Green", "Dark Lime", "Toxic Green", "Teal", "Aquamarine", "Pink", "Bright Pink", "Hot pink", "Soft pink", "Rosegold", "Crimson", "Wine", "Purple", "Medium Purple", "Bright Purple", "Grey", "White", "Snow white"]>>
 			<<set $hairdressersHairColour to ["red", "ebony", "jetblack", "black", "blond", "softblond", "platinumblond", "golden", "ashyblond", "strawberryblond", "darkbrown", "brown", "copperbrown", "softbrown", "lightbrown", "burntorange", "ginger", "bloodorange", "blue", "deepblue", "neonblue", "frostblue", "green", "darklime", "toxicgreen", "teal", "aquamarine", "pink", "brightpink", "hotpink", "softpink", "rosegold", "crimson", "wine", "purple", "mediumpurple", "brightpurple", "grey", "white", "snowwhite"]>>
 
@@ -245,19 +245,19 @@
 				<<elseif $twoToneHairDye>>
 					<<set _currentCost += 25000>>
 				<</if>>
-				Have your hair dyed<<if $haircolour isnot $naturalhaircolour or $hairfringecolour isnot $naturalhaircolour>> or cleared of hair dye<</if>>:
+				머리 염색<<if $haircolour isnot $naturalhaircolour or $hairfringecolour isnot $naturalhaircolour>> 또는 염색 제거<</if>>:
 				<br>
-				<label><<radiobutton "$dyedHairPart" "hair" autocheck>> Full head</label> |
-				<label><<radiobutton "$dyedHairPart" "fringe" autocheck>> Fringe</label> |
-				<label><<radiobutton "$dyedHairPart" "sides" autocheck>> Sides</label> |
+				<label><<radiobutton "$dyedHairPart" "hair" autocheck>> 전체</label> |
+				<label><<radiobutton "$dyedHairPart" "fringe" autocheck>> 앞머리</label> |
+				<label><<radiobutton "$dyedHairPart" "sides" autocheck>> 옆머리</label> |
 				<br>
-				<label><<checkbox "$twoToneHairDye" false true autocheck>> Request a two-tone colouring</label>
+				<label><<checkbox "$twoToneHairDye" false true autocheck>> 투톤 염색 요청</label>
 				<br>
 
-				<<set _dyeOptions to {"Don't dye":"noChange"}>>
+				<<set _dyeOptions to {"염색하지 않음":"noChange"}>>
 				<<set _twotoneDyeOptions to {}>>
 				<<if $haircolour isnot $naturalhaircolour>>
-					<<set _dyeOptions["Remove dye"] to "removeDye">>
+					<<set _dyeOptions["염색 빼기"] to "removeDye">>
 				<</if>>
 				<<if $money gte _currentCost + 6000 or ($dyeOption isnot "noChange" and $dyeOption isnot "removeDye")>>
 					<<for _i to 0; _i lt _dyeNames.length; _i++>>
@@ -281,19 +281,19 @@
 						<br><br>
 					<</if>>
 				<<else>>
-					Style: <<listbox "$twoToneStyle" autoselect>>
-						<<option "Low Ombré" "low-ombre">>
-						<<option "High Ombré" "high-ombre">>
-						<<option "Split" "split">>
-						<<option "Face-framing highlights" "face-frame">>
+					스타일: <<listbox "$twoToneStyle" autoselect>>
+						<<option "연한 투톤" "low-ombre">>
+						<<option "진한 투톤" "high-ombre">>
+						<<option "반반 투톤" "split">>
+						<<option "앞머리 브릿지" "face-frame">>
 					<</listbox>>
 					<br>
-					First colour: <<listbox "$twoToneDyeOption1" autoselect>>
+					첫 번째 색상: <<listbox "$twoToneDyeOption1" autoselect>>
 						<<optionsfrom _twotoneDyeOptions>>
 					<</listbox>>
 					<<dyeSwatch $twoToneDyeOption1>>
 					<br>
-					Second colour: <<listbox "$twoToneDyeOption2" autoselect>>
+					두 번째 색상: <<listbox "$twoToneDyeOption2" autoselect>>
 						<<optionsfrom _twotoneDyeOptions>>
 					<</listbox>>
 					<<dyeSwatch $twoToneDyeOption2>>
@@ -301,7 +301,7 @@
 					<br>
 				<</if>>
 			<<else>>
-				You don't have enough money to dye your <<print $dyedHairPart>>.
+				<<print $dyedHairPart>> 부분을 염색할 돈이 부족하다.
 				<br><br>
 			<</if>>
 
@@ -311,12 +311,12 @@
 				<<elseif $browsDyeOption isnot "noChange">>
 					<<set _currentCost += 2000>>
 				<</if>>
-				Have your eyebrows dyed<<if $makeup.browscolour isnot $naturalhaircolour>> or cleared of hair dye<</if>>:
+				눈썹 염색<<if $makeup.browscolour isnot $naturalhaircolour>> 또는 염색 제거<</if>>:
 				<br>
 
-				<<set _browsDyeOptions to {"Don't dye":"noChange"}>>
+				<<set _browsDyeOptions to {"염색하지 않는다":"noChange"}>>
 				<<if $makeup.browscolour isnot $naturalhaircolour>>
-					<<set _browsDyeOptions["Remove dye"] to "removeDye">>
+					<<set _browsDyeOptions["염색 제거"] to "removeDye">>
 				<</if>>
 				<<if $money gte _currentCost + 2000 or ($browsDyeOption isnot "noChange" and $browsDyeOption isnot "removeDye")>>
 					<<for _i to 0; _i lt _dyeNames.length; _i++>>
@@ -336,7 +336,7 @@
 					<br><br>
 				<</if>>
 			<<else>>
-				You don't have enough money to dye your brow.
+				눈썹을 염색할 돈이 부족하다.
 				<br><br>
 			<</if>>
 		</div>
@@ -349,34 +349,34 @@
 	<<set _pass += $twoToneHairDye ? 30 : $dyeOption is "removeDye" ? 15 : $dyeOption isnot "noChange" ? 30 : 0>>
 	<<if _sydneyPresent>>
 		<<if (!_cancel or _currentCost gt 0) and $money gte _currentCost>>
-			<<hairdressericon "chair">><<link [[Continue|Sydney Hairdressers Session]]>>
+			<<hairdressericon "chair">><<link [[계속|Sydney Hairdressers Session]]>>
 				<<money `-_currentCost` "hairdressers">>
 			<</link>>
 		<<elseif $money lt _currentCost>>
-			<span class="blue">You don't have enough money to pay the hairdresser.</span>
+			<span class="blue">미용사에게 지불할 돈이 부족하다.</span>
 			<br><br>
-			<<hairdressericon "chair">><<link [[Continue|Sydney Hairdressers Session]]>><</link>>
+			<<hairdressericon "chair">><<link [[계속|Sydney Hairdressers Session]]>><</link>>
 			<br>
 		<</if>>
 		<<if _cancel>>
 			<br><br>
-			<<getouticon>><<link [[Leave|Sydney Hairdressers Cancel]]>><<endevent>><</link>>
+			<<getouticon>><<link [[떠난다|Sydney Hairdressers Cancel]]>><<endevent>><</link>>
 		<</if>>
 	<<else>>
 
 		<<if $money lt _currentCost>>
-			<<hairdressericon "chair">><span class="blue">You don't have enough money to pay the hairdresser.</span>
+			<<hairdressericon "chair">><span class="blue">미용사에게 지불할 돈이 부족하다.</span>
 			<br>
 		<<elseif $twoToneHairDye and ($twoToneDyeOption1 eq $twoToneDyeOption2)>>
-			<<hairdressericon "chair">><span class="blue">You need to select two different colours for two-tone hair colouring.</span>
+			<<hairdressericon "chair">><span class="blue">투톤 염색을 하려면 서로 다른 두 가지 색상을 선택해야 한다.</span>
 			<br>
 		<<elseif _currentCost gt 0>>
-			<<hairdressericon "chair">><<link [[Pay hairdresser (<<printmoney _currentCost>> <<= getTimeString(_pass)>>)|Hairdressers Session]]>>
+			<<hairdressericon "chair">><<link [[미용사에게 지불한다 (<<printmoney _currentCost>> <<= getTimeString(_pass)>>)|Hairdressers Session]]>>
 				<<money `-_currentCost` "hairdressers">>
 			<</link>>
 			<br>
 		<</if>>
-		<<getouticon>><<link [[Leave|Hairdressers]]>><<endevent>><</link>>
+		<<getouticon>><<link [[떠난다|Hairdressers]]>><<endevent>><</link>>
 	<</if>>
 <</widget>>
 
