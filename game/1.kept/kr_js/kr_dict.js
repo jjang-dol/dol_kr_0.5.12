@@ -1881,3 +1881,29 @@ window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
     }
     return food.singular + " " + amount + "개";
 };
+
+// 낚시(fishing) 어종 이름 사전. $fishingHookedFish.type 등 저장/로직에 쓰이는 키는
+// 영문 그대로 두고, 화면 표시할 때만 이 사전으로 변환한다.
+window.KR.fishNameDict = {
+    "haddock": "해덕대구",
+    "salmon": "연어",
+    "trout": "송어",
+    "herring": "청어",
+    "whiting": "위팅",
+    "mackerel": "고등어",
+    "flounder": "가자미",
+    "bass": "농어",
+    "roach": "로치",
+    "perch": "퍼치",
+    "chub": "처브",
+    "grayling": "그레일링",
+    "cod": "대구",
+    "pike": "파이크",
+    "eel": "뱀장어",
+    "baitfish": "미끼고기"
+};
+
+// 어종 이름 한글 변환. 사전에 없는 키(예상 외 값)는 원본 키를 그대로 반환한다.
+window.KR.getFishNameKr = function(fishKey) {
+    return window.KR.fishNameDict[fishKey] || fishKey;
+};
