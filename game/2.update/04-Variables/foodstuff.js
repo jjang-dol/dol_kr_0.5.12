@@ -1393,9 +1393,9 @@ function initFoodstuff() {
 		},
 		chilli_pepper: {
 			index: 66,
-			name: "칠리 고추",
-			singular: "칠리 고추",
-			plural: "칠리 고추들",
+			name: "고추",
+			singular: "고추",
+			plural: "고추들",
 			icon: "chilli-pepper.png",
 			category: "vegetable",
 			kitchen_item_type_icon: "recipe-vegetable.png",
