@@ -301,18 +301,6 @@ window.dailyPregnancyEvent = dailyPregnancyEvent;
 
 function pregnancyNameCorrection(name, caps = false) {
 	switch (name) {
-		case "Black Wolf":
-			name = "검은 늑대";
-			break;
-		case "Great Hawk":
-			name = "거대 매";
-			break;
-		case "Night Monster":
-			name = "밤의 괴물";
-			break;
-		case "Ivory Wraith":
-			name = "상아의 원혼";
-			break;
 		case "cum bucket":
 			name = "정액받이";
 			break;
@@ -320,6 +308,7 @@ function pregnancyNameCorrection(name, caps = false) {
 			name = "당신";
 			break;
 		default:
+			name = window.KR.gatPersonNameDictKR(name);
 			break;
 	}
 	return name;
