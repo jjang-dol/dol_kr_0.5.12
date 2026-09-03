@@ -651,9 +651,9 @@
    <br><br>
 
    <!--
-       The PC makes 3 foraging checks, each taking 20 minutes, with a chance of receiving ANY type of fruit.
+       If the PC is foraging for fruit or disabled bestiality, they will get scratched by some branches and nothing else will happen.
 
-       Pig-based dangerEvents may trigger if the PC is Foraging for Fungi.
+       If they are foraging for fungi with a Level 2 Woodland, they will have a 1/2 chance of getting molested by a pig after being scratched by a branch.
 
        Basket holds Strawberries, Peaches, and Plums when Foraging for Fruit, or Mushrooms and Truffles when Foraging for Fungi.
    -->
@@ -731,13 +731,13 @@
 
        If they are foraging for fungi with a Level 3 Woodland, they will have a 4/5 chance of getting molested by a pig.
 
-       If the chosen target on the PC's body fails, or if the PC gets hit with an unlucky 1/4, the pig will simply tackle them and the skill checks will be harder.
+       If however the targeted check fails, due to the PC's hair being too short, the PC's upper or lower clothing slot being naked, or they simply hit the unlucky 1/4, the pig will first tackle them and the skill checks will be harder.
    -->
    <<if ($tempForageType is "fruit" and dangerEvent()) or ($tempForageType is "fungi" and (_fullyNaked or dangerEvent(1.25)))>>
-       <<set _checkResults to [
+       <<if _attemptOne is 0>>
            $hairlength gte random(300, 500),
            not _topless,
-           not _bottomless,
+           <!-- Player's body is targeted while they're wearing clothes. -->
        ]>>
        <<set _attemptOne to random(0, 2)>>
 
@@ -1169,7 +1169,7 @@
 	<br><br>
 
 	<!-- The PC should have a 50% of passing the Science check with a Science Grade of A. -->
-	<<set _checkResults to [
+	<<if _attemptOne is 0>>
 		currentSkillValue("science") gte random(600, 800),
 		currentSkillValue("tending") gte random(600, 800)
 	]>>
@@ -1359,49 +1359,49 @@
 	<</if>>
 
 	<<if $speech_attitude is "meek">>
-		"W-would you all want some <<pluralise $tempRewardQuantity $tempRewardType>>?" you ask.
+		"다들 <<pluralise $tempRewardQuantity $tempRewardType>> 좀 먹을래요?" 당신이 물었다.
 	<<elseif $speech_attitude is "bratty">>
-		You think about what you have stocked. "Want some <<pluralise $tempRewardQuantity $tempRewardType>>?"
+		당신은 비축해 둔 것을 떠올렸다. "<<pluralise $tempRewardQuantity $tempRewardType>> 좀 먹을 사람?"
 	<<else>>
-		"How about some <<pluralise $tempRewardQuantity $tempRewardType>>?" you say.
+		"<<pluralise $tempRewardQuantity $tempRewardType>> 좀 줄까?" 당신이 말했다.
 	<</if>>
 
 	<<if $farm_work.pig.monster>>
 		"Food?" "Reward?" "$tempRewardType.toLocaleUpperFirst()?" "Food?" "<<pShe>> give?" "Reward?"
 	<<else>>
-		They oink to each other.
+		녀석들이 서로 꿀꿀거렸다.
 	<</if>>
 	<<switch $tempRewardType>>
 		<<case "potato">>
-			You think they recognized the word "potato." They start shuffling back to the farm.
+			'감자'라는 단어를 알아들은 모양이다. 녀석들이 우리 쪽으로 터벅터벅 걸어가기 시작했다.
 		<<case "carrot">>
-			You think they recognized the word "carrot." They start walking back to the farm.
+			'당근'라는 단어를 알아들은 모양이다. 녀석들이 우리 쪽으로 걸어가기 시작했다.
 		<<case "apple">>
-			You think they recognized the word "apple." They start trotting back to the farm.
+			'사과'라는 단어를 알아들은 모양이다. 녀석들이 우리 쪽으로 트로트처럼 가볍게 뛰어가기 시작했다.
 	<</switch>>
 	<br><br>
 
-	After leaving the woodland, you head to the storehouse.
+	숲을 나와, 당신은 창고로 향했다.
 
 	<<switch $tempRewardType>>
 		<<case "potato">>
 			<<pass 20>>
 
-			You fill your basket with potatoes, then pour them into the pen. You have to make several trips, the <<farm_text_many pig>> hungry from all of the exertion. By the end, they rest on their sides.
+			당신은 바구니에 감자를 가득 담아, 우리 안에 쏟아부었다. <<farm_text_many pig>> 운동량 때문에 배가 고팠는지 여러 번 왔다 갔다 해야 했다. 결국 녀석들은 옆구리를 땅에 대고 쉬었다.
 			<<set $farm_work.pigs_fed += 1>><<physique 2>>
 			<br><br>
 
-			<span class="green">You think they found it filling.</span><<ggrespect>><<farm_pigs 3>>
+			<span class="green">녀석들이 배불리 먹은 것 같다.</span><<ggrespect>><<farm_pigs 3>>
 		<<case "carrot">>
 			<<pass 10>>
 
-			You fill your basket with carrots, then pour them into the pen. You make a few trips, the <<farm_text_many pig>> crunching them for longer than you think is necessary. When they're done, they wander away from the fence.
+			당신은 바구니에 당근을 가득 채워, 우리 안에 부어주었다. 몇 번 왕복하자, <<farm_text_many pig>> 생각보다 훨씬 오래 그것들을 아삭거리며 씹어 먹었다. 다 먹고 난 녀석들은 울타리에서 멀어졌다.
 			<<physique 1>>
 			<br><br>
 
-			You think they enjoyed the snack.<<grespect>><<farm_pigs 1>>
+			간식을 맛있게 먹은 모양이다.<<grespect>><<farm_pigs 1>>
 		<<case "apple">>
-			You fill your basket with apples and head back to the pen, a small crowd having formed by the fence. You're worried they may injure themselves if you just pour them in, so you try to split them evenly.
+			당신은 바구니에 사과를 채워 우리로 돌아갔고, 울타리 가에는 작은 무리가 형성되었다. 그냥 부어버리면 녀석들이 다칠까 걱정되어 골고루 나눠주려고 했다.
 			<br><br>
 
 			<!--
@@ -1413,10 +1413,10 @@
 				<!-- Takes extra time to feed them properly. -->
 				<<pass 10>>
 
-				You spend some time counting up the <<farm_text_many pig>> because they keep moving around. You then cut the apples so that <span class="teal">each <<farm_text_neutral pig>> gets roughly the same amount.</span>
+				녀석들이 계속 움직여서 <<farm_text_many pig>> 세는 데 시간이 좀 걸렸다. 그러고 나서 <span class="teal">각각의 <<farm_text_neutral pig>> 대략 같은 양을 먹을 수 있도록</span> 사과를 잘라주었다.
 				<br><br>
 
-				<span class="green">The <<farm_text_many pig>> are very happy with your efforts.</span><<ggrespect>><<farm_pigs 3>>
+				<span class="green"><<farm_text_many pig>> 당신의 노력에 매우 만족해했다.</span><<ggrespect>><<farm_pigs 3>>
 			<<elseif currentSkillValue("housekeeping") gte 400>>
 				<!-- Takes a little extra time to cut the pieces. -->
 				<<pass 5>>
@@ -1424,20 +1424,20 @@
 				You try to count how many <<farm_text_many pig>> there are, <span class="teal">but the math makes you dizzy.</span> You settle for an estimate instead. By the time you're nearly done, you realise your pieces were a little <<if random(1, 2) is 1>> too small. <<else>> too large. <</if>>
 				<br><br>
 
-				<span class="green">The <<farm_text_many pig>> appreciate your efforts.</span><<grespect>><<farm_pigs 2>>
+				<span class="green"><<farm_text_many pig>> 당신의 노고를 고마워한다.</span><<grespect>><<farm_pigs 2>>
 			<<else>>
-				You're worried about <span class="teal">cutting yourself with a the kitchen knife,</span> so you hand them out individually. Some <<farm_text_many pig>> inevitably get less than others.
+				<span class="teal">주방 칼에 베일까 봐</span> 걱정되어, 사과를 하나씩 직접 건네주었다. 일부 <<farm_text_many pig>> 필연적으로 다른 녀석들보다 적게 먹게 되었다.
 				<br><br>
 
-				The <<farm_text_many pig>> root around for leftovers.<<grespect>><<farm_pigs 1>>
+				<<farm_text_many pig>> 남은 부스러기를 찾아 바닥을 샅샅이 뒤졌다.<<grespect>><<farm_pigs 1>>
 			<</if>>
 			<!-- Default amount of time. -->
 			<<pass 10>>
 	<</switch>>
 	<br><br>
 
-	By the end, you feed them a total of
-	<span class="green"><<foodstufficon _rewardIcon>> $tempRewardQuantity <<pluralise $tempRewardQuantity $tempRewardType>>.</span>
+	결국 당신이 녀석들에게 먹인 총량은
+	<span class="green"><<foodstufficon _rewardIcon>> $tempRewardQuantity개의 <<pluralise $tempRewardQuantity $tempRewardType>></span>였다.
 	<br><br>
 
 	<<link [[Next|Farm Work]]>>
@@ -1461,53 +1461,53 @@
 	<<beastNEWinit _pigsUnsatisfied pig>>
 	<<set $farm_work.pig.gender to $NPCList[0].gender>>
 
-	You look among the <<farm_text_many pig>> gathered before you, deciding which one you'll reward.
+	당신은 앞에 모인 <<farm_text_many pig>> 사이를 둘러보며, 누구에게 보상을 줄지 골랐다.
 	<br><br>
 
 	<!-- The PC should have a 50% of passing the Science check with a Science Grade of A. -->
-	<<set _checkResults to [
+	<<if _attemptOne is 0>>
 		currentSkillValue("science") gte random(600, 800),
 		currentSkillValue("tending") gte random(600, 800)
 	]>>
 	<!-- Going to hell for this lol -->
 	<<if _checkResults[0] and _checkResults[1]>>
-		<span class="teal">You recognize a <<farm_text pig>> who was particularly helpful.</span>
+		<span class="teal">당신은 유독 도움이 되었던 <<farm_text pig>> 알아차렸다.</span>
 		<br><br>
 
-		You close your basket and lie against it, guiding <<farm_him pig>> towards you. When <<farm_he pig>> reaches your waist, you hold <<farm_him pig>> there with your legs.
-		<<if $farm_work.pig.monster>>"Reward?" <<farm_he pig>> asks.<<else>>It hesitates, unsure of your intentions.<</if>>
+		당신은 바구니를 닫고 그에 기대어 누우며, <<farm_him pig>>【을를】 당신 쪽으로 끌어당겼다. <<farm_he pig>>【이가】 허리에 닿자, 당신은 다리로 <<farm_him pig>>【을를】 그곳에 고정했다.
+		<<if $farm_work.pig.monster>>"보상?" <<farm_he pig>>【이가】 물었다.<<else>>녀석은 당신의 의도를 확신하지 못한 채 망설였다.<</if>>
 		<<deviancy5>>
 
-		You address the rest of the <<farm_text_many pig>>.
+		당신은 나머지 <<farm_text_many pig>> 향해 말을 건넸다.
 		<br><br>
 
 		<<if $speech_attitude is "meek">>
 			"Um, hey!" you say.
 			<<if $farm_work.pig.gender is "m">>
-				"Mister <<farm_text pig>> helped me a lot today,
+				"<<farm_text pig>> 아저씨가 오늘 저를 엄청 도와줬거든요,
 			<<else>>
-				"Missus <<farm_text pig>> helped me a lot today,
+				"<<farm_text pig>> 아줌마가 오늘 저를 엄청 도와줬거든요,
 			<</if>>
-			so I wanted to give <<farm_him pig>> a reward! Next time, if you help me even more, we could do it instead." You release <<farm_him pig>>.
+			그래서 이 녀석에게 보상을 주고 싶었어요! 다음에는 여러분이 더 많이 도와주면, 대신 여러분과 해줄게요." 당신이 <<farm_him pig>>【을를】 풀어주었다.
 		<<elseif $speech_attitude is "bratty">>
 			"Hey!" you say.
 			<<if $farm_work.pig.gender is "m">>
-				"Mister <<farm_text pig>> here was very helpful today, so <<farm_he pig>> gets a big reward. Me! I saw you all eyeing me in the forest, so if you want join in, you'd better ask mister <<farm_text pig>> here for tips." You pull <<farm_him pig>> onto you.
+				"여기 <<farm_text pig>> 아저씨가 오늘 엄청 도움이 됐어, 그래서 이 녀석이 큰 보상을 받게 될 거야. 바로 나지! 숲에서 다들 나를 쳐다보고 있던 거 다 아니까, 동참하고 싶다면 여기 <<farm_text pig>> 아저씨한테 팁이라도 물어보라고." 당신이 <<farm_him pig>>【을를】 위로 끌어올렸다.
 			<<else>>
-				"Missus <<farm_text pig>> here was very helpful today, so <<farm_he pig>> gets a big reward. Me! I saw you all eyeing me in the forest, so if you want join in, you'd better ask missus <<farm_text pig>> here for tips." You pull <<farm_him pig>> onto you.
+				"여기 <<farm_text pig>> 아줌마가 오늘 엄청 도움이 됐어, 그래서 이 녀석이 큰 보상을 받게 될 거야. 바로 나지! 숲에서 다들 나를 쳐다보고 있던 거 다 아니까, 동참하고 싶다면 여기 <<farm_text pig>> 아줌마한테 팁이라도 물어보라고." 당신이 <<farm_him pig>>【을를】 위로 끌어올렸다.
 			<</if>>
 		<<else>>
 			"Hey!" you say.
 			<<if $farm_work.pig.gender is "m">>
-				"Mister <<farm_text pig>> was very helpful today,
+				"<<farm_text pig>> 아저씨가 오늘 아주 유용했어,
 			<<else>>
-				"Missus <<farm_text pig>> was very helpful today,
+				"<<farm_text pig>> 아줌마가 오늘 아주 유용했어,
 			<</if>>
-			so <<farm_he pig>> gets to have some fun. If you want me too, then next time I'm around, I'll need you on your best behavior." You spread your legs.
+			그러니 이 녀석이 좀 놀다 가게 둘 거야. 너희도 원한다면, 다음에 내가 올 때 말 잘 듣고 있어야 할 거야." 당신이 다리를 벌렸다.
 		<</if>>
 		<br><br>
 
-		<span class="green">The <<farm_text_many pig>> are impressed by your discernment.</span><<farm_pigs 1>><<grespect>>
+		<span class="green"><<farm_text_many pig>> 당신의 안목에 감탄했다.</span><<farm_pigs 1>><<grespect>>
 		<br><br>
 
 		<!-- This is the only instance of non-forced consensual sex betwen the PC and a pig, where the PC actually has the option to ask the pig to stop. -->
@@ -1522,7 +1522,7 @@
 		<</link>>
 		<br>
 	<<else>>
-		<span class="teal">You have a hard time telling them apart,</span> and end up selecting one who looks vaguely familiar.
+		<span class="teal">녀석들을 구별하기가 어려워서,</span> 결국 낯이 익은 녀석 하나를 골라잡았다.
 		<br><br>
 
 		You close your basket and lie against it, guiding <<farm_him pig>> towards you. When <<farm_he pig>> crawls up to
@@ -1530,14 +1530,14 @@
 		<<if $farm_work.pig.monster>>"For me?" <<farm_he pig>> asks.<<else>>It presses against you, unsure of your intentions.<</if>>
 		<<deviancy5>>
 
-		You address the rest of the <<farm_text_many pig>>.
+		당신은 나머지 <<farm_text_many pig>> 향해 말을 건넸다.
 		<br><br>
 
 		<<if $speech_attitude is "meek">>
 			"Um, hey!" you say. "Thanks a lot for helping me today. I want to show you how much I appreciate it. Next time,
 			if you help me even more, we could do it together instead." You release <<farm_him pig>> from your legs.
 		<<elseif $speech_attitude is "bratty">>
-			"Hey!" you say. "You all were pretty helpful today.
+			"야!" 당신이 말했다. "너희들 오늘 다들 꽤 도움이 됐어.
 			<<if $farm_work.pig.gender is "m">>
 				As thanks, I'm letting mister <<farm_text pig>> here show you my thank you gift. I saw you all eyeing me in the
 				forest, so if you want to join in, you'd better keep up the good work!" You pull <<farm_him pig>> onto you.
@@ -1546,17 +1546,17 @@
 				forest, so if you want to join in, you'd better keep up the good work!" You pull <<farm_him pig>> onto you.
 			<</if>>
 		<<else>>
-			"Hey!" you say. "You all were fairly helpful today, and I know you all want a reward.
+			"야!" 당신이 말했다. "너희들 오늘 꽤 도움이 됐고, 너희도 다들 보상을 원한다는 거 알아.
 			<<if $farm_work.pig.gender is "m">>
-				As thanks, mister <<farm_text pig>> and I will be putting on a show.
+				고마움의 의미로, <<farm_text pig>> 아저씨와 내가 쇼를 보여줄 거야.
 			<<else>>
-				As thanks, missus <<farm_text pig>> and I will be putting on a show.
+				고마움의 의미로, <<farm_text pig>> 아줌마와 내가 쇼를 보여줄 거야.
 			<</if>>
-			If you want me too, then next time I'm around, I'll need you on your best behavior." You spread your legs.
+			나랑 하고 싶다면, 다음에 내가 올 때 말 잘 듣고 있어야 할 거야." 당신이 다리를 벌렸다.
 		<</if>>
 		<br><br>
 
-		The <<farm_text_many pig>> crowd around to watch you.
+		<<farm_text_many pig>> 구경하려고 몰려들었다.
 		<br><br>
 		<<link [[Next|Farm Woodland Pigs Reward]]>>
 			<<set $sexstart to 1>>
@@ -1570,7 +1570,7 @@
 <<else>>
 	<<farm_pigs -3>>
 	<<if $farm.beasts.pigs gte -5 or not ($settings.bestialityEnabled or $farm_work.pig.monster)>>
-		They consider you, then snort and trot away.
+		녀석들이 당신을 빤히 보더니, 콧방귀를 뀌고는 툭툭 털며 가버렸다.
 		<br><br>
 
 		<<link [[Next|Farm Woodland]]>>
@@ -1581,27 +1581,27 @@
 		<<beastNEWinit 1 pig>>
 		<<set $farm_work.pig.gender to $NPCList[0].gender>>
 
-		They consider you, then snort and trot away.
+		녀석들이 당신을 빤히 보더니, 콧방귀를 뀌고는 툭툭 털며 가버렸다.
 		<br><br>
 
-		As they do, a <<farm_text pig>> stays behind.
+		그러는 사이, <<farm_text pig>> 한 마리가 남았다.
 
 		<<if $farm_work.pig.monster>>
 			<<if random(1, 3) is 1>>
-				"Not enough. Not satisfy." <<farm_He pig>> says. "Stupid human need breed."
+				"부족해. 만족 못 해." <<farm_He pig>>【이가】 말했다. "멍청한 인간 교배 필요."
 			<<elseif random(1, 2) is 1>>
-				"More breed," <<farm_he pig>> says. "Stupid human reward."
+				"더 교배," <<farm_he pig>>【이가】 말했다. "멍청한 인간 보상."
 			<<else>>
-				"No reward. Lie," <<farm_he pig>> says. "Stupid human can satisfy."
+				"보상 없어. 거짓말," <<farm_he pig>>【이가】 말했다. "멍청한 인간 만족시킬 수 있어."
 			<</if>>
 		<<else>>
-			<<farm_He pig>> growls at you, blocking your path.
+			<<farm_He pig>> 당신에게 으르렁거리며 길을 가로막았다.
 		<</if>>
 
-		The <<farm_text_many pig>> turn around at the sound of <<farm_his pig>> voice. You try to move around <<farm_him pig>>, but <<farm_he pig>> moves between you and the farm. You look around. The other <<farm_text_many pig>> don't try to stop you, but they also don't try to stop the <<farm_text pig>>.
+		<<farm_text_many pig>> 녀석의 목소리에 돌아섰다. 당신은 <<farm_him pig>>【을를】 피해 가려 했지만, 녀석은 당신과 농장 사이에 몸을 가로막았다. 주위를 둘러보았다. 다른 <<farm_text_many pig>> 당신을 말리려 들지 않았지만, 그렇다고 저 <<farm_text pig>>【을를】 말리려고도 하지 않았다.
 		<br><br>
 
-		<<link [[Fight <<farm_him pig>> off|Farm Woodland Pigs Reward]]>>
+		<<link [[<<farm_him pig>> 물리친다|Farm Woodland Pigs Reward]]>>
 			<<set $molestationstart to 1>>
 
 			<<set $tempRewardHelpful to false>>
@@ -2581,48 +2581,48 @@
 
 	<<if $tempPigTracker.length gt 0 and $farm_work.pig.monster>>
 		<<if $tempPigTracker.length is 1>>
-			The other <<farm_text pig $tempPigTracker[0]>> cheers.
+			다른 <<farm_text pig $tempPigTracker[0]>>【이가】 환호했다.
 		<<else>>
-			The others cheer.
+			나머지 녀석들이 환호했다.
 		<</if>>
 		<<lrespect>><<farm_pigs -1>>
 		<br>
 
 		<<if random(1, 2) is 2>>
-			"Not so great now."
+			"아까만큼 대단하진 않네."
 		<<elseif $tempPigTracker.length gt 1>>
 			"I hope <<pshe>> know place."
 		<</if>>
 		<br>
 
 		<<if random(1, 2) is 2>>
-			"You should been rougher."
+			"좀 더 거칠게 했어야 했는데."
 		<<elseif $tempPigTracker.length gt 2>>
-			"Can be rougher next time."
+			"다음엔 더 거칠게 할 수 있어."
 		<</if>>
 		<br>
 
 		<<if random(1, 2) is 2>>
 			"We keep <<phim>> here?"
 		<<elseif $tempPigTracker.length gt 3>>
-			"I bet <<pshe>> like that."
+			"저런 거 엄청 좋아할걸."
 		<</if>>
 	<<else>>
 		<<lrespect>><<farm_pigs -1>>
 	<</if>>
 	<br><br>
 
-	<<tearful>> you pick up your basket and stagger away from them.
+	<<tearful>> 당신은 바구니를 집어 들고 녀석들에게서 비틀거리며 멀어졌다.
 	<br><br>
 
-	You check your basket.
+	바구니를 확인했다.
 	<<if $tempBasket[0] + $tempBasket[1] gt 0>>
 		You have
 		<span class="orange">
 			<<foodstuffReport "mushroom" $tempBasket[0] "mushroom">>, and <<foodstuffReport "truffle" $tempBasket[1] "truffle">>.
 		</span>
 	<<else>>
-		<span class="red">Your basket is empty.</span>
+		<span class="red">바구니가 텅 비어 있다.</span>
 	<</if>>
 	<br><br>
 
@@ -2633,26 +2633,26 @@
 	<br>
 
 <<elseif $enemyhealth lte 0>>
-	The <<farm_text pig>> backs away from you, cowed.
+	<<farm_text pig>> 겁을 먹고 당신에게서 뒷걸음질 쳤다.
 	<<if $tempPigTracker.length is 1>>
-		The other <<farm_text pig $tempPigTracker[0]>> follows suit.
+		다른 <<farm_text pig $tempPigTracker[0]>> 그 뒤를 따랐다.
 	<<else>>
-		The others follow suit.
+		나머지 녀석들도 그 뒤를 따랐다.
 	<</if>>
 	<<grespect>><<farm_pigs 1>>
 	<br><br>
 
-	<<tearful>> you pick up your basket and walk away.
+	<<tearful>> 당신은 바구니를 집어 들고 자리를 떠났다.
 	<br><br>
 
-	You check your basket.
+	바구니를 확인했다.
 	<<if $tempBasket[0] + $tempBasket[1] gt 0>>
 		You have
 		<span class="green">
 			<<foodstuffReport "mushroom" $tempBasket[0] "mushroom">>, and <<foodstuffReport "truffle" $tempBasket[1] "truffle">>.
 		</span>
 	<<else>>
-		<span class="red">Your basket is empty.</span>
+		<span class="red">바구니가 텅 비어 있다.</span>
 	<</if>>
 	<br><br>
 
