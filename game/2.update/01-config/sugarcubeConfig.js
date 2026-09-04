@@ -11,10 +11,8 @@ const StartConfig = {
 	debug: false,
 	enableImages: true,
 	enableLinkNumberify: true,
-/* ========= 번역 필요 ========= */
 	version: "0.5.12.8",
 	versionName: `"Abyssal" 에디션`,
-/* ========================= */
 	sneaky: false,
 	socialMediaEnabled: true,
 	sourceLinkEnabled: false,

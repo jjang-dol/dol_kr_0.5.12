@@ -219,9 +219,7 @@ function genderappearancecheck() {
 	if (T.under_lower_protected && V.settings.nudeGenderPerception > 0) {
 		addfemininityfromfactor(T.bulge_size * -60, "속옷 사이로 보이는 볼록함", "noow");
 	} else if ((T.over_lower_protected || T.lower_protected) && V.settings.nudeGenderPerception > 0) {
-/* ========= 번역 필요 ========= */
 		addfemininityfromfactor(-Math.max((T.bulge_size - 6) * 60, 0), "옷 위로 보이는 볼록함", "noow");
-/* ========================= */
 	} else if (V.worn.genitals.exposed && V.settings.nudeGenderPerception === 1) {
 		if (V.player.penisExist) {
 			addfemininityfromfactor((V.player.penissize + 0.5) * -150, "드러난 자지", "noow");
@@ -276,9 +274,7 @@ function genderappearancecheck() {
 		T.bottom_visibility *= 0.75;
 		/* Bulge covered by lower clothes */
 		if (V.settings.nudeGenderPerception > 0) {
-/* ========= 번역 필요 ========= */
 			addfemininityfromfactor(-Math.max((T.bulge_size - 6) * 60, 0), "옷 위로 보이는 볼록함");
-/* ========================= */
 		}
 	}
 	/* Upper clothing and breasts */
@@ -299,15 +295,11 @@ function genderappearancecheck() {
 			addfemininityfromfactor((V.player.perceived_breastsize - 0.5) * 100, V.player.perceived_breastsize > 0 ? "노출된 가슴" : "노출된 납작한 가슴");
 		} else {
 			/* Breasts covered by only underwear */
-/* ========= 번역 필요 ========= */
 			addfemininityfromfactor(Math.max((V.player.perceived_breastsize - 2) * 100, 0), "속옷 너머 보이는 가슴 크기");
-/* ========================= */
 		}
 	} else {
 		/* Breast fully covered */
-/* ========= 번역 필요 ========= */
 		addfemininityfromfactor(Math.max((V.player.perceived_breastsize - 4) * 100, 0), "옷 위로 보이는 가슴 크기");
-/* ========================= */
 	}
 	/* Bottom */
 	addfemininityfromfactor(Math.trunc(V.player.bottomsize * T.bottom_visibility * 50), "엉덩이 크기 (" + Math.trunc(T.bottom_visibility * 100) + "% 노출)");
@@ -320,11 +312,9 @@ function genderappearancecheck() {
 			playerAwareTheyArePregnant() ? "임신한 배" : "임신한 것처럼 보이는 배"
 		);
 	} else if (playerBellySize() >= 18) {
-/* ========= 번역 필요 ========= */
 		addfemininityfromfactor(10000, playerAwareTheyArePregnant() ? "임신한 배" : "임신처럼 보이는 배");
 	} else if (playerBellySize() >= 8) {
 		addfemininityfromfactor(Math.max((playerBellySize() - 7) * 250, 0), playerAwareTheyArePregnant() ? "임신한 배" : "임신처럼 보이는 배");
-/* ========================= */
 	}
 	/* Body writing */
 	bodywritingExposureCheck(true);

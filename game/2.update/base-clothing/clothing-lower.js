@@ -53,9 +53,7 @@ function initLower() {
 			gender: "n",
 			warmth: 0,
 			cost: 0,
-/* ========= 번역 필요 ========= */
 			description: "벗었습니다.",
-/* ========================= */
 			shop: [],
 			accessory: 0,
 			accessory_colour: 0,
