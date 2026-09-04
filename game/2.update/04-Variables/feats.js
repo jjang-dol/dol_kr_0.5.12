@@ -926,7 +926,9 @@ setup.feats = {
 	},
 	"Hail Mary": {
 		title: "성모 마리아",
+/* ========= 번역 필요 ========= */
 		desc: "Have a vaginal birth as a virgin.",
+/* ========================= */
 		difficulty: 4,
 		series: "",
 		filter: ["All", "Pregnancy"],
@@ -935,7 +937,9 @@ setup.feats = {
 	},
 	"Bicycle Mother": {
 		title: "마을버스 엄마",
+/* ========= 번역 필요 ========= */
 		desc: "Gave birth without knowing who the donor is while having five or more possible suspects.",
+/* ========================= */
 		difficulty: 2,
 		series: "",
 		filter: ["All", "Pregnancy"],
@@ -1161,6 +1165,7 @@ setup.feats = {
 		filter: ["All", "Discoveries-Town"],
 		hint: "힌트: 자연의 모든 비밀을 수확하세요.",
 		softLockable: true,
+/* ========= 번역 필요 ========= */
 	},
 	"Wet Rod": {
 		title: "Wet Rod",
@@ -1185,6 +1190,7 @@ setup.feats = {
 		series: "fishing",
 		filter: ["All", "Discoveries-Other"],
 		hint: "Hint: Reel in a bass.",
+/* ========================= */
 	},
 	"Pride of the Farm": {
 		title: "농장의 자랑",
@@ -1895,6 +1901,7 @@ setup.feats = {
 		hint: "힌트: 니키와 함께 일하십시오.",
 		softLockable: true,
 	},
+/* ========= 번역 필요 ========= */
 	"Record Keeper": {
 		title: "Record Keeper",
 		desc: "Organised the forbidden office in the asylum.",
@@ -1931,6 +1938,7 @@ setup.feats = {
 		hint: "Hint: Explore the forbidden section of the asylum.",
 		softLockable: true,
 	},
+/* ========================= */
 	"Hear Me Roar": {
 		title: "내 포효를 들어라",
 		desc: "하이 스트리트에서 더 많은 전단지를 나눠주었습니다.",
@@ -2744,12 +2752,14 @@ const boostData = {
 			required: ["Curious Attire", "Wicked Wardrobe"],
 			cost: 0,
 			missing: "히든 업적을 달성하여 이 부스트를 해금하세요 (" + setup.feats["Curious Attire"].hint + ")",
+/* ========= 번역 필요 ========= */
 		},
 		seeds: {
 			name: "Starting Seeds",
 			required: ["Seedy", "Breedy"],
 			cost: 0,
 			missing: "Unlock this boost by obtaining the 'Seedy' feat",
+/* ========================= */
 		},
 		sexToys: {
 			name: "성인용품",

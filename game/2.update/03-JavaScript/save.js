@@ -1178,8 +1178,10 @@ function settingsObjects(type) {
 					penisModifier: { min: -8, max: 8, decimals: 0, displayName: "NPC 자지 평균 크기:", randomize: "encounter" },
 					breastModifier: { min: -12, max: 12, decimals: 0, displayName: "여성 가슴 평균 크기:", randomize: "encounter" },
 					rentCostModifier: { min: 0.1, max: 3, decimals: 1, displayName: "베일리의 임대료:", randomize: "gameplay" },
+/* ========= 번역 필요 ========= */
 					baseNpcPregnancyChance: { min: 0, max: 100, decimals: 0, displayName: "NPC 기본 임신 확률:", randomize: "gameplay" },
 					basePlayerPregnancyChance: { min: 0, max: 100, decimals: 0, displayName: "플레이어 기본 임신 확률:", randomize: "gameplay" },
+/* ========================= */
 					beastMaleChanceSplit: { bool: true, displayName: "짐승의 성별 외형별 끌림 분리:" },
 					beastMaleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "남성에게 끌리는 짐승:", randomize: "encounter" },
 					beastMaleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "여성에게 끌리는 짐승:", randomize: "encounter" },
@@ -1239,10 +1241,12 @@ function settingsObjects(type) {
 					toyMultiplePenetrationEnabled: { bool: true, displayName: "성인용품 다중 삽입:" },
 					multipleWardrobes: { strings: [false, "isolated"], displayName: "여러 옷장:" }, //, "all"
 					maleChanceSplit: { bool: true, displayName: "NPC의 성별 외형별 끌림 분리:" },
+/* ========= 번역 필요 ========= */
 					npcPregnancyEnabled: { bool: true, displayName: "Generic NPC pregnancy:" },
 					nnpcPregnancyEnabled: { bool: true, displayName: "NNPC/LI pregnancy:" },
 					analPregnancy: { strings: [false, "exceptional", "always"], displayName: "PC anal pregnancy:" },
 					npcAnalPregnancyEnabled: { bool: true, displayName: "NPC anal pregnancy:" },
+/* ========================= */
 					maleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "남성에게 끌리는 NPC:", randomize: "encounter" },
 					maleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "여성에게 끌리는 NPC:", randomize: "encounter" },
 					nudeGenderPerception: {
@@ -1287,7 +1291,9 @@ function settingsObjects(type) {
 					playerPregnancyEggLayingEnabled: { bool: true, displayName: "플레이어 산란:" },
 					playerPregnancyBeastEnabled: { bool: true, displayName: "플레이어의 짐승 임신:" },
 					playerPregnancyHumanEnabled: { bool: true, displayName: "플레이어의 인간 임신:" },
+/* ========= 번역 필요 ========= */
 					pregnancyType: { strings: ["realistic", "fetish"], displayName: "임신 모드:" },
+/* ========================= */
 					pubicHairEnabled: { bool: true, displayName: "음모:" },
 					ruinedOrgasmEnabled: { bool: true, displayName: "망친 절정:" },
 					skillCheckStyle: { strings: ["percentage", "words", "skillname"], randomize: "gameplay", displayName: "스킬 체크 표시:" },

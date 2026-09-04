@@ -77,20 +77,24 @@ setup.debugMenu.eventList = {
 			widgets: [``],
 		},
 		{
+/* ========= 번역 필요 ========= */
 			link: [`Caught Fish Prop Debug`, `Caught Fish Prop Debug`],
 			widgets: [``],
 		},
 		{
+/* ========================= */
 			link: [`모든 레시피 습득`, stayOnPassageFn],
 			widgets: [`<<learn_recipe_all>>`],
 		},
 		{
 			link: [`식재료별 20개 지급`, stayOnPassageFn],
 			widgets: [`<<give_all_foodstuff>>`],
+/* ========= 번역 필요 ========= */
 		},
 		{
 			link: [`Unlock All Love Interests`, stayOnPassageFn],
 			widgets: [`<<debugUnlockAllLoveInterests>>`],
+/* ========================= */
 		},
 		{
 			link: [`벗기기`, stayOnPassageFn],
@@ -725,6 +729,7 @@ setup.debugMenu.eventList = {
 			widgets: [`<<set $averydate to 1>>`, `<<set Time.setTime(20, 0)>>`],
 		},
 		{
+/* ========= 번역 필요 ========= */
 			link: [`Avery Sex Me In The Car`, `Avery Date Sex`],
 			widgets: [`<<endcombat>>`, `<<set $sexstart to 1>>`, `<<npc Avery>>`, `<<person1>>`],
 		},
@@ -749,6 +754,7 @@ setup.debugMenu.eventList = {
 			widgets: [`<<endcombat>>`, `<<set $molestationstart to 1>>`, `<<npc Avery>>`, `<<person1>>`],
 		},
 		{
+/* ========================= */
 			link: [`검은 늑대 강제 이벤트`, `Forest Wolf Molestation`],
 			widgets: [
 				/* `<<beastNNPCinit>>`, */
@@ -974,10 +980,12 @@ setup.debugMenu.eventList = {
 			widgets: [`<<set $control to 0>>`, `<<set $possessed to true>>`],
 		},
 		{
+/* ========= 번역 필요 ========= */
 			link: [`Bait Shop Fish Request`, `Bait Shop Request`],
 			widgets: [``],
 		},
 		{
+/* ========================= */
 			text_only: "\n\n짐승 조우",
 		},
 		{
@@ -1162,6 +1170,7 @@ setup.debugMenu.eventList = {
 			link: [`거대 매에게 붙잡힘`, `Moor`],
 			widgets: [`<<set $moor to 50>>`, `<<set $eventskip to 1>>`, `<<moor_hunt_start>>`, `<<set $moor_hunt to 10>>`],
 		},
+/* ========= 번역 필요 ========= */
 		{
 			text_only: `\n\nFishing Minigame: `,
 		},
@@ -1225,6 +1234,7 @@ setup.debugMenu.eventList = {
 			link: [`Fish: Eel (slipper)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "eel">>`],
 		},
+/* ========================= */
 	],
 	Character: [
 		{
@@ -1827,10 +1837,12 @@ setup.debugMenu.eventList = {
 		{
 			link: [`모든 씨앗 해금`, stayOnPassageFn],
 			widgets: [`<<run unlockAllSeeds()>>`],
+/* ========= 번역 필요 ========= */
 		},
 		{
 			link: [`Complete fishing journal`, stayOnPassageFn],
 			widgets: [`<<run debugDiscoverAllFishing()>>`],
+/* ========================= */
 		},
 		{
 			link: [`슈퍼 디버그 캐릭터`, stayOnPassageFn],

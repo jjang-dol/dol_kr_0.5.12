@@ -315,6 +315,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========= 번역 필요 ========= */
 		variable: "ebony",
 		name: "ebony",
 		name_cap: "Ebony",
@@ -327,6 +328,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========================= */
 		variable: "jetblack",
 		name: "칠흑색",
 		name_cap: "칠흑색",
@@ -546,6 +548,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========= 번역 필요 ========= */
 		variable: "frostblue",
 		name: "frost blue",
 		name_cap: "Frost Blue",
@@ -557,6 +560,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========================= */
 		variable: "green",
 		name: "녹색",
 		name_cap: "녹색",
@@ -657,6 +661,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========= 번역 필요 ========= */
 		variable: "rosegold",
 		name: "rosegold",
 		name_cap: "Rosegold",
@@ -668,6 +673,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========================= */
 		variable: "crimson",
 		name: "진홍색",
 		name_cap: "진홍색",
@@ -679,6 +685,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========= 번역 필요 ========= */
 		variable: "wine",
 		name: "wine",
 		name_cap: "Wine",
@@ -691,6 +698,7 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========================= */
 		variable: "purple",
 		name: "보라색",
 		name_cap: "보라색",
