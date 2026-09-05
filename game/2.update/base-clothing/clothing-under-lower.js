@@ -2635,7 +2635,7 @@ function initUnderLower() {
 			slot: "under_lower",
 			name: "shell bikini bottom",
 			name_cap: "Shell bikini bottom",
-			name_simple: "bikini bottom",
+			name_simple: "bikini bottoms",
 			variable: "shell bikini",
 			description: "직접 주운 조개껍데기로 만들었다.",
 			cost: 4500,
