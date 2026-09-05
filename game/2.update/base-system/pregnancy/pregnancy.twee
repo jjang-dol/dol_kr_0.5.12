@@ -214,9 +214,9 @@
 <<widget "pregnancyFatherHint">>
 	<<if _args[0] and _args[0].possibleDonors.length is 1>>
 		<<set _fatherName to pregnancyNameCorrection(_args[0].possibleDonors[0].name)>>
-		<span class="lewd">It's clear that <<print _fatherName === "yourself" ? "you are" : _fatherName + " is">> the father.</span>
+		<span class="lewd"><<= _args[0].possibleDonors[0].name === "pc" ? "당신이" : _fatherName + "【이가】">> 아버지인 것이 분명합니다.</span>
 	<<else>>
-		<span class="red">You wonder who the father is.</span>
+		<span class="red">아버지가 누구인지 궁금합니다.</span>
 	<</if>>
 <</widget>>
 
@@ -327,27 +327,26 @@
 					????
 				<</if>>
 				<br>
-/* ========= 번역 필요 ========= */
-				<span class="gold">Size:</span> <<print _args[0].features.size>>
+				<span class="gold">크기:</span> <<childKrText "size" _args[0].features.size>>
 				<<if _args[0].features.hairColour>>
 					<<if _args[0].species.includes("human")>>
-						| <span class="gold">Hair:</span>
+						| <span class="gold">머리카락:</span>
 					<<elseif _args[0].species.includes("hawk")>>
-						| <span class="gold">Plumage:</span>
+						| <span class="gold">깃털:</span>
 					<<else>>
-						| <span class="gold">Fur:</span>
+						| <span class="gold">털:</span>
 					<</if>>
-					<<hairmapcolourtext _args[0].features.hairColour>>
+					<<childKrText "hair" _args[0].features.hairColour>>
+				<</if>>
+				<<if _args[0].features.eyeColour>>
+					| <span class="gold">눈:</span> <<childKrText "eye" _args[0].features.eyeColour>>
 				<</if>>
 				<<if _args[0].features.skinColour and (_args[0].species.includes("human") or _args[0].features.monster)>>
-					| <span class="gold">Skin:</span> <<skinColourName _args[0].features.skinColour>>
-/* ========================= */
+					| <span class="gold">피부:</span> <<childKrText "skin" _args[0].features.skinColour>>
 				<</if>>
 				<br>
-/* ========= 번역 필요 ========= */
 				<<if _args[0].identical isnot null>>
-					<span class="gold">Identical:</span> Yes
-/* ========================= */
+					<span class="gold">일란성:</span> 예
 					<br>
 				<</if>>
 			</div>
@@ -1953,12 +1952,10 @@
 	<<set $_pregnancy to getPlayerPregnancy()>><<set $_litter to getChildrenOf($_pregnancy.pregnancyId)>>
 	<<run $_litter.forEach(c => setKnowsGender(c.childId, "pc"))>>
 	<<set $_genders to {m:0,f:0,h:0}>>
-/* ========= 번역 필요 ========= */
 	<<run $_litter.forEach(b => $_genders[b.gender]++)>>
 	<<if $_litter[0].identical isnot null>>
-		<<set $_text_output to `"I believe they are <<if $_litter.length is 3>>all identical triplets<<else>>both identical twins<</if>>. They're the same gender and their facial features are similar."`>>
+		<<set $_text_output to `"제 생각엔 <<if $_litter.length is 3>>셋 다 일란성 세쌍둥이<<else>>둘 다 일란성 쌍둥이<</if>>인 것 같습니다. 성별도 같고 이목구비도 서로 닮았네요."`>>
 	<<elseif ($_genders.m is $_litter.length or $_genders.f is $_litter.length or $_genders.h is $_litter.length) and $_litter.length gt 1>>
-/* ========================= */
 		<<set $_text_output to `"같은 성별이긴 하지만, 일란성은 아닌 것 같습니다. 이목구비가 약간 다르게 생겼네요."`>>
 	<<else>>
 		<<set $_text_output to "당신의 아이는">>
@@ -2115,9 +2112,7 @@
 			<</if>>
 			<<if _pregnantNpc>>
 				<div @class="$options.images is 1 ? 'impregnated' : ''">
-/* ========= 번역 필요 ========= */
-					<div><span class="lewd">You just impregnated <<print pregnancyNameCorrection(_pregnantNpc)>>.</span></div>
-/* ========================= */
+					<div><span class="lewd"><<print pregnancyNameCorrection(_pregnantNpc)>>【을를】 임신시켰습니다.</span></div>
 					<<if $options.images is 1>><img class="fertilization" src="img/sex/fertilisation/impregnate-6.gif"><</if>>
 				</div>
 				<<earnFeat "First Fatherhood">>

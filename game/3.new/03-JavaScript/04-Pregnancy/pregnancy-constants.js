@@ -116,11 +116,11 @@ const PregnancyConstants = ConstantsLoader.init({
 	// Tuned so a 30-day cycle spreads 17/3/2/3/5 across the five bands. Banding on the peak instead
 	// of the integral collapsed that to 25 of 30 days reading either "very safe" or "dangerous".
 	riskMeterLabels: [
-        { text: "매우 안전", colour: "green", upTo: 0.05 },
-        { text: "안전", colour: "teal", upTo: 0.15 },
-        { text: "다소 안전", colour: "lblue", upTo: 0.28 },
-        { text: "위험", colour: "pink", upTo: 0.5 },
-        { text: "매우 위험", colour: "red", upTo: Infinity },
+        { key: "verySafe", text: "매우 안전", colour: "green", upTo: 0.05 },
+        { key: "safe", text: "안전", colour: "teal", upTo: 0.15 },
+        { key: "somewhatSafe", text: "다소 안전", colour: "lblue", upTo: 0.28 },
+        { key: "risky", text: "위험", colour: "pink", upTo: 0.5 },
+        { key: "veryRisky", text: "매우 위험", colour: "red", upTo: Infinity },
     ],
 	// Pregnancy test early negatives
 	pregnancyTest: {

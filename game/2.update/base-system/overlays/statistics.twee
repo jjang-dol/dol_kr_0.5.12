@@ -693,7 +693,7 @@
 			<br>
 			Allure: <<print Math.trunc($allure)>>
 			<br>
-			Drunk: <<print Math.trunc($drunk)>>
+			취기: <<print Math.trunc($drunk)>>
 			<br>
 			Drugs: <<print Math.trunc($drugged)>>
 			<br>
@@ -1008,39 +1008,35 @@
 			<<foldout false "_menstruationFoldout">>
 				<span class="gold">월경 주기</span>
 				<<if $_menstruation.running>>
-/* ========= 번역 필요 ========= */
 					<<set _fertile to menstrualFertileDates()>>
 					<br>
 					<<if _fertile.passed>>
 						/*The next cycle's length and fertile window aren't rolled until it begins, so the span is all that can honestly be given.*/
-						This cycle's fertile days have passed.
+						이번 주기의 가임 기간은 이미 지났습니다.
 						<br>
 						<<if _fertile.nextWindow.min is _fertile.nextWindow.max>>
-							Your next fertile days begin in about <<print _fertile.nextWindow.min>> <<= _fertile.nextWindow.min is 1 ? "day" : "days">>.
+							다음 가임 기간은 약 <<print _fertile.nextWindow.min>>일 후에 시작됩니다.
 						<<else>>
-							Your next fertile days begin in about <<print _fertile.nextWindow.min>> to <<print _fertile.nextWindow.max>> days.
+							다음 가임 기간은 약 <<print _fertile.nextWindow.min>>~<<print _fertile.nextWindow.max>>일 후에 시작됩니다.
 						<</if>>
 					<<else>>
-						Risky days: <<print _fertile.risky>>
+						위험한 날: <<print _fertile.risky>>
 						/*Ovulation can be behind the PC while the luteal tail still runs, and a span that is over is not printed.*/
 						<<if _fertile.dangerous>>
 							<br>
-							Dangerous days: <<print _fertile.dangerous>>
+							매우 위험한 날: <<print _fertile.dangerous>>
 						<</if>>
 					<</if>>
 					<br>
-					Sex today is <span @class="_fertile.todayColour"><<print _fertile.today>></span>.
-/* ========================= */
+					오늘의 성관계 위험도: <span @class="_fertile.todayColour"><<print _fertile.today>></span>.
 					<br>
 					현재 주기 날짜: <<print $_menstruation.currentDay>>
 					<br>
 					주기 마지막 날: <<print $_menstruation.currentDaysMax>>
 					<br>
-/* ========= 번역 필요 ========= */
 				<<else>>
 					<br>
-					Your cycle isn't active right now.
-/* ========================= */
+					현재 주기가 진행 중이지 않습니다.
 					<br>
 				<</if>>
 				<br>
@@ -1049,11 +1045,9 @@
 		<<foldout false "_extraPregnancyFoldout">>
 			<span class="gold">임신</span>
 			/* Previously commented out for being a major spoil, but caused players to think a bug had occurred */
-/* ========= 번역 필요 ========= */
-			Total days being pregnant in this lifetime: <<print Math.floor($pregnancyStats.totalDaysPregnant)>>
+			평생 임신 상태였던 총 일수: <<print Math.floor($pregnancyStats.totalDaysPregnant)>>
 			<br>
-			Total days knowingly being pregnant in this lifetime: <<print Math.floor($pregnancyStats.totalDaysPregnancyKnown)>>
-/* ========================= */
+			평생 임신 사실을 알고 있었던 총 일수: <<print Math.floor($pregnancyStats.totalDaysPregnancyKnown)>>
 			<br>
 			<<if $player.vaginaExist>>
 				<<pregnancyStatusBlock "vagina">>
@@ -1072,18 +1066,16 @@
 						<<if !$_npc.pregnancy.enabled and !_active>>
 							플레이어가 NPC 임신을 비활성화했습니다.
 						<<elseif !_active>>
-							Not pregnant.
-/* ========= 번역 필요 ========= */
+							임신하지 않았습니다.
 						<<else>>
 							<<set _litterCount to getChildrenOf(_active.pregnancyId).length>>
-							Pregnant with <<print _litterCount>>
+							임신 중인 수: <<print _litterCount>>
 							<<extraStatisticsPregnancyType childBaseSpecies(_active.donorSpecies) _litterCount>>
 							<<set $_days to pregnancyDaysEta(_active)>>
-/* ========================= */
 							<<if $_days lt 1>>
-								ETA: Anytime.
+								예상 출산 시점: 언제든지.
 							<<elseif $_days>>
-								ETA: <<print $_days>> <<pluralise $_days "day">>.
+								예상 출산까지: <<print $_days>>일.
 							<</if>>
 						<</if>>
 					</div>
@@ -1096,18 +1088,18 @@
 /* One orifice's parasite slots. _args[0] is "anus" or "vagina". */
 <<widget "parasiteSlotBlock">>
 	<<set _orifice to _args[0]>>
-	<<set _label to _orifice is "anus" ? "Anal" : "Vaginal">>
+	<<set _label to _orifice is "anus" ? "항문" : "질">>
 	<<set $_pregnancy to $sexStats[_orifice].pregnancy>>
 	<<if $_pregnancy.type is "parasite" or ($_pregnancy.type is null and !getActivePregnancy("pc", _orifice))>>
 		<<for _i to 0; _i lt maxParasites(_orifice); _i++>>
 			<<if $_pregnancy.fetus[_i] isnot undefined>>
 				<<if $_pregnancy.fetus[_i].fertilised>>
-					_label slot <<=_i+1>> is pregnant with a $_pregnancy.fetus[_i].stats.gender $_pregnancy.fetus[_i].creature.
+					_label 슬롯 <<=_i+1>>【은는】 <<statisticsParasiteGender $_pregnancy.fetus[_i].stats.gender>> <<statisticsParasiteCreature $_pregnancy.fetus[_i].creature>>【을를】 임신 중입니다.
 					<<if $_pregnancy.fetus[_i].stats.gender is "Hermaphrodite">>
 						<<if $pregnancyStats.parasiteDoctorEvents gte 4 and $_pregnancy.fetus[_i].daysLeft is 0>>
 							하퍼 박사가 언제든 출산을 도와줄 수 있을 것입니다.
 						<<elseif $pregnancyStats.parasiteDoctorEvents gte 4>>
-							Dr Harper will be able to help you to deliver in <<=$_pregnancy.fetus[_i].daysLeft>> days.
+							하퍼 박사가 <<=$_pregnancy.fetus[_i].daysLeft>>일 후 출산을 도와줄 수 있을 것입니다.
 						<<else>>
 							출산을 위해서는 하퍼 박사를 만나야 합니다.
 						<</if>>
@@ -1115,23 +1107,23 @@
 						<<if $_pregnancy.fetus[_i].daysLeft is 0>>
 							곧 언제라도 출산할 준비가 될 것입니다.
 						<<else>>
-							It will be ready to deliver in less than <<=$_pregnancy.fetus[_i].daysLeft>> days.
+							<<=$_pregnancy.fetus[_i].daysLeft>>일 이내에 출산할 준비가 될 것입니다.
 						<</if>>
 					<</if>>
 					<br>
 				<<else>>
-					_label slot <<=_i+1>> has a $_pregnancy.fetus[_i].stats.gender $_pregnancy.fetus[_i].creature egg ready to be fertilised.<br>
+					_label 슬롯 <<=_i+1>>에 수정될 준비가 된 <<statisticsParasiteGender $_pregnancy.fetus[_i].stats.gender>> <<statisticsParasiteCreature $_pregnancy.fetus[_i].creature>> 알이 있습니다.<br>
 				<</if>>
 			<<else>>
-				_label slot <<=_i+1>> is empty.<br>
+				_label 슬롯 <<=_i+1>>【은는】 비어 있습니다.<br>
 			<</if>>
 		<</for>>
 	<<else>>
 		<<if playerAwareTheyArePregnant()>>
-			Unable to host parasites due to other type of <<= _orifice is "anus" ? "anal" : "vaginal">> pregnancy.
+			다른 종류의 <<= _orifice is "anus" ? "항문" : "질">> 임신 중이라 기생체를 품을 수 없습니다.
 		<<else>>
 			<<for _i to 0; _i lt maxParasites(_orifice); _i++>>
-				_label slot <<=_i+1>> is empty.<br>
+				_label 슬롯 <<=_i+1>>【은는】 비어 있습니다.<br>
 			<</for>>
 		<</if>>
 	<</if>>
@@ -1144,18 +1136,18 @@
 	<<set _record to getActivePregnancy("pc", _orifice)>>
 	<<if _record>>
 		<<set _litterCount to getChildrenOf(_record.pregnancyId).length>>
-		Currently pregnant with: <<print _litterCount>>
+		현재 임신 중인 수: <<print _litterCount>>
 		<<extraStatisticsPregnancyType childBaseSpecies(_record.donorSpecies) _litterCount>>
 		<br>
 		<<set _days to pregnancyDaysEta(_record)>>
 		<<if _days lt 1>>
-			ETA: Anytime.
+			예상 출산 시점: 언제든지.
 		<<elseif _days>>
-			ETA: <<print _days>> <<pluralise _days "day">>.
+			예상 출산까지: <<print _days>>일.
 		<</if>>
 		<br>
 	<<elseif orificeHasParasites(_orifice)>>
-		Parasites in <<= _orifice is "anus" ? "your anus" : "the womb">> are preventing <<= _orifice is "anus" ? "anal" : "vaginal">> pregnancy from occurring.
+		<<= _orifice is "anus" ? "항문" : "자궁">> 안의 기생체들이 <<= _orifice is "anus" ? "항문" : "질">> 임신이 일어나는 것을 막고 있습니다.
 	<<elseif (_orifice is "vagina" and !$player.vaginaExist) or !_menstruation.running>>
 		현재 임신할 수 없습니다.
 	<<elseif _menstruation.currentState is "recovering">>
@@ -1175,10 +1167,10 @@
 		<</if>>
 		<<if $settings.pregnancyType is "realistic">>
 			<<set _loads to $cumLoads[_orifice].filter(l => loadIsLive(l))>>
-			Loads of cum that can get you pregnant <<if _orifice is "vagina">>vaginally<<else>>anally<</if>>: <<print _loads.length>>
+			임신 가능성이 있는 <<= _orifice is "vagina" ? "질" : "항문">> 내 정액 수: <<print _loads.length>>
 			<br>
 			<<if _loads.length>>
-				Cum inside you currently:
+				현재 당신 안에 정액이 남아 있는 대상들:
 				<ul>
 					<<set _donors to _loads.map(l => l.donor).filter((d, i, a) => a.indexOf(d) === i)>>
 					<<for _donor range _donors>>
@@ -1202,13 +1194,24 @@
 
 <<widget "extraStatisticsPregnancyType">>
 	<<switch _args[0]>>
-/* ========= 번역 필요 ========= */
-		<<case "human">>normal <<pluralise _args[1] "baby">>.
-		<<case "wolf">>wolf <<pluralise _args[1] "puppy" "puppies">>.
-		<<case "hawk">>hawk <<pluralise _args[1] "egg">>.
-/* ========================= */
+		<<case "human">>명 (평범한 아기)
+		<<case "wolf">>마리 (늑대 새끼)
+		<<case "hawk">>개 (매의 알)
 	<</switch>>
 <</widget>>
+
+<<widget "statisticsParasiteGender">><<silently>>
+	<<switch _args[0]>>
+		<<case "Hermaphrodite" "hermaphrodite">><<set $_text_output to "양성">>
+		<<case "Female" "female">><<set $_text_output to "암컷">>
+		<<case "Male" "male">><<set $_text_output to "수컷">>
+		<<default>><<set $_text_output to _args[0]>>
+	<</switch>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
+
+<<widget "statisticsParasiteCreature">><<silently>>
+	<<set $_text_output to window.KR.getCreatureTypeKr(_args[0])>>
+<</silently>><<if $_text_output>><<print $_text_output>><</if>><</widget>>
 
 <<widget "statisticsTimeCompare">><<silently>>
 	<<if $statFreeze is true>>

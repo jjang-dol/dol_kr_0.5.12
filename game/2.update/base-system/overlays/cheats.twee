@@ -1987,12 +1987,12 @@
 			<</if>>
 			<br><br>
 			<<if $settings.fertilityCycleEnabled>>
-				Menstruation:
+				월경 주기:
 				<br>
 				<<link "<<">><<set _menstruation.currentDay to Math.clamp(_menstruation.currentDay - 5, 0, _menstruation.currentDaysMax)>><<replace "#cheatMenstruationDay">><<= Math.trunc(_menstruation.currentDay)>><</replace>><</link>> |
 				<<link "<">><<set _menstruation.currentDay to Math.clamp(_menstruation.currentDay - 1, 0, _menstruation.currentDaysMax)>><<replace "#cheatMenstruationDay">><<= Math.trunc(_menstruation.currentDay)>><</replace>><</link>> |
 				_menstruation.currentDaysMax일 중 <span id="cheatMenstruationDay"><<= Math.trunc(_menstruation.currentDay)>></span>일째
-				| <<link "Ovulate">><<set _menstruation.currentDay to _menstruation.stages[2]>><<replace "#cheatMenstruationDay">><<= Math.trunc(_menstruation.currentDay)>><</replace>><</link>>
+				| <<link "배란시키기">><<set _menstruation.currentDay to _menstruation.stages[2]>><<replace "#cheatMenstruationDay">><<= Math.trunc(_menstruation.currentDay)>><</replace>><</link>>
 				| <<link ">">><<set _menstruation.currentDay to Math.clamp(_menstruation.currentDay + 1, 0, _menstruation.currentDaysMax)>><<replace "#cheatMenstruationDay">><<= Math.trunc(_menstruation.currentDay)>><</replace>><</link>>
 				| <<link ">>">><<set _menstruation.currentDay to Math.clamp(_menstruation.currentDay + 5, 0, _menstruation.currentDaysMax)>><<replace "#cheatMenstruationDay">><<= Math.trunc(_menstruation.currentDay)>><</replace>><</link>>
 				<br><br>
@@ -2010,7 +2010,7 @@
 				colorArr: ["--teal", "--pink"], activeButtons: ["single", "double"]
 			}>>
 			<br><br>
-			<<link [[Clear current pregnancy|$passage]]>>
+			<<link [[현재 임신 초기화하기|$passage]]>>
 				<<run clearPlayerPregnancies()>>
 				<<set $cumLoads to { vagina: [], anus: [] }>>
 				<<set $pendingPregnancies to { vagina: null, anus: null }>>
@@ -2182,7 +2182,7 @@
 						<</capture>>
 					<</for>>
 					<<if $player.penisExist>>
-						| <<link "Yourself">>
+						| <<link "자기 자신">>
 							<<sceneInseminate _womb "pc" "human" "deep">>
 							<<replace "#cheatSpermSources">><<set _stored to $cumLoads[_womb].filter(loadIsLive).length>><span class="gold">_stored</span>개의 저장된 정액<</replace>>
 						<</link>>
@@ -2282,7 +2282,12 @@
 	<<set _term to getDueDate(_pregRecord) - _pregRecord.conceivedDate>>
 	<<set $_fatherName to pregnancyNameCorrection(_pregRecord.donor)>>
 	<<set _species to childBaseSpecies(_pregRecord.donorSpecies)>>
-	<<print window.KR.gatPersonNameDictKR($NPCName[_args[0]].nam)>>【은는】 <<= window.KR.getBeastTypeKr(_species)>>의 아이를 임신 중입니다. <<= $_fatherName === "yourself" ? "당신" : $_fatherName.toUpperFirst()>>【이가】 아버지입니다.
+	<<switch _species>>
+		<<case "wolf">><<set _speciesKr to "늑대 새끼">>
+		<<case "hawk">><<set _speciesKr to "매의 알">>
+		<<default>><<set _speciesKr to "아기">>
+	<</switch>>
+	<<print window.KR.gatPersonNameDictKR($NPCName[_args[0]].nam)>>【은는】 <<= _speciesKr>>【을를】 임신했습니다. 아버지는 <<= _pregRecord.donor === "pc" ? "당신" : $_fatherName.toUpperFirst()>>입니다.
 	<span id="cheatNPCPregnancyProgress">
 		<<cheatPregnancyNPCStepper _args[0]>>
 	</span>
