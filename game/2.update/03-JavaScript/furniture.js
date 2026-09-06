@@ -626,15 +626,15 @@ const Furniture = (() => {
 				decoration = furnitureGet(Categories.decoration);
 				if (decoration !== null && decoration.id === "owlplushie") {
 					furnitureSet("owlplushie", Categories.owlplushie, {
-						name: "owl plushie",
-						nameCap: "Owl plushie",
+						name: "부엉이 인형",
+						nameCap: "부엉이 인형",
 					});
 					furnitureDelete(Categories.decoration);
 				}
 				if ([2, 4, 7].includes(V.kylar_camera)) {
 					furnitureSet("owlplushie", Categories.owlplushie, {
-						name: "owl plushie",
-						nameCap: "Owl plushie",
+						name: "부엉이 인형",
+						nameCap: "부엉이 인형",
 					});
 				}
 				versions.furniture = 3;
