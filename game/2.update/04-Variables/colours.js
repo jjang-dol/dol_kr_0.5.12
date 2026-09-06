@@ -685,10 +685,9 @@ setup.colours.hair = [
 		},
 	},
 	{
-/* ========= 번역 필요 ========= */
 		variable: "wine",
-		name: "wine",
-		name_cap: "Wine",
+		name: "와인",
+		name_cap: "와인",
 		csstext: "winehair",
 		natural: false,
 		dye: true,
