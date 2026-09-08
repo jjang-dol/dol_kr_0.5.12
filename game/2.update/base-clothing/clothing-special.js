@@ -971,7 +971,7 @@ function specialClothesUnlockText(toUnlock, group) {
 						output += `<span class="gold">숲속 상점에 </span><span class="purple">수련자 로브</span><span class="gold">가 해금되었습니다!</span><br><br>`;
 						break;
 					case "temple_monk_and_nun":
-						output += '<span class="gold">숲속 상점에 수사와 수녀 의상이 해금되었습니다!</span><br><br>';
+						output += '<span class="gold">숲속 상점에 수도사와 수녀 의상이 해금되었습니다!</span><br><br>';
 						break;
 					case "temple_confessor":
 						output += `<span class="gold">숲속 상점에 </span><span class="black">고해 신부 로브</span><span class="gold">가 해금되었습니다...</span><br><br>`;

@@ -316,8 +316,8 @@ setup.colours.hair = [
 	},
 	{
 		variable: "ebony",
-		name: "ebony",
-		name_cap: "Ebony",
+		name: "에보니",
+		name_cap: "에보니",
 		csstext: "black",
 		natural: false,
 		dye: true,
@@ -546,10 +546,9 @@ setup.colours.hair = [
 		},
 	},
 	{
-/* ========= 번역 필요 ========= */
 		variable: "frostblue",
-		name: "frost blue",
-		name_cap: "Frost Blue",
+		name: "프로스트 블루",
+		name_cap: "프로스트 블루",
 		csstext: "frostblue",
 		natural: false,
 		dye: true,
@@ -558,7 +557,6 @@ setup.colours.hair = [
 		},
 	},
 	{
-/* ========================= */
 		variable: "green",
 		name: "녹색",
 		name_cap: "녹색",
@@ -659,11 +657,9 @@ setup.colours.hair = [
 		},
 	},
 	{
-/* ========= 번역 필요 ========= */
 		variable: "rosegold",
-		name: "rosegold",
-		name_cap: "Rosegold",
-/* ========================= */
+		name: "로즈골드",
+		name_cap: "로즈골드",
 		csstext: "rosegold",
 		natural: false,
 		dye: true,
