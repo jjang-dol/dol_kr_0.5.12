@@ -659,9 +659,11 @@ setup.colours.hair = [
 		},
 	},
 	{
+/* ========= 번역 필요 ========= */
 		variable: "rosegold",
 		name: "rosegold",
 		name_cap: "Rosegold",
+/* ========================= */
 		csstext: "rosegold",
 		natural: false,
 		dye: true,
@@ -693,7 +695,6 @@ setup.colours.hair = [
 		},
 	},
 	{
-/* ========================= */
 		variable: "purple",
 		name: "보라색",
 		name_cap: "보라색",
