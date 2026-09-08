@@ -1239,10 +1239,12 @@ function settingsObjects(type) {
 					toyMultiplePenetrationEnabled: { bool: true, displayName: "성인용품 다중 삽입:" },
 					multipleWardrobes: { strings: [false, "isolated"], displayName: "여러 옷장:" }, //, "all"
 					maleChanceSplit: { bool: true, displayName: "NPC의 성별 외형별 끌림 분리:" },
-					npcPregnancyEnabled: { bool: true, displayName: "일반 NPC 임신:" },
-                    nnpcPregnancyEnabled: { bool: true, displayName: "주요 NPC/연인 임신:" },
-                    analPregnancy: { strings: [false, "exceptional", "always"], displayName: "플레이어 항문 임신:" },
-                    npcAnalPregnancyEnabled: { bool: true, displayName: "NPC 항문 임신:" },
+/* ========= 번역 필요 ========= */
+					npcPregnancyEnabled: { bool: true, displayName: "Generic NPC pregnancy:" },
+					nnpcPregnancyEnabled: { bool: true, displayName: "NNPC/LI pregnancy:" },
+					analPregnancy: { strings: [false, "exceptional", "always"], displayName: "PC anal pregnancy:" },
+					npcAnalPregnancyEnabled: { bool: true, displayName: "NPC anal pregnancy:" },
+/* ========================= */
 					maleChanceMale: { min: 0, max: 100, decimals: 0, displayName: "남성에게 끌리는 NPC:", randomize: "encounter" },
 					maleChanceFemale: { min: 0, max: 100, decimals: 0, displayName: "여성에게 끌리는 NPC:", randomize: "encounter" },
 					nudeGenderPerception: {
