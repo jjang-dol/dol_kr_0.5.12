@@ -296,13 +296,11 @@ setup.shopDetails = {
 		desc: "머리에 쓰는 물건입니다.",
 		details: "없음",
 	},
-/* ========= 번역 필요 ========= */
 	fishing_rod: {
-		name: "Fishing Rod",
-		desc: "Needed to go fishing.",
-		details: "none",
+		name: "낚싯대",
+		desc: "낚시를 하려면 필요하다.",
+		details: "없음",
 	},
-/* ========================= */
 };
 
 setup.hairDetails = {

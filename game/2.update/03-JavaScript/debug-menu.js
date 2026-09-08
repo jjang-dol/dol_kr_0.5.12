@@ -77,24 +77,20 @@ setup.debugMenu.eventList = {
 			widgets: [``],
 		},
 		{
-/* ========= 번역 필요 ========= */
-			link: [`Caught Fish Prop Debug`, `Caught Fish Prop Debug`],
+			link: [`잡은 물고기 소지 디버그`, `Caught Fish Prop Debug`],
 			widgets: [``],
 		},
 		{
-/* ========================= */
 			link: [`모든 레시피 습득`, stayOnPassageFn],
 			widgets: [`<<learn_recipe_all>>`],
 		},
 		{
 			link: [`식재료별 20개 지급`, stayOnPassageFn],
 			widgets: [`<<give_all_foodstuff>>`],
-/* ========= 번역 필요 ========= */
 		},
 		{
-			link: [`Unlock All Love Interests`, stayOnPassageFn],
+			link: [`모든 연애 대상 잠금 해제`, stayOnPassageFn],
 			widgets: [`<<debugUnlockAllLoveInterests>>`],
-/* ========================= */
 		},
 		{
 			link: [`벗기기`, stayOnPassageFn],
@@ -729,12 +725,11 @@ setup.debugMenu.eventList = {
 			widgets: [`<<set $averydate to 1>>`, `<<set Time.setTime(20, 0)>>`],
 		},
 		{
-/* ========= 번역 필요 ========= */
-			link: [`Avery Sex Me In The Car`, `Avery Date Sex`],
+			link: [`차 안에서 에이버리와 섹스하기`, `Avery Date Sex`],
 			widgets: [`<<endcombat>>`, `<<set $sexstart to 1>>`, `<<npc Avery>>`, `<<person1>>`],
 		},
 		{
-			link: [`Avery Sex Me At The Hotel`, `Avery Hotel Sex`],
+			link: [`호텔에서 에이버리와 섹스하기`, `Avery Hotel Sex`],
 			widgets: [
 				`<<endcombat>>`,
 				`<<set $sexstart to 1>>`,
@@ -750,11 +745,10 @@ setup.debugMenu.eventList = {
 			],
 		},
 		{
-			link: [`Avery Rape Me In The Car`, `Avery Walk Rape`],
+			link: [`차 안에서 에이버리에게 강간당하기`, `Avery Walk Rape`],
 			widgets: [`<<endcombat>>`, `<<set $molestationstart to 1>>`, `<<npc Avery>>`, `<<person1>>`],
 		},
 		{
-/* ========================= */
 			link: [`검은 늑대 강제 이벤트`, `Forest Wolf Molestation`],
 			widgets: [
 				/* `<<beastNNPCinit>>`, */
@@ -980,12 +974,10 @@ setup.debugMenu.eventList = {
 			widgets: [`<<set $control to 0>>`, `<<set $possessed to true>>`],
 		},
 		{
-/* ========= 번역 필요 ========= */
-			link: [`Bait Shop Fish Request`, `Bait Shop Request`],
+			link: [`미끼 가게 물고기 의뢰`, `Bait Shop Request`],
 			widgets: [``],
 		},
 		{
-/* ========================= */
 			text_only: "\n\n짐승 조우",
 		},
 		{
@@ -1170,71 +1162,69 @@ setup.debugMenu.eventList = {
 			link: [`거대 매에게 붙잡힘`, `Moor`],
 			widgets: [`<<set $moor to 50>>`, `<<set $eventskip to 1>>`, `<<moor_hunt_start>>`, `<<set $moor_hunt to 10>>`],
 		},
-/* ========= 번역 필요 ========= */
 		{
-			text_only: `\n\nFishing Minigame: `,
+			text_only: `\n\n낚시 미니게임: `,
 		},
 		{
-			link: [`Fish: Haddock (runner)`, fishingMinigameDebugPassage],
+			link: [`물고기: 대구 (도망자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "haddock">>`],
 		},
 		{
-			link: [`Fish: Salmon (panicked)`, fishingMinigameDebugPassage],
+			link: [`물고기: 연어 (공황)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "salmon">>`],
 		},
 		{
-			link: [`Fish: Trout (darter)`, fishingMinigameDebugPassage],
+			link: [`물고기: 송어 (돌격자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "trout">>`],
 		},
 		{
-			link: [`Fish: Herring (panicked)`, fishingMinigameDebugPassage],
+			link: [`물고기: 청어 (공황)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "herring">>`],
 		},
 		{
-			link: [`Fish: Whiting (runner)`, fishingMinigameDebugPassage],
+			link: [`물고기: 대구살 (도망자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "whiting">>`],
 		},
 		{
-			link: [`Fish: Mackerel (panicked)`, fishingMinigameDebugPassage],
+			link: [`물고기: 고등어 (공황)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "mackerel">>`],
 		},
 		{
-			link: [`Fish: Flounder (runner)`, fishingMinigameDebugPassage],
+			link: [`물고기: 가자미 (도망자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "flounder">>`],
 		},
 		{
-			link: [`Fish: Bass (darter)`, fishingMinigameDebugPassage],
+			link: [`물고기: 배스 (돌격자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "bass">>`],
 		},
 		{
-			link: [`Fish:  Roach (darter)`, fishingMinigameDebugPassage],
+			link: [`물고기: 바퀴고기 (돌격자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "roach">>`],
 		},
 		{
-			link: [`Fish: Perch (panicked)`, fishingMinigameDebugPassage],
+			link: [`물고기: 농어 (공황)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "perch">>`],
 		},
 		{
-			link: [`Fish: Chub (runner)`, fishingMinigameDebugPassage],
+			link: [`물고기: 피라미 (도망자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "chub">>`],
 		},
 		{
-			link: [`Fish: Grayling (darter)`, fishingMinigameDebugPassage],
+			link: [`물고기: 끄리 (돌격자)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "grayling">>`],
 		},
 		{
-			link: [`Fish: Cod (anchor)`, fishingMinigameDebugPassage],
+			link: [`물고기: 대구 (닻)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "cod">>`],
 		},
 		{
-			link: [`Fish: Pike (thrasher)`, fishingMinigameDebugPassage],
+			link: [`물고기: 강준치 (난동꾼)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "pike">>`],
 		},
 		{
-			link: [`Fish: Eel (slipper)`, fishingMinigameDebugPassage],
+			link: [`물고기: 장어 (미끄러움)`, fishingMinigameDebugPassage],
 			widgets: [`<<fishingMinigameDebugTeleportWidget "eel">>`],
 		},
-/* ========================= */
 	],
 	Character: [
 		{
@@ -1837,12 +1827,10 @@ setup.debugMenu.eventList = {
 		{
 			link: [`모든 씨앗 해금`, stayOnPassageFn],
 			widgets: [`<<run unlockAllSeeds()>>`],
-/* ========= 번역 필요 ========= */
 		},
 		{
-			link: [`Complete fishing journal`, stayOnPassageFn],
+			link: [`낚시 도감 완성`, stayOnPassageFn],
 			widgets: [`<<run debugDiscoverAllFishing()>>`],
-/* ========================= */
 		},
 		{
 			link: [`슈퍼 디버그 캐릭터`, stayOnPassageFn],
