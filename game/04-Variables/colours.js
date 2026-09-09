@@ -726,8 +726,8 @@ setup.colours.hair = [
 	},
 	{
 		variable: "grey",
-		name: "grey",
-		name_cap: "Grey",
+		name: "회색",
+		name_cap: "회색",
 		csstext: "grey",
 		natural: false,
 		dye: true,
