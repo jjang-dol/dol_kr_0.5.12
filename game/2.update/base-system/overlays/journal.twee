@@ -119,24 +119,25 @@
 
 			<<if $syndromeeden is 1 and $edenfreedom gte 1 and $location isnot "cabin">>/* Another parameter is planned, something like $edenpunishment. It is meant to only trigger the journal note after the player has been given a reason to be wary of breaking Eden's rules. */
 				<<if edenFreedomStatus() is 0>>
-					<li>You are expected back at Eden's cabin
+					<li>당신은 에덴의 오두막으로
 					<<if $edenfreedom is 1>>
 						<<if $edendays is 2>>
-							<span class="pink">tonight, before midnight</span>.
+							<span class="pink">오늘 밤 자정 전까지</span>
 						<<else>> /* $edendays is 1 */
-							by <span class="gold">tomorrow night</span>, at the latest.
+							늦어도 <span class="gold">내일 밤까지는</span>
 						<</if>>
 					<<else>> /* $edenfreedom is 2 or more */
 						<<if $edendays is 7>>
-							<span class="pink">tonight, before midnight</span>.
+							<span class="pink">오늘 밤 자정 전까지</span>
 						<<elseif $edendays is 6>>
-							by <span class="gold">tomorrow night</span>, at the latest.
+							늦어도 <span class="gold">내일 밤까지는</span>
 						<<else>> /* $edendays is between 1 and 5 */
-							in <span class="gold"><<print ["seven", "six", "five", "four", "three", "two"][$edendays]>></span> days, at the latest.
+							늦어도 <span class="gold"><<print ["7", "6", "5", "4", "3", "2"][$edendays]>></span>일 안에는
 						<</if>>
-					<</if>></li>
+					<</if>>
+					돌아가야 합니다.</li>
 				<<elseif edenFreedomStatus() is 1 and (($edenfreedom is 1 and $edendays lt 4) or ($edenfreedom is 2 and $edendays lt 10))>> /* Warning lasts for one day on freedom 1 and two days on freedom 2 */
-					<li>You have <span class="red">failed</span> to return to Eden on time. <<nnpc_He "Eden">> will have noticed by now.</li>
+					<li>당신은 에덴에게 <span class="red">돌아가지 않았습니다</span>. <<nnpc_He "Eden">>【이가】 알아차렸을 것입니다.</li>
 				<</if>>
 			<</if>>
 
@@ -153,45 +154,47 @@
 			<</if>>
 
 			<<if $harper_appointments.enabled or $schoolPsych is 1>>
-				<li>You <<if $harper_appointments.enabled>>have an<<else>>may get an<</if>> appointment with Doctor Harper
+				<li>당신은
 				<<if Time.weekDay is 6>>
 					<<if $daily.harperVisit is 1>>
-						next <span class="gold">Friday</span>.
+						다음 주 <span class="gold">금요일</span>에
 					<<else>>
-						<span class="gold">금요일</span>에
-					<</if>>
+						<span class="gold">오늘(금요일)</span>
+					</</if>>
 				<<else>>
-					on <span class="gold">Friday</span>.
-				<</if>></li>
+					<span class="gold">금요일</span>에
+				<</if>>
+				하퍼 의사와의 상담 예약이 <<if $harper_appointments.enabled>>있습니다<<else>>있을 수도 있습니다<</if>>.</li>
 			<</if>>
 
 			<<if $brothelshowdata.type isnot "none" and $brothelshowdata.intro>>
-				<li>You're expected to perform a $brothelshowdata.type show at the brothel
+				<li>당신은
 				<<if Time.weekDay is 6>>
 					<<if $brothelshowdata.done>>
-						next <span class="gold">Friday</span>.
+						다음 주 <span class="gold">금요일</span>에
 					<<else>>
-						<span class="gold">금요일</span>에
+						<span class="gold">오늘(금요일)</span>
 					<</if>>
 				<<else>>
-					on <span class="gold">Friday</span>.
-				<</if>></li>
+					<span class="gold">금요일</span>에
+				<</if>>
+				매춘업소에서 $brothelshowdata.type 쇼 공연을 하기로 되어 있습니다.</li>
 			<</if>>
 
 			<<if $brothel_escortjob isnot undefined>>
 				<<if ($brothel_escortjob.done is undefined or $brothel_escortjob.escape is undefined) and $brothel_escortjob.accept is true and $brothel_escortjob.missed isnot true>>
 					<<set _date to new DateTime($brothel_escortjob.date)>>
-					<li>You have an escort job scheduled. You're expected to be in front of the brothel
+					<li>에스코트 일정이 잡혀 있습니다. 당신은
 					<<if Time.monthDay is _date.day>>
-						<span class="pink">today</span>
+						<span class="pink">오늘</span>
 					<<elseif Time.date.dayDifference(_date) is 1>>
-						<span class="gold">tomorrow</span>
+						<span class="gold">내일</span>
 					<<elseif Time.date.dayDifference(_date) gte 7>>
-						next <span class="gold">_date.weekDayName</span>
+						다음 주 <span class="gold">_date.weekDayName요일</span>
 					<<else>>
-						on <span class="gold">_date.weekDayName</span>
+						<span class="gold">_date.weekDayName요일</span>
 					<</if>>
-					at <span class="gold"><<ampm _date.hour>></span>.</li>
+					<span class="gold"><<ampm _date.hour>></span>에 매춘업소 앞에 도착해야 합니다.</li>
 				<</if>>
 			<</if>>
 
@@ -246,12 +249,12 @@
 					<<else>>
 						<<nDays $farm_attack_timer>>.
 					<</if>>
-					<<nnpc_He Remy>>【은는】 <span class="gold"><<ampm 21 00>></span>부터 <span class="gold">자정</span> 사이에 도착할 것입니다.
+					<<nnpc_He "Remy">>【은는】 <span class="gold"><<ampm 21 00>></span>부터 <span class="gold">자정</span> 사이에 도착할 것입니다.
 				</li>
 			<</if>>
 
 			<<if $temple_rank is "initiate" or $temple_rank is "monk" or $temple_rank is "priest">>
-				<li>You are <<print $temple_rank is "initiate" ? "an initiate at" : "a <<temple_title>> of">> the temple.
+				<li>당신은 신전의 <<print $temple_rank is "initiate" ? "수습생" : "<<temple_title>>">>입니다.
 					<<if $temple_chastity_timer lte 0>>
 						<span class="pink">오늘 정조대 검사를 받아야 합니다.</span>
 					<<elseif $temple_chastity_timer is 1>>
@@ -269,14 +272,20 @@
 						<<switch $studyBooks.rented>>
 							<<case "Pinch">>
 								<<if $per_npc.pinch isnot undefined>>
-									<<set _book to `copy of \"How ${$per_npc.pinch.pronoun is "m" ? "Mr" : "Ms"} Pinch Groped Christmas\"`>>
+									<<set _book to `"${$per_npc.pinch.pronoun is "m" ? "핀치 씨" : "핀치 선생"}가 어떻게 크리스마스를 더듬었는가\" 사본`>>
 								<<else>>
-									<<set _book to "olive-coloured book">>
+									<<set _book to "올리브색 책">>
 								<</if>>
 							<<case "Raul and Janet">>
-								<<set _book to `copy of \"${$studyBooks.rented}\"`>>
-							<<case "English" "science" "maths" "history">>
-								<<set _book to $studyBooks.rented + " textbook">>
+								<<set _book to `"라울과 자넷\" 사본`>>
+							<<case "English">>
+								<<set _book to "영어 교과서">>
+							<<case "science">>
+								<<set _book to "과학 교과서">>
+							<<case "maths">>
+								<<set _book to "수학 교과서">>
+							<<case "history">>
+								<<set _book to "역사 교과서">>
 						<</switch>>
 						<<if Time.schoolTerm>>
 							<<if $book_rent_timer is 0>>
@@ -293,19 +302,25 @@
 						<<switch $studyBooks.stolen>>
 							<<case "Pinch">>
 								<<if $per_npc.pinch isnot undefined>>
-									<span @class=_colour>You've stolen a copy of "How <<= $per_npc.pinch.pronoun is "m" ? "Mr" : "Ms">> Pinch Groped Christmas".</span>
+									<span @class=_colour>"<<= $per_npc.pinch.pronoun is "m" ? "핀치 씨" : "핀치 선생">>【이가】 어떻게 크리스마스를 더듬었는가" 사본을 훔쳤습니다.</span>
 								<<else>>
 									<span @class=_colour>올리브색 책을 훔쳤습니다.</span>
 								<</if>>
 							<<case "Raul and Janet">>
-								<span @class=_colour>You've stolen a copy of "$studyBooks.stolen".</span>
-							<<case "English" "science" "maths" "history">>
-								<span @class=_colour>You've stolen <<a $studyBooks.stolen>> textbook.</span>
+								<span @class=_colour>"라울과 자넷" 사본을 훔쳤습니다.</span>
+							<<case "English">>
+								<span @class=_colour>영어 교과서를 훔쳤습니다.</span>
+							<<case "science">>
+								<span @class=_colour>과학 교과서를 훔쳤습니다.</span>
+							<<case "maths">>
+								<span @class=_colour>수학 교과서를 훔쳤습니다.</span>
+							<<case "history">>
+								<span @class=_colour>역사 교과서를 훔쳤습니다.</span>
 							<<default>>
 						<</switch>>
 					<</if>>
 					<<if !Time.schoolTerm and $studyBooks.rented isnot "none">>
-						<<if $studyBooks.rented>><<a _book>>【을를】 대출했습니다.<</if>>
+						<<if $studyBooks.rented>>_book【을를】 대출했습니다.<</if>>
 						<span class="blue">방학 중에는 반납 기한이 없습니다!</span>
 					<</if>>
 				</li>
@@ -316,12 +331,12 @@
 					<<run statusCheck("Gwylan")>>
 					<<if $gwylan.timer.ritual and Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual)) > 0>>
 						<<set _ritualDays to Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual))>>
-						<<if isGwylanAbsent() is "nobody">>Nobody<<else>>Gwylan<</if>> will be ready for another ritual in <span class="gold"><<number _ritualDays>></span> <<pluralise _ritualDays "day">>.
+						<<if isGwylanAbsent() is "nobody">>누군가<<else>>그윌란이<</if>> <span class="gold"><<number _ritualDays>></span>일 후에 다른 의식을 치를 준비가 될 것입니다.
 					<<elseif _gwylanStatus.includes("badEndReady") or $gwylan.hunting is 3>>
-						<span class="red"><<if isGwylanAbsent() is "nobody">>Nobody<<else>>Gwylan<</if>> is waiting to perform another ritual with you.</span>
+						<span class="red"><<if isGwylanAbsent() is "nobody">>누군가<<else>>그윌란이<</if>> 당신과 다른 의식을 치르기 위해 기다리고 있습니다.</span>
 					<<else>>
-						<span class="pink"><<if isGwylanAbsent() is "nobody">>Nobody<<else>>Gwylan<</if>> is ready to perform another ritual.</span>
-					<</if>>
+						<span class="pink"><<if isGwylanAbsent() is "nobody">>누군가<<else>>그윌란이<</if>> 다른 의식을 치를 준비가 되었습니다.</span>
+					</</if>>
 				</li>
 			<</if>>
 
@@ -330,9 +345,7 @@
 					<<if $pubfame.status is "finished" or $pubfame.status is "hidingKnown">>
 						'미키'가 <span class="gold"><<number $pubfame.timer>></span>일 후에 당신을 만날 준비가 될 것입니다.
 					<<elseif $pubfame.status is "ready">>
-/* ========= 번역 필요 ========= */
-						<span class="gold">'Mickey' is ready to help you with your fame</span>.
-/* ========================= */
+						<span class="gold">'미키'가 당신의 명성 관리를 도와줄 준비가 되었습니다</span>.
 					<<elseif $pubfame.status is "accepted">>
 						'미키'가 준 일을 맡았습니다.
 					<<elseif $pubfame.status is "done">>
@@ -1331,9 +1344,9 @@
 							<</if>>
 						<<elseif $_currentPlot.length is 1>>
 							<<switch $_currentPlot[0].size>>
-								<<case "small">>에 <span class="lblue">화단</span>이 하나 있는데,
-								<<case "medium">>에 <span class="teal">텃밭</span>이 하나 있는데,
-								<<default>>      에 <span class="green">밭</span>이 하나 있는데,
+								<<case "small">>에 <span class="lblue">화단</span>이 있고,
+								<<case "medium">>에 <span class="teal">텃밭</span>이 있고,
+								<<default>>      에 <span class="green">밭</span>이 있고,
 							<</switch>>
 							<<if $_plotsEmpty>>비어 있습니다<<elseif $_plotsToWater>>물을 줘야 합니다<<elseif $_plotsGrowing>>자라는 중입니다<<elseif $_plotsToPick>>수확할 준비가 되었습니다<</if>>.
 						<</if>>

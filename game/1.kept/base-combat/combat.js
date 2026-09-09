@@ -63,7 +63,6 @@ function namedNpcComments(npcName) {
 }
 
 DefineMacroS("namedNpcComments", namedNpcComments);
-/* ========= 번역 필요 ========= */
 
 // NPCs reaction widgets, used namedNpcReaction() to append the relevant action.
 // Example: Avery + "kissSkin" -> <<reaction-avery-kissSkin>>
@@ -94,4 +93,3 @@ function namedNpcReaction(index, event, detail) {
 
 window.namedNpcReaction = namedNpcReaction;
 DefineMacroS("namedNpcReaction", namedNpcReaction);
-/* ========================= */
