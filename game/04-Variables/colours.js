@@ -442,8 +442,8 @@ setup.colours.hair = [
 	},
 	{
 		variable: "copperbrown",
-		name: "copper brown",
-		name_cap: "Copper Brown",
+		name: "구리빛 갈색",
+		name_cap: "구리빛 갈색",
 		csstext: "copperbrown",
 		natural: true,
 		dye: true,
@@ -602,8 +602,8 @@ setup.colours.hair = [
 	},
 	{
 		variable: "aquamarine",
-		name: "aquamarine",
-		name_cap: "Aquamarine",
+		name: "아쿠아마린",
+		name_cap: "아쿠아마린",
 		csstext: "aquamarine",
 		natural: false,
 		dye: true,
