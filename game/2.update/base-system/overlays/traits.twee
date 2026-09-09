@@ -8,7 +8,7 @@
 			title: "일반 특성",
 			traits: [
 				{
-					name: "Virgin",
+					name: "순결한",
 					colour: "green",
 					has: $player.virginity.vaginal is true and $player.virginity.penile is true,
 					text: "순결도가 더 빨리 회복됩니다. 당신의 처녀와 동정은 꽤 가치 있을지도 모릅니다.",
@@ -76,7 +76,7 @@
 					text: `${$player.sex is "f" ? "소년" : "소녀"}처럼 보일 때는 스트레스가 더 빨리 감소하지만, <<pcSex>> 복장일 때는 더 느리게 감소합니다.`,
 				},
 				{
-					name: "Lustful",
+					name: "호색한",
 					colour: "lewd",
 					has: $backgroundTraits.includes("lustful"),
 					text: "시간이 지날수록 흥분이 오르며 이를 관리해야 합니다.",
@@ -101,7 +101,14 @@
 				},
 				{
 					name: () => {
-						return "Ear slime focus: " + $earSlime.focus;
+						let focusName;
+						switch ($earSlime.focus) {
+							case "pregnancy": focusName = "임신"; break;
+							case "mixed": focusName = "혼합된"; break;
+							case "impregnation": focusName = "수정"; break;
+							default: focusName = $earSlime.focus;
+						}
+						return "귀 슬라임의 "  + focusName + " 의지";
 					},
 					colour: "lewd",
 					has: $earSlime.focus and $earSlime.focus isnot "none",
@@ -121,9 +128,9 @@
 						let parasites = [];
 						if ($parasite.breasts and $parasite.breasts.name is "parasite") {
 							if ($player.breastsize gte 1) {
-								parasites.push("breasts");
+								parasites.push("가슴");
 							} else {
-								parasites.push("chest");
+								parasites.push("흉부");
 							}
 						}
 						if (($parasite.clit and $parasite.clit.name is "parasite") or ($parasite.penis and $parasite.penis.name is "parasite")) parasites.push("성기");
@@ -135,7 +142,7 @@
 					name: "임신",
 					colour: "lewd",
 					has: playerIsPregnant() and playerAwareTheyArePregnant(),
-					text: () => playerBellySize() lt 10 or playerNormalPregnancyTotal() gte 20 ? "당신은 임신 중입니다." : "당신은 임신 중입니다. 배가 불러올수록 일부 스킬에 지장이 생깁니다.",
+					text: () => playerBellySize() lt 10 or playerNormalPregnancyTotal() gte 20 ? "임신 중입니다." : "임신 중입니다. 배가 커질수록 일부 스킬에 페널티를 받습니다.",
 				},
 				{
 					name: "초보 어머니",
@@ -150,7 +157,7 @@
 					text: "이제 아이를 두 번 출산했습니다. 임신으로 인한 신체적 페널티가 줄어듭니다.",
 				},
 				{
-					name: "Mother",
+					name: "어머니",
 					colour: "lewd",
 					has: between(playerNormalPregnancyTotal(), 3, 7),
 					text: "어머니로서 꽤 좋은 경험을 가지고 있습니다. 임신으로 인한 신체적 페널티가 적당히 줄어듭니다.",
@@ -162,7 +169,7 @@
 					text: "아주, 아주 많은 아이를 낳았습니다. 임신으로 인한 신체적 페널티가 크게 줄어듭니다.",
 				},
 				{
-					name: "Gaia",
+					name: "가이아",
 					colour: "gold",
 					has: playerNormalPregnancyTotal() gte 20,
 					text: "당신은 말 그대로 아이들의 왕국을 낳았습니다. 임신으로 인한 신체적 페널티가 없어집니다.",
@@ -219,14 +226,14 @@
 					name: () => {
 						if (V.player.gender_appearance is "m") {
 							if (V.player.gender is "n") {
-								return "Bull";
+								return "황소";
 							}
-							return "Bull <<pcGender>>";
+							return "황소 <<pcGender>>";
 						} else {
 							if (V.player.gender is "n") {
-								return "Cow";
+								return "젖소";
 							}
-							return "Cow <<pcGender>>";
+							return "젖소 <<pcGender>>";
 						}
 					},
 					colour: "brat",
@@ -243,11 +250,11 @@
 					name: () => {
 						if (V.player.gender_appearance is "m") {
 							if (V.player.gender is "n") {
-								return "Fox";
+								return "여우";
 							}
-							return "Fox <<pcGender>>";
+							return "여우 <<pcGender>>";
 						} else {
-							return "Vixen";
+							return "여우";
 						}
 					},
 					colour: "",
@@ -256,7 +263,7 @@
 					text: "당신 것이 아닌 걸 가지고 싶은 충동이 듭니다. 귀와 꼬리 덕분에 더 매혹적이고 매력적으로 보입니다.",
 				},
 				{
-					name: "Fangs",
+					name: "송곳니",
 					colour: "def",
 					has: !["disabled", "hidden"].includes($transformationParts.traits.fangs),
 					text: "깨물기가 두 배로 효과적입니다.",
@@ -312,7 +319,7 @@
 					text: "세상의 무게는 무겁지만, 당신은 그것을 견뎌낼 만큼 강하다. 의지력이 더 이상 감소하지 않는다.",
 				},
 				{
-					name: "Angel",
+					name: "천사",
 					colour: "gold",
 					has: $angel gte 6,
 					text: '당신은 순수함을 내뿜습니다. 인카운터 당 한 번 "용서한다" 행동이 해금되어, 여태 얻은 트라우마를 없앱니다. 주의하세요, 순결을 잃으면 이 특성이 사라지고 당신은 부서질 것입니다.',
@@ -336,7 +343,7 @@
 					text: "당신에겐 순수함이라곤 남아있지 않습니다. 무언가 당신 안에 사정하거나, 당신이 다른 무언가에 사정하면 트라우마가 감소합니다. 촉수는 트라우마 대신 스트레스와 고통을 줄여줍니다. 주의하세요, 순결도가 최하 수치가 아닌 상태로 하루를 마치면 상당한 스트레스를 받을 것입니다.",
 				},
 				{
-					name: "Radiant",
+					name: "찬란함",
 					colour: "gold",
 					has: $angel gte 4,
 					text: '당신은 순결합니다. 천사 수치에 따라 하루에 몇 번 "추방한다" 행동을 사용하여 촉수에게 큰 피해를 줄 수 있습니다. 최대 순결도일 때 그 위력이 엄청나게 증가합니다. 오늘 남은 사용 횟수: ($angelBanish / $angelBanishMax)',
@@ -367,13 +374,13 @@
 					},
 				},
 				{
-					name: "Wings",
+					name: "날개",
 					colour: "grey",
 					has: !($harpy gte 6 and $birdFly gte 1) and ($angel gte 6 or $fallenangel gte 2 or $demon gte 6 or $harpy gte 6),
 					text: "높은 곳에서 활강할 수 있습니다.",
 				},
 				{
-					name: "Meek",
+					name: "유순함",
 					colour: "meek",
 					has: $submissive gte 1150 and $submissive lt 1500,
 					text: '"신음한다" 행동이 해금됩니다.',
@@ -385,13 +392,13 @@
 					text: '"신음한다" 행동이 해금됩니다.',
 				},
 				{
-					name: "Bratty",
+					name: "버릇없음",
 					colour: "brat",
 					has: $submissive lte 850 and $submissive gt 500,
 					text: '"요구한다" 행동이 해금됩니다.',
 				},
 				{
-					name: "Defiant",
+					name: "반항적",
 					colour: "def",
 					has: $submissive lte 500,
 					text: '"요구한다" 행동이 해금됩니다.',
@@ -433,7 +440,7 @@
 					text: "당신의 반항적인 행동이 조금 더 고통을 줍니다. 상대에게 고통을 가하면 흥분이 증가합니다.",
 				},
 				{
-					name: "Sadist",
+					name: "사디스트",
 					colour: "purple",
 					has: $sadism_level is 2,
 					text: "당신의 반항적인 행동이 더 고통을 줍니다. 상대에게 고통을 가하면 흥분이 증가합니다.",
@@ -451,7 +458,7 @@
 					text: "당신의 반항적인 행동이 훨씬 위험해집니다. 상대에게 고통을 가하면 흥분이 증가합니다.",
 				},
 				{
-					name: "Farmer",
+					name: "농부",
 					colour: "green",
 					has: $farm_stage gte 6,
 					text: "농장 축사 주변의 지리에 빠삭합니다. 체력을 관리하기 더 수월해집니다.",
@@ -490,44 +497,44 @@
 			],
 		},
 		{
-			title: "의학적 특성",
+			title: "약물 특성",
 			traits: [
 				{
-					name: "모발 성장 공식",
+					name: "모발 성장제",
 					colour: "green",
 					has: _pills and _pills["Hair Growth Formula"] and _pills["Hair Growth Formula"].doseTaken,
 					text: () => {
-						return `빠른 모발 성장을 촉진하기 위해 모발 성장 공식을 적용받았습니다. ${_pills["Hair Growth Formula"].doseTaken}일 남았습니다.`;
+						return `모발의 빠른 성장을 촉진하기 위해 모발 성장제가 도포되었습니다. ${_pills["Hair Growth Formula"].doseTaken}일 남았습니다.`;
 					}
 				},
 				{
-					name: "구충 크림",
+					name: "기생충 방지 크림",
 					colour: "green",
 					has: _pills and _pills["Anti-Parasite Cream"] and _pills["Anti-Parasite Cream"].doseTaken,
 					text: () => {
-						return `체내 기생충이 더 이상 번식하지 못하게 막는 구충 크림입니다. ${_pills["Anti-Parasite Cream"].doseTaken}일 남았습니다.`;
+						return `체내 기생충의 추가 착상을 방지하는 기생충 퇴치 크림입니다. ${_pills["Anti-Parasite Cream"].doseTaken}일 남았습니다.`;
 					}
 				},
 				{
-					name: "수정률 부스터",
+					name: "배란 유도제",
 					colour: "lewd",
 					has: _pills and _pills["fertility booster"] and _pills["fertility booster"].doseTaken,
 					text: () => {
-						let result = `수정률을 높이는 약을 ${_pills["fertility booster"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}. `;
+						let result = `당신은 ${_pills["fertility booster"].doseTaken gte 2 ? "알약을 과다 복용했으며, 이로 인해 " : "알약을 복용했으며, 이로 인해 "}`;
 						let multiple = false;
 						let hasEffect = false;
 						if ((!playerIsPregnant() or !playerAwareTheyArePregnant()) and playerAwareTheyCanBePregnant()) {
 							multiple = true;
 							hasEffect = true;
-							result += "아이를 더 많이 임신하기 쉬워집니다";
+							result += "다태아 임신이 더 쉬워집니다";
 						}
 						if ($player.penisExist and $player.penissize gte 1) {
 							hasEffect = true;
-							if (multiple) result += ", 또한 ";
-							result += "정자의 생식력이 더 강해집니다";
+							if (multiple) result += " 그리고 ";
+							result += "정자의 수정력이 더 강해집니다";
 						}
 						if (!hasEffect) {
-							result += "현재 당신에게는 아무런 효과가 없습니다";
+							result += "현재는 아무런 효과가 없습니다";
 						}
 						result += `. ${_pills["fertility booster"].doseTaken}일 남았습니다.`;
 
@@ -539,21 +546,21 @@
 					colour: "lblue",
 					has: _pills and _pills["contraceptive"] and _pills["contraceptive"].doseTaken,
 					text: () => {
-						let result = `피임약을 ${_pills["contraceptive"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}. `;
+						let result = `당신은 ${_pills["contraceptive"].doseTaken gte 2 ? "알약을 과다 복용했으며, 이로 인해 " : "알약을 복용했으며, 이로 인해 "}`;
 						let multiple = false;
 						let hasEffect = false;
 						if (!playerAwareTheyCanBePregnant() or !playerAwareTheyArePregnant()) {
 							multiple = true;
 							hasEffect = true;
-							result += "임신하기 더 어려워집니다";
+							result += "임신하기가 더 어려워집니다";
 						}
 						if ($player.penisExist and $player.penissize gte 1) {
 							hasEffect = true;
-							if (multiple) result += ", 또한 ";
-							result += "정자의 생식력이 약해집니다";
+							if (multiple) result += " 그리고 ";
+							result += "정자의 수정력이 약해집니다";
 						}
 						if (!hasEffect) {
-							result += "현재 당신에게는 아무런 효과가 없습니다";
+							result += "현재는 아무런 효과가 없습니다";
 						}
 						result += `. ${_pills["contraceptive"].doseTaken}일 남았습니다.`;
 
@@ -561,82 +568,82 @@
 					}
 				},
 				{
-					name: "Penis blocker pills",
+					name: "자지 유지 알약",
 					colour: "green",
-					has: _pills and _pills["penis reduction"] and _pills["penis reduction"].doseTaken,
+					has: _pills and _pills["penis blocker"] and _pills["penis blocker"].doseTaken,
 					text: () => {
-						let result = `자지의 성장을 촉진하는 약을 ${_pills["penis growth"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}.`;
-						if (!$player.penisExist) {
-							result += " 하지만 당신에게는 아무 효과가 없습니다.";
+						let result = `당신은`;
+						if ($player.penisExist) {
+							result += " 자지의 크기 변화를 방지하는 알약을 복용했습니다.";
 						} else {
-							result += "아무런 효과도 없는 약을 복용했습니다.";
+							result += " 아무런 효과가 없는 알약을 복용했습니다.";
 						}
 						return result;
 					}
 				},
 				{
-					name: "자지 축소 약",
+					name: "자지 성장 알약",
 					colour: "green",
-					has: _pills and _pills["penis reduction"] and _pills["penis reduction"].doseTaken,
+					has: _pills and _pills["penis growth"] and _pills["penis growth"].doseTaken,
 					text: () => {
-						let result = `자지의 축소를 촉진하는 약을 ${_pills["penis reduction"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}.`;
-						if (!$player.penisExist) {
-							result += " 하지만 당신에게는 아무 효과가 없습니다.";
+						let result = `당신은`;
+						if ($player.penisExist) {
+							result += ` 자지의 성장을 촉진하는 알약을 ${_pills["penis growth"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`;
 						} else {
-							result += "아무런 효과도 없는 약을 복용했습니다.";
+							result += ` 아무런 효과가 없는 알약을 ${_pills["penis growth"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`;
 						}
 						return result;
 					}
 				},
 				{
-					name: "가슴 억제제",
+					name: "자지 축소 알약",
 					colour: "green",
 					has: _pills and _pills["penis reduction"] and _pills["penis reduction"].doseTaken,
 					text: () => {
-						let result = `You have ${_pills["penis reduction"].doseTaken gte 2 ? "overdosed on" : "taken"} pills that `;
-						if (!$player.penisExist) {
-							result += " encourages the shrinking of your penis.";
+						let result = `당신은`;
+						if ($player.penisExist) {
+							result += ` 자지의 축소를 촉진하는 알약을 ${_pills["penis reduction"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`;
 						} else {
-							result += "아무런 효과도 없는 약을 복용했습니다.";
+							result += ` 아무런 효과가 없는 알약을 ${_pills["penis reduction"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`;
 						}
 						return result;
 					}
 				},
 				{
-					name: "가슴 성장 약",
+					name: "가슴 유지 알약",
+					colour: "green",
+					has: _pills and _pills["breast blocker"] and _pills["breast blocker"].doseTaken,
+					text: "당신은 가슴의 크기 변화를 방지하는 알약을 복용했습니다.",
+				},
+				{
+					name: "가슴 성장 알약",
+					colour: "green",
+					has: _pills and _pills["breast growth"] and _pills["breast growth"].doseTaken,
+					text: `당신은 가슴의 성장을 촉진하는 알약을 ${_pills and _pills["breast growth"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`,
+				},
+				{
+					name: "가슴 축소 알약",
+					colour: "green",
+					has: _pills and _pills["breast reduction"] and _pills["breast reduction"].doseTaken,
+					text: `당신은 가슴의 축소를 촉진하는 알약을 ${_pills and _pills["breast reduction"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`,
+				},
+				{
+					name: "엉덩이 유지 알약",
 					colour: "green",
 					has: _pills and _pills["bottom blocker"] and _pills["bottom blocker"].doseTaken,
-					text: `가슴의 성장을 촉진시키는 약을 ${_pills and _pills["breast growth"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}.`,
+					text: "당신은 엉덩이의 크기 변화를 방지하는 알약을 복용했습니다.",
 				},
 				{
-					name: "가슴 축소 약",
+					name: "엉덩이 성장 알약",
 					colour: "green",
 					has: _pills and _pills["bottom growth"] and _pills["bottom growth"].doseTaken,
-					text: `가슴의 축소를 촉진시키는 약을 ${_pills and _pills["breast reduction"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}.`,
+					text: `당신은 엉덩이의 성장을 촉진하는 알약을 ${_pills and _pills["bottom growth"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`,
 				},
 				{
-					name: "하체 억제제",
-					colour: "green",
-					has: _pills and _pills["bottom growth"] and _pills["bottom growth"].doseTaken,
-					text: "엉덩이 크기가 변하지 않게 막는 약을 먹었습니다.",
-				},
-				{
-					name: "하체 성장 약",
-					colour: "green",
-					has: _pills and _pills["bottom growth"] and _pills["bottom growth"].doseTaken,
-					text: `엉덩이 성장을 촉진시키는 약을 ${_pills and _pills["bottom growth"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}.`,
-				},
-				{
-					name: "Bottom growth pills",
-					colour: "green",
-					has: _pills and _pills["bottom growth"] and _pills["bottom growth"].doseTaken,
-					text: `You have ${_pills and _pills["bottom growth"].doseTaken gte 2 ? "overdosed on" : "taken"} a pill that encourages the growth of your bottom.`,
-				},
-				{
-					name: "Bottom reduction pills",
+					name: "엉덩이 축소 알약",
 					colour: "green",
 					has: _pills and _pills["bottom reduction"] and _pills["bottom reduction"].doseTaken,
-					text: `엉덩이 축소를 촉진시키는 약을 ${_pills and _pills["bottom reduction"].doseTaken gte 2 ? "과다 복용했습니다" : "복용했습니다"}.`,
+					text: `당신은 엉덩이의 축소를 촉진하는 알약을 ${_pills and _pills["bottom reduction"].doseTaken gte 2 ? "과다 복용했습니다." : "복용했습니다."}`,
 				},
 			]
 		},

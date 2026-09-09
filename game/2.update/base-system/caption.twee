@@ -109,13 +109,13 @@
 		<</if>>
 		<<if $options.images is 0>>
 			<div id="money-noimg">
-				<<possessedWord 'You'>> have <<printmoney $money true>><br>
+                소지금: <<printmoney $money true>><br>
 			</div>
 			<br>
 
-			It is <<sidebarTime "desktop">>.
+            현재 시각은 <<sidebarTime "desktop">>입니다.
 			<br>
-			It is <<print Time.weekDayName>>.
+            오늘은 <<print Time.weekDayName>>입니다.
 			<br>
 		<</if>>
 		<<questmarker>>
@@ -172,11 +172,11 @@
 				<span class="pink"><<print window.KR.getBodypartKr($parasite[_type][0])>> 그리고 <<print window.KR.getBodypartKr($parasite[_type][1])>>에 달라붙은 <<print window.KR.getCreatureTypeKr(_type)>> 기생충들이 <<possessedWord '당신' 'pink'>>【을를】 빨며 마사지합니다.</span>
 				<br>
 			<<default>>
-				<<set _pstring to $parasite[_type][0]>>
+                <<set _pstring to window.KR.getBodypartKr($parasite[_type][0])>>
 				<<for _i to 1; _i lt $parasite[_type].length - 1; _i++>>
-					<<set _pstring += ", " + $parasite[_type][_i]>>
+                    <<set _pstring += ", " + window.KR.getBodypartKr($parasite[_type][_i])>>
 				<</for>>
-				<<set _pstring += ", and " + $parasite[_type][_i]>>
+                <<set _pstring += " 또 " + window.KR.getBodypartKr($parasite[_type][_i])>>
 				<span class="pink"><<print _pstring>>에 달라붙은 <<print window.KR.getCreatureTypeKr(_type)>> 기생충들이 <<possessedWord '당신' 'pink'>>【을를】 빨며 마사지합니다.</span>
 				<br>
 			<</switch>>
@@ -266,32 +266,32 @@
 		<</if>>
 
 		<div id="overlayButtons">
-			<<button CHARACTERISTICS>>
+			<<button "캐릭터">>
 				<<overlayReplace "characteristics">>
 			<</button>>
-			<<button SOCIAL>>
+			<<button "소셜">>
 				<<overlayReplace "social">>
 			<</button>>
 			<div class="sidebarButtonSplit">
-				<<button TRAITS>>
+				<<button "특성">>
 					<<overlayReplace "traits">>
 				<</button>>
-				<<button JOURNAL>>
+				<<button "저널">>
 					<<overlayReplace "journal">>
 				<</button>>
 			</div>
 			<div class="sidebarButtonSplit">
-				<<button STATS>>
+				<<button "통계">>
 					<<overlayReplace "statistics">>
 				<</button>>
-				<<button FEATS>>
+				<<button "업적">>
 					<<overlayReplace "gameFeats">>
 				<</button>>
 			</div>
 			<br>
 			<div class="sidebarButtonSplit">
 				<<if $dancing is 0 and $combat is 0 and $passage isnot "Start2" and $cheatsEnabled is true or $debug is 1>>
-					<<button CHEATS>>
+					<<button "치트">>
 						<<overlayReplace "cheats">>
 					<</button>>
 				<</if>>
@@ -302,33 +302,33 @@
 			<!-- Event debug button - Shows an overlay stored in debug-events.twee. -->
 			<<if $event isnot undefined and $options.debugdisable is "f">>
 				<!-- Default _temp to what we should people regularly if an event active. -->
-				<<set _temp to "<span class='yellow'>SHOW EVENT INFO</span>">>
+				<<set _temp to "<span class='yellow'>이벤트 정보 보기</span>">>
 				<!-- Prepare for cases where we want to update the button view. -->
 				<<if EventSystem.any()>>
 					<<if !EventSystem.validate()>>
 						<!-- Could not validate the NPC list with event data. -->
-						<<set _temp to "<span class='red'>EVENT ERROR</span>">>
+						<<set _temp to "<span class='red'>이벤트 오류</span>">>
 					<<elseif EventSystem.has(0) and EventSystem.get(0).area[0] is $passage>>
 						<<set _eventAlertMajorArea to false>>
-						<<set _temp to "<span class='green'>EVENT ACTIVE</span>">>
+						<<set _temp to "<span class='green'>이벤트 진행 중</span>">>
 					<<elseif setup.majorAreas.includes($passage)>>
 						<<set _eventAlertMajorArea to true>>
-						<<set _temp to "<span class='red'>EVENT ACTIVE</span>">>
+						<<set _temp to "<span class='red'>이벤트 진행 중</span>">>
 					<<elseif $event.buffer.map(e => e.area[0]).length is 1 and EventSystem.has(0) and ["Forest Cabin", "Eden Cabin", "Eden Clearing"].includes(EventSystem.get(0).area[0])>>
-						<<set _temp to "<span class='green'>EVENT ACTIVE</span>">>
+						<<set _temp to "<span class='green'>이벤트 진행 중</span>">>
 					<</if>>
 				<</if>>
 				<<button _temp>><<overlayReplace "eventExtraInfo">><</button>>
 				<<unset _temp>>
 			<</if>>
 			<<if $options.showDebugRenderer>>
-				<<button "DEBUG RENDERER">><<overlayReplace "canvasModel">><</button>>
+				<<button "디버그 렌더러">><<overlayReplace "canvasModel">><</button>>
 			<</if>>
 			<div class="sidebarButtonSplit">
-				<<button OPTIONS>>
+				<<button "옵션">>
 					<<overlayReplace "options">>
 				<</button>>
-				<<button SAVES>>
+				<<button "세이브">>
 					<<overlayReplace "saves">>
 				<</button>>
 			</div>
@@ -369,7 +369,6 @@
 <br>
 
 <<unset _currentOverlay>>
-
 
 :: Widgets Clothing Caption [widget]
 <<widget "startCaption">>

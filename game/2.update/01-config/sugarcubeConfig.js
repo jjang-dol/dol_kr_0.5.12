@@ -11,7 +11,7 @@ const StartConfig = {
 	debug: false,
 	enableImages: true,
 	enableLinkNumberify: true,
-	version: "0.5.12.8",
+	version: "0.5.12.10",
 	versionName: `"Abyssal" 에디션`,
 	sneaky: false,
 	socialMediaEnabled: true,
