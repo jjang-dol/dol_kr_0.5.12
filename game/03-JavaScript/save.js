@@ -953,7 +953,7 @@ function settingsObjects(type) {
 				facevariant: {
 					strings: ["default", "catty", "aloof", "sweet", "foxy", "gloomy"],
 					displayName: "인상:",
-					textMap: { default: "기본", catty: "새침함", aloof: "쌀쌀맞음", sweet: "상냥함", foxy: "여우 같음", gloomy: "우울함" },
+					textMap: { default: "상냥한", catty: "새침한", aloof: "냉담한", sweet: "다정한", foxy: "여우같은", gloomy: "우울한" },
 					randomize: "characterAppearance",
 				},
 				breastsensitivity: {
