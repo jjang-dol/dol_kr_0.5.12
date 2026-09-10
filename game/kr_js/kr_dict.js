@@ -1893,3 +1893,20 @@ window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
 // 영문 그대로 두고, 화면 표시할 때만 이 사전으로 변환한다.
 // (fishNameDict / getFishNameKr 삭제됨 — foodstuff.js의 각 어종 name 필드를 직접 한글화해서
 // 더 이상 별도 사전이 필요 없음. setup.foodstuff[fishKey].name 참조로 대체됨.)
+
+// 저널 인벤토리 물품 카테고리 필터 드롭다운(Show: All/Food/...) 번역.
+window.KR.foodstuffCategoryDict = {
+    "food": "음식",
+    "flower": "꽃",
+    "fruit": "과일",
+    "ingredient": "재료",
+    "meat": "고기",
+    "mushroom": "버섯",
+    "produce": "농산물",
+    "seafood": "해산물",
+    "vegetable": "채소",
+};
+window.KR.getFoodstuffCategoryKr = function(category) {
+    if (window.KR.foodstuffCategoryDict[category]) return window.KR.foodstuffCategoryDict[category];
+    return category;
+};

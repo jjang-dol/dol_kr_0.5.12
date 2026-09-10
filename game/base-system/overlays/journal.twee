@@ -1275,16 +1275,20 @@
 					<<set _foodstuff to setup.foodstuff[_foodstuffKeys[_t]]>>
 					<<set _foodstuffType to ((_foodstuff?.category) === "dish" ? "food" : _foodstuff?.category)>>
 					<<if _foodstuffType isnot undefined>>
-						<<set $_types.pushUnique(_foodstuffType.toUpperFirst())>>
+						<<set $_types.pushUnique(_foodstuffType)>>
 					<</if>>
 				<</for>>
 				<<set $_types.sort()>>
 				<<if $_types.length>>
 					<div style="padding: 0.25rem 0.5rem;">
-						Show:
+						표시:
+						<<set _typeLabels to {}>>
+						<<for _tv range $_types>>
+							<<set _typeLabels[window.KR.getFoodstuffCategoryKr(_tv)] to _tv>>
+						<</for>>
 						<<listbox "_invDisplay" autoselect>>
-							<<option "All" "all">>
-							<<optionsfrom $_types>>
+							<<option "전체" "all">>
+							<<optionsfrom _typeLabels>>
 						<</listbox>>
 					</div>
 				<</if>>
@@ -1689,7 +1693,7 @@
 				<<else>>
 					<<set _itemName to _foodstuff.plural>>
 				<</if>>
-				<<set _tooltip to `<span class="green">${_item.amount}</span> ${_itemName}`>>
+				<<set _tooltip to `${_itemName} <span class="green">${_item.amount}</span>`>>
 
 				<div class="item" @tooltip="_tooltip">
 					<<foodstufficon _foodstuffKey>>
