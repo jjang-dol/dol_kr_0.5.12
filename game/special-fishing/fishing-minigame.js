@@ -702,7 +702,7 @@ setup.fishingMinigame = {
 function fishingMinigameStart(fishKey) {
 	const minigame = setup.fishing.lootTables.fish[fishKey].minigame;
 	V.fishingMinigame = {
-		fishName: fishKey,
+		fishName: setup.foodstuff[fishKey].name,
 		behavior: minigame.behavior,
 		maxStamina: minigame.maxStamina,
 		fishStamina: minigame.maxStamina,
