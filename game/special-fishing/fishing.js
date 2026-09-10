@@ -665,11 +665,11 @@ function fishingLocationWaterBodyName(bus) {
 		case "fishingPier":
 		case "fishingBeach":
 		case "fishingCoastPath":
-			return "sea";
+			return "바다";
 		case "fishingForestLake":
-			return "lake";
+			return "호수";
 		case "fishingMoor":
-			return "water";
+			return "물웅덩이";
 		default:
 			throw new Error(`fishingLocationWaterBodyName: unknown bus "${bus}"`);
 	}
