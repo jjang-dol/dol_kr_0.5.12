@@ -166,7 +166,7 @@ window.KR.dict = {
   "chef jacket": "요리사 재킷",
   "cheongsam": "치파오",
   "cheongsam skirt": "치파오 치마",
-  "chest binder": "가슴 바인더",
+  "chest binder": "압박 브라",
   "chest wrap": "가슴 압박 붕대",
   "chinos": "면바지",
   "christmas boots": "크리스마스 부츠",
