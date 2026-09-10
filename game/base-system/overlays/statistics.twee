@@ -750,20 +750,26 @@
 				<li>성기: <<print $genitalsensitivity.toFixed(2)>></li>
 				<li>엉덩이: <<print $bottomsensitivity.toFixed(2)>></li>
 			</ul>
-			가슴 성장: <<print Math.trunc(100 - ($breastgrowthtimer / 10))>>%
+			가슴 성장도: <<print Math.trunc(100 - ($breastgrowthtimer / 10))>>%
 			<mouse class="tooltip linkBlue">(?)<span>100% 이상에 도달하면 커지고, 0% 이하로 떨어지면 작아집니다.</span></mouse>
 			<br>
-			가슴이 커질 수 있음: <<print ($player.breastsize lt $breastsizemax ? "예" : "아니요")>>
-			<<if $player.breastsize is $breastsizemax>>
-				<mouse class="tooltip linkBlue">(?)<span>최대 크기입니다.</span></mouse>
+			<<if $player.breastsize lt $breastsizemax>>
+				더 커질 수 있습니다.
+			<<else>>
+				최대 크기입니다.
 			<</if>>
 			<br>
-			가슴이 작아질 수 있음: <<print ($player.breastsize gt $breastsizemin ? "예" : "아니요")>>
-			<<if $player.breastsize is $breastsizemin>>
-				<mouse class="tooltip linkBlue">(?)<span>최소 크기입니다.</span></mouse>
+			<<if $player.breastsize gt $breastsizemin>>
+				더 작아질 수 있습니다.
+			<<else>>
+				최소 크기입니다.
 			<</if>>
 			<br>
-			모유 분비: <<print ($lactating is 1 ? "예" : "아니요")>>
+			<<if $lactating is 1>>
+				모유가 분비되고 있습니다.
+			<<else>>
+				모유가 분비되지 않습니다.
+			<</if>>
 			<br>
 			<<if $lactating is 1>>
 				모유량: <<print Math.trunc($milk_amount)>>
@@ -777,7 +783,7 @@
 				<<else>>
 					<<set $_penisGrowthMin to -400>>
 				<</if>>
-				<<if $player.penissize gt 2>>
+				<<if $player.penissize gt 0>>
 					<<set $_penisGrowthMax to 1000>>
 				<<elseif $player.penissize is 2>>
 					<<set $_penisGrowthMax to 1200>>
@@ -790,24 +796,32 @@
 					<<set $_penisgrowthtimer -= $_penisGrowthMin>>
 				<</if>>
 				<br>
-				자지 성장: <<print Math.trunc(100 - ($_penisgrowthtimer / $_penisGrowthMax * 100))>>%
+				자지 성장도: <<print Math.trunc(100 - ($_penisgrowthtimer / $_penisGrowthMax * 100))>>%
 				<mouse class="tooltip linkBlue">(?)<span>100% 이상에 도달하면 커지고, 0% 이하로 떨어지면 작아집니다.</span></mouse>
 				<br>
 				<<if $sexStats && $sexStats.pills>>
-					자지가 커질 수 있음: <<print (($player.penissize lt $penissizemax and ($player.penissize gte 1 or $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) gte 20)) ? "예" : "아니요")>>
-					<<if $player.penissize is 0 and $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) lt 20>>
-						<mouse class="tooltip linkBlue">(?)<span>성장 알약을 과다 복용하거나 성게 자지 기생충을 사용해야 합니다.</span></mouse>
+					<<if $player.penissize lt $penissizemax and ($player.penissize gte 1 or $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) gte 20)>>
+						더 커질 수 있습니다.
 					<<elseif $player.penissize is $penissizemax>>
-						<mouse class="tooltip linkBlue">(?)<span>최대 크기입니다.</span></mouse>
+						최대 크기입니다.
+					<<else>>
+						더 커질 수 없습니다.
+						<<if $player.penissize is 0 and $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) lt 20>>
+							<mouse class="tooltip linkBlue">(?)<span>성장 알약을 과다 복용하거나 성게 자지 기생충을 사용해야 합니다.</span></mouse>
+						<</if>>
 					<</if>>
 					<br>
-					자지가 작아질 수 있음: <<print (($player.penissize gt $penissizemin and ($player.sex isnot "f" or $player.penissize gt 0) and ($player.penissize gte 2 or $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) lte -20)) ? "예" : "아니요")>>
-					<<if $player.sex is "f" && $player.penissize is 2>>
-						<mouse class="tooltip linkBlue">(?)<span>기생충 자지에 대한 최소 크기입니다.</span></mouse>
-					<<elseif $player.penissize is 1 and $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) gt -20>>
-						<mouse class="tooltip linkBlue">(?)<span>축소 알약을 과다 복용하거나 슬라임 자지 기생충을 사용해야 합니다.</span></mouse>
+					<<if $player.penissize gt $penissizemin and ($player.sex isnot "f" or $player.penissize gt 0) and ($player.penissize gte 2 or $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) lte -20)>>
+						더 작아질 수 있습니다.
 					<<elseif $player.penissize is $penissizemin>>
-						<mouse class="tooltip linkBlue">(?)<span>최소 크기입니다.</span></mouse>
+						최소 크기입니다.
+					<<elseif $player.sex is "f" && $player.penissize is 2>>
+						더 작아질 수 없습니다. <mouse class="tooltip linkBlue">(?)<span>기생충 자지의 최소 크기입니다.</span></mouse>
+					<<else>>
+						더 작아질 수 없습니다.
+						<<if $player.penissize is 1 and $sexStats.pills["pills"]["penis growth"].overdose - $sexStats.pills["pills"]["penis reduction"].overdose - ($worn.genitals.type.includes("shrinking") ? 20 : 0) gt -20>>
+							<mouse class="tooltip linkBlue">(?)<span>축소 알약을 과다 복용하거나 슬라임 자지 기생충을 사용해야 합니다.</span></mouse>
+						<</if>>
 					<</if>>
 					<br>
 				<</if>>
@@ -817,17 +831,19 @@
 				<br>
 			<</if>>
 			<br>
-			엉덩이 성장: <<print Math.trunc(100 - ($bottomgrowthtimer / 10))>>%
+			엉덩이 성장도: <<print Math.trunc(100 - ($bottomgrowthtimer / 10))>>%
 			<mouse class="tooltip linkBlue">(?)<span>100% 이상에 도달하면 커지고, 0% 이하로 떨어지면 작아집니다.</span></mouse>
 			<br>
-			엉덩이가 커질 수 있음: <<print ($player.bottomsize lt $bottomsizemax ? "예" : "아니요")>>
-			<<if $player.bottomsize is $bottomsizemax>>
-				<mouse class="tooltip linkBlue">(?)<span>최대 크기입니다.</span></mouse>
+			<<if $player.bottomsize lt $bottomsizemax>>
+				더 커질 수 있습니다.
+			<<else>>
+				최대 크기입니다.
 			<</if>>
 			<br>
-			엉덩이가 작아질 수 있음: <<print ($player.bottomsize gt $bottomsizemin ? "예" : "아니요")>>
-			<<if $player.bottomsize is $bottomsizemin>>
-				<mouse class="tooltip linkBlue">(?)<span>최소 크기입니다.</span></mouse>
+			<<if $player.bottomsize gt $bottomsizemin>>
+				더 작아질 수 있습니다.
+			<<else>>
+				최소 크기입니다.
 			<</if>>
 			<br><br>
 		<</foldout>>
@@ -859,7 +875,7 @@
 				<br>
 			<</if>>
 			<<if $worn.genitals.name isnot "naked">>
-				<<print setup.clothes.genitals[clothesIndex('genitals',$worn.genitals)].name_cap>> integrity: <<print Math.trunc($worn.genitals.integrity)>>
+				<<print setup.clothes.genitals[clothesIndex('genitals',$worn.genitals)].name_cap>> 내구도: <<print Math.trunc($worn.genitals.integrity)>>
 				<br>
 			<</if>>
 			<br>
@@ -869,11 +885,11 @@
 			<span class="gold">소셜</span>
 			학교 지위: <<print Math.trunc($cool)>>
 			<br>
-			Delinquency: <<print Math.trunc($delinquency)>>
+			불량도: <<print Math.trunc($delinquency)>>
 			<br>
-			Detention: <<print Math.trunc($detention)>>
+			방과 후 지도: <<print Math.trunc($detention)>>
 			<br>
-			Crime: <<print Math.trunc(crimeSumCurrent())>>
+			범죄: <<print Math.trunc(crimeSumCurrent())>>
 			<br>
 			고아원 희망: <<print Math.trunc($orphan_hope)>>
 			<br>
@@ -939,7 +955,7 @@
 				<</foldout>>
 			<</for>>
 			<<foldout false "_crimeTotalsFoldout">>
-				<span class="gold">합계:</span>
+				<span class="gold">합계</span>
 				<<print "현재: " + crimeSumCurrent()>>
 				<br>
 				<<print "누적: " + crimeSumHistory()>>
@@ -952,7 +968,7 @@
 				<br>
 			<</foldout>>
 			<<foldout false "_crimeEventsFoldout">>
-				<span class="gold">범죄 이벤트:</span>
+				<span class="gold">범죄 이벤트</span>
 				<span id="statscrimeevents"><<listCrimeCheats>></span>
 			<</foldout>>
 			<br>
@@ -1012,27 +1028,27 @@
 					<br>
 					<<if _fertile.passed>>
 						/*The next cycle's length and fertile window aren't rolled until it begins, so the span is all that can honestly be given.*/
-						이번 주기의 가임 기간은 이미 지났습니다.
+						이번 주기의 가임기는 이미 지났습니다.
 						<br>
 						<<if _fertile.nextWindow.min is _fertile.nextWindow.max>>
-							다음 가임 기간은 약 <<print _fertile.nextWindow.min>>일 후에 시작됩니다.
+							다음 가임기는 약 <<print _fertile.nextWindow.min>>일 후에 시작됩니다.
 						<<else>>
-							다음 가임 기간은 약 <<print _fertile.nextWindow.min>>~<<print _fertile.nextWindow.max>>일 후에 시작됩니다.
+							다음 가임기는 약 <<print _fertile.nextWindow.min>>~<<print _fertile.nextWindow.max>>일 후에 시작됩니다.
 						<</if>>
 					<<else>>
-						위험한 날: <<print _fertile.risky>>
+						위험한 날: <<print _fertile.risky.replace(/(\d{1,2})\/(\d{1,2}) to (\d{1,2})\/(\d{1,2})/, "$2월 $1일부터 $4월 $3일까지").replace(/(\d{1,2})\/(\d{1,2})/, "$2월 $1일")>>
 						/*Ovulation can be behind the PC while the luteal tail still runs, and a span that is over is not printed.*/
 						<<if _fertile.dangerous>>
 							<br>
-							매우 위험한 날: <<print _fertile.dangerous>>
+							매우 위험한 날: <<print _fertile.dangerous.replace(/(\d{1,2})\/(\d{1,2}) to (\d{1,2})\/(\d{1,2})/, "$2월 $1일부터 $4월 $3일까지").replace(/(\d{1,2})\/(\d{1,2})/, "$2월 $1일")>>
 						<</if>>
 					<</if>>
 					<br>
 					성관계 위험도: <span @class="_fertile.todayColour"><<print _fertile.today>></span>.
 					<br>
-					현재 주기 날짜: <<print $_menstruation.currentDay>>
+					현재 주기 날짜: <<print $_menstruation.currentDay>>일
 					<br>
-					주기 마지막 날: <<print $_menstruation.currentDaysMax>>
+					주기 마지막 날: <<print $_menstruation.currentDaysMax>>일
 					<br>
 				<<else>>
 					<br>
@@ -1061,7 +1077,7 @@
 				<span class="gold">NPC 임신</span>
 				<<for $_npc range $NPCName.filter(npc => npc.pregnancy and npc.pregnancy.enabled isnot undefined)>>
 					<div>
-						<<print $_npc.nam>>:
+						<<print window.KR.gatPersonNameDictKR($_npc.nam)>>:
 						<<set _active to getActivePregnancies($_npc.nam)[0]>>
 						<<if !$_npc.pregnancy.enabled and !_active>>
 							플레이어가 NPC 임신을 비활성화했습니다.
