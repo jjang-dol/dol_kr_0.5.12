@@ -1896,7 +1896,7 @@ window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
 
 // 저널 인벤토리 물품 카테고리 필터 드롭다운(Show: All/Food/...) 번역.
 window.KR.foodstuffCategoryDict = {
-    "food": "음식",
+    "food": "요리",
     "flower": "꽃",
     "fruit": "과일",
     "ingredient": "재료",
