@@ -282,7 +282,7 @@ setup.debugMenu.eventList = {
 			],
 		},
 		{
-			link: [`모든 짐승을 마물 인간으로`, stayOnPassageFn],
+			link: [`모든 짐승을 수인으로`, stayOnPassageFn],
 			widgets: [`<<set $settings.monsterChance to 100>>`, `<<set $settings.monsterHallucinationsOnly to false>>`],
 		},
 		{
@@ -583,7 +583,7 @@ setup.debugMenu.eventList = {
 			widgets: [`<<endcombat>>`],
 		},
 		{
-			link: [`식물 마물 테스트`, `Plantperson Test`],
+			link: [`인간형 식물 테스트`, `Plantperson Test`],
 			widgets: [`<<endcombat>>`],
 		},
 		{
