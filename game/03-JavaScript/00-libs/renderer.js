@@ -1088,7 +1088,7 @@ var Renderer;
 					if (layer.animation) {
 						let spec = Renderer.AnimationProvider(layer);
 						if (!spec) {
-							console.error("레이어 '" + (layer.name || layer.src) + "'의 애니메이션 '" + layer.animation + "'을(를) 찾을 수 없습니다");
+							console.error("레이어 '" + (layer.name || layer.src) + "'의 애니메이션 '" + layer.animation + "'【을를】 찾을 수 없습니다");
 							continue;
 						}
 						let complex = false;
