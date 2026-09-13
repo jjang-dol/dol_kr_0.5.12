@@ -6,7 +6,7 @@ function timeAfterXHours(hours) {
 DefineMacroS("timeAfterXHours", timeAfterXHours);
 
 function ampm(hour, minute) {
-	let ampm;
+	let ampmPrefix;
 	if (hour !== undefined) {
 		minute ??= "00";
 	} else {
@@ -14,10 +14,10 @@ function ampm(hour, minute) {
 		minute = Time.minute;
 	}
 	if (V.options.timestyle === "ampm") {
-		ampm = hour >= 12 ? "pm" : "am";
+		ampmPrefix = hour >= 12 ? "오후 " : "오전 ";
 		hour = ((hour + 11) % 12) + 1;
 	}
-	return !ampm ? ("0" + getTimeString(hour, minute)).slice(-5) : getTimeString(hour, minute) + ampm;
+	return !ampmPrefix ? ("0" + getTimeString(hour, minute)).slice(-5) : ampmPrefix + getTimeString(hour, minute);
 }
 window.ampm = ampm;
 DefineMacroS("ampm", ampm);
