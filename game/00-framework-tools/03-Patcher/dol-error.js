@@ -75,6 +75,12 @@ function getDebuggingInfo() {
 throwError = function (place, message, source, isExportable = true, isLogged = true) {
 	// add game version and active passage info at the start of the error box
 	const header = `${StartConfig.version} ${L10n.get("errorTitle")} (:: ${passage()}): `;
+
+	// 정상적인 세이브에서는 나올 수 없는 비정상적인 값으로 인한 random() 오류는 커스텀 안내문으로 대체
+	if (typeof message === "string" && message.includes("random max parameter must be an integer")) {
+		message = "정상적인 세이브에서는 나올 수 없는 비정상적인 값이 변수에 저장되어 발생한 오류입니다.";
+	}
+
 	// nested reports are implemented with military-grade stupidity, but informative enough for the screenshots
 	if (typeof message === "string")
 		message = message
