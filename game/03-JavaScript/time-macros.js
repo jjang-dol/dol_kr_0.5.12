@@ -14,7 +14,7 @@ function ampm(hour, minute) {
 		minute = Time.minute;
 	}
 	if (V.options.timestyle === "ampm") {
-		ampm = hour >= 12 ? " pm" : " am";
+		ampm = hour >= 12 ? "pm" : "am";
 		hour = ((hour + 11) % 12) + 1;
 	}
 	return !ampm ? ("0" + getTimeString(hour, minute)).slice(-5) : getTimeString(hour, minute) + ampm;
