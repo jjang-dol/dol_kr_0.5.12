@@ -2959,7 +2959,7 @@ function applyFeatBoosts() {
 		// list of all available tattoos
 		const featsTattooAll = Object.values(setup.bodywriting)
 			.filter(t => !t.featSkip)
-			.map(m => m.writingKr);
+			.map(m => m.writingKr || m.writing);
 		// list of all available bodyparts
 		const bodyparts = clone(setup.bodyparts);
 		// boost options
@@ -2976,7 +2976,7 @@ function applyFeatBoosts() {
 		for (let i = 1; i <= totalTattoos; ++i) {
 			const location = boostObj[i].bodypart === "Random" ? bodyparts.pluck() : boostObj[i].bodypart.toLowerCase().replaceAll(" ", "_");
 			const tattooWriting = boostObj[i].tattoo === "Random" ? featsTattooAll.random() : boostObj[i].tattoo;
-			const tattoo = Object.keys(setup.bodywriting).find(k => setup.bodywriting[k].writingKr === tattooWriting);
+			const tattoo = Object.keys(setup.bodywriting).find(k => (setup.bodywriting[k].writingKr || setup.bodywriting[k].writing) === tattooWriting);
 			const pen = boostObj[i].pen.toLowerCase();
 			wikifier("add_bodywriting", location, tattoo, pen);
 		}
