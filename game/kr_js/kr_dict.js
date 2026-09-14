@@ -1910,3 +1910,15 @@ window.KR.getFoodstuffCategoryKr = function(category) {
     if (window.KR.foodstuffCategoryDict[category]) return window.KR.foodstuffCategoryDict[category];
     return category;
 };
+
+// 문신/낙서(bodywriting) 문구 한글 번역.
+// $skin[bp].writingKr는 낙서가 적용된 시점에 clone된 값이라, 그 시점 이후 kr_dict가
+// 업데이트돼도 예전 세이브에는 반영되지 않는다(구버전 세이브에 writingKr 필드 자체가 없는 경우 포함).
+// 그래서 저장된 writingKr을 믿지 않고, 항상 영문 원문(writing)으로 setup.bodywriting을
+// 다시 조회해 현재 최신 번역을 반환한다.
+window.KR.getBodywritingKr = function(writing) {
+    if (!writing) return writing;
+    if (typeof setup === "undefined" || !setup.bodywriting) return writing;
+    var entry = Object.values(setup.bodywriting).find(function (e) { return e.writing === writing; });
+    return entry ? entry.writingKr : writing; // 매칭되는 게 없으면 원본 그대로 출력
+};
