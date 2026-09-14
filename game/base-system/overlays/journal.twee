@@ -1,7 +1,7 @@
 :: Widgets Journal [widget]
 <<widget "journal">>
 	<br>
-	<<print getFormattedDate(Time.date) + ", " + Time.year + "년입니다.">>
+	<<print Time.year + "년 " + getFormattedDate(Time.date) + "입니다.">>
 	<ul class="journal">
 	<<if Time.days lt 0>>
 		<<if Time.days lt -365>>
@@ -142,7 +142,7 @@
 			<</if>>
 
 			<<if $avery_mansion?.schedule isnot "away" and $averydate is 1 and Time.hour lte 21 and $averydatedone isnot 1>>
-				<li><span class="pink"><<this_saturday>></span>에 에이버리와의 데이트가 예정되어 있습니다. <<nnpc_He "Avery">>【은는】 <span class="gold"><<ampm 20 00>></span>에서 <span class="gold"><<ampm 21 00>></span> 사이에 <<= $avery_mansion ? "차고에서" : "도무스 가에서">> 당신을 기다릴 것입니다.</li>
+				<li><span class="pink"><<this_saturday>></span><<if Time.weekDay isnot 6>>에<</if>> 에이버리와의 데이트가 예정되어 있습니다. <<nnpc_He "Avery">>【은는】 <span class="gold"><<ampm 20 00>></span>에서 <span class="gold"><<ampm 21 00>></span> 사이에 <<= $avery_mansion ? "차고에서" : "도무스 가에서">> 당신을 기다릴 것입니다.</li>
 			<</if>>
 
 			<<if $avery_valentines?.invite and !$avery_valentines?.done and !$avery_valentines?.missed_approach and !$avery_valentines_missed>>
@@ -537,10 +537,10 @@
 			<<elseif $chef_state is 7 and $chef_rework lte 0>>
 				<li><<cafeicon>> 오션 브리즈의 리모델링이 끝났습니다.</li>
 			<<elseif $chef_state is 7 and $chef_rework lte 30>>
-				<li><<cafeicon>> 오션 브리즈가 리모델링으로 인해 휴업 중입니다. 공사는 <<nDays $chef_rework>> 뒤에 끝납니다.</li>
+				<li><<cafeicon>> 오션 브리즈가 리모델링으로 인해 휴업 중입니다. 공사는 <<nDays $chef_rework>><<if $chef_rework gte 2>>에<</if>> 끝납니다.</li>
 			<<elseif $chef_state is 7>>
 				<<set _timer to $chef_rework - 30>>
-				<li><<cafeicon>> 오션 브리즈가 리모델링을 위해 <<nDays _timer>> 뒤에 문을 닫습니다.</li>
+				<li><<cafeicon>> 오션 브리즈가 리모델링을 위해 <<nDays _timer>><<if _timer gte 2>>에<</if>> 문을 닫습니다.</li>
 			<<elseif $chef_state is 8>>
 				<li><<cafeicon>> 샘은 당신이 저녁 <<ampm 18 00>>에서 <<ampm 21 00>> 사이 아무 날이나 오션 브리즈의 재개업 행사에 참석하기를 원합니다.</li>
 			<</if>>
@@ -853,7 +853,7 @@
 					<<set $_averyMissedColor to ["","purple","pink","red"][Math.clamp($avery_mansion.rage.dinner_missed,0,3)]>>
 					<<set $_averyDishAmount to $foodstuff[$avery_mansion.food].amount>>
 					<<set $_averyDishAmountColour to $foodstuff[$avery_mansion.food].amount ? "green" : "red">>
-					<span @class="$_averyMissedColor">저녁 메뉴로 <<recipe_name $avery_mansion.food "article">>【을를】 대접해야 합니다.</span> (<span @class="$_averyDishAmountColour"><<print $_averyDishAmount>></span>개 보유중)
+					<span @class="$_averyMissedColor">저녁 메뉴로 <<recipe_name $avery_mansion.food "article">>【을를】 대접해야 합니다.</span> (<span @class="$_averyDishAmountColour"><<print $_averyDishAmount>></span>개 보유 중)
 				</li>
 			<</if>>
 			<<if !["missed", "started"].includes($avery_mansion.party_state)>>
@@ -1345,7 +1345,7 @@
 							<<elseif $_plotsToPick == $_currentPlot.length>>
 								<span class="green">수확할 준비</span>가 되었습니다.
 							<<else>>
-								그 중 <<print $_descriptors.map((str, idx) => idx === $_descriptors.length - 1 ? str + "다" : str + "고, ").join("")>>.
+								그 중 <<print $_descriptors.map((str, idx) => idx === $_descriptors.length - 1 ? (str.endsWith("하") ? str.slice(0, -1) + "합니다" : str + "습니다") : str + "고, ").join("")>>.
 							<</if>>
 						<<elseif $_currentPlot.length is 1>>
 							<<switch $_currentPlot[0].size>>
