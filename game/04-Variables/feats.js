@@ -2065,7 +2065,7 @@ async function featsMergePre() {
 
 	const result = () => {
         if (!T.saveDataImportCount) {
-            $("#featsBeginText").html(`감지된 저장 데이터가 없습니다. 가져오기를 시도하기 전에 로컬에 저장했는지 확인하십시오.`);
+            $("#featsBeginText").html(`감지된 저장 데이터가 없습니다. 내보내기를 시도하기 전에 로컬에 저장했는지 확인하십시오.`);
         } else if ((T.saveDataImportCount >= 10 && Browser.isMobile.any()) || T.saveDataImportCount >= 25) {
             $("#featsBeginText").html(`저장 데이터 ${T.saveDataImportCount}개가 감지되었습니다. 기기 사양에 따라 시간이 다소 소요될 수 있습니다.`);
         } else {

@@ -701,18 +701,18 @@ Macro.add("canvasModelEditor", {
 							if (textarea.getAttribute("style")) {
 								textarea.setAttribute("style", "");
 								textarea.value = "";
-								this.textContent = "붙여넣은 뒤 다시 클릭해 가져오기";
+								this.textContent = "붙여넣은 뒤 다시 클릭해 내보내기";
 							} else {
 								const ioptions = JSON.parse(textarea.value);
 								Object.assign(options, ioptions);
 								model.redraw();
 								updateControls();
 								textarea.setAttribute("style", "display:none");
-								this.textContent = "가져오기";
+								this.textContent = "내보내기";
 							}
 						},
 					},
-					"가져오기"
+					"내보내기"
 				),
 				element("textarea", { rows: 1, style: "display:none" }),
 			])
