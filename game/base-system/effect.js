@@ -865,7 +865,7 @@ function effects() {
 					break;
 				case "up 4":
 					element("span", "거칠게 놀고 싶다면, 그렇게 해주면 된다.", "red");
-					element("i", "복수심 어린 사디스트가 되었다.", "red");
+					element("i", "복수심에 불타는 사디스트가 되었다.", "red");
 					break;
 				case "down 0":
 					element("i", "더는 사디스트가 아니다.", "lblue");
