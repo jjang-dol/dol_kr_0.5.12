@@ -850,7 +850,7 @@ setup.feats = {
 	},
 	Angel: {
 		title: "천사처럼 걸어라",
-		desc: "추락(타락)하지 않도록 노력하세요.",
+		desc: "추락하지 않도록 노력하세요.",
 		difficulty: 1,
 		series: "",
 		filter: ["All", "Transformation"],
@@ -1290,7 +1290,7 @@ setup.feats = {
 		softLockable: true,
 	},
 	"A Knot to Remember": {
-		title: "잊지 못할 매듭(노팅)",
+		title: "잊지 못할 매듭",
 		desc: "근처에 사람들이 있는 들판에서 노팅당하기.",
 		difficulty: 1,
 		series: "",
