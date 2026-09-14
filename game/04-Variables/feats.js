@@ -2670,7 +2670,7 @@ const boostData = {
 			missing: "'날쌘돌이' 업적을 달성해서 해금하세요.",
 		},
 		tending: {
-			name: "원예 등급",
+			name: "관리 등급",
 			required: ["Green Fingered"],
 			cost: 5,
 			max: 4,
