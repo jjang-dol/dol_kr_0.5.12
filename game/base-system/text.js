@@ -779,12 +779,12 @@ statDisplay.create("gggrespect", arg =>
 	statDisplay.statChange("존중", 3, "green", () => arg === undefined || (arg === "scum" && V.pirate_rank !== 0) || (arg === "mate" && V.pirate_rank !== 1))
 );
 
-statDisplay.create("ladeviancy", () => statDisplay.statChange("알렉스의 일탈도", -1, "green"));
-statDisplay.create("lladeviancy", () => statDisplay.statChange("알렉스의 일탈도", -2, "green"));
-statDisplay.create("llladeviancy", () => statDisplay.statChange("알렉스의 일탈도", -3, "green"));
-statDisplay.create("gadeviancy", () => statDisplay.statChange("알렉스의 일탈도", 1, "red"));
-statDisplay.create("ggadeviancy", () => statDisplay.statChange("알렉스의 일탈도", 2, "red"));
-statDisplay.create("gggadeviancy", () => statDisplay.statChange("알렉스의 일탈도", 3, "red"));
+statDisplay.create("ladeviancy", () => statDisplay.statChange("알렉스의 이상성욕", -1, "green"));
+statDisplay.create("lladeviancy", () => statDisplay.statChange("알렉스의 이상성욕", -2, "green"));
+statDisplay.create("llladeviancy", () => statDisplay.statChange("알렉스의 이상성욕", -3, "green"));
+statDisplay.create("gadeviancy", () => statDisplay.statChange("알렉스의 이상성욕", 1, "red"));
+statDisplay.create("ggadeviancy", () => statDisplay.statChange("알렉스의 이상성욕", 2, "red"));
+statDisplay.create("gggadeviancy", () => statDisplay.statChange("알렉스의 이상성욕", 3, "red"));
 
 statDisplay.create("lyearning", () => {
 	if (V.gwylanSeen?.includes("yearning")) return statDisplay.statChange("갈망", -1, "witchbloom");
