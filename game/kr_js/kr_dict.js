@@ -1271,6 +1271,17 @@ window.KR.getCreatureTypeKr = function(type) {
         case "frog": return _giantPrefix + "개구리";
         case "oyster": return _giantPrefix + "굴";
         case "whale": return _giantPrefix + "고래";
+        // 그윌란 샘플 부탁 등에서 쓰이는 짐승류
+        case "human": return _giantPrefix + "인간";
+        case "dog": return _giantPrefix + "개";
+        case "cat": return _giantPrefix + "고양이";
+        case "wolf": return _giantPrefix + "늑대";
+        case "fox": return _giantPrefix + "여우";
+        case "lizard": return _giantPrefix + "도마뱀";
+        case "boar": return _giantPrefix + "멧돼지";
+        case "bear": return _giantPrefix + "곰";
+        case "hawk": return _giantPrefix + "매";
+        case "dolphin": return _giantPrefix + "돌고래";
         default: return type; // 매칭되는 게 없으면 원본 그대로 출력
     }
 };
