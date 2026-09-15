@@ -1452,7 +1452,16 @@
 		<<for $_key range $_moneyKeys>>
 			<<if $_moneyStats[$_key].earned or $_moneyStats[$_key].spent>>
 				<tbody class="stat">
-					<td data-label="Source"><<moneyStatsNamesKr $_key>></td>
+					<td data-label="Source">
+						<<silently>>
+							/* 1. 원본 위젯 실행 (결과가 $_text_output에 담김) */
+							<<moneyStatsNames $_key>>
+							/* 2. 그 결과를 내가 원하는 임시 변수인 _moneysource로 옮겨 담음 */
+							<<set _moneysource to $_text_output>>
+						<</silently>>
+						/* 3. 새 번역 위젯에 내가 만든 변수를 넘김 */
+						<<moneyStatsNamesKr _moneysource>>
+					</td>
 					<td data-label="Spent" @class="$_moneyStats[$_key].spent ? '' : 'mobileHidden'">
 						<<if $_moneyStats[$_key].spent>>
 							<<printmoney `$_moneyStats[$_key].spent or 0` "red">>
@@ -1593,96 +1602,95 @@
 <</silently>><<if $_text_output>><<print $_text_output>><</if>>
 <</widget>>
 
-/* 위 moneyStatsNames는 원본(영어) 로직 그대로 유지 — 원본이 업데이트되며 새 항목(키)이 추가돼도
-   위 위젯 자체는 손댈 필요 없이 camelCaseToTitle로 자동 영문 표기가 생성된다.
-   아래 moneyStatsNamesKr가 그 영문 출력 결과를 받아 사전 기반으로 한글화한다.
-   완전히 다르게 번역해야 하는 표현(합쳐서 번역 시 어색해지는 경우)은 fullMatch에,
-   나머지는 단어 단위로 wordDict에 등록해 새 키가 추가되어도 최대한 대응 가능하게 한다. */
 <<widget "moneyStatsNamesKr">><<silently>>
-	<<moneyStatsNames _args[0]>>
-	<<set _moneysource to $_text_output>>
+	/* 1. 넘어온 영어 텍스트를 받습니다 */
+	<<set _eng to _args[0]>>
 
-	<<run
-		const eng = State.temporary.moneysource;
-		let output = "";
+	/* 2. 통짜 예외 사전 */
+	<<set _fullMatch to {
+		"Not Tracked": "미추적",
+		"Cafe Chef": "카페 요리사 알바",
+		"Estate Betting": "블랙잭 도박",
+		"Compound Phials": "약병(단지)",
+		"Hospital Parasites Sold": "기생충 판매(병원)",
+		"Hospital Paternity Test": "친자 확인 검사",
+		"Hospital Breast Reduction": "가슴 축소 수술",
+		"Hospital Breast Enlargement": "가슴 확대 수술",
+		"Hospital Penis Reduction": "성기 축소 수술",
+		"Hospital Penis Enlargement": "성기 확대 수술",
+		"Hospital Tattoo Removal": "문신 제거(병원)",
+		"Hospital Parasite Removal": "기생충 제거(병원)",
+		"Pharmacy After Pill": "약국 사후피임약",
+		"People Of Interest": "주요 인물",
+		"Party Dance Job": "파티 댄스 알바",
+		"Danube Dance Job": "다뉴브 댄스 알바",
+		"Party Dance Job Tips": "파티 댄스 알바 팁",
+		"Danube Dance Job Tips": "다뉴브 댄스 알바 팁",
+		"Pet Shop": "펫샵",
+		"Toy Shop": "장난감 가게",
+		"Adult Shop": "성인용품 가게",
+		"Cafe Waiter": "카페 웨이터",
+		"Cafe Waitress": "카페 웨이트리스",
+		"Tutorial Man": "튜토리얼",
+		"Tutorial Woman": "튜토리얼",
+		"Strip Club Bartender": "스트립 클럽 바텐더 팁",
+		"Strip Club Dancer": "스트립 클럽 댄서 팁"
+	}>>
 
-		if (eng && typeof eng === "string") {
-			// 1. 단어 조합 시 번역이 어색해지거나 정보가 손실되는 경우의 통짜 예외 사전
-			const fullMatch = {
-				"Not Tracked": "미추적",
-				"Cafe Chef": "카페 요리사 알바",
-				"Estate Betting": "블랙잭 도박",
-				"Compound Phials": "약병(단지)",
-				"Hospital Parasites Sold": "기생충 판매(병원)",
-				"Hospital Paternity Test": "친자 확인 검사",
-				"Hospital Breast Reduction": "가슴 축소 수술",
-				"Hospital Breast Enlargement": "가슴 확대 수술",
-				"Hospital Penis Reduction": "성기 축소 수술",
-				"Hospital Penis Enlargement": "성기 확대 수술",
-				"Hospital Tattoo Removal": "문신 제거(병원)",
-				"Hospital Parasite Removal": "기생충 제거(병원)",
-				"Pharmacy After Pill": "약국 사후피임약",
-				"People Of Interest": "주요 인물",
-				"Party Dance Job": "파티 댄스 알바",
-				"Danube Dance Job": "다뉴브 댄스 알바",
-				"Party Dance Job Tips": "파티 댄스 알바 팁",
-				"Danube Dance Job Tips": "다뉴브 댄스 알바 팁",
-				"Pet Shop": "펫샵",
-				"Toy Shop": "장난감 가게",
-				"Adult Shop": "성인용품 가게",
-				"Cafe Waiter": "카페 웨이터",
-				"Cafe Waitress": "카페 웨이트리스",
-				"Tutorial Man": "튜토리얼",
-				"Tutorial Woman": "튜토리얼",
-				"Strip Club Bartender": "스트립 클럽 바텐더 팁",
-				"Strip Club Dancer": "스트립 클럽 댄서 팁"
-			};
+	/* 3. 단어 조립용 1:1 사전 */
+	<<set _wordDict to {
+		"Starting": "시작", "Money": "자금", "Town": "마을", "Debug": "디버그",
+		"Farm": "농장", "Upgrades": "업그레이드", "Orphanage": "고아원", "Blackjack": "블랙잭",
+		"Bailey": "베일리", "Rent": "집세", "Museum": "박물관", "Antique": "골동품",
+		"Cafe": "카페", "Chef": "요리사", "Buns": "빵", "Tailor": "재단사", "Clothes": "옷",
+		"Hospital": "병원", "Shopping": "쇼핑", "Bay": "베이", "Window": "윈도우", "Decor": "장식",
+		"Prostitution": "매춘", "Moor": "황무지", "Riding": "승마", "Lessons": "레슨",
+		"Lube": "윤활제", "Tip": "팁", "Tips": "팁", "Bribe": "뇌물", "Arcade": "오락실",
+		"Brothel": "창관", "Gloryhole": "글로리홀", "Show": "쇼", "Vending": "자판기", "Machine": "",
+		"Condoms": "콘돔", "Bus": "버스", "Dance": "댄스", "Studio": "스튜디오",
+		"Danube": "다뉴브", "Party": "파티", "Gift": "선물", "Docks": "부두", "Wage": "임금",
+		"Factory": "공장", "Produce": "농산물", "Flats": "아파트", "Hookah": "물담배", "Cleaning": "청소",
+		"Paternity": "친자", "Test": "검사", "Breast": "가슴", "Reduction": "축소", "Enlargement": "확대",
+		"Penis": "성기", "Tattoo": "문신", "Removal": "제거", "Parasite": "기생충",
+		"Pharmacy": "약국", "Contacts": "콘택트렌즈", "Pump": "유축기", "Pregnancy": "임신",
+		"Cream": "크림", "Pills": "알약", "After": "사후", "Pill": "피임약",
+		"Market": "시장", "Stall": "가판대", "Collar": "목걸이", "Pub": "펍",
+		"Pepper": "호신", "Spray": "스프레이", "Alcohol": "술", "Stolen": "장물", "Goods": "",
+		"Pregnant": "임신한", "Student": "학생", "School": "학교", "Pool": "수영장",
+		"Stimulant": "각성제", "Project": "프로젝트", "Library": "도서관", "Books": "책",
+		"Cosmetics": "화장품", "Furniture": "가구", "Hairdressers": "미용실", "Robin": "로빈",
+		"Pet": "펫", "Shop": "샵", "Toy": "장난감", "Supermarket": "슈퍼마켓", "Spa": "스파",
+		"Thievery": "절도", "Strip": "스트립", "Club": "클럽",
+		"Avery": "에이버리", "Sydney": "시드니", "Whitney": "휘트니", "Police": "경찰",
+		"Jobs": "알바", "Job": "알바", "People": "주요", "Of": "", "Interest": "인물",
+		"Canal": "운하", "Photo": "사진", "Forest": "숲", "Temple": "사원",
+		"Adult": "성인용품", "Office": "사무실", "Pound": "축사", "Pirates": "해적선",
+		"Blitz": "블리츠", "Fishing": "낚시", "Asylum": "정신병원", "Mansion": "저택",
+		"Beach": "해변", "Underground": "지하", "Compound": "엘크 단지",
+		"Bartender": "바텐더", "Dancer": "댄서", "Waiter": "웨이터", "Waitress": "웨이트리스",
+		"Dancing": "댄스 팁", "Estate": "블랙잭", "Betting": "도박"
+	}>>
 
-			// 2. 띄어쓰기 기준 1:1 매칭 사전 (새 키가 추가돼도 단어 단위로 최대한 번역되도록)
-			const wordDict = {
-				"Starting": "시작", "Money": "자금", "Town": "마을", "Debug": "디버그",
-				"Farm": "농장", "Upgrades": "업그레이드", "Orphanage": "고아원", "Blackjack": "블랙잭",
-				"Bailey": "베일리", "Rent": "집세", "Museum": "박물관", "Antique": "골동품",
-				"Cafe": "카페", "Chef": "요리사", "Buns": "빵", "Tailor": "재단사", "Clothes": "옷",
-				"Hospital": "병원", "Shopping": "쇼핑", "Bay": "베이", "Window": "윈도우", "Decor": "장식",
-				"Prostitution": "매춘", "Moor": "황무지", "Riding": "승마", "Lessons": "레슨",
-				"Lube": "윤활제", "Tip": "팁", "Tips": "팁", "Bribe": "뇌물", "Arcade": "오락실",
-				"Brothel": "창관", "Gloryhole": "글로리홀", "Show": "쇼", "Vending": "자판기", "Machine": "",
-				"Condoms": "콘돔", "Bus": "버스", "Dance": "댄스", "Studio": "스튜디오",
-				"Danube": "다뉴브", "Party": "파티", "Gift": "선물", "Docks": "부두", "Wage": "임금",
-				"Factory": "공장", "Produce": "농산물", "Flats": "아파트", "Hookah": "물담배", "Cleaning": "청소",
-				"Paternity": "친자", "Test": "검사", "Breast": "가슴", "Reduction": "축소", "Enlargement": "확대",
-				"Penis": "성기", "Tattoo": "문신", "Removal": "제거", "Parasite": "기생충",
-				"Pharmacy": "약국", "Contacts": "콘택트렌즈", "Pump": "유축기", "Pregnancy": "임신",
-				"Cream": "크림", "Pills": "알약", "After": "사후", "Pill": "피임약",
-				"Market": "시장", "Stall": "가판대", "Collar": "목걸이", "Pub": "펍",
-				"Pepper": "호신", "Spray": "스프레이", "Alcohol": "술", "Stolen": "장물", "Goods": "",
-				"Pregnant": "임신한", "Student": "학생", "School": "학교", "Pool": "수영장",
-				"Stimulant": "각성제", "Project": "프로젝트", "Library": "도서관", "Books": "책",
-				"Cosmetics": "화장품", "Furniture": "가구", "Hairdressers": "미용실", "Robin": "로빈",
-				"Pet": "펫", "Shop": "샵", "Toy": "장난감", "Supermarket": "슈퍼마켓", "Spa": "스파",
-				"Thievery": "절도", "Strip": "스트립", "Club": "클럽",
-				"Avery": "에이버리", "Sydney": "시드니", "Whitney": "휘트니", "Police": "경찰",
-				"Jobs": "알바", "Job": "알바", "People": "주요", "Of": "", "Interest": "인물",
-				"Canal": "운하", "Photo": "사진", "Forest": "숲", "Temple": "사원",
-				"Adult": "성인용품", "Office": "사무실", "Pound": "축사", "Pirates": "해적선",
-				"Blitz": "블리츠", "Fishing": "낚시", "Asylum": "정신병원", "Mansion": "저택",
-				"Beach": "해변", "Underground": "지하", "Compound": "엘크 단지",
-				"Bartender": "바텐더", "Dancer": "댄서", "Waiter": "웨이터", "Waitress": "웨이트리스",
-				"Dancing": "댄스 팁", "Estate": "블랙잭", "Betting": "도박"
-			};
-
-			if (fullMatch[eng]) {
-				output = fullMatch[eng];
-			} else {
-				// 매칭되는 단어가 없으면 원본 영단어를 그대로 두고, 나머지 단어만 번역해서 재조립
-				output = eng.split(" ").map(w => wordDict[w] !== undefined ? wordDict[w] : w).join(" ").replace(/\s+/g, " ").trim();
-			}
-		}
-
-		State.temporary.moneysourcekr = output;
-	>>
-<</silently>><<if _moneysourcekr>><<print _moneysourcekr>><</if>><</widget>>
+	/* 4. 번역 및 조립 과정 */
+	<<if _eng>>
+		<<if _fullMatch[_eng]>>
+			<<set _kor_output to _fullMatch[_eng]>>
+		<<else>>
+			<<set _words to _eng.split(" ")>>
+			<<set _kor_output to "">>
+			<<for _w range _words>>
+				<<if _wordDict[_w] isnot undefined>>
+					<<set _kor_output += _wordDict[_w] + " ">>
+				<<else>>
+					<<set _kor_output += _w + " ">>
+				<</if>>
+			<</for>>
+			<<set _kor_output to _kor_output.replace(/\s+/g, " ").trim()>>
+		<</if>>
+	<<else>>
+		<<set _kor_output to "">>
+	<</if>>
+<</silently>><<if _kor_output>><<print _kor_output>><</if>><</widget>>
 
 <<widget "moneyStatsTitle">><<silently>>
 	<<set $_display to ({ Source: "출처", Spent: "총 지출", "Spent Average": "평균 지출", "Spent Count": "지출 횟수", Earned: "총 수입", "Earned Average": "평균 수입", "Earned Count": "수입 횟수", "Hour Rates": "시급", Date: "날짜" }[_args[0]] || _args[0])>>
