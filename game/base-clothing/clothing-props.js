@@ -34,9 +34,35 @@ function propLevels(prop) {
 }
 window.propLevels = propLevels;
 
+/* Reverse-lookup a translated (Korean) foodstuff display name back to its English setup key.
+   Needed because some code paths (e.g. legacy save migrations, or debug tools) may pass a
+   stored/displayed name into wearProp() instead of the original English setup key -
+   in that case setup.foodstuff[key] fails silently and the prop falls back to the
+   "general" folder with a broken (untranslated-for-files) image name. */
+let _foodstuffNameToKey = null;
+function resolveFoodstuffKey(rawKey) {
+	if (typeof rawKey !== "string") return rawKey;
+	if (setup.foodstuff[rawKey] || setup.props[rawKey]) return rawKey;
+	if (!/[\u3131-\uD79D]/.test(rawKey)) return rawKey; // no Hangul in it, nothing for us to resolve
+	if (!_foodstuffNameToKey) {
+		_foodstuffNameToKey = {};
+		for (const [key, item] of Object.entries(setup.foodstuff)) {
+			if (item.name) _foodstuffNameToKey[item.name] = key;
+			if (item.recipe?.recipe_name) _foodstuffNameToKey[item.recipe.recipe_name] = key;
+		}
+	}
+	const resolved = _foodstuffNameToKey[rawKey];
+	if (resolved) {
+		console.warn(`[wearProp] "${rawKey}"는 setup.foodstuff의 표시용 이름이라 "${resolved}" 키로 대신 변환해 사용합니다. 호출부를 확인해 원래 영문 키를 쓰도록 고치는 것이 좋습니다.`);
+		return resolved;
+	}
+	return rawKey;
+}
+window.resolveFoodstuffKey = resolveFoodstuffKey;
+
 /* primary prop colour may be specified in _args[1], secondary in _args[2]. if the item has colour or accColour options provided in setup, but no colour is specified, one will be randomised. otherwise, prop is assumed to be non-recolourable. */
 function wearProp(prop, colour, accColour) {
-	const key = normaliseKey(removeDiacritics(prop));
+	const key = normaliseKey(removeDiacritics(resolveFoodstuffKey(prop)));
 	const tendingItem = key.replace("_gift", "").replace("_basket", "");
 	const tending = setup.foodstuff[tendingItem];
 	const propErties = setup.props[key] ?? {};
