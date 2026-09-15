@@ -1,13 +1,11 @@
 Macro.add('moneyStatsNamesKr', {
 	handler: function () {
-		// 1. 원본 위젯을 백그라운드에서 실행하여 결과값(영어 텍스트)만 바로 따옴
 		let buffer = document.createDocumentFragment();
 		new Wikifier(buffer, '<<moneyStatsNames ' + this.args.raw + '>>');
 		let eng = $(buffer).text().trim();
 
 		if (!eng) return;
 
-		// 2. 통짜 예외 사전
 		const fullMatch = {
 			"Not Tracked": "미추적",
 			"Cafe Chef": "카페 요리사 알바",
@@ -38,7 +36,6 @@ Macro.add('moneyStatsNamesKr', {
 			"Strip Club Dancer": "스트립 클럽 댄서 팁"
 		};
 
-		// 3. 단어 1:1 매칭 사전
 		const wordDict = {
 			"Starting": "시작", "Money": "자금", "Town": "마을", "Debug": "디버그",
 			"Farm": "농장", "Upgrades": "업그레이드", "Orphanage": "고아원", "Blackjack": "블랙잭",
@@ -72,7 +69,6 @@ Macro.add('moneyStatsNamesKr', {
 			"Dancing": "댄스 팁", "Estate": "블랙잭", "Betting": "도박"
 		};
 
-		// 4. 번역 후 출력
 		let output = "";
 		if (fullMatch[eng]) {
 			output = fullMatch[eng];
