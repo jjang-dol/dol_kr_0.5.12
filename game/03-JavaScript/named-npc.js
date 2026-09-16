@@ -255,9 +255,9 @@ function averySchedule() {
 				else if (Time.hour <= 6) V.avery_mansion.schedule = "breakfast";
 				else if (Time.hour <= 16) V.avery_mansion.schedule = "work";
 				else if (Time.hour <= 17 && V.avery_mansion.rage.work === true) V.avery_mansion.schedule = "return";
-				else if (Time.hour <= 17 && V.avery_mansion.party_state === "waiting" && V.avery_tower?.stage !== 3 && !V.avery_valentines?.invite)
+				else if (Time.hour <= 17 && V.avery_mansion.party_state === "waiting" && !(V.avery_tower?.stage === 3 && V.avery_mansion.stopPartyAfterTower) && !V.avery_valentines?.invite)
 					V.avery_mansion.schedule = "party_prepare";
-				else if (V.avery_mansion.party_state === "waiting" && V.avery_tower?.stage !== 3) V.avery_mansion.schedule = "party";
+				else if (V.avery_mansion.party_state === "waiting" && !(V.avery_tower?.stage === 3 && V.avery_mansion.stopPartyAfterTower)) V.avery_mansion.schedule = "party";
 				else V.avery_mansion.schedule = "drink";
 				break;
 
