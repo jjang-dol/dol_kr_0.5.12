@@ -221,6 +221,13 @@ function averySchedule() {
 
 	if (!V.avery_mansion) return;
 
+	/* Player toggled the "stop party after tower" option while a party was already pending (party_state "waiting").
+	   Neutralize it into the same state used before the player's very first party ever happens, so it never gets
+	   marked "missed" (no-show, which costs love/rage) even if the option is unchecked again later. */
+	if (V.avery_tower?.stage === 3 && V.avery_mansion.stopPartyAfterTower && V.avery_mansion.party_state === "waiting") {
+		V.avery_mansion.party_state = "first sunday skip";
+	}
+
 	if (V.avery_mansion.schedule === "away" && V.avery_skyscraper_fire_time <= 0 && V.avery_injury) V.avery_mansion.schedule = "return";
 	else if (
 		V.avery_mansion.schedule === "away" &&
