@@ -85,10 +85,17 @@
         return false;
     }
 
-    window.KR.translateVisibleText = function translateVisibleText(root, allowDetached = false) {
-        if (!root || typeof setup === "undefined") return;
+    // 이 6개 컨테이너는 세션 내내 안 바뀌는 고정 UI 뼈대이므로 캐시해서
+    // translateVisibleText가 호출될 때마다(꽤 자주 호출됨) getElementById를
+    // 반복하지 않도록 한다. 혹시 연결이 끊긴 경우에만 다시 조회.
+    let _cachedAllowedRoots = null;
 
-        const allowedRoots = [
+    function getAllowedRoots() {
+        if (_cachedAllowedRoots && _cachedAllowedRoots.every(el => el.isConnected)) {
+            return _cachedAllowedRoots;
+        }
+
+        _cachedAllowedRoots = [
             document.getElementById("passages"),
             document.getElementById("ui-bar"),
             document.getElementById("sidebar"),
@@ -96,6 +103,14 @@
             document.getElementById("ui-dialog"),
             document.getElementById("ui-dialog-body")
         ].filter(Boolean);
+
+        return _cachedAllowedRoots;
+    }
+
+    window.KR.translateVisibleText = function translateVisibleText(root, allowDetached = false) {
+        if (!root || typeof setup === "undefined") return;
+
+        const allowedRoots = getAllowedRoots();
 
         if (!allowDetached && !allowedRoots.length) return;
 

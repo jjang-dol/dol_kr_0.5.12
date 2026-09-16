@@ -5,6 +5,11 @@
 	let koreanPostRenderObserver = null;
 	let koreanPostRenderObserverTimer = null;
 
+	// runKoreanPostRender가 만든 DOM 수정 자체가 옵저버를 다시 깨우지 않도록 막는 재진입 방지 플래그.
+	// 예전에는 매번 disconnect()/observe()를 호출해서 같은 일을 했는데, 옵저버를 실제로
+	// 끊었다 붙였다 하는 건 비용이 있어서 훨씬 가벼운 불리언 체크로 대체함.
+	let isApplyingKoreanPostRender = false;
+
 	function trSelectPost(word, type) {
 		if (!word || typeof word !== "string" || word.length === 0) return "";
 
@@ -150,8 +155,17 @@
 		}
 	}
 
+	// 대상 루트 엘리먼트 목록을 매번 getElementById로 다시 찾지 않도록 캐시.
+	// 이 6개 컨테이너는 게임 세션 내내 교체되지 않는 고정 UI 뼈대라 캐시가 안전하지만,
+	// 혹시라도 사라지는 경우(예: 오버레이 재구성)에 대비해 연결 상태를 확인 후 필요할 때만 다시 조회한다.
+	let _cachedRoots = null;
+
 	function getKoreanPostRenderRoots() {
-		return [
+		if (_cachedRoots && _cachedRoots.every(el => el.isConnected)) {
+			return _cachedRoots;
+		}
+
+		_cachedRoots = [
 			document.getElementById("passages"),
 			document.getElementById("ui-bar"),
 			document.getElementById("sidebar"),
@@ -159,6 +173,8 @@
 			document.getElementById("ui-dialog"),
 			document.getElementById("ui-dialog-body")
 		].filter(Boolean);
+
+		return _cachedRoots;
 	}
 
 	function nodeNeedsKoreanPostRender(node) {
@@ -179,52 +195,59 @@
 	}
 
 	function installKoreanPostRenderObserver() {
-        if (koreanPostRenderObserver || typeof MutationObserver === "undefined") return;
+		if (koreanPostRenderObserver || typeof MutationObserver === "undefined") return;
 
-        koreanPostRenderObserver = new MutationObserver(function (mutations) {
-            cancelAnimationFrame(koreanPostRenderObserverTimer);
+		koreanPostRenderObserver = new MutationObserver(function (mutations) {
+			// 우리 스스로가 만든 변경이면 무시 (재진입 방지). disconnect/observe를 매번
+			// 호출하는 대신 이 플래그 체크 한 번으로 대체해서 옵저버 자체는 계속 켜둔 채로 둔다.
+			if (isApplyingKoreanPostRender) return;
 
-            koreanPostRenderObserverTimer = requestAnimationFrame(function () {
-                for (const mutation of mutations) {
-                    if (
-                        mutation.type === "characterData" &&
-                        nodeNeedsKoreanPostRender(mutation.target)
-                    ) {
-                        runKoreanPostRender(document.getElementById("passages"), true);
-                    }
+			cancelAnimationFrame(koreanPostRenderObserverTimer);
 
-                    for (const node of mutation.addedNodes || []) {
-                        if (nodeNeedsKoreanPostRender(node)) {
-                            runKoreanPostRender(node, true);
-                        }
-                    }
-                }
-                runKoreanPostRenderAll();
-            });
-        });
+			koreanPostRenderObserverTimer = requestAnimationFrame(function () {
+				// 실제로 변경된 부분만 처리한다. 예전에는 이 다음에 무조건
+				// runKoreanPostRenderAll()로 6개 루트 전체(현재 패시지 전문 포함)를
+				// 매번 다시 훑었는데, 사이드바 수치 같은 작은 변경 하나에도 전체
+				// 재스캔이 걸려서 렉의 주 원인이었음. 바뀐 노드만 좁게 처리하도록 수정.
+				for (const mutation of mutations) {
+					if (
+						mutation.type === "characterData" &&
+						nodeNeedsKoreanPostRender(mutation.target)
+					) {
+						runKoreanPostRender(mutation.target.parentElement, true);
+					}
 
-        const roots = getKoreanPostRenderRoots();
-        roots.forEach(root => {
-            if (root) {
-                koreanPostRenderObserver.observe(root, {
-                    childList: true,
-                    characterData: true,
-                    subtree: true
-                });
-            }
-        });
-    }
-
-		function runJosa(root) {
-			if (!root) {
-				for (const eachRoot of getKoreanPostRenderRoots()) {
-					runJosa(eachRoot);
+					for (const node of mutation.addedNodes || []) {
+						if (nodeNeedsKoreanPostRender(node)) {
+							runKoreanPostRender(node, true);
+						}
+					}
 				}
-				return;
-			}
+			});
+		});
 
-			walkTextNodes(root);
+		const roots = getKoreanPostRenderRoots();
+		roots.forEach(root => {
+			if (root) {
+				koreanPostRenderObserver.observe(root, {
+					childList: true,
+					characterData: true,
+					subtree: true
+				});
+			}
+		});
+	}
+
+	function runJosa(root) {
+		if (!root) {
+			for (const eachRoot of getKoreanPostRenderRoots()) {
+				runJosa(eachRoot);
+			}
+			return;
 		}
+
+		walkTextNodes(root);
+	}
 
 	function runDisplayTranslation(root, allowDetached = false) {
 		if (!root) return;
@@ -240,19 +263,12 @@
 	function runKoreanPostRender(root, allowDetached = false) {
 		if (!root) return;
 
-		if (koreanPostRenderObserver) {
-			koreanPostRenderObserver.disconnect();
-		}
-
-		runDisplayTranslation(root, allowDetached);
-		runJosa(root);
-
-		if (koreanPostRenderObserver) {
-			koreanPostRenderObserver.observe(document.body, {
-				childList: true,
-				characterData: true,
-				subtree: true
-			});
+		isApplyingKoreanPostRender = true;
+		try {
+			runDisplayTranslation(root, allowDetached);
+			runJosa(root);
+		} finally {
+			isApplyingKoreanPostRender = false;
 		}
 	}
 

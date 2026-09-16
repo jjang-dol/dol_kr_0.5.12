@@ -217,6 +217,13 @@ const createTooltip = ($element, settings) => {
 	$("body").append(tooltip);
 	$element.data("tooltip-instance", tooltip);
 
+	// 툴팁은 감시 대상 6개 루트(#passages 등) 밖인 document.body에 바로 붙기 때문에,
+	// 한글 조사/번역 후처리 옵저버가 이걸 못 잡는다. 생성 시점에 직접 한 번 호출해서
+	// 처리하고, 그 대가로 옵저버 자체는 좁은 범위만 감시하도록 유지한다(성능).
+	if (typeof window.runKoreanPostRender === "function") {
+		window.runKoreanPostRender(tooltip[0], true);
+	}
+
 	updatePosition($element, tooltip);
 
 	const resizeHandler = () => updatePosition($element, tooltip);
