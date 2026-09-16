@@ -86,7 +86,7 @@ const events = [
 			return V.brothelshowdata.type !== "none" && V.brothelshowdata.intro && Time.weekDay === 6 && !V.brothelshowdata.done;
 		},
 		priority: 3,
-		text: "오늘 창관에서 <<print $brothelshowdata.type>> 쇼에 출연하기로 했습니다.",
+		text: "오늘 창관에서 <<print ({flirt:\"유혹 연극\",gangbang:\"윤간 연극\",pig:\"돼지\",swarm:\"생물 테라리움\",machine:\"섹스 머신\",tentacles:\"섹스 머신, 촉수 모드\",horse:\"말\",bukkake:\"붓카케 게임\",virginity:\"처녀 판매\"}[$brothelshowdata.type] || $brothelshowdata.type)>> 쇼에 출연하기로 했습니다.",
 	},
 	{
 		name: "에스코트 일",
