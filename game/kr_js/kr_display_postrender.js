@@ -8,10 +8,17 @@
         return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
+    let _cachedDisplayMap = null;
+    let _cachedDictKeyCount = 0;
+
     function buildDisplayMap() {
         const originalDict = window.KR.dict || {};
+        const keys = Object.keys(originalDict);
+        if (_cachedDisplayMap && keys.length === _cachedDictKeyCount) return _cachedDisplayMap;
+        _cachedDictKeyCount = keys.length;
+
         const lowerDict = {};
-        for (const k in originalDict) {
+        for (const k of keys) {
             const lowerK = k.toLowerCase();
             const val = originalDict[k];
 
@@ -26,6 +33,7 @@
                 lowerDict[lowerK.replace(/[ _-]/g, '')] = val;   // straponhorsecock
             }
         }
+        _cachedDisplayMap = lowerDict;
         return lowerDict;
     }
 
