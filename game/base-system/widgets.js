@@ -521,6 +521,25 @@ function formatList(arr, conjunction = "【와과】", useOxfordComma = false, s
 window.formatList = formatList;
 DefineMacroS("formatList", formatList);
 
+/* 엘크 단지(Elk Compound) 카메라 설치 위치 - $pubfame.compound.cameras 배열엔 영문 키가 그대로
+   저장되므로(원문과 동일한 내부 식별자), 화면에 표시할 때는 이 함수로 한글 명칭으로 바꿔서 출력한다. */
+function getCompoundCameraLocationKr(key) {
+	switch (key) {
+		case "the courtyard":
+			return "안뜰";
+		case "the building with storage tanks":
+			return "저장 탱크가 있는 건물";
+		case "the building with smokestacks":
+		case "the building with smoke stacks":
+			return "굴뚝이 있는 건물";
+		case "the central building":
+			return "중앙 건물";
+		default:
+			return key;
+	}
+}
+window.getCompoundCameraLocationKr = getCompoundCameraLocationKr;
+
 function liquidcount(liquid, parts) {
 	if (!setup.bodyliquid.liquidtype.includes(liquid)) return Errors.report("liquidcount 오류: 잘못된 유형", liquid);
 	let count = 0;
