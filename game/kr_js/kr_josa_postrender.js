@@ -191,7 +191,8 @@
                         mutation.type === "characterData" &&
                         nodeNeedsKoreanPostRender(mutation.target)
                     ) {
-                        runKoreanPostRender(document.getElementById("passages"), true);
+                        const container = mutation.target.parentElement || document.getElementById("passages");
+                        runKoreanPostRender(container, true);
                     }
 
                     for (const node of mutation.addedNodes || []) {
