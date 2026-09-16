@@ -200,7 +200,6 @@
                         }
                     }
                 }
-                runKoreanPostRenderAll();
             });
         });
 
@@ -250,10 +249,13 @@
 		runJosa(root);
 
 		if (koreanPostRenderObserver) {
-			koreanPostRenderObserver.observe(document.body, {
-				childList: true,
-				characterData: true,
-				subtree: true
+			const roots = getKoreanPostRenderRoots();
+			roots.forEach(observedRoot => {
+				koreanPostRenderObserver.observe(observedRoot, {
+					childList: true,
+					characterData: true,
+					subtree: true
+				});
 			});
 		}
 	}
