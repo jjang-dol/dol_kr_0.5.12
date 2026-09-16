@@ -1888,16 +1888,11 @@ window.KR.hangingLabelsKr = {
 };
 
 // 상점/부엌 등에서 "사과 5개", "오렌지 주스 7잔"처럼 [명사] [숫자][단위] 형태로
-// 표시하기 위한 헬퍼. singular 필드가 "오렌지 주스 한 잔"처럼 "~ 한 [단위]" 구조면
-// 그 단위를 추출해서 쓰고, 단위가 없는 단순 명사(사과 등)면 기본 단위 "개"를 붙인다.
+// 표시하기 위한 헬퍼. foodstuff.js 각 항목의 counter 필드(개/병/마리/그릇 등)를 사용한다.
 window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
     var food = setup.foodstuff[foodstuffKey];
     if (!food) return String(amount) + " " + foodstuffKey;
-    var m = food.singular.match(/^(.+) 한 (\S+)$/);
-    if (m) {
-        return m[1] + " " + amount + m[2];
-    }
-    return food.singular + " " + amount + "개";
+    return food.name + " " + amount + (food.counter || "개");
 };
 
 // 낚시(fishing) 어종 이름 사전. $fishingHookedFish.type 등 저장/로직에 쓰이는 키는
