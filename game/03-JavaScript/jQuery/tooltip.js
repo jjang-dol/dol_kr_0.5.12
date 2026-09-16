@@ -211,22 +211,6 @@ const createTooltip = ($element, settings) => {
 	if (settings.style) $body.addClass(settings.style);
 	$body.html(settings.message); // or use `.append(settings.message)` if it's HTML
 
-	// 툴팁 팝업은 document.body에 직접 붙어서 kr_josa_postrender.js가 감시하는
-	// #passages/ui-bar/sidebar/stats/ui-dialog 등 6개 영역 밖에 위치함.
-	// window.runKoreanPostRender()는 전역 MutationObserver를 매번 disconnect/reconnect
-	// 시켜서(옵저버 방식) 이 팝업처럼 자주 뜨는 요소에 쓰면 다른 영역의 변경 감지를 놓칠 수 있음.
-	// 옵저버는 건드리지 않고, 번역/조사 처리 함수만 이 시점에 직접 호출
-	try {
-		if (window.KR && typeof window.KR.translateVisibleText === "function") {
-			window.KR.translateVisibleText(tooltip[0], true);
-		}
-		if (typeof window.runJosa === "function") {
-			window.runJosa(tooltip[0]);
-		}
-	} catch (e) {
-		console.error("Korean tooltip post-render failed:", e);
-	}
-
 	if (settings.width) tooltip.css("width", settings.width);
 	if (settings.maxWidth) tooltip.css("max-width", settings.maxWidth);
 

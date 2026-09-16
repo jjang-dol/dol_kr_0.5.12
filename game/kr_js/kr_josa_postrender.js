@@ -1,4 +1,3 @@
-/* Korean josa post-render engine */
 (function () {
 	"use strict";
 
@@ -180,38 +179,30 @@
 	}
 
 	function installKoreanPostRenderObserver() {
-        if (typeof MutationObserver === "undefined") return;
+        if (koreanPostRenderObserver || typeof MutationObserver === "undefined") return;
 
-        if (!koreanPostRenderObserver) {
-            koreanPostRenderObserver = new MutationObserver(function (mutations) {
-                cancelAnimationFrame(koreanPostRenderObserverTimer);
+        koreanPostRenderObserver = new MutationObserver(function (mutations) {
+            cancelAnimationFrame(koreanPostRenderObserverTimer);
 
-                koreanPostRenderObserverTimer = requestAnimationFrame(function () {
-                    for (const mutation of mutations) {
-                        if (
-                            mutation.type === "characterData" &&
-                            nodeNeedsKoreanPostRender(mutation.target)
-                        ) {
-                            const container = mutation.target.parentElement || document.getElementById("passages");
-                            runDisplayTranslation(container, true);
-                            runJosa(container);
-                        }
+            koreanPostRenderObserverTimer = requestAnimationFrame(function () {
+                for (const mutation of mutations) {
+                    if (
+                        mutation.type === "characterData" &&
+                        nodeNeedsKoreanPostRender(mutation.target)
+                    ) {
+                        runKoreanPostRender(document.getElementById("passages"), true);
+                    }
 
-                        for (const node of mutation.addedNodes || []) {
-                            if (nodeNeedsKoreanPostRender(node)) {
-                                runDisplayTranslation(node, true);
-                                runJosa(node);
-                            }
+                    for (const node of mutation.addedNodes || []) {
+                        if (nodeNeedsKoreanPostRender(node)) {
+                            runKoreanPostRender(node, true);
                         }
                     }
-                });
+                }
+                runKoreanPostRenderAll();
             });
-        }
+        });
 
-        // #ui-dialog/#ui-dialog-body 등은 다이얼로그(저널 등)를 처음 열 때
-        // SugarCube가 그제서야 생성하므로, 옵저버 객체는 한 번만 만들되
-        // 루트 attach는 호출될 때마다 다시 시도해서 새로 생긴 요소도 감시 대상에 포함시킨다.
-        // 이미 관찰 중인 요소에 다시 observe()를 걸어도 안전(idempotent)하다.
         const roots = getKoreanPostRenderRoots();
         roots.forEach(root => {
             if (root) {
@@ -223,7 +214,7 @@
             }
         });
     }
-	
+
 		function runJosa(root) {
 			if (!root) {
 				for (const eachRoot of getKoreanPostRenderRoots()) {
@@ -231,7 +222,7 @@
 				}
 				return;
 			}
-		
+
 			walkTextNodes(root);
 		}
 
@@ -257,13 +248,10 @@
 		runJosa(root);
 
 		if (koreanPostRenderObserver) {
-			const roots = getKoreanPostRenderRoots();
-			roots.forEach(observedRoot => {
-				koreanPostRenderObserver.observe(observedRoot, {
-					childList: true,
-					characterData: true,
-					subtree: true
-				});
+			koreanPostRenderObserver.observe(document.body, {
+				childList: true,
+				characterData: true,
+				subtree: true
 			});
 		}
 	}
@@ -312,4 +300,3 @@
 	});
 
 	$(installKoreanPostRenderObserver);
-})();
