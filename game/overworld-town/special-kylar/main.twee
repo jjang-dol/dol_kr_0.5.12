@@ -421,7 +421,7 @@
 		)>>
 	<<else>>
 		<<set $_underwearSet.push(
-			{id: 20, desc: "XX와 YY 줄무늬 팬티", simpleDesc: "팬티", colourDesc: "XX와 YY 줄무늬 팬티", hasAcc: true},
+			{id: 20, desc: "XX과 YY 줄무늬 팬티", simpleDesc: "팬티", colourDesc: "XX과 YY 줄무늬 팬티", hasAcc: true},
 			{id: 1, desc: "XX 팬티", simpleDesc: "팬티", colourDesc: "XX 팬티", hasAcc: false},
 		)>>
 	<</if>>
@@ -436,8 +436,11 @@
 	<</if>>
 
 	<!-- Replace the XX and YY in the descriptions with the colours that have been randomly chosen -->
-	<<set _kylarUndies.desc to _kylarUndies.desc.replace("XX", _kylarUndies.colour).replace("YY", _kylarUndies.colourAcc)>>
-	<<set _kylarUndies.colourDesc to _kylarUndies.colourDesc.replace("XX", _kylarUndies.colour).replace("YY", _kylarUndies.colourAcc)>>
+	/* colour/colourAcc 자체는 옷장/색상 필터 렌더링 등에서 영어 키로 계속 쓰이므로 그대로 두고,
+	   화면에 보여줄 desc/colourDesc에만 한글 색상명을 대신 넣는다. */
+	<<set _colourKr to { black: "검은색", white: "흰색", grey: "회색", pink: "분홍색", red: "빨간색", green: "초록색" }>>
+	<<set _kylarUndies.desc to _kylarUndies.desc.replace("XX", _colourKr[_kylarUndies.colour] || _kylarUndies.colour).replace("YY", _colourKr[_kylarUndies.colourAcc] || _kylarUndies.colourAcc)>>
+	<<set _kylarUndies.colourDesc to _kylarUndies.colourDesc.replace("XX", _colourKr[_kylarUndies.colour] || _kylarUndies.colour).replace("YY", _colourKr[_kylarUndies.colourAcc] || _kylarUndies.colourAcc)>>
 
 	<<if !($kylarSeen.includes("commando") or $daily.kylar.underwear?.desc)>>
 		<<set $daily.kylar.underwear to _kylarUndies>>
