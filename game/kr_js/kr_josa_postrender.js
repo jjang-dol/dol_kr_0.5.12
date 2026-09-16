@@ -192,12 +192,14 @@
                         nodeNeedsKoreanPostRender(mutation.target)
                     ) {
                         const container = mutation.target.parentElement || document.getElementById("passages");
-                        runKoreanPostRender(container, true);
+                        runDisplayTranslation(container, true);
+                        runJosa(container);
                     }
 
                     for (const node of mutation.addedNodes || []) {
                         if (nodeNeedsKoreanPostRender(node)) {
-                            runKoreanPostRender(node, true);
+                            runDisplayTranslation(node, true);
+                            runJosa(node);
                         }
                     }
                 }
