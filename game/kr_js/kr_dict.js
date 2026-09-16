@@ -1206,7 +1206,7 @@ window.KR.getGenderKR = function(gender) {
         case "Female": return "암컷";
         case "Male": return "수컷";
         case "Hermaphrodite": return "자웅동체";
-        default: return gender; // 매칭되는 게 없으면 그냥 영어로 출력
+        default: return gender;
     }
 };
 
@@ -1241,14 +1241,14 @@ window.KR.getCreatureTypeKr = function(type) {
         _key = _key.slice(6);
     }
     switch (_key) {
-        // 촉수류
+        /* 촉수류 */
         case "tentacle": return _giantPrefix + "촉수";
         case "vine": return _giantPrefix + "덩굴";
         case "root": return _giantPrefix + "뿌리";
         case "shoot": return _giantPrefix + "새순";
         case "tendril": return _giantPrefix + "덩굴손";
         case "metal": return _giantPrefix + "금속 촉수";
-        // 임신/기생체류
+        /* 임신/기생체류 */
         case "slime": return _giantPrefix + "슬라임";
         case "pale slime": return _giantPrefix + "창백한 슬라임";
         case "worm": return _giantPrefix + "벌레";
@@ -1257,7 +1257,7 @@ window.KR.getCreatureTypeKr = function(type) {
         case "snake": return _giantPrefix + "뱀";
         case "urchin": return _giantPrefix + "성게";
         case "parasite": return _giantPrefix + "기생충";
-        // struggle 조우 생물류
+        /* struggle 조우 생물류 */
         case "bee": return _giantPrefix + "벌";
         case "wasp": return _giantPrefix + "말벌";
         case "slug": return _giantPrefix + "민달팽이";
@@ -1265,11 +1265,11 @@ window.KR.getCreatureTypeKr = function(type) {
         case "fish": return _giantPrefix + "물고기";
         case "spider": return _giantPrefix + "거미";
         case "maggot": return _giantPrefix + "구더기";
-        // vore 조우 생물류
+        /* vore 조우 생물류 */
         case "frog": return _giantPrefix + "개구리";
         case "oyster": return _giantPrefix + "굴";
         case "whale": return _giantPrefix + "고래";
-        default: return _giantPrefix + window.KR.getBeastTypeKr(_key); // getBeastTypeKr의 종족 사전 재사용 (그윌란 샘플 부탁 등에서 쓰이는 human/dog/cat 등 포함)
+        default: return _giantPrefix + window.KR.getBeastTypeKr(_key); /* getBeastTypeKr의 종족 사전 재사용 (그윌란 샘플 부탁 등에서 쓰이는 human/dog/cat 등 포함) */
     }
 };
 
@@ -1289,13 +1289,15 @@ window.KR.getNpcRoleKr = function(role) {
         fanboy: "광팬", fangirl: "광팬",
         nurse: "간호사", pirate: "해적", inmate: "수감자", janitor: "청소부"
     };
-    return map[role] || role; // 매칭되는 게 없으면 원본 그대로 출력
+    return map[role] || role;
 };
 
 window.KR.getBeastTypeKr = function(type) {
-    // 성별 접미사(boy/girl)를 분리하고 종족 기본형 + 소년/소녀로 조립.
-    // "젖소소녀"처럼 규칙에서 벗어나는 것과, "horned man/woman"처럼
-    // man/woman으로 끝나 boy/girl 접미사 규칙에 안 걸리는 것만 예외로 먼저 처리.
+    /*
+     * 성별 접미사(boy/girl)를 분리하고 종족 기본형 + 소년/소녀로 조립.
+     * "젖소소녀"처럼 규칙에서 벗어나는 것과, "horned man/woman"처럼
+     * man/woman으로 끝나 boy/girl 접미사 규칙에 안 걸리는 것만 예외로 먼저 처리.
+     */
     switch (type) {
         case "cowgirl": return "젖소소녀";
         case "horned man": return "뿔 달린 남자";
@@ -1338,7 +1340,7 @@ window.KR.getBeastTypeKr = function(type) {
         case "fallen angel": _base = "타락 천사"; break;
         case "demon": _base = "악마"; break;
         case "bird": _base = "하피"; break;
-        default: return type; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return type;
     }
     return _base + _suffix;
 };
@@ -1350,7 +1352,7 @@ window.KR.getSeasonKr = function(season) {
         case "summer": return "여름";
         case "autumn": return "가을";
         case "winter": return "겨울";
-        default: return season; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return season;
     }
 };
 
@@ -1359,7 +1361,7 @@ window.KR.getWeatherKr = function(precipitation) {
     switch (precipitation) {
         case "rain": return "비";
         case "snow": return "눈";
-        default: return precipitation; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return precipitation;
     }
 };
 
@@ -1376,7 +1378,7 @@ window.KR.getContainerNameKr = function(name) {
         case "Huge Fish Tank": return "거대한 어항";
         case "pond": return "연못";
         case "Parasite Barn": return "기생충 축사";
-        default: return String(name).toLowerCase(); // 매칭되는 게 없으면 원본 그대로 출력
+        default: return String(name).toLowerCase();
     }
 };
 
@@ -1385,7 +1387,7 @@ window.KR.getContainerDecoKr = function(deco) {
     switch (deco) {
         case "Standard Decorations": return "일반 장식";
         case "Exotic Decorations": return "이국적인 장식";
-        default: return deco ? String(deco).toLowerCase() : deco; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return deco ? String(deco).toLowerCase() : deco;
     }
 };
 
@@ -1395,7 +1397,7 @@ window.KR.getFeederNameKr = function(name) {
         case "Small Automatic Feeder": return "작은 자동 급식기";
         case "Automatic Feeder": return "자동 급식기";
         case "Large Automatic Feeder": return "큰 자동 급식기";
-        default: return name ? String(name).toLowerCase() : name; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return name ? String(name).toLowerCase() : name;
     }
 };
 
@@ -1412,7 +1414,7 @@ window.KR.getClothingSlotKr = function(slot) {
         hands: "장갑", handheld: "휴대품", head: "머리", over_head: "모자",
         face: "얼굴", neck: "목", legs: "다리", feet: "신발"
     };
-    return map[slot] || slot; // 매칭되는 게 없으면 원본 그대로 출력
+    return map[slot] || slot;
 };
 
 /* 카페 커피 메뉴(mocha/latte 등) 한글 번역. loc-home/loft.twee 고아원 커피포트에서 사용. */
@@ -1422,13 +1424,13 @@ window.KR.getCoffeeMenuKr = function(drink) {
         "white chocolate mocha": "화이트 초콜릿 모카", "flat white": "플랫 화이트",
         "caramel iced latte": "카라멜 아이스 라떼"
     };
-    return map[drink] || drink; // 매칭되는 게 없으면 원본 그대로 출력
+    return map[drink] || drink;
 };
 
 /* 체액 종류(semen/goo/nectar) 한글 번역. widgets.twee 등에서 사용. */
 window.KR.getFluidKr = function(stuff) {
     var map = { semen: "정액", goo: "점액", nectar: "넥타르" };
-    return map[stuff] || stuff; // 매칭되는 게 없으면 원본 그대로 출력
+    return map[stuff] || stuff;
 };
 
 /*
@@ -1443,7 +1445,7 @@ window.KR.getBirdLootKr = function(loot) {
         junk: "장신구", wood: "장작", tarp: "방수포", toolbox: "공구함",
         "antique bullet": "골동품 탄환", "hawk feather": "매의 깃털"
     };
-    return map[loot] || loot; // 매칭되는 게 없으면 원본 그대로 출력
+    return map[loot] || loot;
 };
 
 /* 크기(tiny/small/normal/large) 한글 번역. children.twee, pregnancy.twee 등에서 사용. */
@@ -1453,7 +1455,7 @@ window.KR.getSizeKr = function(size) {
         case "small": return "작음";
         case "normal": return "보통";
         case "large": return "큼";
-        default: return size; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return size;
     }
 };
 
@@ -1486,7 +1488,7 @@ window.KR.getBreastSizeKr = function(size) {
         case "huge": return "거대한" + suffix;
         case "gigantic": return "엄청난" + suffix;
         case "enormous": return "어마어마한" + suffix;
-        default: return size + suffix; // 매칭되는 게 없으면(빈 문자열 등) 원본 그대로 출력
+        default: return size + suffix;
     }
 };
 
@@ -1544,11 +1546,13 @@ window.KR.getPenisDescKr = function(desc) {
 
     if (dict[desc]) return dict[desc];
 
-    // "strap-on {shape}" 조합(generateNewStrapon()이 만드는 "large floppy pink strap-on
-    // dolphin cock" 같은 문자열)은 단순 단어 단위 번역으로는 처리 안 됨: "strap-on"이 이
-    // 사전에 없어 영문 그대로 남고, 설령 있어도 "strap-on dolphin cock"을 그대로 번역하면
-    // "페니스 밴드 돌고래 좆"처럼 한국어 어순이 깨짐. "strap-on" 뒤에 오는 형태 단어들을
-    // 먼저 번역한 뒤 "페니스 밴드"를 맨 뒤로 보내 "돌고래 좆 페니스 밴드" 형태로 재조합.
+    /*
+     * "strap-on {shape}" 조합(generateNewStrapon()이 만드는 "large floppy pink strap-on
+     * dolphin cock" 같은 문자열)은 단순 단어 단위 번역으로는 처리 안 됨: "strap-on"이 이
+     * 사전에 없어 영문 그대로 남고, 설령 있어도 "strap-on dolphin cock"을 그대로 번역하면
+     * "페니스 밴드 돌고래 좆"처럼 한국어 어순이 깨짐. "strap-on" 뒤에 오는 형태 단어들을
+     * 먼저 번역한 뒤 "페니스 밴드"를 맨 뒤로 보내 "돌고래 좆 페니스 밴드" 형태로 재조합.
+     */
     var strapOnIndex = desc.indexOf("strap-on");
     if (strapOnIndex !== -1) {
         var translateWords = function(text) {
@@ -1581,18 +1585,18 @@ window.KR.getBodypartKr = function(key) {
             var side = m[1].toLowerCase();
             var part = m[2].toLowerCase();
 
-            // 팔/손/발/다리: "왼팔", "오른손"처럼 붙여쓰기
+            /* 팔/손/발/다리: "왼팔", "오른손"처럼 붙여쓰기 */
             var fusedParts = { "arm": "팔", "hand": "손", "foot": "발", "feet": "발" };
             if ((side === "left" || side === "right") && fusedParts[part]) {
                 return (side === "left" ? "왼" : "오른") + fusedParts[part];
             }
 
-            // 등: "등 위쪽"/"등 아래쪽"처럼 부위가 먼저, 방향이 나중
+            /* 등: "등 위쪽"/"등 아래쪽"처럼 부위가 먼저, 방향이 나중 */
             if (part === "back" && (side === "upper" || side === "lower")) {
                 return "등 " + (side === "upper" ? "위쪽" : "아래쪽");
             }
 
-            // 나머지는 "왼쪽/오른쪽/위쪽/아래쪽 + 기본 부위명" 조립
+            /* 나머지는 "왼쪽/오른쪽/위쪽/아래쪽 + 기본 부위명" 조립 */
             var baseName = window.KR.getBodypartKr(part);
             if (baseName && baseName !== part) {
                 var sideWord = { "left": "왼쪽", "right": "오른쪽", "upper": "위쪽", "lower": "아래쪽" }[side];
@@ -1623,7 +1627,7 @@ window.KR.getBodypartKr = function(key) {
         case "chest": return "가슴";
         case "feet": return "발";
         case "ear": return "귀";
-        default: return key ? String(key).replace(/_/g, " ") : key; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return key ? String(key).replace(/_/g, " ") : key;
     }
 };
 
@@ -1650,7 +1654,7 @@ window.KR.getToolKr = function(tool) {
  */
 window.KR.getDescriptionKr = function(text) {
     if (!text) return text;
-    if (window.KR.personNameDict[text]) return window.KR.personNameDict[text]; // 몹/캐릭터 이름이 fullDescription에 복사된 경우 대응
+    if (window.KR.personNameDict[text]) return window.KR.personNameDict[text]; /* 몹/캐릭터 이름이 fullDescription에 복사된 경우 대응 */
     var dict = {
         "slight": "가냘픈", "lithe": "유연한", "lean": "마른", "thin": "마른",
         "slender": "호리호리한", "lissome": "나긋나긋한", "slim": "날씬한", "taut": "탄탄한",
@@ -1683,12 +1687,12 @@ window.KR.getDescriptionKr = function(text) {
         "man": "남자", "woman": "여자", "boy": "소년", "girl": "소녀", "plant": "식물",
     };
     if (dict[text]) return dict[text];
-    // 공백으로 나눠서 아는 단어만 번역 (예: "large " + "dog" 같은 조합)
+    /* 공백으로 나눠서 아는 단어만 번역 (예: "large " + "dog" 같은 조합) */
     var translated = text.split(" ").map(function(word) {
         if (dict[word]) return dict[word];
         if (window.KR.tentacleDescDict[word]) return window.KR.tentacleDescDict[word];
         var _creatureKr = window.KR.getCreatureTypeKr(word);
-        if (_creatureKr !== word) return _creatureKr; // 촉수 종류(root/shoot/vine 등) 대응
+        if (_creatureKr !== word) return _creatureKr; /* 촉수 종류(root/shoot/vine 등) 대응 */
         return word;
     }).join(" ");
     return translated;
@@ -1713,7 +1717,7 @@ window.KR.getToyNameKr = function(catalog, name) {
             }
         }
     }
-    return name; // 매칭 없으면 원본(.name) 그대로
+    return name;
 };
 
 /*
@@ -1721,7 +1725,7 @@ window.KR.getToyNameKr = function(catalog, name) {
  * gatPersonNameDictKR가 이 사전을 조회한다.
  */
 window.KR.personNameDict = {
-    // 랜덤 몹 이름 (NPC_names_m/NPC_names_f)
+    /* 랜덤 몹 이름 (NPC_names_m/NPC_names_f) */
     "Adam": "아담", "Andrew": "앤드류", "Archie": "아치", "Arlo": "알로",
     "Arthur": "아서", "Austin": "오스틴", "Ben": "벤", "Brian": "브라이언",
     "Christopher": "크리스토퍼", "Connor": "코너", "Daniel": "대니얼",
@@ -1752,7 +1756,7 @@ window.KR.personNameDict = {
     "Rebecca": "레베카", "Samantha": "사만다", "Sarah": "세라", "Sharon": "섀런",
     "Sophia": "소피아", "Stephanie": "스테파니", "Susan": "수잔",
     "Victoria": "빅토리아",
-    // 네임드 스토리 캐릭터 (setup.NPCNameList)
+    /* 네임드 스토리 캐릭터 (setup.NPCNameList) */
     "Avery": "에이버리", "Bailey": "베일리", "Briar": "브라이어",
     "Charlie": "찰리", "Darryl": "데릴", "Doren": "도렌", "Eden": "에덴",
     "Gwylan": "그윌란", "Harper": "하퍼", "Jordan": "조던", "Kylar": "카일라",
@@ -1772,8 +1776,8 @@ window.KR.personNameDict = {
 window.KR.gatPersonNameDictKR = function(name) {
     if (window.KR.personNameDict[name]) return window.KR.personNameDict[name];
     var _desc = window.KR.getDescriptionKr(name);
-    if (_desc !== name) return _desc; // getDescriptionKr 쪽에서 찾은 경우
-    return name; // 둘 다 못 찾으면(플레이어가 지은 별명 등) 원본 그대로 출력
+    if (_desc !== name) return _desc; /* getDescriptionKr 쪽에서 찾은 경우 */
+    return name;
 };
 /*
  * 일반 NPC 직함/별칭(orphan, businessperson 등) 한글 번역. 저장값 자체는 영어
@@ -1814,7 +1818,7 @@ window.KR.getNpcTitleKr = function(title) {
         case "reflection": return "거울상";
         case "pirate": return "해적";
         case "horror": return "끔찍한 존재";
-        default: return title; // 매칭되는 게 없으면(이미 한글이거나 등) 원본 그대로 출력
+        default: return title;
     }
 };
 
@@ -1827,7 +1831,7 @@ window.KR.getWeatherStateKr = function(state) {
         case "heavyPrecipitation": return "강한 강수";
         case "storm": return "폭풍";
         case "thunderstorm": return "뇌우";
-        default: return state; // 매칭되는 게 없으면 원본 그대로 출력
+        default: return state;
     }
 };
 
@@ -1851,8 +1855,8 @@ window.KR.pronounDict = {
 
 window.KR.getPronounKr = function(field, word) {
     var table = window.KR.pronounDict[field];
-    if (!table) return word; // 알 수 없는 필드명이면 원본 그대로 출력
-    return table[word] || word; // 매칭되는 게 없으면 원본 그대로 출력
+    if (!table) return word;
+    return table[word] || word;
 };
 
 /*
@@ -1923,5 +1927,5 @@ window.KR.getBodywritingKr = function(writing) {
     if (!writing) return writing;
     if (typeof setup === "undefined" || !setup.bodywriting) return writing;
     var entry = Object.values(setup.bodywriting).find(function (e) { return e.writing === writing; });
-    return entry ? entry.writingKr : writing; // 매칭되는 게 없으면 원본 그대로 출력
+    return entry ? entry.writingKr : writing;
 };
