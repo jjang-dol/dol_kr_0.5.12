@@ -211,6 +211,13 @@ const createTooltip = ($element, settings) => {
 	if (settings.style) $body.addClass(settings.style);
 	$body.html(settings.message); // or use `.append(settings.message)` if it's HTML
 
+	// 툴팁 팝업은 document.body에 직접 붙어서 kr_josa_postrender.js가 감시하는
+	// #passages/ui-bar/sidebar/stats/ui-dialog 등 6개 영역 밖에 위치함.
+	// 그 감시 범위에 기대지 않고, 생성되는 이 시점에 조사(을/를 등)와 kr_js 텍스트 치환을 직접 실행
+	if (typeof window.runKoreanPostRender === "function") {
+		window.runKoreanPostRender(tooltip[0], true);
+	}
+
 	if (settings.width) tooltip.css("width", settings.width);
 	if (settings.maxWidth) tooltip.css("max-width", settings.maxWidth);
 
