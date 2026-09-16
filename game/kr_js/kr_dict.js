@@ -1210,13 +1210,9 @@ window.KR.getGenderKR = function(gender) {
     }
 };
 
-// 생물/촉수 종류(creature/tentacle type) 이름의 한글 번역을 한 곳에서 관리.
-// tentacles.twee(_typeKr), statistics.twee(statisticsParasiteCreature),
-// containers.twee(creatureNameDisplay), pregnancy.twee(pregCreatureTypeDisplay),
-// pregnancy/events.twee 등에 중복 정의되어 있던 매핑을 통합.
-// 촉수 묘사(질감/외형) 한글 번역. tentacles.twee의 desc/name 목록과 동일한 어휘를
-// 여기에도 둬서, 예전 세이브에 문자열로 저장된 값(예: 통계 탭의 "첫 경험" 상대 묘사)도
-// 표시 시점에 재번역할 수 있게 함. getDescriptionKr의 단어 분해 fallback에서 참조됨.
+// 생물/촉수 종류(creature/tentacle type) 이름 한글 번역. tentacles.twee,
+// statistics.twee, containers.twee, pregnancy.twee 등에서 공통으로 사용.
+// 촉수 묘사(질감/외형) 한글 번역. getDescriptionKr의 단어 분해 fallback에서 참조됨.
 window.KR.tentacleDescDict = {
     "sticky": "달라붙는", "thick": "두꺼운", "throbbing": "박동하는", "slick": "매끄러운",
     "moist": "축축한", "quivering": "떨리는", "sodden": "흠뻑 젖은", "shivering": "전율하는",
@@ -1287,9 +1283,8 @@ window.KR.getCreatureTypeKr = function(type) {
 };
 
 // NPC/짐승 종족(NPCList[].type) 한글 번역. beasttype/beasttypes/beastsplural 위젯과
-// ejaculation.twee 등에서 화면 스캔(KR.dict) 대신 직접 호출하는 용도로 분리.
-// NPC 역할(role) 이름 한글 번역. base-system/text.twee의 personsimple/person 위젯에서
-// $role 값을 표시할 때 사용. person 위젯은 이 switch 없이 $role을 그대로 붙이고 있었음.
+// ejaculation.twee 등에서 사용.
+// NPC 역할(role) 이름 한글 번역. text.twee의 personsimple/person 위젯에서 $role 표시에 사용.
 window.KR.getNpcRoleKr = function(role) {
     var map = {
         manager: "매니저", scientist: "과학자", initiate: "수련자", cultist: "광신도",
@@ -1355,7 +1350,7 @@ window.KR.getBeastTypeKr = function(type) {
     return _base + _suffix;
 };
 
-// 계절(Time.season) 한글 번역. journal.twee에 중복 정의되어 있던 매핑을 통합.
+// 계절(Time.season) 한글 번역.
 window.KR.getSeasonKr = function(season) {
     switch (season) {
         case "spring": return "봄";
@@ -1376,7 +1371,7 @@ window.KR.getWeatherKr = function(precipitation) {
 };
 
 // 사육장(수조/연못/축사) 이름(container.home/lake/farm.name) 한글 번역.
-// containers.twee의 containersLink 위젯과 본문 안내문에서 사용.
+// containers.twee의 containersLink 위젯 등에서 사용.
 window.KR.getContainerNameKr = function(name) {
     switch (name) {
         case "Tiny Fish Tank": return "아주 작은 어항";
@@ -1412,7 +1407,7 @@ window.KR.getFeederNameKr = function(name) {
 // 몸에 쓴 글씨/문신 위치(bodypart 위젯) 한글 번역. breasts/chest는 <<breasts>> 위젯을
 // 따로 써야 해서 위젯 쪽에서 처리하고, 여기는 그 외 부위 키만 담당.
 // 의상 슬롯(upper/lower/genitals 등) 한글 번역. wardrobes.twee, canvasmodel-example.twee,
-// loc-shop/widgets.twee에 동일한 객체 리터럴로 중복 정의되어 있던 매핑을 통합.
+// loc-shop/widgets.twee 등에서 사용.
 window.KR.getClothingSlotKr = function(slot) {
     var map = {
         upper: "상의", over_upper: "외투", genitals: "성기", lower: "하의",
@@ -1433,15 +1428,14 @@ window.KR.getCoffeeMenuKr = function(drink) {
     return map[drink] || drink; // 매칭되는 게 없으면 원본 그대로 출력
 };
 
-// 체액 종류(semen/goo/nectar) 한글 번역. widgets.twee 안에 동일한 객체 리터럴로
-// 4번 중복 정의되어 있던 매핑을 통합.
+// 체액 종류(semen/goo/nectar) 한글 번역. widgets.twee 등에서 사용.
 window.KR.getFluidKr = function(stuff) {
     var map = { semen: "정액", goo: "점액", nectar: "넥타르" };
     return map[stuff] || stuff; // 매칭되는 게 없으면 원본 그대로 출력
 };
 
-// 새 사냥터(bird tower flight hunt)에서 발견한 잡동사니/귀중품 이름 한글 번역.
-// hunts.twee, widgets.twee에서 _loot/_looted 변수에 담겨 문장에 그대로 삽입되던 값들.
+// 새 사냥터(bird tower flight hunt) 발견물/귀중품 이름 한글 번역.
+// hunts.twee, widgets.twee의 _loot/_looted 변수 표시에 사용.
 window.KR.getBirdLootKr = function(loot) {
     var map = {
         stick: "막대기", lurker: "럴커", rag: "천 조각", disc: "반짝이는 돌",
@@ -1453,8 +1447,7 @@ window.KR.getBirdLootKr = function(loot) {
     return map[loot] || loot; // 매칭되는 게 없으면 원본 그대로 출력
 };
 
-// 크기(tiny/small/normal/large) 한글 번역. children.twee, pregnancy.twee에
-// 동일한 switch로 중복 정의되어 있던 매핑을 통합.
+// 크기(tiny/small/normal/large) 한글 번역. children.twee, pregnancy.twee 등에서 사용.
 window.KR.getSizeKr = function(size) {
     switch (size) {
         case "tiny": return "아주 작음";
@@ -1466,7 +1459,7 @@ window.KR.getSizeKr = function(size) {
 };
 
 // 가슴 사이즈(setup.breastsizes) 한글 번역. 저장값(breastdesc/breastsdesc 등)은
-// 영문 원본을 유지하고(세이브 호환성), 화면에 표시할 때만 이 함수로 번역한다.
+// 영문 원본을 유지하고, 화면에 표시할 때만 이 함수로 번역한다.
 window.KR.getBreastSizeKr = function(size) {
     if (size === "nipple" || size === "nipples") return "유두";
 
@@ -1574,8 +1567,7 @@ window.KR.getPenisDescKr = function(desc) {
     return translated;
 };
 
-// 신체 부위 한글 번역. caption.twee(기생충 부착 부위), cheats.twee(치트 메뉴) 등에서
-// 동일한 switch로 중복 정의되어 있던 걸 통합.
+// 신체 부위 한글 번역. caption.twee(기생충 부착 부위), cheats.twee(치트 메뉴) 등에서 사용.
 // "left_X"/"right_X"/"upper_X"/"lower_X" (구분자는 "_", " ", 없음 다 허용)는
 // 방향 단어 + 기본 부위명을 조립해서 처리. 단, 팔/손/발/다리는 "왼팔"처럼 붙여쓰고
 // (쪽 없이, 띄어쓰기 없이), 등은 "등 위쪽"처럼 부위가 먼저 오고 순서가 반대라 예외 처리.
@@ -1632,9 +1624,8 @@ window.KR.getBodypartKr = function(key) {
     }
 };
 
-// NPC가 손에 든 필기구/최면 도구(.lefttool/.righttool) 한글 번역. 저장값은 영문 원본
-// 유지(딜도 등 다른 값도 같은 필드를 공유하므로), 화면 표시 시점에만 이 함수로 번역.
-// 매칭 안 되는 값(딜도 이름 등 이미 한글인 값 포함)은 원본 그대로 반환.
+// NPC가 손에 든 필기구/최면 도구(.lefttool/.righttool) 한글 번역. 저장값은 영문 원본을
+// 유지하고, 화면 표시 시점에만 이 함수로 번역한다. 매칭 안 되는 값은 원본 그대로 반환.
 window.KR.getToolKr = function(tool) {
     switch (tool) {
         case "pen": return "펜";
@@ -1647,10 +1638,9 @@ window.KR.getToolKr = function(tool) {
     }
 };
 
-// NPC 체형/인상착의(description, fullDescription) 한글 번역.
-// npc-generation.twee/beast-generation.twee의 랜덤 단어 풀은 영문으로 복원해뒀고,
-// 여기서 표시 시점에만 번역함. 정확히 일치하는 구문(고유 캐릭터명 등)을 먼저 찾고,
-// 없으면 공백 단위로 쪼개서 아는 단어만 번역 (예: "Tutorial man" 같은 조합 문구 대응).
+// NPC 체형/인상착의(description, fullDescription) 한글 번역. 표시 시점에만 번역한다.
+// 정확히 일치하는 구문(고유 캐릭터명 등)을 먼저 찾고, 없으면 공백 단위로 쪼개서
+// 아는 단어만 번역한다 (예: "Tutorial man" 같은 조합 문구 대응).
 window.KR.getDescriptionKr = function(text) {
     if (!text) return text;
     if (window.KR.personNameDict[text]) return window.KR.personNameDict[text]; // 몹/캐릭터 이름이 fullDescription에 복사된 경우 대응
@@ -1697,15 +1687,11 @@ window.KR.getDescriptionKr = function(text) {
     return translated;
 };
 
-// 몹(일반 NPC) 랜덤 이름(NPC_names_m/NPC_names_f) 한글 번역. name-list.twee의
-// 풀은 영문 원본으로 복원해뒀고(세이브 호환성), personname/combatperson 위젯과
-// 그 외 개별 표시 지점에서 이 함수로 번역해서 출력한다.
-// 보육원/장난감 이름 출력용. 별도 번역 사전을 두지 않고, 호출부에서 넘겨준
-// 카탈로그(toyShop.twee의 <<toySelection>> 위젯이 만드는 _toySelection, 원본
-// 그대로 안 건드림)를 .name(영문, 불변 키)으로 조회해 name_lower를 반환한다.
-// 예전 구매/보관된 장난감의 name_lower 필드에는 옛 영문 소문자 값이 스냅샷으로
-// 남아있을 수 있지만, .name은 항상 안정적이므로 출력 시점에 카탈로그를 다시
-// 조회하면 신구 세이브 모두 한글로 표시된다.
+// 몹(일반 NPC) 랜덤 이름(NPC_names_m/NPC_names_f) 한글 번역. personname/combatperson
+// 위젯 등에서 이 함수로 번역해서 출력한다.
+// 보육원/장난감 이름 출력용. 별도 번역 사전 없이, 호출부에서 넘겨준 카탈로그
+// (toyShop.twee의 <<toySelection>> 위젯이 만드는 _toySelection)를 .name(영문 키)으로
+// 조회해 name_lower를 반환한다.
 window.KR.getToyNameKr = function(catalog, name) {
     if (!catalog) return name;
     var ids = Object.keys(catalog);
@@ -1721,8 +1707,8 @@ window.KR.getToyNameKr = function(catalog, name) {
     return name; // 매칭 없으면 원본(.name) 그대로
 };
 
-// 사람 이름(랜덤 몹 이름 + 네임드 스토리 캐릭터 이름) 통합 사전. 매핑을 여기
-// 한 곳에서만 관리하고, 아래 gatPersonNameDictKR가 이 사전을 조회한다.
+// 사람 이름(랜덤 몹 이름 + 네임드 스토리 캐릭터 이름) 통합 사전. 아래
+// gatPersonNameDictKR가 이 사전을 조회한다.
 window.KR.personNameDict = {
     // 랜덤 몹 이름 (NPC_names_m/NPC_names_f)
     "Adam": "아담", "Andrew": "앤드류", "Archie": "아치", "Arlo": "알로",
@@ -1769,9 +1755,7 @@ window.KR.personNameDict = {
 };
 
 // 사람/몹 이름 통합 조회 함수. personNameDict에서 못 찾으면 getDescriptionKr
-// (합성 묘사구 분해 번역)로 재조회하고, 그것마저 못 찾으면 원문을 그대로
-// 반환하는 안전장치까지 둔다. 기존 getMobNameKr/getNpcNameKr을 이 함수 하나로
-// 통합함 (호출부 일괄 치환됨).
+// (합성 묘사구 분해 번역)로 재조회하고, 그것마저 못 찾으면 원문을 그대로 반환한다.
 window.KR.gatPersonNameDictKR = function(name) {
     if (window.KR.personNameDict[name]) return window.KR.personNameDict[name];
     var _desc = window.KR.getDescriptionKr(name);
@@ -1779,8 +1763,7 @@ window.KR.gatPersonNameDictKR = function(name) {
     return name; // 둘 다 못 찾으면(플레이어가 지은 별명 등) 원본 그대로 출력
 };
 // 일반 NPC 직함/별칭(orphan, businessperson 등) 한글 번역. 저장값 자체는 영어
-// 원본을 유지하고(세이브 호환성, 버전 마이그레이션 비교 등에 사용됨), 화면에
-// 표시할 때만 이 함수로 번역한다.
+// 원본을 유지하고, 화면에 표시할 때만 이 함수로 번역한다.
 window.KR.getNpcTitleKr = function(title) {
     switch (title) {
         case "businessperson": return "사업가";
@@ -1834,11 +1817,9 @@ window.KR.getWeatherStateKr = function(state) {
 };
 
 // NPC 대명사(person.pronouns.he/his/hers/him/himself/man/boy/men) 한글 번역.
-// 저장값(.pronouns.*)은 generatePronouns 위젯(text.twee)에서 영어 원본을 그대로
-// 유지한다 — 세이브 호환성뿐 아니라, 일부 코드에서 이 값을 "Rub his crotch" 같은
-// 내부 액션 딕셔너리 키나 $changingRoomGender("boys"/"girls") 같은 영어 문자열과의
-// 비교 로직에도 그대로 쓰기 때문. 따라서 절대 저장값 자체를 한글로 바꾸지 말고,
-// 화면에 실제로 출력하는 지점에서만 field를 지정해 이 함수로 감싸서 번역한다.
+// 저장값(.pronouns.*)은 항상 영문 원본을 유지한다 — 다른 코드에서 영어 문자열
+// 비교 로직에도 그대로 쓰기 때문. 화면에 출력하는 지점에서만 field를 지정해
+// 이 함수로 감싸서 번역한다.
 // 사용 예: <<print KR.getPronounKr("he", $NPCList[0].pronouns.he)>>
 window.KR.pronounDict = {
     he:      { "he": "그", "she": "그녀", "it": "그것", "one": "누군가", "they": "그들" },
@@ -1858,11 +1839,7 @@ window.KR.getPronounKr = function(field, word) {
 };
 
 // 가구점의 벽지/포스터 디자인 코드명(vines, tentacles, cowgirl 등) 한글 라벨.
-// 원래 overworld-town/loc-shop/furniture.twee의 furnitureUpdate 위젯 안에서
-// _hangingLabels라는 임시변수로 선언되어 있었으나, paperList/generatePaperShopStock이
-// <<dynamic>>으로 별도 렌더링되면서 furnitureUpdate보다 먼저 실행될 수 있어(스택 방식
-// 역순 처리) _hangingLabels가 정의되기 전에 참조되어 크래시가 나는 문제가 있었음.
-// 전역 상수로 옮겨 렌더링 순서와 무관하게 항상 참조 가능하도록 함.
+// furniture.twee의 furnitureUpdate, paperList 등에서 참조하는 전역 상수.
 window.KR.hangingLabelsKr = {
     "vines": "덩굴",
     "tentacles": "촉수",
@@ -1897,8 +1874,6 @@ window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
 
 // 낚시(fishing) 어종 이름 사전. $fishingHookedFish.type 등 저장/로직에 쓰이는 키는
 // 영문 그대로 두고, 화면 표시할 때만 이 사전으로 변환한다.
-// (fishNameDict / getFishNameKr 삭제됨 — foodstuff.js의 각 어종 name 필드를 직접 한글화해서
-// 더 이상 별도 사전이 필요 없음. setup.foodstuff[fishKey].name 참조로 대체됨.)
 
 // 저널 인벤토리 물품 카테고리 필터 드롭다운(Show: All/Food/...) 번역.
 window.KR.foodstuffCategoryDict = {
@@ -1917,11 +1892,8 @@ window.KR.getFoodstuffCategoryKr = function(category) {
     return category;
 };
 
-// 문신/낙서(bodywriting) 문구 한글 번역.
-// $skin[bp].writingKr는 낙서가 적용된 시점에 clone된 값이라, 그 시점 이후 kr_dict가
-// 업데이트돼도 예전 세이브에는 반영되지 않는다(구버전 세이브에 writingKr 필드 자체가 없는 경우 포함).
-// 그래서 저장된 writingKr을 믿지 않고, 항상 영문 원문(writing)으로 setup.bodywriting을
-// 다시 조회해 현재 최신 번역을 반환한다.
+// 문신/낙서(bodywriting) 문구 한글 번역. 저장된 writingKr 스냅샷을 믿지 않고,
+// 항상 영문 원문(writing)으로 setup.bodywriting을 다시 조회해 최신 번역을 반환한다.
 window.KR.getBodywritingKr = function(writing) {
     if (!writing) return writing;
     if (typeof setup === "undefined" || !setup.bodywriting) return writing;
