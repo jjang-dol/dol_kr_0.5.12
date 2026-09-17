@@ -2662,7 +2662,7 @@ function getTimeString(...args) {
 window.getTimeString = getTimeString;
 
 /* Returns a date formatted for the user's dateFormat
- * getFormattedDate() returns a long date with optional weekday (e.g. [일요일 ]2023년 06월 09일)
+ * getFormattedDate() returns a long date with optional weekday (e.g. 2023년 06월 09일[ 일요일])
  * getShortFormattedDate() returns an abbreviated date (e.g. 06월 09일)
  */
 window.getFormattedDate = function (date, includeWeekday = false) {
@@ -2685,7 +2685,7 @@ window.getFormattedDate = function (date, includeWeekday = false) {
             throw new Error(`Invalid date format: ${V.options.dateFormat}`);
     }
 
-    return includeWeekday ? date.weekDayName + "요일 " + formattedDate : formattedDate;
+    return includeWeekday ? formattedDate + " " + date.weekDayName + "요일" : formattedDate;
 };
 
 window.getShortFormattedDate = function (date) {
