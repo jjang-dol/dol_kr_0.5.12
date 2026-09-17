@@ -196,6 +196,12 @@
 		return false;
 	}
 
+	// 옵저버 콜백이 연속으로 여러 번 불릴 때(예: 저널 탭 전환 시 title/content가
+	// 별도 뮤테이션 배치로 잡히는 경우), 아래에서 매번 rAF를 취소하고 다시 예약하는데
+	// 이때 mutations를 클로저로만 들고 있으면 취소된 이전 배치의 뮤테이션이 그냥
+	// 버려진다. 그래서 처리될 때까지 누적해서 들고 있는 배열을 따로 둔다.
+	let pendingKoreanPostRenderMutations = [];
+
 	function installKoreanPostRenderObserver() {
 		if (typeof MutationObserver === "undefined") return;
 
@@ -206,6 +212,8 @@
 				// 호출하는 대신 이 플래그 체크 한 번으로 대체해서 옵저버 자체는 계속 켜둔 채로 둔다.
 				if (isApplyingKoreanPostRender) return;
 
+				pendingKoreanPostRenderMutations.push(...mutations);
+
 				cancelAnimationFrame(koreanPostRenderObserverTimer);
 
 				koreanPostRenderObserverTimer = requestAnimationFrame(function () {
@@ -213,7 +221,10 @@
 					// runKoreanPostRenderAll()로 6개 루트 전체(현재 패시지 전문 포함)를
 					// 매번 다시 훑었는데, 사이드바 수치 같은 작은 변경 하나에도 전체
 					// 재스캔이 걸려서 렉의 주 원인이었음. 바뀐 노드만 좁게 처리하도록 수정.
-					for (const mutation of mutations) {
+					const mutationsToProcess = pendingKoreanPostRenderMutations;
+					pendingKoreanPostRenderMutations = [];
+
+					for (const mutation of mutationsToProcess) {
 						if (
 							mutation.type === "characterData" &&
 							nodeNeedsKoreanPostRender(mutation.target)
