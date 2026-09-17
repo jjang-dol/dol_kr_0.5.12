@@ -407,8 +407,8 @@ setup.colours.hair = [
 	},
 	{
 		variable: "strawberryblond",
-		name: "딸기 금발",
-		name_cap: "딸기 금발",
+		name: "스트로베리 블론드",
+		name_cap: "스트로베리 블론드",
 		csstext: "strawberry",
 		natural: true,
 		dye: true,
