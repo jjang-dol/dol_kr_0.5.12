@@ -5,9 +5,7 @@
 	let koreanPostRenderObserver = null;
 	let koreanPostRenderObserverTimer = null;
 
-	// runKoreanPostRender가 만든 DOM 수정 자체가 옵저버를 다시 깨우지 않도록 막는 재진입 방지 플래그.
-	// 예전에는 매번 disconnect()/observe()를 호출해서 같은 일을 했는데, 옵저버를 실제로
-	// 끊었다 붙였다 하는 건 비용이 있어서 훨씬 가벼운 불리언 체크로 대체함.
+	// runKoreanPostRender가 만든 DOM 수정이 옵저버를 다시 깨우지 않도록 막는 재진입 방지 플래그.
 	let isApplyingKoreanPostRender = false;
 
 	function trSelectPost(word, type) {
@@ -236,18 +234,11 @@
 				cancelAnimationFrame(koreanPostRenderObserverTimer);
 
 				koreanPostRenderObserverTimer = requestAnimationFrame(function () {
-					// 실제로 변경된 부분만 처리한다. 예전에는 이 다음에 무조건
-					// runKoreanPostRenderAll()로 6개 루트 전체(현재 패시지 전문 포함)를
-					// 매번 다시 훑었는데, 사이드바 수치 같은 작은 변경 하나에도 전체
-					// 재스캔이 걸려서 렉의 주 원인이었음. 바뀐 부분만 좁게 처리하도록 수정.
-					//
-					// childList 변경은 추가된 노드 하나하나를 따로 판단하지 않고,
-					// 자식이 바뀐 컨테이너(mutation.target) 자체를 통째로 재처리한다.
-					// 개별 addedNode 단위로 "번역이 필요한가"를 판단하면, 무거운 위젯이
-					// 내부적으로 여러 단계에 걸쳐 내용을 조립하거나 최상위 노드 구조가
-					// 예상과 다를 때 놓칠 수 있음 (예: 캐릭터/저널 탭). 컨테이너 자체는
-					// 대개 #customOverlayContent처럼 범위가 작아서 통째로 훑어도 비용이
-					// 크지 않다.
+					// 변경된 부분만 처리해 매번 6개 루트 전체를 재스캔하는 걸 피한다(성능 핵심).
+					// childList 변경 시엔 추가된 노드 하나하나가 아니라, 자식이 바뀐 컨테이너
+					// (mutation.target) 자체를 통째로 재처리한다. 개별 addedNode 단위로
+					// 판단하면 무거운 위젯이 여러 단계에 걸쳐 내용을 조립할 때(캐릭터/저널
+					// 탭 등) 놓칠 수 있고, 컨테이너 자체는 대개 범위가 작아 비용도 적다.
 					const mutationsToProcess = pendingKoreanPostRenderMutations;
 					pendingKoreanPostRenderMutations = [];
 
