@@ -2662,16 +2662,46 @@ function getTimeString(...args) {
 window.getTimeString = getTimeString;
 
 /* Returns a date formatted for the user's dateFormat
- * getFormattedDate() returns a long date with optional weekday (e.g. [Sunday ]the 4th of September)
- * getShortFormattedDate() returns an abbreviated date (e.g. 4th Sep)
+ * getFormattedDate() returns a long date with optional weekday (e.g. [일요일 ]2023/06/09)
+ * getShortFormattedDate() returns an abbreviated date (e.g. 06/09)
  */
 window.getFormattedDate = function (date, includeWeekday = false) {
-    const formattedDate = date.monthName + " " + date.day + "일";
-    return includeWeekday ? formattedDate + " " + date.weekDayName + "요일" : formattedDate;
+    const dd = String(date.day).padStart(2, "0");
+    const mm = String(date.month).padStart(2, "0");
+    const yyyy = date.year;
+
+    let formattedDate;
+    switch (V.options.dateFormat) {
+        case "en-US":
+            formattedDate = `${mm}/${dd}/${yyyy}`;
+            break;
+        case "en-GB":
+            formattedDate = `${dd}/${mm}/${yyyy}`;
+            break;
+        case "zh-CN":
+            formattedDate = `${yyyy}/${mm}/${dd}`;
+            break;
+        default:
+            throw new Error(`Invalid date format: ${V.options.dateFormat}`);
+    }
+
+    return includeWeekday ? date.weekDayName + "요일 " + formattedDate : formattedDate;
 };
 
 window.getShortFormattedDate = function (date) {
-    return date.monthName + " " + date.day + "일";
+    const dd = String(date.day).padStart(2, "0");
+    const mm = String(date.month).padStart(2, "0");
+
+    switch (V.options.dateFormat) {
+        case "en-US":
+            return `${mm}/${dd}`;
+        case "en-GB":
+            return `${dd}/${mm}`;
+        case "zh-CN":
+            return `${mm}/${dd}`;
+        default:
+            throw new Error(`Invalid date format: ${V.options.dateFormat}`);
+    }
 };
 
 /* Determines and replenishes stock at supermarket */
