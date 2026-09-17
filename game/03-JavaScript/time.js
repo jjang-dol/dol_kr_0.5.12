@@ -2662,8 +2662,8 @@ function getTimeString(...args) {
 window.getTimeString = getTimeString;
 
 /* Returns a date formatted for the user's dateFormat
- * getFormattedDate() returns a long date with optional weekday (e.g. [일요일 ]2023/06/09)
- * getShortFormattedDate() returns an abbreviated date (e.g. 06/09)
+ * getFormattedDate() returns a long date with optional weekday (e.g. [일요일 ]2023년 06월 09일)
+ * getShortFormattedDate() returns an abbreviated date (e.g. 06월 09일)
  */
 window.getFormattedDate = function (date, includeWeekday = false) {
     const dd = String(date.day).padStart(2, "0");
@@ -2673,13 +2673,13 @@ window.getFormattedDate = function (date, includeWeekday = false) {
     let formattedDate;
     switch (V.options.dateFormat) {
         case "en-US":
-            formattedDate = `${mm}/${dd}/${yyyy}`;
+            formattedDate = `${mm}월 ${dd}일 ${yyyy}년`;
             break;
         case "en-GB":
-            formattedDate = `${dd}/${mm}/${yyyy}`;
+            formattedDate = `${dd}일 ${mm}월 ${yyyy}년`;
             break;
         case "zh-CN":
-            formattedDate = `${yyyy}/${mm}/${dd}`;
+            formattedDate = `${yyyy}년 ${mm}월 ${dd}일`;
             break;
         default:
             throw new Error(`Invalid date format: ${V.options.dateFormat}`);
@@ -2694,11 +2694,11 @@ window.getShortFormattedDate = function (date) {
 
     switch (V.options.dateFormat) {
         case "en-US":
-            return `${mm}/${dd}`;
+            return `${mm}월 ${dd}일`;
         case "en-GB":
-            return `${dd}/${mm}`;
+            return `${dd}일 ${mm}월`;
         case "zh-CN":
-            return `${mm}/${dd}`;
+            return `${mm}월 ${dd}일`;
         default:
             throw new Error(`Invalid date format: ${V.options.dateFormat}`);
     }
