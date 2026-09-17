@@ -83,6 +83,20 @@
 		return last;
 	}
 
+	// 조사 판정 시 무시할 문자들 - 공백 외에, 인용부호/괄호류가 실제 단어 끝 글자와
+	// 조사 마커(【...】) 사이에 끼어있어도 그 안쪽의 진짜 마지막 글자를 보고 판정하도록 함.
+	// (예: "예쁨"【이가】 -> 닫는 큰따옴표 말고 "쁨"을 보고 받침 판정)
+	const JOSA_IGNORABLE_CHAR_RE = /["'“”‘’()（）\[\]{}]/;
+
+	// 문자열 끝에서부터 JOSA_IGNORABLE_CHAR_RE에 해당하는 문자를 건너뛰고,
+	// 실제로 받침 판정에 쓸 수 있는 첫 글자를 반환한다. 전부 무시 대상이면 "".
+	function getEffectiveLastChar(str) {
+		for (let i = str.length - 1; i >= 0; i--) {
+			if (!JOSA_IGNORABLE_CHAR_RE.test(str[i])) return str[i];
+		}
+		return "";
+	}
+
 	function findLastNonSpaceCharBeforeNode(node, root) {
 		let cur = node;
 
@@ -93,6 +107,8 @@
 				const text = (prev.textContent || "").replace(/\s+$/g, "");
 
 				if (text) {
+					const effectiveChar = getEffectiveLastChar(text);
+
 					if (prev.nodeType === Node.TEXT_NODE) {
 						prev.nodeValue = prev.nodeValue.replace(/\s+$/g, "");
 					} else {
@@ -102,10 +118,10 @@
 						}
 					}
 
-					return text[text.length - 1];
-				}
-
-				if (prev.nodeType === Node.TEXT_NODE) {
+					if (effectiveChar) return effectiveChar;
+					// text가 전부 무시 대상 문자(따옴표/괄호 등)뿐이었던 경우,
+					// 그 앞의 형제 노드로 계속 거슬러 올라간다.
+				} else if (prev.nodeType === Node.TEXT_NODE) {
 					prev.nodeValue = "";
 				}
 
@@ -141,7 +157,10 @@
 
 				let lastChar = "";
 				if (left) {
-					lastChar = left[left.length - 1];
+					lastChar = getEffectiveLastChar(left);
+					if (!lastChar) {
+						lastChar = findLastNonSpaceCharBeforeNode(n, root);
+					}
 				} else {
 					lastChar = findLastNonSpaceCharBeforeNode(n, root);
 				}
