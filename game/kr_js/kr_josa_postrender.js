@@ -220,23 +220,31 @@
 					// 실제로 변경된 부분만 처리한다. 예전에는 이 다음에 무조건
 					// runKoreanPostRenderAll()로 6개 루트 전체(현재 패시지 전문 포함)를
 					// 매번 다시 훑었는데, 사이드바 수치 같은 작은 변경 하나에도 전체
-					// 재스캔이 걸려서 렉의 주 원인이었음. 바뀐 노드만 좁게 처리하도록 수정.
+					// 재스캔이 걸려서 렉의 주 원인이었음. 바뀐 부분만 좁게 처리하도록 수정.
+					//
+					// childList 변경은 추가된 노드 하나하나를 따로 판단하지 않고,
+					// 자식이 바뀐 컨테이너(mutation.target) 자체를 통째로 재처리한다.
+					// 개별 addedNode 단위로 "번역이 필요한가"를 판단하면, 무거운 위젯이
+					// 내부적으로 여러 단계에 걸쳐 내용을 조립하거나 최상위 노드 구조가
+					// 예상과 다를 때 놓칠 수 있음 (예: 캐릭터/저널 탭). 컨테이너 자체는
+					// 대개 #customOverlayContent처럼 범위가 작아서 통째로 훑어도 비용이
+					// 크지 않다.
 					const mutationsToProcess = pendingKoreanPostRenderMutations;
 					pendingKoreanPostRenderMutations = [];
 
+					const targets = new Set();
 					for (const mutation of mutationsToProcess) {
-						if (
-							mutation.type === "characterData" &&
-							nodeNeedsKoreanPostRender(mutation.target)
-						) {
-							runKoreanPostRender(mutation.target.parentElement, true);
-						}
-
-						for (const node of mutation.addedNodes || []) {
-							if (nodeNeedsKoreanPostRender(node)) {
-								runKoreanPostRender(node, true);
+						if (mutation.type === "characterData") {
+							if (nodeNeedsKoreanPostRender(mutation.target)) {
+								targets.add(mutation.target.parentElement);
 							}
+						} else if (mutation.addedNodes.length || mutation.removedNodes.length) {
+							targets.add(mutation.target);
 						}
+					}
+
+					for (const target of targets) {
+						if (target) runKoreanPostRender(target, true);
 					}
 				});
 			});
