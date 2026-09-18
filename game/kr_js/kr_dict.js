@@ -1761,6 +1761,7 @@ window.KR.personNameDict = {
     "Charlie": "찰리", "Darryl": "데릴", "Doren": "도렌", "Eden": "에덴",
     "Gwylan": "그윌란", "Harper": "하퍼", "Jordan": "조던", "Kylar": "카일라",
     "Landry": "랜드리", "Leighton": "레이튼", "Mason": "메이슨",
+    "the brown fox": "갈색 여우",
     "Morgan": "모건", "River": "리버", "Robin": "로빈", "Sam": "샘",
     "Sirris": "시리스", "Whitney": "휘트니", "Winter": "윈터",
     "Black Wolf": "검은 늑대", "Niki": "니키", "Quinn": "퀸", "Remy": "레미",
