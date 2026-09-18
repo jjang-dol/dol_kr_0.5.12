@@ -1820,6 +1820,7 @@ window.KR.getNpcTitleKr = function(title) {
         case "reflection": return "거울상";
         case "pirate": return "해적";
         case "horror": return "끔찍한 존재";
+        case "curious": return "호기심 많은";
         default: return title;
     }
 };
