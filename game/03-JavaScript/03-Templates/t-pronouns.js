@@ -127,13 +127,13 @@ Template.add(["hers", "Hers"], function () {
 function getHimself() {
 	switch (V.pronoun) {
 		case "m":
-			return "그 자신";
+			return "자기 자신";
 		case "f":
-			return "그녀 자신";
+			return "자기 자신";
 		case "i":
-			return "그것 자체";
+			return "자기 자신";
 		case "n":
-			return "그 자신";
+			return "자기 자신";
 		case "t":
 			return "그들 자신";
 		default:
