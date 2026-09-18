@@ -1608,6 +1608,7 @@ window.KR.getBodypartKr = function(key) {
         case "pubic": return "사타구니";
         case "bottom": return "엉덩이";
         case "vaginaoutside": return "음순";
+        case "labia": return "음순";
         case "vagina": return "보지";
         case "penis": return "자지";
         case "anus": return "항문";
@@ -1617,7 +1618,7 @@ window.KR.getBodypartKr = function(key) {
         case "neck": return "목";
         case "face": return "얼굴";
         case "hair": return "머리";
-        case "thigh": return "허벅지";
+        case "thigh": case "thighs": return "허벅지";
         case "leg": return "다리";
         case "back": return "등";
         case "forehead": return "이마";
