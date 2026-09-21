@@ -1545,7 +1545,11 @@ window.KR.getPenisDescKr = function(desc) {
         "purple": "보라색",
         "fleshy": "살구색",
         "blue": "파란색",
-        "green": "초록색"
+        "green": "초록색",
+        "white": "흰색",
+        "yellow": "노란색",
+        "tan": "황갈색",
+        "brown": "갈색"
     };
 
     if (dict[desc]) return dict[desc];
