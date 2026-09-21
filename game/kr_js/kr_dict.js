@@ -1838,6 +1838,7 @@ window.KR.getWeatherStateKr = function(state) {
         case "heavyPrecipitation": return "강한 강수";
         case "storm": return "폭풍";
         case "thunderstorm": return "뇌우";
+        case "bloodMoon": return "붉은 달";
         default: return state;
     }
 };

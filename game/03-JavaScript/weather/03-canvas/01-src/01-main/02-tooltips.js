@@ -13,7 +13,7 @@ Weather.Tooltips = (() => {
 			? `<br><br><span class="teal">디버그:</span>
 			<br><span class="blue">패시지:</span> <span class="yellow">${V.passage}</span>
 			<br><span class="blue">시간:</span> <span class="yellow">${ampm()}</span>
-			<br><span class="blue">날씨:</span> <span class="yellow">${Weather.name}</span>
+			<br><span class="blue">날씨:</span> <span class="yellow">${window.KR.getWeatherStateKr(Weather.name)}</span>
 			<br><span class="blue">외부 기온:</span> <span class="yellow">${Weather.toSelectedString(Weather.temperature)}</span>
 			<br><span class="blue">외부 체감 기온:</span> <span class="yellow">${Weather.toSelectedString(Weather.apparentTemperature)}</span>
 			<br><span class="blue">실내 기온:</span> <span class="yellow">${Weather.toSelectedString(Weather.insideTemperature)}</span>
