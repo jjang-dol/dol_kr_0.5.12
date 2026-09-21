@@ -769,18 +769,10 @@ function determineRecipient(index) {
 }
 window.determineRecipient = determineRecipient;
 
-/* 색상 버튼을 직접 누르지 않고 구매/선물하면 .active 버튼이 없으므로,
- * 원본처럼 아이콘의 clothes-<색상> 클래스(열 때 랜덤으로 정해진 색)에서 색상을 읽는다. */
-function sexShopGetSelectedColour() {
-	const active = document.querySelector("#ssm_colour_panel .colour-button.active")?.dataset.colour;
-	if (active) return active;
-	const icon = document.querySelector("#ssm_descContainer .ssm_icon.icon:not(.infront)");
-	return icon?.className.match(/\bclothes-(\S+)/)?.[1];
-}
-
 function sexShopOnGiftClick(index) {
 	const item = setup.sextoys[index];
-	const selectedColour = sexShopGetSelectedColour();
+	const icon = document.querySelector("#ssm_descContainer .ssm_icon.icon:not(.infront)");
+	const iconClassName = icon.className;
 
 	// get the recipient
 	let recipient = document.getElementById("recipientList").value.toLowerCase();
@@ -797,7 +789,7 @@ function sexShopOnGiftClick(index) {
 		index: item.index,
 		name: item.name,
 		namecap: item.namecap,
-		colour: selectedColour || item.default_colour,
+		colour: (iconClassName.match(/\bclothes-([^\s]+)/) || [])[1] || item.default_colour,
 		worn: false,
 		size: item.size,
 		carried: false,
@@ -842,7 +834,7 @@ window.sexShopOnGiftClick = sexShopOnGiftClick;
 
 function sexShopOnBuyClick(index, inSexShop = true, colour, costsMoney = true) {
 	const item = setup.sextoys[index];
-	const selectedColour = sexShopGetSelectedColour();
+	const icon = document.querySelector("#ssm_descContainer .ssm_icon.icon:not(.infront)");
 	sexShopOnBuyClick.counter = sexShopOnBuyClick.counter || "off";
 
 	// add item to player inventory
@@ -850,7 +842,7 @@ function sexShopOnBuyClick(index, inSexShop = true, colour, costsMoney = true) {
 
 	const obj = {
 		index: item.index,
-		colour: selectedColour || item.default_colour,
+		colour: icon?.className.match(/\bclothes-(\S+)/)?.[1].replace(/-/g, " ") || item.default_colour,
 		name: item.name,
 		namecap: item.namecap,
 		worn: false,
