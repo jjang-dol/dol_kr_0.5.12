@@ -3086,10 +3086,10 @@ function initFoodstuff() {
 		},
 		plum_pudding: {
 			index: 133,
-			name: "플럼 푸딩",
-			singular: "플럼 푸딩",
+			name: "자두 푸딩",
+			singular: "자두 푸딩",
 			counter: "개",
-			plural: "플럼 푸딩",
+			plural: "자두 푸딩",
 			icon: "plum-pudding.png",
 			category: "dish",
 			kitchen_item_type_icon: "recipe-food.png",
@@ -3098,7 +3098,7 @@ function initFoodstuff() {
 				sell_price: 1400,
 			},
 			recipe: {
-				recipe_name: "플럼 푸딩",
+				recipe_name: "자두 푸딩",
 				difficulty: 3,
 				cook_minutes: 25,
 				servings: 1,
