@@ -234,7 +234,7 @@ setup.debugMenu.eventList = {
 			widgets: [`<<set $vorestage to 0>>`],
 		},
 		{
-			link: [`Earn all Feats`, stayOnPassageFn],
+			link: [`모든 업적 달성하기`, stayOnPassageFn],
 			widgets: [
 				`
 				<<set _featList to Object.keys(setup.feats)>>
@@ -245,7 +245,7 @@ setup.debugMenu.eventList = {
 			],
 		},
 		{
-			link: [`Unlock forest shop clothing`, stayOnPassageFn],
+			link: [`숲 상점 의상 잠금 해제하기`, stayOnPassageFn],
 			widgets: [
 				`
 				<<for _i to 0; _i lt $specialClothes.length; _i++>>
