@@ -1240,36 +1240,40 @@ window.KR.getCreatureTypeKr = function(type) {
         _giantPrefix = "거대 ";
         _key = _key.slice(6);
     }
+    let _palePrefix = "";
+    if (_key.startsWith("pale ")) {
+        _palePrefix = "창백한 ";
+        _key = _key.slice(5);
+    }
     switch (_key) {
         /* 촉수류 */
-        case "tentacle": return _giantPrefix + "촉수";
-        case "vine": return _giantPrefix + "덩굴";
-        case "root": return _giantPrefix + "뿌리";
-        case "shoot": return _giantPrefix + "새순";
-        case "tendril": return _giantPrefix + "덩굴손";
-        case "metal": return _giantPrefix + "금속 촉수";
+        case "tentacle": return _giantPrefix + _palePrefix + "촉수";
+        case "vine": return _giantPrefix + _palePrefix + "덩굴";
+        case "root": return _giantPrefix + _palePrefix + "뿌리";
+        case "shoot": return _giantPrefix + _palePrefix + "새순";
+        case "tendril": return _giantPrefix + _palePrefix + "덩굴손";
+        case "metal": return _giantPrefix + _palePrefix + "금속 촉수";
         /* 임신/기생체류 */
-        case "slime": return _giantPrefix + "슬라임";
-        case "pale slime": return _giantPrefix + "창백한 슬라임";
-        case "worm": return _giantPrefix + "벌레";
-        case "lurker": return _giantPrefix + "럴커";
-        case "eel": return _giantPrefix + "장어";
-        case "snake": return _giantPrefix + "뱀";
-        case "urchin": return _giantPrefix + "성게";
-        case "parasite": return _giantPrefix + "기생충";
+        case "slime": return _giantPrefix + _palePrefix + "슬라임";
+        case "worm": return _giantPrefix + _palePrefix + "벌레";
+        case "lurker": return _giantPrefix + _palePrefix + "럴커";
+        case "eel": return _giantPrefix + _palePrefix + "장어";
+        case "snake": return _giantPrefix + _palePrefix + "뱀";
+        case "urchin": return _giantPrefix + _palePrefix + "성게";
+        case "parasite": return _giantPrefix + _palePrefix + "기생충";
         /* struggle 조우 생물류 */
-        case "bee": return _giantPrefix + "벌";
-        case "wasp": return _giantPrefix + "말벌";
-        case "slug": return _giantPrefix + "민달팽이";
-        case "squid": return _giantPrefix + "오징어";
-        case "fish": return _giantPrefix + "물고기";
-        case "spider": return _giantPrefix + "거미";
-        case "maggot": return _giantPrefix + "구더기";
+        case "bee": return _giantPrefix + _palePrefix + "벌";
+        case "wasp": return _giantPrefix + _palePrefix + "말벌";
+        case "slug": return _giantPrefix + _palePrefix + "민달팽이";
+        case "squid": return _giantPrefix + _palePrefix + "오징어";
+        case "fish": return _giantPrefix + _palePrefix + "물고기";
+        case "spider": return _giantPrefix + _palePrefix + "거미";
+        case "maggot": return _giantPrefix + _palePrefix + "구더기";
         /* vore 조우 생물류 */
-        case "frog": return _giantPrefix + "개구리";
-        case "oyster": return _giantPrefix + "굴";
-        case "whale": return _giantPrefix + "고래";
-        default: return _giantPrefix + window.KR.getBeastTypeKr(_key); /* getBeastTypeKr의 종족 사전 재사용 (그윌란 샘플 부탁 등에서 쓰이는 human/dog/cat 등 포함) */
+        case "frog": return _giantPrefix + _palePrefix + "개구리";
+        case "oyster": return _giantPrefix + _palePrefix + "굴";
+        case "whale": return _giantPrefix + _palePrefix + "고래";
+        default: return _giantPrefix + _palePrefix + window.KR.getBeastTypeKr(_key); /* getBeastTypeKr의 종족 사전 재사용 (그윌란 샘플 부탁 등에서 쓰이는 human/dog/cat 등 포함) */
     }
 };
 
