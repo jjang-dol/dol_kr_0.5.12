@@ -1942,3 +1942,20 @@ window.KR.getBodywritingKr = function(writing) {
     var entry = Object.values(setup.bodywriting).find(function (e) { return e.writing === writing; });
     return entry ? entry.writingKr : writing;
 };
+
+/*
+ * 디버그용 범죄 사건 코드명(setup.crimeDescs의 키) 한글 번역.
+ * base-system/widgets.twee의 listCrimeCheats 위젯에서 사용.
+ */
+window.KR.getCrimeCaseNameKr = function(key) {
+    switch (key) {
+        case "default": return "일반";
+        case "legacy": return "구범죄";
+        case "escape": return "탈옥";
+        case "cake": return "케이크";
+        case "kylarPrison": return "카일라 탈옥";
+        case "food": return "식품";
+        case "debug": return "디버그";
+        default: return key;
+    }
+};
