@@ -2017,8 +2017,8 @@ setup.colours.mascara = [
     },
 	{
 		variable: "black waterproof",
-		name: "검정 (방수)",
-		name_cap: "검정 (방수)",
+		name: "검정 (워터프루프)",
+		name_cap: "검정 (워터프루프)",
 		csstext: "black",
 		canvasfilter: {
 			blend: "#292929",
