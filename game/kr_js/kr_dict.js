@@ -1959,3 +1959,18 @@ window.KR.getCrimeCaseNameKr = function(key) {
         default: return key;
     }
 };
+
+/*
+ * 손가락 개수 등 소수의 고유어 수 표현(한/두/세/네/다섯). "숫자 손가락" 같은
+ * 부자연스러운 표기 대신 "두 손가락"처럼 자연스럽게 쓰기 위함.
+ */
+window.KR.getNativeCountKr = function(n) {
+    switch (Number(n)) {
+        case 1: return "한";
+        case 2: return "두";
+        case 3: return "세";
+        case 4: return "네";
+        case 5: return "다섯";
+        default: return String(n);
+    }
+};
