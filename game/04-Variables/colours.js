@@ -2254,6 +2254,7 @@ setup.guessColourInMap = function (map, colour) {
 setup.colourName = function (colour) {
 	if (colour === "custom") return "커스텀";
 	if (colour === "random") return "무작위";
+	if (colour === "any") return "무관";
 	for (const map of [
 		setup.colours.hair_map,
 		setup.colours.eyes_map,
