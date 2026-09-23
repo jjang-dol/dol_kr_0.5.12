@@ -1910,11 +1910,6 @@ window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
     return food.name + " " + amount + (food.counter || "개");
 };
 
-/*
- * 낚시(fishing) 어종 이름 사전. $fishingHookedFish.type 등 저장/로직에 쓰이는 키는
- * 영문 그대로 두고, 화면 표시할 때만 이 사전으로 변환한다.
- */
-
 /* 저널 인벤토리 물품 카테고리 필터 드롭다운(Show: All/Food/...) 번역. */
 window.KR.foodstuffCategoryDict = {
     "food": "요리",
