@@ -1564,9 +1564,13 @@ window.KR.getPenisDescKr = function(desc) {
     var strapOnIndex = desc.indexOf("strap-on");
     if (strapOnIndex !== -1) {
         var translateWords = function(text) {
-            return text.split(" ").filter(Boolean).map(function(word) {
-                return dict[word] || word;
-            }).join(" ");
+            return text.split(" ").filter(Boolean)
+                /* "cock"/"penis"는 뒤에 붙는 "페니스 밴드"와 의미가 겹쳐서
+                 * "돌고래 좆 페니스 밴드"처럼 중복되므로 출력에서는 뺀다. */
+                .filter(function(word) { return word !== "cock" && word !== "penis"; })
+                .map(function(word) {
+                    return dict[word] || word;
+                }).join(" ");
         };
         var before = translateWords(desc.slice(0, strapOnIndex));
         var shape = translateWords(desc.slice(strapOnIndex + "strap-on".length));
