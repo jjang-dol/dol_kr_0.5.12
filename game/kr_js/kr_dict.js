@@ -1829,6 +1829,7 @@ window.KR.getNpcTitleKr = function(title) {
         case "pirate": return "해적";
         case "horror": return "끔찍한 존재";
         case "curious": return "호기심 많은";
+        case "scarred": return "상처입은";
         default: return title;
     }
 };
@@ -1909,11 +1910,6 @@ window.KR.getFoodstuffCountKr = function(foodstuffKey, amount) {
     return food.name + " " + amount + (food.counter || "개");
 };
 
-/*
- * 낚시(fishing) 어종 이름 사전. $fishingHookedFish.type 등 저장/로직에 쓰이는 키는
- * 영문 그대로 두고, 화면 표시할 때만 이 사전으로 변환한다.
- */
-
 /* 저널 인벤토리 물품 카테고리 필터 드롭다운(Show: All/Food/...) 번역. */
 window.KR.foodstuffCategoryDict = {
     "food": "요리",
@@ -1940,4 +1936,36 @@ window.KR.getBodywritingKr = function(writing) {
     if (typeof setup === "undefined" || !setup.bodywriting) return writing;
     var entry = Object.values(setup.bodywriting).find(function (e) { return e.writing === writing; });
     return entry ? entry.writingKr : writing;
+};
+
+/*
+ * 디버그용 범죄 사건 코드명(setup.crimeDescs의 키) 한글 번역.
+ * base-system/widgets.twee의 listCrimeCheats 위젯에서 사용.
+ */
+window.KR.getCrimeCaseNameKr = function(key) {
+    switch (key) {
+        case "default": return "일반";
+        case "legacy": return "구범죄";
+        case "escape": return "탈옥";
+        case "cake": return "케이크";
+        case "kylarPrison": return "카일라 탈옥";
+        case "food": return "식품";
+        case "debug": return "디버그";
+        default: return key;
+    }
+};
+
+/*
+ * 손가락 개수 등 소수의 고유어 수 표현(한/두/세/네/다섯). "숫자 손가락" 같은
+ * 부자연스러운 표기 대신 "두 손가락"처럼 자연스럽게 쓰기 위함.
+ */
+window.KR.getNativeCountKr = function(n) {
+    switch (Number(n)) {
+        case 1: return "한";
+        case 2: return "두";
+        case 3: return "세";
+        case 4: return "네";
+        case 5: return "다섯";
+        default: return String(n);
+    }
 };

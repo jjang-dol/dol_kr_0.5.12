@@ -2017,8 +2017,8 @@ setup.colours.mascara = [
     },
 	{
 		variable: "black waterproof",
-		name: "검정 (방수)",
-		name_cap: "검정 (방수)",
+		name: "검정 (워터프루프)",
+		name_cap: "검정 (워터프루프)",
 		csstext: "black",
 		canvasfilter: {
 			blend: "#292929",
@@ -2208,6 +2208,7 @@ buildColourMap("eyes");
 buildColourMap("clothes");
 buildColourMap("lipstick");
 buildColourMap("mascara");
+buildColourMap("blusher");
 buildColourMap("eyeshadow");
 buildColourMap("condom");
 buildColourMap("tentacle");
@@ -2253,6 +2254,7 @@ setup.guessColourInMap = function (map, colour) {
 setup.colourName = function (colour) {
 	if (colour === "custom") return "커스텀";
 	if (colour === "random") return "무작위";
+	if (colour === "any") return "무관";
 	for (const map of [
 		setup.colours.hair_map,
 		setup.colours.eyes_map,
