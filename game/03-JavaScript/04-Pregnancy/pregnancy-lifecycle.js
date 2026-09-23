@@ -489,12 +489,16 @@ function randomPregnancyProgress() {
 		if (record && Time.date.timeStamp >= getDueDate(record)) {
 			const [birthLocation, location] = defaultBirthLocations(record.donorSpecies);
 			birthRecordedLitter(record.pregnancyId, birthLocation, location);
+			if (location === "home") {
+				addBabyIntro("Bailey", npcKey, record.pregnancyId, getChildrenOf(record.pregnancyId).length, V.storedNPCs[npcKey].npc?.fullDescription);
+				setKnowsPregnancy(record.pregnancyId, "Bailey");
+			} else if (location === "wolf_cave") {
+				setKnowsPregnancy(record.pregnancyId, "Black Wolf");
+			}
 			toDelete.push(npcKey);
 		}
 	});
-	toDelete.forEach(npcKey => delete V.storedNPCs[npcKey]);
-	return true;
-}
+
 
 /**
  * Fills in the default birth and placement locations for a species when a caller leaves them blank.

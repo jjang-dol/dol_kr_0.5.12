@@ -2698,7 +2698,7 @@
 		<<set $objectVersion.animations to 1>>
 		<<if $combatAnimations is false and $sidebarAnimations is false>>
 			<div id="animWarning" @class="'no-numberify '">
-				<span class='teal'>현재 애니메이션이 비활성화되어 있습니다. 일시적인 버그로 인해 발생했을 수 있습니다. 지금 바로 애니메이션을 다시 활성화하거나, 설정 메뉴의 "일반" 탭에서 나중에 활성화할 수 있습니다.</span> |
+				<span class='teal'>Animations are currently disabled. This may have been caused by a one-time bug. You can re-enable animations immediately, or in the "general" tab of the settings menu.</span> |
 				<<link "Enable all animations">><<addclass #animWarning "hidden">><<set $combatAnimations to true>><<set $sidebarAnimations to true>><</link>> |
 				<<link "Disable this message">><<addclass #animWarning "hidden">><</link>>
 			</div>
@@ -6367,12 +6367,12 @@
 	<!-- 0.5.5.5, farm assault fields_damaged -->
 	<<if $farm and $plots.farm and ($fields_damaged is undefined or typeof $fields_damaged is "number")>>
 		<<if $farm_assault>>
-			<span class="orange italic small-description">0.5.5.5 업데이트에서 손상된 밭을 추적하는 방식이 변경됨에 따라, 습격 중 손상된 밭과 습격 전 손상되었거나 비어 있던 밭을 정확히 구분할 수 없게 되었습니다.
-			이로 인해, 이 장면 끝에 나오는 메시지가 결과를 정확하게 묘사하지 않을 것입니다. 이는 단순히 표기상의 문제이며, 농장 구역 자체는 아무런 영향을 받지 않았습니다.</span>
+			<span class="orange italic small-description">Due to changes to the way damaged fields are tracked in update 0.5.5.5, we could not accurately determine which fields were damaged during the assault and which were damaged before the assault or left empty.
+			Because of this, the message at the end of this scene will not accurately portray the outcome. This is purely a cosmetic discrepancy; the farm plots themselves have not changed in any way.</span>
 			<br><br>
 		<<elseif $farm_attacked>>
-			<span class="orange italic small-description">0.5.5.5 업데이트에서 손상된 밭을 추적하는 방식이 변경됨에 따라, 막지 못한 습격 중 손상된 알렉스의 농장 밭과 습격 전 손상되었거나 비어 있던 밭을 정확히 구분할 수 없게 되었습니다.
-			이로 인해, 다음에 농장을 방문할 때 나오는 메시지가 결과를 정확하게 묘사하지 않을 것입니다. 이는 단순히 표기상의 문제이며, 농장 구역 자체는 아무런 영향을 받지 않았습니다.</span>
+			<span class="orange italic small-description">Due to changes to the way damaged fields are tracked in update 0.5.5.5, we could not accurately determine which fields of Alex's farm were damaged during missed assaults and which were damaged before the assault or left empty.
+			Because of this, the message the next time you visit the farm will not accurately portray the outcome. This is purely a cosmetic discrepancy; the farm plots themselves have not changed in any way.</span>
 			<br><br>
 		<</if>>
 		<<set $fields_damaged to []>>
@@ -7407,6 +7407,12 @@
 		<<run migratePregnancyData()>>
 	<</if>>
 
+	<!-- Child migration fix for people in the middle of a Story/Memory. -->
+	<<if $children isnot undefined and $objectVersion.pregnancyRecords>>
+		<<run delete $objectVersion.pregnancyRecords>>
+		<<run migratePregnancyData()>>
+	<</if>>
+
 	<!-- One-time ward unlock. Introduce the orphanage's non-hospital-born children to Bailey. Runs
 	after the records migration above so getChildrenAt reads the new records. -->
 	<<if !$objectVersion.wardForceUnlock>>
@@ -7414,6 +7420,18 @@
 			<<run getChildrenAt("home").filter(child => child.development.birthLocation isnot "hospital").forEach(child => setBabyIntro(getPregnancyOf(child).carrier, "Bailey", child.pregnancyId))>>
 		<</if>>
 		<<set $objectVersion.wardForceUnlock to 1>>
+	<</if>>
+
+	<!-- Fix for random carriers not having Bailey's intro. -->
+	<<if !$objectVersion.randomCarrierWardIntro>>
+		<<run $pregnancies.forEach(pregnancy => {
+			if (pregnancy.carrier === "pc" || C.npc[pregnancy.carrier] || pregnancy.deliveredLocation !== "home" || knowsPregnancy(pregnancy.pregnancyId, "Bailey")) return;
+			const litter = getChildrenOf(pregnancy.pregnancyId).filter(child => childIsBorn(child) && child.development.location === "home");
+			if (!litter.length) return;
+			addBabyIntro("Bailey", pregnancy.carrier, pregnancy.pregnancyId, litter.length, "stranger");
+			setKnowsPregnancy(pregnancy.pregnancyId, "Bailey");
+		})>>
+		<<set $objectVersion.randomCarrierWardIntro to 1>>
 	<</if>>
 
 	<!-- Silly is not a supported pregnancy type; fold silly saves into fetish and drop its feat lock. -->
@@ -7518,5 +7536,35 @@
 
 	<<if C.npc.Kylar.init and C.npc.Kylar.state is 0>>
 		<<set C.npc.Kylar.init to 0>>
+	<</if>>
+
+	<<if $avery_mansion and $avery_mansion.version is 4>>
+		<<set $avery_mansion.version to 5>>
+		<<switch $avery_mansion.injury_stage>>
+		<<case "fresh">>
+			<<set $avery_mansion.injury_stage to "sling">>
+		<<case "fresh_done">>
+			<<set $avery_mansion.injury_stage to "sling">>
+			<<set $averySeen.pushUnique("injury_ask_sling")>>
+		<<case "sling">>
+			<<set $avery_mansion.injury_stage to "cast">>
+		<<case "sling_done">>
+			<<set $avery_mansion.injury_stage to "cast">>
+			<<set $averySeen.pushUnique("injury_ask_cast")>>
+		<<case "cast">>
+			<<set $avery_mansion.injury_stage to "healing">>
+		<<case "cast_done">>
+			<<set $avery_mansion.injury_stage to "healing">>
+			<<set $averySeen.pushUnique("injury_ask_healing")>>
+		<<case "healing">>
+			<<set $avery_mansion.injury_stage to "healed">>
+		<<case "healed">>
+			<<set $averySeen.pushUnique("injury_ask_healed")>>
+		<</switch>>
+	<</if>>
+
+	/*0.5.12.13 */
+	<<if $wrenHeist is false and $wrenHeistMonthly is undefined>>
+		<<unset $wrenHeist>>
 	<</if>>
 <</widget>>

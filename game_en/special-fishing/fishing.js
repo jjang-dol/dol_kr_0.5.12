@@ -23,12 +23,17 @@ function rollFishSize(bus, fishKey) {
 		preferredMatchCount++;
 	}
 
-	const targetMean = lerp(preferredMatchCount / 3, 0.45, 0.75);
-	const sizeRoll = State.random() ** ((1 - targetMean) / targetMean);
-	const size = lerp(sizeRoll, fishConfig.minSize, fishConfig.maxSize);
+	// Baitfish are hard to come by, so making the fish that require them larger is nice for people trying to find max size of all fish
+	if (fishConfig.requiresBaitFish) {
+		preferredMatchCount += .75;
+	}
 
-	// Rounds 98%+ sized to 100% so people don't get fish that are super super close to max size, but aren't the max size.
-	if (size >= fishConfig.minSize + 0.97 * (fishConfig.maxSize - fishConfig.minSize)) {
+	const targetMean = lerp(Math.min(preferredMatchCount, 3) / 3, 0.45, 0.75);
+	const sizeRoll = State.random() ** ((1 - targetMean) / targetMean);
+	const size = Math.ceil(lerp(sizeRoll, fishConfig.minSize, fishConfig.maxSize));
+
+	// Rounds fish that are 97%+ sized, or within 3cm of max size, up to 100% so people don't get fish that are super super close to max size, but aren't the max size.
+	if (size >= fishConfig.minSize + 0.97 * (fishConfig.maxSize - fishConfig.minSize) || size >= fishConfig.maxSize - 3) {
 		return fishConfig.maxSize;
 	}
 	return size;
@@ -182,7 +187,7 @@ function rollFish(bus) {
 		}
 	}
 	const fishKey = weightedRandom(...possibleFish);
-	const size = Math.ceil(rollFishSize(bus, fishKey));
+	const size = rollFishSize(bus, fishKey);
 	return {
 		type: fishKey,
 		size,
