@@ -498,7 +498,9 @@ function randomPregnancyProgress() {
 			toDelete.push(npcKey);
 		}
 	});
-
+	toDelete.forEach(npcKey => delete V.storedNPCs[npcKey]);
+	return true;
+}
 
 /**
  * Fills in the default birth and placement locations for a species when a caller leaves them blank.
