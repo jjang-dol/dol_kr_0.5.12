@@ -893,7 +893,7 @@
 <</if>>
 <<avery_injury_check>>
 <<if _avery_injured>>
-	에이버리의 <<= $avery_mansion.injury_stage.includes("sling") ? "깁스와 슬링" : "깁스">> 때문에 조금 까다롭지만, 당신은 해낸다.
+	에이버리의 <<= _avery_injured_sling ? "깁스와 팔걸이" : "깁스">> 때문에 다루기가 조금 까다롭지만, 당신은 어떻게든 해낸다.
 <</if>>
 <br><br>
 당신이 일하는 동안, 에이버리는 <<= either("만족스러운", "무덤덤한", "재미있어하는", "무표정한")>> 표정을 짓고 있다. <<His>> 시선은 한시도 당신에게서 떨어지지 않는다.
@@ -1484,7 +1484,7 @@
 			<<socialiseicon "ask">><<link [[에이버리에게 왜 베일리에게 돈을 주지 않기로 했는지 묻는다|Mansion Talk Ask]]>><<set $avery_ask to "bailey">><<set $weekly.baileymessageask to true>><</link>>
 			<br>
 		<</if>>
-		<<if $avery_fate is "saved" and ["fresh", "sling", "cast", "healing"].includes($avery_mansion.injury_stage)>>
+		<<if $avery_fate is "saved" and $avery_mansion.injury_stage and !$averySeen.includes("injury_ask_" + $avery_mansion.injury_stage)>>
 			<br>
 			<<socialiseicon "ask">><<link [[에이버리에게 팔은 좀 어떤지 묻는다|Mansion Talk Ask]]>><<set $avery_ask to "injury">><</link>>
 			<br>
@@ -1515,6 +1515,7 @@
 
 :: Mansion Talk Ask
 <<effects>>
+<<avery_injury_check>>
 
 <<if $avery_ask is "science" or $avery_ask is "maths" or $avery_ask is "english_play">>
 	<<if $avery_ask is "science">>
@@ -1633,35 +1634,35 @@
 
 <<elseif $avery_ask is "bailey">>
 	<<if $speech_attitude is "meek" or $speech_attitude_avery>>
-		"저기..." 당신은 <<= $outside is 1 ? "땅" : "바닥">>【을를】 쳐다보며 말한다. "베일리가 그러는데, 더 이상 ㅂ-보수를 안 주신다고... 정말인가요?" 당신은 차마 이유를 물어볼 용기가 나지 않는다.
+		"저기..." 당신은 <<= $outside is 1 ? `땅` : `바닥`>>을 바라보며 말한다. "베일리가... 당신이 베일리에게 돈-돈 주는 걸 그만뒀다고 했어요...?" 당신은 차마 이유를 물어볼 엄두를 내지 못한다.
 	<<elseif $speech_attitude is "bratty">>
-		"이봐요, 왜 베일리한테 돈을 안 주는 거예요?" 당신이 따진다. "<<nnpc_He "Bailey">>【이가】 또 나한테 돈을 달라고 하기 시작했다고요."
+		"이봐요, 왜 베일리한테 돈을 안 주는 거예요?" 당신이 따진다. "베일리가 다시 나한테 돈을 요구하기 시작했다고요."
 	<<else>>
-		"베일리한테 들었는데, <<nnpc_him "Bailey">>에게 돈을 그만 주셨다고요." 당신은 비난하는 투로 들리지 않으려 애쓰며 말한다. "제가 뭘 잘못했나요?"
+		"베일리한테서 당신이 돈을 더 이상 안 주신다고 들었어요," 당신은 비난하는 것처럼 보이지 않으려 애쓰며 말한다. "제가 무슨 실수라도 했나요?"
 	<</if>>
 	<br><br>
-	에이버리는 눈살을 찌푸리며
+	에이버리는 눈살을 찌푸리고는
 	<<if $averySeen.includes("chase")>>
-		<<his>> 눈을 가늘게 뜨고 당신을 본다.
+		당신을 향해 눈을 가늘게 뜬다.
 	<<elseif $averyragerevealed is 1>>
-		당신을 보며 한쪽 눈썹을 치켜올린다.
+		당신을 향해 한쪽 눈썹을 치켜올린다.
 	<<else>> /* Rage concealed */
 		한숨을 쉰다.
 	<</if>>
-	"<<= either(`왜인지 알고 싶다고`,`정말 물어봐야겠어`)>>? 그럼,
+	"<<= either(`이유가 알고 싶으신가요`,`정말 물어봐야 알겠나요`)>>? 글쎄요,
 	<<if $avery_mansion.rage.assess gte 9>> /* Avery's demands */
-		네가 잊어버린 건지, 아니면 일부러 그런 건지는 모르겠지만<<if $averyragerevealed gte 1 and C.npc.Avery.rage gte 60>> 나를 엿 먹이려고 그랬던 건지도<</if>>, <span class="pink">내가 부탁한 일은 네가 따라주길 기대하고 있어</span>."
+		당신이 잊어버린 건지, 아니면 <<if $averyragerevealed gte 1 and C.npc.Avery.rage gte 60>>날 약 올리려고 <</if>>일부러 그런 건지는 모르겠지만, <span class="pink">난 당신이 내가 요청한 대로 해주길 바란답니다</span>."
 	<<else>> /* PC is missing for more than one day */
-		난 <span class="pink">며칠 동안 자네를 보지 못했어</span>. 뭘 기대한 거지?"
+		내가 <span class="pink">며칠 동안 당신 얼굴을 못 봤잖아요</span>. 뭘 기대한 건가요?"
 	<</if>>
 	<br><br>
-	<<He>>【은는】 <<= $avery_mansion.injury_stage is "sling" or $avery_pool is "swim" ? `콧방귀를 뀐다` : `<<his>> 팔짱을 낀다`>>. "너에게 많은 걸 요구하는 건 아니야. 하지만 여기서 맡은 책임을 챙기지 못하겠다면, 다른 곳의 책임을 우선한다는 뜻이겠지. 그렇다면 베일리에게는 네가 직접 돈을 내도 되겠군."
+	<<He>>【은는】 <<= _avery_injured_sling or $avery_pool is "swim" ? `한숨을 쉰다` : `팔짱을 낀다`>>. "당신에게 많은 걸 바라는 게 아니에요. 하지만 여기서의 책임도 제대로 다하지 못한다면, 다른 곳에서의 일을 우선시하고 계신 거라 생각할 수밖에 없네요. 그런 경우라면, 베일리에게 지불할 돈도 직접 마련하실 수 있겠죠."
 	<br><br>
-	에이버리는 더는 쳐다보지 않고 <<he>>【이가】 하던 일로 돌아간다.
+	에이버리는 두 번 다시 돌아보지 않고, 자신이 하던 일로 돌아간다.
 	<br><br>
 
 <<elseif $avery_ask is "injury">>
-	<<if $avery_mansion.injury_stage isnot "healing">> /* Avery is still in a cast */
+	<<if $avery_mansion.injury_stage isnot "healed">> /* Avery is still in a cast */
 
 		<<if $speech_attitude is "meek" or $speech_attitude_avery>>
 			"팔은 좀 어떠신지 알고 싶었어요. 제가 도울 일이라도 있을까요?" 당신이 묻는다.
@@ -1671,8 +1672,8 @@
 			"팔은 좀 어떠세요?" 당신은 그의 팔을 들여다보며 묻는다. "도와드릴 일 있으면 말씀하세요."
 		<</if>>
 		<br><br>
-		<<if $avery_mansion.injury_stage is "fresh">> /* Cast in a sling */
-			<<set $avery_mansion.injury_stage to "fresh_done">>
+		<<if $avery_mansion.injury_stage is "sling">> /* Cast in a sling */
+			<<set $averySeen.pushUnique("injury_ask_sling")>>
 			에이버리가 <<= $averyragerevealed is 1 ? `코웃음을 친다` : `한숨을 쉰다`>>. "제안은 고맙네, <<pcpetname "Avery">>. 하지만 안심하게, 내 일은 내가
 			<<if $averyragerevealed is 1 and C.npc.Avery.rage gte 60>>
 				알아서 하네." 그러더니 <<his>> 입술이 비틀린다. "하지만 돕고 싶다면, 시키는 대로만 해 주게. 그럼 내 골칫거리가 하나 줄어들 테니."
@@ -1682,8 +1683,8 @@
 				알아서 하네. <<= $avery_mansion.jobs.includes("lounge") ? `요리와 청소` : `저녁 식사`>>【을를】 챙겨주는 것만으로도 충분해."
 			<</if>>
 			<br><br>
-		<<elseif $avery_mansion.injury_stage is "sling">> /* Only wearing cast */
-			<<set $avery_mansion.injury_stage to "sling_done">>
+		<<elseif $avery_mansion.injury_stage is "cast">> /* Only wearing cast */
+			<<set $averySeen.pushUnique("injury_ask_cast")>>
 			에이버리는 <<his>> 고개를 젓는다. "이제 슬링을 안 차도 되니 훨씬 낫군. 하지만," <<He>>【은는】 <<= $averyragerevealed gte 1 ? `<<his>> 깁스를 노려본다` : `<<his>> 깁스를 보며 얼굴을 찌푸린다`>>. "이<<if $averyragerevealed gte 1>> 빌어먹을<</if>> 물건은 아직도
 
 			<<if $averyragerevealed is 1 and C.npc.Avery.rage gte 60>>
@@ -1695,7 +1696,7 @@
 			<</if>>
 			<br><br>
 		<<else>> /* Only two weeks of recovery left */
-			<<set $avery_mansion.injury_stage to "cast_done">>
+			<<set $averySeen.pushUnique("injury_ask_healing")>>
 			에이버리는 <<his>> 고개를 젓는다. "깁스하는 데 꽤 익숙해졌어." <<he>>【이가】 미소 짓는다. "곧 풀게 될 테지만. 이제 <<= $avery_mansion.injury_timer>>일 남았네. 빨리 그날이 왔으면 좋겠군."
 			<br><br>
 			<span class="gold"><i>에이버리의 깁스가 제거되면, <<he>>【은는】 조우 중 양손을 다시 사용할 수 있게 된다.</i></span>
@@ -1703,7 +1704,7 @@
 		<</if>>
 
 	<<else>> /* Avery has fully recovered */
-		<<set $avery_mansion.injury_stage to "healed">>
+		<<set $averySeen.pushUnique("injury_ask_healed")>>
 		<<if $speech_attitude is "meek" or $speech_attitude_avery>>
 			팔은 좀 어떠세요, 에이버리?" 당신이 묻는다. "이제 깁스도 풀었으니 말이에요." 당신은 <<him>>에게 살짝 미소 짓는다. "좀 나아지셨으면 좋겠네요?"
 		<<elseif $speech_attitude is "bratty">>
@@ -1749,7 +1750,7 @@
 	당신은 에이버리에게 아직 그 예약이 남아 있는지 묻고, 역시 저녁을 먹으러 가고 싶다고 말한다.
 	<br><br>
 	<<if $averyragerevealed is 1 and C.npc.Avery.rage gte 60>>
-		에이버리는 당신을 노려본다<<if $avery_mansion.injury_stage isnot "sling">>, <<he>>【은는】 <<his>> 팔짱을 낀 채<</if>>. "애초에 날 거절한 것에 대해 사과도 안 했으면서?" <<He>>【은는】 콧방귀를 뀐다. "이번엔 제대로 다시 물어보는 게 어때?"
+		에이버리가<<if !_avery_injured_sling>> 팔짱을 끼며<</if>> 눈살을 찌푸린다. "애초에 절 거절했던 것에 대해 사과조차 안 해놓고서요?" <<He>>【은는】 코웃음을 친다. "이번엔 제대로, 다시 부탁해 보는 게 어때요?"
 		<br><br>
 	<<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
 		에이버리가 당신을 비웃는다. "애초에 내 제안을 거절해 놓고 그런 걸 묻다니 배짱도 좋군. 아직 사과도 안 했으면서." <<He>>【이가】 기분 나쁜 듯 코웃음을 친다. "하지만 지금 사과한다면, 고려는 해보지."
@@ -2381,7 +2382,7 @@
 			<</if>>
 
 		<<else>>
-			<<link [[그의 무릎에 앉는다|Mansion Talk Chat Lewd]]>><<set $phase to 1>><<npcincr Avery dom 1>><</link>><<gdom>><<promiscuous1>>
+			<<link [[그의 무릎에 앉는다|Mansion Talk Chat Lewd]]>><<set $phase to 1>><<npcincr Avery dom 1>><</link>><<gdom>><<promiscuous2>>
 			<br>
 			<<link [[거절한다|Mansion Talk Chat End]]>><<set $avery_chat_end to "calm">><<set $phase to 2>><</link>>
 			<br>
@@ -2972,14 +2973,14 @@
 	<br>
 <<else>> /* Sitting on lap */
 	당신은 에이버리의 무릎 위로 올라가, 에이버리의 목에 팔을 두르며 다리를 벌리고 앉는다. <<He>>【은는】 꽤 기뻐하는 표정이다.
-	<<if $avery_mansion.injury_stage is "sling">>
+	<<if _avery_injured_sling>>
 		<<his>> 멀쩡한 손이 당신의 허벅지 위에 놓인다. 그 손은
 	<<else>>
 		<<his>> 팔로 당신의 허리를 감싼다. <<His>> 다른 손은 당신의 허벅지 위에 머물더니,
 	<</if>>
 	이내 위로 올라가 당신의 <<privates>>【을를】 주무르기 시작한다. <<arousal 600 "genitals">><<garousal>>
 	<br><br>
-	<<promiscuity1>>
+	<<promiscuity2>>
 	몇 분 동안 대화하는 척을 이어가던 에이버리는 갑자기 당신을 밀쳐 등을 대고 눕힌다. <<= $outside is 1 ? `<<his>> 이웃들은 신경도 쓰지 않고, <<he>>【은는】` : `<<He>>【은는】`>> <<= $exposed gte 2 ? `<<his>> <<if _avery_injured>>손<<else>>손들<</if>>【을를】 당신의 몸 위로 훑기 시작한다` : `당신의 옷을 잡아당기기 시작한다`>>.
 	<br><br>
 	<<link [[다음|Mansion Talk Sex]]>><<set $sexstart to 1>><</link>>
@@ -3012,6 +3013,7 @@
 
 :: Mansion Talk Sex Finish
 <<pass 10>>
+<<avery_injury_check>>
 
 <<if $enemyarousal gte $enemyarousalmax>>
 	<<ejaculation>>
@@ -3022,7 +3024,7 @@
 
 	<<elseif $avery_mansion.schedule is "pool">>
 		<<if $avery_pool is "coffee">>
-			만족스러운 한숨을 내쉬며 의자에 푹 기대앉는다. 머리를 정리<<= $avery_mansion.injury_stage is "cast" ? `한 뒤,` : `하며,`>> <<he>>【은는】 커피를 한 모금 마신다.
+			만족스러운 한숨을 내쉬며 의자에 푹 기대앉는다. 머리를 정리<<= _avery_injured ? `한 뒤,` : `하며,`>> <<he>>【은는】 커피를 한 모금 마신다.
 		<<elseif $avery_pool is "sunbathe">>
 			만족스러운 한숨을 내쉬며 수영장 썬베드 위에 몸을 쭉 편다. <<He>>【은는】 헝클어진 모습이지만 별로 신경 쓰지 않는 것 같다.
 		<<else>>
@@ -3176,11 +3178,12 @@
 <<avery_mansion_end_links>>
 
 :: Mansion Talk Chat End
+<<avery_injury_check>>
 
 <<if $avery_chat_end is "calm">>
 	<<pass 15>>
 	<<if $phase is 1>>
-		당신은 에이버리의 무릎 위로 올라가 앉아, 한 팔을 에이버리의 목에 두른다. <<He>>【은는】 꽤 만족한 듯, <<his>> 팔로 당신의 허리를 감싼다.<<if !$avery_mansion.injury_stage is "sling">> <<His>> 다른 손은 당신의 허벅지 위에 놓인 채 그대로 머문다.<</if>> 대화하는 동안, <<he>>【은는】 <<his>> 기분에 맞춰 이따금 그곳을 움켜쥔다. <<gdom>>
+		당신은 에이버리의 무릎 위로 올라가 앉아, 한 팔을 에이버리의 목에 두른다. <<He>>【은는】 꽤 만족한 듯, <<his>> 팔로 당신의 허리를 감싼다.<<if !_avery_injured_sling>> <<His>> 다른 손은 당신의 허벅지 위에 놓인 채 그대로 머문다.<</if>> 대화하는 동안, <<he>>【은는】 <<his>> 기분에 맞춰 이따금 그곳을 움켜쥔다. <<gdom>>
 		<br><br>
 		대화가 자연스럽게 끝나자, 에이버리는 당신을 <<his>> 무릎에서 내려준다.
 	<<else>>
@@ -6617,7 +6620,7 @@
 		<<link [[허락한다|Mansion Talk Seduce Sex]]>><<set $sexstart to 1>><</link>><<kissvirginitywarning>>
 	<<elseif $avery_mansion.schedule is "study">>
 		<<avery_injury_check>>
-		당신은 에이버리의 서재를 서성거리며 책을 찾는 척 연기를 시작했고, 서가를 살피기 위해 허리를 굽히거나 발돋움을 했다. 당신의 뽐내기가 먹혀들었는지 확신할 수 없었지만, 에이버리를 지나칠 때 <span class="green">손목을 휘감는 손길</span>이 느껴졌다. 미처 반응하기도 전에 당신은 <<his>> 무릎 위로 당겨졌고<<if !_fullyNaked>>, <<= $avery_mansion.injury_stage is "cast" ? `한 손이` : `양손이`>> 당신의 옷을 잡아끌기 시작했다<</if>>.
+		당신은 에이버리의 서재를 서성거리며 책을 찾는 척 연기를 시작했고, 서가를 살피기 위해 허리를 굽히거나 발돋움을 했다. 당신의 뽐내기가 먹혀들었는지 확신할 수 없었지만, 에이버리를 지나칠 때 <span class="green">손목을 휘감는 손길</span>이 느껴졌다. 미처 반응하기도 전에 당신은 <<his>> 무릎 위로 당겨졌고<<if !_fullyNaked>>, <<= _avery_injured ? `한 손이` : `양손이`>> 당신의 옷을 잡아끌기 시작했다<</if>>.
 		<br><br>
 		<<link [[허락한다|Mansion Talk Seduce Sex]]>><<set $sexstart to 1>><</link>>
 	<<elseif $avery_mansion.schedule is "bath">>

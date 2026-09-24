@@ -1136,7 +1136,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1500,
+				sell_price: 1200,
 			},
 			recipe: {
 				recipe_name: "새우 비스크",
@@ -1295,7 +1295,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 200,
+				sell_price: 600,
 			},
 			recipe: {
 				recipe_name: "키시",
@@ -1704,7 +1704,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1800,
+				sell_price: 1600,
 			},
 			recipe: {
 				recipe_name: "연어 웰링턴",
@@ -1923,7 +1923,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1000,
+				sell_price: 1200,
 			},
 			recipe: {
 				recipe_name: "까르보나라",
@@ -2168,7 +2168,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 3000,
+				sell_price: 1500,
 			},
 			recipe: {
 				recipe_name: "수플레",
@@ -2218,7 +2218,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1600,
+				sell_price: 1100,
 			},
 			recipe: {
 				recipe_name: "레몬 머랭 파이",
@@ -2269,7 +2269,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1500,
+				sell_price: 1300,
 			},
 			recipe: {
 				recipe_name: "스위스 롤",
@@ -2319,7 +2319,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 300,
+				sell_price: 500,
 			},
 			recipe: {
 				recipe_name: "브라우니",
@@ -2344,7 +2344,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1400,
+				sell_price: 800,
 			},
 			recipe: {
 				recipe_name: "당근 케이크",
@@ -2415,7 +2415,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1200,
+				sell_price: 1000,
 			},
 			recipe: {
 				recipe_name: "스티키 토피 푸딩",
@@ -2511,7 +2511,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1000,
+				sell_price: 600,
 			},
 			recipe: {
 				recipe_name: "벨지안 번",
@@ -2801,7 +2801,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1200,
+				sell_price: 1000,
 			},
 			recipe: {
 				recipe_name: "뱅어스 앤 매시",
@@ -2826,7 +2826,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1200,
+				sell_price: 700,
 			},
 			recipe: {
 				recipe_name: "요크셔 푸딩",
@@ -3095,7 +3095,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 1400,
+				sell_price: 1200,
 			},
 			recipe: {
 				recipe_name: "자두 푸딩",
@@ -3171,7 +3171,7 @@ function initFoodstuff() {
 			kitchen_item_type_icon: "recipe-food.png",
 			prop_folder: "food",
 			shop: {
-				sell_price: 700,
+				sell_price: 1400,
 			},
 			recipe: {
 				recipe_name: "아란치니",

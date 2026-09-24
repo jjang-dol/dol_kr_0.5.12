@@ -3061,7 +3061,7 @@ function initUpper() {
 			warmth: 2,
 			cost: 2800,
 			description: "더운 날 오래 육지를 떠나 있을 때를 위한 것입니다.",
-			shop: ["clothing", "adult"],
+			shop: ["baitShop"],
 			accessory: 1,
 			accessory_colour: 0,
 			accessory_colour_options: ["black", "blue", "brown", "green", "pink", "purple", "red", "tangerine", "teal", "white", "yellow", "custom"],

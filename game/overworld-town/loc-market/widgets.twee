@@ -406,9 +406,18 @@
 		<<generate1>><<person1>>
 		<<stall_init>>
 		<<set _produce to setup.foodstuff[$stall_foodstuff].singular || $stall_foodstuff.replace(/_/g," ")>>
-		가판대를 따라 이동하는 <<person>>【이가】 보인다. <<He>>【은는】 무엇을 팔고 있든 가판대마다 멈춰 서서 주인들과 이야기를 나눈다. 마침내 <<he>>【이가】 당신의 가판대에 다다른다.
+		<<set _isFish to setup.fishing.lootTables.fish[$stall_foodstuff] !== undefined>>
+		당신은 가판대 사이를 돌아다니는 <<person>>【을를】 본다. <<He>>【은는】 무엇을 팔든 상관없이 모든 가판대에 멈춰 서서 주인과 이야기를 나눈다. 마침내 <<he>>【이가】 당신의 가판대에 도착한다.
 		<br><br>
-		오호. <<he>>【은는】 <span class="green"><<a _produce>></span>【을를】 들어 올리며 말한다. "아주 좋네요. 직접 생산한 건가요?"
+
+		"오호," <<he>>【이가】 <span class="green"><<a _produce>></span>【을를】 들어 올리며 말한다. 
+		<<if _isFish>>
+			"이거 아주 좋네요. 직접 잡으신 건가요?"
+			<<set $phase to 1>>
+		<<else>>
+			"이것들 아주 좋네요. 직접 만드신 건가요?"
+			<<set $phase to 0>>
+		<</if>>
 		<br><br>
 		<<link [[솔직하게 대답한다|Stall Honest]]>><<set $enemytrust += 20>><</link>><<gtrust>>
 		<br>
@@ -811,10 +820,7 @@
 			<<else>>
 				/* Try to sell two different products */
 				<<if $foodstuff_inventory.length gte 2>>
-					<<set $_food2 to $foodstuff_inventory.random()>>
-					<<if $_food2 is $stall_foodstuff>>
-						<<set $stall_seduced to 2>>  /* Fallback to doubling if same. */
-					<</if>>
+					<<set $_food2 to $foodstuff_inventory.filter(item => item !== $stall_foodstuff).random()>>
 				<<else>>
 					<<set $stall_seduced to 2>>  /* Not enough variety. */
 				<</if>>
