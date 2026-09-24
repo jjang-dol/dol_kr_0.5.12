@@ -1960,23 +1960,6 @@ window.KR.getBodywritingKr = function(writing) {
 };
 
 /*
- * 디버그용 범죄 사건 코드명(setup.crimeDescs의 키) 한글 번역.
- * base-system/widgets.twee의 listCrimeCheats 위젯에서 사용.
- */
-window.KR.getCrimeCaseNameKr = function(key) {
-    switch (key) {
-        case "default": return "일반";
-        case "legacy": return "구범죄";
-        case "escape": return "탈옥";
-        case "cake": return "케이크";
-        case "kylarPrison": return "카일라 탈옥";
-        case "food": return "식품";
-        case "debug": return "디버그";
-        default: return key;
-    }
-};
-
-/*
  * 손가락 개수 등 소수의 고유어 수 표현(한/두/세/네/다섯). "숫자 손가락" 같은
  * 부자연스러운 표기 대신 "두 손가락"처럼 자연스럽게 쓰기 위함.
  */
