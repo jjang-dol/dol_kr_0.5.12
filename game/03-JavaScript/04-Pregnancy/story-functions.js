@@ -438,7 +438,7 @@ window.playerPregnancyRisk = playerPregnancyRisk;
 function menstrualFertileDates() {
 	const m = V.sexStats.vagina.menstruation;
 	const labels = PregnancyConstants.riskMeterLabels;
-	const riskyBound = labels[labels.findIndex(l => l.key === "risky") - 1].upTo;
+	const riskyBound = labels[labels.findIndex(l => l.text === "risky") - 1].upTo;
 	const dangerousBound = labels[labels.length - 2].upTo;
 	const dateIn = days => {
 		const d = new DateTime(Time.date).addDays(days);
