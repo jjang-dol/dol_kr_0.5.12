@@ -1590,23 +1590,6 @@ window.KR.getPenisDescKr = function(desc) {
  * 방향 단어 + 기본 부위명을 조립해서 처리. 단, 팔/손/발/다리는 "왼팔"처럼 붙여쓰고
  * (쪽 없이, 띄어쓰기 없이), 등은 "등 위쪽"처럼 부위가 먼저 오고 순서가 반대라 예외 처리.
  */
-/*
- * riskMeterLabels(pregnancy-constants.js)의 text는 영문 원본과 동일하게 "very safe"/"safe"/
- * "somewhat safe"/"risky"/"dangerous"로 유지한다 (엔진 로직이 이 문자열로 매칭하기 때문에,
- * 여기를 번역해버리면 업스트림 업데이트 병합 때마다 로직이 깨진다 - 실제로 한 번 그랬음).
- * 번역은 화면에 출력하는 시점에만 이 함수로 감싸서 적용한다.
- */
-window.KR.getPregnancyRiskKr = function(text) {
-    var dict = {
-        "very safe": "매우 안전",
-        "safe": "안전",
-        "somewhat safe": "다소 안전",
-        "risky": "위험",
-        "dangerous": "매우 위험",
-    };
-    return dict[text] || text;
-};
-
 window.KR.getBodypartKr = function(key) {
     if (key) {
         var m = String(key).match(/^(left|right|upper|lower)[\s_-]?(.+)$/i);
